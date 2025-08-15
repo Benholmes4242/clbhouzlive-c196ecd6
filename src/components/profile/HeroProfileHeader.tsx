@@ -473,17 +473,20 @@ const HeroProfileHeader = ({
           </div>
         )}
         
-        {/* Profile Content */}
-        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
-          
-          
+        {/* Mobile Cinematic Header */}
+        {isMobile && (
+          <div className="absolute top-0 left-0 right-0 z-20 h-20 bg-gradient-to-b from-black/50 via-black/20 to-transparent backdrop-blur-sm">
+            {/* Navigation and controls can go here */}
+          </div>
+        )}
 
-          {/* Profile Photo/Video */}
-          <div className="w-64 h-64 mb-6">
-            <div 
-              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
-              title={achievementRing.title}
-            >
+        {/* Profile Content */}
+        <div className={`relative z-10 flex flex-col items-center text-center ${isMobile ? 'pt-0' : 'pt-20'} pb-8`}>
+          
+          {/* Profile Photo/Video - Mobile Cinematic vs Desktop Circle */}
+          {isMobile ? (
+            /* Mobile Cinematic Profile Media */
+            <div className="relative w-full">
               <ProfileVideoCircle
                 videoUrl={profile?.profile_video_url}
                 thumbnailUrl={profile?.profile_video_thumbnail_url}
@@ -494,45 +497,91 @@ const HeroProfileHeader = ({
                 onPhotoUpload={handlePhotoUpload}
                 onVideoRemove={handleVideoRemove}
                 uploading={videoUploading || photoUploading}
-                className="w-full h-full"
+                className="w-full"
               />
-            </div>
-          </div>
-          
-          {/* User Information */}
-          <div className="text-center mb-6">
-            {/* User's Name */}
-            <div className="flex items-center justify-center">
-              <h1 className="font-bold text-foreground text-4xl">
-                {displayName}
-              </h1>
-            </div>
-            
-            {/* Username with Edit Button */}
-            {username && (
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-muted-foreground">
-                  @{username}
-                </p>
-                
-                {/* Edit Profile Button - Next to username for own profile */}
-                {isOwnProfile && (
-                  <button 
-                    className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
-                    onClick={() => setEditDialogOpen(true)}
-                  >
-                    Edit Profile
-                  </button>
+              
+              {/* Mobile Content Positioned Over Cinematic Area */}
+              <div className="absolute bottom-4 left-0 right-0 z-30 px-6 text-white">
+                <h1 className="text-3xl font-bold mb-2 text-shadow-lg">{displayName}</h1>
+                {username && (
+                  <p className="text-lg opacity-90 mb-1">@{username}</p>
                 )}
+                <p className="text-base opacity-80">{homeClub}</p>
               </div>
-            )}
 
-            
-            {/* Home Golf Club */}
-            <p className="text-base text-muted-foreground mb-4">
-              {homeClub}
-            </p>
-          </div>
+              {/* Mobile Edit Profile Button */}
+              {isOwnProfile && (
+                <div className="absolute top-16 right-4 z-30">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditDialogOpen(true)}
+                    className="bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/70 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Desktop Circle Profile */
+            <div className="w-64 h-64 mb-6">
+              <div 
+                className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
+                title={achievementRing.title}
+              >
+                <ProfileVideoCircle
+                  videoUrl={profile?.profile_video_url}
+                  thumbnailUrl={profile?.profile_video_thumbnail_url}
+                  profilePhotoUrl={profile?.profile_photo_url}
+                  displayName={displayName}
+                  isOwnProfile={isOwnProfile}
+                  onVideoUpload={handleVideoUpload}
+                  onPhotoUpload={handlePhotoUpload}
+                  onVideoRemove={handleVideoRemove}
+                  uploading={videoUploading || photoUploading}
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* User Information - Desktop Only */}
+          {!isMobile && (
+            <div className="text-center mb-6">
+              {/* User's Name */}
+              <div className="flex items-center justify-center">
+                <h1 className="font-bold text-foreground text-4xl">
+                  {displayName}
+                </h1>
+              </div>
+              
+              {/* Username with Edit Button */}
+              {username && (
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <p className="text-lg text-muted-foreground">
+                    @{username}
+                  </p>
+                  
+                  {/* Edit Profile Button - Next to username for own profile */}
+                  {isOwnProfile && (
+                    <button 
+                      className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
+                      onClick={() => setEditDialogOpen(true)}
+                    >
+                      Edit Profile
+                    </button>
+                  )}
+                </div>
+              )}
+
+              
+              {/* Home Golf Club */}
+              <p className="text-base text-muted-foreground mb-4">
+                {homeClub}
+              </p>
+            </div>
+          )}
 
           {/* Stats Bar - New Horizontal Scrollable Design */}
           <ProfileStatsBar 

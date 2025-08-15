@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ProfileVideoCircleProps {
   videoUrl?: string;
@@ -37,6 +38,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
@@ -214,53 +216,124 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     }
   };
 
+  // Mobile cinematic container style
+  const mobileContainerStyle = isMobile ? {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '60vh',
+    zIndex: 1
+  } : {};
+
+  // Mobile cinema mask style for fade effect
+  const mobileCinemaMask = isMobile ? 
+    'linear-gradient(to bottom, transparent 0%, transparent 20%, black 30%, black 70%, transparent 80%, transparent 100%), linear-gradient(to right, transparent 0%, transparent 10%, black 25%, black 75%, transparent 90%, transparent 100%)' 
+    : '';
+
   return (
     <div 
-      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
+      className={`relative group ${className} ${
         (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+      } ${
+        isMobile 
+          ? 'w-full h-full' 
+          : 'w-full h-full rounded-full overflow-hidden'
       }`}
+      style={isMobile ? mobileContainerStyle : {}}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
       onClick={handleCircleClick}
     >
       {videoUrl ? (
         <>
-          {/* Video Element with smooth fade transition */}
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={thumbnailUrl}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-              showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            }`}
-            playsInline
-            muted={isMuted}
-            preload="auto"
-            crossOrigin="anonymous"
-          />
-          
-          {/* Profile Photo with 4K quality optimization */}
-          {profilePhotoUrl && (
-            <img
-              src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
-              alt={`${displayName} profile`}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              }`}
-              onError={(e) => {
-                // Fallback to original URL without optimization
-                e.currentTarget.src = profilePhotoUrl;
+          {/* Mobile Cinematic Container */}
+          {isMobile ? (
+            <div 
+              className="absolute inset-0 w-full h-full"
+              style={{
+                maskImage: mobileCinemaMask,
+                WebkitMaskImage: mobileCinemaMask,
+                maskComposite: 'intersect',
+                WebkitMaskComposite: 'source-in'
               }}
-            />
-          )}
-          
-          {/* Fallback when photo fails to load or no photo */}
-          {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
-            <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
-              <div className="text-6xl text-muted-foreground/50">
-                {displayName.charAt(0)}
-              </div>
+            >
+              {/* Video Element with cinematic effect */}
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={thumbnailUrl}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                }`}
+                playsInline
+                muted={isMuted}
+                preload="auto"
+                crossOrigin="anonymous"
+              />
+              
+              {/* Profile Photo with cinematic effect */}
+              {profilePhotoUrl && (
+                <img
+                  src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
+                  alt={`${displayName} profile`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                    !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.src = profilePhotoUrl;
+                  }}
+                />
+              )}
+              
+              {/* Fallback for mobile when no photo */}
+              {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+                <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+                  <div className="text-6xl text-muted-foreground/50">
+                    {displayName.charAt(0)}
+                  </div>
+                </div>
+              )}
             </div>
+          ) : (
+            /* Desktop Circle View */
+            <>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={thumbnailUrl}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                }`}
+                playsInline
+                muted={isMuted}
+                preload="auto"
+                crossOrigin="anonymous"
+              />
+              
+              {/* Profile Photo for desktop */}
+              {profilePhotoUrl && (
+                <img
+                  src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
+                  alt={`${displayName} profile`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                    !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.src = profilePhotoUrl;
+                  }}
+                />
+              )}
+              
+              {/* Fallback for desktop when no photo */}
+              {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+                <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+                  <div className="text-6xl text-muted-foreground/50">
+                    {displayName.charAt(0)}
+                  </div>
+                </div>
+              )}
+            </>
           )}
           
           {/* Controls Overlay - Show for both video and photo states */}
