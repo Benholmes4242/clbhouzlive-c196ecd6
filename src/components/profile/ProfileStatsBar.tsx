@@ -49,7 +49,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className={`relative w-full max-w-md mx-auto ${isMobile ? 'px-4' : ''}`}>
+    <div className={`relative w-full max-w-sm mx-auto ${isMobile ? 'px-4' : ''}`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
@@ -70,30 +70,38 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       )}
       
       
-      {/* Stats container */}
-      <div 
-        ref={containerRef}
-        className={`flex gap-6 overflow-x-auto scrollbar-hide px-6 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-xl ${isMobile ? 'pr-8' : ''}`}
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch'
-        }}
-      >
-        {stats.map((stat, index) => (
-          <button
-            key={index}
-            onClick={stat.onClick}
-            className="flex-shrink-0 flex flex-col items-center justify-center py-1 px-2 hover:opacity-80 transition-opacity duration-200"
-          >
-            <div className="text-lg font-semibold text-white drop-shadow-lg">
-              {stat.value}
-            </div>
-            <div className="text-xs text-white/80 font-medium drop-shadow-md">
-              {stat.label}
-            </div>
-          </button>
-        ))}
+      {/* Stats container with peek effect */}
+      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+        <div 
+          ref={containerRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide px-4"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            width: 'calc(4 * 5rem + 3 * 1rem + 2rem + 0.5 * 5rem)', // 4 full stats + 3 gaps + padding + half of 5th stat
+          }}
+        >
+          {stats.map((stat, index) => (
+            <button
+              key={index}
+              onClick={stat.onClick}
+              className="flex-shrink-0 w-20 flex flex-col items-center justify-center py-2 hover:opacity-80 transition-opacity duration-200"
+            >
+              <div className="text-lg font-semibold text-white drop-shadow-lg">
+                {stat.value}
+              </div>
+              <div className="text-xs text-white/80 font-medium drop-shadow-md">
+                {stat.label}
+              </div>
+            </button>
+          ))}
+        </div>
+        
+        {/* Right fade gradient to create peek effect */}
+        {stats.length > 4 && (
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/10 via-white/5 to-transparent pointer-events-none" />
+        )}
       </div>
     </div>
   );
