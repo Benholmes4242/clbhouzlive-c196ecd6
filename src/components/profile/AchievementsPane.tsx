@@ -270,7 +270,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
       case "Eagle Collector":
         return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-48 h-48" />;
       case "Birdie Blitz":
-        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-48 h-48" />;
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "Birdie Every Par":
         return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className="w-48 h-48" />;
       case "One Day, Two Courses":
