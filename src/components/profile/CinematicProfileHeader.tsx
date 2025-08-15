@@ -316,6 +316,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             </div>
           </div>
         )}
+        
+        {/* White gradient overlay for smooth transition to page background */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-1/2 pointer-events-none"
+          style={{
+            background: `linear-gradient(to bottom, 
+              transparent 0%, 
+              rgba(255, 255, 255, 0.4) 100%
+            )`
+          }}
+        />
 
         {/* Upload Interface for Empty State */}
         {!hasMedia && isOwnProfile && (
