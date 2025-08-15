@@ -155,8 +155,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
+                            <div className="text-2xl text-foreground leading-none">
+                              <span>{progress.played}</span>
                               <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
                             <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -174,8 +174,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
+                            <div className="text-2xl text-foreground leading-none">
+                              <span>{progress.played}</span>
                               <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
                             <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -193,8 +193,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
+                            <div className="text-2xl text-foreground leading-none">
+                              <span>{progress.played}</span>
                               <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
                             <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -212,8 +212,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
+                            <div className="text-2xl text-foreground leading-none">
+                              <span>{progress.played}</span>
                               <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
                             <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -223,8 +223,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         </div>
                       ) : (
                         <>
-                          <div className="text-2xl font-bold text-foreground leading-none">
-                            <span className="font-bold">{progress.played}</span>
+                          <div className="text-2xl text-foreground leading-none">
+                            <span>{progress.played}</span>
                             <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                           </div>
                           <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -237,13 +237,33 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   
                   {/* Achievement info below ring - single line */}
                   <div className="mt-4 text-center min-w-[180px]">
-                    <div className="text-sm font-semibold text-foreground mb-2 whitespace-nowrap">
+                    <div className="text-lg text-foreground mb-2 whitespace-nowrap">
                       {achievement.title}
                     </div>
                     <div className="text-xs text-muted-foreground whitespace-nowrap">
                       {progress.remaining > 0 
-                        ? `${progress.remaining} courses to go to unlock`
-                        : 'Achievement unlocked!'
+                        ? progress.remaining <= 20 
+                          ? `${progress.remaining} trips to go! (${Math.round(progress.percentage)}% complete)`
+                          : `${progress.remaining} courses to go (${Math.round(progress.percentage)}% complete)`
+                        : 'Achievement unlocked! (100% complete)'
+                      }
+                    </div>
+                    <div className="text-xs text-primary/80 mt-1 whitespace-nowrap italic">
+                      {achievement.region === 'global' 
+                        ? progress.remaining > 0 
+                          ? "Keep going, you're becoming a true world golfer!"
+                          : "Amazing! You've conquered the world's finest courses!"
+                        : achievement.region === 'usa'
+                        ? progress.remaining > 0
+                          ? "Keep going, you're making your way around the USA!"
+                          : "Incredible! You've mastered America's greatest courses!"
+                        : achievement.region === 'britain-ireland'
+                        ? progress.remaining > 0
+                          ? "Keep going, you're conquering the home of golf!"
+                          : "Brilliant! You've mastered the birthplace of golf!"
+                        : progress.remaining > 0
+                          ? "Keep going, you're exploring Europe's finest!"
+                          : "Magnifique! You've conquered Continental Europe!"
                       }
                     </div>
                   </div>
@@ -331,8 +351,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-lg font-bold text-foreground leading-none">
-                                <span className="font-bold">{progress.played}</span>
+                              <div className="text-lg text-foreground leading-none">
+                                <span>{progress.played}</span>
                                 <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                               </div>
                               <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -350,8 +370,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-lg font-bold text-foreground leading-none">
-                                <span className="font-bold">{progress.played}</span>
+                              <div className="text-lg text-foreground leading-none">
+                                <span>{progress.played}</span>
                                 <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                               </div>
                               <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -369,8 +389,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-lg font-bold text-foreground leading-none">
-                                <span className="font-bold">{progress.played}</span>
+                              <div className="text-lg text-foreground leading-none">
+                                <span>{progress.played}</span>
                                 <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                               </div>
                               <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -388,8 +408,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-lg font-bold text-foreground leading-none">
-                                <span className="font-bold">{progress.played}</span>
+                              <div className="text-lg text-foreground leading-none">
+                                <span>{progress.played}</span>
                                 <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                               </div>
                               <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -399,8 +419,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         ) : (
                           <>
-                            <div className="text-lg font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
+                            <div className="text-lg text-foreground leading-none">
+                              <span>{progress.played}</span>
                               <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
                             <div className="text-xs text-muted-foreground font-medium mt-1">
@@ -413,13 +433,33 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     
                     {/* Achievement info below ring - single line */}
                     <div className="mt-3 text-center w-36">
-                      <div className="text-xs font-semibold text-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="text-sm text-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
                         {achievement.title}
                       </div>
                       <div className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                         {progress.remaining > 0 
-                          ? `${progress.remaining} to unlock`
-                          : 'Unlocked!'
+                          ? progress.remaining <= 20 
+                            ? `${progress.remaining} trips to go! (${Math.round(progress.percentage)}%)`
+                            : `${progress.remaining} courses to go (${Math.round(progress.percentage)}%)`
+                          : 'Achievement unlocked! (100%)'
+                        }
+                      </div>
+                      <div className="text-xs text-primary/80 mt-1 whitespace-nowrap overflow-hidden text-ellipsis italic">
+                        {achievement.region === 'global' 
+                          ? progress.remaining > 0 
+                            ? "Become a world golfer!"
+                            : "World conquered!"
+                          : achievement.region === 'usa'
+                          ? progress.remaining > 0
+                            ? "Explore the USA!"
+                            : "America mastered!"
+                          : achievement.region === 'britain-ireland'
+                          ? progress.remaining > 0
+                            ? "Conquer the home of golf!"
+                            : "Golf's birthplace mastered!"
+                          : progress.remaining > 0
+                            ? "Explore Europe!"
+                            : "Europe conquered!"
                         }
                       </div>
                     </div>
