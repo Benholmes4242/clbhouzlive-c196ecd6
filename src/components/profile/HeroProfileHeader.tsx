@@ -489,14 +489,14 @@ const HeroProfileHeader = ({
             {/* Username with Edit Button */}
             {username && (
               <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-xl md:text-2xl text-black">
+                <p className="text-lg md:text-xl text-black">
                   @{username}
                 </p>
                 
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
                   <button 
-                    className="px-4 py-2 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-base" 
+                    className="px-3 py-1.5 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-sm" 
                     onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
@@ -506,7 +506,7 @@ const HeroProfileHeader = ({
             )}
 
             {/* Home Golf Club */}
-            <p className="text-xl md:text-2xl text-black mb-4">
+            <p className="text-lg md:text-xl text-black mb-4">
               {homeClub}
             </p>
           </div>
