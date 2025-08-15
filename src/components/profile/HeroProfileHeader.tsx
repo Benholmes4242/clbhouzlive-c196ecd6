@@ -564,7 +564,7 @@ const HeroProfileHeader = ({
                   <div className="text-4xl md:text-5xl text-foreground">
                     {userProgressData.coursesPlayed || '24'}
                   </div>
-                  <div className="text-base text-muted-foreground">Level</div>
+                  <div className="text-base text-muted-foreground">Following</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
