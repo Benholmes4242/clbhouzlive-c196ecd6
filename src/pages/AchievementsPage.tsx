@@ -1,19 +1,17 @@
-import React from 'react';
-import AchievementsPane from '@/components/profile/AchievementsPane';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const AchievementsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { session } = useSupabaseSession();
 
-  return (
-    <div className="min-h-screen w-full">
-      <AchievementsPane 
-        userId={session?.user?.id}
-        userDisplayName={session?.user?.user_metadata?.display_name || "User"}
-        isCurrentUser={true}
-      />
-    </div>
-  );
+  useEffect(() => {
+    // Redirect to profile page with achievements tab active
+    navigate('/profile?tab=achievements', { replace: true });
+  }, [navigate]);
+
+  return null; // This component just redirects
 };
 
 export default AchievementsPage;
