@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Trophy, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import padlockIcon from '@/assets/padlock-clean.png';
+// Using the user's original padlock image
+const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';

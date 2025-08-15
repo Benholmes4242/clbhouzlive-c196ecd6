@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import padlockIcon from '@/assets/padlock-clean.png';
+// Using the user's original padlock image
+const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 
 interface AchievementsPaneProps {
   userId?: string;
