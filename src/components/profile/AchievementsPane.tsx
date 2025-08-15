@@ -839,7 +839,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                <img 
                                  src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
                                  alt="Locked" 
-                                 className="w-8 h-8 opacity-60"
+                                 className="w-12 h-12 opacity-60"
                                />
                              </div>
                           )}
@@ -929,7 +929,48 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   );
                 })}
               </div>
-            )}
+          )}
+
+          {/* Latest Achievement Section */}
+          {mostRecentAchievement && (
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-6">
+                  {/* Badge without glow */}
+                  <div className="relative">
+                    {getFeaturedAchievementIcon(mostRecentAchievement)}
+                  </div>
+                  
+                  {/* Latest Achievement Details */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-xl font-bold text-white">Latest Achievement</h3>
+                    </div>
+                    
+                    <h4 className="text-2xl font-bold text-white mb-2">
+                      {mostRecentAchievement.title}
+                    </h4>
+                    
+                    <div className="flex items-center gap-4 text-sm text-white/70">
+                      <span className="text-green-400 font-semibold">+{mostRecentAchievement.xp} XP</span>
+                      <span>Unlocked {mostRecentAchievement.dateEarned}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Share Button */}
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    Share
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
           </div>
 
           {/* Mobile XP Progress - Simplified */}
@@ -1100,7 +1141,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                          <img 
                                            src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
                                            alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
+                                           className="w-16 h-16 opacity-70"
                                          />
                                        </div>
                                      )}
@@ -1187,7 +1228,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                          <img 
                                            src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
                                            alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
+                                           className="w-16 h-16 opacity-70"
                                          />
                                        </div>
                                      )}
