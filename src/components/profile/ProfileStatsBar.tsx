@@ -26,7 +26,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
     if (container) {
       setCanScrollLeft(container.scrollLeft > 2);
       setCanScrollRight(
-        container.scrollLeft < container.scrollWidth - container.clientWidth - 2
+        container.scrollLeft < container.scrollWidth - container.clientWidth
       );
     }
   };
