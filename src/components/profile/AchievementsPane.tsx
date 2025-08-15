@@ -710,11 +710,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </svg>
                     
                     {/* Center content */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-8">
                       <div className="text-4xl font-bold text-foreground mb-2">
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-lg font-medium text-center" style={{ color: nextTier.color }}>
+                      <div className="text-sm font-medium text-center leading-tight max-w-[160px]" style={{ color: nextTier.color }}>
                         {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
