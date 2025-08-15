@@ -16,6 +16,7 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
+const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
@@ -96,6 +97,7 @@ const App: React.FC = () => {
                         <Route path="/following" element={<FollowingPage />} />
                         
                         <Route path="/global-top100" element={<GlobalTop100 />} />
+                        <Route path="/achievements" element={<AchievementsPage />} />
                         
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />

@@ -42,7 +42,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
-import AchievementsContent from './AchievementsContent';
+import EmbeddedAchievementsContent from './EmbeddedAchievementsContent';
 
 interface Course {
   id: string;
@@ -585,6 +585,9 @@ const HeroProfileHeader = ({
           courses: (
             <div></div> // Content will be rendered separately below
           ),
+          achievements: (
+            <div></div> // Content will be rendered separately below
+          ),
           stats: (
             <div></div> // Content will be rendered separately below
           )
@@ -704,7 +707,7 @@ const HeroProfileHeader = ({
             </>
           )}
           {activeSection === 'achievements' && (
-            <AchievementsContent 
+            <EmbeddedAchievementsContent
               userId={profile?.id || ''}
               userDisplayName={profile?.display_name || 'User'}
               userHandicap={profile?.eg_handicap_index}
