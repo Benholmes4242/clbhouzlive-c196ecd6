@@ -216,16 +216,12 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full rounded-2xl overflow-hidden group backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl ${className} ${
+      className={`relative w-full h-full rounded-lg overflow-hidden group ${className} ${
         (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
       }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
       onClick={handleCircleClick}
-      style={{
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-      }}
     >
       {videoUrl ? (
         <>
