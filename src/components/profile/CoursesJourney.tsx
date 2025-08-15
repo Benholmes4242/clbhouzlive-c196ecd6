@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
+import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
 import usaMap from '@/assets/usa-map.png';
 import ukIrelandMap from '@/assets/uk-ireland-map.png';
@@ -19,6 +20,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   isOwnProfile = false 
 }) => {
   const { regionProgress, isLoading } = useTop100CoursesData(userId || '', isOwnProfile);
+  const { generateMotivation } = useProgressMotivation(userId, userDisplayName, isOwnProfile);
+  const [motivationalMessages, setMotivationalMessages] = useState<{[key: string]: string}>({});
 
   // Define the four regional achievements in order: Left → Right
   const achievementRings = [
@@ -72,6 +75,32 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       remaining
     };
   };
+
+  // Generate motivational messages for all regions
+  useEffect(() => {
+    const generateAllMotivations = async () => {
+      const regions = ['global', 'usa', 'britain-ireland', 'europe'];
+      const messages: {[key: string]: string} = {};
+      
+      for (const region of regions) {
+        const progress = getProgressData(region);
+        if (progress.total > 0) {
+          try {
+            const message = await generateMotivation(region, progress.played, progress.total);
+            messages[region] = message;
+          } catch (error) {
+            console.error(`Error generating motivation for ${region}:`, error);
+          }
+        }
+      }
+      
+      setMotivationalMessages(messages);
+    };
+
+    if (regionProgress && Object.keys(regionProgress).length > 0) {
+      generateAllMotivations();
+    }
+  }, [regionProgress, generateMotivation]);
 
   return (
     <div className={`w-full mb-6 md:mb-8 pt-1 ${className}`}>
@@ -249,22 +278,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       }
                     </div>
                     <div className="text-xs text-primary/80 mt-1 whitespace-nowrap italic">
-                      {achievement.region === 'global' 
-                        ? progress.remaining > 0 
-                          ? "Keep going, you're becoming a true world golfer!"
-                          : "Amazing! You've conquered the world's finest courses!"
-                        : achievement.region === 'usa'
-                        ? progress.remaining > 0
-                          ? "Keep going, you're making your way around the USA!"
-                          : "Incredible! You've mastered America's greatest courses!"
-                        : achievement.region === 'britain-ireland'
-                        ? progress.remaining > 0
-                          ? "Keep going, you're conquering the home of golf!"
-                          : "Brilliant! You've mastered the birthplace of golf!"
-                        : progress.remaining > 0
-                          ? "Keep going, you're exploring Europe's finest!"
-                          : "Magnifique! You've conquered Continental Europe!"
-                      }
+                      {motivationalMessages[achievement.region] || 'Adventure awaits on the world\'s finest courses!'}
                     </div>
                   </div>
                 </div>
@@ -445,22 +459,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         }
                       </div>
                       <div className="text-xs text-primary/80 mt-1 whitespace-nowrap overflow-hidden text-ellipsis italic">
-                        {achievement.region === 'global' 
-                          ? progress.remaining > 0 
-                            ? "Become a world golfer!"
-                            : "World conquered!"
-                          : achievement.region === 'usa'
-                          ? progress.remaining > 0
-                            ? "Explore the USA!"
-                            : "America mastered!"
-                          : achievement.region === 'britain-ireland'
-                          ? progress.remaining > 0
-                            ? "Conquer the home of golf!"
-                            : "Golf's birthplace mastered!"
-                          : progress.remaining > 0
-                            ? "Explore Europe!"
-                            : "Europe conquered!"
-                        }
+                        {motivationalMessages[achievement.region] || 'Adventure awaits!'}
                       </div>
                     </div>
                   </div>
