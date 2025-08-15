@@ -476,7 +476,7 @@ const HeroProfileHeader = ({
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
-        <div className="absolute bottom-[-3rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 bg-gradient-to-t from-white/80 via-white/40 to-transparent pt-16">
+        <div className="absolute bottom-[-6rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 bg-gradient-to-t from-white/80 via-white/40 to-transparent pt-16">
           {/* User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
