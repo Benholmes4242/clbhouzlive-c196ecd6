@@ -24,7 +24,7 @@ const UserProfilePage = () => {
   console.log('UserProfilePage - currentUser:', currentUser);
 
   return (
-    <div className="min-h-screen bg-background pb-28 relative overflow-hidden">
+    <div className="min-h-screen bg-background pb-28 relative">
       {/* Critical profile photo preload at page level for immediate loading */}
       {profile?.profile_photo_url && (
         <>
@@ -42,26 +42,18 @@ const UserProfilePage = () => {
         </>
       )}
       
-      {/* Fixed Header with transparent overlay */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <div className="absolute inset-0 backdrop-blur-md bg-background/70 border-b border-border/20" />
-        <div className="relative z-10">
-          <Header />
-        </div>
-      </div>
+      {/* Header */}
+      <Header />
       
-      {/* Content that flows under header */}
-      <div className="relative pt-0">
-        <UserProfileLoader isLoading={isLoading} profile={profile} />
-        
-        {profile && (
-          <UserProfileContent
-            profile={profile}
-            currentUser={currentUser}
-            relationshipStatus={relationshipStatus}
-          />
-        )}
-      </div>
+      <UserProfileLoader isLoading={isLoading} profile={profile} />
+      
+      {profile && (
+        <UserProfileContent
+          profile={profile}
+          currentUser={currentUser}
+          relationshipStatus={relationshipStatus}
+        />
+      )}
       
       <BottomNavigation />
     </div>
