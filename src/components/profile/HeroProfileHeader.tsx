@@ -601,8 +601,9 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
-      {/* Sticky Tab Navigation - Positioned above achievements/courses journey */}
-      <ProfileTabs
+      {/* Sticky Tab Navigation - Positioned above achievements/courses journey with spacing for profile overlay */}
+      <div className="mt-24">
+        <ProfileTabs
         activeTab={activeSection}
         onTabChange={handleTabChange}
         userId={profile?.id || ''}
@@ -632,7 +633,8 @@ const HeroProfileHeader = ({
             <div></div> // Content will be rendered separately below
           )
         }}
-      </ProfileTabs>
+        </ProfileTabs>
+      </div>
 
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
