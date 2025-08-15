@@ -1108,7 +1108,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'} ${isMobile ? 'pt-0' : 'pt-2'}`}>
+            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'} ${isMobile ? 'pt-0' : '-mt-4'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="p-6">
                 {/* Section Header with Icon */}
