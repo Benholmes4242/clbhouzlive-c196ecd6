@@ -666,7 +666,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           {/* Hero XP Progress Section - Desktop Only */}
           {!isMobile && (
             <div className="px-6 pb-8">
-              <div className="flex items-start gap-12">
+              <div className="flex items-start justify-center gap-12">
                 {/* Large Progress Ring on the Left */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-64 h-64">
@@ -674,8 +674,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={nextTier.color} />
-                          <stop offset="100%" stopColor={nextTier.color} stopOpacity="0.6" />
+                          <stop offset="0%" stopColor="#3B82F6" />
+                          <stop offset="50%" stopColor="#8B5CF6" />
+                          <stop offset="100%" stopColor="#06B6D4" />
                         </linearGradient>
                       </defs>
                       
@@ -685,7 +686,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cy="128"
                         r="110"
                         fill="none"
-                        stroke="#E5E7EB"
+                        stroke="#E6F0FF"
                         strokeWidth="6"
                         strokeLinecap="round"
                       />
@@ -695,7 +696,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cx="128"
                         cy="128"
                         r="110"
-                        stroke={nextTier.color}
+                        stroke="url(#progressGradient)"
                         strokeWidth="6"
                         fill="none"
                         strokeDasharray={`${110 * 2 * Math.PI}`}
@@ -711,10 +712,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <div className="text-4xl font-bold text-foreground mb-2">
-                        {totalXP.toLocaleString()}
+                        {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-lg font-medium mb-1" style={{ color: nextTier.color }}>
-                        {Math.round(progressPercentage)}% until {nextTier.name.split(' ')[0].toLowerCase()} ring
+                      <div className="text-lg font-medium text-center" style={{ color: nextTier.color }}>
+                        {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
                   </div>
@@ -733,25 +734,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
                       }
                     </p>
-                    <div className="flex items-center gap-2 text-base font-medium text-blue-600">
-                      <Trophy className="w-5 h-5" />
-                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
-                    </div>
                   </div>
                   
                   {/* XP Earned This Month */}
-                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: nextTier.color }}></div>
-                        <span className="text-sm font-medium text-muted-foreground">XP earned this month</span>
-                      </div>
-                      <div className="flex items-center gap-1" style={{ color: nextTier.color }}>
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-bold">450 XP</span>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-blue-600">XP earned this month</span>
+                    <div className="flex items-center gap-1 text-blue-600">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-bold">450 XP</span>
                     </div>
                   </div>
                 </div>
