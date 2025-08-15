@@ -34,7 +34,11 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   const scroll = (direction: 'left' | 'right') => {
     const container = containerRef.current;
     if (container) {
-      const scrollDistance = direction === 'left' ? -200 : 200;
+      // Desktop: scroll by exactly one stat (5rem + 1rem gap = 6rem = 96px)
+      // Mobile: use original scroll distance
+      const scrollDistance = isDesktop 
+        ? (direction === 'left' ? -96 : 96)
+        : (direction === 'left' ? -200 : 200);
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
     }
   };
