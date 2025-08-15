@@ -1007,9 +1007,16 @@ const AchievementsPage: React.FC<AchievementsPageProps> = ({
                 )}
 
                 {/* Ring Tier Display */}
-                <div className="w-full mt-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
-                  <div className="flex justify-between items-center gap-2">
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Ring Progression Section - Same width as badges */}
+          <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'}`}>
+            <div className="p-6">
+              <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
+              <div className="flex justify-between items-center gap-2">
                      {xpTiers.map((tier, index) => {
                        const isActive = totalXP >= tier.minXP;
                        const isCurrent = currentTier?.name === tier.name;
@@ -1081,12 +1088,10 @@ const AchievementsPage: React.FC<AchievementsPageProps> = ({
                            </div>
                          </div>
                        );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+                     })}
+                   </div>
+                 </div>
+               </div>
 
           {/* Featured Most Recent Achievement */}
           {mostRecentAchievement && (
