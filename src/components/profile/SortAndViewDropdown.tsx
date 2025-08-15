@@ -43,15 +43,12 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div
-          className="flex items-center cursor-pointer bg-white/10 backdrop-blur-2xl border border-white/20 px-3 py-1.5 text-white shadow-lg hover:bg-white/20 transition-all duration-300 rounded-full"
-          style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-        >
-          <span className="text-sm font-medium text-black">
+        <button className="flex items-center gap-2 px-4 py-2 bg-muted/50 hover:bg-muted text-foreground rounded-full transition-all duration-200 border border-border/20">
+          <ChevronDown className="w-4 h-4" />
+          <span className="text-sm font-medium">
             Sort & View
           </span>
-          <ChevronDown className="w-4 h-4 ml-2 text-black" />
-        </div>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
