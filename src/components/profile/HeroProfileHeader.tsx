@@ -474,8 +474,8 @@ const HeroProfileHeader = ({
           uploading={videoUploading || photoUploading}
           className="mb-8"
         />
-        {/* Profile Content */}
-        <div className="relative z-10 flex flex-col items-center text-center pb-8">
+        {/* Profile Content - with backdrop blur overlay */}
+        <div className="relative z-10 flex flex-col items-center text-center pb-8 backdrop-blur-sm bg-background/60 pt-20">
           
           {/* User Information */}
           <div className="text-center mb-6">
