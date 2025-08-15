@@ -1023,30 +1023,46 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
                 {/* Featured Achievement Card */}
-                <div className="p-8 text-center">
-                  <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge with Subtle Glow and Bounce */}
-                    <div className="relative animate-scale-in">
-                      <div className="absolute inset-0 bg-yellow-400/35 rounded-full blur-xl animate-pulse"></div>
-                      <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300 animate-subtle-bounce">
+                <div className="p-8">
+                  <div className="flex items-start gap-6">
+                    {/* Large Badge without glow */}
+                    <div className="relative">
+                      <div style={{ filter: 'none', background: 'transparent' }}>
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
+                      </div>
+                      {/* XP below badge in green */}
+                      <div className="text-center mt-2">
+                        <span className="text-green-500 font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
                       </div>
                     </div>
                     
-                    {/* Achievement Title with Fade Animation */}
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
-                      {mostRecentAchievement.title}
-                    </h3>
-                    
-                    {/* XP Gained */}
-                    <div className="font-bold text-lg text-blue-500 animate-scale-in">
-                      +{mostRecentAchievement.xp} XP
+                    {/* Latest Achievement Details */}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">Latest Achievement</h3>
+                      
+                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                        {mostRecentAchievement.title}
+                      </h4>
+                      
+                      <div className="text-sm text-muted-foreground mb-4">
+                        <span className="text-green-500 font-semibold">+{mostRecentAchievement.xp} XP</span>
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground mb-4">
+                        Unlocked {mostRecentAchievement.dateEarned}
+                      </div>
+                      
+                      {/* Share Button */}
+                      <div className="mt-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          Share
+                        </Button>
+                      </div>
                     </div>
-                    
-                    {/* Date Earned */}
-                    <p className="text-sm text-muted-foreground animate-fade-in">
-                      Unlocked {mostRecentAchievement.dateEarned}
-                    </p>
                   </div>
                 </div>
               </div>
