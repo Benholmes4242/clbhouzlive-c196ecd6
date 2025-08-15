@@ -213,21 +213,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            minHeight: '800px',
            maxHeight: '1200px'
          }}>
-      {/* Bottom gradient overlay for username readability */}
+      {/* White gradient overlay from mid-photo to bottom */}
       <div 
         className="absolute inset-0 pointer-events-none z-30"
         style={{
           background: `
             linear-gradient(to bottom, 
               transparent 0%, 
-              transparent 85%, 
-              hsla(var(--background) / 0.05) 88%, 
-              hsla(var(--background) / 0.1) 91%, 
-              hsla(var(--background) / 0.2) 94%, 
-              hsla(var(--background) / 0.4) 96%, 
-              hsla(var(--background) / 0.6) 98%, 
-              hsla(var(--background) / 0.8) 99%, 
-              hsl(var(--background)) 100%
+              transparent 50%, 
+              rgba(255, 255, 255, 0.4) 100%
             )
           `
         }}

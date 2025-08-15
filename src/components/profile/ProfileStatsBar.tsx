@@ -75,7 +75,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       
       
       {/* Stats container with peek effect */}
-      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md shadow-xl">
         <div 
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"
@@ -92,10 +92,10 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
               onClick={stat.onClick}
               className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
             >
-              <div className="text-lg font-semibold text-white drop-shadow-lg">
+              <div className="text-lg font-semibold text-black">
                 {stat.value}
               </div>
-              <div className="text-xs text-white/80 font-medium drop-shadow-md">
+              <div className="text-xs text-gray-700 font-medium">
                 {stat.label}
               </div>
             </button>
