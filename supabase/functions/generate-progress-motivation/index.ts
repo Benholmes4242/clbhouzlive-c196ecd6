@@ -45,11 +45,11 @@ serve(async (req) => {
     let prompt = '';
     
     if (isCompleted) {
-      prompt = `Generate a short, enthusiastic congratulatory message (8-12 words) for someone who has completed all courses in the ${regionName} golf course list. The message should be celebratory and reference the specific region. Use "${pronoun}" and "${possessive}" appropriately. Make it feel like a major achievement in golf.`;
+      prompt = `Generate a single combined message (15-20 words) that includes both completion status and celebration for someone who has completed all courses in the ${regionName} golf course list. Format: "Achievement unlocked! (100% complete) [celebratory tagline referencing the region]". Use "${pronoun}" and "${possessive}" appropriately.`;
     } else if (isNearCompletion) {
-      prompt = `Generate a short, exciting motivational message (8-12 words) for someone who only has ${remaining} courses left to complete in the ${regionName} golf course list. The message should create urgency and excitement about being so close to completion. Use "${pronoun}" and "${possessive}" appropriately. Make it feel like they're almost at a major milestone.`;
+      prompt = `Generate a single combined message (15-20 words) that includes progress and excitement for someone who only has ${remaining} courses left in the ${regionName} golf course list. Format: "${remaining} trips to go! (${percentage}% complete) [exciting tagline about being close]". Use "${pronoun}" and "${possessive}" appropriately.`;
     } else {
-      prompt = `Generate a short, encouraging motivational message (8-12 words) for someone who has played ${played} out of ${total} courses (${percentage}%) in the ${regionName} golf course list. The message should be uplifting and reference the specific region's golf culture. Use "${pronoun}" and "${possessive}" appropriately. Make it feel like an adventure or journey.`;
+      prompt = `Generate a single combined message (15-20 words) that includes progress and motivation for someone who has played ${played} out of ${total} courses in the ${regionName} golf course list. Format: "${remaining} courses to go (${percentage}% complete) [encouraging tagline referencing the region's golf culture]". Use "${pronoun}" and "${possessive}" appropriately.`;
     }
 
     console.log('Generating motivation for:', { region, played, total, percentage, remaining, isOwnProfile });
@@ -66,7 +66,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a golf enthusiast who creates short, inspiring messages for golfers tracking their progress through prestigious course lists. Keep messages concise, enthusiastic, and golf-focused. Avoid clichés like "keep going" and "keep it up".'
+            content: 'You are a golf enthusiast who creates combined progress and motivational messages for golfers. The message should include both the numerical progress and an inspiring tagline in one cohesive sentence. Keep it concise but engaging.'
           },
           { role: 'user', content: prompt }
         ],

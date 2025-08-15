@@ -186,9 +186,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative z-10 text-center">
                             <div className="text-2xl text-foreground leading-none">
                               <span>{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               Courses
                             </div>
                           </div>
@@ -205,9 +205,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative z-10 text-center">
                             <div className="text-2xl text-foreground leading-none">
                               <span>{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               Courses
                             </div>
                           </div>
@@ -224,9 +224,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative z-10 text-center">
                             <div className="text-2xl text-foreground leading-none">
                               <span>{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               Courses
                             </div>
                           </div>
@@ -243,9 +243,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative z-10 text-center">
                             <div className="text-2xl text-foreground leading-none">
                               <span>{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               Courses
                             </div>
                           </div>
@@ -254,9 +254,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         <>
                           <div className="text-2xl text-foreground leading-none">
                             <span>{progress.played}</span>
-                            <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            <span className="text-muted-foreground"> / {progress.total}</span>
                           </div>
-                          <div className="text-xs text-muted-foreground font-medium mt-1">
+                          <div className="text-xs text-muted-foreground mt-1">
                             Courses
                           </div>
                         </>
@@ -270,15 +270,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {achievement.title}
                     </div>
                     <div className="text-xs text-muted-foreground whitespace-nowrap">
-                      {progress.remaining > 0 
-                        ? progress.remaining <= 20 
-                          ? `${progress.remaining} trips to go! (${Math.round(progress.percentage)}% complete)`
-                          : `${progress.remaining} courses to go (${Math.round(progress.percentage)}% complete)`
-                        : 'Achievement unlocked! (100% complete)'
-                      }
-                    </div>
-                    <div className="text-xs text-primary/80 mt-1 whitespace-nowrap italic">
-                      {motivationalMessages[achievement.region] || 'Adventure awaits on the world\'s finest courses!'}
+                      {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}% complete) Adventure awaits!`}
                     </div>
                   </div>
                 </div>
@@ -367,9 +359,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <div className="relative z-10 text-center">
                               <div className="text-lg text-foreground leading-none">
                                 <span>{progress.played}</span>
-                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                                <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                              <div className="text-xs text-muted-foreground mt-1">
                                 Courses
                               </div>
                             </div>
@@ -386,9 +378,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <div className="relative z-10 text-center">
                               <div className="text-lg text-foreground leading-none">
                                 <span>{progress.played}</span>
-                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                                <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                              <div className="text-xs text-muted-foreground mt-1">
                                 Courses
                               </div>
                             </div>
@@ -405,9 +397,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <div className="relative z-10 text-center">
                               <div className="text-lg text-foreground leading-none">
                                 <span>{progress.played}</span>
-                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                                <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                              <div className="text-xs text-muted-foreground mt-1">
                                 Courses
                               </div>
                             </div>
@@ -424,9 +416,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <div className="relative z-10 text-center">
                               <div className="text-lg text-foreground leading-none">
                                 <span>{progress.played}</span>
-                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                                <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                              <div className="text-xs text-muted-foreground mt-1">
                                 Courses
                               </div>
                             </div>
@@ -435,9 +427,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <>
                             <div className="text-lg text-foreground leading-none">
                               <span>{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               Courses
                             </div>
                           </>
@@ -451,15 +443,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         {achievement.title}
                       </div>
                       <div className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
-                        {progress.remaining > 0 
-                          ? progress.remaining <= 20 
-                            ? `${progress.remaining} trips to go! (${Math.round(progress.percentage)}%)`
-                            : `${progress.remaining} courses to go (${Math.round(progress.percentage)}%)`
-                          : 'Achievement unlocked! (100%)'
-                        }
-                      </div>
-                      <div className="text-xs text-primary/80 mt-1 whitespace-nowrap overflow-hidden text-ellipsis italic">
-                        {motivationalMessages[achievement.region] || 'Adventure awaits!'}
+                        {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}%) Adventure awaits!`}
                       </div>
                     </div>
                   </div>

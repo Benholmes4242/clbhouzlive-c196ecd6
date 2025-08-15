@@ -62,33 +62,34 @@ export const useProgressMotivation = (
 
   const getDefaultMotivation = (region: string, played: number, total: number): string => {
     const remaining = total - played;
+    const percentage = Math.round((played / total) * 100);
     
     if (remaining === 0) {
       switch (region) {
-        case 'global': return 'World champion! You\'ve conquered the finest courses!';
-        case 'usa': return 'America mastered! Coast-to-coast excellence achieved!';
-        case 'britain-ireland': return 'Links legend! Golf\'s birthplace conquered!';
-        case 'europe': return 'Continental champion! Europe\'s best explored!';
-        default: return 'Achievement unlocked! Excellence achieved!';
+        case 'global': return 'Achievement unlocked! (100% complete) World champion of golf!';
+        case 'usa': return 'Achievement unlocked! (100% complete) American golf mastery achieved!';
+        case 'britain-ireland': return 'Achievement unlocked! (100% complete) Links legend status earned!';
+        case 'europe': return 'Achievement unlocked! (100% complete) Continental champion crowned!';
+        default: return 'Achievement unlocked! (100% complete) Excellence achieved!';
       }
     }
 
     if (remaining <= 20) {
       switch (region) {
-        case 'global': return 'So close to world golf glory!';
-        case 'usa': return 'Almost there! American dream within reach!';
-        case 'britain-ireland': return 'Nearly a links master! Push through!';
-        case 'europe': return 'European excellence almost yours!';
-        default: return 'The finish line is in sight!';
+        case 'global': return `${remaining} trips to go! (${percentage}% complete) World golf glory awaits!`;
+        case 'usa': return `${remaining} trips to go! (${percentage}% complete) American dream within reach!`;
+        case 'britain-ireland': return `${remaining} trips to go! (${percentage}% complete) Links mastery almost yours!`;
+        case 'europe': return `${remaining} trips to go! (${percentage}% complete) European excellence nearly achieved!`;
+        default: return `${remaining} trips to go! (${percentage}% complete) The finish line is in sight!`;
       }
     }
 
     switch (region) {
-      case 'global': return 'Building your worldwide golf legacy!';
-      case 'usa': return 'Exploring America\'s golf treasures!';
-      case 'britain-ireland': return 'Walking in golf history\'s footsteps!';
-      case 'europe': return 'Discovering Continental golf gems!';
-      default: return 'Your golf journey continues!';
+      case 'global': return `${remaining} courses to go (${percentage}% complete) Building your worldwide golf legacy!`;
+      case 'usa': return `${remaining} courses to go (${percentage}% complete) Exploring America's golf treasures!`;
+      case 'britain-ireland': return `${remaining} courses to go (${percentage}% complete) Walking golf history's footsteps!`;
+      case 'europe': return `${remaining} courses to go (${percentage}% complete) Discovering Continental golf gems!`;
+      default: return `${remaining} courses to go (${percentage}% complete) Your golf journey continues!`;
     }
   };
 
