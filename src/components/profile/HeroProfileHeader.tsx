@@ -460,27 +460,25 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Cinematic Profile Header - flows underneath user content */}
+      {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
-        <div className="absolute inset-0 z-0">
-          <CinematicProfileHeader
-            videoUrl={profile?.profile_video_url}
-            thumbnailUrl={profile?.profile_video_thumbnail_url}
-            profilePhotoUrl={profile?.profile_photo_url}
-            displayName={displayName}
-            isOwnProfile={isOwnProfile}
-            onVideoUpload={handleVideoUpload}
-            onPhotoUpload={handlePhotoUpload}
-            onVideoRemove={handleVideoRemove}
-            uploading={videoUploading || photoUploading}
-            className="mb-8"
-          />
-        </div>
-        {/* Profile Content - positioned above video/photo */}
-        <div className="relative z-20 flex flex-col items-center text-center pb-8 pt-20 min-h-screen">
+        <CinematicProfileHeader
+          videoUrl={profile?.profile_video_url}
+          thumbnailUrl={profile?.profile_video_thumbnail_url}
+          profilePhotoUrl={profile?.profile_photo_url}
+          displayName={displayName}
+          isOwnProfile={isOwnProfile}
+          onVideoUpload={handleVideoUpload}
+          onPhotoUpload={handlePhotoUpload}
+          onVideoRemove={handleVideoRemove}
+          uploading={videoUploading || photoUploading}
+          className="mb-8"
+        />
+        {/* Profile Content - with backdrop blur overlay */}
+        <div className="relative z-10 flex flex-col items-center text-center pb-8 backdrop-blur-sm bg-background/60 pt-20">
           
-          {/* User Information - with backdrop for readability */}
-          <div className="text-center mb-6 bg-background/80 backdrop-blur-md rounded-lg p-6 mx-4">
+          {/* User Information */}
+          <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
               <h1 className="font-bold text-foreground text-4xl">
