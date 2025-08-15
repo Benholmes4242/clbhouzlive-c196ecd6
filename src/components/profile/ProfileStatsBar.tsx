@@ -53,7 +53,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className={`relative w-full ${isMobile ? 'max-w-full px-1' : 'max-w-lg'} mx-auto`}>
+    <div className={`relative w-full max-w-lg mx-auto ${isMobile ? 'px-4' : ''}`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
@@ -78,24 +78,24 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       <div className="relative overflow-hidden rounded-full bg-muted border shadow-sm">
         <div 
           ref={containerRef}
-          className={`flex gap-${isMobile ? '4' : '8'} overflow-x-auto scrollbar-hide px-${isMobile ? '2' : '4'} pr-${isMobile ? '12' : '20'}`}
+          className="flex gap-8 overflow-x-auto scrollbar-hide px-4 pr-20"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',
-            width: isMobile ? '100%' : 'calc(4 * 5rem + 3 * 1rem + 2rem + 0.5 * 5rem)', // Mobile: full width, Desktop: 4 full stats + 3 gaps + padding + half of 5th stat
+            width: 'calc(4 * 5rem + 3 * 1rem + 2rem + 0.5 * 5rem)', // 4 full stats + 3 gaps + padding + half of 5th stat
           }}
         >
           {stats.map((stat, index) => (
             <button
               key={index}
               onClick={stat.onClick}
-              className={`flex-shrink-0 ${isMobile ? 'w-16' : 'w-20'} flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200`}
+              className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
             >
-              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-black`}>
+              <div className="text-lg font-semibold text-black">
                 {stat.value}
               </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-600 font-medium`}>
+              <div className="text-xs text-gray-600 font-medium">
                 {stat.label}
               </div>
             </button>

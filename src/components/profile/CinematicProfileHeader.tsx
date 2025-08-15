@@ -6,9 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 interface CinematicProfileHeaderProps {
   videoUrl?: string;
   thumbnailUrl?: string;
+  profilePhotoUrl?: string;
   displayName: string;
   isOwnProfile: boolean;
   onVideoUpload: (file: File) => void;
+  onPhotoUpload: (file: File) => void;
   onVideoRemove: () => void;
   uploading?: boolean;
   className?: string;
@@ -17,15 +19,19 @@ interface CinematicProfileHeaderProps {
 const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   videoUrl,
   thumbnailUrl,
+  profilePhotoUrl,
   displayName,
   isOwnProfile,
   onVideoUpload,
+  onPhotoUpload,
   onVideoRemove,
   uploading = false,
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const photoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -50,12 +56,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         const handleTimeUpdate = () => {
           const currentTime = video.currentTime;
           const duration = video.duration;
+          
+          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
+            setShowVideo(false);
+          }
         };
         
         const handleEnded = () => {
           setIsPlaying(false);
           video.currentTime = 0;
           video.pause();
+          
+          if (profilePhotoUrl) {
+            setShowVideo(false);
+          }
         };
         
         video.addEventListener('timeupdate', handleTimeUpdate);
@@ -77,10 +91,14 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     return () => {
       video.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
-  }, [videoUrl, hasPlayed]);
+  }, [videoUrl, hasPlayed, profilePhotoUrl]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
+  };
+
+  const handlePhotoSelect = () => {
+    photoInputRef.current?.click();
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,6 +150,30 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     video.src = URL.createObjectURL(file);
   };
 
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image file must be less than 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onPhotoUpload(file);
+  };
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -156,16 +198,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   };
 
   const handleClick = () => {
-    if (!isOwnProfile && hasPlayed && !isPlaying) {
+    if ((!isOwnProfile && hasPlayed && !isPlaying) || (!showVideo && profilePhotoUrl)) {
       replayVideo();
     }
   };
 
-  const hasMedia = videoUrl;
+  const hasMedia = videoUrl || profilePhotoUrl;
 
   // Debug logging
   console.log('CinematicProfileHeader Debug:', {
     videoUrl,
+    profilePhotoUrl,
     hasMedia,
     displayName,
     showVideo
@@ -176,14 +219,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
          style={{ 
            marginTop: '-16rem',
            height: '100vh',
-           minHeight: '500px',
-           maxHeight: '100vh',
-           width: '100vw',
-           maxWidth: '100vw'
+           minHeight: '800px',
+           maxHeight: '1200px'
          }}>
 
       {/* Central Crisp Media Player - Full Coverage */}
-      <div className="absolute inset-0 z-10 w-full h-full overflow-hidden">
+      <div className="absolute inset-0 z-10">
         {hasMedia ? (
           <>
             {/* Main Video Element - Crisp and Clear */}
@@ -201,6 +242,24 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 crossOrigin="anonymous"
               />
             )}
+            
+            {/* Profile Photo */}
+            {profilePhotoUrl && (
+              <img
+                ref={photoRef}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                alt={`${displayName} profile`}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                }`}
+                onError={(e) => {
+                  e.currentTarget.src = profilePhotoUrl;
+                }}
+              />
+            )}
           </>
         ) : (
           /* Fallback for empty state */
@@ -214,7 +273,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       {/* Content Overlay */}
       <div 
         className={`relative z-10 w-full h-full flex items-center justify-center ${
-          (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
         }`}
         onMouseEnter={() => setShowControls(true)}
         onMouseLeave={() => setShowControls(false)}
@@ -225,7 +284,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div className="absolute inset-0 flex items-center justify-center transition-opacity">
             <div className="flex flex-col gap-3 items-center">
               {/* Play/Replay Button */}
-              {((hasPlayed && !isPlaying && showVideo)) && (
+              {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
                 <Button
                   size="lg"
                   variant="ghost"
@@ -254,6 +313,19 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   >
                     <span className="text-xs font-medium">Change Video</span>
                   </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePhotoSelect();
+                    }}
+                    disabled={uploading}
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  >
+                    <span className="text-xs font-medium">Change Photo</span>
+                  </Button>
                 </div>
               )}
             </div>
@@ -276,18 +348,35 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 <Upload className="w-4 h-4 mr-2" />
                 Add Video
               </Button>
+              <Button
+                variant="secondary"
+                onClick={handlePhotoSelect}
+                disabled={uploading}
+                className="bg-background/80 backdrop-blur-sm"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Add Photo
+              </Button>
             </div>
           </div>
         )}
 
       </div>
 
-      {/* Hidden File Input */}
+      {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
         type="file"
         accept="video/*"
         onChange={handleFileChange}
+        className="hidden"
+      />
+      
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handlePhotoChange}
         className="hidden"
       />
       

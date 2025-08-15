@@ -466,15 +466,17 @@ const HeroProfileHeader = ({
         <CinematicProfileHeader
           videoUrl={profile?.profile_video_url}
           thumbnailUrl={profile?.profile_video_thumbnail_url}
+          profilePhotoUrl={profile?.profile_photo_url}
           displayName={displayName}
           isOwnProfile={isOwnProfile}
           onVideoUpload={handleVideoUpload}
+          onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
-        <div className="absolute bottom-[-10rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-2 md:px-4 bg-gradient-to-t from-white/80 via-white/40 to-transparent pt-16 max-w-full overflow-hidden">
+        <div className="absolute bottom-[-10rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 bg-gradient-to-t from-white/80 via-white/40 to-transparent pt-16">
           {/* User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
@@ -510,9 +512,9 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="flex items-center justify-center gap-2 md:gap-4 w-full max-w-full">
+          <div className="flex items-center justify-center gap-4 w-full">
             {/* Left Navigation Arrow */}
-            <div className="flex-shrink-0 hidden md:block">
+            <div className="flex-shrink-0">
               <button
                 onClick={() => {
                   const container = document.getElementById('stats-container');
@@ -526,53 +528,53 @@ const HeroProfileHeader = ({
               </button>
             </div>
             
-            {/* Stats Container - Responsive width */}
-            <div className="flex-shrink-0 overflow-hidden rounded-lg w-full max-w-sm md:max-w-lg" style={{ maxWidth: isMobile ? '100%' : '520px' }}>
+            {/* Stats Container - Fixed width to show exactly 4 stats */}
+            <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '520px' }}>
               <div 
                 id="stats-container"
-                className={`flex ${isMobile ? 'gap-4' : 'gap-16'} overflow-x-auto scrollbar-hide px-1 md:px-2 py-2`}
+                className="flex gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch'
                 }}
               >
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Handicap</div>
                 </div>
                 
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {postsCount}
                   </div>
                   <div className="text-base text-muted-foreground">Posts</div>
                 </div>
                 
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {followersCount}
                   </div>
                   <div className="text-base text-muted-foreground">Followers</div>
                 </div>
                 
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {userProgressData.coursesPlayed || '24'}
                   </div>
                   <div className="text-base text-muted-foreground">Following</div>
                 </div>
                 
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {ratedCoursesCount}
                   </div>
                   <div className="text-base text-muted-foreground">Rated</div>
                 </div>
                 
-                <div className={`flex-shrink-0 text-center ${isMobile ? 'w-16' : 'w-20'}`}>
+                <div className="flex-shrink-0 text-center w-20">
                   <div className="text-4xl md:text-5xl text-foreground">
                     {averageRating > 0 ? `${averageRating}/10` : '--'}
                   </div>
@@ -582,7 +584,7 @@ const HeroProfileHeader = ({
             </div>
 
             {/* Right Navigation Arrow */}
-            <div className="flex-shrink-0 hidden md:block">
+            <div className="flex-shrink-0">
               <button
                 onClick={() => {
                   const container = document.getElementById('stats-container');
