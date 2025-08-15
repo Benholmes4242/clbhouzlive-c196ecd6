@@ -94,7 +94,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
-                      ? 'text-black bg-gray-100/50 dark:bg-gray-800/50' 
+                      ? 'text-foreground bg-gray-100/50 dark:bg-gray-800/50' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
                   } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
                 >

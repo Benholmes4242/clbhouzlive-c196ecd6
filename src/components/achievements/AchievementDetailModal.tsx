@@ -99,7 +99,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal={false}>
-      <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg">
+      <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg [&>button]:border-0">
         {/* Header */}
         <DialogHeader className="relative bg-gradient-to-b from-background to-muted p-3 pb-2">
           <DialogTitle className="text-center text-lg font-semibold text-foreground">
@@ -109,25 +109,24 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
 
         {/* Content */}
         <div className="px-4 pb-4 space-y-4">
-          {/* Badge and Status Side by Side */}
-          <div className="flex items-center gap-4">
-            {/* Badge on left */}
-            <div className={`w-20 h-20 flex-shrink-0 overflow-hidden ${
+          {/* Badge centered */}
+          <div className="flex justify-center">
+            <div className={`w-20 h-20 overflow-hidden ${
               !achievement.unlocked ? 'grayscale opacity-60' : ''
             }`}>
               {getAchievementBadge(achievement)}
             </div>
-            
-            {/* Status on right */}
-            <div className="flex-1">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                achievement.unlocked 
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                  : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-              }`}>
-                {achievement.unlocked ? 'Unlocked' : 'Locked'}
-              </span>
-            </div>
+          </div>
+          
+          {/* Status centered */}
+          <div className="text-center">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+              achievement.unlocked 
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+            }`}>
+              {achievement.unlocked ? 'Unlocked' : 'Locked'}
+            </span>
           </div>
 
           {/* Description */}
