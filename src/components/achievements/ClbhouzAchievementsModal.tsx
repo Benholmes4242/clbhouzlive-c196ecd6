@@ -1058,12 +1058,20 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   <div className="p-6">
                     <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
                     <div className="relative flex justify-between items-center gap-2">
-                      {/* Connector lines */}
-                      <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
-                        backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
-                        marginLeft: '64px',
-                        marginRight: '64px'
-                      }} />
+                      {/* Connector lines - segments between rings with gaps */}
+                      {xpTiers.map((_, index) => {
+                        if (index === xpTiers.length - 1) return null; // No line after last ring
+                        return (
+                          <div
+                            key={index}
+                            className="absolute top-8 h-px bg-gray-300 dark:bg-gray-600 z-0"
+                            style={{
+                              left: `${(100 / xpTiers.length) * index + (100 / xpTiers.length) * 0.75}%`,
+                              right: `${100 - (100 / xpTiers.length) * (index + 1) + (100 / xpTiers.length) * 0.25}%`
+                            }}
+                          />
+                        );
+                      })}
                       
                       {xpTiers.map((tier, index) => {
                         const isActive = totalXP >= tier.minXP;
