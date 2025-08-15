@@ -17,6 +17,7 @@ interface ProfileTabsProps {
   children: {
     activity: React.ReactNode;
     courses: React.ReactNode;
+    achievements: React.ReactNode;
     stats: React.ReactNode;
   };
 }
@@ -89,13 +90,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => {
-                    if (tab.id === 'achievements') {
-                      navigate('/achievements');
-                    } else {
-                      onTabChange(tab.id);
-                    }
-                  }}
+                  onClick={() => onTabChange(tab.id)}
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
@@ -120,6 +115,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         <div className={`md:max-w-[1150px] md:mx-auto`}>
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
+          {activeTab === 'achievements' && children.achievements}
           {activeTab === 'stats' && children.stats}
         </div>
       </div>

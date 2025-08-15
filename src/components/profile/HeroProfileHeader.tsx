@@ -42,6 +42,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
+import AchievementsPane from './AchievementsPane';
 
 interface Course {
   id: string;
@@ -106,8 +107,8 @@ const HeroProfileHeader = ({
   const tabs = [
     { id: 'activity', label: 'Activity' },
     { id: 'courses', label: 'Courses Played' },
-    { id: 'stats', label: 'Handicap' },
-    { id: 'gear', label: 'Gear & Bag' }
+    { id: 'achievements', label: 'Achievements' },
+    { id: 'stats', label: 'Handicap' }
   ];
 
   const handleTabChange = (newTab: string) => {
@@ -583,6 +584,15 @@ const HeroProfileHeader = ({
           courses: (
             <div></div> // Content will be rendered separately below
           ),
+          achievements: (
+            <AchievementsPane
+              userId={profile?.id}
+              userDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
+          ),
           stats: (
             <div></div> // Content will be rendered separately below
           )
@@ -700,6 +710,9 @@ const HeroProfileHeader = ({
                 displayName={profile?.display_name || 'User'}
               />
             </>
+          )}
+          {activeSection === 'achievements' && (
+            <div></div> // Content is already rendered in ProfileTabs
           )}
           {activeSection === 'stats' && (
             <HandicapSection 
