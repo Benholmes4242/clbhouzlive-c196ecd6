@@ -240,8 +240,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     };
                     
                     const interval = setInterval(syncTime, 100);
-                    return () => clearInterval(interval);
+                    // Store cleanup in the element for later cleanup
+                    (el as any)._cleanup = () => clearInterval(interval);
                   }
+                  // Return undefined, not the cleanup function
+                  return undefined;
                 }}
               />
             )}
@@ -267,7 +270,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         
         {/* Strong vertical gradient overlay for username blur transition */}
         <div 
-          className="absolute inset-0 pointer-events-none z-5"
+          className="absolute inset-0 pointer-events-none z-30"
           style={{
             background: `
               linear-gradient(to bottom, 
@@ -287,7 +290,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         
         {/* Additional side blur for edge-to-edge effect */}
         <div 
-          className="absolute inset-0 pointer-events-none z-5"
+          className="absolute inset-0 pointer-events-none z-30"
           style={{
             background: `
               radial-gradient(ellipse 80% 60% at center bottom, transparent 0%, transparent 40%, hsla(var(--background) / 0.4) 70%, hsla(var(--background) / 0.8) 90%, hsl(var(--background)) 100%),
