@@ -45,6 +45,7 @@ const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
   
   const sortedCourses = userCourses.sort((a, b) => {
     switch (sortBy) {
+      case 'rank-desc':
       case 'rating-high-low':
         // Sort by rating descending (10, 9, 8, ...)
         const aRating = a.rating;
@@ -61,6 +62,7 @@ const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
         const bRank = getCourseRanking(b.golf_courses);
         return aRank - bRank;
         
+      case 'rank-asc':
       case 'rating-low-high':
         // Sort by rating ascending (0.5, 1, 2, ...)
         const aRatingLow = a.rating;
@@ -77,6 +79,7 @@ const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
         const bRankLow = getCourseRanking(b.golf_courses);
         return aRankLow - bRankLow;
         
+      case 'recent':
       case 'recently-played':
       default:
         // Sort by most recent date (played_date or created_at for ratings)
@@ -100,7 +103,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   displayName
 }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<string>('rating-high-low');
+  const [sortBy, setSortBy] = useState<string>('rank-desc');
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCoursePickerOpen, setIsCoursePickerOpen] = useState(false);
   const { viewType, setViewType, isHydrated } = useViewPreference();
@@ -226,7 +229,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       })));
       
       // Apply sorting here to ensure proper order
-      return getSortedUserCourses(rawCourses, 'rating-high-low');
+      return getSortedUserCourses(rawCourses, 'rank-desc');
     },
     enabled: !!targetUserId,
   });
