@@ -541,12 +541,12 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     {
       title: "Birdie Blitz",
       emoji: "🐦",
-      isEarned: false,
+      isEarned: true,
       description: "Score 3 or more birdies in a single round. On fire!",
       xp: 75,
       isRepeatable: true,
-      progress: "Best: 2 birdies",
-      unlockHint: "Focus on approach shots and putting. Target par 4s and 5s where birdies are most achievable."
+      progress: "Best: 3 birdies",
+      dateEarned: "August 8, 2025"
     },
     {
       title: "Eagle Collector",
@@ -658,26 +658,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               </p>
             </div>
             
-            {/* Right side - User profile */}
-            <div className="flex items-center gap-3">
-              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
-                {userProfilePhotoUrl ? (
-                  <img 
-                    src={userProfilePhotoUrl} 
-                    alt={userDisplayName} 
-                    className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
-                  />
-                ) : (
-                  userDisplayName.charAt(0).toUpperCase()
-                )}
-              </div>
-              <div className="text-left">
-                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
         
@@ -1146,24 +1126,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               });
                               setShowAchievementDetailModal(true);
                             }}
-                            onMouseEnter={!isMobile ? () => {
-                              setSelectedAchievement({
-                                id: achievement.title,
-                                name: achievement.title,
-                                xp: achievement.xp,
-                                unlocked: achievement.isEarned,
-                                description: achievement.description,
-                                unlockHint: achievement.unlockHint,
-                                progress: achievement.progress,
-                                dateEarned: achievement.dateEarned,
-                                isRepeatable: achievement.isRepeatable
-                              });
-                              setShowAchievementDetailModal(true);
-                            } : undefined}
-                            onMouseLeave={!isMobile ? () => {
-                              setShowAchievementDetailModal(false);
-                              setSelectedAchievement(null);
-                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1242,24 +1204,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               });
                               setShowAchievementDetailModal(true);
                             }}
-                            onMouseEnter={!isMobile ? () => {
-                              setSelectedAchievement({
-                                id: achievement.title,
-                                name: achievement.title,
-                                xp: achievement.xp,
-                                unlocked: achievement.isEarned,
-                                description: achievement.description,
-                                unlockHint: achievement.unlockHint,
-                                progress: achievement.progress,
-                                dateEarned: achievement.dateEarned,
-                                isRepeatable: achievement.isRepeatable
-                              });
-                              setShowAchievementDetailModal(true);
-                            } : undefined}
-                            onMouseLeave={!isMobile ? () => {
-                              setShowAchievementDetailModal(false);
-                              setSelectedAchievement(null);
-                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
