@@ -206,7 +206,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const hasMedia = videoUrl || profilePhotoUrl;
 
   return (
-    <div className={`relative w-full h-screen overflow-hidden ${className}`} style={{ marginTop: '-4rem' }}>
+    <div className={`relative w-full overflow-hidden ${className}`} 
+         style={{ 
+           marginTop: '-4rem',
+           height: '60vh',
+           minHeight: '400px',
+           maxHeight: '500px'
+         }}>
       {/* Full-width Live Blur Background - extends edge to edge */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         {hasMedia ? (
