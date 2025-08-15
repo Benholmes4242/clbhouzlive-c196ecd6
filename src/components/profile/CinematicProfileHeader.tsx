@@ -353,21 +353,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   <Play className="w-6 h-6" />
                 </Button>
               )}
-              
-              {/* Mute/Unmute Button */}
-              {videoUrl && isPlaying && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleMute();
-                  }}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </Button>
-              )}
             </div>
           </div>
         )}
