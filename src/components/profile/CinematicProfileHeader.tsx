@@ -213,19 +213,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            minHeight: '800px',
            maxHeight: '1200px'
          }}>
-      {/* White gradient overlay from mid-photo to bottom */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-30"
-        style={{
-          background: `
-            linear-gradient(to bottom, 
-              transparent 0%, 
-              transparent 50%, 
-              rgba(255, 255, 255, 0.4) 100%
-            )
-          `
-        }}
-      />
 
       {/* Central Crisp Media Player - Full Coverage */}
       <div className="absolute inset-0 z-10">
