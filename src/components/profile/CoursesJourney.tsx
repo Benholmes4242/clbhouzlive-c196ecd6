@@ -143,20 +143,84 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       {achievement.region === 'usa' ? (
-                        <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* USA Flag Background */}
                           <img
                             src="https://flagicons.lipis.dev/flags/4x3/us.svg"
                             alt="USA flag background"
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover opacity-30"
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-lg font-bold text-white drop-shadow-md leading-none">
+                            <div className="text-2xl font-bold text-foreground leading-none">
                               <span className="font-bold">{progress.played}</span>
-                              <span className="font-normal text-white/90"> / {progress.total}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-white/90 font-medium drop-shadow-md">
+                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                              Courses
+                            </div>
+                          </div>
+                        </div>
+                      ) : achievement.region === 'europe' ? (
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          {/* EU Flag Background */}
+                          <img
+                            src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
+                            alt="EU flag background"
+                            className="absolute inset-0 w-full h-full object-cover opacity-30"
+                          />
+                          {/* Overlay content */}
+                          <div className="relative z-10 text-center">
+                            <div className="text-2xl font-bold text-foreground leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                              Courses
+                            </div>
+                          </div>
+                        </div>
+                      ) : achievement.region === 'britain-ireland' ? (
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          {/* Split Flags Background */}
+                          <div className="absolute inset-0 flex">
+                            <img
+                              src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
+                              alt="UK flag background"
+                              className="w-1/2 h-full object-cover opacity-30"
+                            />
+                            <img
+                              src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
+                              alt="Ireland flag background"
+                              className="w-1/2 h-full object-cover opacity-30"
+                            />
+                          </div>
+                          {/* Overlay content */}
+                          <div className="relative z-10 text-center">
+                            <div className="text-2xl font-bold text-foreground leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                              Courses
+                            </div>
+                          </div>
+                        </div>
+                      ) : achievement.region === 'global' ? (
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          {/* World Map Background */}
+                          <img
+                            src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
+                            alt="World map background"
+                            className="absolute inset-0 w-full h-full object-contain opacity-20"
+                          />
+                          {/* Overlay content */}
+                          <div className="relative z-10 text-center">
+                            <div className="text-2xl font-bold text-foreground leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-medium mt-1">
                               Courses
                             </div>
                           </div>
@@ -262,20 +326,84 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Flag Background */}
                             <img
                               src="https://flagicons.lipis.dev/flags/4x3/us.svg"
                               alt="USA flag background"
-                              className="absolute inset-0 w-full h-full object-cover"
+                              className="absolute inset-0 w-full h-full object-cover opacity-30"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm font-bold text-white drop-shadow-md leading-none">
+                              <div className="text-lg font-bold text-foreground leading-none">
                                 <span className="font-bold">{progress.played}</span>
-                                <span className="font-normal text-white/90"> / {progress.total}</span>
+                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-xs text-white/90 font-medium drop-shadow-md">
+                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                                Courses
+                              </div>
+                            </div>
+                          </div>
+                        ) : achievement.region === 'europe' ? (
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                            {/* EU Flag Background */}
+                            <img
+                              src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
+                              alt="EU flag background"
+                              className="absolute inset-0 w-full h-full object-cover opacity-30"
+                            />
+                            {/* Overlay content */}
+                            <div className="relative z-10 text-center">
+                              <div className="text-lg font-bold text-foreground leading-none">
+                                <span className="font-bold">{progress.played}</span>
+                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                                Courses
+                              </div>
+                            </div>
+                          </div>
+                        ) : achievement.region === 'britain-ireland' ? (
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                            {/* Split Flags Background */}
+                            <div className="absolute inset-0 flex">
+                              <img
+                                src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
+                                alt="UK flag background"
+                                className="w-1/2 h-full object-cover opacity-30"
+                              />
+                              <img
+                                src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
+                                alt="Ireland flag background"
+                                className="w-1/2 h-full object-cover opacity-30"
+                              />
+                            </div>
+                            {/* Overlay content */}
+                            <div className="relative z-10 text-center">
+                              <div className="text-lg font-bold text-foreground leading-none">
+                                <span className="font-bold">{progress.played}</span>
+                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground font-medium mt-1">
+                                Courses
+                              </div>
+                            </div>
+                          </div>
+                        ) : achievement.region === 'global' ? (
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                            {/* World Map Background */}
+                            <img
+                              src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
+                              alt="World map background"
+                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                            />
+                            {/* Overlay content */}
+                            <div className="relative z-10 text-center">
+                              <div className="text-lg font-bold text-foreground leading-none">
+                                <span className="font-bold">{progress.played}</span>
+                                <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground font-medium mt-1">
                                 Courses
                               </div>
                             </div>
