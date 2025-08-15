@@ -480,7 +480,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="font-bold text-black text-4xl">
+              <h1 className="text-xl md:text-2xl text-foreground font-bold">
                 {displayName}
               </h1>
             </div>
@@ -488,15 +488,15 @@ const HeroProfileHeader = ({
             {/* Username with Edit Button */}
             {username && (
               <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-muted-foreground">
                   @{username}
                 </p>
                 
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
-                  <button 
-                    className="bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
-                    onClick={() => setEditDialogOpen(true)}
+                    <button 
+                      className="px-6 py-2 rounded-lg bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-xs" 
+                      onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
                   </button>
@@ -505,40 +505,55 @@ const HeroProfileHeader = ({
             )}
 
             {/* Home Golf Club */}
-            <p className="text-base text-gray-600 mb-4">
+            <p className="text-base text-muted-foreground mb-4">
               {homeClub}
             </p>
           </div>
 
-          {/* Stats Bar */}
-          <ProfileStatsBar 
-            stats={[
-              { 
-                value: profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--',
-                label: 'Handicap'
-              },
-              { 
-                value: postsCount,
-                label: 'Posts'
-              },
-              { 
-                value: followersCount,
-                label: 'Followers'
-              },
-              { 
-                value: userProgressData.coursesPlayed || '24',
-                label: 'Level'
-              },
-              { 
-                value: ratedCoursesCount,
-                label: 'Rated Courses'
-              },
-              { 
-                value: averageRating > 0 ? `${averageRating}/10` : '--',
-                label: 'Avg. Rating'
-              }
-            ]}
-          />
+          {/* Stats Grid - Replacing the pill container */}
+          <div className="grid grid-cols-3 gap-8 w-full max-w-2xl">
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+              </div>
+              <div className="text-base text-muted-foreground">Handicap</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {postsCount}
+              </div>
+              <div className="text-base text-muted-foreground">Posts</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {followersCount}
+              </div>
+              <div className="text-base text-muted-foreground">Followers</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {userProgressData.coursesPlayed || '24'}
+              </div>
+              <div className="text-base text-muted-foreground">Level</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {ratedCoursesCount}
+              </div>
+              <div className="text-base text-muted-foreground">Rated Courses</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl md:text-2xl font-bold text-foreground">
+                {averageRating > 0 ? `${averageRating}/10` : '--'}
+              </div>
+              <div className="text-base text-muted-foreground">Avg. Rating</div>
+            </div>
+          </div>
         </div>
       </div>
 
