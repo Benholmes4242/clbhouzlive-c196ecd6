@@ -193,6 +193,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
                               alt="Ireland flag background"
                               className="w-1/2 h-full object-cover opacity-30"
+                              style={{ objectPosition: '25% center' }}
                             />
                           </div>
                           {/* Overlay content */}
@@ -376,6 +377,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
                                 alt="Ireland flag background"
                                 className="w-1/2 h-full object-cover opacity-30"
+                                style={{ objectPosition: '25% center' }}
                               />
                             </div>
                             {/* Overlay content */}
