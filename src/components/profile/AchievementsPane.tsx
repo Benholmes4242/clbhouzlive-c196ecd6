@@ -663,15 +663,123 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         
         <div className="w-full" style={{ paddingTop: isMobile ? '20px' : '30px', paddingBottom: isMobile ? '130px' : '60px' }}>
 
-          {/* Collapsible XP Progress Header with Smooth Animations */}
+          {/* Hero XP Progress Section - Desktop Only */}
+          {!isMobile && (
+            <div className="px-6 pb-8">
+              <div className="flex items-start gap-12">
+                {/* Large Progress Ring on the Left */}
+                <div className="relative flex-shrink-0">
+                  <div className="relative w-64 h-64">
+                    <svg className="w-64 h-64 transform -rotate-90" viewBox="0 0 256 256">
+                      {/* Gradient definition */}
+                      <defs>
+                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor={nextTier.color} />
+                          <stop offset="100%" stopColor={nextTier.color} stopOpacity="0.6" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Background ring */}
+                      <circle
+                        cx="128"
+                        cy="128"
+                        r="110"
+                        fill="none"
+                        stroke="#E5E7EB"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+                      
+                      {/* Animated progress circle */}
+                      <circle
+                        cx="128"
+                        cy="128"
+                        r="110"
+                        stroke={nextTier.color}
+                        strokeWidth="6"
+                        fill="none"
+                        strokeDasharray={`${110 * 2 * Math.PI}`}
+                        strokeDashoffset={animateProgress ? 
+                          `${110 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                          `${110 * 2 * Math.PI}`
+                        }
+                        strokeLinecap="round"
+                        className="transition-all duration-2000 ease-out"
+                      />
+                    </svg>
+                    
+                    {/* Center content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className="text-4xl font-bold text-foreground mb-2">
+                        {totalXP.toLocaleString()}
+                      </div>
+                      <div className="text-lg font-medium mb-1" style={{ color: nextTier.color }}>
+                        {Math.round(progressPercentage)}% until {nextTier.name.split(' ')[0].toLowerCase()} ring
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Right Side Info */}
+                <div className="flex-1 space-y-6 pt-8">
+                  {/* Ring Achievement Status */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-2xl text-muted-foreground">
+                      {currentTier ? currentTier.name : 'No Ring Achieved'}
+                    </h3>
+                    <p className="text-base text-muted-foreground">
+                      {currentTier ? 
+                        `Congratulations! You've earned the ${currentTier.name}!` :
+                        `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                      }
+                    </p>
+                    <div className="flex items-center gap-2 text-base font-medium text-blue-600">
+                      <Trophy className="w-5 h-5" />
+                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    </div>
+                  </div>
+                  
+                  {/* XP Earned This Month */}
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: nextTier.color }}></div>
+                        <span className="text-sm font-medium text-muted-foreground">XP earned this month</span>
+                      </div>
+                      <div className="flex items-center gap-1" style={{ color: nextTier.color }}>
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-bold">450 XP</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile XP Progress - Simplified */}
+          {isMobile && (
+            <div className="px-4 pb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-foreground mb-2">
+                  {totalXP.toLocaleString()} XP
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {Math.round(progressPercentage)}% to {nextTier.name}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sticky Progress Header (Collapsed state) */}
           <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
             isCollapsed 
               ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
-              : isMobile ? 'px-4 pb-3' : 'px-6 pb-4'
+              : 'hidden'
           }`}>
-            {isCollapsed ? (
-              /* Collapsed Mini View */
-              <div className={`flex items-center justify-between ${
+            <div className={`flex items-center justify-between ${
                 isMobile ? 'p-2 max-h-[52px]' : 'p-3'
               }`}>
                 <div className="flex items-center gap-2">
@@ -732,258 +840,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   )}
                 </div>
               </div>
-            ) : (
-              /* Full XP Ring Section - Mobile Optimized */
-              <div className={`relative overflow-hidden ${
-                isMobile ? 'p-3' : 'p-6'
-              }`}>
-                {/* Celebration Animation Overlay */}
-                {showCelebration && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl animate-pulse">
-                    <div className={`${isMobile ? 'text-4xl' : 'text-6xl'} animate-bounce`}>🎉</div>
-                  </div>
-                )}
-                
-                {/* Mobile Stacked Layout */}
-                {isMobile ? (
-                  <div className="space-y-3">
-                    {/* Header with collapse button */}
-                    <div className="flex justify-between items-center">
-                      <div className="text-center flex-1">
-                         <div className="text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
-                           {totalXP.toLocaleString()} XP
-                         </div>
-                        
-                      </div>
-                      {!isMobile && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleToggleCollapse}
-                          className="p-1 h-6 w-6"
-                        >
-                          <ChevronUp className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
-                    
-                    {/* Next ring text and toggle */}
-                    <div className="text-center text-xs text-muted-foreground">
-                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
-                    </div>
-                  </div>
-                ) : (
-                  /* Desktop Header Layout */
-                  <div>
-                    <div className="flex justify-between items-start mb-6">
-                      <div>
-                        <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
-                        
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                           <div className="text-2xl font-bold text-foreground flex items-center gap-2">
-                             {totalXP.toLocaleString()} XP
-                           </div>
-                        </div>
-                        {!isMobile && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleToggleCollapse}
-                            className="p-1 h-8 w-8"
-                          >
-                            <ChevronUp className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Main Progress Ring and Info - Desktop Only */}
-                {!isMobile && (
-                  <>
-                    <div className="flex justify-center mb-6">
-                      <div className="flex items-center gap-12">
-                        {/* Enhanced Progress Ring */}
-                        <div className="relative flex-shrink-0">
-                          <div className="relative w-40 h-40">
-                            
-                            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                              {/* Gradient definition */}
-                              <defs>
-                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                  <stop offset="0%" stopColor="#3B82F6" />
-                                  <stop offset="50%" stopColor="#8B5CF6" />
-                                  <stop offset="100%" stopColor="#06B6D4" />
-                                </linearGradient>
-                              </defs>
-                              
-                              {/* Background ring (light color) */}
-                              <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                fill="none"
-                                stroke="#E6F0FF"
-                                strokeWidth="3"
-                                strokeLinecap="round"
-                              />
-                              
-                              {/* Animated progress circle */}
-                              <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                stroke={`url(#progressGradient)`}
-                                strokeWidth="3"
-                                fill="none"
-                                strokeDasharray={`${70 * 2 * Math.PI}`}
-                                strokeDashoffset={animateProgress ? 
-                                  `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                                  `${70 * 2 * Math.PI}`
-                                }
-                                strokeLinecap="round"
-                                className="transition-all duration-1000 ease-out"
-                              />
-                            </svg>
-                            
-                            {/* Subtle glow effect around the ring */}
-                            <div className="absolute inset-0 pointer-events-none">
-                              <div 
-                                className="absolute opacity-20 animate-pulse rounded-full"
-                                style={{
-                                  top: '15px',
-                                  left: '15px',
-                                  right: '15px',
-                                  bottom: '15px',
-                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
-                                  filter: 'blur(8px)',
-                                  borderRadius: '50%'
-                                }}
-                              />
-                            </div>
-                            
-                            {/* Center content */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <div className="text-2xl font-bold text-foreground mb-1">
-                                {(nextTier.minXP - totalXP).toLocaleString()}
-                              </div>
-                              <div className="text-xs text-muted-foreground text-center mb-2">
-                                XP to next ring
-                              </div>
-                              <div className="text-xs font-medium" style={{ color: nextTier.color }}>
-                                {Math.round(progressPercentage)}% Complete
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Ring Info */}
-                        <div className="w-64 space-y-4">
-                          <div className="space-y-2">
-                            <h3 className="font-semibold text-xl text-muted-foreground">
-                              {currentTier ? currentTier.name : 'No Ring Achieved'}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {currentTier ? 
-                                `Congratulations! You've earned the ${currentTier.name}!` :
-                                `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
-                              }
-                            </p>
-                            <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
-                              <Trophy className="w-4 h-4" />
-                              Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </>
-                )}
-
-                {/* Ring Tier Display */}
-                <div className="w-full mt-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
-                  <div className="flex justify-between items-center gap-2">
-                     {xpTiers.map((tier, index) => {
-                       const isActive = totalXP >= tier.minXP;
-                       const isCurrent = currentTier?.name === tier.name;
-                       const isNext = nextTier?.name === tier.name;
-                       
-                       // Calculate progress for this specific tier
-                       let tierProgress = 0;
-                       if (isActive) {
-                         // Tier is completed, show 100%
-                         tierProgress = 100;
-                       } else if (isCurrent || isNext) {
-                         // This is the tier being worked towards
-                         const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
-                         const tierEnd = tier.minXP;
-                         const tierRange = tierEnd - tierStart;
-                         const currentProgress = Math.max(0, totalXP - tierStart);
-                         tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
-                       }
-                       
-                       return (
-                          <div key={tier.name} className="flex-1 text-center">
-                             <div className="relative flex justify-center mb-2">
-                               {/* Progress ring above titles */}
-                                <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
-                                  {/* Background ring (light color) */}
-                                  <circle
-                                    cx="32"
-                                    cy="32"
-                                    r="30"
-                                    fill="none"
-                                    stroke={`${tier.color}30`}
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                  />
-                                  
-                                  {/* Progress circle */}
-                                  {tierProgress > 0 && (
-                                    <circle
-                                      cx="32"
-                                      cy="32"
-                                      r="30"
-                                      stroke={tier.color}
-                                      strokeWidth="3"
-                                      fill="none"
-                                      strokeDasharray={`${30 * 2 * Math.PI}`}
-                                      strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                      strokeLinecap="round"
-                                      className="transition-all duration-700"
-                                    />
-                                  )}
-                                </svg>
-                               
-                                {/* Padlock icon for locked rings - including next tier */}
-                                {!isActive && (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <img 
-                                      src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                      alt="Locked" 
-                                      className="w-6 h-6 opacity-60"
-                                    />
-                                  </div>
-                                )}
-                             </div>
-                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
-                             {tier.name}
-                           </div>
-                           <div className="text-xs text-muted-foreground">
-                             {tier.minXP.toLocaleString()} XP
-                           </div>
-                         </div>
-                       );
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Featured Most Recent Achievement */}
