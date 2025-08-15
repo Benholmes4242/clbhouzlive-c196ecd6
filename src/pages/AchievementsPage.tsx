@@ -727,7 +727,7 @@ const AchievementsPage: React.FC<AchievementsPageProps> = ({
       {/* Header */}
       <Header />
 
-      <div className="w-full flex flex-col bg-background">
+      <div className={`w-full flex flex-col bg-background ${isMobile ? '' : 'max-w-[1200px] mx-auto'}`}>
         <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
