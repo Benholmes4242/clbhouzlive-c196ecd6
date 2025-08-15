@@ -69,15 +69,6 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
         </button>
       )}
       
-      {/* Left fade gradient */}
-      {canScrollLeft && (
-        <div className={`absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/80 to-transparent z-10 pointer-events-none ${isMobile ? 'ml-4' : ''}`} />
-      )}
-      
-      {/* Right fade gradient for peek effect - stronger on mobile */}
-      {canScrollRight && (
-        <div className={`absolute right-0 top-0 bottom-0 ${isMobile ? 'w-12 mr-4 bg-gradient-to-l from-background/95 via-background/60 to-transparent' : 'w-8 bg-gradient-to-l from-background/80 to-transparent'} z-10 pointer-events-none`} />
-      )}
       
       {/* Stats container */}
       <div 
