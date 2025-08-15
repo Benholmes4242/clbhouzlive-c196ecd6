@@ -78,7 +78,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
         <div 
           ref={containerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-12"
+          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
