@@ -672,7 +672,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
         </div>
         
-        <div className="w-full" style={{ paddingTop: isMobile ? '20px' : '30px', paddingBottom: isMobile ? '130px' : '60px' }}>
+        <div className="w-full" style={{ paddingTop: isMobile ? '0px' : '0px', paddingBottom: isMobile ? '130px' : '60px' }}>
 
           {/* Hero XP Progress Section - Desktop Only */}
           {!isMobile && (
