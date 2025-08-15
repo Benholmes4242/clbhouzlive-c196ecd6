@@ -757,11 +757,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
                 <div className="relative flex justify-between items-center gap-2">
                   {/* Connector lines */}
-                  <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
-                    backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
-                    marginLeft: '64px',
-                    marginRight: '64px'
-                  }} />
+                   <div className="absolute top-10 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
+                     backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
+                     marginLeft: '76px',
+                     marginRight: '76px'
+                   }} />
                   
                   {xpTiers.map((tier, index) => {
                     const isActive = totalXP >= tier.minXP;
@@ -784,7 +784,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-2">
                           {/* Progress ring */}
-                          <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
                             {/* Background ring */}
                             <circle
                               cx="32"
@@ -819,7 +819,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               <img 
                                 src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
                                 alt="Locked" 
-                                className="w-6 h-6 opacity-60"
+                                className="w-8 h-8 opacity-60"
                               />
                             </div>
                           )}

@@ -1079,11 +1079,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <h4 className="text-sm font-medium text-black mb-3 text-center">Ring Progression</h4>
                     <div className="relative flex justify-between items-center gap-2">
                       {/* Connector lines */}
-                      <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
-                        backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
-                        marginLeft: '64px',
-                        marginRight: '64px'
-                      }} />
+                       <div className="absolute top-10 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
+                         backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
+                         marginLeft: '80px',
+                         marginRight: '80px'
+                       }} />
                       
                       {xpTiers.map((tier, index) => {
                         const isActive = totalXP >= tier.minXP;
@@ -1104,7 +1104,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         return (
                           <div key={tier.name} className="flex-1 text-center relative z-10">
                             <div className="relative flex justify-center mb-2">
-                              <svg className={`w-20 h-20 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                              <svg className={`w-28 h-28 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
                                 <circle cx="32" cy="32" r="30" fill="none" stroke={`${tier.color}30`} strokeWidth="3" strokeLinecap="round" />
                                 {tierProgress > 0 && (
                                   <circle cx="32" cy="32" r="30" stroke={tier.color} strokeWidth="3" fill="none"
@@ -1115,7 +1115,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               </svg>
                               {!isActive && (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                  <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                                   </svg>
                                 </div>
