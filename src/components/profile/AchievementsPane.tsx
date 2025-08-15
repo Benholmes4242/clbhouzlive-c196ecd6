@@ -213,6 +213,26 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     }
   };
 
+  // Get filter count
+  const getFilterCount = (filter: 'all' | 'unlocked' | 'locked' | 'exploration' | 'skill') => {
+    const allAchievements = [...explorationAchievements, ...skillAchievements];
+    
+    switch (filter) {
+      case 'all':
+        return allAchievements.length;
+      case 'unlocked':
+        return allAchievements.filter(a => a.isEarned).length;
+      case 'locked':
+        return allAchievements.filter(a => !a.isEarned).length;
+      case 'exploration':
+        return explorationAchievements.length;
+      case 'skill':
+        return skillAchievements.length;
+      default:
+        return 0;
+    }
+  };
+
   // Get most recently unlocked achievement
   const getMostRecentAchievement = () => {
     const allAchievements = [...explorationAchievements, ...skillAchievements];
@@ -1007,22 +1027,25 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   { key: 'locked' as const, label: 'Locked', icon: '🔒' },
                   { key: 'exploration' as const, label: 'Exploration', icon: '🌍' },
                   { key: 'skill' as const, label: 'Skill', icon: '🎯' }
-                ].map(({ key, label, icon }) => (
-                  <Button
-                    key={key}
-                    variant={activeFilter === key ? 'secondary' : 'outline'}
-                    size="sm"
-                    onClick={() => setActiveFilter(key)}
-                    className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                      activeFilter === key 
-                        ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
-                        : ''
-                    }`}
-                  >
-                    <span>{icon}</span>
-                    {label}
-                  </Button>
-                ))}
+                ].map(({ key, label, icon }) => {
+                  const count = getFilterCount(key);
+                  return (
+                    <Button
+                      key={key}
+                      variant={activeFilter === key ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => setActiveFilter(key)}
+                      className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                        activeFilter === key 
+                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                          : ''
+                      }`}
+                    >
+                      <span>{icon}</span>
+                      {label} ({count})
+                    </Button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1039,7 +1062,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </h3>
                   </div>
                 
-                   <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
+                   <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-4 gap-3'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1067,20 +1090,29 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                             }}
                                  >
                                   {/* Icon directly on background - no container */}
-                                  <div className="flex justify-center items-center">
-                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
-                                      {getAchievementIcon(achievement)}
-                                    </div>
-                                  </div>
+                                   <div className="flex justify-center items-center relative">
+                                     <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                       {getAchievementIcon(achievement)}
+                                     </div>
+                                     {!achievement.isEarned && (
+                                       <div className="absolute inset-0 flex items-center justify-center">
+                                         <img 
+                                           src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
+                                           alt="Locked" 
+                                           className="w-8 h-8 opacity-60"
+                                         />
+                                       </div>
+                                     )}
+                                   </div>
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
                                     <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
                                       {achievement.title.toUpperCase()}
                                     </h4>
-                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                      +{achievement.xp} XP
-                                    </p>
+                                     <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                       +{achievement.xp} XP
+                                     </p>
                                   </div>
                                   
                                    {/* Smart Nudge Label */}
@@ -1117,7 +1149,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
+                  <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-4 gap-3'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1145,11 +1177,20 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                             }}
                                  >
                                   {/* Icon directly on background - no container */}
-                                  <div className="flex justify-center items-center">
-                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
-                                      {getAchievementIcon(achievement)}
-                                    </div>
-                                  </div>
+                                   <div className="flex justify-center items-center relative">
+                                     <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                       {getAchievementIcon(achievement)}
+                                     </div>
+                                     {!achievement.isEarned && (
+                                       <div className="absolute inset-0 flex items-center justify-center">
+                                         <img 
+                                           src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
+                                           alt="Locked" 
+                                           className="w-8 h-8 opacity-60"
+                                         />
+                                       </div>
+                                     )}
+                                   </div>
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
