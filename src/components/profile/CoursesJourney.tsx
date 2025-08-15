@@ -149,7 +149,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* USA Map Background */}
                           <img
-                            src="/lovable-uploads/916759af-e847-4fcf-be5b-68b34a4e5096.png"
+                            src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
                             alt="USA map background"
                             className="absolute inset-0 w-full h-full object-contain opacity-20"
                           />
@@ -325,7 +325,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Map Background */}
                             <img
-                              src="/lovable-uploads/916759af-e847-4fcf-be5b-68b34a4e5096.png"
+                              src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
                               alt="USA map background"
                               className="absolute inset-0 w-full h-full object-contain opacity-20"
                             />
