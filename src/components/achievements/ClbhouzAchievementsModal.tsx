@@ -772,7 +772,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
                 Achievements
               </DialogTitle>
-              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
                 Defining your game through achievement
               </DialogDescription>
             </div>
@@ -1032,10 +1032,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Ring Info */}
                         <div className="w-64 space-y-4">
                           <div className="space-y-2">
-                            <h3 className="font-semibold text-xl text-muted-foreground">
+                            <h3 className="font-semibold text-xl text-black dark:text-white">
                               {currentTier ? currentTier.name : 'No Ring Achieved'}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-black dark:text-white">
                               {currentTier ? 
                                 `Congratulations! You've earned the ${currentTier.name}!` :
                                 `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
