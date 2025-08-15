@@ -1025,13 +1025,19 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Featured Achievement Card */}
                 <div className="p-8">
                   <div className="flex items-start gap-6">
-                    {/* Large Badge without glow */}
-                    <div className="relative">
+                    {/* Large Badge without glow and title underneath */}
+                    <div className="relative text-center">
                       <div style={{ filter: 'none', background: 'transparent' }}>
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
                       </div>
-                      {/* XP below badge in green */}
-                      <div className="text-center mt-2">
+                      
+                      {/* Achievement Title under badge */}
+                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-3 mb-2">
+                        {mostRecentAchievement.title}
+                      </h4>
+                      
+                      {/* XP below title in green */}
+                      <div className="text-center">
                         <span className="text-green-500 font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
                       </div>
                     </div>
@@ -1039,10 +1045,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     {/* Latest Achievement Details */}
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">Latest Achievement</h3>
-                      
-                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                        {mostRecentAchievement.title}
-                      </h4>
                       
                       <div className="text-sm text-muted-foreground mb-4">
                         <span className="text-green-500 font-semibold">+{mostRecentAchievement.xp} XP</span>
