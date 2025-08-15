@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import padlockIcon from '@/assets/padlock.png';
+import padlockIcon from '@/assets/padlock-clean.png';
 
 interface AchievementsPaneProps {
   userId?: string;
@@ -836,12 +836,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           
                            {/* Padlock icon for locked rings */}
                            {!isActive && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <img 
-                                  src={padlockIcon} 
-                                  alt="Locked" 
-                                  className="w-10 h-10 opacity-60"
-                                />
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                 <img 
+                                   src={padlockIcon} 
+                                   alt="Locked" 
+                                   className="w-10 h-10 opacity-60 drop-shadow-none"
+                                   style={{ filter: 'none', background: 'transparent' }}
+                                 />
                               </div>
                            )}
                         </div>
@@ -1097,12 +1098,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                        {getAchievementIcon(achievement)}
                                      </div>
                                       {!achievement.isEarned && (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                          <img 
-                                            src={padlockIcon} 
-                                            alt="Locked" 
-                                            className="w-16 h-16 opacity-60"
-                                          />
+                                         <div className="absolute inset-0 flex items-center justify-center">
+                                           <img 
+                                             src={padlockIcon} 
+                                             alt="Locked" 
+                                             className="w-16 h-16 opacity-60 drop-shadow-none"
+                                             style={{ filter: 'none', background: 'transparent' }}
+                                           />
                                         </div>
                                       )}
                                    </div>
@@ -1184,12 +1186,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                        {getAchievementIcon(achievement)}
                                      </div>
                                       {!achievement.isEarned && (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                          <img 
-                                            src={padlockIcon} 
-                                            alt="Locked" 
-                                            className="w-16 h-16 opacity-60"
-                                          />
+                                         <div className="absolute inset-0 flex items-center justify-center">
+                                           <img 
+                                             src={padlockIcon} 
+                                             alt="Locked" 
+                                             className="w-16 h-16 opacity-60 drop-shadow-none"
+                                             style={{ filter: 'none', background: 'transparent' }}
+                                           />
                                         </div>
                                       )}
                                    </div>
