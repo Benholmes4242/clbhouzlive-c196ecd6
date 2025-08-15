@@ -315,7 +315,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       >
         {/* Central Media Controls */}
         {hasMedia && showControls && (
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center transition-opacity">
+          <div className="absolute inset-0 flex items-center justify-center transition-opacity">
             <div className="flex flex-col gap-3 items-center">
               {/* Play/Replay Button */}
               {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
