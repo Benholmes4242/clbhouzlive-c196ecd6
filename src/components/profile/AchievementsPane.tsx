@@ -685,9 +685,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#3B82F6" />
-                          <stop offset="50%" stopColor="#8B5CF6" />
-                          <stop offset="100%" stopColor="#06B6D4" />
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="50%" stopColor="#34D399" />
+                          <stop offset="100%" stopColor="#6EE7B7" />
                         </linearGradient>
                       </defs>
                       
@@ -725,7 +725,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div className="text-5xl font-bold text-foreground mb-3">
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-base font-medium text-center leading-tight max-w-[200px]" style={{ color: nextTier.color }}>
+                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-green-500">
                         {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
@@ -749,8 +749,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   
                   {/* XP Earned This Month - Below centered content */}
                   <div className="flex items-center justify-center gap-3">
-                    <span className="text-sm font-medium text-blue-600">XP earned this month</span>
-                    <div className="flex items-center gap-1 text-blue-600">
+                    <span className="text-sm font-medium text-green-600">XP earned this month</span>
+                    <div className="flex items-center gap-1 text-green-600 relative">
+                      {/* Light green glow */}
+                      <div className="absolute inset-0 bg-green-200/30 rounded-lg blur-sm -z-10"></div>
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
