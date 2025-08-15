@@ -163,21 +163,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with share button */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-foreground">Handicap & Performance</h2>
-        {currentHandicap && (
-          <ShareHandicap
-            currentHandicap={currentHandicap}
-            bestHandicap={summaryStats.bestHandicap}
-            totalRounds={summaryStats.totalRounds}
-            recentTrend={recentTrend}
-            onShare={handleShare}
-          />
-        )}
-      </div>
-
+    <div className="space-y-6 pt-0">
       {/* Summary Stats */}
       <HandicapSummaryStats
         currentHandicap={currentHandicap}

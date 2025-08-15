@@ -103,13 +103,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   }, [regionProgress, generateMotivation]);
 
   return (
-    <div className={`w-full mb-6 md:mb-8 pt-1 ${className}`}>
+    <div className={`w-full mb-6 md:mb-8 pt-0 ${className}`}>
       <div className="md:max-w-[1150px] md:mx-auto">
-        {/* Courses Journey Title moved above highlights */}
-        <div className="flex items-center gap-2 mb-4 md:mb-6 px-4 md:px-0">
-          <h3 className="text-xl md:text-2xl text-foreground">Courses Journey</h3>
-        </div>
-
         {/* Course highlights section removed */}
 
         {/* Controls Section moved - now appears above depth stack carousel */}
