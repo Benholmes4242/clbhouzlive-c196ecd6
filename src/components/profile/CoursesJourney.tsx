@@ -143,7 +143,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       {achievement.region === 'usa' ? (
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* USA Flag Background */}
                           <img
                             src="https://flagicons.lipis.dev/flags/4x3/us.svg"
@@ -162,7 +162,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         </div>
                       ) : achievement.region === 'europe' ? (
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* EU Flag Background */}
                           <img
                             src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
@@ -181,7 +181,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         </div>
                       ) : achievement.region === 'britain-ireland' ? (
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* Split Flags Background */}
                           <div className="absolute inset-0 flex">
                             <img
@@ -207,7 +207,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         </div>
                       ) : achievement.region === 'global' ? (
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* World Map Background */}
                           <img
                             src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
@@ -326,7 +326,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Flag Background */}
                             <img
                               src="https://flagicons.lipis.dev/flags/4x3/us.svg"
@@ -345,7 +345,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
-                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* EU Flag Background */}
                             <img
                               src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
@@ -364,7 +364,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
-                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Split Flags Background */}
                             <div className="absolute inset-0 flex">
                               <img
@@ -390,7 +390,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
-                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* World Map Background */}
                             <img
                               src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
