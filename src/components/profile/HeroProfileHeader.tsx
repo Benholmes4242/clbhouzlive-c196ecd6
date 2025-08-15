@@ -488,7 +488,7 @@ const HeroProfileHeader = ({
             {/* Username with Edit Button */}
             {username && (
               <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-muted-foreground">
+                <p className="text-xl md:text-2xl text-black">
                   @{username}
                 </p>
                 
@@ -505,7 +505,7 @@ const HeroProfileHeader = ({
             )}
 
             {/* Home Golf Club */}
-            <p className="text-base text-muted-foreground mb-4">
+            <p className="text-xl md:text-2xl text-black mb-4">
               {homeClub}
             </p>
           </div>
