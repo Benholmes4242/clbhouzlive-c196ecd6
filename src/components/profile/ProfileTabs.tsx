@@ -101,7 +101,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   <span className="whitespace-nowrap text-xl md:text-2xl text-black font-medium">{tab.label}</span>
                   {/* Underline only under text label */}
                   {isActive && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gray-600 dark:bg-gray-400 w-3/4" />
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gray-600 dark:bg-gray-400 w-1/2" />
                   )}
                 </button>
               );
@@ -111,7 +111,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className={`py-6 md:py-8 ${activeTab === 'activity' ? 'md:px-0' : 'px-4 md:px-0'}`}>
+      <div className={`py-2 md:py-3 ${activeTab === 'activity' ? 'md:px-0' : 'px-4 md:px-0'}`}>
         <div className={`md:max-w-[1150px] md:mx-auto`}>
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}

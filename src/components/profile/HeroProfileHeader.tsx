@@ -481,7 +481,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="text-4xl md:text-5xl text-black font-bold">
+              <h1 className="text-4xl md:text-5xl text-black">
                 {displayName}
               </h1>
             </div>

@@ -114,61 +114,53 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       <div className="px-4 md:px-0">
-
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-end gap-2">
-            <h3 className="text-xl md:text-2xl text-foreground">Activity</h3>
-            <span className="text-muted-foreground text-base">
-              {activeFilter === 'all' ? `${posts.length} posts` : `${filteredPosts.length} of ${posts.length} posts`}
-            </span>
-          </div>
-          
           {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="bg-muted border border-border hover:bg-muted/80 text-foreground transition-all duration-200"
+          <div className="flex justify-end mb-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="bg-muted border border-border hover:bg-muted/80 text-foreground transition-all duration-200"
+                >
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="bg-background border border-border"
               >
-                <Filter className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
-              className="bg-background border border-border"
-            >
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('all')}
-                className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
-              >
-                <span className="mr-2">📱</span>
-                All Posts
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('videos')}
-                className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
-              >
-                <Video className="mr-2 h-4 w-4" />
-                Videos only
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('photos')}
-                className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
-              >
-                <Image className="mr-2 h-4 w-4" />
-                Photos only
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('golf-courses')}
-                className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
-              >
-                <MapPin className="mr-2 h-4 w-4" />
-                Posts tagged with golf course
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('all')}
+                  className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
+                >
+                  <span className="mr-2">📱</span>
+                  All Posts
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('videos')}
+                  className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  Videos only
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('photos')}
+                  className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
+                >
+                  <Image className="mr-2 h-4 w-4" />
+                  Photos only
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('golf-courses')}
+                  className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
+                >
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Posts tagged with golf course
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
         {posts.length === 0 ? (
           <div className="text-center py-8">
