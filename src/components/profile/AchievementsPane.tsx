@@ -1020,8 +1020,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
           {/* Featured Most Recent Achievement */}
           {mostRecentAchievement && (
-            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
-              <div className="relative">
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'} flex justify-center`}>
+              <div className="relative max-w-2xl">
                 {/* Featured Achievement Card */}
                 <div className="p-8">
                   <div className="flex items-start gap-6">
