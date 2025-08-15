@@ -32,7 +32,7 @@ const CoursesControls: React.FC<CoursesControlsProps> = ({
             <h3 className="text-xl md:text-2xl text-foreground">Courses Played</h3>
           </div>
           
-          <div className={`flex items-center ${isMobile ? 'justify-center' : 'gap-3'}`}>
+          <div className={`flex items-center ${isMobile ? 'justify-center' : ''}`}>
             <SortAndViewDropdown 
               selectedRegion={activeFilter || 'all'}
               onRegionChange={onFilterChange}
