@@ -480,7 +480,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-xl md:text-2xl text-black font-bold">
                 {displayName}
               </h1>
             </div>
@@ -495,7 +495,7 @@ const HeroProfileHeader = ({
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
                     <button 
-                      className="px-6 py-2 rounded-lg bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-xs" 
+                      className="px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-sm" 
                       onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
@@ -510,48 +510,84 @@ const HeroProfileHeader = ({
             </p>
           </div>
 
-          {/* Stats Grid - Replacing the pill container */}
-          <div className="grid grid-cols-3 gap-8 w-full max-w-2xl">
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
-              </div>
-              <div className="text-base text-muted-foreground">Handicap</div>
-            </div>
+          {/* Stats Carousel - 4 stats per row with navigation */}
+          <div className="relative w-full max-w-2xl">
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => {
+                const container = document.getElementById('stats-container');
+                if (container) {
+                  container.scrollBy({ left: -320, behavior: 'smooth' });
+                }
+              }}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200"
+            >
+              ←
+            </button>
             
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {postsCount}
+            <button
+              onClick={() => {
+                const container = document.getElementById('stats-container');
+                if (container) {
+                  container.scrollBy({ left: 320, behavior: 'smooth' });
+                }
+              }}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200"
+            >
+              →
+            </button>
+
+            {/* Stats Container */}
+            <div 
+              id="stats-container"
+              className="flex gap-4 overflow-x-auto scrollbar-hide px-8 py-2"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                </div>
+                <div className="text-base text-muted-foreground">Handicap</div>
               </div>
-              <div className="text-base text-muted-foreground">Posts</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {followersCount}
+              
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {postsCount}
+                </div>
+                <div className="text-base text-muted-foreground">Posts</div>
               </div>
-              <div className="text-base text-muted-foreground">Followers</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {userProgressData.coursesPlayed || '24'}
+              
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {followersCount}
+                </div>
+                <div className="text-base text-muted-foreground">Followers</div>
               </div>
-              <div className="text-base text-muted-foreground">Level</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {ratedCoursesCount}
+              
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {userProgressData.coursesPlayed || '24'}
+                </div>
+                <div className="text-base text-muted-foreground">Level</div>
               </div>
-              <div className="text-base text-muted-foreground">Rated Courses</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-xl md:text-2xl font-bold text-foreground">
-                {averageRating > 0 ? `${averageRating}/10` : '--'}
+              
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {ratedCoursesCount}
+                </div>
+                <div className="text-base text-muted-foreground">Rated</div>
               </div>
-              <div className="text-base text-muted-foreground">Avg. Rating</div>
+              
+              <div className="flex-shrink-0 text-center w-20">
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {averageRating > 0 ? `${averageRating}/10` : '--'}
+                </div>
+                <div className="text-base text-muted-foreground">Avg Rating</div>
+              </div>
             </div>
           </div>
         </div>
