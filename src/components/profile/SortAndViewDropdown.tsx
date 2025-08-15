@@ -40,15 +40,6 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
     { value: 'recent', label: 'Recently Played' }
   ];
 
-  const viewOptions = [
-    { value: 'cards' as const, label: 'Card View', icon: Grid3X3 },
-    { value: 'list' as const, label: 'List View', icon: List }
-  ];
-
-  const currentRegion = regions.find(r => r.value === selectedRegion);
-  const currentSort = sortOptions.find(s => s.value === selectedSort);
-  const currentView = viewOptions.find(v => v.value === viewType);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -64,70 +55,88 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
-        className="w-64 bg-background/95 backdrop-blur-sm border border-border/50"
+        className="w-80 bg-background/95 backdrop-blur-sm border border-border/50 z-50"
         style={{ backdropFilter: 'blur(20px) saturate(150%)' }}
       >
-        {/* Region Section */}
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          Region Filter
-        </DropdownMenuLabel>
-        {regions.map((region) => (
-          <DropdownMenuItem
-            key={region.value}
-            onClick={() => onRegionChange(region.value)}
-            className={`cursor-pointer transition-colors ${
-              selectedRegion === region.value 
-                ? 'bg-primary/10 text-primary font-medium' 
-                : 'hover:bg-muted/50'
-            }`}
-          >
-            {region.label}
-          </DropdownMenuItem>
-        ))}
+        {/* Top Section - Two Columns */}
+        <div className="grid grid-cols-2 gap-4 p-2">
+          {/* Left Column - Region Filter */}
+          <div className="space-y-1">
+            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-2">
+              REGION FILTER
+            </DropdownMenuLabel>
+            <div className="space-y-1">
+              {regions.map((region) => (
+                <div
+                  key={region.value}
+                  onClick={() => onRegionChange(region.value)}
+                  className={`cursor-pointer transition-colors px-2 py-1.5 text-sm rounded ${
+                    selectedRegion === region.value 
+                      ? 'bg-primary/10 text-primary font-medium' 
+                      : 'hover:bg-muted/50'
+                  }`}
+                >
+                  {region.label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column - Sort Options */}
+          <div className="space-y-1">
+            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-2">
+              SORT OPTIONS
+            </DropdownMenuLabel>
+            <div className="space-y-1">
+              {sortOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => onSortChange(option.value)}
+                  className={`cursor-pointer transition-colors px-2 py-1.5 text-sm rounded ${
+                    selectedSort === option.value 
+                      ? 'bg-primary/10 text-primary font-medium' 
+                      : 'hover:bg-muted/50'
+                  }`}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
         <DropdownMenuSeparator />
 
-        {/* Sort Section */}
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          Sort Options
-        </DropdownMenuLabel>
-        {sortOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.value}
-            onClick={() => onSortChange(option.value)}
-            className={`cursor-pointer transition-colors ${
-              selectedSort === option.value 
-                ? 'bg-primary/10 text-primary font-medium' 
-                : 'hover:bg-muted/50'
-            }`}
-          >
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-
-        <DropdownMenuSeparator />
-
-        {/* View Section */}
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          View Type
-        </DropdownMenuLabel>
-        {viewOptions.map((option) => {
-          const IconComponent = option.icon;
-          return (
-            <DropdownMenuItem
-              key={option.value}
-              onClick={() => onViewTypeChange(option.value)}
-              className={`cursor-pointer transition-colors flex items-center ${
-                viewType === option.value 
-                  ? 'bg-primary/10 text-primary font-medium' 
-                  : 'hover:bg-muted/50'
+        {/* Bottom Section - Horizontal View Toggle */}
+        <div className="p-2">
+          <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-2 mb-2">
+            VIEW TYPE
+          </DropdownMenuLabel>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onViewTypeChange('cards')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
+                viewType === 'cards'
+                  ? 'bg-muted text-foreground shadow-sm'
+                  : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <IconComponent className="w-4 h-4 mr-2" />
-              {option.label}
-            </DropdownMenuItem>
-          );
-        })}
+              <Grid3X3 className="w-4 h-4" />
+              Card View
+            </button>
+            <button
+              onClick={() => onViewTypeChange('list')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
+                viewType === 'list'
+                  ? 'bg-muted text-foreground shadow-sm'
+                  : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              <List className="w-4 h-4" />
+              List View
+            </button>
+          </div>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
