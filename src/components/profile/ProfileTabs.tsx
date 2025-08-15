@@ -94,8 +94,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
-                      ? 'text-foreground bg-gray-100/50 dark:bg-gray-800/50' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
                   } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
                 >
                   <span className="whitespace-nowrap text-lg md:text-xl font-medium">{tab.label}</span>
