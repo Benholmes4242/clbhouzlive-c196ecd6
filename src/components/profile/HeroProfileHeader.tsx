@@ -37,7 +37,7 @@ import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { Swords } from 'lucide-react';
-import ProfileVideoCircle from './ProfileVideoCircle';
+import CinematicProfileHeader from './CinematicProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
@@ -473,31 +473,22 @@ const HeroProfileHeader = ({
           </div>
         )}
         
-        {/* Profile Content */}
-        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
-          
-          
+        {/* Cinematic Profile Header */}
+        <CinematicProfileHeader
+          videoUrl={profile?.profile_video_url}
+          thumbnailUrl={profile?.profile_video_thumbnail_url}
+          profilePhotoUrl={profile?.profile_photo_url}
+          displayName={displayName}
+          isOwnProfile={isOwnProfile}
+          onVideoUpload={handleVideoUpload}
+          onPhotoUpload={handlePhotoUpload}
+          onVideoRemove={handleVideoRemove}
+          uploading={videoUploading || photoUploading}
+          className="mb-8"
+        />
 
-          {/* Profile Photo/Video */}
-          <div className="w-64 h-64 mb-6">
-            <div 
-              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
-              title={achievementRing.title}
-            >
-              <ProfileVideoCircle
-                videoUrl={profile?.profile_video_url}
-                thumbnailUrl={profile?.profile_video_thumbnail_url}
-                profilePhotoUrl={profile?.profile_photo_url}
-                displayName={displayName}
-                isOwnProfile={isOwnProfile}
-                onVideoUpload={handleVideoUpload}
-                onPhotoUpload={handlePhotoUpload}
-                onVideoRemove={handleVideoRemove}
-                uploading={videoUploading || photoUploading}
-                className="w-full h-full"
-              />
-            </div>
-          </div>
+        {/* Profile Content */}
+        <div className="relative z-10 flex flex-col items-center text-center pb-8">
           
           {/* User Information */}
           <div className="text-center mb-6">
