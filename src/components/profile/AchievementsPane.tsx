@@ -69,7 +69,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   
   // XP Tier System
   const xpTiers = [
-    { name: "Blue Ring", color: "#10B981", minXP: 10000 },
+    { name: "Blue Ring", color: "#3B82F6", minXP: 10000 },
     { name: "Green Ring", color: "#10B981", minXP: 20000 },
     { name: "Silver Ring", color: "#6B7280", minXP: 30000 },
     { name: "Gold Ring", color: "#F59E0B", minXP: 40000 }
@@ -684,7 +684,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320">
                       {/* Gradient definition */}
                       <defs>
-                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <linearGradient id="greenProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#10B981" />
                           <stop offset="50%" stopColor="#34D399" />
                           <stop offset="100%" stopColor="#6EE7B7" />
@@ -707,7 +707,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cx="160"
                         cy="160"
                         r="140"
-                        stroke="#10B981"
+                        stroke="url(#greenProgressGradient)"
                         strokeWidth="8"
                         fill="none"
                         strokeDasharray={`${140 * 2 * Math.PI}`}
