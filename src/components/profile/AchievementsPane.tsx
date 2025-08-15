@@ -664,197 +664,315 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         
         <div className="w-full" style={{ paddingTop: isMobile ? '0px' : '0px', paddingBottom: isMobile ? '130px' : '60px' }}>
 
-          {/* Hero XP Progress Section - Both Desktop and Mobile */}
-          <div className="flex justify-center px-6 pb-8">
-            <div className={`flex items-center justify-center ${isMobile ? 'flex-col gap-6' : 'gap-12'}`}>
-              {/* Large Progress Ring */}
-              <div className="relative flex-shrink-0">
-                <div className={`relative ${isMobile ? 'w-64 h-64' : 'w-80 h-80'}`}>
-                  <svg className={`${isMobile ? 'w-64 h-64' : 'w-80 h-80'} transform -rotate-90`} viewBox="0 0 320 320">
-                    {/* Gradient definition */}
-                    <defs>
-                      <linearGradient id="greenProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#10B981" />
-                        <stop offset="50%" stopColor="#34D399" />
-                        <stop offset="100%" stopColor="#6EE7B7" />
-                      </linearGradient>
-                    </defs>
-                    
-                    {/* Background ring */}
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="140"
-                      fill="none"
-                      stroke="#E6F7F1"
-                      strokeWidth="8"
-                      strokeLinecap="round"
-                    />
-                    
-                    {/* Animated progress circle */}
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="140"
-                      stroke="#10B981"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray={`${140 * 2 * Math.PI}`}
-                      strokeDashoffset={animateProgress ? 
-                        `${140 * 2 * Math.PI * (1 - (isMobile ? 25 : progressPercentage) / 100)}` : 
-                        `${140 * 2 * Math.PI}`
-                      }
-                      strokeLinecap="round"
-                      className="transition-all duration-2000 ease-out"
-                    />
-                  </svg>
-                  
-                  {/* Center content */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center px-12">
-                    <div className={`${isMobile ? 'text-4xl' : 'text-5xl'} font-bold text-foreground mb-3`}>
-                      {totalXP.toLocaleString()} XP
-                    </div>
-                    <div className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-center leading-tight max-w-[200px] text-green-500`}>
-                      {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Right Side Info */}
-              <div className="flex-1 flex flex-col justify-center">
-                {/* Ring Achievement Status - Centered with ring */}
-                <div className="space-y-3 mb-8">
-                  <h3 className={`font-semibold ${isMobile ? 'text-xl' : 'text-2xl'} text-black dark:text-white text-center`}>
-                    {currentTier ? currentTier.name : 'No Ring Achieved'}
-                  </h3>
-                  <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white text-center`}>
-                    {currentTier ? 
-                      `Congratulations! You've earned the ${currentTier.name}!` :
-                      `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
-                    }
-                  </p>
-                </div>
-                
-                {/* XP Earned This Month - Below centered content */}
-                <div className="flex items-center justify-center gap-3">
-                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-green-600`}>XP earned this month</span>
-                  <div className="flex items-center gap-1 text-green-600 relative px-3 py-1">
-                    {/* Light green glow - more visible */}
-                    <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
-                    <svg className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} relative z-10`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          {/* Hero XP Progress Section - Desktop Only */}
+          {!isMobile && (
+            <div className="flex justify-center px-6 pb-8">
+              <div className="flex items-center justify-center gap-12">
+                {/* Large Progress Ring on the Left */}
+                <div className="relative flex-shrink-0">
+                  <div className="relative w-80 h-80">
+                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320">
+                      {/* Gradient definition */}
+                      <defs>
+                        <linearGradient id="greenProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="50%" stopColor="#34D399" />
+                          <stop offset="100%" stopColor="#6EE7B7" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Background ring */}
+                      <circle
+                        cx="160"
+                        cy="160"
+                        r="140"
+                        fill="none"
+                        stroke="#E6F7F1"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                      />
+                      
+                      {/* Animated progress circle */}
+                      <circle
+                        cx="160"
+                        cy="160"
+                        r="140"
+                        stroke="#10B981"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={`${140 * 2 * Math.PI}`}
+                        strokeDashoffset={animateProgress ? 
+                          `${140 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                          `${140 * 2 * Math.PI}`
+                        }
+                        strokeLinecap="round"
+                        className="transition-all duration-2000 ease-out"
+                      />
                     </svg>
-                    <span className={`${isMobile ? 'text-sm' : 'text-base'} font-bold relative z-10`}>450 XP</span>
+                    
+                    {/* Center content */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-12">
+                      <div className="text-5xl font-bold text-foreground mb-3">
+                        {totalXP.toLocaleString()} XP
+                      </div>
+                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-green-500">
+                        {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Right Side Info */}
+                <div className="flex-1 flex flex-col justify-center">
+                  {/* Ring Achievement Status - Centered with ring */}
+                  <div className="space-y-3 mb-8">
+                    <h3 className="font-semibold text-2xl text-black dark:text-white text-center">
+                      {currentTier ? currentTier.name : 'No Ring Achieved'}
+                    </h3>
+                    <p className="text-base text-black dark:text-white text-center">
+                      {currentTier ? 
+                        `Congratulations! You've earned the ${currentTier.name}!` :
+                        `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                      }
+                    </p>
+                  </div>
+                  
+                  {/* XP Earned This Month - Below centered content */}
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-sm font-medium text-green-600">XP earned this month</span>
+                    <div className="flex items-center gap-1 text-green-600 relative px-3 py-1">
+                      {/* Light green glow - more visible */}
+                      <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
+                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-bold relative z-10">450 XP</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
           
-          {/* XP Ring Tiers Display */}
-          <div className={`${isMobile ? 'px-4' : 'px-6'} pb-8`}>
-            <div className="relative w-full">
-              {/* Connector line across full width */}
-              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 dark:bg-gray-600 transform -translate-y-1/2" />
-              
-              {/* Ring achievement levels positioned absolutely */}
-              {xpTiers.map((tier, index) => {
-                const isUnlocked = totalXP >= tier.minXP;
-                const leftPercentage = (index / (xpTiers.length - 1)) * 100;
-                
-                return (
-                  <div 
-                    key={tier.name}
-                    className="absolute flex flex-col items-center transform -translate-x-1/2"
-                    style={{ left: `${leftPercentage}%`, top: '0' }}
-                  >
-                    {/* Ring Circle */}
-                    <div className="relative">
-                      <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full border-4 flex items-center justify-center relative ${
-                        isUnlocked 
-                          ? `bg-gradient-to-br border-4 shadow-lg`
-                          : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                      }`}
-                      style={isUnlocked ? {
-                        borderColor: tier.color,
-                        background: `linear-gradient(135deg, ${tier.color}, ${tier.color}80)`
-                      } : {}}>
-                        {!isUnlocked && (
-                          <img 
-                            src={padlockIcon}
-                            alt="Locked"
-                            className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} opacity-50`}
-                          />
-                        )}
-                        {isUnlocked && (
-                          <div className="text-white font-bold text-xl">
-                            ✓
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Ring Label */}
-                    <div className="text-center mt-2">
-                      <div className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium mb-1 text-black dark:text-white`}>
-                        {tier.name}
-                      </div>
-                      <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-black dark:text-white`}>
-                        {tier.minXP.toLocaleString()} XP
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* Achievements Title and Subtitle - Between large and small rings */}
+          {!isMobile && (
+            <div className="flex justify-center items-center px-6 pb-8">
+              <div className="text-center">
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                  Achievements
+                </h1>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                  Defining your game through achievement
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           
-          {/* Achievements Main Header */}
-          <div className={`${isMobile ? 'px-4' : 'px-6'} pb-6`}>
-            <div className="text-center">
-              <h2 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-black dark:text-white mb-2`}>
-                Achievements
-              </h2>
-              <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mb-6`}>
-                Defining your game through achievement
-              </p>
-              
-              {/* Filter Buttons */}
-              <div className={`flex flex-wrap justify-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                {(['all', 'unlocked', 'locked', 'exploration', 'skill'] as const).map((filter) => {
-                  const count = getFilterCount(filter);
-                  const isActive = activeFilter === filter;
+          {/* Mobile Title Section */}
+          {isMobile && (
+            <div className="flex justify-center items-center px-4 pb-6">
+              <div className="text-center">
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                  Achievements
+                </h1>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                  Defining your game through achievement
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Ring Progression Section - Same width as badges */}
+          {!isMobile && (
+            <div className="px-0 pb-8">
+              <div className="p-6">
+                
+                <div className="relative flex justify-between items-center gap-2">
+                  {/* Segmented connector lines between rings */}
+                  {xpTiers.map((_, index) => {
+                    if (index === xpTiers.length - 1) return null; // Don't create line after last ring
+                    
+                    const leftOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1))) + 48; // Start from right edge of current ring
+                    const rightOffset = 76 + ((index + 1) * ((100 - 2 * 76) / (xpTiers.length - 1))) - 48; // End at left edge of next ring
+                    const segmentWidth = rightOffset - leftOffset;
+                    
+                    return (
+                      <div 
+                        key={`connector-${index}`}
+                        className="absolute top-10 h-px bg-gray-300 dark:bg-gray-600 z-0" 
+                        style={{
+                          left: `${leftOffset}px`,
+                          width: `${segmentWidth}px`
+                        }} 
+                      />
+                    );
+                  })}
                   
-                  const getFilterIcon = (filter: string) => {
-                    switch (filter) {
-                      case 'all': return '🏆';
-                      case 'unlocked': return '✅';
-                      case 'locked': return '🔒';
-                      case 'exploration': return '🌍';
-                      case 'skill': return '🎯';
-                      default: return '';
+                  {xpTiers.map((tier, index) => {
+                    const isActive = totalXP >= tier.minXP;
+                    const isCurrent = currentTier?.name === tier.name;
+                    const isNext = nextTier?.name === tier.name;
+                    
+                    // Calculate progress for this specific tier
+                    let tierProgress = 0;
+                    if (isActive) {
+                      tierProgress = 100;
+                    } else if (isCurrent || isNext) {
+                      const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
+                      const tierEnd = tier.minXP;
+                      const tierRange = tierEnd - tierStart;
+                      const currentProgress = Math.max(0, totalXP - tierStart);
+                      tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
                     }
-                  };
+                    
+                    return (
+                      <div key={tier.name} className="flex-1 text-center relative z-10">
+                        <div className="relative flex justify-center mb-2">
+                          {/* Progress ring */}
+                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                            {/* Background ring */}
+                            <circle
+                              cx="32"
+                              cy="32"
+                              r="30"
+                              fill="none"
+                              stroke={`${tier.color}30`}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                            
+                            {/* Progress circle */}
+                            {tierProgress > 0 && (
+                              <circle
+                                cx="32"
+                                cy="32"
+                                r="30"
+                                stroke={tier.color}
+                                strokeWidth="3"
+                                fill="none"
+                                strokeDasharray={`${30 * 2 * Math.PI}`}
+                                strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                strokeLinecap="round"
+                                className="transition-all duration-700"
+                              />
+                            )}
+                          </svg>
+                          
+                           {/* Padlock icon for locked rings */}
+                           {!isActive && (
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                 <img 
+                                   src={padlockIcon} 
+                                   alt="Locked" 
+                                   className="w-10 h-10 opacity-60 drop-shadow-none"
+                                   style={{ filter: 'none', background: 'transparent' }}
+                                 />
+                              </div>
+                           )}
+                        </div>
+                        <div className="text-xs font-medium mb-1 text-black dark:text-white">
+                          {tier.name}
+                        </div>
+                        <div className="text-xs text-black dark:text-white">
+                          {tier.minXP.toLocaleString()} XP
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Filter Buttons - Mobile Optimized */}
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+            {isMobile ? (
+              /* Mobile: Fixed titles with dropdowns */
+              <div className="space-y-3">
+                {/* Fixed tab titles */}
+                <div className="grid grid-cols-3 gap-2 text-center text-sm font-medium text-muted-foreground mb-2">
+                  <div>Region</div>
+                  <div>Sort</div>
+                  <div>View</div>
+                </div>
+                
+                {/* Filter dropdowns */}
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Region filter */}
+                  <select 
+                    value={activeFilter === 'exploration' ? 'exploration' : activeFilter === 'skill' ? 'skill' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="exploration">Exploration</option>
+                    <option value="skill">Skill</option>
+                  </select>
                   
+                  {/* Sort filter */}
+                  <select 
+                    value={activeFilter === 'unlocked' ? 'unlocked' : activeFilter === 'locked' ? 'locked' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="unlocked">Unlocked</option>
+                    <option value="locked">Locked</option>
+                  </select>
+                  
+                  {/* View filter - placeholder for now */}
+                  <select className="h-8 text-xs border border-border rounded bg-background px-2">
+                    <option value="cards">Cards</option>
+                  </select>
+                </div>
+              </div>
+            ) : (
+              /* Desktop: Horizontal button layout */
+              <div className="flex justify-center gap-2 flex-wrap">
+                {[
+                  { key: 'all' as const, label: 'All', icon: '🏆' },
+                  { key: 'unlocked' as const, label: 'Unlocked', icon: '✅' },
+                  { key: 'locked' as const, label: 'Locked', icon: '🔒' },
+                  { key: 'exploration' as const, label: 'Exploration', icon: '🌍' },
+                  { key: 'skill' as const, label: 'Skill', icon: '🎯' }
+                ].map(({ key, label, icon }) => {
+                  const count = getFilterCount(key);
                   return (
-                    <button
-                      key={filter}
-                      onClick={() => setActiveFilter(filter)}
-                      className={`px-3 py-2 rounded-full border transition-all duration-200 ${
-                        isActive 
-                          ? 'bg-gray-100 dark:bg-gray-700 text-black dark:text-white border-gray-300 dark:border-gray-600' 
-                          : 'bg-white dark:bg-gray-800 text-black dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    <Button
+                      key={key}
+                      variant={activeFilter === key ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => setActiveFilter(key)}
+                      className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                        activeFilter === key 
+                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                          : ''
                       }`}
                     >
-                      <span className="mr-1">{getFilterIcon(filter)}</span>
-                      {filter.charAt(0).toUpperCase() + filter.slice(1)} ({count})
-                    </button>
+                      <span>{icon}</span>
+                      {label} ({count})
+                    </Button>
                   );
                 })}
               </div>
-            </div>
+            )}
           </div>
+
+          {/* Mobile XP Progress - Simplified */}
+          {isMobile && (
+            <div className="px-4 pb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-foreground mb-2">
+                  {totalXP.toLocaleString()} XP
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {Math.round(progressPercentage)}% to {nextTier.name}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sticky Progress Header (Collapsed state) */}
           <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
             isCollapsed 
               ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
