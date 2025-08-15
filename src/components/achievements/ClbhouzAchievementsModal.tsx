@@ -1016,13 +1016,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             
                             {/* Center content */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <div className="text-2xl font-bold text-foreground mb-1">
+                              <div className="text-2xl font-bold text-black mb-1">
                                 {(nextTier.minXP - totalXP).toLocaleString()}
                               </div>
-                              <div className="text-xs text-muted-foreground text-center mb-2">
+                              <div className="text-xs text-black text-center mb-2">
                                 XP to next ring
                               </div>
-                              <div className="text-xs font-medium" style={{ color: nextTier.color }}>
+                              <div className="text-xs font-medium text-black">
                                 {Math.round(progressPercentage)}% Complete
                               </div>
                             </div>
@@ -1032,16 +1032,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Ring Info */}
                         <div className="w-64 space-y-4">
                           <div className="space-y-2">
-                            <h3 className="font-semibold text-xl text-muted-foreground">
+                            <h3 className="font-semibold text-xl text-black">
                               {currentTier ? currentTier.name : 'No Ring Achieved'}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-black">
                               {currentTier ? 
                                 `Congratulations! You've earned the ${currentTier.name}!` :
                                 `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
                               }
                             </p>
-                            <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
+                            <div className="flex items-center gap-2 text-sm font-medium text-black">
                               <Trophy className="w-4 h-4" />
                               Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
                             </div>
@@ -1054,9 +1054,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 )}
 
                 {/* Ring Progression Section - Same width as badges */}
-                <div className="px-0 pb-8">
+                <div className="px-0 pb-8 max-w-none w-full">
                   <div className="p-6">
-                    <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
+                    <h4 className="text-sm font-medium text-black mb-3 text-center">Ring Progression</h4>
                     <div className="relative flex justify-between items-center gap-2">
                       {/* Connector lines */}
                       <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
@@ -1084,7 +1084,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         return (
                           <div key={tier.name} className="flex-1 text-center relative z-10">
                             <div className="relative flex justify-center mb-2">
-                              <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                              <svg className={`w-20 h-20 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
                                 <circle cx="32" cy="32" r="30" fill="none" stroke={`${tier.color}30`} strokeWidth="3" strokeLinecap="round" />
                                 {tierProgress > 0 && (
                                   <circle cx="32" cy="32" r="30" stroke={tier.color} strokeWidth="3" fill="none"
@@ -1095,12 +1095,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               </svg>
                               {!isActive && (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                  <img src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" alt="Locked" className="w-6 h-6 opacity-60" />
+                                  <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                  </svg>
                                 </div>
                               )}
                             </div>
-                            <div className="text-xs font-medium mb-1 text-black dark:text-white">{tier.name}</div>
-                            <div className="text-xs text-black dark:text-white">{tier.minXP.toLocaleString()} XP</div>
+                            <div className="text-xs font-medium mb-1 text-black">{tier.name}</div>
+                            <div className="text-xs text-black">{tier.minXP.toLocaleString()} XP</div>
                           </div>
                         );
                       })}
@@ -1370,11 +1372,20 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
-                                  <div className="flex justify-center items-center">
-                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
-                                      {getAchievementIcon(achievement)}
-                                    </div>
-                                  </div>
+                                   <div className="flex justify-center items-center relative">
+                                     <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                       {getAchievementIcon(achievement)}
+                                     </div>
+                                     {!achievement.isEarned && (
+                                       <div className="absolute inset-0 flex items-center justify-center">
+                                         <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                                           <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                           </svg>
+                                         </div>
+                                       </div>
+                                     )}
+                                   </div>
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
