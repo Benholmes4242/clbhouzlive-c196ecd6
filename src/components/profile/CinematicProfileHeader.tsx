@@ -250,7 +250,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Media Player */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-80 h-56 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="relative w-96 h-64 rounded-2xl overflow-hidden shadow-2xl">
           {hasMedia ? (
             <>
               {/* Video Element */}
