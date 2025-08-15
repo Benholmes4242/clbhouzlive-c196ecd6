@@ -177,10 +177,6 @@
     width: var(--achv-badge-size, 8rem);
     height: var(--achv-badge-size, 8rem);
   }
-
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
-  }
   
 .container {
   max-width: 1400px;
