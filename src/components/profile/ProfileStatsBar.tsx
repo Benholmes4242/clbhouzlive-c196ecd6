@@ -53,7 +53,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className={`relative w-full max-w-sm mx-auto ${isMobile ? 'px-4' : ''}`}>
+    <div className={`relative w-full max-w-lg mx-auto ${isMobile ? 'px-4' : ''}`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
@@ -78,7 +78,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       <div className="relative overflow-hidden rounded-full bg-muted border shadow-sm">
         <div 
           ref={containerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"
+          className="flex gap-8 overflow-x-auto scrollbar-hide px-4 pr-20"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
