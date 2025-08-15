@@ -796,12 +796,25 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 
                 <div className="relative flex justify-between items-center gap-2">
-                  {/* Connector lines */}
-                   <div className="absolute top-10 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
-                     backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
-                     marginLeft: '76px',
-                     marginRight: '76px'
-                   }} />
+                  {/* Segmented connector lines between rings */}
+                  {xpTiers.map((_, index) => {
+                    if (index === xpTiers.length - 1) return null; // Don't create line after last ring
+                    
+                    const leftOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1))) + 48; // Start from right edge of current ring
+                    const rightOffset = 76 + ((index + 1) * ((100 - 2 * 76) / (xpTiers.length - 1))) - 48; // End at left edge of next ring
+                    const segmentWidth = rightOffset - leftOffset;
+                    
+                    return (
+                      <div 
+                        key={`connector-${index}`}
+                        className="absolute top-10 h-px bg-gray-300 dark:bg-gray-600 z-0" 
+                        style={{
+                          left: `${leftOffset}px`,
+                          width: `${segmentWidth}px`
+                        }} 
+                      />
+                    );
+                  })}
                   
                   {xpTiers.map((tier, index) => {
                     const isActive = totalXP >= tier.minXP;
