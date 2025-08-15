@@ -460,20 +460,8 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Dynamic Background - Auto-generated from profile photo */}
+      {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
-        {/* Blurred Background Layer with Gradient Fade */}
-        {profile?.profile_photo_url && (
-          <div 
-            className="absolute top-0 left-0 w-full h-[400px] z-0"
-            style={createDynamicBackgroundStyle(profile.profile_photo_url)}
-          >
-            {/* Gradient overlay that fades the blur effect towards the profile photo */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
-          </div>
-        )}
-        
-        {/* Cinematic Profile Header */}
         <CinematicProfileHeader
           videoUrl={profile?.profile_video_url}
           thumbnailUrl={profile?.profile_video_thumbnail_url}
@@ -486,7 +474,6 @@ const HeroProfileHeader = ({
           uploading={videoUploading || photoUploading}
           className="mb-8"
         />
-
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pb-8">
           
