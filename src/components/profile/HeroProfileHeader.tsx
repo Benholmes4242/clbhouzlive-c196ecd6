@@ -475,8 +475,8 @@ const HeroProfileHeader = ({
           uploading={videoUploading || photoUploading}
         />
         
-        {/* Profile Info and Stats Bar - Below the cinematic header */}
-        <div className="relative z-40 flex flex-col items-center text-center py-8 px-4 bg-background">
+        {/* Profile Info and Stats Bar - Positioned over the blurred area */}
+        <div className="absolute bottom-0 left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 bg-gradient-to-t from-white/80 via-white/40 to-transparent pt-16">
           {/* User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
@@ -495,9 +495,9 @@ const HeroProfileHeader = ({
                 
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
-                    <button 
-                      className="px-4 py-2 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-base" 
-                      onClick={() => setEditDialogOpen(true)}
+                  <button 
+                    className="px-4 py-2 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-base" 
+                    onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
                   </button>
