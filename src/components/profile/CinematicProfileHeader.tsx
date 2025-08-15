@@ -270,7 +270,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         
         {/* Visible vertical gradient overlay for username blur transition */}
         <div 
-          className="absolute inset-0 pointer-events-none z-12"
+          className="absolute inset-0 pointer-events-none z-25"
           style={{
             background: `
               linear-gradient(to bottom, 
@@ -289,7 +289,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         
         {/* Side fade for cinematic effect */}
         <div 
-          className="absolute inset-0 pointer-events-none z-12"
+          className="absolute inset-0 pointer-events-none z-25"
           style={{
             background: `
               radial-gradient(ellipse 70% 40% at center bottom, transparent 0%, transparent 50%, hsla(var(--background) / 0.3) 75%, hsla(var(--background) / 0.7) 90%, hsl(var(--background)) 100%),
