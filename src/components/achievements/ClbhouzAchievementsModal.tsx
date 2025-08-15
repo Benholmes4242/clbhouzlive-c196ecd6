@@ -1053,82 +1053,58 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   </>
                 )}
 
-                {/* Ring Tier Display */}
-                <div className="w-full mt-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
-                  <div className="flex justify-between items-center gap-2">
-                     {xpTiers.map((tier, index) => {
-                       const isActive = totalXP >= tier.minXP;
-                       const isCurrent = currentTier?.name === tier.name;
-                       const isNext = nextTier?.name === tier.name;
-                       
-                       // Calculate progress for this specific tier
-                       let tierProgress = 0;
-                       if (isActive) {
-                         // Tier is completed, show 100%
-                         tierProgress = 100;
-                       } else if (isCurrent || isNext) {
-                         // This is the tier being worked towards
-                         const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
-                         const tierEnd = tier.minXP;
-                         const tierRange = tierEnd - tierStart;
-                         const currentProgress = Math.max(0, totalXP - tierStart);
-                         tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
-                       }
-                       
-                       return (
-                          <div key={tier.name} className="flex-1 text-center">
-                             <div className="relative flex justify-center mb-2">
-                               {/* Progress ring above titles */}
-                                <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
-                                  {/* Background ring (light color) */}
-                                  <circle
-                                    cx="32"
-                                    cy="32"
-                                    r="30"
-                                    fill="none"
-                                    stroke={`${tier.color}30`}
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                  />
-                                  
-                                  {/* Progress circle */}
-                                  {tierProgress > 0 && (
-                                    <circle
-                                      cx="32"
-                                      cy="32"
-                                      r="30"
-                                      stroke={tier.color}
-                                      strokeWidth="3"
-                                      fill="none"
-                                      strokeDasharray={`${30 * 2 * Math.PI}`}
-                                      strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                      strokeLinecap="round"
-                                      className="transition-all duration-700"
-                                    />
-                                  )}
-                                </svg>
-                               
-                                {/* Padlock icon for locked rings - including next tier */}
-                                {!isActive && (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <img 
-                                      src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                      alt="Locked" 
-                                      className="w-6 h-6 opacity-60"
-                                    />
-                                  </div>
+                {/* Ring Progression Section - Same width as badges */}
+                <div className="px-0 pb-8">
+                  <div className="p-6">
+                    <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
+                    <div className="relative flex justify-between items-center gap-2">
+                      {/* Connector lines */}
+                      <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
+                        backgroundImage: 'repeating-linear-gradient(to right, currentColor 0, currentColor 20px, transparent 20px, transparent 40px)',
+                        marginLeft: '64px',
+                        marginRight: '64px'
+                      }} />
+                      
+                      {xpTiers.map((tier, index) => {
+                        const isActive = totalXP >= tier.minXP;
+                        const isCurrent = currentTier?.name === tier.name;
+                        const isNext = nextTier?.name === tier.name;
+                        
+                        let tierProgress = 0;
+                        if (isActive) {
+                          tierProgress = 100;
+                        } else if (isCurrent || isNext) {
+                          const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
+                          const tierEnd = tier.minXP;
+                          const tierRange = tierEnd - tierStart;
+                          const currentProgress = Math.max(0, totalXP - tierStart);
+                          tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
+                        }
+                        
+                        return (
+                          <div key={tier.name} className="flex-1 text-center relative z-10">
+                            <div className="relative flex justify-center mb-2">
+                              <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="30" fill="none" stroke={`${tier.color}30`} strokeWidth="3" strokeLinecap="round" />
+                                {tierProgress > 0 && (
+                                  <circle cx="32" cy="32" r="30" stroke={tier.color} strokeWidth="3" fill="none"
+                                    strokeDasharray={`${30 * 2 * Math.PI}`}
+                                    strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                    strokeLinecap="round" className="transition-all duration-700" />
                                 )}
-                             </div>
-                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
-                             {tier.name}
-                           </div>
-                           <div className="text-xs text-muted-foreground">
-                             {tier.minXP.toLocaleString()} XP
-                           </div>
-                         </div>
-                       );
-                    })}
+                              </svg>
+                              {!isActive && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <img src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" alt="Locked" className="w-6 h-6 opacity-60" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-xs font-medium mb-1 text-black dark:text-white">{tier.name}</div>
+                            <div className="text-xs text-black dark:text-white">{tier.minXP.toLocaleString()} XP</div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
