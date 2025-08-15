@@ -54,18 +54,18 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       {isDesktop && canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 z-20 w-7 h-7 p-1 bg-white/90 hover:bg-white shadow-md rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 z-20 w-7 h-7 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronLeft className="w-4 h-4 text-gray-700" />
+          <ChevronLeft className="w-4 h-4 text-white drop-shadow-lg" />
         </button>
       )}
       
       {isDesktop && canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 z-20 w-7 h-7 p-1 bg-white/90 hover:bg-white shadow-md rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 z-20 w-7 h-7 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronRight className="w-4 h-4 text-gray-700" />
+          <ChevronRight className="w-4 h-4 text-white drop-shadow-lg" />
         </button>
       )}
       
