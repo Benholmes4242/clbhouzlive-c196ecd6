@@ -1099,7 +1099,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                          <img 
                                            src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
                                            alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
+                                           className="w-16 h-16 opacity-60"
                                          />
                                        </div>
                                      )}
@@ -1186,7 +1186,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                          <img 
                                            src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
                                            alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
+                                           className="w-16 h-16 opacity-60"
                                          />
                                        </div>
                                      )}
