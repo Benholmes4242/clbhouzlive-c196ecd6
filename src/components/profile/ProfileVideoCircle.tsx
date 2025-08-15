@@ -275,8 +275,12 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             />
           </div>
           
-          {/* Main Content Container with rounded corners */}
-          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20">
+          {/* Main Content Container with soft faded edges */}
+          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20"
+               style={{
+                 maskImage: 'radial-gradient(ellipse 85% 90% at center, black 60%, transparent 100%)',
+                 WebkitMaskImage: 'radial-gradient(ellipse 85% 90% at center, black 60%, transparent 100%)'
+               }}>
             {/* Video Element with smooth fade transition */}
             <video
               ref={videoRef}
@@ -289,6 +293,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
               muted={isMuted}
               preload="auto"
               crossOrigin="anonymous"
+            />
+            
+            {/* Soft edge overlay for additional fade effect */}
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{
+                   background: 'radial-gradient(ellipse 90% 95% at center, transparent 50%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.3) 85%, rgba(0,0,0,0.6) 100%)'
+                 }}
             />
           
             {/* Profile Photo with 4K quality optimization */}
