@@ -473,14 +473,14 @@ const HeroProfileHeader = ({
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
         />
-        {/* Profile Content - positioned over blurred media */}
-        <div className="relative z-20 flex flex-col items-center text-center pb-8">
+        {/* Profile Content - positioned absolutely over blurred header area */}
+        <div className="absolute bottom-0 left-0 right-0 z-40 flex flex-col items-center text-center pb-8 px-4">
           
           {/* User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="font-bold text-foreground text-4xl">
+              <h1 className="font-bold text-white text-4xl drop-shadow-lg">
                 {displayName}
               </h1>
             </div>
@@ -488,14 +488,14 @@ const HeroProfileHeader = ({
             {/* Username with Edit Button */}
             {username && (
               <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-muted-foreground">
+                <p className="text-lg text-white/80 drop-shadow-md">
                   @{username}
                 </p>
                 
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
                   <button 
-                    className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
+                    className="bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white font-medium hover:bg-white/30 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
                     onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
@@ -506,7 +506,7 @@ const HeroProfileHeader = ({
 
             
             {/* Home Golf Club */}
-            <p className="text-base text-muted-foreground mb-4">
+            <p className="text-base text-white/70 mb-4 drop-shadow-md">
               {homeClub}
             </p>
           </div>
