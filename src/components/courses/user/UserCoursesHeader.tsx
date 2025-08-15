@@ -19,7 +19,7 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
     : `Here's how ${firstName} rates the world's top courses`;
 
   return (
-    <div className="text-center mb-6">
+    <div>
     </div>
   );
 };

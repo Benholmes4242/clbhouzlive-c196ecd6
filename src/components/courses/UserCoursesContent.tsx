@@ -284,7 +284,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   }, [allPlayedCourses]);
 
   return (
-    <div className="relative space-y-8">
+    <div className="relative space-y-6">
       <UserCoursesHeader
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
