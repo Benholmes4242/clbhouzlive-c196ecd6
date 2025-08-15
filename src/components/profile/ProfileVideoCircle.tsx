@@ -216,7 +216,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
+      className={`relative w-full h-full rounded-lg overflow-hidden group ${className} ${
         (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
       }`}
       onMouseEnter={() => setShowControls(true)}
@@ -371,7 +371,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
       
       {/* Loading Overlay */}
       {uploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             <span className="text-white text-xs">Uploading...</span>

@@ -479,9 +479,9 @@ const HeroProfileHeader = ({
           
 
           {/* Profile Photo/Video */}
-          <div className="w-64 h-64 mb-6">
+          <div className="w-[512px] h-96 mb-6">
             <div 
-              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
+              className="relative rounded-lg overflow-hidden transition-all duration-300 w-full h-full"
               title={achievementRing.title}
             >
               <ProfileVideoCircle
