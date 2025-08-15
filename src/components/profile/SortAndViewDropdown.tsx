@@ -35,8 +35,8 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
   ];
 
   const sortOptions = [
-    { value: 'rank-asc', label: 'Rank: Low to High' },
     { value: 'rank-desc', label: 'Rank: High to Low' },
+    { value: 'rank-asc', label: 'Rank: Low to High' },
     { value: 'recent', label: 'Recently Played' }
   ];
 
@@ -72,7 +72,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
                   onClick={() => onRegionChange(region.value)}
                   className={`cursor-pointer transition-colors px-2 py-1.5 text-sm rounded ${
                     selectedRegion === region.value 
-                      ? 'bg-primary/10 text-primary font-medium' 
+                      ? 'bg-muted text-foreground font-medium' 
                       : 'hover:bg-muted/50'
                   }`}
                 >
@@ -94,7 +94,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
                   onClick={() => onSortChange(option.value)}
                   className={`cursor-pointer transition-colors px-2 py-1.5 text-sm rounded ${
                     selectedSort === option.value 
-                      ? 'bg-primary/10 text-primary font-medium' 
+                      ? 'bg-muted text-foreground font-medium' 
                       : 'hover:bg-muted/50'
                   }`}
                 >

@@ -34,7 +34,7 @@ const CoursesControls: React.FC<CoursesControlsProps> = ({
           
           <div className={`flex items-center ${isMobile ? 'justify-center' : 'gap-3'}`}>
             <SortAndViewDropdown 
-              selectedRegion={activeFilter || 'global'}
+              selectedRegion={activeFilter || 'all'}
               onRegionChange={onFilterChange}
               selectedSort={sortBy}
               onSortChange={onSortChange}
