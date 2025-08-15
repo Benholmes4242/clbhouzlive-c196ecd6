@@ -481,7 +481,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="text-5xl md:text-6xl text-black font-bold">
+              <h1 className="text-4xl md:text-5xl text-black font-bold">
                 {displayName}
               </h1>
             </div>
@@ -496,7 +496,7 @@ const HeroProfileHeader = ({
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
                     <button 
-                      className="px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-sm" 
+                      className="px-4 py-2 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-base" 
                       onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
@@ -529,7 +529,7 @@ const HeroProfileHeader = ({
             </div>
             
             {/* Stats Container - Fixed width to show exactly 4 stats */}
-            <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '320px' }}>
+            <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '400px' }}>
               <div 
                 id="stats-container"
                 className="flex gap-4 overflow-x-auto scrollbar-hide px-2 py-2"
@@ -540,42 +540,42 @@ const HeroProfileHeader = ({
                 }}
               >
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Handicap</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {postsCount}
                   </div>
                   <div className="text-base text-muted-foreground">Posts</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {followersCount}
                   </div>
                   <div className="text-base text-muted-foreground">Followers</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {userProgressData.coursesPlayed || '24'}
                   </div>
                   <div className="text-base text-muted-foreground">Level</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {ratedCoursesCount}
                   </div>
                   <div className="text-base text-muted-foreground">Rated</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl font-bold text-foreground">
                     {averageRating > 0 ? `${averageRating}/10` : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Avg Rating</div>
