@@ -668,8 +668,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="flex items-start justify-center gap-12">
                 {/* Large Progress Ring on the Left */}
                 <div className="relative flex-shrink-0">
-                  <div className="relative w-64 h-64">
-                    <svg className="w-64 h-64 transform -rotate-90" viewBox="0 0 256 256">
+                  <div className="relative w-80 h-80">
+                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320">
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -681,27 +681,27 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       
                       {/* Background ring */}
                       <circle
-                        cx="128"
-                        cy="128"
-                        r="110"
+                        cx="160"
+                        cy="160"
+                        r="140"
                         fill="none"
                         stroke="#E6F0FF"
-                        strokeWidth="6"
+                        strokeWidth="8"
                         strokeLinecap="round"
                       />
                       
                       {/* Animated progress circle */}
                       <circle
-                        cx="128"
-                        cy="128"
-                        r="110"
+                        cx="160"
+                        cy="160"
+                        r="140"
                         stroke="url(#progressGradient)"
-                        strokeWidth="6"
+                        strokeWidth="8"
                         fill="none"
-                        strokeDasharray={`${110 * 2 * Math.PI}`}
+                        strokeDasharray={`${140 * 2 * Math.PI}`}
                         strokeDashoffset={animateProgress ? 
-                          `${110 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                          `${110 * 2 * Math.PI}`
+                          `${140 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                          `${140 * 2 * Math.PI}`
                         }
                         strokeLinecap="round"
                         className="transition-all duration-2000 ease-out"
@@ -709,11 +709,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </svg>
                     
                     {/* Center content */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center px-8">
-                      <div className="text-4xl font-bold text-foreground mb-2">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-12">
+                      <div className="text-5xl font-bold text-foreground mb-3">
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-sm font-medium text-center leading-tight max-w-[160px]" style={{ color: nextTier.color }}>
+                      <div className="text-base font-medium text-center leading-tight max-w-[200px]" style={{ color: nextTier.color }}>
                         {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
