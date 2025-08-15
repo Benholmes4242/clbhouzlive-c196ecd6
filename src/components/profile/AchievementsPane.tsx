@@ -754,45 +754,32 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           
           {/* XP Ring Tiers Display */}
           <div className={`${isMobile ? 'px-4' : 'px-6'} pb-8`}>
-            <div className="relative flex justify-between items-center gap-2">
-              {/* Segmented connector lines between rings */}
-              {xpTiers.map((_, index) => {
-                if (index === xpTiers.length - 1) return null; // Don't create line after last ring
-                
-                const leftOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1))) + 48; // Start from right edge of current ring
-                const rightOffset = 76 + ((index + 1) * ((100 - 2 * 76) / (xpTiers.length - 1))) - 48; // End at left edge of next ring
-                const segmentWidth = rightOffset - leftOffset;
-                
-                return (
-                  <div 
-                    key={`line-${index}`}
-                    className="absolute top-1/2 h-0.5 bg-gray-300 dark:bg-gray-600 transform -translate-y-1/2"
-                    style={{
-                      left: `${leftOffset}%`,
-                      width: `${segmentWidth}%`,
-                    }}
-                  />
-                );
-              })}
+            <div className="relative w-full">
+              {/* Connector line across full width */}
+              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 dark:bg-gray-600 transform -translate-y-1/2" />
               
-              {/* Ring achievement levels */}
+              {/* Ring achievement levels positioned absolutely */}
               {xpTiers.map((tier, index) => {
                 const isUnlocked = totalXP >= tier.minXP;
-                const lockOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1)));
+                const leftPercentage = (index / (xpTiers.length - 1)) * 100;
                 
                 return (
                   <div 
                     key={tier.name}
-                    className="relative flex flex-col items-center"
-                    style={{ left: `${lockOffset}%`, transform: 'translateX(-50%)' }}
+                    className="absolute flex flex-col items-center transform -translate-x-1/2"
+                    style={{ left: `${leftPercentage}%`, top: '0' }}
                   >
                     {/* Ring Circle */}
                     <div className="relative">
                       <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full border-4 flex items-center justify-center relative ${
                         isUnlocked 
-                          ? `bg-gradient-to-br from-${tier.color} to-${tier.color}/70 border-${tier.color} shadow-lg`
+                          ? `bg-gradient-to-br border-4 shadow-lg`
                           : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                      }`}>
+                      }`}
+                      style={isUnlocked ? {
+                        borderColor: tier.color,
+                        background: `linear-gradient(135deg, ${tier.color}, ${tier.color}80)`
+                      } : {}}>
                         {!isUnlocked && (
                           <img 
                             src={padlockIcon}
@@ -856,8 +843,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       onClick={() => setActiveFilter(filter)}
                       className={`px-3 py-2 rounded-full border transition-all duration-200 ${
                         isActive 
-                          ? 'bg-blue-500 text-white border-blue-500' 
-                          : 'bg-white dark:bg-gray-800 text-black dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          ? 'bg-gray-100 dark:bg-gray-700 text-black dark:text-white border-gray-300 dark:border-gray-600' 
+                          : 'bg-white dark:bg-gray-800 text-black dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
                       <span className="mr-1">{getFilterIcon(filter)}</span>
