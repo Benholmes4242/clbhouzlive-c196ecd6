@@ -473,9 +473,9 @@ const HeroProfileHeader = ({
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
         />
-        {/* Profile Content - positioned absolutely over blurred header area */}
-        <div className="absolute bottom-0 left-0 right-0 z-40 flex flex-col items-center text-center pb-8 px-4">
-          
+        
+        {/* Profile Info and Stats Bar - Below the cinematic header */}
+        <div className="relative z-40 flex flex-col items-center text-center py-8 px-4 bg-background">
           {/* Dark Liquid Glass Container for Profile Info and Stats */}
           <div className="backdrop-blur-md bg-black/40 border border-white/10 shadow-2xl rounded-3xl p-6 max-w-md w-full">
             {/* User Information */}
@@ -512,7 +512,7 @@ const HeroProfileHeader = ({
               </p>
             </div>
 
-            {/* Stats Bar - Now inside the same container */}
+            {/* Stats Bar - Inside the same container */}
             <ProfileStatsBar 
               stats={[
                 { 
