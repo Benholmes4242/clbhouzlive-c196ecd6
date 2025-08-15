@@ -175,21 +175,19 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         ) : null}
       </div>
 
-      {/* Move ExploreGrid outside the padded container for mobile */}
+      {/* Remove padding on mobile for edge-to-edge cards like discover page */}
       {posts.length > 0 && filteredPosts.length > 0 && (
-        <div className="md:px-8">
-          <ExploreGrid
-            content={exploreContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            isLoading={false}
-            hasMore={false}
-            onLoadMore={handleLoadMore}
-            isDiscoverPage={true}
-            hideBadges={true}
-          />
-        </div>
+        <ExploreGrid
+          content={exploreContent}
+          onLike={handleLike}
+          onFollow={handleFollow}
+          onMediaClick={handleMediaClick}
+          isLoading={false}
+          hasMore={false}
+          onLoadMore={handleLoadMore}
+          isDiscoverPage={true}
+          hideBadges={true}
+        />
       )}
 
       {/* Vertical Media Feed Modal */}

@@ -299,12 +299,24 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
       );
     }
     
-    // Fallback for unmapped achievements - keep fallback icons for non-standard badges
-    return (
-      <div className={`${isMobile ? "w-24 h-24" : "w-40 h-40"} text-6xl flex items-center justify-center drop-shadow-lg`}>
-        {achievement.emoji}
-      </div>
-    );
+    // Use specific badge images as fallback for featured display
+    switch (achievement.title) {
+      case "Birdie Blitz":
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "20 Club":
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "50 Club":
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Eagle Collector":
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      default:
+        // Fallback for unmapped achievements
+        return (
+          <div className={`${isMobile ? "w-24 h-24" : "w-40 h-40"} text-6xl flex items-center justify-center drop-shadow-lg`}>
+            {achievement.emoji}
+          </div>
+        );
+    }
   };
 
   // Helper function to get achievement badge image
