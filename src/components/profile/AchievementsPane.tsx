@@ -721,13 +721,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 </div>
                 
                 {/* Right Side Info */}
-                <div className="flex-1 flex flex-col justify-center space-y-6">
-                  {/* Ring Achievement Status */}
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-2xl text-muted-foreground">
+                <div className="flex-1 flex flex-col justify-center">
+                  {/* Ring Achievement Status - Centered with ring */}
+                  <div className="space-y-3 mb-8">
+                    <h3 className="font-semibold text-2xl text-muted-foreground text-center">
                       {currentTier ? currentTier.name : 'No Ring Achieved'}
                     </h3>
-                    <p className="text-base text-muted-foreground">
+                    <p className="text-base text-muted-foreground text-center">
                       {currentTier ? 
                         `Congratulations! You've earned the ${currentTier.name}!` :
                         `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
@@ -735,8 +735,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </p>
                   </div>
                   
-                  {/* XP Earned This Month */}
-                  <div className="flex items-center gap-3">
+                  {/* XP Earned This Month - Below centered content */}
+                  <div className="flex items-center justify-center gap-3">
                     <span className="text-sm font-medium text-blue-600">XP earned this month</span>
                     <div className="flex items-center gap-1 text-blue-600">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
