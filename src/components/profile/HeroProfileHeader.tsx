@@ -472,10 +472,9 @@ const HeroProfileHeader = ({
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
-          className="mb-8"
         />
         {/* Profile Content - positioned over blurred media */}
-        <div className="relative z-20 flex flex-col items-center text-center pb-8 pt-20">
+        <div className="relative z-20 flex flex-col items-center text-center pb-8">
           
           {/* User Information */}
           <div className="text-center mb-6">
