@@ -540,42 +540,42 @@ const HeroProfileHeader = ({
                 }}
               >
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Handicap</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {postsCount}
                   </div>
                   <div className="text-base text-muted-foreground">Posts</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {followersCount}
                   </div>
                   <div className="text-base text-muted-foreground">Followers</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {userProgressData.coursesPlayed || '24'}
                   </div>
                   <div className="text-base text-muted-foreground">Level</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {ratedCoursesCount}
                   </div>
                   <div className="text-base text-muted-foreground">Rated</div>
                 </div>
                 
                 <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl font-bold text-foreground">
+                  <div className="text-4xl md:text-5xl text-foreground">
                     {averageRating > 0 ? `${averageRating}/10` : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Avg Rating</div>
