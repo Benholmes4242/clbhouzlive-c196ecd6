@@ -476,44 +476,38 @@ const HeroProfileHeader = ({
         {/* Profile Content - positioned absolutely over blurred header area */}
         <div className="absolute bottom-0 left-0 right-0 z-40 flex flex-col items-center text-center pb-8 px-4">
           
-          {/* User Information with Frosted Glass Background */}
-          <div className="relative text-center mb-6">
-            {/* Backdrop blur container */}
-            <div className="absolute inset-0 backdrop-blur-sm bg-white/30 rounded-3xl -m-6 shadow-lg"></div>
-            
-            {/* Content */}
-            <div className="relative z-10 p-6">
-              {/* User's Name */}
-              <div className="flex items-center justify-center">
-                <h1 className="font-bold text-black text-4xl drop-shadow-sm">
-                  {displayName}
-                </h1>
-              </div>
-              
-              {/* Username with Edit Button */}
-              {username && (
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <p className="text-lg text-gray-700 drop-shadow-sm">
-                    @{username}
-                  </p>
-                  
-                  {/* Edit Profile Button - Next to username for own profile */}
-                  {isOwnProfile && (
-                    <button 
-                      className="backdrop-blur-sm bg-white/40 rounded-full text-black font-medium hover:bg-white/50 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
-                      onClick={() => setEditDialogOpen(true)}
-                    >
-                      Edit Profile
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Home Golf Club */}
-              <p className="text-base text-gray-700 mb-4 drop-shadow-sm">
-                {homeClub}
-              </p>
+          {/* User Information */}
+          <div className="text-center mb-6">
+            {/* User's Name */}
+            <div className="flex items-center justify-center">
+              <h1 className="font-bold text-black text-4xl drop-shadow-sm">
+                {displayName}
+              </h1>
             </div>
+            
+            {/* Username with Edit Button */}
+            {username && (
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <p className="text-lg text-gray-700 drop-shadow-sm">
+                  @{username}
+                </p>
+                
+                {/* Edit Profile Button - Next to username for own profile */}
+                {isOwnProfile && (
+                  <button 
+                    className="backdrop-blur-sm bg-white/40 rounded-full text-black font-medium hover:bg-white/50 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
+                    onClick={() => setEditDialogOpen(true)}
+                  >
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Home Golf Club */}
+            <p className="text-base text-gray-700 mb-4 drop-shadow-sm">
+              {homeClub}
+            </p>
           </div>
 
           {/* Stats Bar - New Horizontal Scrollable Design */}
