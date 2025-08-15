@@ -69,7 +69,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   
   // XP Tier System
   const xpTiers = [
-    { name: "Blue Ring", color: "#3B82F6", minXP: 10000 },
+    { name: "Blue Ring", color: "#10B981", minXP: 10000 },
     { name: "Green Ring", color: "#10B981", minXP: 20000 },
     { name: "Silver Ring", color: "#6B7280", minXP: 30000 },
     { name: "Gold Ring", color: "#F59E0B", minXP: 40000 }
@@ -750,13 +750,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   {/* XP Earned This Month - Below centered content */}
                   <div className="flex items-center justify-center gap-3">
                     <span className="text-sm font-medium text-green-600">XP earned this month</span>
-                    <div className="flex items-center gap-1 text-green-600 relative">
-                      {/* Light green glow */}
-                      <div className="absolute inset-0 bg-green-200/30 rounded-lg blur-sm -z-10"></div>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center gap-1 text-green-600 relative px-3 py-1">
+                      {/* Light green glow - more visible */}
+                      <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
+                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span className="font-bold">450 XP</span>
+                      <span className="font-bold relative z-10">450 XP</span>
                     </div>
                   </div>
                 </div>
@@ -1108,7 +1108,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'}`}>
+            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'} ${isMobile ? 'pt-0' : 'pt-2'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="p-6">
                 {/* Section Header with Icon */}
