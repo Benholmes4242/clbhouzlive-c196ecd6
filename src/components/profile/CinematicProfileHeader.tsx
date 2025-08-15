@@ -265,13 +265,23 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-muted" />
         )}
         
-        {/* Edge-to-edge gradient overlay for smooth transitions */}
+        {/* Vertical gradient overlay for username blur transition */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `
               radial-gradient(ellipse 60% 40% at center, transparent 0%, transparent 30%, hsla(var(--background) / 0.2) 50%, hsla(var(--background) / 0.6) 70%, hsla(var(--background) / 0.9) 85%, hsl(var(--background)) 100%),
-              linear-gradient(to bottom, hsla(var(--background) / 0.1) 0%, transparent 20%, transparent 80%, hsla(var(--background) / 0.8) 95%, hsl(var(--background)) 100%),
+              linear-gradient(to bottom, 
+                hsla(var(--background) / 0.0) 0%, 
+                hsla(var(--background) / 0.0) 40%, 
+                hsla(var(--background) / 0.1) 50%, 
+                hsla(var(--background) / 0.3) 60%, 
+                hsla(var(--background) / 0.5) 70%, 
+                hsla(var(--background) / 0.7) 80%, 
+                hsla(var(--background) / 0.85) 90%, 
+                hsla(var(--background) / 0.95) 95%, 
+                hsl(var(--background)) 100%
+              ),
               linear-gradient(to right, hsla(var(--background) / 0.3) 0%, transparent 15%, transparent 85%, hsla(var(--background) / 0.3) 100%)
             `
           }}
