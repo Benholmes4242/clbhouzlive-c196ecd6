@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 // Using the user's original padlock image
@@ -1044,25 +1045,26 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     {/* Latest Achievement Details */}
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">Latest Achievement</h3>
+                      <h3 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white mb-3`}>Latest Achievement</h3>
                       
-                      <div className="text-sm text-muted-foreground mb-4">
-                        <span className="text-green-500 font-semibold">+{mostRecentAchievement.xp} XP</span>
-                      </div>
-                      
-                      <div className="text-sm text-muted-foreground mb-4">
-                        Unlocked {mostRecentAchievement.dateEarned}
+                      <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+                        <span className="text-green-500 font-bold">+{mostRecentAchievement.xp} XP</span>
                       </div>
                       
                       {/* Share Button */}
-                      <div className="mt-4">
+                      <div className="mb-4">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex items-center gap-2"
                         >
+                          <PaperAirplaneIcon className="w-4 h-4" />
                           Share
                         </Button>
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground">
+                        Unlocked {mostRecentAchievement.dateEarned}
                       </div>
                     </div>
                   </div>
