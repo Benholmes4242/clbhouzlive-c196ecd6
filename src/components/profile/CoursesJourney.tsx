@@ -184,7 +184,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         </div>
                       ) : achievement.region === 'britain-ireland' ? (
-                        <div className="relative w-44 h-44 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                        <div className="relative w-40 h-40 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* UK & Ireland Map Background */}
                           <img
                             src="/lovable-uploads/dc0f671b-b75f-4121-8ebd-18dd7f9b67c3.png"
@@ -360,7 +360,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
-                          <div className="relative w-40 h-40 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-36 h-36 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* UK & Ireland Map Background */}
                             <img
                               src="/lovable-uploads/dc0f671b-b75f-4121-8ebd-18dd7f9b67c3.png"
