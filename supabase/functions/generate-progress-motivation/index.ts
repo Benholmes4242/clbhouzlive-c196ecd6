@@ -45,11 +45,11 @@ serve(async (req) => {
     let prompt = '';
     
     if (isCompleted) {
-      prompt = `Generate a single combined message (15-20 words) that includes both completion status and celebration for someone who has completed all courses in the ${regionName} golf course list. Format: "Achievement unlocked! (100% complete) [celebratory tagline referencing the region]". Use "${pronoun}" and "${possessive}" appropriately.`;
+      prompt = `Generate a unique celebratory message (12-18 words) for someone who has completed all courses in the ${regionName} golf course list. Create a COMPLETELY DIFFERENT format from standard messages - be creative with structure. Reference the specific region's golf culture. Use "${pronoun}" and "${possessive}" appropriately. Examples of varied formats: "Links mastery achieved - 100% complete!", "Every American treasure conquered!", "Continental excellence personified - all courses complete!". Make it unique and different from other regions.`;
     } else if (isNearCompletion) {
-      prompt = `Generate a single combined message (15-20 words) that includes progress and excitement for someone who only has ${remaining} courses left in the ${regionName} golf course list. Format: "${remaining} trips to go! (${percentage}% complete) [exciting tagline about being close]". Use "${pronoun}" and "${possessive}" appropriately.`;
+      prompt = `Generate a unique urgent message (12-18 words) for someone who only has ${remaining} courses left in the ${regionName} golf course list (${percentage}% complete). Create a COMPLETELY DIFFERENT format - don't follow standard patterns. Be creative with how you present the progress and motivation. Reference the region's golf character. Use "${pronoun}" and "${possessive}" appropriately. Make it structurally different from other region messages.`;
     } else {
-      prompt = `Generate a single combined message (15-20 words) that includes progress and motivation for someone who has played ${played} out of ${total} courses in the ${regionName} golf course list. Format: "${remaining} courses to go (${percentage}% complete) [encouraging tagline referencing the region's golf culture]". Use "${pronoun}" and "${possessive}" appropriately.`;
+      prompt = `Generate a unique motivational message (12-18 words) for someone who has played ${played} out of ${total} courses in the ${regionName} golf course list (${percentage}% complete, ${remaining} remaining). Create a COMPLETELY DIFFERENT format and structure - don't follow standard "X courses to go (Y% complete) tagline" patterns. Be creative with how you present the progress. Reference the region's unique golf culture. Use "${pronoun}" and "${possessive}" appropriately. Examples of varied structures: "Building your Scottish legacy, 19% conquered", "America's finest await - 15 down, many adventures ahead", "Continental conquest underway, ${percentage}% explored". Make each region's message structurally unique.`;
     }
 
     console.log('Generating motivation for:', { region, played, total, percentage, remaining, isOwnProfile });
@@ -66,7 +66,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a golf enthusiast who creates combined progress and motivational messages for golfers. The message should include both the numerical progress and an inspiring tagline in one cohesive sentence. Keep it concise but engaging.'
+            content: 'You are a creative golf writer who creates unique, varied motivational messages. NEVER use the same format twice. Each message should have a completely different structure and style. Avoid repetitive patterns like "X courses to go (Y% complete)" - be creative with how you present progress. Make each region feel distinct with varied formatting.'
           },
           { role: 'user', content: prompt }
         ],
