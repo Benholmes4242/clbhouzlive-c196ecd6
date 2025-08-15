@@ -670,17 +670,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     <div className="w-full max-w-[1200px] mx-auto">
       <div className={`w-full flex flex-col bg-background`}>
         <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
-          <div className="flex justify-center items-center">
-            {/* Centered Title and subtitle */}
-            <div className="text-center">
-              <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
-                Achievements
-              </h1>
-              <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
-                Defining your game through achievement
-              </p>
-            </div>
-          </div>
         </div>
         
         <div className="w-full" style={{ paddingTop: isMobile ? '20px' : '30px', paddingBottom: isMobile ? '130px' : '60px' }}>
@@ -773,11 +762,39 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             </div>
           )}
           
+          {/* Achievements Title and Subtitle - Between large and small rings */}
+          {!isMobile && (
+            <div className="flex justify-center items-center px-6 pb-8">
+              <div className="text-center">
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                  Achievements
+                </h1>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                  Defining your game through achievement
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Mobile Title Section */}
+          {isMobile && (
+            <div className="flex justify-center items-center px-4 pb-6">
+              <div className="text-center">
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                  Achievements
+                </h1>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                  Defining your game through achievement
+                </p>
+              </div>
+            </div>
+          )}
+          
           {/* Ring Progression Section - Same width as badges */}
           {!isMobile && (
             <div className="px-0 pb-8">
               <div className="p-6">
-                <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
+                
                 <div className="relative flex justify-between items-center gap-2">
                   {/* Connector lines */}
                    <div className="absolute top-10 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
@@ -1021,7 +1038,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
           {/* Featured Most Recent Achievement */}
           {mostRecentAchievement && (
-            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'} flex justify-center`}>
+            <div className={`${isMobile ? 'px-4 pb-3' : 'px-6 pb-4'} flex justify-center`}>
               <div className="relative max-w-2xl">
                 {/* Featured Achievement Card */}
                 <div className="p-8">
@@ -1033,7 +1050,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       </div>
                       
                       {/* Achievement Title under badge */}
-                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-3 mb-2">
+                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-3 mb-1">
                         {mostRecentAchievement.title}
                       </h4>
                       
