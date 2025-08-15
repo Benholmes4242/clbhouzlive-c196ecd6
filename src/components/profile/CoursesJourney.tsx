@@ -143,16 +143,24 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       {achievement.region === 'usa' ? (
-                        <>
-                          <CountryFlag country="USA" size="lg" className="mb-1" />
-                          <div className="text-lg font-bold text-foreground leading-none">
-                            <span className="font-bold">{progress.played}</span>
-                            <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          {/* USA Flag Background */}
+                          <img
+                            src="https://flagicons.lipis.dev/flags/4x3/us.svg"
+                            alt="USA flag background"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          {/* Overlay content */}
+                          <div className="relative z-10 text-center">
+                            <div className="text-lg font-bold text-white drop-shadow-md leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-white/90"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-white/90 font-medium drop-shadow-md">
+                              Courses
+                            </div>
                           </div>
-                          <div className="text-xs text-muted-foreground font-medium">
-                            Courses
-                          </div>
-                        </>
+                        </div>
                       ) : (
                         <>
                           <div className="text-2xl font-bold text-foreground leading-none">
@@ -254,16 +262,24 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <>
-                            <CountryFlag country="USA" size="md" className="mb-1" />
-                            <div className="text-sm font-bold text-foreground leading-none">
-                              <span className="font-bold">{progress.played}</span>
-                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                            {/* USA Flag Background */}
+                            <img
+                              src="https://flagicons.lipis.dev/flags/4x3/us.svg"
+                              alt="USA flag background"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                            {/* Overlay content */}
+                            <div className="relative z-10 text-center">
+                              <div className="text-sm font-bold text-white drop-shadow-md leading-none">
+                                <span className="font-bold">{progress.played}</span>
+                                <span className="font-normal text-white/90"> / {progress.total}</span>
+                              </div>
+                              <div className="text-xs text-white/90 font-medium drop-shadow-md">
+                                Courses
+                              </div>
                             </div>
-                            <div className="text-xs text-muted-foreground font-medium">
-                              Courses
-                            </div>
-                          </>
+                          </div>
                         ) : (
                           <>
                             <div className="text-lg font-bold text-foreground leading-none">
