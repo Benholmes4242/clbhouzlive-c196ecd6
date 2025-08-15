@@ -86,7 +86,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
             <button
               key={index}
               onClick={stat.onClick}
-              className="flex-shrink-0 w-20 flex flex-col items-center justify-center py-2 hover:opacity-80 transition-opacity duration-200"
+              className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
             >
               <div className="text-lg font-semibold text-white drop-shadow-lg">
                 {stat.value}
