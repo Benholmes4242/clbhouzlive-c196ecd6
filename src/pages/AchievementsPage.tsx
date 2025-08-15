@@ -723,15 +723,12 @@ const AchievementsPage: React.FC<AchievementsPageProps> = ({
   const mostRecentAchievement = getMostRecentAchievement();
 
   return (
-    <div className="min-h-screen bg-background pb-28 relative">
+    <div className="min-h-screen bg-background relative">
       {/* Header */}
       <Header />
 
-      <div className={`
-        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-2xl max-h-[85vh] p-0'} 
-        mx-auto overflow-hidden flex flex-col bg-white mt-4
-      `}>
-        <div className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+      <div className="w-full flex flex-col bg-background">
+        <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
             <div className="text-left">
@@ -766,17 +763,7 @@ const AchievementsPage: React.FC<AchievementsPageProps> = ({
           </div>
         </div>
         
-        <div 
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y"
-          style={{ 
-            scrollbarWidth: 'thin',
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch',
-            touchAction: 'pan-y',
-            overscrollBehaviorY: 'contain'
-          }}
-        >
+        <div className="w-full" style={{ paddingTop: isMobile ? '20px' : '30px', paddingBottom: isMobile ? '130px' : '60px' }}>
 
           {/* Collapsible XP Progress Header with Smooth Animations */}
           <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
