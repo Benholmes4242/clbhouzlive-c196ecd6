@@ -255,8 +255,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Gradient fade to white at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent z-20 pointer-events-none"></div>
+      {/* Gradient fade to white at bottom - extended and smoother */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
 
       {/* Content Overlay */}
       <div 
