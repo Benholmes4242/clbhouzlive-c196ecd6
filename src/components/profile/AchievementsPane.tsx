@@ -697,7 +697,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cy="160"
                         r="140"
                         fill="none"
-                        stroke="#E6F0FF"
+                        stroke="#E6F7F1"
                         strokeWidth="8"
                         strokeLinecap="round"
                       />
@@ -707,7 +707,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cx="160"
                         cy="160"
                         r="140"
-                        stroke="url(#greenProgressGradient)"
+                        stroke="#10B981"
                         strokeWidth="8"
                         fill="none"
                         strokeDasharray={`${140 * 2 * Math.PI}`}
