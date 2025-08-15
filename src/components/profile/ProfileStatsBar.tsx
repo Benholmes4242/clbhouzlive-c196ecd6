@@ -75,7 +75,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       
       
       {/* Stats container with peek effect */}
-      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md shadow-xl">
         <div 
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"

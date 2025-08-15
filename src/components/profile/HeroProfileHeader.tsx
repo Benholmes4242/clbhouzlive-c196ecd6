@@ -495,7 +495,7 @@ const HeroProfileHeader = ({
                 {/* Edit Profile Button - Next to username for own profile */}
                 {isOwnProfile && (
                   <button 
-                    className="bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white font-medium hover:bg-white/30 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
+                    className="bg-white/20 backdrop-blur-md rounded-full text-black font-medium hover:bg-white/30 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
                     onClick={() => setEditDialogOpen(true)}
                   >
                     Edit Profile
