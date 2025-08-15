@@ -647,9 +647,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     <div className="w-full max-w-[1200px] mx-auto">
       <div className={`w-full flex flex-col bg-background`}>
         <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
-          <div className="flex justify-between items-center">
-            {/* Left side - Title and subtitle */}
-            <div className="text-left">
+          <div className="flex justify-center items-center">
+            {/* Centered Title and subtitle */}
+            <div className="text-center">
               <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
                 Achievements
               </h1>
@@ -657,7 +657,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 Defining your game through achievement
               </p>
             </div>
-            
           </div>
         </div>
         
@@ -665,7 +664,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
           {/* Hero XP Progress Section - Desktop Only */}
           {!isMobile && (
-            <div className="px-6 pb-8">
+            <div className="flex justify-center px-6 pb-8">
               <div className="flex items-start justify-center gap-12">
                 {/* Large Progress Ring on the Left */}
                 <div className="relative flex-shrink-0">
