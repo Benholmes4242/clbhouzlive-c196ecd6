@@ -480,7 +480,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="font-bold text-black text-4xl" style={{ textShadow: '0 1px 3px rgba(255, 255, 255, 0.8)' }}>
+              <h1 className="font-bold text-black text-4xl">
                 {displayName}
               </h1>
             </div>
@@ -488,7 +488,7 @@ const HeroProfileHeader = ({
             {/* Username with Edit Button */}
             {username && (
               <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-black" style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.6)' }}>
+                <p className="text-lg text-black">
                   @{username}
                 </p>
                 
@@ -506,7 +506,7 @@ const HeroProfileHeader = ({
 
             
             {/* Home Golf Club */}
-            <p className="text-base text-black" style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.6)' }}>
+            <p className="text-base text-black">
               {homeClub}
             </p>
           </div>

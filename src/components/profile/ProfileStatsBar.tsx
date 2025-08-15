@@ -92,10 +92,10 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
               onClick={stat.onClick}
               className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
             >
-              <div className="text-lg font-semibold text-black" style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)' }}>
+              <div className="text-lg font-semibold text-black">
                 {stat.value}
               </div>
-              <div className="text-xs text-black/80 font-medium" style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.6)' }}>
+              <div className="text-xs text-black/80 font-medium">
                 {stat.label}
               </div>
             </button>
