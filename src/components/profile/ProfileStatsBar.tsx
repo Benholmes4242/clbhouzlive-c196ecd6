@@ -60,7 +60,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
           onClick={() => scroll('left')}
           className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
+          <ChevronLeft className="w-5 h-5 text-black drop-shadow-sm" />
         </button>
       )}
       
@@ -69,13 +69,13 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
           onClick={() => scroll('right')}
           className="absolute right-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
+          <ChevronRight className="w-5 h-5 text-black drop-shadow-sm" />
         </button>
       )}
       
       
-      {/* Stats container with peek effect */}
-      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+      {/* Stats container with frosted glass effect */}
+      <div className="relative overflow-hidden rounded-full backdrop-blur-sm bg-white/30 shadow-xl">
         <div 
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"
@@ -92,10 +92,10 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
               onClick={stat.onClick}
               className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
             >
-              <div className="text-lg font-semibold text-white drop-shadow-lg">
+              <div className="text-lg font-semibold text-black drop-shadow-sm">
                 {stat.value}
               </div>
-              <div className="text-xs text-white/80 font-medium drop-shadow-md">
+              <div className="text-xs text-gray-700 font-medium drop-shadow-sm">
                 {stat.label}
               </div>
             </button>
@@ -104,7 +104,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
         
         {/* Right fade gradient to create peek effect */}
         {stats.length > 4 && (
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/10 via-white/5 to-transparent pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/30 via-white/15 to-transparent pointer-events-none" />
         )}
       </div>
     </div>
