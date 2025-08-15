@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -141,13 +142,28 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <div className="text-2xl font-bold text-foreground leading-none">
-                        <span className="font-bold">{progress.played}</span>
-                        <span className="font-normal text-muted-foreground"> / {progress.total}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground font-medium mt-1">
-                        Courses
-                      </div>
+                      {achievement.region === 'usa' ? (
+                        <>
+                          <CountryFlag country="USA" size="lg" className="mb-1" />
+                          <div className="text-lg font-bold text-foreground leading-none">
+                            <span className="font-bold">{progress.played}</span>
+                            <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground font-medium">
+                            Courses
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-bold text-foreground leading-none">
+                            <span className="font-bold">{progress.played}</span>
+                            <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground font-medium mt-1">
+                            Courses
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                   
@@ -237,13 +253,28 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <div className="text-lg font-bold text-foreground leading-none">
-                          <span className="font-bold">{progress.played}</span>
-                          <span className="font-normal text-muted-foreground"> / {progress.total}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium mt-1">
-                          Courses
-                        </div>
+                        {achievement.region === 'usa' ? (
+                          <>
+                            <CountryFlag country="USA" size="md" className="mb-1" />
+                            <div className="text-sm font-bold text-foreground leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-medium">
+                              Courses
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-lg font-bold text-foreground leading-none">
+                              <span className="font-bold">{progress.played}</span>
+                              <span className="font-normal text-muted-foreground"> / {progress.total}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-medium mt-1">
+                              Courses
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                     
