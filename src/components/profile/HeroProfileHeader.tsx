@@ -481,7 +481,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="text-xl md:text-2xl text-black font-bold">
+              <h1 className="text-3xl md:text-4xl text-black font-bold">
                 {displayName}
               </h1>
             </div>
@@ -512,7 +512,7 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="relative w-full max-w-sm mx-auto flex items-center gap-2">
+          <div className="flex items-center justify-center gap-3 w-full max-w-md mx-auto">
             {/* Left Navigation Arrow */}
             <button
               onClick={() => {
@@ -521,13 +521,13 @@ const HeroProfileHeader = ({
                   container.scrollBy({ left: -320, behavior: 'smooth' });
                 }
               }}
-              className="flex-shrink-0 w-6 h-6 rounded-full backdrop-blur-sm bg-black/20 border border-white/20 flex items-center justify-center text-white opacity-80 hover:opacity-100 transition-all duration-200 p-1"
+              className="flex-shrink-0 w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
             >
               <ArrowLeftIcon className="w-3 h-3" />
             </button>
             
             {/* Stats Container - Fixed width to show exactly 4 stats */}
-            <div className="overflow-hidden rounded-lg flex-1">
+            <div className="overflow-hidden rounded-lg">
               <div 
                 id="stats-container"
                 className="flex gap-4 overflow-x-auto scrollbar-hide px-2 py-2"
@@ -589,7 +589,7 @@ const HeroProfileHeader = ({
                   container.scrollBy({ left: 320, behavior: 'smooth' });
                 }
               }}
-              className="flex-shrink-0 w-6 h-6 rounded-full backdrop-blur-sm bg-black/20 border border-white/20 flex items-center justify-center text-white opacity-80 hover:opacity-100 transition-all duration-200 p-1"
+              className="flex-shrink-0 w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
             >
               <ArrowRightIcon className="w-3 h-3" />
             </button>
