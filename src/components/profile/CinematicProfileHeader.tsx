@@ -208,7 +208,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   return (
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
-           marginTop: '-12rem',
+           marginTop: '-8rem',
            height: '80vh',
            minHeight: '600px',
            maxHeight: '800px'
