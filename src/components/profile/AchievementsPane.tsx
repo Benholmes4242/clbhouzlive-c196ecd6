@@ -1,7 +1,7 @@
 // AchievementsPane - Complete inline achievements for Profile page
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Trophy, ChevronDown, ChevronUp, Lock } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 
@@ -858,6 +858,80 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             </div>
           )}
 
+          {/* Filter Buttons - Mobile Optimized */}
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+            {isMobile ? (
+              /* Mobile: Fixed titles with dropdowns */
+              <div className="space-y-3">
+                {/* Fixed tab titles */}
+                <div className="grid grid-cols-3 gap-2 text-center text-sm font-medium text-muted-foreground mb-2">
+                  <div>Region</div>
+                  <div>Sort</div>
+                  <div>View</div>
+                </div>
+                
+                {/* Filter dropdowns */}
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Region filter */}
+                  <select 
+                    value={activeFilter === 'exploration' ? 'exploration' : activeFilter === 'skill' ? 'skill' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="exploration">Exploration</option>
+                    <option value="skill">Skill</option>
+                  </select>
+                  
+                  {/* Sort filter */}
+                  <select 
+                    value={activeFilter === 'unlocked' ? 'unlocked' : activeFilter === 'locked' ? 'locked' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="unlocked">Unlocked</option>
+                    <option value="locked">Locked</option>
+                  </select>
+                  
+                  {/* View filter - placeholder for now */}
+                  <select className="h-8 text-xs border border-border rounded bg-background px-2">
+                    <option value="cards">Cards</option>
+                  </select>
+                </div>
+              </div>
+            ) : (
+              /* Desktop: Horizontal button layout */
+              <div className="flex justify-center gap-2 flex-wrap">
+                {[
+                  { key: 'all' as const, label: 'All', icon: '🏆' },
+                  { key: 'unlocked' as const, label: 'Unlocked', icon: '✅' },
+                  { key: 'locked' as const, label: 'Locked', icon: '🔒' },
+                  { key: 'exploration' as const, label: 'Exploration', icon: '🌍' },
+                  { key: 'skill' as const, label: 'Skill', icon: '🎯' }
+                ].map(({ key, label, icon }) => {
+                  const count = getFilterCount(key);
+                  return (
+                    <Button
+                      key={key}
+                      variant={activeFilter === key ? 'secondary' : 'outline'}
+                      size="sm"
+                      onClick={() => setActiveFilter(key)}
+                      className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                        activeFilter === key 
+                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                          : ''
+                      }`}
+                    >
+                      <span>{icon}</span>
+                      {label} ({count})
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Mobile XP Progress - Simplified */}
           {isMobile && (
             <div className="px-4 pb-6">
@@ -976,79 +1050,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             </div>
           )}
 
-          {/* Filter Buttons - Mobile Optimized */}
-          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
-            {isMobile ? (
-              /* Mobile: Fixed titles with dropdowns */
-              <div className="space-y-3">
-                {/* Fixed tab titles */}
-                <div className="grid grid-cols-3 gap-2 text-center text-sm font-medium text-muted-foreground mb-2">
-                  <div>Region</div>
-                  <div>Sort</div>
-                  <div>View</div>
-                </div>
-                
-                {/* Filter dropdowns */}
-                <div className="grid grid-cols-3 gap-2">
-                  {/* Region filter */}
-                  <select 
-                    value={activeFilter === 'exploration' ? 'exploration' : activeFilter === 'skill' ? 'skill' : 'all'}
-                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
-                    className="h-8 text-xs border border-border rounded bg-background px-2"
-                  >
-                    <option value="all">All</option>
-                    <option value="exploration">Exploration</option>
-                    <option value="skill">Skill</option>
-                  </select>
-                  
-                  {/* Sort filter */}
-                  <select 
-                    value={activeFilter === 'unlocked' ? 'unlocked' : activeFilter === 'locked' ? 'locked' : 'all'}
-                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
-                    className="h-8 text-xs border border-border rounded bg-background px-2"
-                  >
-                    <option value="all">All</option>
-                    <option value="unlocked">Unlocked</option>
-                    <option value="locked">Locked</option>
-                  </select>
-                  
-                  {/* View filter - placeholder for now */}
-                  <select className="h-8 text-xs border border-border rounded bg-background px-2">
-                    <option value="cards">Cards</option>
-                  </select>
-                </div>
-              </div>
-            ) : (
-              /* Desktop: Horizontal button layout */
-              <div className="flex justify-center gap-2 flex-wrap">
-                {[
-                  { key: 'all' as const, label: 'All', icon: '🏆' },
-                  { key: 'unlocked' as const, label: 'Unlocked', icon: '✅' },
-                  { key: 'locked' as const, label: 'Locked', icon: '🔒' },
-                  { key: 'exploration' as const, label: 'Exploration', icon: '🌍' },
-                  { key: 'skill' as const, label: 'Skill', icon: '🎯' }
-                ].map(({ key, label, icon }) => {
-                  const count = getFilterCount(key);
-                  return (
-                    <Button
-                      key={key}
-                      variant={activeFilter === key ? 'secondary' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveFilter(key)}
-                      className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                        activeFilter === key 
-                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
-                          : ''
-                      }`}
-                    >
-                      <span>{icon}</span>
-                      {label} ({count})
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
 
           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
@@ -1096,11 +1097,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      </div>
                                      {!achievement.isEarned && (
                                        <div className="absolute inset-0 flex items-center justify-center">
-                                         <img 
-                                           src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                           alt="Locked" 
-                                           className="w-16 h-16 opacity-60"
-                                         />
+                                         <div className="bg-black/50 rounded-full p-3">
+                                           <Lock className="w-8 h-8 text-white/70" fill="currentColor" />
+                                         </div>
                                        </div>
                                      )}
                                    </div>
@@ -1183,11 +1182,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      </div>
                                      {!achievement.isEarned && (
                                        <div className="absolute inset-0 flex items-center justify-center">
-                                         <img 
-                                           src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                           alt="Locked" 
-                                           className="w-16 h-16 opacity-60"
-                                         />
+                                         <div className="bg-black/50 rounded-full p-3">
+                                           <Lock className="w-8 h-8 text-white/70" fill="currentColor" />
+                                         </div>
                                        </div>
                                      )}
                                    </div>
