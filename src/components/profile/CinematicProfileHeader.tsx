@@ -207,38 +207,50 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   return (
     <div className={`relative w-full h-96 overflow-hidden ${className}`}>
-      {/* Full Background Media Layer with Blur */}
-      <div className="absolute inset-0">
+      {/* Full-width Live Blur Background - extends edge to edge */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
         {hasMedia ? (
           <>
-            {/* Blurred Background Layer */}
-            {profilePhotoUrl && (
-              <div 
-                className="absolute inset-0 w-full h-full"
-                style={{
-                  backgroundImage: `url(${profilePhotoUrl}?quality=60&format=auto&width=1920&height=1080&fit=cover)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: 'blur(40px)',
-                  transform: 'scale(1.1)'
-                }}
-              />
-            )}
-            
-            {/* Video Blurred Background */}
-            {videoUrl && !profilePhotoUrl && (
+            {/* Live Video Blur Background */}
+            {videoUrl && (
               <video
                 src={videoUrl}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover scale-110"
                 style={{
-                  filter: 'blur(40px)',
-                  transform: 'scale(1.1)',
-                  opacity: 0.7
+                  filter: 'blur(60px)',
+                  opacity: 0.8
                 }}
                 muted
                 loop
                 autoPlay
                 playsInline
+                ref={(el) => {
+                  if (el && videoRef.current) {
+                    // Sync the blur video with the main video
+                    const syncTime = () => {
+                      if (videoRef.current && Math.abs(el.currentTime - videoRef.current.currentTime) > 0.5) {
+                        el.currentTime = videoRef.current.currentTime;
+                      }
+                    };
+                    
+                    const interval = setInterval(syncTime, 100);
+                    return () => clearInterval(interval);
+                  }
+                }}
+              />
+            )}
+            
+            {/* Static Photo Blur Background (fallback when no video) */}
+            {profilePhotoUrl && !videoUrl && (
+              <div 
+                className="absolute inset-0 w-full h-full scale-110"
+                style={{
+                  backgroundImage: `url(${profilePhotoUrl}?quality=60&format=auto&width=1920&height=1080&fit=cover)`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'blur(60px)',
+                  opacity: 0.8
+                }}
               />
             )}
           </>
@@ -246,14 +258,26 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           /* Fallback gradient background */
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-muted" />
         )}
+        
+        {/* Edge-to-edge gradient overlay for smooth transitions */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse 60% 40% at center, transparent 0%, transparent 30%, hsla(var(--background) / 0.2) 50%, hsla(var(--background) / 0.6) 70%, hsla(var(--background) / 0.9) 85%, hsl(var(--background)) 100%),
+              linear-gradient(to bottom, hsla(var(--background) / 0.1) 0%, transparent 20%, transparent 80%, hsla(var(--background) / 0.8) 95%, hsl(var(--background)) 100%),
+              linear-gradient(to right, hsla(var(--background) / 0.3) 0%, transparent 15%, transparent 85%, hsla(var(--background) / 0.3) 100%)
+            `
+          }}
+        />
       </div>
 
-      {/* Central Media Player */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-[480px] h-80 rounded-2xl overflow-hidden shadow-2xl">
+      {/* Central Crisp Media Player */}
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="relative w-[480px] h-80 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm bg-black/5">
           {hasMedia ? (
             <>
-              {/* Video Element */}
+              {/* Main Video Element - Crisp and Clear */}
               {videoUrl && (
                 <video
                   ref={videoRef}
@@ -289,19 +313,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50 backdrop-blur-sm" />
           )}
         </div>
-      </div>
-
-      {/* Enhanced Cinema-style Overlays */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Comprehensive blur fade */}
-        <div className="absolute inset-0"
-             style={{
-               background: `
-                 radial-gradient(ellipse 50% 35% at center, transparent 0%, transparent 40%, hsla(var(--background) / 0.3) 60%, hsla(var(--background) / 0.7) 80%, hsl(var(--background)) 100%),
-                 linear-gradient(to bottom, hsl(var(--background)) 0%, hsla(var(--background) / 0.8) 15%, transparent 30%, transparent 70%, hsla(var(--background) / 0.8) 85%, hsl(var(--background)) 100%),
-                 linear-gradient(to right, hsl(var(--background)) 0%, hsla(var(--background) / 0.6) 25%, transparent 35%, transparent 65%, hsla(var(--background) / 0.6) 75%, hsl(var(--background)) 100%)
-               `
-             }} />
       </div>
 
       {/* Content Overlay */}
