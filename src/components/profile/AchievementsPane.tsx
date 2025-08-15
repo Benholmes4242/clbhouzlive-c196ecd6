@@ -256,50 +256,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
   // Helper function to get achievement badge image for featured display
   const getFeaturedAchievementIcon = (achievement: Achievement) => {
-    console.log('Getting optimized icon for achievement:', achievement.title);
+    console.log('Getting featured icon for achievement:', achievement.title, 'with emoji:', achievement.emoji);
     
-    // Map achievement titles to optimized medal icon types with R2 URLs
-    const achievementIconMap: Record<string, any> = {
-      "Birdie Blitz": { type: "birdie-blitz", priority: true },
-      "Birdie Every Par": { type: "birdie-every-par", priority: true },
-      "Eagle Collector": { type: "eagle-collector", priority: true },
-      "First Eagle": { type: "eagle-collector", priority: true },
-      "Hole-in-One": { type: "albatross", priority: true },
-      "Albatross Ace": { type: "albatross", priority: true },
-      "20 Club": { type: "20-club", priority: true },
-      "50 Club": { type: "50-club", priority: true },
-      "100 Century Club": { type: "100-club", priority: true },
-      "Century Club": { type: "100-club", priority: true },
-      "200 Clubhouse Elite": { type: "200-club", priority: true },
-      "Clubhouse Elite": { type: "200-club", priority: true },
-      "300 Club Champion": { type: "300-club", priority: true },
-      "Club Champion": { type: "300-club", priority: true },
-      "Great Britain & Ireland": { type: "uk-ireland-explorer", priority: true },
-      "UK & Ireland Explorer": { type: "uk-ireland-explorer", priority: true },
-      "Continental Europe": { type: "eu-explorer", priority: true },
-      "Continental Europe Explorer": { type: "eu-explorer", priority: true },
-      "USA": { type: "usa-explorer", priority: true },
-      "USA Explorer": { type: "usa-explorer", priority: true },
-      "Worldwide": { type: "world-explorer", priority: true },
-      "World Explorer": { type: "world-explorer", priority: true },
-      "Globetrotter Golfer": { type: "globe-trotter", priority: true },
-      "Globe Trotter": { type: "globe-trotter", priority: true }
-    };
-    
-    const iconConfig = achievementIconMap[achievement.title];
-    
-    if (iconConfig) {
-      return (
-        <OptimizedMedalIcon 
-          type={iconConfig.type}
-          size={isMobile ? 'lg' : 'xl'}
-          priority={iconConfig.priority}
-          className={isMobile ? "w-24 h-24" : "w-40 h-40"}
-        />
-      );
-    }
-    
-    // Use specific badge images as fallback for featured display
+    // Use specific badge images directly for featured display to avoid fallback issues
     switch (achievement.title) {
       case "Birdie Blitz":
         return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
@@ -307,10 +266,53 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "50 Club":
         return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "100 Century Club":
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "200 Clubhouse Elite":
+        return <img src="/lovable-uploads/88ba82c3-999c-40b9-885e-313869a7e795.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "300 Club Champion":
+        return <img src="/lovable-uploads/0088ccbe-6198-4f2c-ada2-e2bf642abec3.png" alt="300 Club Champion Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "Eagle Collector":
         return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Birdie Every Par":
+        return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "One Day, Two Courses":
+        return <img src="/lovable-uploads/f8900d31-7d35-4e4e-9352-99f6198da121.png" alt="One Day Two Courses Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Globetrotter Golfer":
+        return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Marathon Golfer":
+        return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Single-Figure Handicap":
+        return <img src="/lovable-uploads/066c5dd6-9e79-49f2-8e4b-935a5242850a.png" alt="Single-Figure Handicap Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Plus Handicap Player":
+        return <img src="/lovable-uploads/1779738a-184b-4a0d-85d0-b964641019d9.png" alt="Plus Handicap Player Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Under Par Round":
+        return <img src="/lovable-uploads/d7d44dea-f5cc-416d-9a01-985d48262fc6.png" alt="Under Par Round Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "First Eagle":
+        return <img src="/lovable-uploads/6b62e9b3-33d7-4825-b1d7-aac6f86e4ad7.png" alt="First Eagle Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Hole-in-One":
+        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Back-to-Back Birdies":
+        return <img src="/lovable-uploads/7e98fdc5-ab55-44e0-87ec-8b93e493b7e4.png" alt="Back-to-Back Birdies Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "No Bogey Round":
+        return <img src="/lovable-uploads/1a37c1e5-56c0-4e02-a95a-cbfa8ce3a1b6.png" alt="No Bogey Round Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Par Machine":
+        return <img src="/lovable-uploads/51973f3e-599d-4110-bcf6-8eac43b963f8.png" alt="Par Machine Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "International Golfer":
+        return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Great Britain & Ireland":
+        return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Continental Europe":
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Europe Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "USA":
+        return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Worldwide":
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Worldwide Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Albatross Ace":
+        return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       default:
         // Fallback for unmapped achievements
+        console.log('Using fallback emoji for achievement:', achievement.title);
         return (
           <div className={`${isMobile ? "w-24 h-24" : "w-40 h-40"} text-6xl flex items-center justify-center drop-shadow-lg`}>
             {achievement.emoji}
