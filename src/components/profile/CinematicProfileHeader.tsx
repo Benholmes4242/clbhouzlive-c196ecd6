@@ -248,45 +248,47 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Central Media Player - No Container */}
+      {/* Central Media Player */}
       <div className="absolute inset-0 flex items-center justify-center">
-        {hasMedia ? (
-          <>
-            {/* Video Element */}
-            {videoUrl && (
-              <video
-                ref={videoRef}
-                src={videoUrl}
-                poster={thumbnailUrl}
-                className={`w-[480px] h-80 object-cover rounded-2xl shadow-2xl transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                }`}
-                playsInline
-                muted={isMuted}
-                preload="auto"
-                crossOrigin="anonymous"
-              />
-            )}
-            
-            {/* Profile Photo */}
-            {profilePhotoUrl && (
-              <img
-                ref={photoRef}
-                src={`${profilePhotoUrl}?quality=100&format=auto&width=1280&height=720&fit=cover`}
-                alt={`${displayName} profile`}
-                className={`w-[480px] h-80 object-cover rounded-2xl shadow-2xl transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                }`}
-                onError={(e) => {
-                  e.currentTarget.src = profilePhotoUrl;
-                }}
-              />
-            )}
-          </>
-        ) : (
-          /* Fallback for empty state */
-          <div className="w-[480px] h-80 rounded-2xl bg-gradient-to-br from-primary/30 via-background/80 to-muted/50 backdrop-blur-sm shadow-2xl" />
-        )}
+        <div className="relative w-[480px] h-80 rounded-2xl overflow-hidden shadow-2xl">
+          {hasMedia ? (
+            <>
+              {/* Video Element */}
+              {videoUrl && (
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  poster={thumbnailUrl}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                    showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                  }`}
+                  playsInline
+                  muted={isMuted}
+                  preload="auto"
+                  crossOrigin="anonymous"
+                />
+              )}
+              
+              {/* Profile Photo */}
+              {profilePhotoUrl && (
+                <img
+                  ref={photoRef}
+                  src={`${profilePhotoUrl}?quality=100&format=auto&width=1280&height=720&fit=cover`}
+                  alt={`${displayName} profile`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                    !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.src = profilePhotoUrl;
+                  }}
+                />
+              )}
+            </>
+          ) : (
+            /* Fallback for empty state */
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50 backdrop-blur-sm" />
+          )}
+        </div>
       </div>
 
       {/* Enhanced Cinema-style Overlays */}
