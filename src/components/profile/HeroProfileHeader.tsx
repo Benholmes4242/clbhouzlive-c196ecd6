@@ -476,69 +476,72 @@ const HeroProfileHeader = ({
         {/* Profile Content - positioned absolutely over blurred header area */}
         <div className="absolute bottom-0 left-0 right-0 z-40 flex flex-col items-center text-center pb-8 px-4">
           
-          {/* User Information */}
-          <div className="text-center mb-6">
-            {/* User's Name */}
-            <div className="flex items-center justify-center">
-              <h1 className="font-bold text-black text-4xl drop-shadow-sm">
-                {displayName}
-              </h1>
-            </div>
-            
-            {/* Username with Edit Button */}
-            {username && (
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-gray-700 drop-shadow-sm">
-                  @{username}
-                </p>
-                
-                {/* Edit Profile Button - Next to username for own profile */}
-                {isOwnProfile && (
-                  <button 
-                    className="backdrop-blur-sm bg-white/40 rounded-full text-black font-medium hover:bg-white/50 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
-                    onClick={() => setEditDialogOpen(true)}
-                  >
-                    Edit Profile
-                  </button>
-                )}
+          {/* Dark Liquid Glass Container for Profile Info and Stats */}
+          <div className="backdrop-blur-md bg-black/40 border border-white/10 shadow-2xl rounded-3xl p-6 max-w-md w-full">
+            {/* User Information */}
+            <div className="text-center mb-6">
+              {/* User's Name */}
+              <div className="flex items-center justify-center">
+                <h1 className="font-bold text-white text-4xl drop-shadow-lg">
+                  {displayName}
+                </h1>
               </div>
-            )}
+              
+              {/* Username with Edit Button */}
+              {username && (
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <p className="text-lg text-white/80 drop-shadow-md">
+                    @{username}
+                  </p>
+                  
+                  {/* Edit Profile Button - Next to username for own profile */}
+                  {isOwnProfile && (
+                    <button 
+                      className="backdrop-blur-sm bg-white/20 border border-white/30 rounded-full text-white font-medium hover:bg-white/30 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs shadow-lg" 
+                      onClick={() => setEditDialogOpen(true)}
+                    >
+                      Edit Profile
+                    </button>
+                  )}
+                </div>
+              )}
 
-            {/* Home Golf Club */}
-            <p className="text-base text-gray-700 mb-4 drop-shadow-sm">
-              {homeClub}
-            </p>
+              {/* Home Golf Club */}
+              <p className="text-base text-white/70 mb-4 drop-shadow-md">
+                {homeClub}
+              </p>
+            </div>
+
+            {/* Stats Bar - Now inside the same container */}
+            <ProfileStatsBar 
+              stats={[
+                { 
+                  value: profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--',
+                  label: 'Handicap'
+                },
+                { 
+                  value: postsCount,
+                  label: 'Posts'
+                },
+                { 
+                  value: followersCount,
+                  label: 'Followers'
+                },
+                { 
+                  value: userProgressData.coursesPlayed || '24',
+                  label: 'Level'
+                },
+                { 
+                  value: ratedCoursesCount,
+                  label: 'Rated Courses'
+                },
+                { 
+                  value: averageRating > 0 ? `${averageRating}/10` : '--',
+                  label: 'Avg. Rating'
+                }
+              ]}
+            />
           </div>
-
-          {/* Stats Bar - New Horizontal Scrollable Design */}
-          <ProfileStatsBar 
-            stats={[
-              { 
-                value: profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--',
-                label: 'Handicap'
-              },
-              { 
-                value: postsCount,
-                label: 'Posts'
-              },
-              { 
-                value: followersCount,
-                label: 'Followers'
-              },
-              { 
-                value: userProgressData.coursesPlayed || '24',
-                label: 'Level'
-              },
-              { 
-                value: ratedCoursesCount,
-                label: 'Rated Courses'
-              },
-              { 
-                value: averageRating > 0 ? `${averageRating}/10` : '--',
-                label: 'Avg. Rating'
-              }
-            ]}
-          />
         </div>
       </div>
 

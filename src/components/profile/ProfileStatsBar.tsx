@@ -74,8 +74,8 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       )}
       
       
-      {/* Stats container with liquid glass dark effect */}
-      <div className="relative overflow-hidden rounded-full backdrop-blur-md bg-black/40 border border-white/10 shadow-2xl">
+      {/* Stats container with transparent background since it's inside the main container now */}
+      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg">
         <div 
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pr-20"
