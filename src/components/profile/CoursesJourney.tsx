@@ -168,7 +168,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                           {/* Continental Europe Map Background */}
                           <img
-                            src={continentalEuropeMap}
+                            src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
                             alt="Continental Europe map background"
                             className="absolute inset-0 w-full h-full object-contain opacity-20"
                           />
@@ -344,7 +344,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Continental Europe Map Background */}
                             <img
-                              src={continentalEuropeMap}
+                              src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
                               alt="Continental Europe map background"
                               className="absolute inset-0 w-full h-full object-contain opacity-20"
                             />
