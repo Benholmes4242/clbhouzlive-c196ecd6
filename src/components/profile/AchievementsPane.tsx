@@ -1088,7 +1088,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           size="sm"
                           className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex items-center gap-2"
                         >
-                          <PaperAirplaneIcon className="w-4 h-4" />
+                          <PaperAirplaneIcon className="w-5 h-5" />
                           Share
                         </Button>
                       </div>
