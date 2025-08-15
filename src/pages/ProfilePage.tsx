@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
@@ -9,17 +9,8 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const tabParam = searchParams.get('tab');
-  const [activeSection, setActiveSection] = useState(tabParam || 'activity');
+  const [activeSection, setActiveSection] = useState('activity');
   const queryClient = useQueryClient();
-  
-  // Update active section when URL parameter changes
-  useEffect(() => {
-    if (tabParam && ['activity', 'courses', 'achievements', 'stats'].includes(tabParam)) {
-      setActiveSection(tabParam);
-    }
-  }, [tabParam]);
   
   // Force invalidate profile cache on page load to ensure fresh data
   useEffect(() => {
