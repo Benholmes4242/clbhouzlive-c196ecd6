@@ -301,6 +301,26 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   };
 
+  // Get filter count
+  const getFilterCount = (filter: 'all' | 'unlocked' | 'locked' | 'exploration' | 'skill') => {
+    const allAchievements = [...explorationAchievements, ...skillAchievements];
+    
+    switch (filter) {
+      case 'all':
+        return allAchievements.length;
+      case 'unlocked':
+        return allAchievements.filter(a => a.isEarned).length;
+      case 'locked':
+        return allAchievements.filter(a => !a.isEarned).length;
+      case 'exploration':
+        return explorationAchievements.length;
+      case 'skill':
+        return skillAchievements.length;
+      default:
+        return 0;
+    }
+  };
+
   // Get most recently unlocked achievement
   const getMostRecentAchievement = () => {
     const allAchievements = [...explorationAchievements, ...skillAchievements];
@@ -1148,74 +1168,32 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           )}
 
-          {/* Filter Buttons - Mobile Optimized */}
+          {/* Filter Bar */}
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
-            {isMobile ? (
-              /* Mobile: Fixed titles with dropdowns */
-              <div className="space-y-3">
-                {/* Fixed tab titles */}
-                <div className="grid grid-cols-3 gap-2 text-center text-sm font-medium text-muted-foreground mb-2">
-                  <div>Region</div>
-                  <div>Sort</div>
-                  <div>View</div>
-                </div>
-                
-                {/* Filter dropdowns */}
-                <div className="grid grid-cols-3 gap-2">
-                  {/* Region filter */}
-                  <select 
-                    value={activeFilter === 'exploration' ? 'exploration' : activeFilter === 'skill' ? 'skill' : 'all'}
-                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
-                    className="h-8 text-xs border border-border rounded bg-background px-2"
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {[
+                { key: 'all', label: 'All' },
+                { key: 'unlocked', label: 'Unlocked' },
+                { key: 'locked', label: 'Locked' },
+                { key: 'exploration', label: 'Exploration' },
+                { key: 'skill', label: 'Skill' }
+              ].map((filter) => {
+                const count = getFilterCount(filter.key as any);
+                return (
+                  <button
+                    key={filter.key}
+                    onClick={() => setActiveFilter(filter.key as any)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                      activeFilter === filter.key
+                        ? 'bg-muted text-black shadow-sm'
+                        : 'text-muted-foreground hover:text-black hover:bg-muted/50'
+                    }`}
                   >
-                    <option value="all">All</option>
-                    <option value="exploration">Exploration</option>
-                    <option value="skill">Skill</option>
-                  </select>
-                  
-                  {/* Sort filter */}
-                  <select 
-                    value={activeFilter === 'unlocked' ? 'unlocked' : activeFilter === 'locked' ? 'locked' : 'all'}
-                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
-                    className="h-8 text-xs border border-border rounded bg-background px-2"
-                  >
-                    <option value="all">All</option>
-                    <option value="unlocked">Earned</option>
-                    <option value="locked">Locked</option>
-                  </select>
-                  
-                  {/* View filter - placeholder for now */}
-                  <select className="h-8 text-xs border border-border rounded bg-background px-2">
-                    <option>Grid</option>
-                  </select>
-                </div>
-              </div>
-            ) : (
-              /* Desktop: single row layout */
-              <div className="flex flex-wrap gap-2 justify-center">
-                {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
-                  <Button
-                    key={filter}
-                    variant={activeFilter === filter ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setActiveFilter(filter as typeof activeFilter)}
-                    className={`
-                      capitalize transition-all duration-200 hover:scale-105
-                      ${activeFilter === filter 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                        : 'hover:bg-muted/80'
-                      }
-                    `}
-                  >
-                     {filter === 'all' ? 'All Achievements' : 
-                      filter === 'unlocked' ? 'Unlocked' :
-                      filter === 'locked' ? 'Locked' :
-                     filter === 'exploration' ? 'Experience & Exploration' :
-                     'Skill-Based'}
-                  </Button>
-                ))}
-              </div>
-            )}
+                    {filter.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
            {/* Experience & Exploration Achievements Section */}
