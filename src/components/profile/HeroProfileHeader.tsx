@@ -512,7 +512,7 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="flex items-center justify-center gap-2 w-full">
+          <div className="flex items-center justify-center gap-4 w-full">
             {/* Left Navigation Arrow */}
             <div className="flex-shrink-0">
               <button
@@ -532,7 +532,7 @@ const HeroProfileHeader = ({
             <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '520px' }}>
               <div 
                 id="stats-container"
-                className="flex gap-12 overflow-x-auto scrollbar-hide px-2 py-2"
+                className="flex gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
