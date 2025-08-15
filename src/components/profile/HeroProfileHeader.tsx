@@ -481,7 +481,7 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className="text-3xl md:text-4xl text-black font-bold">
+              <h1 className="text-5xl md:text-6xl text-black font-bold">
                 {displayName}
               </h1>
             </div>
@@ -512,30 +512,31 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="flex items-center justify-center gap-3 w-full max-w-md mx-auto">
+          <div className="flex items-center justify-center gap-2 w-full">
             {/* Left Navigation Arrow */}
-            <button
-              onClick={() => {
-                const container = document.getElementById('stats-container');
-                if (container) {
-                  container.scrollBy({ left: -320, behavior: 'smooth' });
-                }
-              }}
-              className="flex-shrink-0 w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
-            >
-              <ArrowLeftIcon className="w-3 h-3" />
-            </button>
+            <div className="flex-shrink-0">
+              <button
+                onClick={() => {
+                  const container = document.getElementById('stats-container');
+                  if (container) {
+                    container.scrollBy({ left: -320, behavior: 'smooth' });
+                  }
+                }}
+                className="w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
+              >
+                <ArrowLeftIcon className="w-3 h-3" />
+              </button>
+            </div>
             
             {/* Stats Container - Fixed width to show exactly 4 stats */}
-            <div className="overflow-hidden rounded-lg">
+            <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '320px' }}>
               <div 
                 id="stats-container"
                 className="flex gap-4 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  width: 'calc(4 * 80px + 3 * 16px + 16px)' // 4 stats (80px each) + 3 gaps (16px each) + padding (16px total)
+                  WebkitOverflowScrolling: 'touch'
                 }}
               >
                 <div className="flex-shrink-0 text-center w-20">
@@ -578,22 +579,24 @@ const HeroProfileHeader = ({
                     {averageRating > 0 ? `${averageRating}/10` : '--'}
                   </div>
                   <div className="text-base text-muted-foreground">Avg Rating</div>
+                </div>
               </div>
             </div>
 
             {/* Right Navigation Arrow */}
-            <button
-              onClick={() => {
-                const container = document.getElementById('stats-container');
-                if (container) {
-                  container.scrollBy({ left: 320, behavior: 'smooth' });
-                }
-              }}
-              className="flex-shrink-0 w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
-            >
-              <ArrowRightIcon className="w-3 h-3" />
-            </button>
-          </div>
+            <div className="flex-shrink-0">
+              <button
+                onClick={() => {
+                  const container = document.getElementById('stats-container');
+                  if (container) {
+                    container.scrollBy({ left: 320, behavior: 'smooth' });
+                  }
+                }}
+                className="w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
+              >
+                <ArrowRightIcon className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
