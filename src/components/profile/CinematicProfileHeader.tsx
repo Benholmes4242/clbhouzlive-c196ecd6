@@ -357,6 +357,37 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   <Play className="w-6 h-6" />
                 </Button>
               )}
+
+              {/* Owner Edit Controls - positioned under play button */}
+              {isOwnProfile && (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFileSelect();
+                    }}
+                    disabled={uploading}
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  >
+                    <span className="text-xs font-medium">Change Video</span>
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePhotoSelect();
+                    }}
+                    disabled={uploading}
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  >
+                    <span className="text-xs font-medium">Change Photo</span>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -390,36 +421,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           </div>
         )}
 
-        {/* Owner Edit Controls */}
-        {hasMedia && isOwnProfile && showControls && (
-          <div className="absolute top-4 right-4 flex gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleFileSelect();
-              }}
-              disabled={uploading}
-              className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-            >
-              <span className="text-xs font-medium">Change Video</span>
-            </Button>
-            
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePhotoSelect();
-              }}
-              disabled={uploading}
-              className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-            >
-              <span className="text-xs font-medium">Change Photo</span>
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Hidden File Inputs */}

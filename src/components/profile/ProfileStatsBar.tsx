@@ -82,7 +82,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       {/* Stats container */}
       <div 
         ref={containerRef}
-        className={`flex gap-2 overflow-x-auto scrollbar-hide py-0.5 bg-background/70 backdrop-blur-sm rounded-2xl border border-border/20 shadow-sm ${isMobile ? 'px-4 pr-8' : 'px-2'}`}
+        className={`flex gap-6 overflow-x-auto scrollbar-hide py-2 ${isMobile ? 'px-4 pr-8' : 'px-2'}`}
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -93,12 +93,12 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
           <button
             key={index}
             onClick={stat.onClick}
-            className="flex-shrink-0 w-24 flex flex-col items-center justify-center py-0.5 px-2 rounded-xl bg-background/50 hover:bg-background/80 transition-all duration-200 hover:shadow-sm"
+            className="flex-shrink-0 flex flex-col items-center justify-center py-1 px-2 hover:opacity-80 transition-opacity duration-200"
           >
-            <div className="text-lg font-semibold text-foreground">
+            <div className="text-lg font-semibold text-white drop-shadow-lg">
               {stat.value}
             </div>
-            <div className="text-xs text-muted-foreground font-medium">
+            <div className="text-xs text-white/80 font-medium drop-shadow-md">
               {stat.label}
             </div>
           </button>
