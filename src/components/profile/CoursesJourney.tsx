@@ -1,6 +1,9 @@
 import React from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import CountryFlag from '@/components/ui/country-flag';
+import usaMap from '@/assets/usa-map.png';
+import ukIrelandMap from '@/assets/uk-ireland-map.png';
+import continentalEuropeMap from '@/assets/continental-europe-map.png';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -144,11 +147,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       {achievement.region === 'usa' ? (
                         <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                          {/* USA Flag Background */}
+                          {/* USA Map Background */}
                           <img
-                            src="https://flagicons.lipis.dev/flags/4x3/us.svg"
-                            alt="USA flag background"
-                            className="absolute inset-0 w-full h-full object-cover opacity-30"
+                            src={usaMap}
+                            alt="USA map background"
+                            className="absolute inset-0 w-full h-full object-contain opacity-20"
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
@@ -163,11 +166,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         </div>
                       ) : achievement.region === 'europe' ? (
                         <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                          {/* EU Flag Background */}
+                          {/* Continental Europe Map Background */}
                           <img
-                            src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
-                            alt="EU flag background"
-                            className="absolute inset-0 w-full h-full object-cover opacity-30"
+                            src={continentalEuropeMap}
+                            alt="Continental Europe map background"
+                            className="absolute inset-0 w-full h-full object-contain opacity-20"
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
@@ -182,20 +185,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         </div>
                       ) : achievement.region === 'britain-ireland' ? (
                         <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                          {/* Split Flags Background */}
-                          <div className="absolute inset-0 flex">
-                            <img
-                              src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
-                              alt="UK flag background"
-                              className="w-1/2 h-full object-cover opacity-30"
-                            />
-                            <img
-                              src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
-                              alt="Ireland flag background"
-                              className="w-1/2 h-full object-cover opacity-30"
-                              style={{ objectPosition: 'center center', transform: 'scaleX(1.5)' }}
-                            />
-                          </div>
+                          {/* UK & Ireland Map Background */}
+                          <img
+                            src={ukIrelandMap}
+                            alt="UK & Ireland map background"
+                            className="absolute inset-0 w-full h-full object-contain opacity-20"
+                          />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
                             <div className="text-2xl font-bold text-foreground leading-none">
@@ -328,11 +323,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
                           <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                            {/* USA Flag Background */}
+                            {/* USA Map Background */}
                             <img
-                              src="https://flagicons.lipis.dev/flags/4x3/us.svg"
-                              alt="USA flag background"
-                              className="absolute inset-0 w-full h-full object-cover opacity-30"
+                              src={usaMap}
+                              alt="USA map background"
+                              className="absolute inset-0 w-full h-full object-contain opacity-20"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
@@ -347,11 +342,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         ) : achievement.region === 'europe' ? (
                           <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                            {/* EU Flag Background */}
+                            {/* Continental Europe Map Background */}
                             <img
-                              src="https://flagicons.lipis.dev/flags/4x3/eu.svg"
-                              alt="EU flag background"
-                              className="absolute inset-0 w-full h-full object-cover opacity-30"
+                              src={continentalEuropeMap}
+                              alt="Continental Europe map background"
+                              className="absolute inset-0 w-full h-full object-contain opacity-20"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
@@ -366,20 +361,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
                           <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
-                            {/* Split Flags Background */}
-                            <div className="absolute inset-0 flex">
-                              <img
-                                src="https://flagicons.lipis.dev/flags/4x3/gb.svg"
-                                alt="UK flag background"
-                                className="w-1/2 h-full object-cover opacity-30"
-                              />
-                              <img
-                                src="https://flagicons.lipis.dev/flags/4x3/ie.svg"
-                                alt="Ireland flag background"
-                                className="w-1/2 h-full object-cover opacity-30"
-                                style={{ objectPosition: 'center center', transform: 'scaleX(1.5)' }}
-                              />
-                            </div>
+                            {/* UK & Ireland Map Background */}
+                            <img
+                              src={ukIrelandMap}
+                              alt="UK & Ireland map background"
+                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                            />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
                               <div className="text-lg font-bold text-foreground leading-none">
