@@ -219,8 +219,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
          style={{ 
            marginTop: '-16rem',
            height: '100vh',
-           minHeight: '800px',
-           maxHeight: '1200px'
+           minHeight: '500px',
+           maxHeight: '100vh'
          }}>
 
       {/* Central Crisp Media Player - Full Coverage */}
