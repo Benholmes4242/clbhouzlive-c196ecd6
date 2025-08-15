@@ -50,15 +50,6 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
 
   return (
     <div className={`relative w-full max-w-sm mx-auto ${isMobile ? 'px-4' : ''}`}>
-      {/* Desktop scroll buttons */}
-      {isDesktop && canScrollLeft && (
-        <button
-          onClick={() => scroll('left')}
-          className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
-        >
-          <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
-        </button>
-      )}
       
       {isDesktop && canScrollRight && (
         <button
