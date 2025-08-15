@@ -268,32 +268,33 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-muted" />
         )}
         
-        {/* Visible vertical gradient overlay for username blur transition */}
+        {/* Strong vertical gradient overlay for username blur transition */}
         <div 
-          className="absolute inset-0 pointer-events-none z-25"
+          className="absolute inset-0 pointer-events-none z-30"
           style={{
             background: `
               linear-gradient(to bottom, 
                 transparent 0%, 
                 transparent 50%, 
-                hsla(var(--background) / 0.2) 65%, 
-                hsla(var(--background) / 0.5) 75%, 
-                hsla(var(--background) / 0.75) 85%, 
-                hsla(var(--background) / 0.9) 92%, 
-                hsla(var(--background) / 0.98) 97%, 
+                hsla(var(--background) / 0.3) 60%, 
+                hsla(var(--background) / 0.6) 70%, 
+                hsla(var(--background) / 0.8) 80%, 
+                hsla(var(--background) / 0.9) 85%, 
+                hsla(var(--background) / 0.95) 90%, 
+                hsla(var(--background) / 0.98) 95%, 
                 hsl(var(--background)) 100%
               )
             `
           }}
         />
         
-        {/* Side fade for cinematic effect */}
+        {/* Additional side blur for edge-to-edge effect */}
         <div 
-          className="absolute inset-0 pointer-events-none z-25"
+          className="absolute inset-0 pointer-events-none z-30"
           style={{
             background: `
-              radial-gradient(ellipse 70% 40% at center bottom, transparent 0%, transparent 50%, hsla(var(--background) / 0.3) 75%, hsla(var(--background) / 0.7) 90%, hsl(var(--background)) 100%),
-              linear-gradient(to right, hsla(var(--background) / 0.3) 0%, transparent 20%, transparent 80%, hsla(var(--background) / 0.3) 100%)
+              radial-gradient(ellipse 80% 60% at center bottom, transparent 0%, transparent 40%, hsla(var(--background) / 0.4) 70%, hsla(var(--background) / 0.8) 90%, hsl(var(--background)) 100%),
+              linear-gradient(to right, hsla(var(--background) / 0.4) 0%, transparent 20%, transparent 80%, hsla(var(--background) / 0.4) 100%)
             `
           }}
         />
