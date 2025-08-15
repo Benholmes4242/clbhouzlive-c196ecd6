@@ -1075,10 +1075,14 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 ].map(({ key, label, icon }) => (
                   <Button
                     key={key}
-                    variant={activeFilter === key ? 'default' : 'outline'}
+                    variant={activeFilter === key ? 'secondary' : 'outline'}
                     size="sm"
                     onClick={() => setActiveFilter(key)}
-                    className="gap-2 px-4 py-2 rounded-full transition-all duration-200"
+                    className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                      activeFilter === key 
+                        ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                        : ''
+                    }`}
                   >
                     <span>{icon}</span>
                     {label}
