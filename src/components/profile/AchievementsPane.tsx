@@ -836,11 +836,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           {/* Padlock icon for locked rings */}
                           {!isActive && (
                              <div className="absolute inset-0 flex items-center justify-center">
-                               <img 
-                                 src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
-                                 alt="Locked" 
-                                 className="w-8 h-8 opacity-60"
-                               />
+                                <img 
+                                  src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
+                                  alt="Locked" 
+                                  className="w-12 h-12 opacity-60"
+                                />
                              </div>
                           )}
                         </div>
@@ -1015,35 +1015,62 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               </div>
           </div>
 
+          {/* Filter Tabs */}
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {[
+                { key: 'all' as const, label: 'All', icon: '🏆' },
+                { key: 'unlocked' as const, label: 'Unlocked', icon: '✅' },
+                { key: 'locked' as const, label: 'Locked', icon: '🔒' },
+                { key: 'exploration' as const, label: 'Exploration', icon: '🗺️' },
+                { key: 'skill' as const, label: 'Skill', icon: '🎯' }
+              ].map((filter) => (
+                <Button
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setActiveFilter(filter.key)}
+                  className="text-xs"
+                >
+                  <span className="mr-1">{filter.icon}</span>
+                  {filter.label} ({getFilterCount(filter.key)})
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* Featured Most Recent Achievement */}
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
                 {/* Featured Achievement Card */}
-                <div className="p-8 text-center">
-                  <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge with Subtle Glow and Bounce */}
-                    <div className="relative animate-scale-in">
-                      <div className="absolute inset-0 bg-yellow-400/35 rounded-full blur-xl animate-pulse"></div>
-                      <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300 animate-subtle-bounce">
-                        {getFeaturedAchievementIcon(mostRecentAchievement)}
-                      </div>
+                <div className="p-8 flex items-center gap-6">
+                  {/* Large Badge without glow */}
+                  <div className="relative animate-scale-in">
+                    <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300">
+                      {getFeaturedAchievementIcon(mostRecentAchievement)}
                     </div>
-                    
-                    {/* Achievement Title with Fade Animation */}
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
+                  </div>
+                  
+                  {/* Achievement Details */}
+                  <div className="flex-1 text-left">
+                    <div className="text-lg font-semibold text-gray-500 mb-2">
+                      Latest Achievement
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">
                       {mostRecentAchievement.title}
                     </h3>
-                    
-                    {/* XP Gained */}
-                    <div className="font-bold text-lg text-blue-500 animate-scale-in">
+                    <div className="font-bold text-lg text-green-600 mb-2">
                       +{mostRecentAchievement.xp} XP
                     </div>
-                    
-                    {/* Date Earned */}
-                    <p className="text-sm text-muted-foreground animate-fade-in">
-                      Unlocked {mostRecentAchievement.dateEarned}
-                    </p>
+                    {mostRecentAchievement.dateEarned && (
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Unlocked {new Date(mostRecentAchievement.dateEarned).toLocaleDateString()}
+                      </p>
+                    )}
+                    <Button variant="outline" size="sm">
+                      Share
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1097,11 +1124,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      </div>
                                      {!achievement.isEarned && (
                                        <div className="absolute inset-0 flex items-center justify-center">
-                                         <img 
-                                           src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
-                                           alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
-                                         />
+                                          <img 
+                                            src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
+                                            alt="Locked" 
+                                            className="w-16 h-16 opacity-60"
+                                          />
                                        </div>
                                      )}
                                    </div>
