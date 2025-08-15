@@ -213,81 +213,25 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            minHeight: '800px',
            maxHeight: '1200px'
          }}>
-      {/* Full-width Live Blur Background - extends edge to edge */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {hasMedia ? (
-          <>
-            {/* Live Video Blur Background */}
-            {videoUrl && (
-              <video
-                src={videoUrl}
-                className="absolute inset-0 w-full h-full object-cover scale-110"
-                style={{
-                  filter: 'blur(60px)',
-                  opacity: 0.8
-                }}
-                muted
-                loop
-                autoPlay
-                playsInline
-                ref={(el) => {
-                  if (el && videoRef.current) {
-                    // Sync the blur video with the main video
-                    const syncTime = () => {
-                      if (videoRef.current && Math.abs(el.currentTime - videoRef.current.currentTime) > 0.5) {
-                        el.currentTime = videoRef.current.currentTime;
-                      }
-                    };
-                    
-                    const interval = setInterval(syncTime, 100);
-                    // Store cleanup in the element for later cleanup
-                    (el as any)._cleanup = () => clearInterval(interval);
-                  }
-                  // Return undefined, not the cleanup function
-                  return undefined;
-                }}
-              />
-            )}
-            
-            {/* Static Photo Blur Background (fallback when no video) */}
-            {profilePhotoUrl && !videoUrl && (
-              <div 
-                className="absolute inset-0 w-full h-full scale-110"
-                style={{
-                  backgroundImage: `url(${profilePhotoUrl}?quality=60&format=auto&width=1920&height=1080&fit=cover)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: 'blur(60px)',
-                  opacity: 0.8
-                }}
-              />
-            )}
-          </>
-        ) : (
-          /* Fallback gradient background */
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-muted" />
-        )}
-        
-        {/* Bottom gradient overlay for username readability */}
-        <div 
-          className="absolute inset-0 pointer-events-none z-30"
-          style={{
-            background: `
-              linear-gradient(to bottom, 
-                transparent 0%, 
-                transparent 85%, 
-                hsla(var(--background) / 0.05) 88%, 
-                hsla(var(--background) / 0.1) 91%, 
-                hsla(var(--background) / 0.2) 94%, 
-                hsla(var(--background) / 0.4) 96%, 
-                hsla(var(--background) / 0.6) 98%, 
-                hsla(var(--background) / 0.8) 99%, 
-                hsl(var(--background)) 100%
-              )
-            `
-          }}
-        />
-      </div>
+      {/* Bottom gradient overlay for username readability */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-30"
+        style={{
+          background: `
+            linear-gradient(to bottom, 
+              transparent 0%, 
+              transparent 85%, 
+              hsla(var(--background) / 0.05) 88%, 
+              hsla(var(--background) / 0.1) 91%, 
+              hsla(var(--background) / 0.2) 94%, 
+              hsla(var(--background) / 0.4) 96%, 
+              hsla(var(--background) / 0.6) 98%, 
+              hsla(var(--background) / 0.8) 99%, 
+              hsl(var(--background)) 100%
+            )
+          `
+        }}
+      />
 
       {/* Central Crisp Media Player - Full Coverage */}
       <div className="absolute inset-0 z-10">
