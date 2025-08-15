@@ -247,13 +247,23 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full rounded-lg overflow-hidden group ${className} ${
-        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-      }`}
+      className={`relative w-full h-full group ${className}`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
-      onClick={handleCircleClick}
     >
+      {/* Dedicated media container with radial mask */}
+      <div 
+        className={`relative w-full h-full ${
+          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+        }`}
+        onClick={handleCircleClick}
+        style={{
+          WebkitMask: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
+          mask: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
+          WebkitMaskComposite: 'source-over',
+          maskComposite: 'intersect'
+        }}
+      >
       {videoUrl ? (
         <>
           {/* Dynamic Blur Background Layer */}
@@ -404,6 +414,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           )}
         </div>
       )}
+      </div>
       
       {/* Hidden File Inputs */}
       <input
