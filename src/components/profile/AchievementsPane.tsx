@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { MdOutlineTrendingUp } from 'react-icons/md';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 import { OptimizedMedalIcon } from '@/components/ui/optimized-medal-icon';
@@ -862,17 +863,15 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
                   </div>
                   
-                  {/* XP Earned This Month */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 text-green-600 relative px-3 py-2">
-                      <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
-                      <span className="text-base font-medium relative z-10">XP earned this month</span>
-                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-bold relative z-10 text-xs">450 XP</span>
-                    </div>
-                  </div>
+                   {/* Monthly Gain */}
+                   <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-2 text-green-600 relative px-3 py-2">
+                       <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
+                       <span className="text-base font-medium relative z-10">Monthly Gain:</span>
+                       <span className="font-bold relative z-10 text-base">450 XP</span>
+                       <MdOutlineTrendingUp className="w-4 h-4 relative z-10" />
+                     </div>
+                   </div>
                 </div>
               </div>
             </div>
