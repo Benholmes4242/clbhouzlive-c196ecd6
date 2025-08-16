@@ -218,21 +218,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-16rem',
-           height: '100vh',
-           minHeight: '800px',
-           maxHeight: '1200px'
+           height: 'clamp(60vh, 80vh, 90vh)',
+           minHeight: '500px'
          }}>
 
-      {/* Blurred Background Layer - Dynamic and Edge-to-Edge */}
+      {/* Blurred Background Layer - Full Cover Fill */}
       <div className="absolute inset-0 z-0">
         {hasMedia && (
           <>
-            {/* Blurred Video Background */}
+            {/* Blurred Video Background - Always Cover */}
             {videoUrl && (
               <video
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100' : 'opacity-0'
                 }`}
                 playsInline
@@ -240,36 +239,42 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 loop
                 autoPlay
                 crossOrigin="anonymous"
-                style={{ filter: 'blur(40px) brightness(0.8)' }}
+                style={{ 
+                  filter: 'blur(24px) brightness(0.7) saturate(1.1)',
+                  transform: 'scale(1.1)'
+                }}
               />
             )}
             
-            {/* Blurred Photo Background */}
+            {/* Blurred Photo Background - Always Cover */}
             {profilePhotoUrl && (
               <img
-                src={`${profilePhotoUrl}?quality=60&format=auto&width=800&height=600&fit=cover`}
+                src={`${profilePhotoUrl}?quality=60&format=auto&fit=cover`}
                 alt=""
-                className={`absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
                 }`}
-                style={{ filter: 'blur(40px) brightness(0.8)' }}
+                style={{ 
+                  filter: 'blur(24px) brightness(0.7) saturate(1.1)',
+                  transform: 'scale(1.1)'
+                }}
               />
             )}
           </>
         )}
       </div>
 
-      {/* Main Media Layer - Centered with Scale-to-Fit */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
+      {/* Sharp Media Layer - Centered and Fit to View */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
         {hasMedia ? (
           <>
-            {/* Main Video Element - Scale to Fit */}
+            {/* Sharp Video Element - Fit Entire Media */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`max-w-full max-h-full w-auto h-auto object-contain transition-all duration-1000 ease-out ${
+                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
@@ -279,16 +284,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               />
             )}
             
-            {/* Profile Photo - Scale to Fit */}
+            {/* Sharp Profile Photo - Fit Entire Media */}
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1920&height=1080&fit=contain`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&fit=contain`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`max-w-full max-h-full w-auto h-auto object-contain transition-all duration-1000 ease-out ${
+                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
@@ -303,8 +308,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Gradient fade to white at bottom - extended and smoother */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
+      {/* Bottom Gradient Overlay for Page Blend */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent z-15 pointer-events-none"></div>
 
       {/* Content Overlay */}
       <div 
