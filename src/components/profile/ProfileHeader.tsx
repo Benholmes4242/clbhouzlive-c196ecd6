@@ -118,10 +118,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
-        {/* Liquid Glass Card */}
+        {/* Liquid Glass Media Card - ONLY glass element */}
         <div
           ref={cardRef}
-          className="relative mb-8 rounded-2xl overflow-hidden shadow-2xl"
+          className="relative mb-8 rounded-2xl overflow-hidden"
           style={{
             width: cardDimensions.width,
             height: cardDimensions.height,
@@ -130,7 +130,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             backdropFilter: 'blur(20px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)',
           }}
         >
           {/* Media Content */}
@@ -172,7 +172,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </div>
 
-        {/* Profile Information */}
+        {/* Profile Information - Directly on background */}
         <div className="text-center space-y-4 max-w-lg">
           {/* Name */}
           <h1 
@@ -221,11 +221,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {homeClub}
           </p>
 
-          {/* Stats Bar (Frosted Glass Chip) */}
+          {/* Stats Bar - Small frosted glass chip only */}
           <div 
             className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+              backgroundColor: 'rgba(255, 255, 255, 0.25)',
               backdropFilter: 'blur(15px) saturate(1.6)',
               WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
