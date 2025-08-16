@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 
 interface ProfileVideoCircleProps {
   videoUrl?: string;
@@ -31,70 +32,65 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [showPhoto, setShowPhoto] = useState(false);
+  const [canAutoplay, setCanAutoplay] = useState(true);
   const [showControls, setShowControls] = useState(false);
-  const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
 
-  // Auto-play video once when component mounts and video is available
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !videoUrl || hasPlayed) return;
+  // Check for reduced motion preference
+  const prefersReduced = typeof window !== "undefined" && 
+    window.matchMedia && 
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const handleCanPlayThrough = async () => {
-      try {
-        video.muted = true; // Ensure muted for autoplay
-        video.currentTime = 0; // Start from beginning
-        await video.play();
-        setIsPlaying(true);
-        setHasPlayed(true);
-        setShowVideo(true); // Ensure video is visible when playing
-        
-        // Set up time update listener for smooth transition
-        const handleTimeUpdate = () => {
-          const currentTime = video.currentTime;
-          const duration = video.duration;
-          
-          // Start fade transition 1 second before video ends (only if profile photo exists)
-          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
-            setShowVideo(false);
-          }
-        };
-        
-        // Set up ended listener for cleanup
-        const handleEnded = () => {
-          setIsPlaying(false);
-          video.currentTime = 0; // Reset to first frame
-          video.pause();
-          
-          // Ensure we've transitioned to photo if it exists
-          if (profilePhotoUrl) {
-            setShowVideo(false);
-          }
-        };
-        
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('ended', handleEnded);
-        
-        return () => {
-          video.removeEventListener('timeupdate', handleTimeUpdate);
-          video.removeEventListener('ended', handleEnded);
-        };
-      } catch (error) {
-        console.error('Auto-play failed:', error);
-        setHasPlayed(true); // Mark as played even if failed to prevent retry
+  // Use video visibility hook for viewport-based autoplay
+  const { containerRef, isVisible } = useVideoVisibility({
+    threshold: 0.2,
+    videoRef,
+    shouldAutoplay: true,
+    globallyMuted: true,
+    onEnterView: () => {
+      if (!videoUrl || prefersReduced) {
+        setShowPhoto(true);
+        return;
       }
-    };
+      
+      const video = videoRef.current;
+      if (video && canAutoplay) {
+        video.play().catch(() => {
+          setCanAutoplay(false);
+          setShowPhoto(true);
+        });
+      }
+    },
+    onExitView: () => {
+      const video = videoRef.current;
+      if (video) {
+        video.pause();
+      }
+    }
+  });
 
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
-    video.load(); // Ensure video starts loading
+  // Handle video events for smooth cross-fade
+  useEffect(() => {
+    if (!videoUrl || prefersReduced) {
+      setShowPhoto(true);
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onEnded = () => setShowPhoto(true);
+    const onError = () => setShowPhoto(true);
+
+    video.addEventListener("ended", onEnded);
+    video.addEventListener("error", onError);
 
     return () => {
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("error", onError);
     };
-  }, [videoUrl, hasPlayed, profilePhotoUrl]);
+  }, [videoUrl, prefersReduced]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -183,141 +179,117 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     onPhotoUpload(file);
   };
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const replayVideo = async () => {
+  const replay = () => {
+    if (!videoUrl || prefersReduced) return;
     const video = videoRef.current;
-    if (video && videoUrl) {
-      try {
-        video.currentTime = 0;
-        video.muted = isMuted;
-        await video.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Replay failed:', error);
-      }
-    }
-  };
-
-  const handleCircleClick = () => {
-    // Allow click-to-replay when:
-    // 1. For other users: when video has ended and showing photo
-    // 2. For own profile: when showing photo (not when showing video to avoid conflicts)
-    if ((!isOwnProfile && hasPlayed && !isPlaying) || (!showVideo && profilePhotoUrl)) {
-      setShowVideo(true);
-      replayVideo();
-    }
+    if (!video) return;
+    
+    setShowPhoto(false);
+    video.currentTime = 0;
+    video.play().catch(() => setShowPhoto(true));
   };
 
   return (
     <div 
-      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
-        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+      ref={containerRef}
+      className={`squircle-mask relative w-full h-full group ${className} ${
+        showPhoto ? 'cursor-pointer' : ''
       }`}
+      style={{ 
+        WebkitMaskImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C77.6 0 100 22.4 100 50 C100 77.6 77.6 100 50 100 C22.4 100 0 77.6 0 50 C0 22.4 22.4 0 50 0 Z"/></svg>')`,
+        maskImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 0 C77.6 0 100 22.4 100 50 C100 77.6 77.6 100 50 100 C22.4 100 0 77.6 0 50 C0 22.4 22.4 0 50 0 Z"/></svg>')`,
+        WebkitMaskSize: '100% 100%',
+        maskSize: '100% 100%',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        borderRadius: 0
+      }}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
-      onClick={handleCircleClick}
+      onClick={replay}
     >
-      {videoUrl ? (
-        <>
-          {/* Video Element with smooth fade transition */}
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={thumbnailUrl}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-              showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            }`}
-            playsInline
-            muted={isMuted}
-            preload="auto"
-            crossOrigin="anonymous"
-          />
-          
-          {/* Profile Photo with 4K quality optimization */}
-          {profilePhotoUrl && (
-            <img
-              src={`${profilePhotoUrl}?quality=95&format=auto&width=512&height=512&fit=cover`}
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              alt={`${displayName} profile`}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              }`}
-              onError={(e) => {
-                // Fallback to original URL without optimization
-                e.currentTarget.src = profilePhotoUrl;
-              }}
-            />
-          )}
-          
-          {/* Fallback when photo fails to load or no photo */}
-          {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
-            <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
-              <div className="text-6xl text-muted-foreground/50">
-                {displayName.charAt(0)}
-              </div>
-            </div>
-          )}
-          
-          {/* Controls Overlay - Show for both video and photo states */}
-          {showControls && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
-              <div className="flex flex-col gap-2 items-center">
-                {/* Play/Replay Button - Centered */}
-                {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      if (!showVideo) {
-                        setShowVideo(true);
-                      }
-                      replayVideo();
-                    }}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  >
-                    <Play className="w-4 h-4" />
-                  </Button>
-                )}
+      {videoUrl && !prefersReduced && (
+        <video
+          ref={videoRef}
+          className="squircle-media absolute inset-0 w-full h-full object-cover"
+          src={videoUrl}
+          playsInline
+          muted
+          preload="metadata"
+          poster={profilePhotoUrl || thumbnailUrl}
+        />
+      )}
+
+      <img
+        className={`squircle-media absolute inset-0 w-full h-full object-cover ${
+          prefersReduced ? '' : 'transition-opacity duration-300 ease-in-out'
+        } ${showPhoto ? 'opacity-100' : 'opacity-0'}`}
+        src={profilePhotoUrl || `${profilePhotoUrl}?quality=95&format=auto&width=512&height=512&fit=cover` || "/placeholder.svg"}
+        alt={`${displayName} profile`}
+        draggable="false"
+        onError={(e) => {
+          if (profilePhotoUrl) {
+            e.currentTarget.src = profilePhotoUrl;
+          }
+        }}
+      />
+
+      {/* Fallback when no photo */}
+      {(!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+        <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+          <div className="text-6xl text-muted-foreground/50">
+            {displayName.charAt(0)}
+          </div>
+        </div>
+      )}
+      
+      {/* Controls Overlay */}
+      {showControls && (videoUrl || isOwnProfile) && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+          <div className="flex flex-col gap-2 items-center">
+            {/* Play/Replay Button */}
+            {videoUrl && showPhoto && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={replay}
+                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+              >
+                <Play className="w-4 h-4" />
+              </Button>
+            )}
+            
+            {/* Owner Controls */}
+            {isOwnProfile && (
+              <div className="flex flex-col gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleFileSelect}
+                  disabled={uploading}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  title="Change video"
+                >
+                  <span className="text-xs font-medium">Change Video</span>
+                </Button>
                 
-                {/* Owner Controls - Change Video and Photo buttons */}
-                {isOwnProfile && (
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleFileSelect}
-                      disabled={uploading}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                      title="Change video"
-                    >
-                      <span className="text-xs font-medium">Change Video</span>
-                    </Button>
-                    
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handlePhotoSelect}
-                      disabled={uploading}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                      title="Change profile photo"
-                    >
-                      <span className="text-xs font-medium">Change Photo</span>
-                    </Button>
-                  </div>
-                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handlePhotoSelect}
+                  disabled={uploading}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  title="Change profile photo"
+                >
+                  <span className="text-xs font-medium">Change Photo</span>
+                </Button>
               </div>
-            </div>
-          )}
-        </>
-      ) : (
+            )}
+          </div>
+        </div>
+      )}
+
+      {!videoUrl && (
         /* No Video - Show Upload Area */
         <div className="w-full h-full bg-muted/30 flex flex-col items-center justify-center">
           <div className="text-6xl text-muted-foreground/50 mb-4">
