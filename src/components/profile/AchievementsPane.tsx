@@ -923,7 +923,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         style={{
                           left: `${lineStart}%`,
                           width: `${lineWidth}%`,
-                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
+                          background: `linear-gradient(to right, ${tier.color}40, ${nextTier.color}40)`,
                           borderRadius: '2px'
                         }}
                       />
@@ -1038,9 +1038,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         style={{
                           left: `${lineStart}%`,
                           width: `${lineWidth}%`,
-                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
+                          background: `linear-gradient(to right, ${tier.color}40, ${nextTier.color}40)`,
                           borderRadius: '2px'
-                        }} 
+                        }}
                       />
                     );
                   })}
