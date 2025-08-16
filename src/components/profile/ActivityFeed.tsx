@@ -175,7 +175,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         ) : null}
       </div>
 
-      {/* Remove padding on mobile for edge-to-edge cards like discover page */}
+      {/* Activity cards with edge-to-edge layout on mobile like discover page */}
       {posts.length > 0 && filteredPosts.length > 0 && (
         <ExploreGrid
           content={exploreContent}

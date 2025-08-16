@@ -725,8 +725,8 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Content sections for the selected tab */}
-      <div className="py-6 md:py-8 px-4 md:px-0">
-        <div className="md:max-w-[1150px] md:mx-auto">
+      <div className={`py-6 md:py-8 ${activeSection === 'activity' ? 'px-0 md:px-0' : 'px-4 md:px-0'}`}>
+        <div className={`${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}`}>
           {activeSection === 'activity' && (
             <ActivityFeed
               userId={profile?.id || ''}
