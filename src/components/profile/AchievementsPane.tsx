@@ -1264,7 +1264,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex items-center gap-2"
                         >
                           GIANT SHARE TEST
-                          <PaperAirplaneIcon className="w-24 h-24" />
+                          <PaperAirplaneIcon className="w-32 h-32" />
                         </Button>
                       </div>
                       
@@ -1328,7 +1328,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                            <img 
                                              src={padlockIcon} 
                                              alt="Locked" 
-                                              className={`${isMobile ? 'w-8 h-8' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
+                                              className={`${isMobile ? 'w-8 h-8' : 'w-14 h-14'} opacity-60 drop-shadow-none`}
                                              style={{ filter: 'none', background: 'transparent' }}
                                            />
                                         </div>
@@ -1416,7 +1416,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                            <img 
                                              src={padlockIcon} 
                                              alt="Locked" 
-                                             className={`${isMobile ? 'w-8 h-8' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
+                                             className={`${isMobile ? 'w-8 h-8' : 'w-14 h-14'} opacity-60 drop-shadow-none`}
                                              style={{ filter: 'none', background: 'transparent' }}
                                            />
                                         </div>
