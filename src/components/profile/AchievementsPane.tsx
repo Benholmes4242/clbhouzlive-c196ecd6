@@ -899,18 +899,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     if (index === xpTiers.length - 1) return null;
                     
                     const nextTier = xpTiers[index + 1];
-                    const leftOffset = 50 + (index * ((100 - 2 * 50) / (xpTiers.length - 1))) + 32;
-                    const rightOffset = 50 + ((index + 1) * ((100 - 2 * 50) / (xpTiers.length - 1))) - 32;
-                    const segmentWidth = rightOffset - leftOffset;
                     
                     return (
                       <div 
                         key={`connector-${index}`}
-                        className="absolute top-6 h-0.5 z-0" 
+                        className="absolute top-6 h-1 z-10" 
                         style={{
-                          left: `${leftOffset}px`,
-                          width: `${segmentWidth}px`,
-                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`
+                          left: `${25 + (index * 25) + 8}%`,
+                          width: '17%',
+                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
+                          borderRadius: '2px'
                         }} 
                       />
                     );
@@ -1003,18 +1001,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     if (index === xpTiers.length - 1) return null; // Don't create line after last ring
                     
                     const nextTier = xpTiers[index + 1];
-                    const leftOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1))) + 48; // Start from right edge of current ring
-                    const rightOffset = 76 + ((index + 1) * ((100 - 2 * 76) / (xpTiers.length - 1))) - 48; // End at left edge of next ring
-                    const segmentWidth = rightOffset - leftOffset;
                     
                     return (
                       <div 
                         key={`connector-${index}`}
-                        className="absolute top-10 h-0.5 z-0" 
+                        className="absolute top-12 h-1 z-10" 
                         style={{
-                          left: `${leftOffset}px`,
-                          width: `${segmentWidth}px`,
-                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`
+                          left: `${25 + (index * 25) + 10}%`,
+                          width: '15%',
+                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
+                          borderRadius: '2px'
                         }} 
                       />
                     );
