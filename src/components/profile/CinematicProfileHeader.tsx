@@ -360,8 +360,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Media Controls - Show on hover with stable positioning */}
       {hasMedia && isHovering && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <div className="flex flex-col gap-4 items-center pointer-events-auto">
+        <div 
+          className="absolute inset-0 flex items-center justify-center z-20"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <div className="flex flex-col gap-4 items-center">
             {/* Play/Replay Button */}
             {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
               <Button
@@ -399,7 +403,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
                   }}
                 >
-                  <span className="text-xs font-medium">Video</span>
+                  <span className="text-xs font-medium">Change Video</span>
                 </Button>
                 
                 <Button
@@ -416,7 +420,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
                   }}
                 >
-                  <span className="text-xs font-medium">Photo</span>
+                  <span className="text-xs font-medium">Change Photo</span>
                 </Button>
               </div>
             )}
