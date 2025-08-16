@@ -60,28 +60,68 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }, [userMedia, mediaType]);
 
-  // Get responsive card dimensions - full screen width
+  // Get responsive card dimensions
   const getCardDimensions = () => {
-    // Full screen width for all breakpoints
-    const width = '100vw';
+    if (isMobile) {
+      const width = '90vw';
+      const height = `calc(90vw / ${aspectRatio})`;
+      return { width, height, maxWidth: 'none' };
+    }
     
-    // Calculate height based on current aspect ratio and screen width
-    const screenWidth = window.innerWidth;
-    const height = `${screenWidth / aspectRatio}px`;
+    // Desktop/tablet sizing
+    const baseWidth = window.innerWidth > 1200 ? 600 : 
+                     window.innerWidth > 768 ? 500 : 450;
+    const width = `${baseWidth}px`;
+    const height = `${baseWidth / aspectRatio}px`;
     
-    return { width, height, maxWidth: 'none' };
+    return { width, height, maxWidth: width };
   };
 
   const cardDimensions = getCardDimensions();
 
   return (
     <div className="relative w-full overflow-hidden">
+      {/* Dynamic Blur Background */}
+      <div className="absolute inset-0 z-0">
+        {mediaType === 'video' && !reducedMotion ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={userMedia}
+          >
+            <source src={userMedia} type="video/mp4" />
+          </video>
+        ) : (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${userMedia})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+          />
+        )}
+        
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
+        
+        {/* Optional radial vignette */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
+      </div>
+
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
-        {/* Liquid Glass Media Card - ONLY glass element */}
+        {/* Liquid Glass Card */}
         <div
           ref={cardRef}
-          className="relative mb-8 rounded-2xl overflow-hidden"
+          className="relative mb-8 rounded-2xl overflow-hidden shadow-2xl"
           style={{
             width: cardDimensions.width,
             height: cardDimensions.height,
@@ -90,7 +130,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             backdropFilter: 'blur(20px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
           }}
         >
           {/* Media Content */}
@@ -132,16 +172,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </div>
 
-        {/* Profile Information - Directly on background */}
+        {/* Profile Information */}
         <div className="text-center space-y-4 max-w-lg">
           {/* Name */}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+          <h1 
+            className="text-4xl md:text-5xl font-bold text-white"
+            style={{
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
             {userName}
           </h1>
 
           {/* Username and Edit Profile */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <span className="text-lg text-muted-foreground font-medium">
+            <span 
+              className="text-lg text-white/90 font-medium"
+              style={{
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+              }}
+            >
               {username}
             </span>
             
@@ -150,6 +200,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 variant="secondary"
                 size="sm"
                 onClick={onEditProfile}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                }}
               >
                 Edit Profile
               </Button>
@@ -157,9 +212,42 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </div>
 
           {/* Home Club */}
-          <p className="text-lg text-muted-foreground">
+          <p 
+            className="text-lg text-white/80"
+            style={{
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
             {homeClub}
           </p>
+
+          {/* Stats Bar (Frosted Glass Chip) */}
+          <div 
+            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+              backdropFilter: 'blur(15px) saturate(1.6)',
+              WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <div className="text-center">
+              <div className="font-bold text-lg">156</div>
+              <div className="text-xs opacity-80">Rounds</div>
+            </div>
+            <div className="w-px h-8 bg-white/20" />
+            <div className="text-center">
+              <div className="font-bold text-lg">12.3</div>
+              <div className="text-xs opacity-80">Handicap</div>
+            </div>
+            <div className="w-px h-8 bg-white/20" />
+            <div className="text-center">
+              <div className="font-bold text-lg">2.5k</div>
+              <div className="text-xs opacity-80">XP</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
