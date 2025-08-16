@@ -685,7 +685,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Large Progress Ring on the Left */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-80 h-80">
-                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320">
+                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320" style={{ filter: 'blur(1px) drop-shadow(0 0 20px #10B98160)' }}>
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="greenProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
