@@ -1173,7 +1173,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         size="sm"
                         className="border-white/20 text-white hover:bg-white/10 rounded-full flex items-center gap-2"
                       >
-                        <PaperAirplaneIcon className="w-6 h-6" />
+                        <PaperAirplaneIcon className="w-7 h-7" />
                         Share
                       </Button>
                     </div>
