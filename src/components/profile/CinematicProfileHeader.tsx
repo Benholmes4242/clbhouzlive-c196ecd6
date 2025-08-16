@@ -29,9 +29,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const blurVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
-  const blurPhotoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -41,56 +39,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showVideo, setShowVideo] = useState(true);
   const { toast } = useToast();
 
-  // Sync blur video with main video
-  useEffect(() => {
-    const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
-    
-    if (!video || !blurVideo || !videoUrl) return;
-    
-    const syncVideos = () => {
-      if (Math.abs(video.currentTime - blurVideo.currentTime) > 0.1) {
-        blurVideo.currentTime = video.currentTime;
-      }
-    };
-    
-    const handlePlay = () => {
-      blurVideo.play().catch(console.error);
-    };
-    
-    const handlePause = () => {
-      blurVideo.pause();
-    };
-    
-    video.addEventListener('timeupdate', syncVideos);
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-    
-    return () => {
-      video.removeEventListener('timeupdate', syncVideos);
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-    };
-  }, [videoUrl]);
-
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
       try {
         video.muted = true;
         video.currentTime = 0;
-        if (blurVideo) {
-          blurVideo.muted = true;
-          blurVideo.currentTime = 0;
-        }
         await video.play();
-        if (blurVideo) {
-          await blurVideo.play().catch(console.error);
-        }
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
@@ -108,9 +66,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           setIsPlaying(false);
           video.currentTime = 0;
           video.pause();
-          if (blurVideo) {
-            blurVideo.pause();
-          }
           
           if (profilePhotoUrl) {
             setShowVideo(false);
@@ -229,19 +184,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const replayVideo = async () => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
         video.muted = isMuted;
-        if (blurVideo) {
-          blurVideo.currentTime = 0;
-          blurVideo.muted = true;
-        }
         await video.play();
-        if (blurVideo) {
-          await blurVideo.play().catch(console.error);
-        }
         setIsPlaying(true);
         setShowVideo(true);
       } catch (error) {
@@ -271,61 +218,23 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-16rem',
-           height: '70vh',
-           minHeight: '500px',
-           maxHeight: '800px'
+           height: '100vh',
+           minHeight: '800px',
+           maxHeight: '1200px'
          }}>
 
-      {/* Blurred Background Layer */}
-      <div className="absolute inset-0 z-0">
+      {/* Central Crisp Media Player - Full Coverage */}
+      <div className="absolute inset-0 z-10">
         {hasMedia ? (
           <>
-            {/* Blurred Video Background */}
-            {videoUrl && (
-              <video
-                ref={blurVideoRef}
-                src={videoUrl}
-                poster={thumbnailUrl}
-                className={`absolute inset-0 w-full h-full object-cover blur-2xl scale-110 transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100' : 'opacity-0'
-                }`}
-                playsInline
-                muted
-                preload="auto"
-                crossOrigin="anonymous"
-              />
-            )}
-            
-            {/* Blurred Photo Background */}
-            {profilePhotoUrl && (
-              <img
-                ref={blurPhotoRef}
-                src={`${profilePhotoUrl}?quality=70&format=auto&width=800&height=600&fit=cover`}
-                loading="eager"
-                alt=""
-                className={`absolute inset-0 w-full h-full object-cover blur-2xl scale-110 transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
-                }`}
-              />
-            )}
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
-        )}
-      </div>
-
-      {/* Fitted Media Container */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
-        {hasMedia && (
-          <div className="relative w-full h-full max-w-6xl max-h-full flex items-center justify-center">
-            {/* Main Video Element - Fit to View */}
+            {/* Main Video Element - Crisp and Clear */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100' : 'opacity-0'
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
                 muted={isMuted}
@@ -334,29 +243,32 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               />
             )}
             
-            {/* Profile Photo - Fit to View */}
+            {/* Profile Photo */}
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
                   e.currentTarget.src = profilePhotoUrl;
                 }}
               />
             )}
-          </div>
+          </>
+        ) : (
+          /* Fallback for empty state */
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
         )}
       </div>
 
-      {/* Gradient fade to white at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/90 via-white/50 to-transparent z-20 pointer-events-none"></div>
+      {/* Gradient fade to white at bottom - extended and smoother */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
 
       {/* Content Overlay */}
       <div 
