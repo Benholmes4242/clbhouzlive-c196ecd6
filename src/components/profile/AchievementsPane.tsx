@@ -905,11 +905,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         key={`connector-${index}`}
                         className="absolute top-6 h-1 z-10" 
                         style={{
-                          left: `${25 + (index * 25) + 6}%`,
-                          width: '19%',
+                          left: `${25 + (index * 25) + 12.5}%`,
+                          width: '12.5%',
                           background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
                           borderRadius: '2px'
-                        }} 
+                        }}
                       />
                     );
                   })}
@@ -1007,11 +1007,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         key={`connector-${index}`}
                         className="absolute top-12 h-1 z-10" 
                         style={{
-                          left: `${25 + (index * 25) + 12}%`,
-                          width: '13%',
+                          left: `${25 + (index * 25) + 12.5}%`,
+                          width: '12.5%',
                           background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
                           borderRadius: '2px'
-                        }} 
+                        }}
                       />
                     );
                   })}
