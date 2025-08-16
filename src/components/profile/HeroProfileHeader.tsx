@@ -478,7 +478,7 @@ const HeroProfileHeader = ({
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
         <div className="absolute bottom-[-10rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 pt-16">
           {/* User Information */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-12">
             {/* User's Name */}
             <div className="flex items-center justify-center">
               <h1 className="text-4xl md:text-5xl text-black font-bold">
