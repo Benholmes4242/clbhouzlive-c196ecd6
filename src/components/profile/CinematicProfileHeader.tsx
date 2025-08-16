@@ -39,81 +39,59 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showVideo, setShowVideo] = useState(true);
   const { toast } = useToast();
 
-  // Synchronized dual video playback with error handling
+  // Auto-play video once when component mounts and video is available
   useEffect(() => {
-    if (!videoUrl || hasPlayed) return;
-
-    let timeoutId: NodeJS.Timeout;
     const video = videoRef.current;
-    
-    const playBothVideos = async () => {
-      if (!video) return;
-      
+    if (!video || !videoUrl || hasPlayed) return;
+
+    const handleCanPlayThrough = async () => {
       try {
-        // Configure main video
         video.muted = true;
         video.currentTime = 0;
-        
-        // Load main video first
-        await new Promise((resolve, reject) => {
-          const onCanPlay = () => {
-            video.removeEventListener('canplay', onCanPlay);
-            video.removeEventListener('error', onError);
-            resolve(null);
-          };
-          
-          const onError = () => {
-            video.removeEventListener('canplay', onCanPlay);
-            video.removeEventListener('error', onError);
-            reject(new Error('Main video failed to load'));
-          };
-          
-          video.addEventListener('canplay', onCanPlay);
-          video.addEventListener('error', onError);
-          video.load();
-          
-          // Timeout after 8 seconds
-          setTimeout(() => {
-            video.removeEventListener('canplay', onCanPlay);
-            video.removeEventListener('error', onError);
-            reject(new Error('Main video load timeout'));
-          }, 8000);
-        });
-
-        // Play main video
         await video.play();
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
         
-        // Start background video after main video is playing
-        setTimeout(() => {
-          const bgVideos = document.querySelectorAll('video[style*="blur"]');
-          bgVideos.forEach(bgVideo => {
-            if (bgVideo !== video) {
-              (bgVideo as HTMLVideoElement).currentTime = video.currentTime;
-              (bgVideo as HTMLVideoElement).play().catch(() => {
-                // Silently handle background video errors
-              });
-            }
-          });
-        }, 100);
+        const handleTimeUpdate = () => {
+          const currentTime = video.currentTime;
+          const duration = video.duration;
+          
+          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
+            setShowVideo(false);
+          }
+        };
         
+        const handleEnded = () => {
+          setIsPlaying(false);
+          video.currentTime = 0;
+          video.pause();
+          
+          if (profilePhotoUrl) {
+            setShowVideo(false);
+          }
+        };
+        
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('ended', handleEnded);
+        
+        return () => {
+          video.removeEventListener('timeupdate', handleTimeUpdate);
+          video.removeEventListener('ended', handleEnded);
+        };
       } catch (error) {
-        console.warn('Video playback failed:', error);
-        setShowVideo(false);
-        setIsPlaying(false);
+        console.error('Auto-play failed:', error);
         setHasPlayed(true);
       }
     };
 
-    // Stagger the video loading to prevent conflicts
-    timeoutId = setTimeout(playBothVideos, 300);
-    
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    video.load();
+
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
-  }, [videoUrl, hasPlayed]);
+  }, [videoUrl, hasPlayed, profilePhotoUrl]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -204,39 +182,18 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   };
 
-  // Enhanced replay with synchronized background video
   const replayVideo = async () => {
     const video = videoRef.current;
-    if (!video || !videoUrl) return;
-    
-    try {
-      // Reset main video
-      video.pause();
-      video.currentTime = 0;
-      video.muted = isMuted;
-      
-      // Play main video
-      setShowVideo(true);
-      await video.play();
-      setIsPlaying(true);
-      
-      // Sync background video
-      setTimeout(() => {
-        const bgVideos = document.querySelectorAll('video[style*="blur"]');
-        bgVideos.forEach(bgVideo => {
-          if (bgVideo !== video) {
-            (bgVideo as HTMLVideoElement).currentTime = 0;
-            (bgVideo as HTMLVideoElement).play().catch(() => {
-              // Silently handle background video errors
-            });
-          }
-        });
-      }, 50);
-      
-    } catch (error) {
-      console.warn('Replay failed:', error);
-      setShowVideo(false);
-      setIsPlaying(false);
+    if (video && videoUrl) {
+      try {
+        video.currentTime = 0;
+        video.muted = isMuted;
+        await video.play();
+        setIsPlaying(true);
+        setShowVideo(true);
+      } catch (error) {
+        console.error('Replay failed:', error);
+      }
     }
   };
 
@@ -247,6 +204,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   };
 
   const hasMedia = videoUrl || profilePhotoUrl;
+
+  // Debug logging
+  console.log('CinematicProfileHeader Debug:', {
+    videoUrl,
+    profilePhotoUrl,
+    hasMedia,
+    displayName,
+    showVideo,
+    thumbnailUrl
+  });
 
   // Test with a fallback image if no media is available
   const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';
@@ -262,44 +229,38 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            paddingTop: '8rem' // Add padding to push content down
          }}>
 
-      {/* Dynamic Blurred Background - Synchronized with foreground video */}
+      {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Video Background - Plays when main video is playing */}
+        {/* Video Background - Shows when video is playing */}
         {videoUrl && showVideo && (
           <video
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
             src={videoUrl}
+            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
             poster={thumbnailUrl}
-            onError={() => {
-              // Silently handle background video errors
-            }}
-            onLoadStart={() => {
-              // Background video loading
-            }}
           />
         )}
         
-        {/* Photo Background - Shows when video not playing */}
+        {/* Photo Background - Shows when photo is displayed or video ended */}
         {(!videoUrl || !showVideo) && (
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${actualPhotoUrl})`,
               filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
           />
         )}
         
-        {/* Gradient overlay */}
+        {/* Gradient overlay for smooth transition to page content */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
       </div>
 
@@ -313,27 +274,24 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             height: '300px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
           }}
-          onMouseEnter={() => {
-            if (!uploading) {
-              setShowControls(true);
-            }
-          }}
-          onMouseLeave={() => {
-            setShowControls(false);
-          }}
+          onMouseEnter={() => setShowControls(true)}
+          onMouseLeave={() => setShowControls(false)}
           onClick={handleClick}
         >
-          {/* Main Video Element - Enhanced error handling */}
+          {/* Video Element - Shows first and autoplays */}
           {videoUrl && (
             <video
               ref={videoRef}
+              src={videoUrl}
+              poster={thumbnailUrl}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
               }`}
               playsInline
               muted={isMuted}
-              preload="metadata"
-              poster={thumbnailUrl}
+              preload="auto"
+              crossOrigin="anonymous"
+              autoPlay
               onPlay={() => {
                 setIsPlaying(true);
                 setHasPlayed(true);
@@ -341,23 +299,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false);
-                // Pause background videos when main video ends
-                document.querySelectorAll('video[style*="blur"]').forEach(bgVideo => {
-                  (bgVideo as HTMLVideoElement).pause();
-                });
+                setShowVideo(false); // Switch to photo when video ends - background will update automatically
               }}
-              onError={() => {
-                console.warn('Main video error, switching to photo');
-                setShowVideo(false);
-                setIsPlaying(false);
-              }}
-            >
-              <source src={videoUrl} type="video/mp4" />
-            </video>
+            />
           )}
           
-          {/* Profile Photo - Enhanced error handling */}
+          {/* Profile Photo - Shows when no video or video has ended */}
           <img
             ref={photoRef}
             src={actualPhotoUrl}
@@ -369,11 +316,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             onError={(e) => {
-              console.warn('Profile image failed to load, using fallback');
+              console.log('Image failed to load:', actualPhotoUrl);
               e.currentTarget.src = fallbackImage;
-            }}
-            onLoad={() => {
-              // Image loaded successfully
             }}
           />
         </div>
