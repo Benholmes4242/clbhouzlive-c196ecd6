@@ -81,41 +81,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   return (
     <div className="relative w-full overflow-hidden">
-      {/* Dynamic Blur Background */}
-      <div className="absolute inset-0 z-0">
-        {mediaType === 'video' && !reducedMotion ? (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={userMedia}
-          >
-            <source src={userMedia} type="video/mp4" />
-          </video>
-        ) : (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${userMedia})`,
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-          />
-        )}
-        
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
-        
-        {/* Optional radial vignette */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
-      </div>
-
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
         {/* Liquid Glass Media Card - ONLY glass element */}
@@ -175,23 +140,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {/* Profile Information - Directly on background */}
         <div className="text-center space-y-4 max-w-lg">
           {/* Name */}
-          <h1 
-            className="text-4xl md:text-5xl font-bold text-white"
-            style={{
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
-            }}
-          >
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
             {userName}
           </h1>
 
           {/* Username and Edit Profile */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <span 
-              className="text-lg text-white/90 font-medium"
-              style={{
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-              }}
-            >
+            <span className="text-lg text-muted-foreground font-medium">
               {username}
             </span>
             
@@ -200,11 +155,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 variant="secondary"
                 size="sm"
                 onClick={onEditProfile}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
-                style={{
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                }}
               >
                 Edit Profile
               </Button>
@@ -212,12 +162,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </div>
 
           {/* Home Club */}
-          <p 
-            className="text-lg text-white/80"
-            style={{
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-            }}
-          >
+          <p className="text-lg text-muted-foreground">
             {homeClub}
           </p>
         </div>
