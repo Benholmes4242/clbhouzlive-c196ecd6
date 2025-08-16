@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import { Search } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 
 const Clubhouse = () => {
+  const navigate = useNavigate();
   const {
     posts,
     isLoading,
@@ -65,6 +67,17 @@ const Clubhouse = () => {
               className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
             />
           </div>
+        </div>
+
+        {/* Demo Button */}
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={() => navigate('/profile-demo2')}
+            className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-lg border border-white/20 text-white text-sm font-medium transition-all duration-200"
+          >
+            <Eye className="w-4 h-4" />
+            Demo 2
+          </button>
         </div>
 
         {/* Floating Horizontal Menu */}
