@@ -604,7 +604,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Sticky Tab Navigation - Positioned above achievements/courses journey with spacing for profile overlay */}
-      <div className="mt-56">
+      <div className="mt-44">
         <ProfileTabs
         activeTab={activeSection}
         onTabChange={handleTabChange}
