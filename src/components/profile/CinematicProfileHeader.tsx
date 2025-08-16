@@ -215,25 +215,54 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   });
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} 
+    <div className={`relative w-full overflow-hidden bg-gradient-to-b from-gray-100 to-white ${className}`} 
          style={{ 
            marginTop: '-16rem',
-           height: '100vh',
-           minHeight: '800px',
-           maxHeight: '1200px'
+           height: '60vh',
+           minHeight: '400px',
+           maxHeight: '600px'
          }}>
 
-      {/* Central Crisp Media Player - Full Coverage */}
-      <div className="absolute inset-0 z-10">
+      {/* Background blur effect */}
+      {hasMedia && (
+        <div className="absolute inset-0 z-0">
+          {profilePhotoUrl && (
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${profilePhotoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
+        </div>
+      )}
+
+      {/* Central Circular Media */}
+      <div className="relative z-10 w-full h-full flex items-center justify-center">
         {hasMedia ? (
-          <>
-            {/* Main Video Element - Crisp and Clear */}
+          <div 
+            className={`relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 ${
+              (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+            }`}
+            style={{
+              width: '300px',
+              height: '300px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            }}
+            onMouseEnter={() => setShowControls(true)}
+            onMouseLeave={() => setShowControls(false)}
+            onClick={handleClick}
+          >
+            {/* Video Element - Circular */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
+                className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
@@ -243,16 +272,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               />
             )}
             
-            {/* Profile Photo */}
+            {/* Profile Photo - Circular */}
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=600&height=600&fit=cover`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
+                className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
@@ -260,108 +289,94 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 }}
               />
             )}
-          </>
+          </div>
         ) : (
-          /* Fallback for empty state */
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
+          /* Fallback for empty state - circular placeholder */
+          <div className="w-[300px] h-[300px] rounded-full bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
         )}
       </div>
 
-      {/* Gradient fade to white at bottom - extended and smoother */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
+      {/* Central Media Controls */}
+      {hasMedia && showControls && (
+        <div className="absolute inset-0 flex items-center justify-center transition-opacity z-20">
+          <div className="flex flex-col gap-3 items-center">
+            {/* Play/Replay Button */}
+            {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
+              <Button
+                size="lg"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  replayVideo();
+                }}
+                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-4 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-110"
+              >
+                <Play className="w-6 h-6" />
+              </Button>
+            )}
 
-      {/* Content Overlay */}
-      <div 
-        className={`relative z-10 w-full h-full flex items-center justify-center ${
-          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-        }`}
-        onMouseEnter={() => setShowControls(true)}
-        onMouseLeave={() => setShowControls(false)}
-        onClick={handleClick}
-      >
-        {/* Central Media Controls */}
-        {hasMedia && showControls && (
-          <div className="absolute inset-0 flex items-center justify-center transition-opacity">
-            <div className="flex flex-col gap-3 items-center">
-              {/* Play/Replay Button */}
-              {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
+            {/* Owner Edit Controls - positioned under play button */}
+            {isOwnProfile && (
+              <div className="flex gap-2">
                 <Button
-                  size="lg"
+                  size="sm"
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    replayVideo();
+                    handleFileSelect();
                   }}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-4 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-110"
+                  disabled={uploading}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                 >
-                  <Play className="w-6 h-6" />
+                  <span className="text-xs font-medium">Change Video</span>
                 </Button>
-              )}
-
-              {/* Owner Edit Controls - positioned under play button */}
-              {isOwnProfile && (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFileSelect();
-                    }}
-                    disabled={uploading}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  >
-                    <span className="text-xs font-medium">Change Video</span>
-                  </Button>
-                  
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePhotoSelect();
-                    }}
-                    disabled={uploading}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  >
-                    <span className="text-xs font-medium">Change Photo</span>
-                  </Button>
-                </div>
-              )}
-            </div>
+                
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePhotoSelect();
+                  }}
+                  disabled={uploading}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                >
+                  <span className="text-xs font-medium">Change Photo</span>
+                </Button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Upload Interface for Empty State */}
-        {!hasMedia && isOwnProfile && (
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="text-6xl text-muted-foreground/50 mb-2">
-              {displayName.charAt(0)}
-            </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={handleFileSelect}
-                disabled={uploading}
-                className="bg-background/80 backdrop-blur-sm"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Add Video
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={handlePhotoSelect}
-                disabled={uploading}
-                className="bg-background/80 backdrop-blur-sm"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Add Photo
-              </Button>
-            </div>
+      {/* Upload Interface for Empty State */}
+      {!hasMedia && isOwnProfile && (
+        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
+          <div className="text-6xl text-muted-foreground/50 mb-2">
+            {displayName.charAt(0)}
           </div>
-        )}
-
-      </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={handleFileSelect}
+              disabled={uploading}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Add Video
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handlePhotoSelect}
+              disabled={uploading}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Add Photo
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Hidden File Inputs */}
       <input
