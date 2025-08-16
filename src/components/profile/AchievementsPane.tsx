@@ -846,10 +846,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex flex-col justify-center flex-1 space-y-2">
                   {/* Ring Achievement Status */}
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-base text-black dark:text-white leading-tight">
+                    <h3 className="font-semibold text-lg text-black dark:text-white leading-tight">
                       {currentTier ? currentTier.name : "No Ring Achieved"}
                     </h3>
-                    <p className="text-xs text-black dark:text-white leading-tight">
+                    <p className="text-base text-black dark:text-white leading-tight">
                       {currentTier ? 
                         `You've earned the ${currentTier.name}!` :
                         `${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
@@ -858,16 +858,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   </div>
                   
                   {/* XP Progress Text */}
-                  <div className="text-xs text-green-500 leading-tight">
+                  <div className="text-base text-green-500 leading-tight">
                     {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
                   </div>
                   
                   {/* XP Earned This Month */}
-                  <div className="flex items-center gap-1">
-                    <div className="flex items-center gap-1 text-green-600 relative px-2 py-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-green-600 relative px-3 py-2">
                       <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
-                      <span className="text-xs font-medium relative z-10">XP earned this month</span>
-                      <svg className="w-3 h-3 relative z-10" fill="currentColor" viewBox="0 0 20 20">
+                      <span className="text-base font-medium relative z-10">XP earned this month</span>
+                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
                       <span className="font-bold relative z-10 text-xs">450 XP</span>
@@ -903,7 +903,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     // Calculate exact positions for ring edges - Mobile responsive
                     // Each ring is 48px wide, positioned in flex-1 containers
                     // Container width per ring is 25% of total width
-                    const ringWidth = 48; // w-12 = 48px
+                    const ringWidth = 64; // w-16 = 64px (updated from 48px)
                     const containerWidthPercent = 25; // 100% / 4 rings
                     
                     // Position of ring center as percentage
@@ -915,11 +915,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     let ringRadiusPercent;
                     
                     if (screenWidth < 640) { // mobile
-                      ringRadiusPercent = 5.5; // larger offset for smaller screens
+                      ringRadiusPercent = 6.5; // adjusted for larger rings (w-16)
                     } else if (screenWidth < 768) { // tablet
-                      ringRadiusPercent = 4.5;
+                      ringRadiusPercent = 5.5;
                     } else { // desktop
-                      ringRadiusPercent = 3.8;
+                      ringRadiusPercent = 4.8;
                     }
                     
                     let lineStart = ringCenterPercent + ringRadiusPercent;
@@ -973,7 +973,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-1">
                           {/* Progress ring */}
-                          <svg className={`w-12 h-12 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 8px ${tier.color}40)` }}>
+                          <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 8px ${tier.color}40)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
@@ -981,7 +981,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               r="30"
                               fill="none"
                               stroke={`${tier.color}30`}
-                              strokeWidth="3"
+                              strokeWidth="4"
                               strokeLinecap="round"
                             />
                             
@@ -992,7 +992,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                 cy="32"
                                 r="30"
                                 stroke={tier.color}
-                                strokeWidth="3"
+                                strokeWidth="4"
                                 fill="none"
                                 strokeDasharray={`${30 * 2 * Math.PI}`}
                                 strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
@@ -1014,10 +1014,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                             </div>
                           )}
                         </div>
-                        <div className="text-xs font-medium mb-1 text-black dark:text-white">
+                        <div className="text-base font-medium mb-1 text-black dark:text-white">
                           {tier.name}
                         </div>
-                        <div className="text-xs text-black dark:text-white">
+                        <div className="text-base text-black dark:text-white">
                           {tier.minXP.toLocaleString()} XP
                         </div>
                       </div>
@@ -1174,13 +1174,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       variant={activeFilter === key ? 'secondary' : 'outline'}
                       size="sm"
                       onClick={() => setActiveFilter(key)}
-                      className={`gap-1 px-2 py-1.5 rounded-full transition-all duration-200 text-xs ${
+                      className={`gap-2 px-3 py-2 rounded-full transition-all duration-200 text-sm ${
                         activeFilter === key 
                           ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
                           : ''
                       }`}
                     >
-                      <span>{icon}</span>
+                      <span className="text-base">{icon}</span>
                       {label} ({count})
                     </Button>
                   );
