@@ -271,8 +271,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         <div 
           className="group relative rounded-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl"
           style={{
-            width: '320px',
-            height: '320px',
+            width: '400px',
+            height: '400px',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.2)',
