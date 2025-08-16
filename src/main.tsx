@@ -3,6 +3,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import './styles/squircle.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 
 const container = document.getElementById("root");
