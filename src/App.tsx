@@ -17,7 +17,6 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 
 const Auth = lazy(() => import("./pages/Auth"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
-const ProfileDemo = lazy(() => import("./pages/ProfileDemo"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -41,7 +40,7 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-
+const ProfileDemo = lazy(() => import("./pages/ProfileDemo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -78,7 +77,6 @@ const App: React.FC = () => {
                         <Route path="/" element={<Clubhouse />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/create-profile" element={<CreateProfile />} />
-                        <Route path="/profile-demo" element={<ProfileDemo />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/profile/:username" element={<UserProfilePage />} />
                         <Route path="/settings" element={<Settings />} />
@@ -102,7 +100,7 @@ const App: React.FC = () => {
                         <Route path="/achievements" element={<AchievementsPage />} />
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
-                        
+                        <Route path="/profile-demo" element={<ProfileDemo />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
