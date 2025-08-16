@@ -1,7 +1,7 @@
-/* Apple-style superellipse mask (n=5) for iOS icon shape - more rounded */
+/* Apple-style superellipse mask (n=5) for iOS icon shape - softer rounded corners */
 .superellipse-mask {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M25 0h50C83.8 0 100 16.2 100 25v50C100 83.8 83.8 100 75 100H25C16.2 100 0 83.8 0 75V25C0 16.2 16.2 0 25 0z'/%3E%3C/svg%3E") !important;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M25 0h50C83.8 0 100 16.2 100 25v50C100 83.8 83.8 100 75 100H25C16.2 100 0 83.8 0 75V25C0 16.2 16.2 0 25 0z'/%3E%3C/svg%3E") !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30 0h40C87 0 100 13 100 30v40C100 87 87 100 70 100H30C13 100 0 87 0 70V30C0 13 13 0 30 0z'/%3E%3C/svg%3E") !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30 0h40C87 0 100 13 100 30v40C100 87 87 100 70 100H30C13 100 0 87 0 70V30C0 13 13 0 30 0z'/%3E%3C/svg%3E") !important;
   -webkit-mask-size: 100% 100% !important;
   mask-size: 100% 100% !important;
   -webkit-mask-repeat: no-repeat !important;
