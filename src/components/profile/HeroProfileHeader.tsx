@@ -528,11 +528,11 @@ const HeroProfileHeader = ({
               </button>
             </div>
             
-            {/* Stats Container - Fixed width to show exactly 4 stats */}
-            <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '520px' }}>
+            {/* Stats Container - Responsive width */}
+            <div className="flex-shrink-0 overflow-hidden rounded-lg w-full md:w-[520px]">
               <div 
                 id="stats-container"
-                className="flex gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
+                className="flex gap-4 md:gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
