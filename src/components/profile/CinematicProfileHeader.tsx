@@ -283,29 +283,32 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Mobile: Dynamic background blur that matches current display */}
+        {/* Mobile: Smooth transitioning background blur */}
         {isMobile && (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out"
-            style={{
-              backgroundImage: `url(${(() => {
-                // Use video thumbnail when video is playing, photo when video ended
-                const backgroundUrl = showVideo && videoUrl ? (thumbnailUrl || videoUrl) : actualPhotoUrl;
-                console.log('Mobile Background Debug:', {
-                  showVideo,
-                  videoUrl: !!videoUrl,
-                  thumbnailUrl,
-                  actualPhotoUrl,
-                  backgroundUrl,
-                  isMobile,
-                  usingVideoForBackground: showVideo && videoUrl
-                });
-                return backgroundUrl;
-              })()})`,
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-          />
+          <>
+            {/* Video thumbnail background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                showVideo && videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${thumbnailUrl || videoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+            {/* Photo background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${actualPhotoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+          </>
         )}
         
         {/* Desktop: Video Background - Shows when video is playing */}
