@@ -288,7 +288,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url(${videoUrl && thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl})`,
+              backgroundImage: `url(${showVideo && videoUrl && thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl})`,
               filter: 'blur(20px) saturate(1.2)',
               transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
