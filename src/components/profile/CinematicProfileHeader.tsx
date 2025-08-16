@@ -328,7 +328,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       <div className="relative z-10 w-full h-full flex items-start justify-center pt-20">
         {/* Always show a circular element */}
         <div 
-          className="group relative rounded-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
+          className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
             width: '400px',
             height: '400px',
@@ -336,7 +336,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             backdropFilter: 'blur(20px) saturate(1.3)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            borderRadius: '50%',
+            borderRadius: '0', // Make it square to test
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
