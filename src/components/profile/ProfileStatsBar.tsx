@@ -102,9 +102,9 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
           ))}
         </div>
         
-        {/* Right fade gradient to create peek effect */}
+        {/* Right fade gradient to create peek effect - contained within bounds */}
         {stats.length > 4 && (
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted via-muted/50 to-transparent pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted via-muted/50 to-transparent pointer-events-none z-10" />
         )}
       </div>
     </div>
