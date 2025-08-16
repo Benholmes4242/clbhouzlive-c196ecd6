@@ -786,7 +786,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           
           {/* Hero XP Progress Section - Mobile Only */}
           {isMobile && (
-            <div className="flex justify-center items-center px-2 pb-6">
+            <div className="flex justify-start items-center px-4 pb-6">
               <div className="flex items-center gap-6 w-full max-w-[360px] mx-auto">
                 {/* Mobile Progress Ring - Left Side */}
                 <div className="relative flex-shrink-0">
