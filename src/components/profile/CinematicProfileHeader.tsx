@@ -288,7 +288,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out"
             style={{
-              backgroundImage: `url(${showVideo && videoUrl && thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl})`,
+              backgroundImage: `url(${(() => {
+                // Use video thumbnail when video is playing, photo when video ended
+                const backgroundUrl = showVideo && videoUrl ? (thumbnailUrl || videoUrl) : actualPhotoUrl;
+                console.log('Mobile Background Debug:', {
+                  showVideo,
+                  videoUrl: !!videoUrl,
+                  thumbnailUrl,
+                  actualPhotoUrl,
+                  backgroundUrl,
+                  isMobile,
+                  usingVideoForBackground: showVideo && videoUrl
+                });
+                return backgroundUrl;
+              })()})`,
               filter: 'blur(20px) saturate(1.2)',
               transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
