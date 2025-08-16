@@ -218,63 +218,22 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-16rem',
-           height: 'clamp(60vh, 80vh, 90vh)',
-           minHeight: '500px'
+           height: '100vh',
+           minHeight: '800px',
+           maxHeight: '1200px'
          }}>
 
-      {/* Blurred Background Layer - Full Cover Fill */}
-      <div className="absolute inset-0 z-0">
-        {hasMedia && (
-          <>
-            {/* Blurred Video Background - Always Cover */}
-            {videoUrl && (
-              <video
-                src={videoUrl}
-                poster={thumbnailUrl}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100' : 'opacity-0'
-                }`}
-                playsInline
-                muted
-                loop
-                autoPlay
-                crossOrigin="anonymous"
-                style={{ 
-                  filter: 'blur(24px) brightness(0.7) saturate(1.1)',
-                  transform: 'scale(1.1)'
-                }}
-              />
-            )}
-            
-            {/* Blurred Photo Background - Always Cover */}
-            {profilePhotoUrl && (
-              <img
-                src={`${profilePhotoUrl}?quality=60&format=auto&fit=cover`}
-                alt=""
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
-                }`}
-                style={{ 
-                  filter: 'blur(24px) brightness(0.7) saturate(1.1)',
-                  transform: 'scale(1.1)'
-                }}
-              />
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Sharp Media Layer - Centered and Fit to View */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
+      {/* Central Crisp Media Player - Full Coverage */}
+      <div className="absolute inset-0 z-10">
         {hasMedia ? (
           <>
-            {/* Sharp Video Element - Fit Entire Media */}
+            {/* Main Video Element - Crisp and Clear */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
@@ -284,16 +243,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               />
             )}
             
-            {/* Sharp Profile Photo - Fit Entire Media */}
+            {/* Profile Photo */}
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&fit=contain`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`w-full h-full object-contain transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
@@ -308,8 +267,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Bottom Gradient Overlay for Page Blend */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent z-15 pointer-events-none"></div>
+      {/* Gradient fade to white at bottom - extended and smoother */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
 
       {/* Content Overlay */}
       <div 
