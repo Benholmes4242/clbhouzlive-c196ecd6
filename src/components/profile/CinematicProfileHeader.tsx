@@ -39,59 +39,82 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showVideo, setShowVideo] = useState(true);
   const { toast } = useToast();
 
-  // Auto-play video once when component mounts and video is available
+  // Optimized auto-play with better error handling
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
-    const handleCanPlayThrough = async () => {
+    let timeoutId: NodeJS.Timeout;
+    let cleanup = () => {};
+
+    const attemptPlay = async () => {
       try {
-        video.muted = true;
+        // Reset video state
         video.currentTime = 0;
+        video.muted = true;
+        
+        // Load video with timeout
+        const loadPromise = new Promise((resolve, reject) => {
+          const onCanPlay = () => {
+            cleanup();
+            resolve(null);
+          };
+          
+          const onError = (e: Event) => {
+            cleanup();
+            reject(new Error('Video load failed'));
+          };
+          
+          const onAbort = () => {
+            cleanup();
+            reject(new Error('Video load aborted'));
+          };
+          
+          cleanup = () => {
+            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener('error', onError);
+            video.removeEventListener('abort', onAbort);
+          };
+          
+          video.addEventListener('canplay', onCanPlay, { once: true });
+          video.addEventListener('error', onError, { once: true });
+          video.addEventListener('abort', onAbort, { once: true });
+        });
+
+        // Set up timeout
+        timeoutId = setTimeout(() => {
+          cleanup();
+          console.warn('Video load timeout');
+        }, 10000);
+
+        // Load the video
+        video.load();
+        await loadPromise;
+        
+        clearTimeout(timeoutId);
+        
+        // Try to play
         await video.play();
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
         
-        const handleTimeUpdate = () => {
-          const currentTime = video.currentTime;
-          const duration = video.duration;
-          
-          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
-            setShowVideo(false);
-          }
-        };
-        
-        const handleEnded = () => {
-          setIsPlaying(false);
-          video.currentTime = 0;
-          video.pause();
-          
-          if (profilePhotoUrl) {
-            setShowVideo(false);
-          }
-        };
-        
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('ended', handleEnded);
-        
-        return () => {
-          video.removeEventListener('timeupdate', handleTimeUpdate);
-          video.removeEventListener('ended', handleEnded);
-        };
       } catch (error) {
-        console.error('Auto-play failed:', error);
-        setHasPlayed(true);
+        console.warn('Auto-play failed:', error);
+        setShowVideo(false);
+        setIsPlaying(false);
+        setHasPlayed(true); // Prevent retry loops
       }
     };
 
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
-    video.load();
-
+    // Delay initial play attempt
+    timeoutId = setTimeout(attemptPlay, 500);
+    
     return () => {
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      if (timeoutId) clearTimeout(timeoutId);
+      cleanup();
     };
-  }, [videoUrl, hasPlayed, profilePhotoUrl]);
+  }, [videoUrl, hasPlayed]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -182,18 +205,43 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   };
 
+  // Enhanced replay with better error handling
   const replayVideo = async () => {
     const video = videoRef.current;
-    if (video && videoUrl) {
-      try {
-        video.currentTime = 0;
-        video.muted = isMuted;
-        await video.play();
-        setIsPlaying(true);
-        setShowVideo(true);
-      } catch (error) {
-        console.error('Replay failed:', error);
+    if (!video || !videoUrl) return;
+    
+    try {
+      // Stop any ongoing playback
+      video.pause();
+      video.currentTime = 0;
+      
+      // Ensure video is ready
+      if (video.readyState < 2) {
+        video.load();
+        await new Promise((resolve, reject) => {
+          const onCanPlay = () => {
+            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener('error', onError);
+            resolve(null);
+          };
+          const onError = () => {
+            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener('error', onError);
+            reject(new Error('Video not ready'));
+          };
+          video.addEventListener('canplay', onCanPlay);
+          video.addEventListener('error', onError);
+        });
       }
+      
+      setShowVideo(true);
+      video.muted = isMuted;
+      await video.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.warn('Replay failed:', error);
+      setShowVideo(false);
+      setIsPlaying(false);
     }
   };
 
@@ -221,38 +269,23 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Video Background - Shows when video is playing */}
-        {videoUrl && showVideo && (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-            src={videoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={thumbnailUrl}
-            preload="metadata"
-            onError={() => {
-              // If background video fails, just continue - main video will handle fallback
-            }}
-          />
-        )}
+        {/* Use photo background when video is playing to avoid dual HLS loads */}
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${actualPhotoUrl})`,
+            filter: 'blur(20px) saturate(1.2)',
+            transform: 'scale(1.1)', // Prevent blur edge artifacts
+          }}
+        />
         
-        {/* Photo Background - Shows when photo is displayed or video ended */}
-        {(!videoUrl || !showVideo) && (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${actualPhotoUrl})`,
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-          />
-        )}
+        {/* Enhanced blur overlay when video is playing */}
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${
+          showVideo && videoUrl ? 'opacity-30' : 'opacity-0'
+        }`} style={{
+          background: 'radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%)',
+          backdropFilter: 'blur(5px)',
+        }} />
         
         {/* Gradient overlay for smooth transition to page content */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
@@ -272,20 +305,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseLeave={() => setShowControls(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Shows first and autoplays */}
+          {/* Video Element - Optimized for HLS */}
           {videoUrl && (
             <video
               ref={videoRef}
-              src={videoUrl}
-              poster={thumbnailUrl}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
               }`}
               playsInline
               muted={isMuted}
-              preload="metadata"
-              crossOrigin="anonymous"
-              autoPlay
+              preload="none"
+              poster={thumbnailUrl}
               onPlay={() => {
                 setIsPlaying(true);
                 setHasPlayed(true);
@@ -293,22 +323,26 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false); // Switch to photo when video ends - background will update automatically
-              }}
-              onError={(e) => {
-                console.warn('Video failed to load, falling back to photo');
                 setShowVideo(false);
               }}
-              onLoadStart={() => {
-                // Video started loading
+              onError={(e) => {
+                console.warn('Video playback error, switching to photo');
+                setShowVideo(false);
+                setIsPlaying(false);
               }}
-              onCanPlay={() => {
-                // Video can start playing
+              onAbort={() => {
+                console.warn('Video loading aborted');
               }}
-            />
+              onStalled={() => {
+                console.warn('Video loading stalled');
+              }}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           )}
           
-          {/* Profile Photo - Shows when no video or video has ended */}
+          {/* Profile Photo - Enhanced error handling */}
           <img
             ref={photoRef}
             src={actualPhotoUrl}
@@ -320,8 +354,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             onError={(e) => {
-              console.warn('Image failed to load, using fallback');
+              console.warn('Profile image failed to load, using fallback');
               e.currentTarget.src = fallbackImage;
+            }}
+            onLoad={() => {
+              // Image loaded successfully
             }}
           />
         </div>
