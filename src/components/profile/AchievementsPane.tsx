@@ -894,10 +894,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               {/* Ring Progression Section - Mobile */}
               <div className="mb-6">
                 <div className="relative flex justify-between items-center gap-1">
-                  {/* Segmented connector lines between rings */}
-                  {xpTiers.map((_, index) => {
+                  {/* Gradient connector lines between rings */}
+                  {xpTiers.map((tier, index) => {
                     if (index === xpTiers.length - 1) return null;
                     
+                    const nextTier = xpTiers[index + 1];
                     const leftOffset = 50 + (index * ((100 - 2 * 50) / (xpTiers.length - 1))) + 32;
                     const rightOffset = 50 + ((index + 1) * ((100 - 2 * 50) / (xpTiers.length - 1))) - 32;
                     const segmentWidth = rightOffset - leftOffset;
@@ -905,10 +906,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     return (
                       <div 
                         key={`connector-${index}`}
-                        className="absolute top-6 h-px bg-gray-300 dark:bg-gray-600 z-0" 
+                        className="absolute top-6 h-0.5 z-0" 
                         style={{
                           left: `${leftOffset}px`,
-                          width: `${segmentWidth}px`
+                          width: `${segmentWidth}px`,
+                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`
                         }} 
                       />
                     );
@@ -996,10 +998,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 
                 <div className="relative flex justify-between items-center gap-2">
-                  {/* Segmented connector lines between rings */}
-                  {xpTiers.map((_, index) => {
+                  {/* Gradient connector lines between rings */}
+                  {xpTiers.map((tier, index) => {
                     if (index === xpTiers.length - 1) return null; // Don't create line after last ring
                     
+                    const nextTier = xpTiers[index + 1];
                     const leftOffset = 76 + (index * ((100 - 2 * 76) / (xpTiers.length - 1))) + 48; // Start from right edge of current ring
                     const rightOffset = 76 + ((index + 1) * ((100 - 2 * 76) / (xpTiers.length - 1))) - 48; // End at left edge of next ring
                     const segmentWidth = rightOffset - leftOffset;
@@ -1007,10 +1010,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     return (
                       <div 
                         key={`connector-${index}`}
-                        className="absolute top-10 h-px bg-gray-300 dark:bg-gray-600 z-0" 
+                        className="absolute top-10 h-0.5 z-0" 
                         style={{
                           left: `${leftOffset}px`,
-                          width: `${segmentWidth}px`
+                          width: `${segmentWidth}px`,
+                          background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`
                         }} 
                       />
                     );
