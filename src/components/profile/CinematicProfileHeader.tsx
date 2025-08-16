@@ -223,53 +223,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            maxHeight: '1200px'
          }}>
 
-      {/* Blurred Background Layer - Dynamic and Edge-to-Edge */}
-      <div className="absolute inset-0 z-0">
-        {hasMedia && (
-          <>
-            {/* Blurred Video Background */}
-            {videoUrl && (
-              <video
-                src={videoUrl}
-                poster={thumbnailUrl}
-                className={`absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100' : 'opacity-0'
-                }`}
-                playsInline
-                muted
-                loop
-                autoPlay
-                crossOrigin="anonymous"
-                style={{ filter: 'blur(40px) brightness(0.8)' }}
-              />
-            )}
-            
-            {/* Blurred Photo Background */}
-            {profilePhotoUrl && (
-              <img
-                src={`${profilePhotoUrl}?quality=60&format=auto&width=800&height=600&fit=cover`}
-                alt=""
-                className={`absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
-                }`}
-                style={{ filter: 'blur(40px) brightness(0.8)' }}
-              />
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Main Media Layer - Centered with Scale-to-Fit */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
+      {/* Central Crisp Media Player - Full Coverage */}
+      <div className="absolute inset-0 z-10">
         {hasMedia ? (
           <>
-            {/* Main Video Element - Scale to Fit */}
+            {/* Main Video Element - Crisp and Clear */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`max-w-full max-h-full w-auto h-auto object-contain transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
@@ -279,16 +243,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               />
             )}
             
-            {/* Profile Photo - Scale to Fit */}
+            {/* Profile Photo */}
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1920&height=1080&fit=contain`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`max-w-full max-h-full w-auto h-auto object-contain transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
