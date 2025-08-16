@@ -220,34 +220,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           >
             {homeClub}
           </p>
-
-          {/* Stats Bar - Small frosted glass chip only */}
-          <div 
-            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.25)',
-              backdropFilter: 'blur(15px) saturate(1.6)',
-              WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <div className="text-center">
-              <div className="font-bold text-lg">156</div>
-              <div className="text-xs opacity-80">Rounds</div>
-            </div>
-            <div className="w-px h-8 bg-white/20" />
-            <div className="text-center">
-              <div className="font-bold text-lg">12.3</div>
-              <div className="text-xs opacity-80">Handicap</div>
-            </div>
-            <div className="w-px h-8 bg-white/20" />
-            <div className="text-center">
-              <div className="font-bold text-lg">2.5k</div>
-              <div className="text-xs opacity-80">XP</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
