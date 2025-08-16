@@ -39,80 +39,79 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showVideo, setShowVideo] = useState(true);
   const { toast } = useToast();
 
-  // Optimized auto-play with better error handling
+  // Synchronized dual video playback with error handling
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !videoUrl || hasPlayed) return;
+    if (!videoUrl || hasPlayed) return;
 
     let timeoutId: NodeJS.Timeout;
-    let cleanup = () => {};
-
-    const attemptPlay = async () => {
+    const video = videoRef.current;
+    
+    const playBothVideos = async () => {
+      if (!video) return;
+      
       try {
-        // Reset video state
-        video.currentTime = 0;
+        // Configure main video
         video.muted = true;
+        video.currentTime = 0;
         
-        // Load video with timeout
-        const loadPromise = new Promise((resolve, reject) => {
+        // Load main video first
+        await new Promise((resolve, reject) => {
           const onCanPlay = () => {
-            cleanup();
+            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener('error', onError);
             resolve(null);
           };
           
-          const onError = (e: Event) => {
-            cleanup();
-            reject(new Error('Video load failed'));
-          };
-          
-          const onAbort = () => {
-            cleanup();
-            reject(new Error('Video load aborted'));
-          };
-          
-          cleanup = () => {
+          const onError = () => {
             video.removeEventListener('canplay', onCanPlay);
             video.removeEventListener('error', onError);
-            video.removeEventListener('abort', onAbort);
+            reject(new Error('Main video failed to load'));
           };
           
-          video.addEventListener('canplay', onCanPlay, { once: true });
-          video.addEventListener('error', onError, { once: true });
-          video.addEventListener('abort', onAbort, { once: true });
+          video.addEventListener('canplay', onCanPlay);
+          video.addEventListener('error', onError);
+          video.load();
+          
+          // Timeout after 8 seconds
+          setTimeout(() => {
+            video.removeEventListener('canplay', onCanPlay);
+            video.removeEventListener('error', onError);
+            reject(new Error('Main video load timeout'));
+          }, 8000);
         });
 
-        // Set up timeout
-        timeoutId = setTimeout(() => {
-          cleanup();
-          console.warn('Video load timeout');
-        }, 10000);
-
-        // Load the video
-        video.load();
-        await loadPromise;
-        
-        clearTimeout(timeoutId);
-        
-        // Try to play
+        // Play main video
         await video.play();
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
         
+        // Start background video after main video is playing
+        setTimeout(() => {
+          const bgVideos = document.querySelectorAll('video[style*="blur"]');
+          bgVideos.forEach(bgVideo => {
+            if (bgVideo !== video) {
+              (bgVideo as HTMLVideoElement).currentTime = video.currentTime;
+              (bgVideo as HTMLVideoElement).play().catch(() => {
+                // Silently handle background video errors
+              });
+            }
+          });
+        }, 100);
+        
       } catch (error) {
-        console.warn('Auto-play failed:', error);
+        console.warn('Video playback failed:', error);
         setShowVideo(false);
         setIsPlaying(false);
-        setHasPlayed(true); // Prevent retry loops
+        setHasPlayed(true);
       }
     };
 
-    // Delay initial play attempt
-    timeoutId = setTimeout(attemptPlay, 500);
+    // Stagger the video loading to prevent conflicts
+    timeoutId = setTimeout(playBothVideos, 300);
     
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
-      cleanup();
     };
   }, [videoUrl, hasPlayed]);
 
@@ -205,39 +204,35 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   };
 
-  // Enhanced replay with better error handling
+  // Enhanced replay with synchronized background video
   const replayVideo = async () => {
     const video = videoRef.current;
     if (!video || !videoUrl) return;
     
     try {
-      // Stop any ongoing playback
+      // Reset main video
       video.pause();
       video.currentTime = 0;
-      
-      // Ensure video is ready
-      if (video.readyState < 2) {
-        video.load();
-        await new Promise((resolve, reject) => {
-          const onCanPlay = () => {
-            video.removeEventListener('canplay', onCanPlay);
-            video.removeEventListener('error', onError);
-            resolve(null);
-          };
-          const onError = () => {
-            video.removeEventListener('canplay', onCanPlay);
-            video.removeEventListener('error', onError);
-            reject(new Error('Video not ready'));
-          };
-          video.addEventListener('canplay', onCanPlay);
-          video.addEventListener('error', onError);
-        });
-      }
-      
-      setShowVideo(true);
       video.muted = isMuted;
+      
+      // Play main video
+      setShowVideo(true);
       await video.play();
       setIsPlaying(true);
+      
+      // Sync background video
+      setTimeout(() => {
+        const bgVideos = document.querySelectorAll('video[style*="blur"]');
+        bgVideos.forEach(bgVideo => {
+          if (bgVideo !== video) {
+            (bgVideo as HTMLVideoElement).currentTime = 0;
+            (bgVideo as HTMLVideoElement).play().catch(() => {
+              // Silently handle background video errors
+            });
+          }
+        });
+      }, 50);
+      
     } catch (error) {
       console.warn('Replay failed:', error);
       setShowVideo(false);
@@ -267,27 +262,44 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            paddingTop: '8rem' // Add padding to push content down
          }}>
 
-      {/* Dynamic Blurred Background - Matches Media Card */}
+      {/* Dynamic Blurred Background - Synchronized with foreground video */}
       <div className="absolute inset-0 z-0">
-        {/* Use photo background when video is playing to avoid dual HLS loads */}
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${actualPhotoUrl})`,
-            filter: 'blur(20px) saturate(1.2)',
-            transform: 'scale(1.1)', // Prevent blur edge artifacts
-          }}
-        />
+        {/* Video Background - Plays when main video is playing */}
+        {videoUrl && showVideo && (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)',
+            }}
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={thumbnailUrl}
+            onError={() => {
+              // Silently handle background video errors
+            }}
+            onLoadStart={() => {
+              // Background video loading
+            }}
+          />
+        )}
         
-        {/* Enhanced blur overlay when video is playing */}
-        <div className={`absolute inset-0 transition-opacity duration-1000 ${
-          showVideo && videoUrl ? 'opacity-30' : 'opacity-0'
-        }`} style={{
-          background: 'radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%)',
-          backdropFilter: 'blur(5px)',
-        }} />
+        {/* Photo Background - Shows when video not playing */}
+        {(!videoUrl || !showVideo) && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${actualPhotoUrl})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)',
+            }}
+          />
+        )}
         
-        {/* Gradient overlay for smooth transition to page content */}
+        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
       </div>
 
@@ -305,7 +317,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseLeave={() => setShowControls(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Optimized for HLS */}
+          {/* Main Video Element - Enhanced error handling */}
           {videoUrl && (
             <video
               ref={videoRef}
@@ -314,7 +326,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               }`}
               playsInline
               muted={isMuted}
-              preload="none"
+              preload="metadata"
               poster={thumbnailUrl}
               onPlay={() => {
                 setIsPlaying(true);
@@ -324,21 +336,18 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onEnded={() => {
                 setIsPlaying(false);
                 setShowVideo(false);
+                // Pause background videos when main video ends
+                document.querySelectorAll('video[style*="blur"]').forEach(bgVideo => {
+                  (bgVideo as HTMLVideoElement).pause();
+                });
               }}
-              onError={(e) => {
-                console.warn('Video playback error, switching to photo');
+              onError={() => {
+                console.warn('Main video error, switching to photo');
                 setShowVideo(false);
                 setIsPlaying(false);
               }}
-              onAbort={() => {
-                console.warn('Video loading aborted');
-              }}
-              onStalled={() => {
-                console.warn('Video loading stalled');
-              }}
             >
               <source src={videoUrl} type="video/mp4" />
-              Your browser does not support the video tag.
             </video>
           )}
           
