@@ -277,7 +277,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            marginTop: '-8rem', // Reduced margin to give more space at top
            height: window.innerWidth < 768 ? '75vh' : '65vh', // Increased mobile height to 75vh
            minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
-           maxHeight: '800px',
+           maxHeight: window.innerWidth < 768 ? '900px' : '800px',
            paddingTop: '8rem' // Add padding to push content down
          }}>
 
