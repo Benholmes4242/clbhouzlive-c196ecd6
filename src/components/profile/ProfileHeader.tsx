@@ -118,7 +118,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
-        {/* Liquid Glass Media Card - ONLY glass element */}
+        {/* Media Card */}
         <div
           ref={cardRef}
           className="relative mb-8 rounded-2xl overflow-hidden"
@@ -126,11 +126,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             width: cardDimensions.width,
             height: cardDimensions.height,
             maxWidth: cardDimensions.maxWidth,
-            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.15)',
           }}
         >
           {/* Media Content */}
