@@ -354,12 +354,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseLeave={() => setIsHovering(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Shows first and autoplays (desktop only) */}
-          {!isMobile && videoUrl && (
+          {/* Video Element - Shows first and autoplays */}
+          {videoUrl && (
             <video
               ref={videoRef}
               src={videoUrl}
-              poster={thumbnailUrl}
+              poster={thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
               }`}
@@ -377,17 +377,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 setIsPlaying(false);
                 setShowVideo(false); // Switch to photo when video ends - background will update automatically
               }}
-            />
-          )}
-          
-          {/* Mobile: Static thumbnail instead of playing video */}
-          {isMobile && videoUrl && (
-            <img
-              src={thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl}
-              alt={`${displayName} video thumbnail`}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-              }`}
             />
           )}
           
