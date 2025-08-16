@@ -269,14 +269,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       <div className="relative z-10 w-full h-full flex items-start justify-center pt-12">
         {/* Always show a circular element */}
         <div 
-          className="group relative rounded-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl"
+          className="group relative rounded-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
             width: '400px',
             height: '400px',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1) inset',
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(20px) saturate(1.3)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
+            borderRadius: '50%',
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
