@@ -785,11 +785,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           {/* Hero XP Progress Section - Mobile Only */}
           {isMobile && (
             <div className="flex justify-center px-4 pb-6">
-              <div className="flex flex-col items-center">
-                {/* Mobile Progress Ring - Smaller Size */}
-                <div className="relative flex-shrink-0 mb-4">
-                  <div className="relative w-48 h-48">
-                    <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 192 192">
+              <div className="flex items-center gap-6 w-full max-w-sm">
+                {/* Mobile Progress Ring - Left Side */}
+                <div className="relative flex-shrink-0">
+                  <div className="relative w-32 h-32">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128">
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="greenProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -801,27 +801,27 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       
                       {/* Background ring */}
                       <circle
-                        cx="96"
-                        cy="96"
-                        r="84"
+                        cx="64"
+                        cy="64"
+                        r="56"
                         fill="none"
                         stroke="#E6F7F1"
-                        strokeWidth="6"
+                        strokeWidth="5"
                         strokeLinecap="round"
                       />
                       
                       {/* Animated progress circle */}
                       <circle
-                        cx="96"
-                        cy="96"
-                        r="84"
+                        cx="64"
+                        cy="64"
+                        r="56"
                         stroke="#10B981"
-                        strokeWidth="6"
+                        strokeWidth="5"
                         fill="none"
-                        strokeDasharray={`${84 * 2 * Math.PI}`}
+                        strokeDasharray={`${56 * 2 * Math.PI}`}
                         strokeDashoffset={animateProgress ? 
-                          `${84 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                          `${84 * 2 * Math.PI}`
+                          `${56 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                          `${56 * 2 * Math.PI}`
                         }
                         strokeLinecap="round"
                         className="transition-all duration-2000 ease-out"
@@ -829,42 +829,46 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     </svg>
                     
                     {/* Center content */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
-                      <div className="text-3xl font-bold text-foreground mb-2">
-                        {totalXP.toLocaleString()} XP
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-2">
+                      <div className="text-lg font-bold text-foreground mb-1">
+                        {totalXP.toLocaleString()}
                       </div>
-                      <div className="text-xs font-medium text-center leading-tight max-w-[120px] text-green-500">
-                        {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(' ')[0].toLowerCase()} ring
+                      <div className="text-xs font-medium text-foreground">
+                        XP
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                {/* Mobile Info Section */}
-                <div className="flex flex-col items-center text-center space-y-3">
+                {/* Mobile Info Section - Right Side */}
+                <div className="flex flex-col justify-center flex-1 space-y-2">
                   {/* Ring Achievement Status */}
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg text-black dark:text-white">
-                      {currentTier ? currentTier.name : 'No Ring Achieved'}
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-base text-black dark:text-white leading-tight">
+                      {currentTier ? currentTier.name : "No Ring Achieved"}
                     </h3>
-                    <p className="text-sm text-black dark:text-white">
+                    <p className="text-xs text-black dark:text-white leading-tight">
                       {currentTier ? 
-                        `Congratulations! You've earned the ${currentTier.name}!` :
-                        `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                        `You've earned the ${currentTier.name}!` :
+                        `${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
                       }
                     </p>
                   </div>
                   
+                  {/* XP Progress Text */}
+                  <div className="text-xs text-green-500 leading-tight">
+                    {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
+                  </div>
+                  
                   {/* XP Earned This Month */}
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-sm font-medium text-green-600">XP earned this month</span>
-                    <div className="flex items-center gap-1 text-green-600 relative px-2 py-1">
-                      {/* Light green glow */}
-                      <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
-                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-medium text-green-600">This month:</span>
+                    <div className="flex items-center gap-1 text-green-600 relative px-1">
+                      <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
+                      <svg className="w-3 h-3 relative z-10" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span className="font-bold relative z-10">450 XP</span>
+                      <span className="font-bold relative z-10 text-xs">450 XP</span>
                     </div>
                   </div>
                 </div>
