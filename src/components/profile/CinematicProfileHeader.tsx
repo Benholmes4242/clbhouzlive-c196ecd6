@@ -334,7 +334,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             height: '400px',
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
           }}
           onMouseEnter={() => setIsHovering(true)}
