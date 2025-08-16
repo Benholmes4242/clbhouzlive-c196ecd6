@@ -273,8 +273,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-8rem', // Reduced margin to give more space at top
-           height: window.innerWidth < 768 ? '75vh' : '65vh', // Increased height for mobile
-           minHeight: window.innerWidth < 768 ? '700px' : '600px', // Increased min-height for mobile
+           height: window.innerWidth < 768 ? '65vh' : '65vh', // Reduced height for mobile back to 65vh
+           minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
            maxHeight: '800px',
            paddingTop: '8rem' // Add padding to push content down
          }}>
@@ -330,8 +330,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         <div 
           className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
-            width: window.innerWidth < 768 ? '280px' : '400px', // Smaller on mobile, same on desktop
-            height: window.innerWidth < 768 ? '280px' : '400px', // Smaller on mobile, same on desktop
+            width: window.innerWidth < 768 ? '320px' : '400px', // Increased to 320px on mobile, same on desktop
+            height: window.innerWidth < 768 ? '320px' : '400px', // Increased to 320px on mobile, same on desktop
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
