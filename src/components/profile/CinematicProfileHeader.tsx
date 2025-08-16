@@ -288,7 +288,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url(${videoUrl && thumbnailUrl ? thumbnailUrl : actualPhotoUrl})`,
+              backgroundImage: `url(${videoUrl && thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl})`,
               filter: 'blur(20px) saturate(1.2)',
               transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
@@ -383,7 +383,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {/* Mobile: Static thumbnail instead of playing video */}
           {isMobile && videoUrl && (
             <img
-              src={thumbnailUrl || actualPhotoUrl}
+              src={thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl}
               alt={`${displayName} video thumbnail`}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
