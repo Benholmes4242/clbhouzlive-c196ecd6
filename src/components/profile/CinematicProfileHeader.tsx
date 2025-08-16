@@ -211,8 +211,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     profilePhotoUrl,
     hasMedia,
     displayName,
-    showVideo
+    showVideo,
+    thumbnailUrl
   });
+
+  // Test with a fallback image if no media is available
+  const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';
+  const actualPhotoUrl = profilePhotoUrl || fallbackImage;
 
   return (
     <div className={`relative w-full overflow-hidden bg-gradient-to-b from-gray-100 to-white ${className}`} 
@@ -225,75 +230,95 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
          }}>
 
       {/* Background blur effect */}
-      {hasMedia && (
-        <div className="absolute inset-0 z-0">
-          {profilePhotoUrl && (
-            <div
-              className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url(${profilePhotoUrl})`,
-                filter: 'blur(20px) saturate(1.2)',
-                transform: 'scale(1.1)',
-              }}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
-        </div>
-      )}
+      <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${actualPhotoUrl})`,
+            filter: 'blur(20px) saturate(1.2)',
+            transform: 'scale(1.1)',
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
+      </div>
 
       {/* Central Circular Media */}
       <div className="relative z-10 w-full h-full flex items-start justify-center pt-12">
-        {hasMedia ? (
-          <div 
-            className={`relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 ${
-              (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+        {/* Always show a circular element */}
+        <div 
+          className="relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 cursor-pointer"
+          style={{
+            width: '300px',
+            height: '300px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          }}
+          onMouseEnter={() => setShowControls(true)}
+          onMouseLeave={() => setShowControls(false)}
+          onClick={handleClick}
+        >
+          {/* Video Element - Circular */}
+          {videoUrl && (
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={thumbnailUrl}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+              }`}
+              playsInline
+              muted={isMuted}
+              preload="auto"
+              crossOrigin="anonymous"
+            />
+          )}
+          
+          {/* Profile Photo - Always show either real photo or fallback */}
+          <img
+            ref={photoRef}
+            src={actualPhotoUrl}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            alt={`${displayName} profile`}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+              !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
-            style={{
-              width: '300px',
-              height: '300px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            onError={(e) => {
+              console.log('Image failed to load:', actualPhotoUrl);
+              e.currentTarget.src = fallbackImage;
             }}
-            onMouseEnter={() => setShowControls(true)}
-            onMouseLeave={() => setShowControls(false)}
-            onClick={handleClick}
-          >
-            {/* Video Element - Circular */}
-            {videoUrl && (
-              <video
-                ref={videoRef}
-                src={videoUrl}
-                poster={thumbnailUrl}
-                className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                }`}
-                playsInline
-                muted={isMuted}
-                preload="auto"
-                crossOrigin="anonymous"
-              />
-            )}
-            
-            {/* Profile Photo - Circular */}
-            {profilePhotoUrl && (
-              <img
-                ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=600&height=600&fit=cover`}
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-                alt={`${displayName} profile`}
-                className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                }`}
-                onError={(e) => {
-                  e.currentTarget.src = profilePhotoUrl;
-                }}
-              />
-            )}
+          />
+        </div>
+
+        {/* Upload Interface for Empty State */}
+        {!hasMedia && isOwnProfile && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl text-white/80 mb-4">
+                {displayName.charAt(0)}
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleFileSelect}
+                  disabled={uploading}
+                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Add Video
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handlePhotoSelect}
+                  disabled={uploading}
+                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Add Photo
+                </Button>
+              </div>
+            </div>
           </div>
-        ) : (
-          /* Fallback for empty state - circular placeholder */
-          <div className="w-[300px] h-[300px] rounded-full bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
         )}
       </div>
 
