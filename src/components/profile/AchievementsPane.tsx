@@ -912,7 +912,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     // Calculate line start (right edge of current ring) and end (left edge of next ring)
                     // Convert ring radius from px to percentage (approximate)
-                    const ringRadiusPercent = 3.5; // fine-tuned to match the perfect middle line
+                    const ringRadiusPercent = 3.8; // precise positioning to just touch ring edges
                     const lineStart = ringCenterPercent + ringRadiusPercent;
                     const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
                     
@@ -1027,7 +1027,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
                     
                     // Calculate line start (right edge of current ring) and end (left edge of next ring)
-                    const ringRadiusPercent = 4.5; // fine-tuned for desktop to match middle line
+                    const ringRadiusPercent = 4.8; // precise positioning for desktop
                     const lineStart = ringCenterPercent + ringRadiusPercent;
                     const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
                     
