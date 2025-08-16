@@ -29,6 +29,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const backgroundVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -40,9 +41,23 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [isHovering, setIsHovering] = useState(false);
   const { toast } = useToast();
 
+  // Sync background video with main video
+  const syncVideos = () => {
+    const mainVideo = videoRef.current;
+    const bgVideo = backgroundVideoRef.current;
+    
+    if (mainVideo && bgVideo && !mainVideo.paused) {
+      const timeDiff = Math.abs(mainVideo.currentTime - bgVideo.currentTime);
+      if (timeDiff > 0.1) { // Only sync if difference is significant
+        bgVideo.currentTime = mainVideo.currentTime;
+      }
+    }
+  };
+
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
+    const bgVideo = backgroundVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
@@ -54,7 +69,21 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         setHasPlayed(true);
         setShowVideo(true);
         
+        // Start background video sync
+        if (bgVideo) {
+          bgVideo.muted = true;
+          bgVideo.currentTime = 0;
+          try {
+            await bgVideo.play();
+          } catch (error) {
+            console.log('Background video autoplay failed, will sync when loaded');
+          }
+        }
+        
+        const syncInterval = setInterval(syncVideos, 100); // Sync every 100ms
+        
         const handleTimeUpdate = () => {
+          syncVideos(); // Sync on every time update
           const currentTime = video.currentTime;
           const duration = video.duration;
           
@@ -68,9 +97,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           video.currentTime = 0;
           video.pause();
           
+          if (bgVideo) {
+            bgVideo.currentTime = 0;
+            bgVideo.pause();
+          }
+          
           if (profilePhotoUrl) {
             setShowVideo(false);
           }
+          
+          clearInterval(syncInterval);
         };
         
         video.addEventListener('timeupdate', handleTimeUpdate);
@@ -79,6 +115,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         return () => {
           video.removeEventListener('timeupdate', handleTimeUpdate);
           video.removeEventListener('ended', handleEnded);
+          clearInterval(syncInterval);
         };
       } catch (error) {
         console.error('Auto-play failed:', error);
@@ -185,10 +222,22 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const replayVideo = async () => {
     const video = videoRef.current;
+    const bgVideo = backgroundVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
         video.muted = isMuted;
+        
+        if (bgVideo) {
+          bgVideo.currentTime = 0;
+          bgVideo.muted = true;
+          try {
+            await bgVideo.play();
+          } catch (error) {
+            console.log('Background video replay failed');
+          }
+        }
+        
         await video.play();
         setIsPlaying(true);
         setShowVideo(true);
@@ -235,17 +284,26 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         {/* Video Background - Shows when video is playing */}
         {videoUrl && showVideo && (
           <video
+            ref={backgroundVideoRef}
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               filter: 'blur(20px) saturate(1.2)',
               transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
             src={videoUrl}
-            autoPlay
             muted
             loop
             playsInline
             poster={thumbnailUrl}
+            onCanPlay={() => {
+              // Sync with main video when background video becomes ready
+              const mainVideo = videoRef.current;
+              const bgVideo = backgroundVideoRef.current;
+              if (mainVideo && bgVideo && !mainVideo.paused) {
+                bgVideo.currentTime = mainVideo.currentTime;
+                bgVideo.play().catch(console.log);
+              }
+            }}
           />
         )}
         
