@@ -265,6 +265,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 opacity-30"
               playsInline
               muted
+              loop
               preload="auto"
             />
           )}
