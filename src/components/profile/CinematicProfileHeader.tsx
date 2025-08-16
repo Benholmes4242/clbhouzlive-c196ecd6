@@ -37,6 +37,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
   const { toast } = useToast();
 
   // Auto-play video once when component mounts and video is available
@@ -268,14 +269,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       <div className="relative z-10 w-full h-full flex items-start justify-center pt-12">
         {/* Always show a circular element */}
         <div 
-          className="relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 cursor-pointer"
+          className="group relative rounded-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl"
           style={{
-            width: '300px',
-            height: '300px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            width: '320px',
+            height: '320px',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1) inset',
           }}
-          onMouseEnter={() => setShowControls(true)}
-          onMouseLeave={() => setShowControls(false)}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
           onClick={handleClick}
         >
           {/* Video Element - Shows first and autoplays */}
@@ -354,10 +358,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Central Media Controls */}
-      {hasMedia && showControls && (
-        <div className="absolute inset-0 flex items-center justify-center transition-opacity z-20">
-          <div className="flex flex-col gap-3 items-center">
+      {/* Central Media Controls - Show on hover with stable positioning */}
+      {hasMedia && isHovering && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+          <div className="flex flex-col gap-4 items-center pointer-events-auto">
             {/* Play/Replay Button */}
             {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
               <Button
@@ -367,15 +371,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   e.stopPropagation();
                   replayVideo();
                 }}
-                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-4 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-110"
+                className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 border-0"
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2) inset'
+                }}
               >
-                <Play className="w-6 h-6" />
+                <Play className="w-7 h-7 fill-white" />
               </Button>
             )}
 
             {/* Owner Edit Controls - positioned under play button */}
             {isOwnProfile && (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button
                   size="sm"
                   variant="ghost"
@@ -384,9 +393,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handleFileSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                  style={{
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                  }}
                 >
-                  <span className="text-xs font-medium">Change Video</span>
+                  <span className="text-xs font-medium">Video</span>
                 </Button>
                 
                 <Button
@@ -397,9 +410,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handlePhotoSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                  style={{
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                  }}
                 >
-                  <span className="text-xs font-medium">Change Photo</span>
+                  <span className="text-xs font-medium">Photo</span>
                 </Button>
               </div>
             )}
