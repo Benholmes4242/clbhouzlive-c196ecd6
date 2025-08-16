@@ -60,24 +60,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }, [userMedia, mediaType]);
 
-  // Get responsive card dimensions
-  const getCardDimensions = () => {
+  // Get circular dimensions for profile media
+  const getCircleDimensions = () => {
     if (isMobile) {
-      const width = '90vw';
-      const height = `calc(90vw / ${aspectRatio})`;
-      return { width, height, maxWidth: 'none' };
+      return { size: '200px' };
     }
-    
-    // Desktop/tablet sizing
-    const baseWidth = window.innerWidth > 1200 ? 600 : 
-                     window.innerWidth > 768 ? 500 : 450;
-    const width = `${baseWidth}px`;
-    const height = `${baseWidth / aspectRatio}px`;
-    
-    return { width, height, maxWidth: width };
+    // Desktop/tablet - larger circle
+    return { size: '300px' };
   };
 
-  const cardDimensions = getCardDimensions();
+  const circleDimensions = getCircleDimensions();
 
   return (
     <div className="relative w-full overflow-hidden">
@@ -118,21 +110,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
-        {/* Media Card */}
+        {/* Circular Profile Media */}
         <div
           ref={cardRef}
-          className="relative mb-8 rounded-2xl overflow-hidden"
+          className="relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20"
           style={{
-            width: cardDimensions.width,
-            height: cardDimensions.height,
-            maxWidth: cardDimensions.maxWidth,
+            width: circleDimensions.size,
+            height: circleDimensions.size,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
           }}
         >
           {/* Media Content */}
           {mediaType === 'video' && !reducedMotion ? (
             <video
               ref={videoRef}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               style={{
                 transition: 'opacity 300ms ease-in-out',
                 opacity: isLoaded ? 1 : 0,
@@ -150,7 +142,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <img
               src={userMedia}
               alt={`${userName}'s profile`}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               style={{
                 transition: 'opacity 300ms ease-in-out',
                 opacity: isLoaded ? 1 : 0,
@@ -161,12 +153,54 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           
           {/* Loading placeholder */}
           {!isLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/10">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/10 rounded-full">
               <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             </div>
           )}
         </div>
 
+        {/* Profile Information Below Circle */}
+        <div className="text-center mt-6 space-y-3">
+          <h1 
+            className="text-3xl md:text-4xl font-bold text-white"
+            style={{
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {userName}
+          </h1>
+
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <span 
+              className="text-lg text-white/90 font-medium"
+              style={{
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              {username}
+            </span>
+            
+            {isCurrentUser && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onEditProfile}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
+              >
+                Edit Profile
+              </Button>
+            )}
+          </div>
+
+          <p 
+            className="text-base text-white/80"
+            style={{
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {homeClub}
+          </p>
+        </div>
       </div>
     </div>
   );
