@@ -1328,7 +1328,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                            <img 
                                              src={padlockIcon} 
                                              alt="Locked" 
-                                              className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
+                                              className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
                                              style={{ filter: 'none', background: 'transparent' }}
                                            />
                                         </div>
@@ -1416,7 +1416,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                            <img 
                                              src={padlockIcon} 
                                              alt="Locked" 
-                                             className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
+                                             className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} opacity-60 drop-shadow-none`}
                                              style={{ filter: 'none', background: 'transparent' }}
                                            />
                                         </div>
