@@ -1,5 +1,7 @@
-/* Apple-style superellipse mask (n=5) for iOS icon shape - extremely soft corners */
-.superellipse-mask {
+/* CLBHOUZ SQUIRCLE - Reusable superellipse mask for modern app design */
+/* Perfect for profile photos, cards, and any element needing soft, elegant corners */
+
+.clbhouz-squircle {
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E") !important;
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E") !important;
   -webkit-mask-size: 100% 100% !important;
@@ -10,10 +12,20 @@
 }
 
 /* Ensure all children fill the container and are properly clipped */
-.superellipse-mask > * {
+.clbhouz-squircle > * {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   position: absolute !important;
   inset: 0 !important;
+}
+
+/* Utility classes for easy application */
+.squircle {
+  @apply clbhouz-squircle;
+}
+
+/* Legacy support - will be deprecated */
+.superellipse-mask {
+  @apply clbhouz-squircle;
 }
