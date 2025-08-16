@@ -283,10 +283,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Mobile: Static image background (no video playing) */}
+        {/* Mobile: Dynamic background blur that matches current display */}
         {isMobile && (
           <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out"
             style={{
               backgroundImage: `url(${showVideo && videoUrl && thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl})`,
               filter: 'blur(20px) saturate(1.2)',
