@@ -272,10 +272,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const isMobile = window.innerWidth < 768;
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} 
+     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-8rem', // Reduced margin to give more space at top
-           height: window.innerWidth < 768 ? '65vh' : '65vh', // Reduced height for mobile back to 65vh
+           height: window.innerWidth < 768 ? '70vh' : '65vh', // Mobile: 70vh, Desktop: 65vh
            minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
            maxHeight: '800px',
            paddingTop: '8rem' // Add padding to push content down
@@ -355,7 +355,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       </div>
 
       {/* Central Circular Media */}
-      <div className="relative z-10 w-full h-full flex items-start justify-center pt-20">
+      <div className={`relative z-10 w-full h-full flex items-start justify-center ${window.innerWidth < 768 ? 'pt-16' : 'pt-20'}`}>
         {/* Always show a circular element */}
         <div 
           className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
