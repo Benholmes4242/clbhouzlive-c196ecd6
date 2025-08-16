@@ -20,10 +20,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   
   return (
     <nav 
-      className={`fixed bottom-0 left-0 right-0 z-40 ${
+      className={`fixed bottom-0 left-0 right-0 z-50 md:z-40 ${
         isClubhouse 
           ? 'bg-black' 
-          : 'bg-background'
+          : 'bg-background/95 backdrop-blur-md border-t border-border/50'
       }`}
     >
       <div className={`w-full px-2 ${isClubhouse ? 'bg-transparent' : ''}`}>

@@ -269,6 +269,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';
   const actualPhotoUrl = profilePhotoUrl || fallbackImage;
 
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
@@ -281,8 +283,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Video Background - Shows when video is playing */}
-        {videoUrl && showVideo && (
+        {/* Mobile: Static image background (no video playing) */}
+        {isMobile && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${videoUrl && thumbnailUrl ? thumbnailUrl : actualPhotoUrl})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+          />
+        )}
+        
+        {/* Desktop: Video Background - Shows when video is playing */}
+        {!isMobile && videoUrl && showVideo && (
           <video
             ref={backgroundVideoRef}
             className="absolute inset-0 w-full h-full object-cover"
@@ -307,8 +321,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           />
         )}
         
-        {/* Photo Background - Shows when photo is displayed or video ended */}
-        {(!videoUrl || !showVideo) && (
+        {/* Desktop: Photo Background - Shows when photo is displayed or video ended */}
+        {!isMobile && (!videoUrl || !showVideo) && (
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
@@ -340,8 +354,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseLeave={() => setIsHovering(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Shows first and autoplays */}
-          {videoUrl && (
+          {/* Video Element - Shows first and autoplays (desktop only) */}
+          {!isMobile && videoUrl && (
             <video
               ref={videoRef}
               src={videoUrl}
@@ -363,6 +377,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 setIsPlaying(false);
                 setShowVideo(false); // Switch to photo when video ends - background will update automatically
               }}
+            />
+          )}
+          
+          {/* Mobile: Static thumbnail instead of playing video */}
+          {isMobile && videoUrl && (
+            <img
+              src={thumbnailUrl || actualPhotoUrl}
+              alt={`${displayName} video thumbnail`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+              }`}
             />
           )}
           
