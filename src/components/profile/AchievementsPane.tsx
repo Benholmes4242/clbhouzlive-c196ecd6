@@ -893,66 +893,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               
               {/* Ring Progression Section - Mobile */}
               <div className="mb-6">
-                <div className="relative flex justify-between items-center gap-1">
-                  {/* Gradient connector lines between rings */}
-                  {xpTiers.map((tier, index) => {
-                    if (index === xpTiers.length - 1) return null;
-                    
-                    const nextTier = xpTiers[index + 1];
-                    
-                    // Calculate exact positions for ring edges - Mobile responsive
-                    // Each ring is 48px wide, positioned in flex-1 containers
-                    // Container width per ring is 25% of total width
-                    const ringWidth = 64; // w-16 = 64px (updated from 48px)
-                    const containerWidthPercent = 25; // 100% / 4 rings
-                    
-                    // Position of ring center as percentage
-                    const ringCenterPercent = containerWidthPercent * index + (containerWidthPercent / 2);
-                    const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
-                    
-                    // Dynamic ring radius based on screen size - more responsive for mobile
-                    const screenWidth = window.innerWidth;
-                    let ringRadiusPercent;
-                    
-                    if (screenWidth < 640) { // mobile
-                      ringRadiusPercent = 6.5; // adjusted for larger rings (w-16)
-                    } else if (screenWidth < 768) { // tablet
-                      ringRadiusPercent = 5.5;
-                    } else { // desktop
-                      ringRadiusPercent = 4.8;
-                    }
-                    
-                    let lineStart = ringCenterPercent + ringRadiusPercent;
-                    let lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
-                    
-                    // Special adjustments for first and last lines - scale with screen size
-                    const edgeAdjustment = screenWidth < 640 ? 0.5 : 0.3;
-                    if (index === 0) {
-                      // Extend left edge of first line (going into blue ring)
-                      lineStart -= edgeAdjustment;
-                      lineWidth += edgeAdjustment;
-                    } else if (index === 2) {
-                      // Extend right edge of last line (going into gold ring)
-                      lineWidth += edgeAdjustment;
-                    }
-                    
-                    return (
-                      <div 
-                        key={`connector-${index}`}
-                        className="absolute top-6 h-1 z-10" 
-                        style={{
-                          left: `${lineStart}%`,
-                          width: `${lineWidth}%`,
-                          background: `linear-gradient(to right, ${tier.color}40, ${nextTier.color}40)`,
-                          borderRadius: '2px',
-                          filter: 'blur(0.3px)',
-                          boxShadow: `0 0 3px ${tier.color}15, 0 0 3px ${nextTier.color}15`
-                        }}
-                      />
-                    );
-                  })}
-                  
-                  {xpTiers.map((tier, index) => {
+                 <div className="relative flex justify-between items-center gap-1">
+                   {xpTiers.map((tier, index) => {
                     const isActive = totalXP >= tier.minXP;
                     const isCurrent = currentTier?.name === tier.name;
                     const isNext = nextTier?.name === tier.name;
@@ -1034,51 +976,6 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 
                 <div className="relative flex justify-between items-center gap-2">
-                  {/* Gradient connector lines between rings */}
-                  {xpTiers.map((tier, index) => {
-                    if (index === xpTiers.length - 1) return null; // Don't create line after last ring
-                    
-                    const nextTier = xpTiers[index + 1];
-                    
-                    // Calculate exact positions for ring edges - desktop version
-                    const ringWidth = 80; // larger rings on desktop
-                    const containerWidthPercent = 25; // 100% / 4 rings
-                    
-                    // Position of ring center as percentage
-                    const ringCenterPercent = containerWidthPercent * index + (containerWidthPercent / 2);
-                    const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
-                    
-                    // Calculate line start (right edge of current ring) and end (left edge of next ring)
-                    const ringRadiusPercent = 4.8; // precise positioning for desktop
-                    let lineStart = ringCenterPercent + ringRadiusPercent;
-                    let lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
-                    
-                    // Special adjustments for first and last lines
-                    if (index === 0) {
-                      // Extend left edge of first line (going into blue ring)
-                      lineStart -= 0.4;
-                      lineWidth += 0.4;
-                    } else if (index === 2) {
-                      // Extend right edge of last line (going into gold ring)
-                      lineWidth += 0.4;
-                    }
-                    
-                    return (
-                      <div 
-                        key={`connector-${index}`}
-                        className="absolute top-12 h-1 z-10" 
-                        style={{
-                          left: `${lineStart}%`,
-                          width: `${lineWidth}%`,
-                          background: `linear-gradient(to right, ${tier.color}40, ${nextTier.color}40)`,
-                          borderRadius: '2px',
-                          filter: 'blur(0.3px)',
-                          boxShadow: `0 0 3px ${tier.color}15, 0 0 3px ${nextTier.color}15`
-                        }}
-                      />
-                    );
-                  })}
-                  
                   {xpTiers.map((tier, index) => {
                     const isActive = totalXP >= tier.minXP;
                     const isCurrent = currentTier?.name === tier.name;
@@ -1100,7 +997,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-2">
                           {/* Progress ring */}
-                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 10px ${tier.color}40)` }}>
+                          <svg className={`w-28 h-28 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 10px ${tier.color}40)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
