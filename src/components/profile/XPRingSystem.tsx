@@ -226,11 +226,16 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                   return (
                     <div key={tier.name} className="flex flex-col items-center flex-1 relative">
                       {/* Connecting line to next ring */}
-                      {nextTierData && (
-                        <div className="absolute top-6 left-full w-full h-0.5 z-0" style={{
-                          background: `linear-gradient(to right, ${tier.color}, ${nextTierData.color})`,
-                          transform: 'translateY(-50%)'
-                        }} />
+                      {nextTierData && index < XP_RING_TIERS.length - 1 && (
+                        <div 
+                          className="absolute top-6 left-1/2 h-0.5 z-0" 
+                          style={{
+                            background: `linear-gradient(to right, ${tier.color}, ${nextTierData.color})`,
+                            width: 'calc(100% + 8px)',
+                            transform: 'translateX(24px) translateY(-50%)',
+                            height: '2px'
+                          }} 
+                        />
                       )}
                       
                       <div className="relative z-10">
