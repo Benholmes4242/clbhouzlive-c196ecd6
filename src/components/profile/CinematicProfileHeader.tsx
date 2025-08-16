@@ -275,9 +275,9 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-8rem', // Reduced margin to give more space at top
-           height: window.innerWidth < 768 ? '75vh' : '65vh', // Increased mobile height to 75vh
+           height: window.innerWidth < 768 ? '65vh' : '65vh', // Reduced height for mobile back to 65vh
            minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
-           maxHeight: window.innerWidth < 768 ? '900px' : '800px',
+           maxHeight: '800px',
            paddingTop: '8rem' // Add padding to push content down
          }}>
 
