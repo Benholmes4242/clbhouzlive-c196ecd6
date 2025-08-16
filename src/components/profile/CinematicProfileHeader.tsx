@@ -205,16 +205,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const hasMedia = videoUrl || profilePhotoUrl;
 
-  // Debug logging
-  console.log('CinematicProfileHeader Debug:', {
-    videoUrl,
-    profilePhotoUrl,
-    hasMedia,
-    displayName,
-    showVideo,
-    thumbnailUrl
-  });
-
   // Test with a fallback image if no media is available
   const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';
   const actualPhotoUrl = profilePhotoUrl || fallbackImage;
@@ -245,6 +235,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             loop
             playsInline
             poster={thumbnailUrl}
+            preload="metadata"
+            onError={() => {
+              // If background video fails, just continue - main video will handle fallback
+            }}
           />
         )}
         
@@ -289,7 +283,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               }`}
               playsInline
               muted={isMuted}
-              preload="auto"
+              preload="metadata"
               crossOrigin="anonymous"
               autoPlay
               onPlay={() => {
@@ -300,6 +294,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onEnded={() => {
                 setIsPlaying(false);
                 setShowVideo(false); // Switch to photo when video ends - background will update automatically
+              }}
+              onError={(e) => {
+                console.warn('Video failed to load, falling back to photo');
+                setShowVideo(false);
+              }}
+              onLoadStart={() => {
+                // Video started loading
+              }}
+              onCanPlay={() => {
+                // Video can start playing
               }}
             />
           )}
@@ -316,7 +320,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             onError={(e) => {
-              console.log('Image failed to load:', actualPhotoUrl);
+              console.warn('Image failed to load, using fallback');
               e.currentTarget.src = fallbackImage;
             }}
           />
