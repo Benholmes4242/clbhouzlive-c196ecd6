@@ -476,7 +476,7 @@ const HeroProfileHeader = ({
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
-        <div className="absolute bottom-[-10rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 pt-16">
+        <div className="absolute bottom-[-12rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 pt-16">
           {/* User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
@@ -604,7 +604,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Sticky Tab Navigation - Positioned above achievements/courses journey with spacing for profile overlay */}
-      <div className="mt-40">
+      <div className="mt-56">
         <ProfileTabs
         activeTab={activeSection}
         onTabChange={handleTabChange}
