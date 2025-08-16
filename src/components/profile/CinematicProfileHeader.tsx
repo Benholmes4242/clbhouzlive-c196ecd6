@@ -220,7 +220,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const actualPhotoUrl = profilePhotoUrl || fallbackImage;
 
   return (
-    <div className={`relative w-full overflow-hidden bg-gradient-to-b from-gray-100 to-white ${className}`} 
+    <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
            marginTop: '-8rem', // Reduced margin to give more space at top
            height: '70vh',
@@ -229,16 +229,38 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            paddingTop: '8rem' // Add padding to push content down
          }}>
 
-      {/* Background blur effect */}
+      {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${actualPhotoUrl})`,
-            filter: 'blur(20px) saturate(1.2)',
-            transform: 'scale(1.1)',
-          }}
-        />
+        {/* Video Background - Shows when video is playing */}
+        {videoUrl && showVideo && (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+            src={videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={thumbnailUrl}
+          />
+        )}
+        
+        {/* Photo Background - Shows when photo is displayed or video ended */}
+        {(!videoUrl || !showVideo) && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${actualPhotoUrl})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+          />
+        )}
+        
+        {/* Gradient overlay for smooth transition to page content */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
       </div>
 
@@ -277,7 +299,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false); // Switch to photo when video ends
+                setShowVideo(false); // Switch to photo when video ends - background will update automatically
               }}
             />
           )}
