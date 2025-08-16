@@ -80,8 +80,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const cardDimensions = getCardDimensions();
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Dynamic Blur Background */}
+    <div className="relative w-full min-h-[60vh] overflow-hidden">
+      {/* Dynamic Blur Background - Full bleed */}
       <div className="absolute inset-0 z-0">
         {mediaType === 'video' && !reducedMotion ? (
           <video
@@ -109,28 +109,28 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
         )}
         
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
+        {/* Soft bottom white gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/60" />
         
-        {/* Optional radial vignette */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
+        {/* Subtle radial vignette */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/5" />
       </div>
 
-      {/* Main Content Container */}
+      {/* Content positioned above blur background */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
-        {/* Liquid Glass Card */}
+        {/* Liquid Glass Card - Only glass element */}
         <div
           ref={cardRef}
-          className="relative mb-8 rounded-2xl overflow-hidden shadow-2xl"
+          className="relative mb-8 rounded-2xl overflow-hidden"
           style={{
             width: cardDimensions.width,
             height: cardDimensions.height,
             maxWidth: cardDimensions.maxWidth,
             backgroundColor: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.15)',
           }}
         >
           {/* Media Content */}
@@ -176,9 +176,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="text-center space-y-4 max-w-lg">
           {/* Name */}
           <h1 
-            className="text-4xl md:text-5xl font-bold text-white"
+            className="text-4xl md:text-5xl font-bold text-gray-900"
             style={{
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
+              textShadow: '0 1px 3px rgba(255, 255, 255, 0.8)',
             }}
           >
             {userName}
@@ -187,9 +187,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {/* Username and Edit Profile */}
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <span 
-              className="text-lg text-white/90 font-medium"
+              className="text-lg text-gray-700 font-medium"
               style={{
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+                textShadow: '0 1px 2px rgba(255, 255, 255, 0.6)',
               }}
             >
               {username}
@@ -200,7 +200,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 variant="secondary"
                 size="sm"
                 onClick={onEditProfile}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
+                className="bg-white/30 hover:bg-white/40 backdrop-blur-md border border-white/20 text-gray-900 font-medium px-4 py-2 rounded-full transition-all duration-200"
                 style={{
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
@@ -213,9 +213,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
           {/* Home Club */}
           <p 
-            className="text-lg text-white/80"
+            className="text-lg text-gray-600"
             style={{
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+              textShadow: '0 1px 2px rgba(255, 255, 255, 0.6)',
             }}
           >
             {homeClub}
@@ -223,14 +223,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
           {/* Stats Bar (Frosted Glass Chip) */}
           <div 
-            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
+            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-gray-900"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.35)',
-              backdropFilter: 'blur(15px) saturate(1.6)',
-              WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
+              backdropFilter: 'blur(15px)',
+              WebkitBackdropFilter: 'blur(15px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
             }}
           >
             <div className="text-center">
