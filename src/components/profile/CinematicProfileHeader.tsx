@@ -313,8 +313,14 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             height: '300px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
           }}
-          onMouseEnter={() => setShowControls(true)}
-          onMouseLeave={() => setShowControls(false)}
+          onMouseEnter={() => {
+            if (!uploading) {
+              setShowControls(true);
+            }
+          }}
+          onMouseLeave={() => {
+            setShowControls(false);
+          }}
           onClick={handleClick}
         >
           {/* Main Video Element - Enhanced error handling */}
