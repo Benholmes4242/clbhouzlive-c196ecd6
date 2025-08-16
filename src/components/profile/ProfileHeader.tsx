@@ -1,175 +1,256 @@
-
-import React, { useRef, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import HighQualityImage from '@/components/ui/high-quality-image';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ProfileHeaderProps {
-  photoPreview: string | null;
-  profilePhotoUrl: string | null;
-  uploading: boolean;
-  handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  canEdit?: boolean;
+  userMedia?: string; // URL to user's uploaded image/video
+  userName: string;
+  username: string;
+  homeClub: string;
+  isCurrentUser?: boolean;
+  mediaType?: 'image' | 'video';
+  onEditProfile?: () => void;
 }
 
-const UserPlaceholderIcon = () => (
-  <svg
-    width="100%"
-    height="100%"
-    viewBox="0 0 100 100"
-    fill="none"
-    aria-hidden="true"
-  >
-    <circle cx="50" cy="50" r="50" fill="#c5c5c5" />
-    <ellipse cx="50" cy="42" rx="18" ry="16" fill="#ededed" />
-    <ellipse cx="50" cy="73" rx="28" ry="18" fill="#ededed" />
-  </svg>
-);
-
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  photoPreview,
-  profilePhotoUrl,
-  uploading,
-  handlePhotoUpload,
-  canEdit = false,
+  userMedia = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png',
+  userName = 'Benjamin Holmes',
+  username = '@benjaminholmes',
+  homeClub = 'Sundridge Park Golf Club',
+  isCurrentUser = true,
+  mediaType = 'image',
+  onEditProfile
 }) => {
-  const hasPhoto = !!photoPreview || !!profilePhotoUrl;
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showEnlargedPhoto, setShowEnlargedPhoto] = useState(false);
+  const isMobile = useIsMobile();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<number>(4/5); // Default 4:5 portrait
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  // When editable, clicking the avatar triggers the file picker
-  // When not editable but has photo, clicking shows enlarged view
-  const handleAvatarClick = () => {
-    if (canEdit && !uploading) {
-      console.log('Avatar clicked, triggering file input');
-      fileInputRef.current?.click();
-    } else if (hasPhoto) {
-      setShowEnlargedPhoto(true);
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mediaQuery.matches);
+    
+    const handleChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Calculate adaptive aspect ratio based on media
+  useEffect(() => {
+    if (userMedia) {
+      if (mediaType === 'image') {
+        const img = new Image();
+        img.onload = () => {
+          const newAspectRatio = img.width / img.height;
+          // Constrain between 4:5 portrait and 16:9 landscape
+          const constrainedRatio = Math.max(4/5, Math.min(16/9, newAspectRatio));
+          setAspectRatio(constrainedRatio);
+          setIsLoaded(true);
+        };
+        img.src = userMedia;
+      } else {
+        // For video, we'll use default 4:5 unless we can get metadata
+        setAspectRatio(4/5);
+        setIsLoaded(true);
+      }
     }
+  }, [userMedia, mediaType]);
+
+  // Get responsive card dimensions
+  const getCardDimensions = () => {
+    if (isMobile) {
+      const width = '90vw';
+      const height = `calc(90vw / ${aspectRatio})`;
+      return { width, height, maxWidth: 'none' };
+    }
+    
+    // Desktop/tablet sizing
+    const baseWidth = window.innerWidth > 1200 ? 600 : 
+                     window.innerWidth > 768 ? 500 : 450;
+    const width = `${baseWidth}px`;
+    const height = `${baseWidth / aspectRatio}px`;
+    
+    return { width, height, maxWidth: width };
   };
 
-  // Trick: allow selecting the same file again by resetting file input after use
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('File input changed, files:', event.target.files);
-    handlePhotoUpload(event);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // reset file input so re-uploading same file triggers change
-    }
-  };
-
-  const shouldShowClickCursor = canEdit || hasPhoto;
+  const cardDimensions = getCardDimensions();
 
   return (
-    <>
-      <div className="flex flex-col items-center gap-3 pt-8" style={{ background: "transparent", boxShadow: "none" }}>
-        <div
-          className={`
-            relative
-            ${shouldShowClickCursor ? "cursor-pointer group focus-within:ring-2 focus-within:ring-green-600" : ""}
-          `}
-          tabIndex={shouldShowClickCursor ? 0 : -1}
-          onClick={handleAvatarClick}
-          onKeyDown={e => {
-            if (shouldShowClickCursor && (e.key === "Enter" || e.key === " ")) handleAvatarClick();
-          }}
-          aria-label={canEdit ? "Change profile photo" : hasPhoto ? "View profile photo" : "Profile photo"}
-          role={shouldShowClickCursor ? "button" : undefined}
-          style={{ background: "transparent", boxShadow: "none" }}
-        >
-          {/* Avatar circle, absolutely NO background, shadow, or padding */}
-          <div
-            className={
-              "w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
-              (shouldShowClickCursor ? " group-hover:opacity-80" : "")
-            }
+    <div className="relative w-full overflow-hidden">
+      {/* Dynamic Blur Background */}
+      <div className="absolute inset-0 z-0">
+        {mediaType === 'video' && !reducedMotion ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              background: "transparent",
-              boxShadow: "none",
-              padding: 0,
-              margin: 0,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
             }}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={userMedia}
           >
-            {hasPhoto ? (
-              <HighQualityImage
-                src={photoPreview || profilePhotoUrl!}
-                alt="Profile"
-                className="w-full h-full select-none"
-                width={200}
-                height={200}
-              />
-            ) : (
-              <UserPlaceholderIcon />
-            )}
-            {/* When editable: show a dim overlay + "Change" label on hover */}
-            {canEdit && !uploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
-                  Change photo
-                </span>
-              </div>
-            )}
-            {/* Show uploading state */}
-            {canEdit && uploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                  <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
-                    Uploading...
-                  </span>
-                </div>
-              </div>
-            )}
-            {/* When not editable but has photo: show view overlay */}
-            {!canEdit && hasPhoto && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
-                  View photo
-                </span>
-              </div>
-            )}
-          </div>
-          {/* Hidden file input - positioned separately for better mobile compatibility */}
-          {canEdit && (
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={onFileChange}
-              className="sr-only"
-              disabled={uploading}
-              aria-label="Upload profile photo"
-            />
-          )}
-        </div>
+            <source src={userMedia} type="video/mp4" />
+          </video>
+        ) : (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${userMedia})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+          />
+        )}
+        
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
+        
+        {/* Optional radial vignette */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
       </div>
 
-      {/* Enlarged photo dialog */}
-      {hasPhoto && (
-        <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
-          <DialogContent className="max-w-fit w-auto p-0 bg-transparent border-none shadow-none">
-            <div className="w-80 h-80 mx-auto relative">
-              <HighQualityImage
-                src={photoPreview || profilePhotoUrl!}
-                alt="Profile photo"
-                className="w-full h-full rounded-full shadow-2xl"
-                width={320}
-                height={320}
-              />
-              {/* Custom close button positioned outside the circle */}
-              <button
-                onClick={() => setShowEnlargedPhoto(false)}
-                className="absolute -top-2 -right-2 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-                aria-label="Close"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m18 6-12 12" />
-                  <path d="m6 6 12 12" />
-                </svg>
-              </button>
+      {/* Main Content Container */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
+        {/* Liquid Glass Card */}
+        <div
+          ref={cardRef}
+          className="relative mb-8 rounded-2xl overflow-hidden shadow-2xl"
+          style={{
+            width: cardDimensions.width,
+            height: cardDimensions.height,
+            maxWidth: cardDimensions.maxWidth,
+            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          }}
+        >
+          {/* Media Content */}
+          {mediaType === 'video' && !reducedMotion ? (
+            <video
+              ref={videoRef}
+              className="w-full h-full object-contain"
+              style={{
+                transition: 'opacity 300ms ease-in-out',
+                opacity: isLoaded ? 1 : 0,
+              }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={userMedia}
+              onLoadedData={() => setIsLoaded(true)}
+            >
+              <source src={userMedia} type="video/mp4" />
+            </video>
+          ) : (
+            <img
+              src={userMedia}
+              alt={`${userName}'s profile`}
+              className="w-full h-full object-contain"
+              style={{
+                transition: 'opacity 300ms ease-in-out',
+                opacity: isLoaded ? 1 : 0,
+              }}
+              onLoad={() => setIsLoaded(true)}
+            />
+          )}
+          
+          {/* Loading placeholder */}
+          {!isLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/10">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
-    </>
+          )}
+        </div>
+
+        {/* Profile Information */}
+        <div className="text-center space-y-4 max-w-lg">
+          {/* Name */}
+          <h1 
+            className="text-4xl md:text-5xl font-bold text-white"
+            style={{
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {userName}
+          </h1>
+
+          {/* Username and Edit Profile */}
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <span 
+              className="text-lg text-white/90 font-medium"
+              style={{
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              {username}
+            </span>
+            
+            {isCurrentUser && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onEditProfile}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                }}
+              >
+                Edit Profile
+              </Button>
+            )}
+          </div>
+
+          {/* Home Club */}
+          <p 
+            className="text-lg text-white/80"
+            style={{
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {homeClub}
+          </p>
+
+          {/* Stats Bar (Frosted Glass Chip) */}
+          <div 
+            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+              backdropFilter: 'blur(15px) saturate(1.6)',
+              WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <div className="text-center">
+              <div className="font-bold text-lg">156</div>
+              <div className="text-xs opacity-80">Rounds</div>
+            </div>
+            <div className="w-px h-8 bg-white/20" />
+            <div className="text-center">
+              <div className="font-bold text-lg">12.3</div>
+              <div className="text-xs opacity-80">Handicap</div>
+            </div>
+            <div className="w-px h-8 bg-white/20" />
+            <div className="text-center">
+              <div className="font-bold text-lg">2.5k</div>
+              <div className="text-xs opacity-80">XP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
