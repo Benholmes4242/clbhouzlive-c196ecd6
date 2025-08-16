@@ -528,15 +528,17 @@ const HeroProfileHeader = ({
               </button>
             </div>
             
-            {/* Stats Container - Responsive width */}
+            {/* Stats Container - Mobile shows 3.5 stats, Desktop shows 4 */}
             <div className="flex-shrink-0 overflow-hidden rounded-lg w-full md:w-[520px]">
               <div 
                 id="stats-container"
-                className="flex gap-4 md:gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
+                className="flex gap-6 md:gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  // Mobile: show 3.5 stats (3 full + half of 4th to encourage swiping)
+                  width: window.innerWidth < 768 ? 'calc(3.5 * 80px + 3 * 24px + 16px)' : 'auto'
                 }}
               >
                 <div className="flex-shrink-0 text-center w-20">
