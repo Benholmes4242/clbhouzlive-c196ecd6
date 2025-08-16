@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Play, Upload, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -16,67 +16,6 @@ interface CinematicProfileHeaderProps {
   className?: string;
 }
 
-// Smart viewport detection hook
-const useViewportSize = () => {
-  const [viewport, setViewport] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1440,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setViewport({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return viewport;
-};
-
-// Smart media fitting logic
-const useSmartMediaFit = (viewport: { width: number; height: number }) => {
-  const getMediaFitMode = useCallback(() => {
-    const { width, height } = viewport;
-    
-    // Large desktop: Fill Header (cover) allowed
-    if (width >= 1440) {
-      return 'cover';
-    }
-    
-    // Small desktop, laptops, tablets, phones: Fit Entire Media (contain)
-    return 'contain';
-  }, [viewport]);
-
-  const getResponsiveHeight = useCallback(() => {
-    const { width, height } = viewport;
-    
-    // Responsive height calculation
-    if (width >= 1440) {
-      // Large desktop: medium-tall banner
-      return Math.min(height * 0.6, 700);
-    } else if (width >= 1024) {
-      // Small desktop/laptop: slightly shorter
-      return Math.min(height * 0.5, 600);
-    } else if (width >= 768) {
-      // Tablet: shorter
-      return Math.min(height * 0.45, 500);
-    } else {
-      // Mobile: shortest
-      return Math.min(height * 0.4, 400);
-    }
-  }, [viewport]);
-
-  return {
-    fitMode: getMediaFitMode(),
-    responsiveHeight: getResponsiveHeight()
-  };
-};
-
 const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   videoUrl,
   thumbnailUrl,
@@ -90,12 +29,9 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const blurVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
-  const blurPhotoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -103,48 +39,21 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showVideo, setShowVideo] = useState(true);
   const { toast } = useToast();
 
-  const viewport = useViewportSize();
-  const { fitMode, responsiveHeight } = useSmartMediaFit(viewport);
-
-  // Sync blur video with main video
-  const syncBlurVideo = useCallback(() => {
-    const mainVideo = videoRef.current;
-    const blurVideo = blurVideoRef.current;
-    
-    if (mainVideo && blurVideo && videoUrl) {
-      blurVideo.currentTime = mainVideo.currentTime;
-      if (mainVideo.paused) {
-        blurVideo.pause();
-      } else {
-        blurVideo.play().catch(() => {});
-      }
-    }
-  }, [videoUrl]);
-
-  // Auto-play video and sync blur
+  // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
-    
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
       try {
         video.muted = true;
-        if (blurVideo) blurVideo.muted = true;
-        
         video.currentTime = 0;
-        if (blurVideo) blurVideo.currentTime = 0;
-        
         await video.play();
-        if (blurVideo) await blurVideo.play().catch(() => {});
-        
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
         
         const handleTimeUpdate = () => {
-          syncBlurVideo();
           const currentTime = video.currentTime;
           const duration = video.duration;
           
@@ -157,10 +66,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           setIsPlaying(false);
           video.currentTime = 0;
           video.pause();
-          if (blurVideo) {
-            blurVideo.currentTime = 0;
-            blurVideo.pause();
-          }
           
           if (profilePhotoUrl) {
             setShowVideo(false);
@@ -182,12 +87,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
     video.addEventListener('canplaythrough', handleCanPlayThrough);
     video.load();
-    if (blurVideo) blurVideo.load();
 
     return () => {
       video.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
-  }, [videoUrl, hasPlayed, profilePhotoUrl, syncBlurVideo]);
+  }, [videoUrl, hasPlayed, profilePhotoUrl]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -280,20 +184,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const replayVideo = async () => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
-    
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
         video.muted = isMuted;
-        if (blurVideo) {
-          blurVideo.currentTime = 0;
-          blurVideo.muted = true;
-        }
-        
         await video.play();
-        if (blurVideo) await blurVideo.play().catch(() => {});
-        
         setIsPlaying(true);
         setShowVideo(true);
       } catch (error) {
@@ -309,69 +204,42 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   };
 
   const hasMedia = videoUrl || profilePhotoUrl;
-  const currentMediaUrl = showVideo && videoUrl ? videoUrl : profilePhotoUrl;
-  const showBlurredBackground = fitMode === 'contain' && hasMedia;
+
+  // Debug logging
+  console.log('CinematicProfileHeader Debug:', {
+    videoUrl,
+    profilePhotoUrl,
+    hasMedia,
+    displayName,
+    showVideo
+  });
 
   return (
-    <div 
-      className={`relative w-full overflow-hidden ${className}`} 
-      style={{ height: `${responsiveHeight}px` }}
-    >
-      {/* Blurred Background Layer (only for contain mode) */}
-      {showBlurredBackground && (
-        <div className="absolute inset-0 z-0">
-          {videoUrl && (
-            <video
-              ref={blurVideoRef}
-              src={videoUrl}
-              poster={thumbnailUrl}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out blur-2xl scale-110 ${
-                showVideo ? 'opacity-70' : 'opacity-0'
-              }`}
-              playsInline
-              muted
-              preload="auto"
-              crossOrigin="anonymous"
-            />
-          )}
-          
-          {profilePhotoUrl && (
-            <img
-              ref={blurPhotoRef}
-              src={`${profilePhotoUrl}?quality=60&format=auto&width=800&height=600&fit=cover`}
-              alt=""
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out blur-2xl scale-110 ${
-                !showVideo || !videoUrl ? 'opacity-70' : 'opacity-0'
-              }`}
-            />
-          )}
-        </div>
-      )}
+    <div className={`relative w-full overflow-hidden ${className}`} 
+         style={{ 
+           marginTop: '-16rem',
+           height: '100vh',
+           minHeight: '800px',
+           maxHeight: '1200px'
+         }}>
 
-      {/* Main Media Layer */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
+      {/* Central Crisp Media Player - Full Coverage */}
+      <div className="absolute inset-0 z-10">
         {hasMedia ? (
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Main Video Element */}
+          <>
+            {/* Main Video Element - Crisp and Clear */}
             {videoUrl && (
               <video
                 ref={videoRef}
                 src={videoUrl}
                 poster={thumbnailUrl}
-                className={`${
-                  fitMode === 'contain' 
-                    ? 'max-w-full max-h-full object-contain' 
-                    : 'absolute inset-0 w-full h-full object-cover'
-                } transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 }`}
                 playsInline
                 muted={isMuted}
                 preload="auto"
                 crossOrigin="anonymous"
-                style={{
-                  filter: viewport.width < 768 ? 'brightness(1.05) contrast(1.02)' : 'none'
-                }}
               />
             )}
             
@@ -379,39 +247,32 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1920&height=1080&fit=${fitMode}`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`${
-                  fitMode === 'contain' 
-                    ? 'max-w-full max-h-full object-contain' 
-                    : 'absolute inset-0 w-full h-full object-cover'
-                } transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
-                style={{
-                  filter: viewport.width < 768 ? 'brightness(1.05) contrast(1.02)' : 'none'
-                }}
                 onError={(e) => {
                   e.currentTarget.src = profilePhotoUrl;
                 }}
               />
             )}
-          </div>
+          </>
         ) : (
           /* Fallback for empty state */
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
         )}
       </div>
 
-      {/* Frosted Glass Text Area Backdrop */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white/90 via-white/60 to-transparent backdrop-blur-sm z-20 pointer-events-none" />
+      {/* Gradient fade to white at bottom - extended and smoother */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent z-20 pointer-events-none"></div>
 
       {/* Content Overlay */}
       <div 
-        className={`relative z-30 w-full h-full flex items-center justify-center ${
+        className={`relative z-10 w-full h-full flex items-center justify-center ${
           (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
         }`}
         onMouseEnter={() => setShowControls(true)}
@@ -437,22 +298,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 </Button>
               )}
 
-              {/* Mute Button */}
-              {videoUrl && isPlaying && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleMute();
-                  }}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </Button>
-              )}
-
-              {/* Owner Edit Controls */}
+              {/* Owner Edit Controls - positioned under play button */}
               {isOwnProfile && (
                 <div className="flex gap-2">
                   <Button
@@ -514,6 +360,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             </div>
           </div>
         )}
+
       </div>
 
       {/* Hidden File Inputs */}
@@ -535,7 +382,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       
       {/* Loading Overlay */}
       {uploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-40">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <span className="text-white font-medium">Uploading...</span>
