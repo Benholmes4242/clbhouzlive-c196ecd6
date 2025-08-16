@@ -900,13 +900,29 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     const nextTier = xpTiers[index + 1];
                     
+                    // Calculate exact positions for ring edges
+                    // Each ring is 48px wide, positioned in flex-1 containers
+                    // Container width per ring is 25% of total width
+                    const ringWidth = 48; // w-12 = 48px
+                    const containerWidthPercent = 25; // 100% / 4 rings
+                    
+                    // Position of ring center as percentage
+                    const ringCenterPercent = containerWidthPercent * index + (containerWidthPercent / 2);
+                    const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
+                    
+                    // Calculate line start (right edge of current ring) and end (left edge of next ring)
+                    // Convert ring radius from px to percentage (approximate)
+                    const ringRadiusPercent = 3; // approximate percentage for ring radius
+                    const lineStart = ringCenterPercent + ringRadiusPercent;
+                    const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    
                     return (
                       <div 
                         key={`connector-${index}`}
                         className="absolute top-6 h-1 z-10" 
                         style={{
-                          left: `${25 + (index * 25) + 12.5}%`,
-                          width: '12.5%',
+                          left: `${lineStart}%`,
+                          width: `${lineWidth}%`,
                           background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
                           borderRadius: '2px'
                         }}
@@ -1002,16 +1018,29 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     const nextTier = xpTiers[index + 1];
                     
+                    // Calculate exact positions for ring edges - desktop version
+                    const ringWidth = 80; // larger rings on desktop
+                    const containerWidthPercent = 25; // 100% / 4 rings
+                    
+                    // Position of ring center as percentage
+                    const ringCenterPercent = containerWidthPercent * index + (containerWidthPercent / 2);
+                    const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
+                    
+                    // Calculate line start (right edge of current ring) and end (left edge of next ring)
+                    const ringRadiusPercent = 4; // approximate percentage for ring radius on desktop
+                    const lineStart = ringCenterPercent + ringRadiusPercent;
+                    const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    
                     return (
                       <div 
                         key={`connector-${index}`}
                         className="absolute top-12 h-1 z-10" 
                         style={{
-                          left: `${25 + (index * 25) + 12.5}%`,
-                          width: '12.5%',
+                          left: `${lineStart}%`,
+                          width: `${lineWidth}%`,
                           background: `linear-gradient(to right, ${tier.color}, ${nextTier.color})`,
                           borderRadius: '2px'
-                        }}
+                        }} 
                       />
                     );
                   })}
