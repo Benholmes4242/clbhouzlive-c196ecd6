@@ -41,7 +41,6 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ProfileDemo = lazy(() => import("./pages/ProfileDemo"));
-const ProfileDemo2 = lazy(() => import("./pages/ProfileDemo2"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -102,7 +101,6 @@ const App: React.FC = () => {
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="/profile-demo" element={<ProfileDemo />} />
-                        <Route path="/profile-demo2" element={<ProfileDemo2 />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
