@@ -217,14 +217,23 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
           {/* Mini Rings Display (All Tiers) for horizontal layout */}
           {showMiniRings && (
             <div className="w-full mt-4">
-              <div className="flex justify-between items-start gap-2">
+              <div className="flex justify-between items-start gap-2 relative">
                 {XP_RING_TIERS.map((tier, index) => {
                   const isActive = currentXP >= tier.minXP;
                   const isCurrent = currentTier && tier.name === currentTier.name;
+                  const nextTierData = XP_RING_TIERS[index + 1];
                   
                   return (
-                    <div key={tier.name} className="flex flex-col items-center flex-1">
-                      <div className="relative">
+                    <div key={tier.name} className="flex flex-col items-center flex-1 relative">
+                      {/* Connecting line to next ring */}
+                      {nextTierData && (
+                        <div className="absolute top-6 left-full w-full h-0.5 z-0" style={{
+                          background: `linear-gradient(to right, ${tier.color}, ${nextTierData.color})`,
+                          transform: 'translateY(-50%)'
+                        }} />
+                      )}
+                      
+                      <div className="relative z-10">
                         {/* Glow effect for active mini rings */}
                         {isActive && (
                           <div 
