@@ -869,7 +869,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                        <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
                        <span className="text-base font-medium relative z-10">Monthly Gain:</span>
                        <span className="font-bold relative z-10 text-base">450 XP</span>
-                       <MdOutlineTrendingUp className="w-4 h-4 relative z-10" />
+                       <MdOutlineTrendingUp className="w-5 h-5 relative z-10" />
                      </div>
                    </div>
                 </div>
