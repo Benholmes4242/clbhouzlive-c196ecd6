@@ -1251,7 +1251,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     {/* Latest Achievement Details */}
                     <div className="flex-1">
-                      <h3 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white mb-3 mt-4`}>Latest Achievement</h3>
+                      <h3 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white mb-3 mt-2`}>Latest Achievement</h3>
                       
                       <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
                         <span className="text-green-500 font-bold">+{mostRecentAchievement.xp} XP</span>
