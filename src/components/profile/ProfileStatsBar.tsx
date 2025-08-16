@@ -78,7 +78,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       <div className="relative overflow-hidden rounded-full bg-muted border shadow-sm">
         <div 
           ref={containerRef}
-          className={`flex gap-8 overflow-x-auto scrollbar-hide px-4 ${isMobile ? '' : 'pr-20'}`}
+          className={`flex ${isMobile ? 'gap-2' : 'gap-8'} overflow-x-auto scrollbar-hide ${isMobile ? 'px-2' : 'px-4'} ${isMobile ? '' : 'pr-20'}`}
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -90,12 +90,12 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
             <button
               key={index}
               onClick={stat.onClick}
-              className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
+              className={`flex-shrink-0 ${isMobile ? 'w-16' : 'w-20'} flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200`}
             >
-              <div className="text-lg font-semibold text-black">
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-black`}>
                 {stat.value}
               </div>
-              <div className="text-xs text-gray-600 font-medium">
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-600 font-medium`}>
                 {stat.label}
               </div>
             </button>
