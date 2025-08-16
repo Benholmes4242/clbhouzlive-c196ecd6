@@ -791,7 +791,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Mobile Progress Ring - Left Side */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-32 h-32">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(0.3px) drop-shadow(0 0 8px #10B98130)' }}>
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(1px) drop-shadow(0 0 15px #10B98160)' }}>
                       {/* Gradient definition */}
                       <defs>
                         <linearGradient id="greenProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -963,7 +963,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-1">
                           {/* Progress ring */}
-                          <svg className={`w-12 h-12 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 8px ${tier.color}40)` }}>
+                          <svg className={`w-12 h-12 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(1px) drop-shadow(0 0 12px ${tier.color}60)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
@@ -1090,7 +1090,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-2">
                           {/* Progress ring */}
-                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.5px) drop-shadow(0 0 10px ${tier.color}40)` }}>
+                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(1px) drop-shadow(0 0 15px ${tier.color}60)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
