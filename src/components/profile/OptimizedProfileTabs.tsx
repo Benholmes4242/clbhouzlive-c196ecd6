@@ -147,7 +147,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
   };
 
   return (
-    <div className="bg-background min-h-screen -mt-8 md:mt-0">
+    <div className="bg-background min-h-screen -mt-16 md:mt-0">
       {/* Tabs Navigation */}
       <div className="bg-background border-b border-border sticky top-0 z-40">
         <div className="container mx-auto px-4">
