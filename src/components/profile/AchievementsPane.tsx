@@ -963,7 +963,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-1">
                           {/* Progress ring */}
-                          <svg className={`w-12 h-12 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                          <svg className={`w-12 h-12 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.3px) drop-shadow(0 0 6px ${tier.color}30)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
@@ -1090,7 +1090,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div key={tier.name} className="flex-1 text-center relative z-10">
                         <div className="relative flex justify-center mb-2">
                           {/* Progress ring */}
-                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                          <svg className={`w-24 h-24 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64" style={{ filter: `blur(0.3px) drop-shadow(0 0 8px ${tier.color}30)` }}>
                             {/* Background ring */}
                             <circle
                               cx="32"
