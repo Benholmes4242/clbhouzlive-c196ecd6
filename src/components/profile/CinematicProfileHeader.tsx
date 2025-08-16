@@ -256,7 +256,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           onMouseLeave={() => setShowControls(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Circular */}
+          {/* Video Element - Shows first and autoplays */}
           {videoUrl && (
             <video
               ref={videoRef}
@@ -269,10 +269,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               muted={isMuted}
               preload="auto"
               crossOrigin="anonymous"
+              autoPlay
+              onPlay={() => {
+                setIsPlaying(true);
+                setHasPlayed(true);
+              }}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => {
+                setIsPlaying(false);
+                setShowVideo(false); // Switch to photo when video ends
+              }}
             />
           )}
           
-          {/* Profile Photo - Always show either real photo or fallback */}
+          {/* Profile Photo - Shows when no video or video has ended */}
           <img
             ref={photoRef}
             src={actualPhotoUrl}
