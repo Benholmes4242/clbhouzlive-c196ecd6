@@ -66,7 +66,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
   const nextMilestone = 10000;
-  const progressPercentage = isMobile ? 100 : (totalXP / nextMilestone) * 100;
+  const progressPercentage = (totalXP / nextMilestone) * 100;
   
   // XP Tier System
   const xpTiers = [
