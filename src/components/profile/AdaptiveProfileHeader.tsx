@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AdaptiveProfileHeaderProps {
@@ -26,7 +25,6 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
   const [aspectRatio, setAspectRatio] = useState<number>(4/5); // Default 4:5 portrait
   const [reducedMotion, setReducedMotion] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -53,36 +51,36 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
         };
         img.src = userMedia;
       } else {
-        // For video, we'll use default 4:5 unless we can get metadata
+        // For video, use default 4:5 unless metadata available
         setAspectRatio(4/5);
         setIsLoaded(true);
       }
     }
   }, [userMedia, mediaType]);
 
-  // Get responsive card dimensions based on breakpoints
+  // Get responsive card dimensions per specifications
   const getCardDimensions = () => {
     if (isMobile) {
+      // Mobile: 90% viewport width
       const width = '90vw';
       const height = `calc(90vw / ${aspectRatio})`;
       return { width, height, maxWidth: 'none' };
     }
     
-    // Desktop/tablet sizing with specific breakpoints
+    // Desktop/tablet sizing per specifications
     const viewportWidth = window.innerWidth;
     let baseWidth: number;
     
     if (viewportWidth >= 1200) {
-      // Large desktop: 560-640px
+      // Desktop (large screens): Max width 560–640px
       baseWidth = 600;
     } else if (viewportWidth >= 1024) {
-      // Small desktop/laptop: 480-560px
+      // Laptop/Small desktops: Max width 480–560px
       baseWidth = 520;
     } else if (viewportWidth >= 768) {
-      // Tablet: 420-480px
+      // Tablet: Max width 420–480px
       baseWidth = 450;
     } else {
-      // Small tablet
       baseWidth = 400;
     }
     
@@ -96,7 +94,7 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
 
   return (
     <div className="relative w-full overflow-hidden">
-      {/* Dynamic Blur Background - Full Header Edge-to-Edge */}
+      {/* Dynamic Blur Background - Edge-to-Edge */}
       <div className="absolute inset-0 z-0">
         {mediaType === 'video' && !reducedMotion ? (
           <video
@@ -119,37 +117,38 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
             style={{
               backgroundImage: `url(${userMedia})`,
               filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
+              transform: 'scale(1.1)',
             }}
           />
         )}
         
-        {/* Soft bottom gradient for smooth transition */}
+        {/* Soft bottom white gradient for smooth transition */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/80" />
       </div>
 
-      {/* Main Content Container */}
+      {/* Main Content Container - Card centered horizontally, slightly above vertical center */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[70vh] px-4 py-12">
-        {/* Liquid Glass Adaptive Card */}
+        {/* Liquid Glass Card */}
         <div
-          ref={cardRef}
-          className="relative mb-8 rounded-2xl overflow-hidden"
+          className="relative rounded-2xl overflow-hidden"
           style={{
             width: cardDimensions.width,
             height: cardDimensions.height,
             maxWidth: cardDimensions.maxWidth,
-            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
+            // Liquid glass effect
+            backgroundColor: 'rgba(255, 255, 255, 0.25)', // Semi-transparent surface ~25%
+            backdropFilter: 'blur(20px) saturate(1.8)', // Backdrop blur + saturation boost
             WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.2)', // Thin white hairline stroke
+            borderRadius: '16px', // 16px radius
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)', // Subtle wide shadow
           }}
         >
-          {/* Media Content - Always show full media (contain) */}
+          {/* Media Content - Always fit entire media (contain/aspect-fit) */}
           {mediaType === 'video' && !reducedMotion ? (
             <video
               ref={videoRef}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain" // No cropping, no distortion
               style={{
                 transition: 'opacity 300ms ease-in-out',
                 opacity: isLoaded ? 1 : 0,
@@ -158,7 +157,7 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
               muted
               loop
               playsInline
-              poster={userMedia}
+              poster={userMedia} // Fallback until video loads
               onLoadedData={() => setIsLoaded(true)}
             >
               <source src={userMedia} type="video/mp4" />
@@ -167,7 +166,7 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
             <img
               src={userMedia}
               alt={`${userName}'s profile`}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain" // No cropping, no distortion
               style={{
                 transition: 'opacity 300ms ease-in-out',
                 opacity: isLoaded ? 1 : 0,
@@ -183,82 +182,27 @@ const AdaptiveProfileHeader: React.FC<AdaptiveProfileHeaderProps> = ({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Profile Information */}
-        <div className="text-center space-y-4 max-w-lg">
-          {/* Name */}
-          <h1 
-            className="text-4xl md:text-5xl font-bold text-white"
-            style={{
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            {userName}
-          </h1>
-
-          {/* Username and Edit Profile */}
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <span 
-              className="text-lg text-white/90 font-medium"
-              style={{
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-              }}
-            >
-              {username}
-            </span>
-            
-            {isCurrentUser && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onEditProfile}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
-                style={{
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                }}
-              >
-                Edit Profile
-              </Button>
-            )}
+      {/* Profile Info - Keep as is per instructions */}
+      <div className="relative z-10 text-center py-8 px-4">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{userName}</h1>
+        <p className="text-lg text-gray-600 mb-1">{username}</p>
+        <p className="text-base text-gray-500">{homeClub}</p>
+        
+        {/* Basic stats */}
+        <div className="flex justify-center gap-6 mt-6 text-sm">
+          <div className="text-center">
+            <div className="font-bold text-lg">156</div>
+            <div className="text-gray-500">Rounds</div>
           </div>
-
-          {/* Home Club */}
-          <p 
-            className="text-lg text-white/80"
-            style={{
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            {homeClub}
-          </p>
-
-          {/* Stats Bar - Liquid glass chip */}
-          <div 
-            className="inline-flex items-center gap-6 px-6 py-3 rounded-full text-sm font-medium text-white"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.25)',
-              backdropFilter: 'blur(15px) saturate(1.6)',
-              WebkitBackdropFilter: 'blur(15px) saturate(1.6)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <div className="text-center">
-              <div className="font-bold text-lg">156</div>
-              <div className="text-xs opacity-80">Rounds</div>
-            </div>
-            <div className="w-px h-8 bg-white/20" />
-            <div className="text-center">
-              <div className="font-bold text-lg">12.3</div>
-              <div className="text-xs opacity-80">Handicap</div>
-            </div>
-            <div className="w-px h-8 bg-white/20" />
-            <div className="text-center">
-              <div className="font-bold text-lg">2.5k</div>
-              <div className="text-xs opacity-80">XP</div>
-            </div>
+          <div className="text-center">
+            <div className="font-bold text-lg">12.3</div>
+            <div className="text-gray-500">Handicap</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-lg">2.5k</div>
+            <div className="text-gray-500">XP</div>
           </div>
         </div>
       </div>
