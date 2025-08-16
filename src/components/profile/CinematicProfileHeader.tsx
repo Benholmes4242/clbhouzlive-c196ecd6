@@ -37,7 +37,44 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
+  const [aspectRatio, setAspectRatio] = useState('4/5'); // Default aspect ratio
   const { toast } = useToast();
+
+  // Get aspect ratio from media dimensions
+  useEffect(() => {
+    if (videoUrl) {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        const ratio = video.videoWidth / video.videoHeight;
+        if (ratio >= 16/9) {
+          setAspectRatio('16/9');
+        } else if (ratio >= 1.3) {
+          setAspectRatio('4/3');
+        } else if (ratio >= 0.9 && ratio <= 1.1) {
+          setAspectRatio('1/1');
+        } else {
+          setAspectRatio('4/5');
+        }
+      };
+      video.src = videoUrl;
+    } else if (profilePhotoUrl) {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = img.width / img.height;
+        if (ratio >= 16/9) {
+          setAspectRatio('16/9');
+        } else if (ratio >= 1.3) {
+          setAspectRatio('4/3');
+        } else if (ratio >= 0.9 && ratio <= 1.1) {
+          setAspectRatio('1/1');
+        } else {
+          setAspectRatio('4/5');
+        }
+      };
+      img.src = profilePhotoUrl;
+    }
+  }, [videoUrl, profilePhotoUrl]);
 
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
@@ -222,14 +259,14 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   return (
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
-           marginTop: '-8rem', // Reduced margin to give more space at top
+           marginTop: '-8rem',
            height: '70vh',
            minHeight: '500px',
            maxHeight: '700px',
-           paddingTop: '8rem' // Add padding to push content down
+           paddingTop: '8rem'
          }}>
 
-      {/* Dynamic Blurred Background - Matches Media Card */}
+      {/* Dynamic Blurred Background */}
       <div className="absolute inset-0 z-0">
         {/* Video Background - Shows when video is playing */}
         {videoUrl && showVideo && (
@@ -237,7 +274,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
+              transform: 'scale(1.1)',
             }}
             src={videoUrl}
             autoPlay
@@ -255,38 +292,40 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             style={{
               backgroundImage: `url(${actualPhotoUrl})`,
               filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
+              transform: 'scale(1.1)',
             }}
           />
         )}
         
-        {/* Gradient overlay for smooth transition to page content */}
+        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
       </div>
 
-      {/* Central Circular Media */}
-      <div className="relative z-10 w-full h-full flex items-start justify-center pt-12">
-        {/* Always show a circular element */}
+      {/* Liquid Glass Card */}
+      <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
         <div 
-          className="relative rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 cursor-pointer"
+          className="relative bg-white/20 backdrop-blur-md border border-white/20 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
           style={{
-            width: '300px',
-            height: '300px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            borderRadius: '16px',
+            aspectRatio: aspectRatio,
+            width: 'min(90vw, 560px)',
+            maxWidth: '640px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
           }}
           onMouseEnter={() => setShowControls(true)}
           onMouseLeave={() => setShowControls(false)}
           onClick={handleClick}
         >
-          {/* Video Element - Shows first and autoplays */}
+          {/* Video Element */}
           {videoUrl && (
             <video
               ref={videoRef}
               src={videoUrl}
               poster={thumbnailUrl}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+              className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
                 showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
               }`}
+              style={{ borderRadius: '16px' }}
               playsInline
               muted={isMuted}
               preload="auto"
@@ -299,12 +338,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false); // Switch to photo when video ends - background will update automatically
+                setShowVideo(false);
               }}
             />
           )}
           
-          {/* Profile Photo - Shows when no video or video has ended */}
+          {/* Profile Photo */}
           <img
             ref={photoRef}
             src={actualPhotoUrl}
@@ -312,9 +351,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             fetchPriority="high"
             decoding="async"
             alt={`${displayName} profile`}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+            className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
               !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
+            style={{ borderRadius: '16px' }}
             onError={(e) => {
               console.log('Image failed to load:', actualPhotoUrl);
               e.currentTarget.src = fallbackImage;
@@ -325,25 +365,25 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         {/* Upload Interface for Empty State */}
         {!hasMedia && isOwnProfile && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl text-white/80 mb-4">
+            <div className="text-center text-white/80">
+              <div className="text-6xl mb-6">
                 {displayName.charAt(0)}
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <Button
                   variant="outline"
                   onClick={handleFileSelect}
                   disabled={uploading}
-                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                  className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Add Video
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   onClick={handlePhotoSelect}
                   disabled={uploading}
-                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                  className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Add Photo
@@ -354,7 +394,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
       </div>
 
-      {/* Central Media Controls */}
+      {/* Media Controls Overlay */}
       {hasMedia && showControls && (
         <div className="absolute inset-0 flex items-center justify-center transition-opacity z-20">
           <div className="flex flex-col gap-3 items-center">
@@ -367,13 +407,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   e.stopPropagation();
                   replayVideo();
                 }}
-                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-4 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-110"
+                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-full p-4 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-110"
               >
                 <Play className="w-6 h-6" />
               </Button>
             )}
 
-            {/* Owner Edit Controls - positioned under play button */}
+            {/* Owner Edit Controls */}
             {isOwnProfile && (
               <div className="flex gap-2">
                 <Button
@@ -384,7 +424,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handleFileSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                 >
                   <span className="text-xs font-medium">Change Video</span>
                 </Button>
@@ -397,7 +437,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handlePhotoSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                 >
                   <span className="text-xs font-medium">Change Photo</span>
                 </Button>
@@ -407,34 +447,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         </div>
       )}
 
-      {/* Upload Interface for Empty State */}
-      {!hasMedia && isOwnProfile && (
-        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-          <div className="text-6xl text-muted-foreground/50 mb-2">
-            {displayName.charAt(0)}
-          </div>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={handleFileSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Video
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handlePhotoSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Photo
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Hidden File Inputs */}
       <input
