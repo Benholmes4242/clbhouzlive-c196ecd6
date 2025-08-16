@@ -163,7 +163,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
   }
 
   return (
-    <div className="space-y-6 pt-0">
+    <div className="space-y-8 pt-0">
       {/* Summary Stats */}
       <HandicapSummaryStats
         currentHandicap={currentHandicap}

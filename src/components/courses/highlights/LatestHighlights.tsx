@@ -215,7 +215,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   }
 
   return (
-    <div className="pt-1">
+    <div className="pt-0 pb-8">
       <DepthStackCarousel
         highlights={highlights}
         onVideoPlay={handleVideoPlay}

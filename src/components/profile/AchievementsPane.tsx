@@ -673,7 +673,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   return (
     <div className="w-full max-w-[1200px] mx-auto">
       <div className={`w-full flex flex-col bg-background`}>
-        <div className={`${isMobile ? 'px-4 py-6' : 'px-8 py-8'} w-full`}>
+        <div className="px-4 py-8 md:px-8 w-full">
         </div>
         
         <div className="w-full" style={{ paddingTop: isMobile ? '0px' : '0px', paddingBottom: isMobile ? '130px' : '60px' }}>
