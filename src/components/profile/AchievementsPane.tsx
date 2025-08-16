@@ -900,7 +900,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     const nextTier = xpTiers[index + 1];
                     
-                    // Calculate exact positions for ring edges
+                    // Calculate exact positions for ring edges - Mobile responsive
                     // Each ring is 48px wide, positioned in flex-1 containers
                     // Container width per ring is 25% of total width
                     const ringWidth = 48; // w-12 = 48px
@@ -910,20 +910,30 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     const ringCenterPercent = containerWidthPercent * index + (containerWidthPercent / 2);
                     const nextRingCenterPercent = containerWidthPercent * (index + 1) + (containerWidthPercent / 2);
                     
-                    // Calculate line start (right edge of current ring) and end (left edge of next ring)
-                    // Convert ring radius from px to percentage (approximate)
-                    const ringRadiusPercent = 3.8; // precise positioning to just touch ring edges
+                    // Dynamic ring radius based on screen size - more responsive for mobile
+                    const screenWidth = window.innerWidth;
+                    let ringRadiusPercent;
+                    
+                    if (screenWidth < 640) { // mobile
+                      ringRadiusPercent = 5.5; // larger offset for smaller screens
+                    } else if (screenWidth < 768) { // tablet
+                      ringRadiusPercent = 4.5;
+                    } else { // desktop
+                      ringRadiusPercent = 3.8;
+                    }
+                    
                     let lineStart = ringCenterPercent + ringRadiusPercent;
                     let lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
                     
-                    // Special adjustments for first and last lines
+                    // Special adjustments for first and last lines - scale with screen size
+                    const edgeAdjustment = screenWidth < 640 ? 0.5 : 0.3;
                     if (index === 0) {
                       // Extend left edge of first line (going into blue ring)
-                      lineStart -= 0.3;
-                      lineWidth += 0.3;
+                      lineStart -= edgeAdjustment;
+                      lineWidth += edgeAdjustment;
                     } else if (index === 2) {
                       // Extend right edge of last line (going into gold ring)
-                      lineWidth += 0.3;
+                      lineWidth += edgeAdjustment;
                     }
                     
                     return (
