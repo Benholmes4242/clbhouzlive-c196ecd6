@@ -60,21 +60,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }, [userMedia, mediaType]);
 
-  // Get responsive card dimensions
+  // Get responsive card dimensions - full screen width
   const getCardDimensions = () => {
-    if (isMobile) {
-      const width = '90vw';
-      const height = `calc(90vw / ${aspectRatio})`;
-      return { width, height, maxWidth: 'none' };
-    }
+    // Full screen width for all breakpoints
+    const width = '100vw';
     
-    // Desktop/tablet sizing
-    const baseWidth = window.innerWidth > 1200 ? 600 : 
-                     window.innerWidth > 768 ? 500 : 450;
-    const width = `${baseWidth}px`;
-    const height = `${baseWidth / aspectRatio}px`;
+    // Calculate height based on current aspect ratio and screen width
+    const screenWidth = window.innerWidth;
+    const height = `${screenWidth / aspectRatio}px`;
     
-    return { width, height, maxWidth: width };
+    return { width, height, maxWidth: 'none' };
   };
 
   const cardDimensions = getCardDimensions();
