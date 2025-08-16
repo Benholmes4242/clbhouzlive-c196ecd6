@@ -913,8 +913,18 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     // Calculate line start (right edge of current ring) and end (left edge of next ring)
                     // Convert ring radius from px to percentage (approximate)
                     const ringRadiusPercent = 3.8; // precise positioning to just touch ring edges
-                    const lineStart = ringCenterPercent + ringRadiusPercent;
-                    const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    let lineStart = ringCenterPercent + ringRadiusPercent;
+                    let lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    
+                    // Special adjustments for first and last lines
+                    if (index === 0) {
+                      // Extend left edge of first line (going into blue ring)
+                      lineStart -= 0.3;
+                      lineWidth += 0.3;
+                    } else if (index === 2) {
+                      // Extend right edge of last line (going into gold ring)
+                      lineWidth += 0.3;
+                    }
                     
                     return (
                       <div 
@@ -1028,8 +1038,18 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     
                     // Calculate line start (right edge of current ring) and end (left edge of next ring)
                     const ringRadiusPercent = 4.8; // precise positioning for desktop
-                    const lineStart = ringCenterPercent + ringRadiusPercent;
-                    const lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    let lineStart = ringCenterPercent + ringRadiusPercent;
+                    let lineWidth = nextRingCenterPercent - ringRadiusPercent - lineStart;
+                    
+                    // Special adjustments for first and last lines
+                    if (index === 0) {
+                      // Extend left edge of first line (going into blue ring)
+                      lineStart -= 0.4;
+                      lineWidth += 0.4;
+                    } else if (index === 2) {
+                      // Extend right edge of last line (going into gold ring)
+                      lineWidth += 0.4;
+                    }
                     
                     return (
                       <div 
