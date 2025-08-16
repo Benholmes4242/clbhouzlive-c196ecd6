@@ -29,6 +29,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const backgroundVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -42,13 +43,26 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
+    const backgroundVideo = backgroundVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
       try {
         video.muted = true;
         video.currentTime = 0;
+        
+        // Sync background video
+        if (backgroundVideo) {
+          backgroundVideo.muted = true;
+          backgroundVideo.currentTime = 0;
+        }
+        
         await video.play();
+        // Start background video at the same time
+        if (backgroundVideo) {
+          backgroundVideo.play().catch(console.error);
+        }
+        
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true);
@@ -56,6 +70,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         const handleTimeUpdate = () => {
           const currentTime = video.currentTime;
           const duration = video.duration;
+          
+          // Sync background video time
+          if (backgroundVideo && Math.abs(backgroundVideo.currentTime - currentTime) > 0.1) {
+            backgroundVideo.currentTime = currentTime;
+          }
           
           if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
             setShowVideo(false);
@@ -66,6 +85,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           setIsPlaying(false);
           video.currentTime = 0;
           video.pause();
+          
+          // Sync background video end
+          if (backgroundVideo) {
+            backgroundVideo.currentTime = 0;
+            backgroundVideo.pause();
+          }
           
           if (profilePhotoUrl) {
             setShowVideo(false);
@@ -184,11 +209,24 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const replayVideo = async () => {
     const video = videoRef.current;
+    const backgroundVideo = backgroundVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
         video.muted = isMuted;
+        
+        // Sync background video
+        if (backgroundVideo) {
+          backgroundVideo.currentTime = 0;
+          backgroundVideo.muted = true;
+        }
+        
         await video.play();
+        // Start background video at the same time
+        if (backgroundVideo) {
+          backgroundVideo.play().catch(console.error);
+        }
+        
         setIsPlaying(true);
         setShowVideo(true);
       } catch (error) {
@@ -222,12 +260,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {/* Background blur of the same media */}
           {videoUrl && showVideo && (
             <video
+              ref={backgroundVideoRef}
               src={videoUrl}
               className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 opacity-30"
               playsInline
               muted
-              autoPlay
-              loop
               preload="auto"
             />
           )}
