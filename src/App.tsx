@@ -17,6 +17,7 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 
 const Auth = lazy(() => import("./pages/Auth"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
+const ProfileDemo = lazy(() => import("./pages/ProfileDemo"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -77,6 +78,7 @@ const App: React.FC = () => {
                         <Route path="/" element={<Clubhouse />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/create-profile" element={<CreateProfile />} />
+                        <Route path="/profile-demo" element={<ProfileDemo />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/profile/:username" element={<UserProfilePage />} />
                         <Route path="/settings" element={<Settings />} />
