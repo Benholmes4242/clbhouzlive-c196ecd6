@@ -753,14 +753,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   
                   {/* XP Earned This Month - Below centered content */}
                   <div className="flex items-center justify-center gap-3">
-                    <span className="text-sm font-medium text-green-600">XP earned this month</span>
-                    <div className="flex items-center gap-1 text-green-600 relative px-3 py-1">
-                      {/* Light green glow - more visible */}
+                    <div className="flex items-center gap-3 text-green-600 relative px-4 py-2">
+                      {/* Light green glow across entire section */}
                       <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
-                      <svg className="w-4 h-4 relative z-10" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-bold relative z-10">450 XP</span>
+                      <span className="text-sm font-medium relative z-10">XP earned this month</span>
+                      <div className="flex items-center gap-1 relative z-10">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-bold">450 XP</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -862,9 +864,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   
                   {/* XP Earned This Month */}
                   <div className="flex items-center gap-1">
-                    <span className="text-xs font-medium text-green-600">This month:</span>
-                    <div className="flex items-center gap-1 text-green-600 relative px-1">
+                    <div className="flex items-center gap-1 text-green-600 relative px-2 py-1">
                       <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
+                      <span className="text-xs font-medium relative z-10">XP earned this month</span>
                       <svg className="w-3 h-3 relative z-10" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
