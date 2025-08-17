@@ -387,10 +387,18 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             className="w-full h-full object-cover"
             autoPlay
-            muted={isGloballyMuted}
+            muted
             playsInline
+            loop={false}
             onLoadedData={() => {
               startTimeRef.current = Date.now();
+            }}
+            onCanPlay={(e) => {
+              const video = e.currentTarget;
+              video.muted = true; // Always start muted
+              video.play().catch(() => {
+                // Autoplay failed, video will show play button
+              });
             }}
           />
         ) : (
