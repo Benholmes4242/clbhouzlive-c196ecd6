@@ -86,6 +86,7 @@ interface HeroProfileHeaderProps {
   onProfileUpdate: () => void;
   activeSection?: string;
   onSectionChange?: (section: string) => void;
+  onBleedContentChange?: (content: React.ReactNode) => void;
 }
 
 const HeroProfileHeader = ({ 
@@ -93,7 +94,8 @@ const HeroProfileHeader = ({
   isOwnProfile,
   onProfileUpdate,
   activeSection = 'activity',
-  onSectionChange
+  onSectionChange,
+  onBleedContentChange
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -459,6 +461,13 @@ const HeroProfileHeader = ({
     }
   };
 
+  const [bleedContent, setBleedContent] = useState<React.ReactNode>(null);
+
+  // Pass bleed content up to parent
+  useEffect(() => {
+    onBleedContentChange?.(bleedContent);
+  }, [bleedContent, onBleedContentChange]);
+
   return (
     <>
       {/* Cinematic Profile Header */}
@@ -473,6 +482,7 @@ const HeroProfileHeader = ({
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
+          onBleedContentChange={setBleedContent}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}

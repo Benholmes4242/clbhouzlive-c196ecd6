@@ -14,6 +14,7 @@ interface CinematicProfileHeaderProps {
   onVideoRemove: () => void;
   uploading?: boolean;
   className?: string;
+  onBleedContentChange?: (content: React.ReactNode) => void;
 }
 
 const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
@@ -26,7 +27,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   onPhotoUpload,
   onVideoRemove,
   uploading = false,
-  className = ''
+  className = '',
+  onBleedContentChange
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement>(null);
@@ -310,69 +312,78 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const isMobile = window.innerWidth < 768;
 
+  // Update bleed content when media changes
+  useEffect(() => {
+    if (onBleedContentChange) {
+      onBleedContentChange(createBleedContent());
+    }
+  }, [videoUrl, showVideo, actualPhotoUrl, onBleedContentChange]);
+
+  // Create bleed content to pass to header
+  const createBleedContent = () => {
+    if (!isMobile) return null;
+    
+    return (
+      <>
+        {/* Video Bleed Background */}
+        {videoUrl && showVideo && (
+          <div className="absolute inset-0 overflow-hidden">
+            <video
+              ref={bleedVideoRef}
+              className="absolute w-full object-cover"
+              style={{
+                height: '1000%', // Scale source area 10x to use top 10%
+                top: '0',
+                objectPosition: 'center top',
+                filter: 'blur(16px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+              src={videoUrl}
+              muted
+              loop
+              playsInline
+              poster={thumbnailUrl}
+              onCanPlay={() => {
+                // Sync with main video
+                const mainVideo = videoRef.current;
+                const bleedVideo = bleedVideoRef.current;
+                if (mainVideo && bleedVideo && !mainVideo.paused) {
+                  bleedVideo.currentTime = mainVideo.currentTime;
+                  bleedVideo.play().catch(console.log);
+                }
+              }}
+            />
+            {/* Gradient overlay for smooth blending */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+          </div>
+        )}
+        
+        {/* Photo Bleed Background */}
+        {(!videoUrl || !showVideo) && (
+          <div className="absolute inset-0 overflow-hidden">
+            <div
+              className="absolute w-full"
+              style={{
+                height: '1000%', // Scale source area 10x to use top 10%
+                top: '0',
+                backgroundImage: `url(${actualPhotoUrl})`,
+                backgroundPosition: 'center top',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                filter: 'blur(16px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+            {/* Gradient overlay for smooth blending */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+          </div>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
-      {/* Mobile-only Header Bleed Layer */}
-      {isMobile && (
-        <div 
-          className="fixed top-0 left-0 right-0 pointer-events-none z-40"
-          style={{ height: '4rem' }} // Match header height
-        >
-          {/* Video Bleed Background */}
-          {videoUrl && showVideo && (
-            <div className="absolute inset-0 overflow-hidden">
-              <video
-                ref={bleedVideoRef}
-                className="absolute w-full object-cover"
-                style={{
-                  height: '1000%', // Scale source area 10x to use top 10%
-                  top: '0',
-                  objectPosition: 'center top',
-                  filter: 'blur(16px) saturate(1.2)',
-                  transform: 'scale(1.1)',
-                }}
-                src={videoUrl}
-                muted
-                loop
-                playsInline
-                poster={thumbnailUrl}
-                onCanPlay={() => {
-                  // Sync with main video
-                  const mainVideo = videoRef.current;
-                  const bleedVideo = bleedVideoRef.current;
-                  if (mainVideo && bleedVideo && !mainVideo.paused) {
-                    bleedVideo.currentTime = mainVideo.currentTime;
-                    bleedVideo.play().catch(console.log);
-                  }
-                }}
-              />
-              {/* Gradient overlay for smooth blending */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
-            </div>
-          )}
-          
-          {/* Photo Bleed Background */}
-          {(!videoUrl || !showVideo) && (
-            <div className="absolute inset-0 overflow-hidden">
-              <div
-                className="absolute w-full"
-                style={{
-                  height: '1000%', // Scale source area 10x to use top 10%
-                  top: '0',
-                  backgroundImage: `url(${actualPhotoUrl})`,
-                  backgroundPosition: 'center top',
-                  backgroundSize: 'cover',
-                  backgroundRepeat: 'no-repeat',
-                  filter: 'blur(16px) saturate(1.2)',
-                  transform: 'scale(1.1)',
-                }}
-              />
-              {/* Gradient overlay for smooth blending */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
-            </div>
-          )}
-        </div>
-      )}
       
       <div className={`relative w-full overflow-hidden ${className}`} 
           style={{ 

@@ -86,10 +86,12 @@ const ProfilePage = () => {
     return null;
   }
 
+  const [bleedContent, setBleedContent] = useState<React.ReactNode>(null);
+
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      <Header />
+      <Header bleedContent={bleedContent} />
       
       <div className="md:container md:mx-auto md:px-8">
         <HeroProfileHeader 
@@ -98,6 +100,7 @@ const ProfilePage = () => {
           onProfileUpdate={refreshProfile}
           activeSection={activeSection}
           onSectionChange={setActiveSection}
+          onBleedContentChange={setBleedContent}
         />
         
         {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
