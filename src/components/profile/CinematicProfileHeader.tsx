@@ -96,7 +96,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {isMobile ? (
             // Mobile: Edge-to-edge carousel
             <div 
-              className="group fixed z-10"
+              className="group absolute z-10"
               style={{
                 top: '8rem',
                 left: '0',
