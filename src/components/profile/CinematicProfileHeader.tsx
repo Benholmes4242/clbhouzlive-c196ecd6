@@ -72,16 +72,21 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <>
       {/* AI Header Blur - Fixed behind header bar only */}
       <div 
-        className="fixed top-0 left-0 right-0 z-30 pointer-events-none"
+        className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{ height: '64px' }}
       >
-        <div 
-          className="absolute inset-0 transition-all duration-700 ease-in-out"
-          style={{
-            ...getBackgroundStyle(),
-            filter: 'blur(20px) saturate(1.2)',
-          }}
-        />
+        {headerStripUrl && isHeaderReady() && (
+          <div 
+            className="absolute inset-0 transition-all duration-700 ease-in-out"
+            style={{
+              backgroundImage: `url(${headerStripUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center top',
+              backgroundRepeat: 'no-repeat',
+              filter: 'blur(20px) saturate(1.2)',
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
       </div>
 
