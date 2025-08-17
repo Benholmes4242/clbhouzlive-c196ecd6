@@ -283,6 +283,16 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     startTimeRef.current = Date.now();
     setProgress(0);
 
+    // Ensure video plays when it becomes active
+    if (currentItem.media_type === 'video') {
+      const videoElement = document.querySelector(`video[src="${currentItem.media_url}"]`) as HTMLVideoElement;
+      if (videoElement) {
+        videoElement.play().catch((error) => {
+          console.log('Video autoplay failed:', error);
+        });
+      }
+    }
+
     const updateProgress = () => {
       const elapsed = Date.now() - startTimeRef.current;
       const newProgress = Math.min((elapsed / duration) * 100, 100);
@@ -391,9 +401,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             playsInline
             onLoadedData={() => {
               startTimeRef.current = Date.now();
-            }}
-            onCanPlay={(e) => {
-              e.currentTarget.play();
             }}
           />
         ) : (
