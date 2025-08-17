@@ -312,52 +312,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   return (
     <>
-      {/* Header Bleed Layer - Seamless continuation behind header */}
-      <div 
-        className="fixed top-0 left-0 right-0 pointer-events-none z-40"
-        style={{ height: '4rem' }} // Match header height
-      >
-        {/* Video Bleed Background */}
-        {videoUrl && showVideo && (
-          <video
-            ref={bleedVideoRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'blur(15px) saturate(1.2)',
-              transform: 'scale(1.1)',
-              objectPosition: 'center top', // Align to show top of video
-            }}
-            src={videoUrl}
-            muted
-            loop
-            playsInline
-            poster={thumbnailUrl}
-            onCanPlay={() => {
-              // Sync with main video when bleed video becomes ready
-              const mainVideo = videoRef.current;
-              const bleedVideo = bleedVideoRef.current;
-              if (mainVideo && bleedVideo && !mainVideo.paused) {
-                bleedVideo.currentTime = mainVideo.currentTime;
-                bleedVideo.play().catch(console.log);
-              }
-            }}
-          />
-        )}
-        
-        {/* Photo Bleed Background */}
-        {(!videoUrl || !showVideo) && (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
-            style={{
-              backgroundImage: `url(${actualPhotoUrl})`,
-              filter: 'blur(15px) saturate(1.2)',
-              transform: 'scale(1.1)',
-              backgroundPosition: 'center top', // Align to show top of photo
-            }}
-          />
-        )}
-        
-      </div>
       
       <div className={`relative w-full overflow-hidden ${className}`} 
           style={{ 
