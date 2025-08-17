@@ -83,7 +83,7 @@ const OptimizedProfileLoader: React.FC<OptimizedProfileLoaderProps> = ({
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
-          onBleedContentChange={() => {}} // Placeholder - not used in optimized loader
+          
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}

@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('activity');
-  const [bleedContent, setBleedContent] = useState<React.ReactNode>(null);
+  
   const queryClient = useQueryClient();
   
   // Force invalidate profile cache on page load to ensure fresh data
@@ -90,7 +90,7 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      <Header bleedContent={bleedContent} />
+      <Header />
       
       <div className="md:container md:mx-auto md:px-8">
         <HeroProfileHeader 
@@ -99,7 +99,7 @@ const ProfilePage = () => {
           onProfileUpdate={refreshProfile}
           activeSection={activeSection}
           onSectionChange={setActiveSection}
-          onBleedContentChange={setBleedContent}
+          
         />
         
         {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}

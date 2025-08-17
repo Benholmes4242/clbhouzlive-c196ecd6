@@ -14,7 +14,7 @@ interface CinematicProfileHeaderProps {
   onVideoRemove: () => void;
   uploading?: boolean;
   className?: string;
-  onBleedContentChange?: (content: React.ReactNode) => void;
+  
 }
 
 const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
@@ -28,7 +28,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   onVideoRemove,
   uploading = false,
   className = '',
-  onBleedContentChange
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement>(null);
@@ -41,28 +40,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
-  const bleedVideoRef = useRef<HTMLVideoElement>(null);
-  const bleedPhotoRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
 
   // Sync background video with main video
   const syncVideos = () => {
     const mainVideo = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     
     if (mainVideo && bgVideo && !mainVideo.paused) {
       const timeDiff = Math.abs(mainVideo.currentTime - bgVideo.currentTime);
       if (timeDiff > 0.1) { // Only sync if difference is significant
         bgVideo.currentTime = mainVideo.currentTime;
-      }
-    }
-    
-    // Sync bleed video with main video
-    if (mainVideo && bleedVideo && !mainVideo.paused) {
-      const timeDiff = Math.abs(mainVideo.currentTime - bleedVideo.currentTime);
-      if (timeDiff > 0.2) { // Slightly higher tolerance for bleed since it's blurred
-        bleedVideo.currentTime = mainVideo.currentTime;
       }
     }
   };
@@ -71,7 +59,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
@@ -94,16 +81,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           }
         }
         
-        // Start bleed video sync
-        if (bleedVideo) {
-          bleedVideo.muted = true;
-          bleedVideo.currentTime = 0;
-          try {
-            await bleedVideo.play();
-          } catch (error) {
-            console.log('Bleed video autoplay failed, will sync when loaded');
-          }
-        }
         
         const syncInterval = setInterval(syncVideos, 100); // Sync every 100ms
         
@@ -127,10 +104,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             bgVideo.pause();
           }
           
-          if (bleedVideo) {
-            bleedVideo.currentTime = 0;
-            bleedVideo.pause();
-          }
           
           if (profilePhotoUrl) {
             setShowVideo(false);
@@ -253,7 +226,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const replayVideo = async () => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
@@ -266,16 +238,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video replay failed');
-          }
-        }
-        
-        if (bleedVideo) {
-          bleedVideo.currentTime = 0;
-          bleedVideo.muted = true;
-          try {
-            await bleedVideo.play();
-          } catch (error) {
-            console.log('Bleed video replay failed');
           }
         }
         
@@ -312,69 +274,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const isMobile = window.innerWidth < 768;
 
-  // Update bleed content when media changes
-  useEffect(() => {
-    if (onBleedContentChange) {
-      onBleedContentChange(createBleedContent());
-    }
-  }, [videoUrl, showVideo, actualPhotoUrl, onBleedContentChange]);
-
-  // Create bleed content to pass to header with seamless blending
-  const createBleedContent = () => {
-    if (!isMobile) return null;
-    
-    return (
-      <>
-        {/* Video Bleed Background */}
-        {videoUrl && showVideo && (
-          <div className="absolute inset-0 overflow-hidden">
-            <video
-              ref={bleedVideoRef}
-              className="absolute w-full object-cover"
-              style={{
-                height: '1000%', // Scale source area 10x to sample top 10%
-                top: '0',
-                objectPosition: 'center top',
-                // Removed individual filters - will be applied by Header component
-              }}
-              src={videoUrl}
-              muted
-              loop
-              playsInline
-              poster={thumbnailUrl}
-              onCanPlay={() => {
-                // Sync with main video
-                const mainVideo = videoRef.current;
-                const bleedVideo = bleedVideoRef.current;
-                if (mainVideo && bleedVideo && !mainVideo.paused) {
-                  bleedVideo.currentTime = mainVideo.currentTime;
-                  bleedVideo.play().catch(console.log);
-                }
-              }}
-            />
-          </div>
-        )}
-        
-        {/* Photo Bleed Background */}
-        {(!videoUrl || !showVideo) && (
-          <div className="absolute inset-0 overflow-hidden">
-            <div
-              className="absolute w-full"
-              style={{
-                height: '1000%', // Scale source area 10x to sample top 10%
-                top: '0',
-                backgroundImage: `url(${actualPhotoUrl})`,
-                backgroundPosition: 'center top',
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                // Removed individual filters - will be applied by Header component
-              }}
-            />
-          </div>
-        )}
-      </>
-    );
-  };
 
   return (
     <>
