@@ -370,8 +370,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            borderRadius: '0',
-            clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 40px), calc(100% - 20px) calc(100% - 20px), calc(100% - 40px) 100%, 40px 100%, 20px calc(100% - 20px), 0 calc(100% - 40px))'
+            borderRadius: '0 0 40px 40px',
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
