@@ -44,6 +44,9 @@ import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
 import AchievementsPane from './AchievementsPane';
+import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
+import MediaManagerModal from './immersive/MediaManagerModal';
+import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 
 interface Course {
   id: string;
@@ -100,6 +103,24 @@ const HeroProfileHeader = ({
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const isMobile = useIsMobile();
+
+  // Immersive profile functionality
+  const {
+    isImmersiveOpen,
+    currentMediaIndex,
+    hasImmersiveMedia,
+    mediaItems,
+    loading: immersiveLoading,
+    shouldAutoOpen,
+    openImmersive,
+    closeImmersive,
+    reopenImmersive,
+    previewImmersive,
+    refetch: refetchMedia,
+    setCurrentMediaIndex
+  } = useImmersiveProfile(profile?.id || '', isOwnProfile);
+
+  const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
     duration: 300
@@ -164,6 +185,13 @@ const HeroProfileHeader = ({
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+
+  // Auto-open immersive mode for other users when they have media
+  useEffect(() => {
+    if (shouldAutoOpen && !immersiveLoading) {
+      openImmersive(0);
+    }
+  }, [shouldAutoOpen, immersiveLoading, openImmersive]);
   
   // Fetch stats data including progress
   useEffect(() => {
@@ -473,6 +501,10 @@ const HeroProfileHeader = ({
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading}
+          hasImmersiveMedia={hasImmersiveMedia}
+          onOpenMediaManager={() => setMediaManagerOpen(true)}
+          onPreviewImmersive={previewImmersive}
+          onReopenImmersive={reopenImmersive}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
@@ -805,6 +837,43 @@ const HeroProfileHeader = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Compare Progress Modal - Placeholder for now */}
+      {isCompareModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setIsCompareModalOpen(false)}>
+          <div className="bg-white p-4 rounded-lg">
+            <h3>Compare Progress Modal</h3>
+            <button onClick={() => setIsCompareModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Immersive Profile Modal */}
+      <ImmersiveProfileModal
+        isOpen={isImmersiveOpen}
+        onClose={closeImmersive}
+        mediaItems={mediaItems.map(item => ({
+          ...item,
+          media_type: item.media_type as 'image' | 'video'
+        }))}
+        profileUserId={profile?.id || ''}
+        currentIndex={currentMediaIndex}
+        profilePhotoUrl={profile?.profile_photo_url}
+        displayName={displayName}
+        isOwnProfile={isOwnProfile}
+      />
+
+      {/* Media Manager Modal */}
+      <MediaManagerModal
+        isOpen={mediaManagerOpen}
+        onClose={() => setMediaManagerOpen(false)}
+        userId={profile?.id || ''}
+        mediaItems={mediaItems.map(item => ({
+          ...item,
+          media_type: item.media_type as 'image' | 'video'
+        }))}
+        onMediaUpdate={refetchMedia}
+      />
     </>
   );
 };

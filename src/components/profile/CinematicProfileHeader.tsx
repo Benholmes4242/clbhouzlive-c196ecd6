@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Upload, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useSwipeable } from 'react-swipeable';
 
 interface CinematicProfileHeaderProps {
   videoUrl?: string;
@@ -14,6 +15,10 @@ interface CinematicProfileHeaderProps {
   onVideoRemove: () => void;
   uploading?: boolean;
   className?: string;
+  hasImmersiveMedia?: boolean;
+  onOpenMediaManager?: () => void;
+  onPreviewImmersive?: () => void;
+  onReopenImmersive?: () => void;
 }
 
 const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
@@ -26,7 +31,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   onPhotoUpload,
   onVideoRemove,
   uploading = false,
-  className = ''
+  className = '',
+  hasImmersiveMedia = false,
+  onOpenMediaManager,
+  onPreviewImmersive,
+  onReopenImmersive
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement>(null);
@@ -271,15 +280,31 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const isMobile = window.innerWidth < 768;
 
+  // Swipe handlers for reopening immersive mode
+  const swipeHandlers = useSwipeable({
+    onSwipedDown: () => {
+      if (hasImmersiveMedia && !isOwnProfile) {
+        onReopenImmersive?.();
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    preventScrollOnSwipe: false,
+    delta: 50
+  });
+
   return (
-     <div className={`relative w-full overflow-hidden ${className}`} 
-         style={{ 
-           marginTop: '-8rem', // Reduced margin to give more space at top
-           height: window.innerWidth < 768 ? '70vh' : '65vh', // Mobile: 70vh, Desktop: 65vh
-           minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
-           maxHeight: '800px',
-           paddingTop: '8rem' // Add padding to push content down
-         }}>
+     <div 
+       className={`relative w-full overflow-hidden ${className}`} 
+       style={{ 
+         marginTop: '-8rem', // Reduced margin to give more space at top
+         height: window.innerWidth < 768 ? '70vh' : '65vh', // Mobile: 70vh, Desktop: 65vh
+         minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
+         maxHeight: '800px',
+         paddingTop: '8rem' // Add padding to push content down
+       }}
+       {...swipeHandlers}
+     >
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
@@ -416,36 +441,47 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           />
         </div>
 
-        {/* Upload Interface for Empty State */}
-        {!hasMedia && isOwnProfile && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl text-white/80 mb-4">
-                {displayName.charAt(0)}
-              </div>
+      {/* Upload Interface for Empty State */}
+      {!hasMedia && isOwnProfile && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-4xl text-white/80 mb-4">
+              {displayName.charAt(0)}
+            </div>
+            <div className="flex flex-col gap-3 items-center">
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  onClick={handleFileSelect}
-                  disabled={uploading}
-                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Add Video
-                </Button>
-                <Button
-                  variant="secondary"
                   onClick={handlePhotoSelect}
                   disabled={uploading}
                   className="bg-white/20 backdrop-blur-sm text-white border-white/30"
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  Add Photo
+                  Profile Photo
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => onOpenMediaManager?.()}
+                  disabled={uploading}
+                  className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Immersive Media
                 </Button>
               </div>
+              {hasImmersiveMedia && (
+                <Button
+                  variant="ghost"
+                  onClick={() => onPreviewImmersive?.()}
+                  className="bg-white/10 backdrop-blur-sm text-white border-white/20"
+                >
+                  Preview Immersive Mode
+                </Button>
+              )}
             </div>
           </div>
-        )}
+        </div>
+      )}
       </div>
 
       {/* Central Media Controls - Show on hover with stable positioning */}
@@ -478,74 +514,66 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
             {/* Owner Edit Controls - positioned under play button */}
             {isOwnProfile && (
-              <div className="flex gap-3">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleFileSelect();
-                  }}
-                  disabled={uploading}
-                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
-                  style={{
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
-                  }}
-                >
-                  <span className="text-xs font-medium">Change Video</span>
-                </Button>
+              <div className="flex flex-col gap-3 items-center">
+                <div className="flex gap-3">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFileSelect();
+                    }}
+                    disabled={uploading}
+                    className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                    style={{
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    <span className="text-xs font-medium">Profile Photo</span>
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenMediaManager?.();
+                    }}
+                    disabled={uploading}
+                    className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                    style={{
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    <span className="text-xs font-medium">Immersive Media</span>
+                  </Button>
+                </div>
                 
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePhotoSelect();
-                  }}
-                  disabled={uploading}
-                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
-                  style={{
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
-                  }}
-                >
-                  <span className="text-xs font-medium">Change Photo</span>
-                </Button>
+                {hasImmersiveMedia && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPreviewImmersive?.();
+                    }}
+                    className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                    style={{
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    <span className="text-xs font-medium">Preview Immersive Mode</span>
+                  </Button>
+                )}
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Upload Interface for Empty State */}
-      {!hasMedia && isOwnProfile && (
-        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-          <div className="text-6xl text-muted-foreground/50 mb-2">
-            {displayName.charAt(0)}
-          </div>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={handleFileSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Video
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handlePhotoSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Photo
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Hidden File Inputs */}
       <input
