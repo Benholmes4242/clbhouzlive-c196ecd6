@@ -387,10 +387,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             className="w-full h-full object-cover"
             autoPlay
-            muted={isGloballyMuted}
+            muted
             playsInline
             onLoadedData={() => {
               startTimeRef.current = Date.now();
+            }}
+            onCanPlay={(e) => {
+              e.currentTarget.play();
             }}
           />
         ) : (
@@ -450,18 +453,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         />
       )}
 
-      {/* Upload Button - Bottom Left (Upload Mode) */}
-      {uploadMode && (
-        <div className="absolute bottom-8 left-8 z-20">
-          <label 
-            htmlFor="immersive-file-input"
-            className="w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center cursor-pointer"
-            style={liquidGlassStyle}
-          >
-            <Upload className="w-5 h-5 text-white" />
-          </label>
-        </div>
-      )}
 
       {/* Down Arrow - Bottom Center */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
