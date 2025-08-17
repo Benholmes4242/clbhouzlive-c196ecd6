@@ -327,6 +327,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 filter: 'blur(12px) saturate(1.1)',
                 transform: 'scale(1.05)',
                 objectPosition: 'center top',
+                clipPath: 'inset(0 0 90% 0)', // Only show top 10% of video
               }}
               src={videoUrl}
               muted
@@ -354,6 +355,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 filter: 'blur(12px) saturate(1.1)',
                 transform: 'scale(1.05)',
                 backgroundPosition: 'center top',
+                clipPath: 'inset(0 0 90% 0)', // Only show top 10% of photo
               }}
             />
           )}
