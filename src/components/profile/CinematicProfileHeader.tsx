@@ -274,11 +274,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   return (
      <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
-           marginTop: '-8rem', // Reduced margin to give more space at top
-           height: window.innerWidth < 768 ? '70vh' : '65vh', // Mobile: 70vh, Desktop: 65vh
-           minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
+           marginTop: '-8rem',
+           height: window.innerWidth < 768 ? '70vh' : '65vh',
+           minHeight: window.innerWidth < 768 ? '600px' : '600px',
            maxHeight: '800px',
-           paddingTop: '8rem' // Add padding to push content down
+           paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
+           paddingLeft: '0', // Remove any left padding
+           paddingRight: '0' // Remove any right padding
          }}>
 
       {/* Dynamic Blurred Background - Matches Media Card */}
@@ -356,12 +358,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
-        // Mobile: Remove container to go edge-to-edge
+        // Mobile: Use fixed positioning to truly go edge-to-edge
         <div 
-          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 absolute z-10"
+          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-10"
           style={{
-            top: '2rem',
+            top: '8rem',
             left: '0',
+            right: '0',
             width: '100vw',
             height: '380px',
             background: 'rgba(255, 255, 255, 0.25)',
