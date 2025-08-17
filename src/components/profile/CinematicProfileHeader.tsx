@@ -283,78 +283,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            paddingRight: '0' // Remove any right padding
          }}>
 
-      {/* Dynamic Blurred Background - Matches Media Card */}
-      <div className="absolute inset-0 z-0">
-        {/* Mobile: Smooth transitioning background blur */}
-        {isMobile && (
-          <>
-            {/* Video thumbnail background */}
-            <div
-              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
-                showVideo && videoUrl ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                backgroundImage: `url(${thumbnailUrl || videoUrl})`,
-                filter: 'blur(20px) saturate(1.2)',
-                transform: 'scale(1.1)',
-              }}
-            />
-            {/* Photo background */}
-            <div
-              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
-                !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                backgroundImage: `url(${actualPhotoUrl})`,
-                filter: 'blur(20px) saturate(1.2)',
-                transform: 'scale(1.1)',
-              }}
-            />
-          </>
-        )}
-        
-        {/* Desktop: Video Background - Shows when video is playing */}
-        {!isMobile && videoUrl && showVideo && (
-          <video
-            ref={backgroundVideoRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-            src={videoUrl}
-            muted
-            loop
-            playsInline
-            poster={thumbnailUrl}
-            onCanPlay={() => {
-              // Sync with main video when background video becomes ready
-              const mainVideo = videoRef.current;
-              const bgVideo = backgroundVideoRef.current;
-              if (mainVideo && bgVideo && !mainVideo.paused) {
-                bgVideo.currentTime = mainVideo.currentTime;
-                bgVideo.play().catch(console.log);
-              }
-            }}
-          />
-        )}
-        
-        {/* Desktop: Photo Background - Shows when photo is displayed or video ended */}
-        {!isMobile && (!videoUrl || !showVideo) && (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${actualPhotoUrl})`,
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)', // Prevent blur edge artifacts
-            }}
-          />
-        )}
-        
-        {/* Gradient overlay for smooth transition to page content */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
-      </div>
+      {/* Simple gradient background */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
