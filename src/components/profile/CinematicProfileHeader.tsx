@@ -354,14 +354,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
       </div>
 
-      {/* Central Circular Media */}
+      {/* Central Media */}
       <div className={`relative z-10 w-full h-full flex items-start justify-center ${window.innerWidth < 768 ? 'pt-16' : 'pt-20'}`}>
-        {/* Always show a circular element */}
+        {/* Mobile: Full width rectangle, Desktop: Circular element */}
         <div 
-          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
+          className={`group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 ${
+            window.innerWidth < 768 ? 'w-full mx-0 rounded-lg' : 'clbhouz-squircle'
+          }`}
           style={{
-            width: window.innerWidth < 768 ? '360px' : '400px', // Increased mobile from 320px to 360px
-            height: window.innerWidth < 768 ? '360px' : '400px', // Increased mobile from 320px to 360px
+            width: window.innerWidth < 768 ? '100%' : '400px',
+            height: window.innerWidth < 768 ? '280px' : '400px', // Rectangle aspect ratio for mobile
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
