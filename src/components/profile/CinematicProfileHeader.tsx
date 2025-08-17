@@ -315,7 +315,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       {/* Mobile-only Header Bleed Layer */}
       {isMobile && (
         <div 
-          className="absolute top-0 left-0 right-0 pointer-events-none z-40"
+          className="fixed top-0 left-0 right-0 pointer-events-none z-40"
           style={{ height: '4rem' }} // Match header height
         >
           {/* Video Bleed Background */}
