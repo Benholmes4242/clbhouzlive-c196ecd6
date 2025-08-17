@@ -70,31 +70,24 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   return (
     <>
-      {/* AI Header Extension Background - Fixed at top to be the header background */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-0 transition-all duration-700 ease-in-out"
-        style={{
-          height: '8rem',
-          ...getBackgroundStyle()
-        }}
-      >
-        {/* Gradient overlay for better text contrast with logo/icons */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-transparent" />
-      </div>
-
       <div className={`relative w-full overflow-hidden ${className}`} 
           style={{ 
             marginTop: '-8rem',
             height: isMobile ? '70vh' : '65vh',
             minHeight: isMobile ? '600px' : '600px',
             maxHeight: '800px',
-            paddingTop: isMobile ? '8rem' : '8rem',
+            paddingTop: isMobile ? '0' : '8rem',
             paddingLeft: '0',
             paddingRight: '0'
           }}>
 
-        {/* Content Background */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-white/50 via-60% to-white">
+        {/* Dynamic Background with AI Header Extension */}
+        <div 
+          className="absolute inset-0 z-0 transition-all duration-700 ease-in-out"
+          style={getBackgroundStyle()}
+        >
+          {/* Gradient overlay for smooth transition to page content */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
         </div>
 
