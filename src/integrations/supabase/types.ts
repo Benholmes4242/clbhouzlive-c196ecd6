@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
+  // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -674,63 +674,6 @@ export type Database = {
         }
         Relationships: []
       }
-      profile_media: {
-        Row: {
-          aspect_ratio: number | null
-          created_at: string
-          display_order: number
-          file_name: string | null
-          file_size: number | null
-          header_extended_url: string | null
-          header_metadata: Json | null
-          header_processing_error: string | null
-          header_processing_status: string | null
-          header_strip_url: string | null
-          id: string
-          media_type: string
-          media_url: string
-          thumbnail_url: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          aspect_ratio?: number | null
-          created_at?: string
-          display_order?: number
-          file_name?: string | null
-          file_size?: number | null
-          header_extended_url?: string | null
-          header_metadata?: Json | null
-          header_processing_error?: string | null
-          header_processing_status?: string | null
-          header_strip_url?: string | null
-          id?: string
-          media_type: string
-          media_url: string
-          thumbnail_url?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          aspect_ratio?: number | null
-          created_at?: string
-          display_order?: number
-          file_name?: string | null
-          file_size?: number | null
-          header_extended_url?: string | null
-          header_metadata?: Json | null
-          header_processing_error?: string | null
-          header_processing_status?: string | null
-          header_strip_url?: string | null
-          id?: string
-          media_type?: string
-          media_url?: string
-          thumbnail_url?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       push_notification_tokens: {
         Row: {
           created_at: string | null
@@ -1378,42 +1321,42 @@ export type Database = {
         }[]
       }
       execute_sql: {
-        Args: { params?: Json; query: string }
+        Args: { query: string; params?: Json }
         Returns: Json
       }
       fetch_social_feed_posts: {
         Args: {
-          current_offset: number
           followed_user_ids: string[]
+          current_offset: number
           posts_per_page: number
         }
         Returns: {
-          comments_count: number
+          id: string
+          user_id: string
           content: string
           created_at: string
-          id: string
-          interaction_type: string
           likes_count: number
+          comments_count: number
+          shares_count: number
+          interaction_type: string
           post_media: Json
           post_tags: Json
-          shares_count: number
-          user_id: string
         }[]
       }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
-          auth_created_at: string
-          display_name: string
-          email: string
-          email_confirmed_at: string
-          home_club: string
           id: string
-          is_public: boolean
+          email: string
+          auth_created_at: string
           last_sign_in_at: string
+          email_confirmed_at: string
+          display_name: string
+          username: string
+          home_club: string
+          is_public: boolean
           profile_created_at: string
           role: Database["public"]["Enums"]["app_role"]
-          username: string
         }[]
       }
       get_cloudflare_secrets: {
@@ -1421,12 +1364,12 @@ export type Database = {
         Returns: Json
       }
       get_user_recent_achievements: {
-        Args: { limit_param?: number; user_id_param: string }
+        Args: { user_id_param: string; limit_param?: number }
         Returns: {
-          achievement_data: Json
-          achievement_type: string
-          created_at: string
           id: string
+          achievement_type: string
+          achievement_data: Json
+          created_at: string
         }[]
       }
       get_user_top100_courses_count: {
@@ -1435,8 +1378,8 @@ export type Database = {
       }
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
       }
@@ -1444,15 +1387,11 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
-      is_mobile_device: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
       log_user_achievement: {
         Args: {
-          achievement_data_param: Json
-          achievement_type_param: string
           user_id_param: string
+          achievement_type_param: string
+          achievement_data_param: Json
         }
         Returns: undefined
       }
@@ -1462,11 +1401,11 @@ export type Database = {
       }
       send_push_notification: {
         Args: {
-          data?: Json
-          message: string
-          notification_type: string
           target_user_id: string
+          notification_type: string
           title: string
+          message: string
+          data?: Json
         }
         Returns: undefined
       }
