@@ -355,13 +355,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       </div>
 
       {/* Central Circular Media */}
-      <div className={`relative z-10 w-full h-full flex items-start ${window.innerWidth < 768 ? 'justify-start px-0' : 'justify-center'} ${window.innerWidth < 768 ? 'pt-8' : 'pt-20'}`}>
-        {/* Always show a circular element */}
+      {window.innerWidth < 768 ? (
+        // Mobile: Remove container to go edge-to-edge
         <div 
-          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
+          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 absolute z-10"
           style={{
-            width: window.innerWidth < 768 ? '100vw' : '400px', // Full viewport width on mobile
-            height: window.innerWidth < 768 ? '380px' : '400px', // Keep mobile height at 380px
+            top: '2rem',
+            left: '0',
+            width: '100vw',
+            height: '380px',
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
@@ -391,7 +393,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false); // Switch to photo when video ends - background will update automatically
+                setShowVideo(false);
               }}
             />
           )}
@@ -413,6 +415,67 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             }}
           />
         </div>
+      ) : (
+        // Desktop: Keep container
+        <div className="relative z-10 w-full h-full flex items-start justify-center pt-20">
+          <div 
+            className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
+            style={{
+              width: '400px',
+              height: '400px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(20px) saturate(1.3)',
+              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
+            }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            onClick={handleClick}
+          >
+            {/* Video Element - Shows first and autoplays */}
+            {videoUrl && (
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                }`}
+                playsInline
+                muted={isMuted}
+                preload="auto"
+                crossOrigin="anonymous"
+                autoPlay
+                onPlay={() => {
+                  setIsPlaying(true);
+                  setHasPlayed(true);
+                }}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => {
+                  setIsPlaying(false);
+                  setShowVideo(false);
+                }}
+              />
+            )}
+            
+            {/* Profile Photo - Shows when no video or video has ended */}
+            <img
+              ref={photoRef}
+              src={actualPhotoUrl}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              alt={`${displayName} profile`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`}
+              onError={(e) => {
+                console.log('Image failed to load:', actualPhotoUrl);
+                e.currentTarget.src = fallbackImage;
+              }}
+            />
+          </div>
+        </div>
+      )}
 
         {/* Upload Interface for Empty State */}
         {!hasMedia && isOwnProfile && (
@@ -444,7 +507,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             </div>
           </div>
         )}
-      </div>
 
       {/* Central Media Controls - Show on hover with stable positioning */}
       {hasMedia && isHovering && (
@@ -512,35 +574,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 </Button>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Upload Interface for Empty State */}
-      {!hasMedia && isOwnProfile && (
-        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-          <div className="text-6xl text-muted-foreground/50 mb-2">
-            {displayName.charAt(0)}
-          </div>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={handleFileSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Video
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handlePhotoSelect}
-              disabled={uploading}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Add Photo
-            </Button>
           </div>
         </div>
       )}
