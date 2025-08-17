@@ -30,7 +30,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement>(null);
-  const bleedVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -40,6 +39,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
+  const bleedVideoRef = useRef<HTMLVideoElement>(null);
+  const bleedPhotoRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
 
   // Sync background video with main video
@@ -55,10 +56,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       }
     }
     
-    // Sync bleed video
+    // Sync bleed video with main video
     if (mainVideo && bleedVideo && !mainVideo.paused) {
       const timeDiff = Math.abs(mainVideo.currentTime - bleedVideo.currentTime);
-      if (timeDiff > 0.2) { // Looser sync for bleed (blur hides micro-differences)
+      if (timeDiff > 0.2) { // Slightly higher tolerance for bleed since it's blurred
         bleedVideo.currentTime = mainVideo.currentTime;
       }
     }
@@ -68,6 +69,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
@@ -91,7 +93,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         }
         
         // Start bleed video sync
-        const bleedVideo = bleedVideoRef.current;
         if (bleedVideo) {
           bleedVideo.muted = true;
           bleedVideo.currentTime = 0;
@@ -124,7 +125,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             bgVideo.pause();
           }
           
-          const bleedVideo = bleedVideoRef.current;
           if (bleedVideo) {
             bleedVideo.currentTime = 0;
             bleedVideo.pause();
@@ -311,78 +311,140 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const isMobile = window.innerWidth < 768;
 
   return (
-     <div className={`relative w-full overflow-hidden ${className}`} 
-         style={{ 
-           marginTop: '-8rem',
-           height: window.innerWidth < 768 ? '70vh' : '65vh',
-           minHeight: window.innerWidth < 768 ? '600px' : '600px',
-           maxHeight: '800px',
-           paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
-           paddingLeft: '0', // Remove any left padding
-           paddingRight: '0' // Remove any right padding
-         }}>
-
-      {/* Simple gradient background */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
-
-      {/* Header Bleed Layer - Creates seamless extension behind header */}
-      {hasMedia && (
-        <div 
-          className="fixed top-0 left-0 right-0 pointer-events-none overflow-hidden"
-          style={{
-            height: '8rem', // Header height
-            zIndex: 1, // Below header but above other content
-          }}
-        >
-          {/* Video Bleed */}
-          {videoUrl && showVideo && (
-            <video
-              ref={bleedVideoRef}
-              src={videoUrl}
-              className="absolute inset-0 w-full h-full object-cover object-top"
-              style={{
-                filter: 'blur(15px) saturate(1.2)',
-                transform: 'scale(1.1)', // Scale to hide blur edges
-                objectPosition: 'center top', // Align with top of main media
-              }}
-              muted
-              playsInline
-              preload="auto"
-              crossOrigin="anonymous"
-              onCanPlay={() => {
-                // Sync with main video when bleed video becomes ready
-                const mainVideo = videoRef.current;
-                const bleedVideo = bleedVideoRef.current;
-                if (mainVideo && bleedVideo && !mainVideo.paused) {
-                  bleedVideo.currentTime = mainVideo.currentTime;
-                  bleedVideo.play().catch(console.log);
-                }
-              }}
-            />
-          )}
-          
-          {/* Photo Bleed */}
-          {(!videoUrl || !showVideo) && (
-            <div
-              className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
-              style={{
-                backgroundImage: `url(${actualPhotoUrl})`,
-                backgroundPosition: 'center top', // Align with top of main media
-                filter: 'blur(15px) saturate(1.2)',
-                transform: 'scale(1.1)', // Scale to hide blur edges
-              }}
-            />
-          )}
-          
-          {/* Gradient mask to blend seamlessly */}
-          <div 
-            className="absolute inset-0"
+    <>
+      {/* Header Bleed Layer - Seamless continuation behind header */}
+      <div 
+        className="fixed top-0 left-0 right-0 pointer-events-none z-40"
+        style={{ height: '4rem' }} // Match header height
+      >
+        {/* Video Bleed Background */}
+        {videoUrl && showVideo && (
+          <video
+            ref={bleedVideoRef}
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.8) 100%)'
+              filter: 'blur(15px) saturate(1.2)',
+              transform: 'scale(1.1)',
+              objectPosition: 'center top', // Align to show top of video
+            }}
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            poster={thumbnailUrl}
+            onCanPlay={() => {
+              // Sync with main video when bleed video becomes ready
+              const mainVideo = videoRef.current;
+              const bleedVideo = bleedVideoRef.current;
+              if (mainVideo && bleedVideo && !mainVideo.paused) {
+                bleedVideo.currentTime = mainVideo.currentTime;
+                bleedVideo.play().catch(console.log);
+              }
             }}
           />
-        </div>
-      )}
+        )}
+        
+        {/* Photo Bleed Background */}
+        {(!videoUrl || !showVideo) && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: `url(${actualPhotoUrl})`,
+              filter: 'blur(15px) saturate(1.2)',
+              transform: 'scale(1.1)',
+              backgroundPosition: 'center top', // Align to show top of photo
+            }}
+          />
+        )}
+        
+        {/* Gradient mask to fade into page */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent" />
+      </div>
+      
+      <div className={`relative w-full overflow-hidden ${className}`} 
+          style={{ 
+            marginTop: '-8rem',
+            height: window.innerWidth < 768 ? '70vh' : '65vh',
+            minHeight: window.innerWidth < 768 ? '600px' : '600px',
+            maxHeight: '800px',
+            paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
+            paddingLeft: '0', // Remove any left padding
+            paddingRight: '0' // Remove any right padding
+          }}>
+
+      {/* Dynamic Blurred Background - Matches Media Card */}
+      <div className="absolute inset-0 z-0">
+        {/* Mobile: Smooth transitioning background blur */}
+        {isMobile && (
+          <>
+            {/* Video thumbnail background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                showVideo && videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${thumbnailUrl || videoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+            {/* Photo background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${actualPhotoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+          </>
+        )}
+        
+        {/* Desktop: Video Background - Shows when video is playing */}
+        {!isMobile && videoUrl && showVideo && (
+          <video
+            ref={backgroundVideoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            poster={thumbnailUrl}
+            onCanPlay={() => {
+              // Sync with main video when background video becomes ready
+              const mainVideo = videoRef.current;
+              const bgVideo = backgroundVideoRef.current;
+              if (mainVideo && bgVideo && !mainVideo.paused) {
+                bgVideo.currentTime = mainVideo.currentTime;
+                bgVideo.play().catch(console.log);
+              }
+            }}
+          />
+        )}
+        
+        {/* Desktop: Photo Background - Shows when photo is displayed or video ended */}
+        {!isMobile && (!videoUrl || !showVideo) && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${actualPhotoUrl})`,
+              filter: 'blur(20px) saturate(1.2)',
+              transform: 'scale(1.1)', // Prevent blur edge artifacts
+            }}
+          />
+        )}
+        
+        {/* Gradient overlay for smooth transition to page content */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
+      </div>
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
@@ -636,7 +698,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
