@@ -70,26 +70,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   return (
     <>
-      {/* AI Header Blur - Fixed behind header bar only */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
-        style={{ height: '64px' }}
-      >
-        {headerStripUrl && isHeaderReady() && (
-          <div 
-            className="absolute inset-0 transition-all duration-700 ease-in-out"
-            style={{
-              backgroundImage: `url(${headerStripUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center top',
-              backgroundRepeat: 'no-repeat',
-              filter: 'blur(20px) saturate(1.2)',
-            }}
-          />
-        )}
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-      </div>
-
       <div className={`relative w-full overflow-hidden ${className}`} 
           style={{ 
             marginTop: '-8rem',
@@ -101,8 +81,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             paddingRight: '0'
           }}>
 
-        {/* Clean Background for Profile Content */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-transparent via-60% to-white" />
+        {/* Dynamic Background with AI Header Extension */}
+        <div 
+          className="absolute inset-0 z-0 transition-all duration-700 ease-in-out"
+          style={getBackgroundStyle()}
+        >
+          {/* Gradient overlay for smooth transition to page content */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
+        </div>
 
         {/* Media Carousel */}
         <div className="relative z-10 w-full h-full">
