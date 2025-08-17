@@ -328,10 +328,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       {/* Header Bleed Layer - Creates seamless extension behind header */}
       {hasMedia && (
         <div 
-          className="absolute top-0 left-0 right-0 z-5 pointer-events-none overflow-hidden"
+          className="fixed top-0 left-0 right-0 pointer-events-none overflow-hidden"
           style={{
             height: '8rem', // Header height
-            marginTop: '-8rem', // Position behind header
+            zIndex: 1, // Below header but above other content
           }}
         >
           {/* Video Bleed */}
@@ -342,29 +342,45 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               className="absolute inset-0 w-full h-full object-cover object-top"
               style={{
                 filter: 'blur(15px) saturate(1.2)',
-                transform: 'scale(1.05)', // Slight scale to hide blur edges
+                transform: 'scale(1.1)', // Scale to hide blur edges
+                objectPosition: 'center top', // Align with top of main media
               }}
               muted
               playsInline
               preload="auto"
               crossOrigin="anonymous"
+              onCanPlay={() => {
+                // Sync with main video when bleed video becomes ready
+                const mainVideo = videoRef.current;
+                const bleedVideo = bleedVideoRef.current;
+                if (mainVideo && bleedVideo && !mainVideo.paused) {
+                  bleedVideo.currentTime = mainVideo.currentTime;
+                  bleedVideo.play().catch(console.log);
+                }
+              }}
             />
           )}
           
           {/* Photo Bleed */}
           {(!videoUrl || !showVideo) && (
             <div
-              className="absolute inset-0 w-full h-full bg-cover bg-top bg-no-repeat"
+              className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
               style={{
                 backgroundImage: `url(${actualPhotoUrl})`,
+                backgroundPosition: 'center top', // Align with top of main media
                 filter: 'blur(15px) saturate(1.2)',
-                transform: 'scale(1.05)', // Slight scale to hide blur edges
+                transform: 'scale(1.1)', // Scale to hide blur edges
               }}
             />
           )}
           
-          {/* Gradient mask to blend into page */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background opacity-60" />
+          {/* Gradient mask to blend seamlessly */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.8) 100%)'
+            }}
+          />
         </div>
       )}
 
