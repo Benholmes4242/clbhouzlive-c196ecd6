@@ -30,6 +30,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement>(null);
+  const bleedVideoRef = useRef<HTMLVideoElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -45,11 +46,20 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const syncVideos = () => {
     const mainVideo = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     
     if (mainVideo && bgVideo && !mainVideo.paused) {
       const timeDiff = Math.abs(mainVideo.currentTime - bgVideo.currentTime);
       if (timeDiff > 0.1) { // Only sync if difference is significant
         bgVideo.currentTime = mainVideo.currentTime;
+      }
+    }
+    
+    // Sync bleed video
+    if (mainVideo && bleedVideo && !mainVideo.paused) {
+      const timeDiff = Math.abs(mainVideo.currentTime - bleedVideo.currentTime);
+      if (timeDiff > 0.2) { // Looser sync for bleed (blur hides micro-differences)
+        bleedVideo.currentTime = mainVideo.currentTime;
       }
     }
   };
@@ -80,6 +90,18 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           }
         }
         
+        // Start bleed video sync
+        const bleedVideo = bleedVideoRef.current;
+        if (bleedVideo) {
+          bleedVideo.muted = true;
+          bleedVideo.currentTime = 0;
+          try {
+            await bleedVideo.play();
+          } catch (error) {
+            console.log('Bleed video autoplay failed, will sync when loaded');
+          }
+        }
+        
         const syncInterval = setInterval(syncVideos, 100); // Sync every 100ms
         
         const handleTimeUpdate = () => {
@@ -100,6 +122,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           if (bgVideo) {
             bgVideo.currentTime = 0;
             bgVideo.pause();
+          }
+          
+          const bleedVideo = bleedVideoRef.current;
+          if (bleedVideo) {
+            bleedVideo.currentTime = 0;
+            bleedVideo.pause();
           }
           
           if (profilePhotoUrl) {
@@ -223,6 +251,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const replayVideo = async () => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
@@ -235,6 +264,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video replay failed');
+          }
+        }
+        
+        if (bleedVideo) {
+          bleedVideo.currentTime = 0;
+          bleedVideo.muted = true;
+          try {
+            await bleedVideo.play();
+          } catch (error) {
+            console.log('Bleed video replay failed');
           }
         }
         
@@ -285,6 +324,49 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Simple gradient background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
+
+      {/* Header Bleed Layer - Creates seamless extension behind header */}
+      {hasMedia && (
+        <div 
+          className="absolute top-0 left-0 right-0 z-5 pointer-events-none overflow-hidden"
+          style={{
+            height: '8rem', // Header height
+            marginTop: '-8rem', // Position behind header
+          }}
+        >
+          {/* Video Bleed */}
+          {videoUrl && showVideo && (
+            <video
+              ref={bleedVideoRef}
+              src={videoUrl}
+              className="absolute inset-0 w-full h-full object-cover object-top"
+              style={{
+                filter: 'blur(15px) saturate(1.2)',
+                transform: 'scale(1.05)', // Slight scale to hide blur edges
+              }}
+              muted
+              playsInline
+              preload="auto"
+              crossOrigin="anonymous"
+            />
+          )}
+          
+          {/* Photo Bleed */}
+          {(!videoUrl || !showVideo) && (
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-top bg-no-repeat"
+              style={{
+                backgroundImage: `url(${actualPhotoUrl})`,
+                filter: 'blur(15px) saturate(1.2)',
+                transform: 'scale(1.05)', // Slight scale to hide blur edges
+              }}
+            />
+          )}
+          
+          {/* Gradient mask to blend into page */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background opacity-60" />
+        </div>
+      )}
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
