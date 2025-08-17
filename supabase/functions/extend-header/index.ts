@@ -12,6 +12,7 @@ interface ExtendHeaderRequest {
   imageBase64: string;
   extensionHeight: number;
   devicePixelRatio?: number;
+  containerWidth?: number;
   prompt?: string;
   fallbackOnly?: boolean;
 }
@@ -82,6 +83,7 @@ serve(async (req) => {
       imageBase64, 
       extensionHeight = 200, 
       devicePixelRatio = 1,
+      containerWidth = 390, // Default to mobile width
       prompt,
       fallbackOnly = false 
     }: ExtendHeaderRequest = await req.json();
@@ -90,35 +92,62 @@ serve(async (req) => {
       throw new Error('Missing required field: imageBase64');
     }
 
-    // 1. Upload & Validation
-    console.log('📏 Validating image dimensions...');
+    // 1. Compute target work width based on device characteristics
+    console.log('📏 Computing target dimensions...');
     const dimensions = await getImageDimensions(imageBase64);
     const actualExtensionHeight = Math.round(extensionHeight * devicePixelRatio);
     
-    // Enforce minimum width (header width × 2, minimum 1024px)
-    const minWidth = Math.max(1024, extensionHeight * 2);
-    if (dimensions.width < minWidth) {
-      throw new Error(`Image too narrow. Minimum width: ${minWidth}px, got: ${dimensions.width}px`);
+    // Compute responsive target width: clamp(containerWidth * DPR, 800, 2400)
+    const targetWorkWidth = Math.max(800, Math.min(2400, containerWidth * devicePixelRatio));
+    console.log(`🎯 Target work width: ${targetWorkWidth}px for container ${containerWidth}px @${devicePixelRatio}x`);
+    
+    // Determine processing method based on source width vs target
+    let processingMethod = 'fallback';
+    let needsUpscaling = false;
+    let upscaleFactor = 1;
+    
+    if (dimensions.width >= targetWorkWidth) {
+      processingMethod = 'ai';
+      console.log('✅ Source width sufficient for direct AI processing');
+    } else if (dimensions.width >= targetWorkWidth * 0.6) {
+      // Need upscaling first
+      upscaleFactor = Math.min(1.8, targetWorkWidth / dimensions.width);
+      processingMethod = 'upscale+ai';
+      needsUpscaling = true;
+      console.log(`📈 Will upscale by ${upscaleFactor.toFixed(2)}x then run AI`);
+    } else {
+      console.log('📱 Using fallback method for narrow image');
     }
     
-    // Reject extreme panoramas (aspect < 0.4)
+    // Reject extreme panoramas (aspect < 0.4) - force fallback
     const aspectRatio = dimensions.width / dimensions.height;
     if (aspectRatio < 0.4) {
       console.log('📐 Extreme panorama detected, forcing fallback');
-      throw new Error('Extreme panorama detected. Using fallback method.');
+      processingMethod = 'fallback';
     }
 
-    // Skip AI processing if fallback requested
-    if (fallbackOnly) {
-      throw new Error('Fallback method requested');
+    // Skip AI processing if fallback requested or determined
+    if (fallbackOnly || processingMethod === 'fallback') {
+      throw new Error(`Using ${processingMethod} method`);
     }
 
     console.log(`🎯 Processing ${dimensions.width}x${dimensions.height} image with ${actualExtensionHeight}px extension`);
 
-    // 2. Mask + Request (OpenAI Images API)
-    const maxSize = devicePixelRatio > 1 ? 2048 : 1024; // Cost control
-    const targetWidth = Math.min(dimensions.width, maxSize);
-    const targetHeight = Math.min(dimensions.height + actualExtensionHeight, maxSize);
+    // 2. Determine final processing dimensions
+    const workingWidth = needsUpscaling ? Math.round(dimensions.width * upscaleFactor) : dimensions.width;
+    const workingHeight = needsUpscaling ? Math.round(dimensions.height * upscaleFactor) : dimensions.height;
+    
+    // Apply size limits for OpenAI API (must be square and standard sizes)
+    // OpenAI Images API supports: 256x256, 512x512, 1024x1024
+    const extendedHeight = workingHeight + actualExtensionHeight;
+    const maxDimension = Math.max(workingWidth, extendedHeight);
+    
+    let apiSize = '1024x1024'; // Default
+    if (maxDimension <= 256) apiSize = '256x256';
+    else if (maxDimension <= 512) apiSize = '512x512';
+    else apiSize = '1024x1024';
+    
+    const [targetWidth, targetHeight] = apiSize.split('x').map(Number);
     
     // Create strict prompt
     const strictPrompt = prompt || 
@@ -161,7 +190,7 @@ serve(async (req) => {
             formData.append('mask', maskBlob, 'mask.png');
             formData.append('prompt', strictPrompt);
             formData.append('n', '1');
-            formData.append('size', `${targetWidth}x${targetHeight}`);
+            formData.append('size', apiSize);
             
             return formData;
           })(),
@@ -218,7 +247,10 @@ serve(async (req) => {
       generatedAt: new Date().toISOString(),
       model: 'gpt-image-1',
       originalDimensions: dimensions,
-      targetDimensions: { width: targetWidth, height: targetHeight }
+      targetDimensions: { width: targetWidth, height: targetHeight },
+      processingMethod,
+      targetWorkWidth,
+      upscaleFactor: needsUpscaling ? upscaleFactor : 1
     };
 
     return new Response(JSON.stringify({ 

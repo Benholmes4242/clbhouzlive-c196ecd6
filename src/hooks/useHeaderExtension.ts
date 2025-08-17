@@ -290,6 +290,7 @@ export const useHeaderExtension = (): UseHeaderExtensionReturn => {
             imageBase64,
             extensionHeight,
             devicePixelRatio,
+            containerWidth: window.innerWidth,
             prompt: customPrompt
           }
         });
