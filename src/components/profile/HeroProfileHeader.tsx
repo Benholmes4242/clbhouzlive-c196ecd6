@@ -852,11 +852,9 @@ const HeroProfileHeader = ({
           ...item,
           media_type: item.media_type as 'image' | 'video'
         }))}
-        profileUserId={profile?.id || ''}
-        currentIndex={currentMediaIndex}
-        profilePhotoUrl={profile?.profile_photo_url}
-        displayName={displayName}
-        isOwnProfile={isOwnProfile}
+        userId={profile?.id || ''}
+        initialIndex={currentMediaIndex}
+        onCurrentIndexChange={setCurrentMediaIndex}
       />
 
       {/* Media Manager Modal */}

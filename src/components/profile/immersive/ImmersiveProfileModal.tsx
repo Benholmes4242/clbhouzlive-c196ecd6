@@ -62,18 +62,17 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     if (!session?.user?.id) return;
     
     try {
-      await supabase.from('profile_media_telemetry').insert({
-        user_id: session.user.id,
-        profile_user_id: userId,
+      await supabase.from('profile_immersive_telemetry').insert({
+        user_id: userId,
+        viewer_id: session.user.id,
         session_id: sessionId,
         event_type: event,
-        media_id: currentItem?.id,
         media_index: activeIndex,
-        timestamp: new Date().toISOString(),
         metadata: {
           ...data,
           total_items: totalItems,
-          is_own_profile: session.user.id === userId
+          is_own_profile: session.user.id === userId,
+          media_id: currentItem?.id
         }
       });
     } catch (error) {
