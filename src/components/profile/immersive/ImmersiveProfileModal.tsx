@@ -387,7 +387,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             className="w-full h-full object-cover"
             autoPlay
-            muted={isGloballyMuted}
+            muted
             playsInline
             onLoadedData={() => {
               startTimeRef.current = Date.now();
