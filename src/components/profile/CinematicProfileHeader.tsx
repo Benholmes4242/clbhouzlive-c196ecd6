@@ -346,8 +346,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   }
                 }}
               />
-              {/* Gradient overlay for smooth blending */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
             </div>
           )}
           
@@ -367,8 +365,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   transform: 'scale(1.1)',
                 }}
               />
-              {/* Gradient overlay for smooth blending */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
             </div>
           )}
         </div>
