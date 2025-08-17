@@ -74,7 +74,7 @@ const UserProfilePage = () => {
       
       {/* Fixed Header with transparent overlay */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <div className="absolute inset-0 backdrop-blur-md border-b border-border/20" />
+        <div className="absolute inset-0 backdrop-blur-md bg-background/70 border-b border-border/20" />
         <div className="relative z-10">
           <Header />
         </div>

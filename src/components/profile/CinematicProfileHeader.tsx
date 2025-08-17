@@ -39,28 +39,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
-  const bleedVideoRef = useRef<HTMLVideoElement>(null);
-  const bleedPhotoRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
 
   // Sync background video with main video
   const syncVideos = () => {
     const mainVideo = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     
     if (mainVideo && bgVideo && !mainVideo.paused) {
       const timeDiff = Math.abs(mainVideo.currentTime - bgVideo.currentTime);
       if (timeDiff > 0.1) { // Only sync if difference is significant
         bgVideo.currentTime = mainVideo.currentTime;
-      }
-    }
-    
-    // Sync bleed video with main video
-    if (mainVideo && bleedVideo && !mainVideo.paused) {
-      const timeDiff = Math.abs(mainVideo.currentTime - bleedVideo.currentTime);
-      if (timeDiff > 0.2) { // Slightly higher tolerance for bleed since it's blurred
-        bleedVideo.currentTime = mainVideo.currentTime;
       }
     }
   };
@@ -69,7 +58,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
@@ -89,17 +77,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video autoplay failed, will sync when loaded');
-          }
-        }
-        
-        // Start bleed video sync
-        if (bleedVideo) {
-          bleedVideo.muted = true;
-          bleedVideo.currentTime = 0;
-          try {
-            await bleedVideo.play();
-          } catch (error) {
-            console.log('Bleed video autoplay failed, will sync when loaded');
           }
         }
         
@@ -123,11 +100,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           if (bgVideo) {
             bgVideo.currentTime = 0;
             bgVideo.pause();
-          }
-          
-          if (bleedVideo) {
-            bleedVideo.currentTime = 0;
-            bleedVideo.pause();
           }
           
           if (profilePhotoUrl) {
@@ -251,7 +223,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const replayVideo = async () => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    const bleedVideo = bleedVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
@@ -264,16 +235,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video replay failed');
-          }
-        }
-        
-        if (bleedVideo) {
-          bleedVideo.currentTime = 0;
-          bleedVideo.muted = true;
-          try {
-            await bleedVideo.play();
-          } catch (error) {
-            console.log('Bleed video replay failed');
           }
         }
         
@@ -311,75 +272,14 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const isMobile = window.innerWidth < 768;
 
   return (
-    <>
-      {/* Mobile-only Header Bleed Layer */}
-      {isMobile && (
-        <div 
-          className="fixed top-0 left-0 right-0 pointer-events-none z-40"
-          style={{ height: '4rem' }} // Match header height
-        >
-          {/* Video Bleed Background */}
-          {videoUrl && showVideo && (
-            <div className="absolute inset-0 overflow-hidden">
-              <video
-                ref={bleedVideoRef}
-                className="absolute w-full object-cover"
-                style={{
-                  height: '1000%', // Scale source area 10x to use top 10%
-                  top: '0',
-                  objectPosition: 'center top',
-                  filter: 'blur(16px) saturate(1.2)',
-                  transform: 'scale(1.1)',
-                }}
-                src={videoUrl}
-                muted
-                loop
-                playsInline
-                poster={thumbnailUrl}
-                onCanPlay={() => {
-                  // Sync with main video
-                  const mainVideo = videoRef.current;
-                  const bleedVideo = bleedVideoRef.current;
-                  if (mainVideo && bleedVideo && !mainVideo.paused) {
-                    bleedVideo.currentTime = mainVideo.currentTime;
-                    bleedVideo.play().catch(console.log);
-                  }
-                }}
-              />
-            </div>
-          )}
-          
-          {/* Photo Bleed Background */}
-          {(!videoUrl || !showVideo) && (
-            <div className="absolute inset-0 overflow-hidden">
-              <div
-                className="absolute w-full"
-                style={{
-                  height: '1000%', // Scale source area 10x to use top 10%
-                  top: '0',
-                  backgroundImage: `url(${actualPhotoUrl})`,
-                  backgroundPosition: 'center top',
-                  backgroundSize: 'cover',
-                  backgroundRepeat: 'no-repeat',
-                  filter: 'blur(16px) saturate(1.2)',
-                  transform: 'scale(1.1)',
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-      
-      <div className={`relative w-full overflow-hidden ${className}`} 
-          style={{ 
-            marginTop: '-8rem',
-            height: window.innerWidth < 768 ? '70vh' : '65vh',
-            minHeight: window.innerWidth < 768 ? '600px' : '600px',
-            maxHeight: '800px',
-            paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
-            paddingLeft: '0', // Remove any left padding
-            paddingRight: '0' // Remove any right padding
-          }}>
+     <div className={`relative w-full overflow-hidden ${className}`} 
+         style={{ 
+           marginTop: '-8rem', // Reduced margin to give more space at top
+           height: window.innerWidth < 768 ? '70vh' : '65vh', // Mobile: 70vh, Desktop: 65vh
+           minHeight: window.innerWidth < 768 ? '600px' : '600px', // Reduced min-height for mobile back to 600px
+           maxHeight: '800px',
+           paddingTop: '8rem' // Add padding to push content down
+         }}>
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
@@ -449,24 +349,22 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           />
         )}
         
+        {/* Gradient overlay for smooth transition to page content */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
       </div>
 
       {/* Central Circular Media */}
-      {window.innerWidth < 768 ? (
-        // Mobile: Custom shape - square top, rounded bottom, true edge-to-edge
+      <div className={`relative z-10 w-full h-full flex items-start justify-center ${window.innerWidth < 768 ? 'pt-16' : 'pt-20'}`}>
+        {/* Always show a circular element */}
         <div 
-          className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-10"
+          className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
-            top: '8rem',
-            left: '0',
-            right: '0',
-            width: '100vw',
-            height: '380px',
+            width: window.innerWidth < 768 ? '360px' : '400px', // Increased mobile from 320px to 360px
+            height: window.innerWidth < 768 ? '360px' : '400px', // Increased mobile from 320px to 360px
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            borderRadius: '0 0 40px 40px',
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
@@ -493,7 +391,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                setShowVideo(false);
+                setShowVideo(false); // Switch to photo when video ends - background will update automatically
               }}
             />
           )}
@@ -515,67 +413,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             }}
           />
         </div>
-      ) : (
-        // Desktop: Keep container
-        <div className="relative z-10 w-full h-full flex items-start justify-center pt-20">
-          <div 
-            className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
-            style={{
-              width: '400px',
-              height: '400px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              backdropFilter: 'blur(20px) saturate(1.3)',
-              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            }}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            onClick={handleClick}
-          >
-            {/* Video Element - Shows first and autoplays */}
-            {videoUrl && (
-              <video
-                ref={videoRef}
-                src={videoUrl}
-                poster={thumbnailUrl && thumbnailUrl !== videoUrl ? thumbnailUrl : actualPhotoUrl}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                }`}
-                playsInline
-                muted={isMuted}
-                preload="auto"
-                crossOrigin="anonymous"
-                autoPlay
-                onPlay={() => {
-                  setIsPlaying(true);
-                  setHasPlayed(true);
-                }}
-                onPause={() => setIsPlaying(false)}
-                onEnded={() => {
-                  setIsPlaying(false);
-                  setShowVideo(false);
-                }}
-              />
-            )}
-            
-            {/* Profile Photo - Shows when no video or video has ended */}
-            <img
-              ref={photoRef}
-              src={actualPhotoUrl}
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              alt={`${displayName} profile`}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              }`}
-              onError={(e) => {
-                console.log('Image failed to load:', actualPhotoUrl);
-                e.currentTarget.src = fallbackImage;
-              }}
-            />
-          </div>
-        </div>
-      )}
 
         {/* Upload Interface for Empty State */}
         {!hasMedia && isOwnProfile && (
@@ -607,6 +444,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             </div>
           </div>
         )}
+      </div>
 
       {/* Central Media Controls - Show on hover with stable positioning */}
       {hasMedia && isHovering && (
@@ -678,6 +516,35 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         </div>
       )}
 
+      {/* Upload Interface for Empty State */}
+      {!hasMedia && isOwnProfile && (
+        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
+          <div className="text-6xl text-muted-foreground/50 mb-2">
+            {displayName.charAt(0)}
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={handleFileSelect}
+              disabled={uploading}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Add Video
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handlePhotoSelect}
+              disabled={uploading}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Add Photo
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
@@ -704,8 +571,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           </div>
         </div>
       )}
-      </div>
-    </>
+    </div>
   );
 };
 

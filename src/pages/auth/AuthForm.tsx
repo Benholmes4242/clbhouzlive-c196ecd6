@@ -108,9 +108,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
     setUsername(cleanValue);
     
     // Debounce the username check
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       checkUsernameAvailability(cleanValue);
     }, 500);
+
+    return () => clearTimeout(timeoutId);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
