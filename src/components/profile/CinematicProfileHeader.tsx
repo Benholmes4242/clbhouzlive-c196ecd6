@@ -355,12 +355,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       </div>
 
       {/* Central Circular Media */}
-      <div className={`relative z-10 w-full h-full flex items-start justify-center ${window.innerWidth < 768 ? 'pt-8' : 'pt-20'}`}>
+      <div className={`relative z-10 w-full h-full flex items-start ${window.innerWidth < 768 ? 'justify-stretch px-0' : 'justify-center'} ${window.innerWidth < 768 ? 'pt-8' : 'pt-20'}`}>
         {/* Always show a circular element */}
         <div 
           className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
-            width: window.innerWidth < 768 ? '450px' : '400px', // Increased mobile width to 450px
+            width: window.innerWidth < 768 ? '100vw' : '400px', // Full viewport width on mobile
             height: window.innerWidth < 768 ? '380px' : '400px', // Keep mobile height at 380px
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
