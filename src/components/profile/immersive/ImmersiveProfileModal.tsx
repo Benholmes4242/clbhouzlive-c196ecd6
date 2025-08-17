@@ -53,6 +53,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
   const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const startTimeRef = useRef<number>(0);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const { session } = useSupabaseSession();
@@ -284,13 +285,10 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setProgress(0);
 
     // Ensure video plays when it becomes active
-    if (currentItem.media_type === 'video') {
-      const videoElement = document.querySelector(`video[src="${currentItem.media_url}"]`) as HTMLVideoElement;
-      if (videoElement) {
-        videoElement.play().catch((error) => {
-          console.log('Video autoplay failed:', error);
-        });
-      }
+    if (currentItem.media_type === 'video' && videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.log('Video autoplay failed:', error);
+      });
     }
 
     const updateProgress = () => {
@@ -392,6 +390,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       <div className="absolute inset-0 flex items-center justify-center">
         {currentItem.media_type === 'video' ? (
           <video
+            ref={videoRef}
             key={`${currentItem.id}-${activeIndex}`}
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
@@ -401,6 +400,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             playsInline
             onLoadedData={() => {
               startTimeRef.current = Date.now();
+            }}
+            onCanPlay={() => {
+              if (videoRef.current) {
+                videoRef.current.play().catch((error) => {
+                  console.log('Video autoplay failed in onCanPlay:', error);
+                });
+              }
             }}
           />
         ) : (
