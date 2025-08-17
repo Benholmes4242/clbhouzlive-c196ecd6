@@ -90,7 +90,7 @@ const App: React.FC = () => {
                         <Route path="/my-ratings" element={<MyRatings />} />
                         <Route path="/news" element={<News />} />
                         <Route path="/tour-central" element={<TourCentral />} />
-                        <Route path="/header-extension-demo" element={<HeaderExtensionDemo />} />
+                        <Route path="/clbhouz-ai-header-generator" element={<HeaderExtensionDemo />} />
                         
                         <Route path="/messages" element={<MessagesPage />} />
                         <Route path="/notifications" element={<NotificationsPage />} />
