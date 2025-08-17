@@ -285,31 +285,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Mobile: Smooth transitioning background blur */}
-        {isMobile && (
-          <>
-            {/* Video thumbnail background */}
-            <div
-              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
-                showVideo && videoUrl ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                backgroundImage: `url(${thumbnailUrl || videoUrl})`,
-                transform: 'scale(1.1)',
-              }}
-            />
-            {/* Photo background */}
-            <div
-              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
-                !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                backgroundImage: `url(${actualPhotoUrl})`,
-                transform: 'scale(1.1)',
-              }}
-            />
-          </>
-        )}
         
         {/* Desktop: Video Background - Shows when video is playing */}
         {!isMobile && videoUrl && showVideo && (
