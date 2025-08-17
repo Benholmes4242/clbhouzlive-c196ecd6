@@ -36,7 +36,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   return (
     <>
       
-      <div className="w-full md:px-8 px-0 overflow-x-auto">
+      <div className="w-full md:px-8 -mx-4 md:mx-0 overflow-x-auto">
         <HeroProfileHeader 
           profile={profile}
           isOwnProfile={isOwnProfile}
