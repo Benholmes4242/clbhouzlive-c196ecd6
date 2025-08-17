@@ -38,7 +38,7 @@ import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { Swords } from 'lucide-react';
-import CinematicProfileHeader from './CinematicProfileHeader';
+import EnhancedCinematicProfileHeader from './EnhancedCinematicProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
@@ -463,19 +463,13 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Cinematic Profile Header */}
+      {/* Enhanced Cinematic Profile Header with Multi-Media Carousel */}
       <div className="relative w-full bg-background">
-        <CinematicProfileHeader
-          videoUrl={profile?.profile_video_url}
-          thumbnailUrl={profile?.profile_video_thumbnail_url}
-          profilePhotoUrl={profile?.profile_photo_url}
-          displayName={displayName}
+        <EnhancedCinematicProfileHeader
+          userId={profile?.id || ''}
           isOwnProfile={isOwnProfile}
-          onVideoUpload={handleVideoUpload}
-          onPhotoUpload={handlePhotoUpload}
-          onVideoRemove={handleVideoRemove}
-          uploading={videoUploading || photoUploading}
-          
+          displayName={displayName}
+          onMediaUpdate={onProfileUpdate}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
