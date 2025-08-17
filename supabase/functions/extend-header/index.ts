@@ -95,7 +95,11 @@ serve(async (req) => {
     const dimensions = await getImageDimensions(imageBase64);
     const actualExtensionHeight = Math.round(extensionHeight * devicePixelRatio);
     
-    // Skip minimum width validation - allow all image sizes
+    // Enforce minimum width (header width × 2, minimum 1024px)
+    const minWidth = Math.max(1024, extensionHeight * 2);
+    if (dimensions.width < minWidth) {
+      throw new Error(`Image too narrow. Minimum width: ${minWidth}px, got: ${dimensions.width}px`);
+    }
     
     // Reject extreme panoramas (aspect < 0.4)
     const aspectRatio = dimensions.width / dimensions.height;
