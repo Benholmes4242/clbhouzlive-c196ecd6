@@ -285,16 +285,32 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
-        {/* Mobile: Background blur only during video playback */}
-        {isMobile && isPlaying && videoUrl && (
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${thumbnailUrl || videoUrl})`,
-              filter: 'blur(20px) saturate(1.2)',
-              transform: 'scale(1.1)',
-            }}
-          />
+        {/* Mobile: Smooth transitioning background blur */}
+        {isMobile && (
+          <>
+            {/* Video thumbnail background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                showVideo && videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${thumbnailUrl || videoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+            {/* Photo background */}
+            <div
+              className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-700 ease-in-out ${
+                !showVideo || !videoUrl ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${actualPhotoUrl})`,
+                filter: 'blur(20px) saturate(1.2)',
+                transform: 'scale(1.1)',
+              }}
+            />
+          </>
         )}
         
         {/* Desktop: Video Background - Shows when video is playing */}
@@ -342,11 +358,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
-        // Mobile: Original container size, positioned to go under header
+        // Mobile: Custom shape - square top, rounded bottom, true edge-to-edge
         <div 
-          className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-0"
+          className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-10"
           style={{
-            top: '0',
+            top: '8rem',
             left: '0',
             right: '0',
             width: '100vw',
@@ -354,7 +370,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            borderRadius: '0 0 80px 80px',
+            borderRadius: '0 0 60px 60px', // Square top, rounded bottom
+            clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), calc(100% - 60px) 100%, 60px 100%, 0 calc(100% - 60px))'
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
