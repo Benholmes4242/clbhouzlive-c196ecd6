@@ -322,13 +322,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {videoUrl && showVideo && (
             <video
               ref={bleedVideoRef}
-              className="absolute inset-0 w-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{
                 filter: 'blur(12px) saturate(1.1)',
                 transform: 'scale(1.05)',
                 objectPosition: 'center top',
-                height: '150%', // Show more content to crop properly
-                clipPath: 'inset(0 0 85% 0)', // Only show top 15% of video
               }}
               src={videoUrl}
               muted
@@ -350,14 +348,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {/* Photo Bleed Background */}
           {(!videoUrl || !showVideo) && (
             <div
-              className="absolute inset-0 w-full bg-cover bg-no-repeat"
+              className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
               style={{
                 backgroundImage: `url(${actualPhotoUrl})`,
                 filter: 'blur(12px) saturate(1.1)',
                 transform: 'scale(1.05)',
                 backgroundPosition: 'center top',
-                height: '150%', // Show more content to crop properly
-                clipPath: 'inset(0 0 85% 0)', // Only show top 15% of image
               }}
             />
           )}
