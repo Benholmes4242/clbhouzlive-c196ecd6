@@ -363,7 +363,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           }`}
           style={{
             width: window.innerWidth < 768 ? '100%' : '400px',
-            height: window.innerWidth < 768 ? '280px' : '400px', // Rectangle aspect ratio for mobile
+            height: window.innerWidth < 768 ? '400px' : '400px', // Increased mobile height to match desktop
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
