@@ -499,15 +499,9 @@ const HeroProfileHeader = ({
       {/* Enhanced Cinematic Profile Header with Multi-Media Carousel */}
       <div className="relative w-full bg-background">
         <CinematicProfileHeader
-          videoUrl={profile?.profile_video_url}
-          thumbnailUrl={profile?.profile_video_thumbnail_url}
-          profilePhotoUrl={profile?.profile_photo_url}
+          userId={profile?.id || ''}
           displayName={displayName}
           isOwnProfile={isOwnProfile}
-          onVideoUpload={handleVideoUpload}
-          onPhotoUpload={handlePhotoUpload}
-          onVideoRemove={handleVideoRemove}
-          uploading={videoUploading || photoUploading || headerProcessing}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
