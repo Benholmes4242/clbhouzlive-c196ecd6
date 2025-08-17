@@ -319,7 +319,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   }, [videoUrl, showVideo, actualPhotoUrl, onBleedContentChange]);
 
-  // Create bleed content to pass to header
+  // Create bleed content to pass to header with seamless blending
   const createBleedContent = () => {
     if (!isMobile) return null;
     
@@ -332,11 +332,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               ref={bleedVideoRef}
               className="absolute w-full object-cover"
               style={{
-                height: '1000%', // Scale source area 10x to use top 10%
+                height: '1000%', // Scale source area 10x to sample top 10%
                 top: '0',
                 objectPosition: 'center top',
-                filter: 'blur(16px) saturate(1.2)',
-                transform: 'scale(1.1)',
+                // Removed individual filters - will be applied by Header component
               }}
               src={videoUrl}
               muted
@@ -353,8 +352,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 }
               }}
             />
-            {/* Gradient overlay for smooth blending */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
           </div>
         )}
         
@@ -364,18 +361,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             <div
               className="absolute w-full"
               style={{
-                height: '1000%', // Scale source area 10x to use top 10%
+                height: '1000%', // Scale source area 10x to sample top 10%
                 top: '0',
                 backgroundImage: `url(${actualPhotoUrl})`,
                 backgroundPosition: 'center top',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                filter: 'blur(16px) saturate(1.2)',
-                transform: 'scale(1.1)',
+                // Removed individual filters - will be applied by Header component
               }}
             />
-            {/* Gradient overlay for smooth blending */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
           </div>
         )}
       </>
