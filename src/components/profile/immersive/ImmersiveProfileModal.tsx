@@ -152,7 +152,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       id: tempId,
       media_type: isVideo ? 'video' : 'image',
       media_url: URL.createObjectURL(file),
-      duration: isVideo ? 30000 : 3000,
+      duration: Math.round(isVideo ? 30000 : 3000), // Ensure integer value
       display_order: localMediaItems.length,
       created_at: new Date().toISOString(),
       isUploading: true,
@@ -180,14 +180,16 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         ));
         
         // Create form data for image upload
-        const formData = new FormData();
-        formData.append('file', file);
+        const fileName = `${userId}/${Date.now()}-${file.name}`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('profile-media')
-          .upload(`${userId}/${Date.now()}-${file.name}`, file);
+          .upload(fileName, file);
           
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Storage upload error:', uploadError);
+          throw uploadError;
+        }
         
         const { data: { publicUrl } } = supabase.storage
           .from('profile-media')
@@ -197,6 +199,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           success: true,
           url: publicUrl
         };
+        
+        // Update progress to 100%
+        setLocalMediaItems(prev => prev.map(item => 
+          item.id === tempId ? { ...item, uploadProgress: 100 } : item
+        ));
       }
 
       if (uploadResult.success) {
@@ -208,9 +215,10 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             media_type: isVideo ? 'video' : 'image',
             media_url: isVideo ? (uploadResult.urls?.hls || uploadResult.videoId) : uploadResult.url,
             thumbnail_url: isVideo ? uploadResult.thumbnail : undefined,
-            duration: isVideo ? 30000 : 3000,
+            duration: Math.round(isVideo ? 30000 : 3000), // Ensure integer value
             display_order: localMediaItems.length,
-            video_method: isVideo ? 'cloudflare_stream' : undefined
+            video_method: isVideo ? 'cloudflare_stream' : undefined,
+            is_immersive: true
           })
           .select()
           .single();

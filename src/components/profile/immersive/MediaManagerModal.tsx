@@ -92,7 +92,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
               media_type: 'video',
               media_url: result.videoUrl,
               thumbnail_url: result.thumbnailUrl,
-              duration: Math.min(video.duration * 1000, 20000), // Convert to ms, cap at 20s
+              duration: Math.round(Math.min(video.duration * 1000, 20000)), // Convert to ms, cap at 20s, ensure integer
               display_order: items.length + newItems.length,
               file_name: file.name,
               video_method: 'upload'
@@ -169,7 +169,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           media_type: item.media_type,
           media_url: item.media_url,
           thumbnail_url: item.thumbnail_url,
-          duration: item.duration,
+          duration: Math.round(item.duration || 3000), // Ensure integer value
           display_order: index,
           is_immersive: true,
           file_name: item.file_name,

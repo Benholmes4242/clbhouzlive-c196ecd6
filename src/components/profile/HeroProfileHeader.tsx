@@ -855,6 +855,8 @@ const HeroProfileHeader = ({
         userId={profile?.id || ''}
         initialIndex={currentMediaIndex}
         onCurrentIndexChange={setCurrentMediaIndex}
+        uploadMode={isOwnProfile}
+        onUploadComplete={() => refetchMedia()}
       />
 
       {/* Media Manager Modal */}
