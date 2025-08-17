@@ -72,11 +72,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     <>
       <div className={`relative w-full overflow-hidden ${className}`} 
           style={{ 
-            marginTop: '0',
+            marginTop: '-8rem',
             height: isMobile ? '70vh' : '65vh',
             minHeight: isMobile ? '600px' : '600px',
             maxHeight: '800px',
-            paddingTop: '0',
+            paddingTop: isMobile ? '0' : '8rem',
             paddingLeft: '0',
             paddingRight: '0'
           }}>
@@ -96,12 +96,12 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           {isMobile ? (
             // Mobile: Edge-to-edge carousel
             <div 
-              className="group absolute z-10"
+              className="group fixed z-10"
               style={{
-                top: '0',
+                top: '8rem',
                 left: '0',
                 right: '0',
-                width: '100%',
+                width: '100vw',
                 height: '380px',
                 background: 'rgba(255, 255, 255, 0.25)',
                 backdropFilter: 'blur(20px) saturate(1.3)',
@@ -139,7 +139,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             </div>
           ) : (
             // Desktop: Centered squircle container
-            <div className="flex items-start justify-center pt-8 h-full">
+            <div className="flex items-start justify-center pt-20 h-full">
               <div 
                 className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
                 style={{
