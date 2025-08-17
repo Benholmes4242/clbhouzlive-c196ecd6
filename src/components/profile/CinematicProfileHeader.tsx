@@ -357,9 +357,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           />
         )}
         
-        {/* Gradient mask to fade into page */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
-        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent" />
       </div>
       
       <div className={`relative w-full overflow-hidden ${className}`} 
