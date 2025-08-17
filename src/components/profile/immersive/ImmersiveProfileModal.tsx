@@ -196,13 +196,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       {/* Mute Button - Top Right */}
       <button
         onClick={toggleGlobalMute}
-        className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105"
+        className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center"
         style={liquidGlassStyle}
       >
         {isGloballyMuted ? (
-          <VolumeX className="w-6 h-6 text-white mx-auto" />
+          <VolumeX className="w-5 h-5 text-white" />
         ) : (
-          <Volume2 className="w-6 h-6 text-white mx-auto" />
+          <Volume2 className="w-5 h-5 text-white" />
         )}
       </button>
 
@@ -238,7 +238,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <button
           onClick={handleClose}
-          className="w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 animate-bounce"
+          className="w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_3s_ease-in-out_infinite]"
           style={liquidGlassStyle}
         >
           <ChevronDown className="w-6 h-6 text-white mx-auto" />
