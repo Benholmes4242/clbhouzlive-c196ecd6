@@ -162,24 +162,26 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
         .eq('user_id', userId)
         .eq('is_immersive', true);
 
-      // Insert new media items
-      const mediaToInsert = items.map((item, index) => ({
-        user_id: userId,
-        media_type: item.media_type,
-        media_url: item.media_url,
-        thumbnail_url: item.thumbnail_url,
-        duration: item.duration,
-        display_order: index,
-        is_immersive: true,
-        file_name: item.file_name,
-        video_method: item.video_method || 'upload'
-      }));
+      // Insert new media items (only if there are items to insert)
+      if (items.length > 0) {
+        const mediaToInsert = items.map((item, index) => ({
+          user_id: userId,
+          media_type: item.media_type,
+          media_url: item.media_url,
+          thumbnail_url: item.thumbnail_url,
+          duration: item.duration,
+          display_order: index,
+          is_immersive: true,
+          file_name: item.file_name,
+          video_method: item.video_method || 'upload'
+        }));
 
-      const { error } = await supabase
-        .from('profile_media')
-        .insert(mediaToInsert);
+        const { error } = await supabase
+          .from('profile_media')
+          .insert(mediaToInsert);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       toast.success('Media saved successfully!');
       onMediaUpdate();
@@ -219,7 +221,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
               <div>
                 <h3 className="text-lg font-medium">Add Media</h3>
                 <p className="text-sm text-muted-foreground">
-                  Upload photos (3s each) or videos (max 20s). Maximum 5 items total.
+                  Upload up to 5 items total (photos or videos, any mix). Videos max 20s.
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Currently: {items.length}/5 items
@@ -346,7 +348,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
             </Button>
             <Button
               onClick={handleSave}
-              disabled={saving || items.length === 0}
+              disabled={saving}
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
