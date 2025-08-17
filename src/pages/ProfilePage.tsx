@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('activity');
+  const [bleedContent, setBleedContent] = useState<React.ReactNode>(null);
   const queryClient = useQueryClient();
   
   // Force invalidate profile cache on page load to ensure fresh data
@@ -85,8 +86,6 @@ const ProfilePage = () => {
   if (!user) {
     return null;
   }
-
-  const [bleedContent, setBleedContent] = useState<React.ReactNode>(null);
 
   return (
     <div className="min-h-screen bg-background pb-28 relative">
