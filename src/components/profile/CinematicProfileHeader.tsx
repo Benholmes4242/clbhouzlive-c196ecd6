@@ -360,7 +360,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         <div 
           className="group relative clbhouz-squircle overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105"
           style={{
-            width: window.innerWidth < 768 ? '400px' : '400px', // Increased mobile width to 400px
+            width: window.innerWidth < 768 ? '420px' : '400px', // Increased mobile width to 420px
             height: window.innerWidth < 768 ? '380px' : '400px', // Keep mobile height at 380px
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
