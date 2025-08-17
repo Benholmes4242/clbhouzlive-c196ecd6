@@ -39,17 +39,28 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
+  const bleedVideoRef = useRef<HTMLVideoElement>(null);
+  const bleedPhotoRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
 
   // Sync background video with main video
   const syncVideos = () => {
     const mainVideo = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     
     if (mainVideo && bgVideo && !mainVideo.paused) {
       const timeDiff = Math.abs(mainVideo.currentTime - bgVideo.currentTime);
       if (timeDiff > 0.1) { // Only sync if difference is significant
         bgVideo.currentTime = mainVideo.currentTime;
+      }
+    }
+    
+    // Sync bleed video with main video
+    if (mainVideo && bleedVideo && !mainVideo.paused) {
+      const timeDiff = Math.abs(mainVideo.currentTime - bleedVideo.currentTime);
+      if (timeDiff > 0.2) { // Slightly higher tolerance for bleed since it's blurred
+        bleedVideo.currentTime = mainVideo.currentTime;
       }
     }
   };
@@ -58,6 +69,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
@@ -77,6 +89,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video autoplay failed, will sync when loaded');
+          }
+        }
+        
+        // Start bleed video sync
+        if (bleedVideo) {
+          bleedVideo.muted = true;
+          bleedVideo.currentTime = 0;
+          try {
+            await bleedVideo.play();
+          } catch (error) {
+            console.log('Bleed video autoplay failed, will sync when loaded');
           }
         }
         
@@ -100,6 +123,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           if (bgVideo) {
             bgVideo.currentTime = 0;
             bgVideo.pause();
+          }
+          
+          if (bleedVideo) {
+            bleedVideo.currentTime = 0;
+            bleedVideo.pause();
           }
           
           if (profilePhotoUrl) {
@@ -223,6 +251,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const replayVideo = async () => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
+    const bleedVideo = bleedVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
@@ -235,6 +264,16 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             await bgVideo.play();
           } catch (error) {
             console.log('Background video replay failed');
+          }
+        }
+        
+        if (bleedVideo) {
+          bleedVideo.currentTime = 0;
+          bleedVideo.muted = true;
+          try {
+            await bleedVideo.play();
+          } catch (error) {
+            console.log('Bleed video replay failed');
           }
         }
         
@@ -272,16 +311,67 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const isMobile = window.innerWidth < 768;
 
   return (
-     <div className={`relative w-full overflow-hidden ${className}`} 
-         style={{ 
-           marginTop: '-8rem',
-           height: window.innerWidth < 768 ? '70vh' : '65vh',
-           minHeight: window.innerWidth < 768 ? '600px' : '600px',
-           maxHeight: '800px',
-           paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
-           paddingLeft: '0', // Remove any left padding
-           paddingRight: '0' // Remove any right padding
-         }}>
+    <>
+      {/* Header Bleed Layer - Seamless continuation behind header */}
+      <div 
+        className="fixed top-0 left-0 right-0 pointer-events-none z-40"
+        style={{ height: '4rem' }} // Match header height
+      >
+        {/* Video Bleed Background */}
+        {videoUrl && showVideo && (
+          <video
+            ref={bleedVideoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'blur(15px) saturate(1.2)',
+              transform: 'scale(1.1)',
+              objectPosition: 'center top', // Align to show top of video
+            }}
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            poster={thumbnailUrl}
+            onCanPlay={() => {
+              // Sync with main video when bleed video becomes ready
+              const mainVideo = videoRef.current;
+              const bleedVideo = bleedVideoRef.current;
+              if (mainVideo && bleedVideo && !mainVideo.paused) {
+                bleedVideo.currentTime = mainVideo.currentTime;
+                bleedVideo.play().catch(console.log);
+              }
+            }}
+          />
+        )}
+        
+        {/* Photo Bleed Background */}
+        {(!videoUrl || !showVideo) && (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: `url(${actualPhotoUrl})`,
+              filter: 'blur(15px) saturate(1.2)',
+              transform: 'scale(1.1)',
+              backgroundPosition: 'center top', // Align to show top of photo
+            }}
+          />
+        )}
+        
+        {/* Gradient mask to fade into page */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent" />
+      </div>
+      
+      <div className={`relative w-full overflow-hidden ${className}`} 
+          style={{ 
+            marginTop: '-8rem',
+            height: window.innerWidth < 768 ? '70vh' : '65vh',
+            minHeight: window.innerWidth < 768 ? '600px' : '600px',
+            maxHeight: '800px',
+            paddingTop: window.innerWidth < 768 ? '0' : '8rem', // Remove padding on mobile
+            paddingLeft: '0', // Remove any left padding
+            paddingRight: '0' // Remove any right padding
+          }}>
 
       {/* Dynamic Blurred Background - Matches Media Card */}
       <div className="absolute inset-0 z-0">
@@ -608,7 +698,8 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
