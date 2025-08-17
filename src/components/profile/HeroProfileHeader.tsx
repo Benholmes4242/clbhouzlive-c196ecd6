@@ -42,6 +42,8 @@ import CinematicProfileHeader from './CinematicProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import { useHeaderExtension } from '@/hooks/useHeaderExtension';
+import { useProfileMediaManager } from '@/hooks/useProfileMediaManager';
+import ProfileMediaUploadModal from './ProfileMediaUploadModal';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
 import AchievementsPane from './AchievementsPane';
@@ -99,10 +101,27 @@ const HeroProfileHeader = ({
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const { extendHeader, isProcessing: headerProcessing } = useHeaderExtension();
   const isMobile = useIsMobile();
+
+  // Profile media management
+  const {
+    mediaItems,
+    currentIndex,
+    getCurrentMedia,
+    getHeaderStripUrl,
+    getFallbackHeaderUrl,
+    isHeaderReady,
+    nextSlide,
+    prevSlide,
+    goToSlide,
+    refreshMedia,
+    migrateLegacyMedia,
+    hasMedia
+  } = useProfileMediaManager(profile?.id || '');
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
     duration: 300
@@ -477,7 +496,7 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Cinematic Profile Header */}
+      {/* Enhanced Cinematic Profile Header with Multi-Media Carousel */}
       <div className="relative w-full bg-background">
         <CinematicProfileHeader
           videoUrl={profile?.profile_video_url}
@@ -489,7 +508,6 @@ const HeroProfileHeader = ({
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
           uploading={videoUploading || photoUploading || headerProcessing}
-          
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
@@ -821,6 +839,15 @@ const HeroProfileHeader = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Profile Media Upload Modal */}
+      <ProfileMediaUploadModal
+        isOpen={mediaModalOpen}
+        onClose={() => setMediaModalOpen(false)}
+        userId={user?.id || ''}
+        existingMedia={mediaItems}
+        onMediaUpdated={refreshMedia}
+      />
     </>
   );
 };
