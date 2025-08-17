@@ -295,7 +295,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               }`}
               style={{
                 backgroundImage: `url(${thumbnailUrl || videoUrl})`,
-                filter: 'blur(20px) saturate(1.2)',
                 transform: 'scale(1.1)',
               }}
             />
@@ -306,7 +305,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               }`}
               style={{
                 backgroundImage: `url(${actualPhotoUrl})`,
-                filter: 'blur(20px) saturate(1.2)',
                 transform: 'scale(1.1)',
               }}
             />
