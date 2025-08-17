@@ -342,7 +342,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
-        // Mobile: Edge-to-edge with squircle bottom corners, passes under header
+        // Mobile: Original container size, positioned to go under header
         <div 
           className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-0"
           style={{
@@ -350,8 +350,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             left: '0',
             right: '0',
             width: '100vw',
-            height: '60vh',
-            minHeight: '400px',
+            height: '380px',
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(20px) saturate(1.3)',
+            boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
             borderRadius: '0 0 80px 80px',
           }}
           onMouseEnter={() => setIsHovering(true)}
