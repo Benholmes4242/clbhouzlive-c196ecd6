@@ -316,7 +316,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       {isMobile && (
         <div 
           className="fixed top-0 left-0 right-0 pointer-events-none z-40"
-          style={{ height: '6rem' }} // Extend slightly beyond header
+          style={{ height: '4rem' }} // Match header height
         >
           {/* Video Bleed Background */}
           {videoUrl && showVideo && (
@@ -357,12 +357,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
               }}
             />
           )}
-          
-          {/* Seamless blend gradient */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-white"
-            style={{ transform: 'translateY(100%)' }}
-          />
         </div>
       )}
       
