@@ -16,7 +16,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50">
       {/* Header content */}
-      <div className="container mx-auto px-4 md:px-0 max-w-full box-border bg-background/95 backdrop-blur-sm border-b border-border/40">
+      <div className="container mx-auto px-4 md:px-0 max-w-full box-border bg-transparent backdrop-blur-sm border-b border-white/20">
         <div className="flex items-center justify-between h-16 max-w-full">
           {/* Logo - Enlarged and optimized positioning */}
           <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
