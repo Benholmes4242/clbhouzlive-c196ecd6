@@ -358,19 +358,19 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
       {/* Central Circular Media */}
       {window.innerWidth < 768 ? (
-        // Mobile: Custom shape - square top, rounded bottom, true edge-to-edge
+        // Mobile: Custom shape - extends under header
         <div 
           className="group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 fixed z-10"
           style={{
-            top: '8rem',
+            top: '0',
             left: '0',
             right: '0',
             width: '100vw',
-            height: '380px',
+            height: '500px',
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(20px) saturate(1.3)',
             boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2) inset',
-            borderRadius: '0 0 60px 60px', // Square top, rounded bottom
+            borderRadius: '0 0 60px 60px',
             clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), calc(100% - 60px) 100%, 60px 100%, 0 calc(100% - 60px))'
           }}
           onMouseEnter={() => setIsHovering(true)}
