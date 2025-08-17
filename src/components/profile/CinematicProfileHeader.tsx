@@ -636,11 +636,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                   e.stopPropagation();
                   replayVideo();
                 }}
-                className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 border-0"
+                className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full p-5 transition-all duration-300 hover:scale-110 border-0"
                 style={{
                   background: 'rgba(255,255,255,0.2)',
                   backdropFilter: 'blur(10px)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2) inset'
+                  // boxShadow: '0 10px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2) inset'
                 }}
               >
                 <Play className="w-7 h-7 fill-white" />
@@ -658,10 +658,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handleFileSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 transition-all duration-300 hover:scale-105 border-0"
                   style={{
                     backdropFilter: 'blur(8px)',
-                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                    // boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
                   }}
                 >
                   <span className="text-xs font-medium">Change Video</span>
@@ -675,10 +675,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                     handlePhotoSelect();
                   }}
                   disabled={uploading}
-                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 shadow-lg transition-all duration-300 hover:scale-105 border-0"
+                  className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full px-4 py-2 transition-all duration-300 hover:scale-105 border-0"
                   style={{
                     backdropFilter: 'blur(8px)',
-                    boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+                    // boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
                   }}
                 >
                   <span className="text-xs font-medium">Change Photo</span>
