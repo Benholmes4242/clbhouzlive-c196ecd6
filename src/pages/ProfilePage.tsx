@@ -10,7 +10,6 @@ import { useQueryClient } from '@tanstack/react-query';
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('activity');
-  
   const queryClient = useQueryClient();
   
   // Force invalidate profile cache on page load to ensure fresh data
@@ -99,7 +98,6 @@ const ProfilePage = () => {
           onProfileUpdate={refreshProfile}
           activeSection={activeSection}
           onSectionChange={setActiveSection}
-          
         />
         
         {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}

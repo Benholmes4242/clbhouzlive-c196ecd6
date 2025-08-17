@@ -74,10 +74,15 @@ const OptimizedProfileLoader: React.FC<OptimizedProfileLoaderProps> = ({
       {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
         <CinematicProfileHeader
-          userId={profile?.id || ''}
+          videoUrl={profile?.profile_video_url}
+          thumbnailUrl={profile?.profile_video_thumbnail_url}
+          profilePhotoUrl={profile?.profile_photo_url}
           displayName={displayName}
           isOwnProfile={isOwnProfile}
-          
+          onVideoUpload={handleVideoUpload}
+          onPhotoUpload={handlePhotoUpload}
+          onVideoRemove={handleVideoRemove}
+          uploading={videoUploading || photoUploading}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}

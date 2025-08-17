@@ -29,7 +29,6 @@ const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
 const TourCentral = lazy(() => import("./pages/TourCentral"));
-const HeaderExtensionDemo = lazy(() => import("./pages/HeaderExtensionDemo"));
 
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
@@ -90,7 +89,6 @@ const App: React.FC = () => {
                         <Route path="/my-ratings" element={<MyRatings />} />
                         <Route path="/news" element={<News />} />
                         <Route path="/tour-central" element={<TourCentral />} />
-                        <Route path="/clbhouz-ai-header-generator" element={<HeaderExtensionDemo />} />
                         
                         <Route path="/messages" element={<MessagesPage />} />
                         <Route path="/notifications" element={<NotificationsPage />} />

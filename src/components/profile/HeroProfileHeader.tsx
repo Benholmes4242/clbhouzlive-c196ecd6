@@ -41,9 +41,6 @@ import { Swords } from 'lucide-react';
 import CinematicProfileHeader from './CinematicProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
-import { useHeaderExtension } from '@/hooks/useHeaderExtension';
-import { useProfileMediaManager } from '@/hooks/useProfileMediaManager';
-import ProfileMediaUploadModal from './ProfileMediaUploadModal';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
 import AchievementsPane from './AchievementsPane';
@@ -89,7 +86,6 @@ interface HeroProfileHeaderProps {
   onProfileUpdate: () => void;
   activeSection?: string;
   onSectionChange?: (section: string) => void;
-  
 }
 
 const HeroProfileHeader = ({ 
@@ -97,31 +93,13 @@ const HeroProfileHeader = ({
   isOwnProfile,
   onProfileUpdate,
   activeSection = 'activity',
-  onSectionChange,
+  onSectionChange
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [mediaModalOpen, setMediaModalOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
-  const { extendHeader, isProcessing: headerProcessing } = useHeaderExtension();
   const isMobile = useIsMobile();
-
-  // Profile media management
-  const {
-    mediaItems,
-    currentIndex,
-    getCurrentMedia,
-    getHeaderStripUrl,
-    getFallbackHeaderUrl,
-    isHeaderReady,
-    nextSlide,
-    prevSlide,
-    goToSlide,
-    refreshMedia,
-    migrateLegacyMedia,
-    hasMedia
-  } = useProfileMediaManager(profile?.id || '');
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
     duration: 300
@@ -442,18 +420,6 @@ const HeroProfileHeader = ({
 
       toast.success("Profile photo uploaded successfully!");
 
-      // Auto-extend header on mobile devices only
-      if (isMobile && result.imageUrl) {
-        try {
-          console.log('🚀 Starting automatic header extension for mobile device');
-          await extendHeader(file, 200, "Extend the background upwards to match the existing scene. Seamless continuation for profile header.");
-          console.log('✅ Header extension completed');
-        } catch (extensionError) {
-          console.log('🔄 Header extension failed, using fallback:', extensionError);
-          // Don't show error to user - fallback will be used automatically
-        }
-      }
-
       onProfileUpdate();
       
       console.log('Profile photo updated successfully:', result.imageUrl);
@@ -493,15 +459,20 @@ const HeroProfileHeader = ({
     }
   };
 
-
   return (
     <>
-      {/* Enhanced Cinematic Profile Header with Multi-Media Carousel */}
+      {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
         <CinematicProfileHeader
-          userId={profile?.id || ''}
+          videoUrl={profile?.profile_video_url}
+          thumbnailUrl={profile?.profile_video_thumbnail_url}
+          profilePhotoUrl={profile?.profile_photo_url}
           displayName={displayName}
           isOwnProfile={isOwnProfile}
+          onVideoUpload={handleVideoUpload}
+          onPhotoUpload={handlePhotoUpload}
+          onVideoRemove={handleVideoRemove}
+          uploading={videoUploading || photoUploading}
         />
         
         {/* Profile Info and Stats Bar - Positioned over the blurred area */}
@@ -833,15 +804,6 @@ const HeroProfileHeader = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Profile Media Upload Modal */}
-      <ProfileMediaUploadModal
-        isOpen={mediaModalOpen}
-        onClose={() => setMediaModalOpen(false)}
-        userId={user?.id || ''}
-        existingMedia={mediaItems}
-        onMediaUpdated={refreshMedia}
-      />
     </>
   );
 };

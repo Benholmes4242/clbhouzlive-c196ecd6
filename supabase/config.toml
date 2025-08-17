@@ -33,6 +33,3 @@ verify_jwt = true
 
 [functions.generate-progress-motivation]
 verify_jwt = false
-
-[functions.extend-header]
-verify_jwt = true
