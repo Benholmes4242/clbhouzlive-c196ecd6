@@ -41,6 +41,7 @@ import { Swords } from 'lucide-react';
 import CinematicProfileHeader from './CinematicProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
+import { useHeaderExtension } from '@/hooks/useHeaderExtension';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
 import AchievementsPane from './AchievementsPane';
@@ -100,6 +101,7 @@ const HeroProfileHeader = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
+  const { extendHeader, isProcessing: headerProcessing } = useHeaderExtension();
   const isMobile = useIsMobile();
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
@@ -421,6 +423,18 @@ const HeroProfileHeader = ({
 
       toast.success("Profile photo uploaded successfully!");
 
+      // Auto-extend header on mobile devices only
+      if (isMobile && result.imageUrl) {
+        try {
+          console.log('🚀 Starting automatic header extension for mobile device');
+          await extendHeader(file, 200, "Extend the background upwards to match the existing scene. Seamless continuation for profile header.");
+          console.log('✅ Header extension completed');
+        } catch (extensionError) {
+          console.log('🔄 Header extension failed, using fallback:', extensionError);
+          // Don't show error to user - fallback will be used automatically
+        }
+      }
+
       onProfileUpdate();
       
       console.log('Profile photo updated successfully:', result.imageUrl);
@@ -474,7 +488,7 @@ const HeroProfileHeader = ({
           onVideoUpload={handleVideoUpload}
           onPhotoUpload={handlePhotoUpload}
           onVideoRemove={handleVideoRemove}
-          uploading={videoUploading || photoUploading}
+          uploading={videoUploading || photoUploading || headerProcessing}
           
         />
         
