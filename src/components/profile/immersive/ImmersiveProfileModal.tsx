@@ -465,6 +465,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       <ImmersiveIdentityDock 
         userId={userId}
         isVisible={isOpen && !currentItem.isUploading}
+        onMorphToHeader={handleClose}
       />
 
       {/* Down Arrow - Bottom Center */}

@@ -1,209 +1,153 @@
 import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Zap, Trophy, Star, TrendingUp, Target, MapPin, Award, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Users, FileText, Trophy, Target, Star, MapPin } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TieredStatsDisplayProps {
   primaryStats: {
-    handicap?: number;
+    handicap: string | number;
     posts: number;
     followers: number;
     following: number;
   };
   secondaryStats: {
     coursesRated: number;
-    averageRating: number;
+    avgRating: number;
     achievements: number;
-    coursesPlayed: number;
+    memberSince?: string;
   };
+  onStatClick?: (statType: string) => void;
 }
 
 const TieredStatsDisplay: React.FC<TieredStatsDisplayProps> = ({
   primaryStats,
-  secondaryStats
+  secondaryStats,
+  onStatClick
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isMobile = useIsMobile();
 
-  const primaryStatsData = [
-    {
-      key: 'handicap',
-      label: 'Handicap',
-      value: primaryStats.handicap || '--',
-      icon: Target,
-      color: 'text-green-400'
-    },
-    {
-      key: 'posts',
-      label: 'Posts',
-      value: primaryStats.posts,
-      icon: FileText,
-      color: 'text-blue-400'
-    },
-    {
-      key: 'followers',
-      label: 'Followers',
-      value: primaryStats.followers,
-      icon: Users,
-      color: 'text-purple-400'
-    },
-    {
-      key: 'following',
-      label: 'Following',
-      value: primaryStats.following,
-      icon: Users,
-      color: 'text-pink-400'
-    }
-  ];
+  const PrimaryStat = ({ icon: Icon, label, value, onClick }: {
+    icon: React.ElementType;
+    label: string;
+    value: string | number;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center gap-1 p-3 rounded-xl bg-background/60 hover:bg-background/80 transition-all duration-200 backdrop-blur-sm border border-border/30 ${
+        isMobile ? 'min-w-[70px]' : 'min-w-[100px]'
+      }`}
+    >
+      <Icon className="w-5 h-5 text-primary" />
+      <div className="text-lg font-bold text-foreground">{value}</div>
+      <div className="text-xs text-muted-foreground font-medium">{label}</div>
+    </button>
+  );
 
-  const secondaryStatsData = [
-    {
-      key: 'coursesRated',
-      label: 'Courses Rated',
-      value: secondaryStats.coursesRated,
-      icon: Star,
-      color: 'text-yellow-400'
-    },
-    {
-      key: 'averageRating',
-      label: 'Avg Rating',
-      value: secondaryStats.averageRating.toFixed(1),
-      icon: Trophy,
-      color: 'text-orange-400'
-    },
-    {
-      key: 'achievements',
-      label: 'Achievements',
-      value: secondaryStats.achievements,
-      icon: Trophy,
-      color: 'text-red-400'
-    },
-    {
-      key: 'coursesPlayed',
-      label: 'Courses Played',
-      value: secondaryStats.coursesPlayed,
-      icon: MapPin,
-      color: 'text-indigo-400'
-    }
-  ];
-
-  if (isMobile) {
-    return (
-      <div className="w-full">
-        {/* Primary Stats - Horizontal Scroll Pills */}
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {primaryStatsData.map((stat) => {
-            const IconComponent = stat.icon;
-            return (
-              <div
-                key={stat.key}
-                className="flex-shrink-0 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20"
-              >
-                <div className="flex items-center gap-2">
-                  <IconComponent className={`w-4 h-4 ${stat.color}`} />
-                  <div className="text-white text-sm">
-                    <span className="font-semibold">{stat.value}</span>
-                    <span className="ml-1 text-white/70 text-xs">{stat.label}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Expandable Secondary Stats */}
-        <div className="mt-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-white/80 hover:text-white hover:bg-white/10"
-          >
-            {isExpanded ? 'Less Stats' : 'More Stats'}
-            {isExpanded ? (
-              <ChevronUp className="w-4 h-4 ml-1" />
-            ) : (
-              <ChevronDown className="w-4 h-4 ml-1" />
-            )}
-          </Button>
-
-          {isExpanded && (
-            <div className="mt-2 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {secondaryStatsData.map((stat) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div
-                    key={stat.key}
-                    className="flex-shrink-0 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10"
-                  >
-                    <div className="flex items-center gap-2">
-                      <IconComponent className={`w-4 h-4 ${stat.color}`} />
-                      <div className="text-white text-sm">
-                        <span className="font-semibold">{stat.value}</span>
-                        <span className="ml-1 text-white/70 text-xs">{stat.label}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+  const SecondaryStat = ({ icon: Icon, label, value, onClick }: {
+    icon: React.ElementType;
+    label: string;
+    value: string | number;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className="flex items-center justify-between p-3 rounded-lg bg-background/40 hover:bg-background/60 transition-all duration-200 backdrop-blur-sm border border-border/20"
+    >
+      <div className="flex items-center gap-3">
+        <Icon className="w-4 h-4 text-primary" />
+        <span className="text-sm font-medium text-foreground">{label}</span>
       </div>
-    );
-  }
+      <span className="text-sm font-bold text-foreground">{value}</span>
+    </button>
+  );
 
-  // Desktop Layout
   return (
-    <div className="w-full">
-      {/* Primary Stats - Inline with spacing */}
-      <div className="flex items-center justify-center gap-8 mb-4">
-        {primaryStatsData.map((stat) => {
-          const IconComponent = stat.icon;
-          return (
-            <div key={stat.key} className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <IconComponent className={`w-5 h-5 ${stat.color}`} />
-                <span className="text-white font-bold text-xl">{stat.value}</span>
-              </div>
-              <div className="text-white/70 text-sm">{stat.label}</div>
-            </div>
-          );
-        })}
+    <div className="space-y-4">
+      {/* Primary Stats - Always Visible */}
+      <div className={`${
+        isMobile 
+          ? 'flex gap-2 overflow-x-auto scrollbar-hide pb-2' 
+          : 'grid grid-cols-4 gap-4'
+      }`}>
+        <PrimaryStat 
+          icon={Zap} 
+          label="Handicap" 
+          value={primaryStats.handicap}
+          onClick={() => onStatClick?.('handicap')}
+        />
+        <PrimaryStat 
+          icon={Trophy} 
+          label="Posts" 
+          value={primaryStats.posts}
+          onClick={() => onStatClick?.('posts')}
+        />
+        <PrimaryStat 
+          icon={Star} 
+          label="Followers" 
+          value={primaryStats.followers}
+          onClick={() => onStatClick?.('followers')}
+        />
+        <PrimaryStat 
+          icon={TrendingUp} 
+          label="Following" 
+          value={primaryStats.following}
+          onClick={() => onStatClick?.('following')}
+        />
       </div>
 
-      {/* Secondary Stats - Expandable */}
-      <div className="text-center">
+      {/* Expand/Collapse Button */}
+      <div className="flex justify-center">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-white/80 hover:text-white hover:bg-white/10"
+          className="text-muted-foreground hover:text-foreground transition-colors"
         >
-          {isExpanded ? 'Less Stats' : 'More Stats'}
+          <span className="text-xs font-medium mr-2">
+            {isExpanded ? 'Show Less' : 'Show More Stats'}
+          </span>
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 ml-1" />
+            <ChevronUp className="w-4 h-4" />
           ) : (
-            <ChevronDown className="w-4 h-4 ml-1" />
+            <ChevronDown className="w-4 h-4" />
           )}
         </Button>
+      </div>
 
-        {isExpanded && (
-          <div className="mt-4 flex items-center justify-center gap-6">
-            {secondaryStatsData.map((stat) => {
-              const IconComponent = stat.icon;
-              return (
-                <div key={stat.key} className="text-center">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <IconComponent className={`w-4 h-4 ${stat.color}`} />
-                    <span className="text-white font-semibold text-lg">{stat.value}</span>
-                  </div>
-                  <div className="text-white/70 text-xs">{stat.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+      {/* Secondary Stats - Expandable */}
+      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+        isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
+      }`}>
+        <div className="space-y-2 pt-2">
+          <SecondaryStat 
+            icon={Target} 
+            label="Courses Rated" 
+            value={secondaryStats.coursesRated}
+            onClick={() => onStatClick?.('coursesRated')}
+          />
+          <SecondaryStat 
+            icon={MapPin} 
+            label="Avg Rating" 
+            value={secondaryStats.avgRating > 0 ? `${secondaryStats.avgRating}/5` : 'N/A'}
+            onClick={() => onStatClick?.('avgRating')}
+          />
+          <SecondaryStat 
+            icon={Award} 
+            label="Achievements" 
+            value={secondaryStats.achievements}
+            onClick={() => onStatClick?.('achievements')}
+          />
+          {secondaryStats.memberSince && (
+            <SecondaryStat 
+              icon={Calendar} 
+              label="Member Since" 
+              value={secondaryStats.memberSince}
+              onClick={() => onStatClick?.('memberSince')}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

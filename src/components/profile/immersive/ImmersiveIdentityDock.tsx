@@ -17,11 +17,13 @@ interface ProfileData {
 interface ImmersiveIdentityDockProps {
   userId: string;
   isVisible: boolean;
+  onMorphToHeader?: () => void;
 }
 
 const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
   userId,
-  isVisible
+  isVisible,
+  onMorphToHeader
 }) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -112,6 +114,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
           : 'translate-y-full opacity-0'
       }`}
       style={liquidGlassStyle}
+      onClick={onMorphToHeader}
     >
       <div className="px-6 py-4 rounded-2xl">
         <div className="flex items-center gap-4">

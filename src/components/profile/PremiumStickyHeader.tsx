@@ -1,127 +1,172 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin } from 'lucide-react';
-
-interface Profile {
-  id: string;
-  display_name?: string;
-  username?: string;
-  profile_photo_url?: string;
-  home_club?: string;
-}
+import { MapPin, Zap, Trophy, Star, TrendingUp } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PremiumStickyHeaderProps {
-  profile: Profile;
   isVisible: boolean;
+  profile: {
+    id: string;
+    display_name?: string;
+    username?: string;
+    profile_photo_url?: string;
+    home_club?: string;
+  } | null;
   stats: {
-    handicap?: number;
+    handicap: string | number;
     posts: number;
     followers: number;
     following: number;
   };
+  onStatClick?: (statType: string) => void;
 }
 
 const PremiumStickyHeader: React.FC<PremiumStickyHeaderProps> = ({
+  isVisible,
   profile,
-  isVisible: initialVisible,
-  stats
+  stats,
+  onStatClick
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useIsMobile();
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const shouldShow = scrollY > 400; // Show after scrolling past 400px
-      setIsVisible(shouldShow);
+      setHasScrolled(window.scrollY > 100);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  const liquidGlassStyle = {
-    background: 'rgba(255, 255, 255, 0.08)',
-    backdropFilter: 'blur(20px) saturate(1.8)',
-    WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
-  };
+
+  if (!profile || !isVisible) return null;
+
+  const StatItem = ({ icon: Icon, label, value, onClick }: {
+    icon: React.ElementType;
+    label: string;
+    value: string | number;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/80 hover:bg-background/90 transition-all duration-200 backdrop-blur-sm border border-border/50"
+    >
+      <Icon className="w-3 h-3 text-primary" />
+      <span className="text-xs font-medium text-foreground/80">{label}</span>
+      <span className="text-xs font-bold text-foreground">{value}</span>
+    </button>
+  );
 
   return (
-    <div
-      className={`fixed top-16 left-0 right-0 z-40 transition-all duration-500 ease-out ${
-        isVisible 
+    <div 
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out ${
+        isVisible && hasScrolled
           ? 'translate-y-0 opacity-100' 
           : '-translate-y-full opacity-0'
       }`}
-      style={liquidGlassStyle}
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(20px) saturate(1.2)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)'
+      }}
     >
-      <div className="px-4 py-3">
+      <div className={`max-w-6xl mx-auto ${isMobile ? 'px-4 py-3' : 'px-6 py-4'}`}>
         <div className="flex items-center justify-between">
           {/* Left: Avatar + Name */}
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 rounded-lg">
+            <Avatar className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-xl border-2 border-primary/20`}>
               <AvatarImage 
                 src={profile.profile_photo_url || undefined}
                 alt={profile.display_name || 'User'}
               />
-              <AvatarFallback className="rounded-lg bg-primary/20 text-primary font-semibold">
+              <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-semibold text-sm">
                 {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="min-w-0">
-              <div className="text-white font-semibold text-sm truncate">
+              <div className={`font-bold text-foreground truncate ${isMobile ? 'text-sm' : 'text-base'}`}>
                 {profile.display_name || profile.username || 'Unknown User'}
               </div>
-              {profile.username && (
-                <div className="text-white/70 text-xs truncate">
+              {profile.username && profile.display_name && (
+                <div className={`text-muted-foreground truncate ${isMobile ? 'text-xs' : 'text-sm'}`}>
                   @{profile.username}
+                </div>
+              )}
+              {profile.home_club && !isMobile && (
+                <div className="flex items-center gap-1 text-muted-foreground text-xs truncate mt-0.5">
+                  <MapPin className="w-3 h-3" />
+                  <span>{profile.home_club}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right: Compact Stats (Desktop) */}
-          <div className="hidden md:flex items-center gap-6">
-            {stats.handicap && (
-              <div className="text-center">
-                <div className="text-white font-bold text-sm">{stats.handicap}</div>
-                <div className="text-white/70 text-xs">HCP</div>
-              </div>
-            )}
-            <div className="text-center">
-              <div className="text-white font-bold text-sm">{stats.posts}</div>
-              <div className="text-white/70 text-xs">Posts</div>
-            </div>
-            <div className="text-center">
-              <div className="text-white font-bold text-sm">{stats.followers}</div>
-              <div className="text-white/70 text-xs">Followers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-white font-bold text-sm">{stats.following}</div>
-              <div className="text-white/70 text-xs">Following</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Stats Strip */}
-        <div className="md:hidden mt-3 flex justify-center">
-          <div className="flex items-center gap-4 text-xs">
-            {stats.handicap && (
+          {/* Right: Stats */}
+          <div className={`flex ${isMobile ? 'flex-col gap-1.5' : 'items-center gap-3'}`}>
+            {isMobile ? (
+              // Mobile: Vertical stack
               <>
-                <span className="text-white/90">
-                  <span className="font-semibold">{stats.handicap}</span> HCP
-                </span>
-                <span className="text-white/40">•</span>
+                <div className="flex gap-1.5">
+                  <StatItem 
+                    icon={Zap} 
+                    label="HC" 
+                    value={stats.handicap}
+                    onClick={() => onStatClick?.('handicap')}
+                  />
+                  <StatItem 
+                    icon={Trophy} 
+                    label="Posts" 
+                    value={stats.posts}
+                    onClick={() => onStatClick?.('posts')}
+                  />
+                </div>
+                <div className="flex gap-1.5">
+                  <StatItem 
+                    icon={Star} 
+                    label="Followers" 
+                    value={stats.followers}
+                    onClick={() => onStatClick?.('followers')}
+                  />
+                  <StatItem 
+                    icon={TrendingUp} 
+                    label="Following" 
+                    value={stats.following}
+                    onClick={() => onStatClick?.('following')}
+                  />
+                </div>
+              </>
+            ) : (
+              // Desktop: Horizontal row
+              <>
+                <StatItem 
+                  icon={Zap} 
+                  label="Handicap" 
+                  value={stats.handicap}
+                  onClick={() => onStatClick?.('handicap')}
+                />
+                <StatItem 
+                  icon={Trophy} 
+                  label="Posts" 
+                  value={stats.posts}
+                  onClick={() => onStatClick?.('posts')}
+                />
+                <StatItem 
+                  icon={Star} 
+                  label="Followers" 
+                  value={stats.followers}
+                  onClick={() => onStatClick?.('followers')}
+                />
+                <StatItem 
+                  icon={TrendingUp} 
+                  label="Following" 
+                  value={stats.following}
+                  onClick={() => onStatClick?.('following')}
+                />
               </>
             )}
-            <span className="text-white/90">
-              <span className="font-semibold">{stats.posts}</span> Posts
-            </span>
-            <span className="text-white/40">•</span>
-            <span className="text-white/90">
-              <span className="font-semibold">{stats.followers}</span> Followers
-            </span>
           </div>
         </div>
       </div>
