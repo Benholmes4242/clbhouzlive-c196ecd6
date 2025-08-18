@@ -408,7 +408,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         // For videos, use actual video currentTime for accurate sync
         const videoDurationMs = currentVideoElement.duration * 1000;
         const videoCurrentTimeMs = currentVideoElement.currentTime * 1000;
-        newProgress = Math.min((videoCurrentTimeMs / videoDurationMs) * 100, 100);
+        
+        // Check if video has ended
+        if (currentVideoElement.ended || videoCurrentTimeMs >= videoDurationMs) {
+          newProgress = 100;
+        } else {
+          newProgress = Math.min((videoCurrentTimeMs / videoDurationMs) * 100, 100);
+        }
       } else {
         // For images, use elapsed time as before
         const elapsed = Date.now() - startTimeRef.current;
