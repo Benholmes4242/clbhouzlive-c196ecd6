@@ -1,13 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Upload, X, Play, Image as ImageIcon, GripVertical, Scissors, Edit, Check, AlertCircle } from 'lucide-react';
+import { Upload, X, Play, Image as ImageIcon, GripVertical, Scissors, Edit } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { toast } from 'sonner';
-import { useMediaManagerState } from '@/hooks/useMediaManagerState';
-import { useBackgroundMediaUpload } from '@/hooks/useBackgroundMediaUpload';
-import type { StagedMediaItem } from '@/types/mediaManager';
+import { supabase } from '@/integrations/supabase/client';
+import { useCloudflareStream } from '@/hooks/useCloudflareStream';
+import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface MediaItem {
   id: string;
@@ -37,26 +36,18 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
   mediaItems,
   onMediaUpdate
 }) => {
+  const [items, setItems] = useState<MediaItem[]>(mediaItems);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const {
-    stagedItems,
-    hasChanges,
-    canSave,
-    addFiles,
-    updateItemState,
-    removeItem,
-    reorderItems,
-    commitChanges
-  } = useMediaManagerState(mediaItems);
-  
-  const {
-    queueUpload,
-    startProcessing,
-    isProcessing,
-    queueLength
-  } = useBackgroundMediaUpload();
+  const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
+  const { uploadImage, uploading: imageUploading } = useR2Upload();
+
+  // Update items when mediaItems prop changes
+  React.useEffect(() => {
+    setItems(mediaItems.sort((a, b) => a.display_order - b.display_order));
+  }, [mediaItems]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -67,16 +58,19 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
     if (!files) return;
 
     // Check if adding these files would exceed the 5-item limit
-    if (stagedItems.length + files.length > 5) {
-      toast.error(`Cannot add ${files.length} files. Maximum 5 items allowed. You currently have ${stagedItems.length} items.`);
+    if (items.length + files.length > 5) {
+      toast.error(`Cannot add ${files.length} files. Maximum 5 items allowed. You currently have ${items.length} items.`);
       return;
     }
 
+    setUploading(true);
+
     try {
-      // Basic validation first
+      const newItems: Partial<MediaItem>[] = [];
+
       for (const file of Array.from(files)) {
         if (file.type.startsWith('video/')) {
-          // Quick duration check
+          // Check video duration (max 20s)
           const video = document.createElement('video');
           video.preload = 'metadata';
           
@@ -91,56 +85,47 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
             video.onerror = () => reject(new Error('Invalid video file'));
             video.src = URL.createObjectURL(file);
           });
+
+          const result = await uploadVideo(file);
+          if (result.success && result.videoUrl) {
+            newItems.push({
+              media_type: 'video',
+              media_url: result.videoUrl,
+              thumbnail_url: result.thumbnailUrl,
+              duration: Math.round(Math.min(video.duration * 1000, 20000)), // Convert to ms, cap at 20s, ensure integer
+              display_order: items.length + newItems.length,
+              file_name: file.name,
+              video_method: 'upload'
+            });
+          }
+        } else if (file.type.startsWith('image/')) {
+          const result = await uploadImage(file);
+          if (result.success && result.imageUrl) {
+            newItems.push({
+              media_type: 'image',
+              media_url: result.imageUrl,
+              duration: 3000, // 3 seconds for images
+              display_order: items.length + newItems.length,
+              file_name: file.name
+            });
+          }
         }
       }
 
-      // Add files to staging immediately
-      const newItems = addFiles(Array.from(files));
-      
-      // Queue uploads for background processing
-      newItems.forEach(item => {
-        if (item.file) {
-          queueUpload({
-            id: `upload_${item.id}`,
-            mediaItemId: item.id,
-            file: item.file,
-            type: item.media_type,
-            userId,
-            onProgress: (progress) => {
-              updateItemState(item.id, { 
-                state: 'uploading', 
-                uploadProgress: progress 
-              });
-            },
-            onComplete: (result) => {
-              updateItemState(item.id, {
-                state: 'ready',
-                media_url: result.media_url,
-                thumbnail_url: result.thumbnail_url,
-                duration: result.duration,
-                video_method: result.video_method,
-                uploadProgress: 100
-              });
-            },
-            onError: (error) => {
-              updateItemState(item.id, {
-                state: 'error',
-                error
-              });
-            }
-          });
-        }
-      });
+      // Add temporary IDs and update local state
+      const itemsWithTempIds = newItems.map((item, index) => ({
+        ...item,
+        id: `temp_${Date.now()}_${index}`,
+      })) as MediaItem[];
 
-      // Start processing uploads
-      startProcessing();
-
-      toast.success(`Added ${newItems.length} item(s) to staging.`);
+      setItems(prev => [...prev, ...itemsWithTempIds]);
+      toast.success(`Added ${newItems.length} item(s). Remember to save your changes.`);
 
     } catch (error: any) {
-      console.error('File validation error:', error);
-      toast.error(error.message || 'Failed to add files');
+      console.error('Upload error:', error);
+      toast.error(error.message || 'Failed to upload media');
     } finally {
+      setUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -149,54 +134,63 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
-    reorderItems(result.source.index, result.destination.index);
+
+    const reorderedItems = Array.from(items);
+    const [removed] = reorderedItems.splice(result.source.index, 1);
+    reorderedItems.splice(result.destination.index, 0, removed);
+
+    // Update display_order
+    const updatedItems = reorderedItems.map((item, index) => ({
+      ...item,
+      display_order: index
+    }));
+
+    setItems(updatedItems);
   };
 
   const handleRemove = (id: string) => {
-    const item = stagedItems.find(item => item.id === id);
-    if (item?.state === 'uploading') {
-      // Cancel upload if in progress
-      updateItemState(id, { state: 'removed' });
-    }
-    removeItem(id);
+    setItems(prev => prev.filter(item => item.id !== id));
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await commitChanges(userId);
-      
-      const uploadsInProgress = stagedItems.filter(item => 
-        item.state === 'uploading' || item.state === 'queued'
-      ).length;
-      
-      if (uploadsInProgress > 0) {
-        toast.success(`Changes saved. ${uploadsInProgress} items still uploading in background.`);
-      } else {
-        toast.success('Changes saved successfully!');
+      // Delete all existing media for this user
+      await supabase
+        .from('profile_media')
+        .delete()
+        .eq('user_id', userId)
+        .eq('is_immersive', true);
+
+      // Insert new media items (only if there are items to insert)
+      if (items.length > 0) {
+        const mediaToInsert = items.map((item, index) => ({
+          user_id: userId,
+          media_type: item.media_type,
+          media_url: item.media_url,
+          thumbnail_url: item.thumbnail_url,
+          duration: Math.round(item.duration || 3000), // Ensure integer value
+          display_order: index,
+          is_immersive: true,
+          file_name: item.file_name,
+          video_method: item.video_method || 'upload'
+        }));
+
+        const { error } = await supabase
+          .from('profile_media')
+          .insert(mediaToInsert);
+
+        if (error) throw error;
       }
-      
+
+      toast.success('Media saved successfully!');
       onMediaUpdate();
       onClose();
     } catch (error: any) {
       console.error('Save error:', error);
-      toast.error(error.message || 'Failed to save changes');
+      toast.error(error.message || 'Failed to save media');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const getStateIcon = (item: StagedMediaItem) => {
-    switch (item.state) {
-      case 'ready':
-        return <Check className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'uploading':
-      case 'processing':
-        return null; // Show progress bar instead
-      default:
-        return null;
     }
   };
 
@@ -230,24 +224,24 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                   Upload up to 5 items total (photos or videos, any mix). Videos max 20s.
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Currently: {stagedItems.length}/5 items
+                  Currently: {items.length}/5 items
                 </p>
               </div>
               
               <Button
                 onClick={handleFileSelect}
-                disabled={stagedItems.length >= 5}
+                disabled={uploading || items.length >= 5}
                 variant="outline"
               >
-                Choose Files
+                {uploading ? 'Uploading...' : 'Choose Files'}
               </Button>
             </div>
           </div>
 
           {/* Media List */}
-          {stagedItems.length > 0 && (
+          {items.length > 0 && (
             <div>
-              <h3 className="text-lg font-medium mb-4">Your Media ({stagedItems.length}/5)</h3>
+              <h3 className="text-lg font-medium mb-4">Your Media ({items.length}/5)</h3>
               
               <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="media-list">
@@ -257,26 +251,19 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                       ref={provided.innerRef}
                       className="space-y-3"
                     >
-                      {stagedItems.map((item, index) => (
-                        <Draggable 
-                          key={item.id} 
-                          draggableId={item.id} 
-                          index={index}
-                          isDragDisabled={item.state === 'uploading'}
-                        >
+                      {items.map((item, index) => (
+                        <Draggable key={item.id} draggableId={item.id} index={index}>
                           {(provided, snapshot) => (
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               className={`flex items-center space-x-4 p-4 border rounded-lg ${
                                 snapshot.isDragging ? 'shadow-lg' : ''
-                              } ${item.state === 'error' ? 'border-red-200 bg-red-50' : ''}`}
+                              }`}
                             >
                               <div
                                 {...provided.dragHandleProps}
-                                className={`text-gray-400 hover:text-gray-600 ${
-                                  item.state === 'uploading' ? 'opacity-50' : ''
-                                }`}
+                                className="text-gray-400 hover:text-gray-600"
                               >
                                 <GripVertical className="h-5 w-5" />
                               </div>
@@ -306,24 +293,12 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                                     </div>
                                   </>
                                 )}
-                                
-                                {/* Status overlay */}
-                                <div className="absolute top-1 right-1">
-                                  {getStateIcon(item)}
-                                </div>
                               </div>
 
                               <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <p className="font-medium">
-                                    {item.media_type === 'video' ? 'Video' : 'Photo'} {index + 1}
-                                  </p>
-                                  {item.isNew && (
-                                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
-                                      New
-                                    </span>
-                                  )}
-                                </div>
+                                <p className="font-medium">
+                                  {item.media_type === 'video' ? 'Video' : 'Photo'} {index + 1}
+                                </p>
                                 <p className="text-sm text-muted-foreground">
                                   {item.media_type === 'video' 
                                     ? `${(item.duration / 1000).toFixed(1)}s` 
@@ -331,44 +306,15 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                                   }
                                   {item.file_name && ` • ${item.file_name}`}
                                 </p>
-                                
-                                {/* Progress bar */}
-                                {(item.state === 'uploading' || item.state === 'processing') && (
-                                  <div className="mt-2">
-                                    <Progress 
-                                      value={item.uploadProgress || 0} 
-                                      className="h-2"
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {item.state === 'uploading' ? 'Uploading...' : 'Processing...'}
-                                      {' '}
-                                      {item.uploadProgress?.toFixed(0) || 0}%
-                                    </p>
-                                  </div>
-                                )}
-                                
-                                {/* Error state */}
-                                {item.state === 'error' && (
-                                  <p className="text-xs text-red-600 mt-1">
-                                    {item.error || 'Upload failed'}
-                                  </p>
-                                )}
-                                
-                                {/* Upload complete */}
-                                {item.state === 'ready' && item.isNew && (
-                                  <p className="text-xs text-green-600 mt-1">
-                                    Upload complete
-                                  </p>
-                                )}
                               </div>
 
-                              {/* Actions */}
+                              {/* Future: Trim/Edit buttons */}
                               <div className="flex space-x-2">
                                 {item.media_type === 'video' && (
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    disabled={item.state === 'uploading'}
+                                    disabled
                                     title="Coming soon"
                                   >
                                     <Scissors className="h-4 w-4" />
@@ -402,7 +348,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
             </Button>
             <Button
               onClick={handleSave}
-              disabled={saving || !canSave}
+              disabled={saving}
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
