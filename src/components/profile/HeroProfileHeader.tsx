@@ -50,8 +50,9 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 import PremiumStickyHeader from './PremiumStickyHeader';
-import TieredStatsDisplay from './TieredStatsDisplay';
-import StickyTabNavigation from './StickyTabNavigation';
+import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
+import ResponsiveGlassCard from './ResponsiveGlassCard';
+import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 
 interface Course {
   id: string;
@@ -192,12 +193,16 @@ const HeroProfileHeader = ({
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
-  // Auto-open immersive mode for other users when they have media
+  // Auto-open immersive mode for other users when they have media (default entry)
   useEffect(() => {
-    if (shouldAutoOpen && !immersiveLoading) {
-      openImmersive(0);
+    if (shouldAutoOpen && !immersiveLoading && hasImmersiveMedia) {
+      // Delay slightly to ensure smooth page load
+      const timer = setTimeout(() => {
+        openImmersive(0);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [shouldAutoOpen, immersiveLoading, openImmersive]);
+  }, [shouldAutoOpen, immersiveLoading, openImmersive, hasImmersiveMedia]);
   
   // Fetch stats data including progress
   useEffect(() => {
@@ -332,12 +337,12 @@ const HeroProfileHeader = ({
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      setShowStickyHeader(scrollY > 200);
+      setShowStickyHeader(scrollY > (isMobile ? 150 : 200));
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isMobile]);
 
   // Handle morphing from identity dock to sticky header
   const handleMorphTransition = () => {
@@ -546,33 +551,29 @@ const HeroProfileHeader = ({
         }}
         onStatClick={handleStatClick}
       />
-      {/* Cinematic Profile Header */}
-      <div className="relative w-full bg-background">
-         <CinematicProfileHeader
-          profilePhotoUrl={profile?.profile_photo_url}
-          displayName={displayName}
-          isOwnProfile={isOwnProfile}
-          onPhotoUpload={handlePhotoUpload}
-          uploading={photoUploading}
-          hasImmersiveMedia={hasImmersiveMedia}
-          onOpenMediaManager={() => setMediaManagerOpen(true)}
-          onPreviewImmersive={previewImmersive}
-          onReopenImmersive={reopenImmersive}
+      {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
+      <div className="relative w-full">
+        <ResponsiveImmersiveHeader
+          mediaItems={mediaItems}
+          isCollapsed={showStickyHeader}
         />
       </div>
 
-      {/* Glassmorphic Profile Card - Pinned below collapsed header */}
-      <div className="relative -mt-16 z-50">
-        <GlassmorphicProfileCard
+      {/* Responsive Glass Profile Card */}
+      <div className={`relative z-50 ${hasImmersiveMedia ? '-mt-20' : 'mt-8'}`}>
+        <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
+          hasImmersiveMedia={hasImmersiveMedia}
+          onPreviewImmersive={previewImmersive}
           onEditProfile={() => setEditDialogOpen(true)}
+          onMediaManager={() => setMediaManagerOpen(true)}
         />
       </div>
 
-      {/* Tiered Stats Display */}
-      <div className="px-4 md:px-6 py-6">
-        <TieredStatsDisplay
+      {/* Responsive Stats Display */}
+      <div className={`px-4 md:px-8 py-6 ${isMobile ? 'py-4' : 'py-8'}`}>
+        <ResponsiveStatsDisplay
           primaryStats={{
             handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
             posts: postsCount,
@@ -589,12 +590,39 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Sticky Tab Navigation */}
-      <StickyTabNavigation
-        activeTab={activeSection}
-        onTabChange={handleTabChange}
-        isVisible={true}
-      />
+      {/* Tab Navigation with Underline Animation */}
+      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-lg border-b border-border/20">
+        <div className="relative">
+          <div className={`flex ${isMobile ? 'px-4' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`
+                  relative py-4 px-4 text-sm font-medium transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'text-primary' 
+                    : 'text-muted-foreground hover:text-foreground'
+                  }
+                  flex-1 text-center
+                `}
+              >
+                {tab.label}
+                {/* Underline animation */}
+                <div className={`
+                  absolute bottom-0 left-0 right-0 h-0.5 bg-primary
+                  transition-all duration-300 ease-out
+                  ${activeSection === tab.id 
+                    ? 'scale-x-100 opacity-100' 
+                    : 'scale-x-0 opacity-0'
+                  }
+                  origin-center
+                `} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Legacy ProfileTabs for content rendering */}
       <div style={{ display: 'none' }}>
@@ -717,9 +745,16 @@ const HeroProfileHeader = ({
         )}
       </div>
 
-      {/* Content sections for the selected tab */}
-      <div className={`py-8 ${activeSection === 'activity' ? 'px-0 md:px-0' : 'px-4 md:px-0'}`}>
-        <div className={`${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}`}>
+      {/* Content sections for the selected tab with responsive animations */}
+      <div className={`
+        py-8 transition-all duration-300 ease-out
+        ${activeSection === 'activity' ? 'px-0 md:px-0' : 'px-4 md:px-0'}
+        ${isMobile ? 'py-4' : 'py-8'}
+      `}>
+        <div className={`
+          transition-transform duration-300 ease-out
+          ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
+        `}>
           {activeSection === 'activity' && (
             <ActivityFeed
               userId={profile?.id || ''}

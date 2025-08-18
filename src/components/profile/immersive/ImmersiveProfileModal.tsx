@@ -59,6 +59,9 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const startTimeRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  
+  // Enhanced mobile animations
+  const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
   
@@ -118,14 +121,21 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     if (isTransitioning) return;
     
     if (activeIndex >= totalItems - 1) {
-      // Auto-fade and close when reaching the end
+      // Enhanced mobile fade and close
+      setIsMobileTransitioning(true);
       const modal = document.getElementById('immersive-modal');
       if (modal) {
-        modal.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        const isMobile = window.innerWidth < 768;
+        modal.style.transition = isMobile 
+          ? 'opacity 0.4s ease-out, transform 0.4s ease-out' 
+          : 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         modal.style.opacity = '0';
+        if (isMobile) {
+          modal.style.transform = 'translateY(20px)';
+        }
         setTimeout(() => {
           onClose();
-        }, 800);
+        }, isMobile ? 400 : 800);
       } else {
         onClose();
       }
@@ -133,25 +143,37 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
 
     setIsTransitioning(true);
+    setIsMobileTransitioning(true);
     const nextIndex = activeIndex + 1;
+    
+    // Faster transitions on mobile
+    const transitionDuration = window.innerWidth < 768 ? 100 : 150;
     
     setTimeout(() => {
       setActiveIndex(nextIndex);
       onCurrentIndexChange?.(nextIndex);
       setProgress(0);
       setIsTransitioning(false);
-    }, 150);
+      setIsMobileTransitioning(false);
+    }, transitionDuration);
   }, [activeIndex, totalItems, isTransitioning, onCurrentIndexChange, onClose]);
 
   const handleClose = useCallback(() => {
-    // Smooth fade-out transition
+    // Enhanced mobile fade-out transition
+    setIsMobileTransitioning(true);
     const modal = document.getElementById('immersive-modal');
     if (modal) {
-      modal.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      const isMobile = window.innerWidth < 768;
+      modal.style.transition = isMobile 
+        ? 'opacity 0.4s ease-out, transform 0.4s ease-out' 
+        : 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
       modal.style.opacity = '0';
+      if (isMobile) {
+        modal.style.transform = 'translateY(20px)';
+      }
       setTimeout(() => {
         onClose();
-      }, 800);
+      }, isMobile ? 400 : 800);
     } else {
       onClose();
     }
