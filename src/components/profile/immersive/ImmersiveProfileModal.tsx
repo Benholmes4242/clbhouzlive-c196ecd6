@@ -52,8 +52,10 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [progress, setProgress] = useState(0);
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
   const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
+  const [isVideoPaused, setIsVideoPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
@@ -74,6 +76,19 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     border: '1px solid rgba(255, 255, 255, 0.2)',
     boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
   };
+
+  // Handle video tap to pause/unpause
+  const handleVideoTap = useCallback(() => {
+    if (currentItem?.media_type === 'video' && videoRef.current) {
+      if (isVideoPaused) {
+        videoRef.current.play();
+        setIsVideoPaused(false);
+      } else {
+        videoRef.current.pause();
+        setIsVideoPaused(true);
+      }
+    }
+  }, [currentItem, isVideoPaused]);
 
   const logTelemetryEvent = useCallback(async (event: string, data: any = {}) => {
     if (!session?.user?.id) return;
@@ -277,7 +292,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
   // Progress timer for current media
   useEffect(() => {
-    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading) return;
+    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading || isVideoPaused) return;
 
     const duration = currentItem.media_type === 'image' ? 3000 : currentItem.duration;
     startTimeRef.current = Date.now();
@@ -299,7 +314,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext]);
+  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused]);
+
+  // Reset video pause state when changing media
+  useEffect(() => {
+    setIsVideoPaused(false);
+  }, [activeIndex]);
 
   // Swipe handlers
   const swipeHandlers = useSwipeable({
@@ -368,7 +388,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       {/* Mute Button - Top Right */}
       <button
         onClick={toggleGlobalMute}
-        className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center"
+        className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1"
         style={liquidGlassStyle}
       >
         {isGloballyMuted ? (
@@ -379,19 +399,22 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       </button>
 
       {/* Media Content */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
         {currentItem.media_type === 'video' ? (
           <video
+            ref={videoRef}
             key={`${currentItem.id}-${activeIndex}`}
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-pointer"
             autoPlay
             muted={isGloballyMuted}
             playsInline
             onLoadedData={() => {
               startTimeRef.current = Date.now();
             }}
+            onPlay={() => setIsVideoPaused(false)}
+            onPause={() => setIsVideoPaused(true)}
           />
         ) : (
           <img
@@ -467,7 +490,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <button
           onClick={handleClose}
-          className="w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_3s_ease-in-out_infinite]"
+          className="w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_2s_ease-in-out_infinite] p-1"
           style={liquidGlassStyle}
         >
           <ChevronDown className="w-6 h-6 text-white mx-auto" />

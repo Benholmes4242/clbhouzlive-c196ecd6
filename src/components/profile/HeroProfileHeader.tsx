@@ -47,6 +47,8 @@ import AchievementsPane from './AchievementsPane';
 import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
 import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
+import GlassmorphicProfileCard from './GlassmorphicProfileCard';
+import SwipeToReturnZone from './SwipeToReturnZone';
 
 interface Course {
   id: string;
@@ -488,7 +490,7 @@ const HeroProfileHeader = ({
   };
 
   return (
-    <>
+    <SwipeToReturnZone onSwipeDown={reopenImmersive}>
       {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
          <CinematicProfileHeader
@@ -502,137 +504,19 @@ const HeroProfileHeader = ({
           onPreviewImmersive={previewImmersive}
           onReopenImmersive={reopenImmersive}
         />
-        
-        {/* Profile Info and Stats Bar - Positioned over the blurred area */}
-        <div className={`absolute bottom-[-14rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 ${window.innerWidth < 768 ? 'pt-20' : 'pt-16'}`}>
-          {/* User Information */}
-          <div className="text-center mb-6">
-            {/* User's Name */}
-            <div className="flex items-center justify-center">
-              <h1 className="text-4xl md:text-5xl text-black font-bold">
-                {displayName}
-              </h1>
-            </div>
-            
-            {/* Username with Edit Button */}
-            {username && (
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg md:text-xl text-black">
-                  @{username}
-                </p>
-                
-                {/* Edit Profile Button - Next to username for own profile */}
-                {isOwnProfile && (
-                  <button 
-                    className="px-3 py-1.5 rounded-full bg-muted/50 hover:bg-muted border border-border text-foreground font-medium transition-all duration-300 ease-in-out flex items-center justify-center text-sm" 
-                    onClick={() => setEditDialogOpen(true)}
-                  >
-                    Edit Profile
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Home Golf Club */}
-            <p className="text-lg md:text-xl text-black mb-4">
-              {homeClub}
-            </p>
-          </div>
-
-          {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="flex items-center justify-center gap-4 w-full">
-            {/* Left Navigation Arrow */}
-            <div className="flex-shrink-0">
-              <button
-                onClick={() => {
-                  const container = document.getElementById('stats-container');
-                  if (container) {
-                    container.scrollBy({ left: -320, behavior: 'smooth' });
-                  }
-                }}
-                className="w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
-              >
-                <ArrowLeftIcon className="w-3 h-3" />
-              </button>
-            </div>
-            
-            {/* Stats Container - Mobile shows 3.5 stats, Desktop shows 4 */}
-            <div className="flex-shrink-0 overflow-hidden rounded-lg w-full md:w-[520px]">
-              <div 
-                id="stats-container"
-                className="flex gap-6 md:gap-16 overflow-x-auto scrollbar-hide px-2 py-2"
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  // Mobile: show 3.5 stats (3 full + half of 4th to encourage swiping)
-                  width: window.innerWidth < 768 ? 'calc(3.5 * 80px + 3 * 24px + 16px)' : 'auto'
-                }}
-              >
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
-                  </div>
-                  <div className="text-base text-muted-foreground">Handicap</div>
-                </div>
-                
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {postsCount}
-                  </div>
-                  <div className="text-base text-muted-foreground">Posts</div>
-                </div>
-                
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {followersCount}
-                  </div>
-                  <div className="text-base text-muted-foreground">Followers</div>
-                </div>
-                
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {userProgressData.coursesPlayed || '24'}
-                  </div>
-                  <div className="text-base text-muted-foreground">Following</div>
-                </div>
-                
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {ratedCoursesCount}
-                  </div>
-                  <div className="text-base text-muted-foreground">Rated</div>
-                </div>
-                
-                <div className="flex-shrink-0 text-center w-20">
-                  <div className="text-4xl md:text-5xl text-foreground">
-                    {averageRating > 0 ? `${averageRating}/10` : '--'}
-                  </div>
-                  <div className="text-base text-muted-foreground">Avg Rating</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Navigation Arrow */}
-            <div className="flex-shrink-0">
-              <button
-                onClick={() => {
-                  const container = document.getElementById('stats-container');
-                  if (container) {
-                    container.scrollBy({ left: 320, behavior: 'smooth' });
-                  }
-                }}
-                className="w-6 h-6 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200 p-1"
-              >
-                <ArrowRightIcon className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Spacer for profile overlay */}
-      <div className="h-56 md:h-64"></div>
+      {/* Glassmorphic Profile Card - Pinned below collapsed header */}
+      <div className="relative -mt-16 z-50">
+        <GlassmorphicProfileCard
+          profile={profile}
+          isOwnProfile={isOwnProfile}
+          onEditProfile={() => setEditDialogOpen(true)}
+        />
+      </div>
+
+      {/* Spacer */}
+      <div className="h-8"></div>
 
       {/* Sticky Tab Navigation */}
       <ProfileTabs
@@ -870,7 +754,7 @@ const HeroProfileHeader = ({
         }))}
         onMediaUpdate={refetchMedia}
       />
-    </>
+    </SwipeToReturnZone>
   );
 };
 
