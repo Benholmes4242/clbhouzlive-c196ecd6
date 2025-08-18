@@ -402,8 +402,19 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setProgress(0);
 
     const updateProgress = () => {
-      const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / duration) * 100, 100);
+      let newProgress = 0;
+      
+      if (currentItem.media_type === 'video' && currentVideoElement) {
+        // For videos, use actual video currentTime for accurate sync
+        const videoDurationMs = currentVideoElement.duration * 1000;
+        const videoCurrentTimeMs = currentVideoElement.currentTime * 1000;
+        newProgress = Math.min((videoCurrentTimeMs / videoDurationMs) * 100, 100);
+      } else {
+        // For images, use elapsed time as before
+        const elapsed = Date.now() - startTimeRef.current;
+        newProgress = Math.min((elapsed / duration) * 100, 100);
+      }
+      
       setProgress(newProgress);
 
       if (newProgress >= 100) {
@@ -417,7 +428,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused]);
+  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused, currentVideoElement]);
 
   // Attach video elements to containers
   useEffect(() => {
