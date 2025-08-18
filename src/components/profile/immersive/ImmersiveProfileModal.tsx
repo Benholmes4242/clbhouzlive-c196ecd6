@@ -408,17 +408,29 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             className="w-full h-full object-cover cursor-pointer"
             autoPlay
-            muted
+            muted={isGloballyMuted}
             playsInline
             loop
             onLoadedData={() => {
               startTimeRef.current = Date.now();
-              // Force play for autoplay
+            }}
+            onCanPlayThrough={() => {
+              // Force play when video is ready
               if (videoRef.current) {
-                videoRef.current.play().catch(() => {
-                  // Autoplay blocked, user interaction required
+                videoRef.current.play().catch((error) => {
+                  console.log('Autoplay failed:', error);
                 });
               }
+            }}
+            onLoadStart={() => {
+              // Ensure video starts playing as soon as possible
+              setTimeout(() => {
+                if (videoRef.current) {
+                  videoRef.current.play().catch((error) => {
+                    console.log('Manual play failed:', error);
+                  });
+                }
+              }, 100);
             }}
             onPlay={() => setIsVideoPaused(false)}
             onPause={() => setIsVideoPaused(true)}
