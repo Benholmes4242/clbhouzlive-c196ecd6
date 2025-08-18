@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface MediaItem {
   id: string;
-  media_type: string;
+  media_type: 'image' | 'video';
   media_url: string;
   thumbnail_url?: string;
   duration: number;
