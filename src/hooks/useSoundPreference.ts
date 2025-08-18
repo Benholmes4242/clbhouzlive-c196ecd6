@@ -5,7 +5,6 @@ const SOUND_PREFERENCE_KEY = 'video_sound_preference';
 export interface SoundPreference {
   isMuted: boolean;
   setMuted: (muted: boolean) => void;
-  toggleMute: () => void;
 }
 
 export const useSoundPreference = (): SoundPreference => {
@@ -35,13 +34,8 @@ export const useSoundPreference = (): SoundPreference => {
     }
   };
 
-  const toggleMute = () => {
-    setMuted(!isMuted);
-  };
-
   return {
     isMuted,
-    setMuted,
-    toggleMute
+    setMuted
   };
 };

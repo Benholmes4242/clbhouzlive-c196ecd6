@@ -188,10 +188,10 @@ const HeroProfileHeader = ({
 
   // Auto-open immersive mode for other users when they have media
   useEffect(() => {
-    if (shouldAutoOpen && !immersiveLoading && hasImmersiveMedia) {
+    if (shouldAutoOpen && !immersiveLoading) {
       openImmersive(0);
     }
-  }, [shouldAutoOpen, immersiveLoading, hasImmersiveMedia, openImmersive]);
+  }, [shouldAutoOpen, immersiveLoading, openImmersive]);
   
   // Fetch stats data including progress
   useEffect(() => {
@@ -491,7 +491,7 @@ const HeroProfileHeader = ({
     <>
       {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
-          <CinematicProfileHeader
+         <CinematicProfileHeader
           profilePhotoUrl={profile?.profile_photo_url}
           displayName={displayName}
           isOwnProfile={isOwnProfile}
@@ -499,6 +499,7 @@ const HeroProfileHeader = ({
           uploading={photoUploading}
           hasImmersiveMedia={hasImmersiveMedia}
           onOpenMediaManager={() => setMediaManagerOpen(true)}
+          onPreviewImmersive={previewImmersive}
           onReopenImmersive={reopenImmersive}
         />
         
@@ -856,14 +857,6 @@ const HeroProfileHeader = ({
         onCurrentIndexChange={setCurrentMediaIndex}
         uploadMode={isOwnProfile}
         onUploadComplete={() => refetchMedia()}
-        profile={profile ? {
-          id: profile.id,
-          display_name: profile.display_name,
-          username: profile.username,
-          profile_photo_url: profile.profile_photo_url,
-          home_club: profile.home_club
-        } : undefined}
-        isOwnProfile={isOwnProfile}
       />
 
       {/* Media Manager Modal */}
