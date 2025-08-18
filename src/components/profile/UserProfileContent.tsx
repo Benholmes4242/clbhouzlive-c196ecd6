@@ -5,8 +5,10 @@ import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
 import GlassProfileCard from './GlassProfileCard';
 import StickyProfileHeader from './StickyProfileHeader';
 import ProfileTabs from './ProfileTabs';
+import ProfileStats from './ProfileStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
+import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 
 interface UserProfileContentProps {
@@ -24,10 +26,22 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile?.id;
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('activity');
-  const [showImmersive, setShowImmersive] = useState(!isOwnProfile); // Show immersive by default for other profiles
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
+  
+  // Use the immersive profile hook
+  const {
+    isImmersiveOpen,
+    currentMediaIndex,
+    hasImmersiveMedia,
+    mediaItems,
+    loading: mediaLoading,
+    shouldAutoOpen,
+    openImmersive,
+    closeImmersive,
+    previewImmersive
+  } = useImmersiveProfile(profile?.id || '', isOwnProfile);
 
   // Handle scroll events for sticky header
   useEffect(() => {
@@ -39,20 +53,18 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Mock media data - in real app, this would come from profile
-  const mediaItems = profile?.media_items || [
-    {
-      type: 'image' as const,
-      url: profile?.profile_photo_url || '/placeholder.svg',
-      duration: 3000
-    }
-  ];
-
-  const profileStats = {
+  const primaryStats = {
     handicap: profile?.handicap || 'N/A',
     posts: profile?.post_count || 0,
     followers: profile?.followers_count || 0,
     following: profile?.following_count || 0
+  };
+
+  const secondaryStats = {
+    coursesRated: profile?.courses_rated || 0,
+    avgRating: profile?.avg_rating || 0,
+    achievements: profile?.achievements_count || 0,
+    totalRounds: profile?.total_rounds || 0
   };
 
   console.log('UserProfileContent - Debug isOwnProfile:', {
@@ -67,32 +79,51 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
     return null;
   }
 
+  // Auto-open immersive for others (not own profile)
+  useEffect(() => {
+    if (shouldAutoOpen && !mediaLoading) {
+      openImmersive(0);
+    }
+  }, [shouldAutoOpen, mediaLoading, openImmersive]);
+
   return (
     <>
       {/* Immersive Media Modal */}
-      {showImmersive && mediaItems.length > 0 && (
-        <ImmersiveProfileModal
-          isOpen={showImmersive}
-          mediaItems={mediaItems}
-          onClose={() => setShowImmersive(false)}
-          userId={profile.id}
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-        />
-      )}
+      <ImmersiveProfileModal
+        isOpen={isImmersiveOpen}
+        mediaItems={mediaItems.map(item => ({
+          id: item.id,
+          media_type: (item.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
+          media_url: item.media_url,
+          thumbnail_url: item.thumbnail_url,
+          duration: item.duration,
+          display_order: item.display_order,
+          header_extended_url: item.header_extended_url,
+          header_strip_url: item.header_strip_url,
+          header_metadata: item.header_metadata,
+          video_method: item.video_method,
+          file_name: item.file_name,
+          created_at: item.created_at
+        }))}
+        onClose={closeImmersive}
+        userId={profile.id}
+        profile={profile}
+        isOwnProfile={isOwnProfile}
+        onCurrentIndexChange={(index: number) => {}}
+      />
 
-      {/* Sticky Profile Header */}
-      {!showImmersive && (
+      {/* Sticky Profile Header - only when not in immersive mode */}
+      {!isImmersiveOpen && (
         <StickyProfileHeader
           profile={profile}
-          stats={profileStats}
+          stats={primaryStats}
           isScrolled={isScrolled}
         />
       )}
 
-      {/* Main Profile Content */}
-      {!showImmersive && (
-        <div className="relative">
+      {/* Main Profile Content - only when not in immersive mode */}
+      {!isImmersiveOpen && (
+        <div className="relative min-h-screen">
           {/* Hero Header with Glass Profile Card */}
           <div className="relative">
             <HeroProfileHeader 
@@ -108,6 +139,15 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
               profile={profile}
               isOwnProfile={isOwnProfile}
               onEditProfile={() => {}}
+            />
+          </div>
+
+          {/* Profile Stats Section */}
+          <div className="px-4 pb-6">
+            <ProfileStats 
+              stats={primaryStats}
+              secondaryStats={secondaryStats}
+              isMobile={isMobile}
             />
           </div>
 
@@ -132,14 +172,14 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
             </ProfileTabs>
           </div>
 
-          {/* View Immersive Mode Button for Own Profile */}
-          {isOwnProfile && mediaItems.length > 0 && (
+          {/* Preview Immersive Mode Button for Own Profile */}
+          {isOwnProfile && hasImmersiveMedia && (
             <div className="fixed bottom-20 right-4 z-50">
               <button
-                onClick={() => setShowImmersive(true)}
-                className="bg-white/20 backdrop-blur-lg border border-white/30 rounded-full px-4 py-2 text-white shadow-lg hover:bg-white/30 transition-all"
+                onClick={previewImmersive}
+                className="bg-primary/80 backdrop-blur-lg border border-primary/30 rounded-full px-4 py-2 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-300 font-medium"
               >
-                View Immersive Mode
+                Preview Profile
               </button>
             </div>
           )}
