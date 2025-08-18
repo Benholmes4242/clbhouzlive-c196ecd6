@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useIntersectionObserver } from './useIntersectionObserver';
-import { useIsMobile } from './use-mobile';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UseVideoAutoplayOptions {
   enabled?: boolean;
