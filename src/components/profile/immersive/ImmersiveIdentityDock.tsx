@@ -11,7 +11,7 @@ interface ProfileData {
   display_name?: string;
   username?: string;
   profile_photo_url?: string;
-  location?: string;
+  club_name?: string;
 }
 
 interface ImmersiveIdentityDockProps {
@@ -44,7 +44,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('public_profiles')
-          .select('id, display_name, username, profile_photo_url, location')
+          .select('id, display_name, username, profile_photo_url')
           .eq('id', userId)
           .single();
 
@@ -106,18 +106,17 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-24 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-500 min-w-[320px] max-w-[90vw] ${
+      className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-500 ${
         isVisible 
           ? 'translate-y-0 opacity-100 animate-[bounce_0.6s_ease-out]' 
           : 'translate-y-full opacity-0'
       }`}
       style={liquidGlassStyle}
     >
-      <div className="px-4 py-3 rounded-2xl">
-        {/* Main Content Row */}
-        <div className="flex items-center gap-3 mb-2">
+      <div className="px-6 py-4 rounded-2xl">
+        <div className="flex items-center gap-4">
           {/* Avatar */}
-          <Avatar className="w-12 h-12 rounded-xl flex-shrink-0">
+          <Avatar className="w-12 h-12 rounded-xl">
             <AvatarImage 
               src={profile.profile_photo_url || undefined}
               alt={profile.display_name || 'User'}
@@ -129,7 +128,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
           {/* Profile Info */}
           <div className="flex-1 min-w-0">
-            <div className="text-white font-bold text-base truncate">
+            <div className="text-white font-bold text-lg truncate">
               {profile.display_name || profile.username || 'Unknown User'}
             </div>
             {profile.username && (
@@ -137,46 +136,46 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
                 @{profile.username}
               </div>
             )}
-            {profile.location && (
-              <div className="flex items-center gap-1 text-white/80 text-xs truncate mt-0.5">
-                <MapPin className="w-3 h-3 flex-shrink-0" />
-                <span className="truncate">⛳ {profile.location}</span>
+            {profile.club_name && (
+              <div className="flex items-center gap-1 text-white/80 text-sm truncate">
+                <MapPin className="w-3 h-3" />
+                <span>{profile.club_name}</span>
               </div>
             )}
           </div>
+
+          {/* Actions */}
+          {!isOwnProfile && (
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleFollow}
+                size="sm"
+                variant={isFollowing ? "secondary" : "default"}
+                className="rounded-full px-4 h-8 text-xs font-medium"
+              >
+                <UserPlus className="w-3 h-3 mr-1" />
+                {isFollowing ? 'Following' : 'Follow'}
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full px-4 h-8 text-xs font-medium text-white border-white/30 hover:bg-white/10"
+              >
+                <MessageCircle className="w-3 h-3 mr-1" />
+                Message
+              </Button>
+
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full w-8 h-8 p-0 text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
-
-        {/* Action Buttons Row */}
-        {!isOwnProfile && (
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              onClick={handleFollow}
-              size="sm"
-              variant={isFollowing ? "secondary" : "default"}
-              className="rounded-full px-4 h-7 text-xs font-medium flex-1 max-w-[80px]"
-            >
-              <UserPlus className="w-3 h-3 mr-1" />
-              {isFollowing ? 'Following' : 'Follow'}
-            </Button>
-
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-full px-4 h-7 text-xs font-medium text-white border-white/30 hover:bg-white/10 flex-1 max-w-[80px]"
-            >
-              <MessageCircle className="w-3 h-3 mr-1" />
-              Message
-            </Button>
-
-            <Button
-              size="sm"
-              variant="ghost"
-              className="rounded-full w-7 h-7 p-0 text-white/80 hover:text-white hover:bg-white/10 flex-shrink-0"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
