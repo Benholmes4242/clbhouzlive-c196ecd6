@@ -38,7 +38,15 @@ export const useProfileMedia = (userId: string) => {
 
       if (error) throw error;
 
-      setMediaItems(data || []);
+      // Transform data to match MediaItem interface
+      const transformedData: MediaItem[] = (data || []).map(item => ({
+        ...item,
+        media_type: (item.media_type === 'video' || item.media_type === 'image') 
+          ? item.media_type as 'video' | 'image'
+          : 'image' // default fallback
+      }));
+
+      setMediaItems(transformedData);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching profile media:', err);

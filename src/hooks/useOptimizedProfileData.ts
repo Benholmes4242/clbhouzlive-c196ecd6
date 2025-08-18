@@ -97,6 +97,19 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
         })
         .slice(0, 5);
 
+      // Format achievements for display
+      const formattedAchievements = (achievementsResult.data || []).map((achievement: any) => {
+        const data = achievement.achievement_data || {};
+        return {
+          id: achievement.id,
+          type: achievement.achievement_type,
+          title: data.badge_name || 'Achievement Unlocked',
+          description: data.badge_emoji ? `${data.badge_emoji} ${data.badge_name}` : 'New achievement earned',
+          created_at: achievement.created_at,
+          data: data
+        };
+      });
+
       return {
         profile: profileResult.data,
         coursesPlayed: coursesPlayedResult.count || 0,
@@ -105,7 +118,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
         followersCount: followersResult.count || 0,
         followingCount: followingResult.count || 0,
         recentPosts: postsResult.data || [],
-        recentAchievements: achievementsResult.data || [],
+        recentAchievements: formattedAchievements,
         topRankedCourses
       };
     },
