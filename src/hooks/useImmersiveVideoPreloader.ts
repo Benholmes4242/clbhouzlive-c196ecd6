@@ -42,10 +42,9 @@ export const useImmersiveVideoPreloader = (
   const preloadQueue = useRef<Set<string>>(new Set());
   const imageCache = useRef<Set<string>>(new Set());
 
-  // Create video element with optimal settings
-  const createVideoElement = useCallback((src: string): HTMLVideoElement => {
+  // Create video element with optimal settings and HLS support
+  const createVideoElement = useCallback(async (src: string): Promise<HTMLVideoElement> => {
     const video = document.createElement('video');
-    video.src = src;
     video.muted = true;
     video.playsInline = true;
     video.preload = 'auto';
@@ -62,6 +61,33 @@ export const useImmersiveVideoPreloader = (
     video.setAttribute('playsinline', 'true');
     
     document.body.appendChild(video);
+
+    // Handle HLS streams
+    if (src.includes('.m3u8')) {
+      // Import HLS.js dynamically
+      const { default: Hls } = await import('hls.js');
+      
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: false,
+          backBufferLength: 90
+        });
+        
+        hls.loadSource(src);
+        hls.attachMedia(video);
+        
+        // Store HLS instance for cleanup
+        (video as any).__hls = hls;
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (Safari)
+        video.src = src;
+      }
+    } else {
+      // Regular MP4 video
+      video.src = src;
+    }
+    
     return video;
   }, []);
 
@@ -168,6 +194,12 @@ export const useImmersiveVideoPreloader = (
     const toRemove = sortedKeys.slice(0, keys.length - MAX_POOL_SIZE);
     toRemove.forEach(key => {
       const video = videoPool.current[key];
+      
+      // Clean up HLS instance if exists
+      if ((video.element as any).__hls) {
+        (video.element as any).__hls.destroy();
+      }
+      
       if (video.element.parentNode) {
         video.element.parentNode.removeChild(video.element);
       }
@@ -194,18 +226,19 @@ export const useImmersiveVideoPreloader = (
           preloadQueue.current.add(videoId);
           
           promises.push(
-            new Promise<void>((resolve) => {
-              const videoElement = createVideoElement(item.media_url);
-              
-              videoPool.current[videoId] = {
-                element: videoElement,
-                isReady: false,
-                readyState: 0,
-                preloaded: false,
-                lastUsed: Date.now()
-              };
+            new Promise<void>(async (resolve) => {
+              try {
+                const videoElement = await createVideoElement(item.media_url);
+                
+                videoPool.current[videoId] = {
+                  element: videoElement,
+                  isReady: false,
+                  readyState: 0,
+                  preloaded: false,
+                  lastUsed: Date.now()
+                };
 
-              const onLoadStart = () => {
+                const onLoadStart = () => {
                 videoPool.current[videoId].preloaded = true;
               };
 
@@ -270,6 +303,11 @@ export const useImmersiveVideoPreloader = (
                   videoElement.parentNode.removeChild(videoElement);
                 }
                 delete videoPool.current[videoId];
+                resolve();
+              }
+              } catch (createError) {
+                console.log(`📱 Video element creation failed: ${videoId}`);
+                preloadQueue.current.delete(videoId);
                 resolve();
               }
             })
@@ -341,6 +379,11 @@ export const useImmersiveVideoPreloader = (
   useEffect(() => {
     return () => {
       Object.values(videoPool.current).forEach(({ element }) => {
+        // Clean up HLS instance if exists
+        if ((element as any).__hls) {
+          (element as any).__hls.destroy();
+        }
+        
         if (element.parentNode) {
           element.parentNode.removeChild(element);
         }
