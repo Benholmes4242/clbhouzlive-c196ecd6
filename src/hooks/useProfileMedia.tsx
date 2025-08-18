@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface MediaItem {
   id: string;
-  media_type: 'image' | 'video';
+  media_type: string;
   media_url: string;
   thumbnail_url?: string;
   duration: number;
@@ -38,15 +38,7 @@ export const useProfileMedia = (userId: string) => {
 
       if (error) throw error;
 
-      // Transform data to match MediaItem interface
-      const transformedData: MediaItem[] = (data || []).map(item => ({
-        ...item,
-        media_type: (item.media_type === 'video' || item.media_type === 'image') 
-          ? item.media_type as 'video' | 'image'
-          : 'image' // default fallback
-      }));
-
-      setMediaItems(transformedData);
+      setMediaItems(data || []);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching profile media:', err);

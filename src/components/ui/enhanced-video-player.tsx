@@ -9,16 +9,13 @@ interface EnhancedVideoPlayerProps {
   autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
-  playsInline?: boolean;
   className?: string;
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
-  onEnded?: () => void;
   enableHLS?: boolean; // Enable HLS streaming
   adaptiveBitrate?: boolean; // Enable adaptive bitrate
   preloadLevel?: 'none' | 'metadata' | 'auto';
-  preload?: 'none' | 'metadata' | 'auto';
   quality?: 'auto' | '240p' | '360p' | '480p' | '720p' | '1080p';
   hideControls?: boolean; // Hide play/pause controls
   objectFit?: 'cover' | 'contain' | 'smart'; // Add smart object fit option for TikTok-style behavior
@@ -36,16 +33,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   autoplay = false,
   muted = true,
   loop = false,
-  playsInline = true,
   className = '',
   onPlay,
   onPause,
   onClick,
-  onEnded,
   enableHLS = false,
   adaptiveBitrate = true,
   preloadLevel = 'metadata',
-  preload = 'metadata',
   quality = 'auto',
   hideControls = false,
   objectFit = 'cover'
@@ -452,10 +446,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         muted={muted}
         loop={loop}
         autoPlay={autoplay}
-        playsInline={playsInline}
-        preload={preload}
+        playsInline
+        preload="metadata"
         src={src}
-        onEnded={onEnded}
         className={`w-full h-full ${
           objectFit === 'smart' 
             ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')

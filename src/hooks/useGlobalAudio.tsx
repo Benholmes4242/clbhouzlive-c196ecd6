@@ -3,18 +3,18 @@ import { useState, useCallback, useEffect } from 'react';
 const MUTE_STATE_KEY = 'globalAudioMuted';
 
 export const useGlobalAudio = () => {
-  // Initialize from sessionStorage for session-wide persistence
+  // Initialize from localStorage
   const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem(MUTE_STATE_KEY);
-      return saved ? JSON.parse(saved) : true; // Default to muted
+      const saved = localStorage.getItem(MUTE_STATE_KEY);
+      return saved ? JSON.parse(saved) : false;
     }
-    return true;
+    return false;
   });
   
-  // Persist to sessionStorage when state changes
+  // Persist to localStorage when state changes
   useEffect(() => {
-    sessionStorage.setItem(MUTE_STATE_KEY, JSON.stringify(isGloballyMuted));
+    localStorage.setItem(MUTE_STATE_KEY, JSON.stringify(isGloballyMuted));
   }, [isGloballyMuted]);
   
   const toggleGlobalMute = useCallback(() => {
