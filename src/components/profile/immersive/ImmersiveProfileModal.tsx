@@ -31,6 +31,7 @@ interface MediaItem {
 interface ImmersiveProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onMorphToHeader?: () => void;
   mediaItems: MediaItem[];
   initialIndex?: number;
   userId: string;
@@ -42,6 +43,7 @@ interface ImmersiveProfileModalProps {
 const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   isOpen,
   onClose,
+  onMorphToHeader,
   mediaItems = [],
   initialIndex = 0,
   userId,
@@ -72,6 +74,21 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   useEffect(() => {
     setLocalMediaItems(mediaItems);
   }, [mediaItems]);
+
+  // Video preloading for instant playback
+  useEffect(() => {
+    if (currentItem?.media_type === 'video' && activeIndex < totalItems - 1) {
+      const nextItem = localMediaItems[activeIndex + 1];
+      if (nextItem?.media_type === 'video') {
+        // Preload next video
+        const preloadVideo = document.createElement('video');
+        preloadVideo.src = nextItem.media_url;
+        preloadVideo.preload = 'auto';
+        preloadVideo.muted = true;
+        preloadVideo.playsInline = true;
+      }
+    }
+  }, [activeIndex, currentItem, localMediaItems, totalItems]);
 
   // Liquid glass styles for buttons
   const liquidGlassStyle = {
@@ -483,11 +500,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         )}
       </div>
 
-      {/* Identity Dock */}
+      {/* Enhanced Liquid Glass Identity Dock */}
       <ImmersiveIdentityDock 
         userId={userId}
         isVisible={isOpen && !currentItem.isUploading}
-        onMorphToHeader={handleClose}
+        onMorphToHeader={onMorphToHeader || handleClose}
       />
 
       {/* Down Arrow - Bottom Center */}

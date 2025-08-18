@@ -30,12 +30,13 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
   const [loading, setLoading] = useState(true);
   const { session } = useSupabaseSession();
 
+  // Enhanced liquid glass styling - match golf club tab pull style
   const liquidGlassStyle = {
-    background: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px) saturate(1.8)',
-    WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+    background: 'rgba(255, 255, 255, 0.08)',
+    backdropFilter: 'blur(40px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    boxShadow: '0 20px 60px -10px rgba(0, 0, 0, 0.4), 0 8px 32px -8px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
   };
 
   useEffect(() => {
@@ -108,15 +109,15 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-500 ${
+      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-700 ease-out ${
         isVisible 
-          ? 'translate-y-0 opacity-100 animate-[bounce_0.6s_ease-out]' 
+          ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
           : 'translate-y-full opacity-0'
       }`}
       style={liquidGlassStyle}
       onClick={onMorphToHeader}
     >
-      <div className="px-6 py-4 rounded-2xl">
+      <div className="px-8 py-5 rounded-3xl shadow-2xl backdrop-blur-md">
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <Avatar className="w-12 h-12 rounded-xl">

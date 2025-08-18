@@ -347,8 +347,10 @@ const HeroProfileHeader = ({
   // Handle morphing from identity dock to sticky header
   const handleMorphTransition = () => {
     closeImmersive();
-    // Smooth scroll to top of content
-    window.scrollTo({ top: 200, behavior: 'smooth' });
+    // Smooth scroll to trigger sticky header
+    setTimeout(() => {
+      window.scrollTo({ top: isMobile ? 200 : 300, behavior: 'smooth' });
+    }, 300);
   };
 
   // Stats handling
@@ -547,7 +549,9 @@ const HeroProfileHeader = ({
           handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
           posts: postsCount,
           followers: followersCount,
-          following: followingCount
+          following: followingCount,
+          ratedCoursesCount,
+          averageRating
         }}
         onStatClick={handleStatClick}
       />
@@ -847,6 +851,7 @@ const HeroProfileHeader = ({
       <ImmersiveProfileModal
         isOpen={isImmersiveOpen}
         onClose={closeImmersive}
+        onMorphToHeader={handleMorphTransition}
         mediaItems={mediaItems.map(item => ({
           ...item,
           media_type: item.media_type as 'image' | 'video'

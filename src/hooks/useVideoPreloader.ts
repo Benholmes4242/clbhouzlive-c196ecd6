@@ -24,7 +24,7 @@ export const useVideoPreloader = ({
 
         const video = document.createElement('video');
         video.src = videoUrl;
-        video.preload = 'metadata'; // Only load metadata, not full video
+        video.preload = 'auto'; // Lightweight full preload for instant playback
         video.muted = true;
         video.playsInline = true;
 

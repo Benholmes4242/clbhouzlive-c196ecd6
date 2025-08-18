@@ -25,14 +25,14 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
     rootMargin
   });
 
-  // Update autoplay state based on visibility only, but don't change it once set to true
+  // Update autoplay state based on visibility - immediate autoplay without delay
   useEffect(() => {
     if (!enabled) {
       setShouldAutoplay(false);
       return;
     }
 
-    // Only set to true when in view, don't toggle back to false to prevent restarts
+    // Immediate autoplay when in view
     if (isInView && !shouldAutoplay) {
       setShouldAutoplay(true);
     }
