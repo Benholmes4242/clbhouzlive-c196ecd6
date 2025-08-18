@@ -7,6 +7,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import ImmersiveIdentityDock from './ImmersiveIdentityDock';
 // import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface MediaItem {
@@ -460,6 +461,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         )}
       </div>
 
+      {/* Identity Dock */}
+      <ImmersiveIdentityDock 
+        userId={userId}
+        isVisible={isOpen && !currentItem.isUploading}
+      />
 
       {/* Down Arrow - Bottom Center */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
