@@ -45,6 +45,7 @@ const OptimizedProfilePage: React.FC = () => {
         isOwnProfile={isOwnProfile}
         activeSection={activeSection}
         onSectionChange={setActiveSection}
+        userId={userId!}
       />
     </div>
   );

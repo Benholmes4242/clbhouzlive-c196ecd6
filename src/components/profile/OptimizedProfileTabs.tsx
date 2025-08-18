@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { ProfileTabsSkeleton, ActivityFeedSkeleton } from './ProfileSkeleton';
 import OptimizedActivityFeed from './OptimizedActivityFeed';
 import { OptimizedProfileData } from '@/hooks/useOptimizedProfileData';
+import AchievementsPane from './AchievementsPane';
 
 // Lazy load heavy components for better initial load
 const CourseHighlightsCarousel = lazy(() => import('./CourseHighlightsCarousel'));
@@ -14,6 +15,7 @@ interface OptimizedProfileTabsProps {
   isOwnProfile: boolean;
   activeSection: string;
   onSectionChange: (section: string) => void;
+  userId: string;
 }
 
 const TabButton: React.FC<{
@@ -44,7 +46,8 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
   profileData,
   isOwnProfile,
   activeSection,
-  onSectionChange
+  onSectionChange,
+  userId
 }) => {
   const tabs = [
     { id: 'activity', label: 'Activity', count: profileData.recentPosts.length },
@@ -109,21 +112,13 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       
       case 'achievements':
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Achievements</h2>
-            {profileData.recentAchievements.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {profileData.recentAchievements.map((achievement: any, index: number) => (
-                  <div key={index} className="bg-card rounded-lg border p-4">
-                    <h3 className="font-semibold">{achievement.title || 'Achievement'}</h3>
-                    <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">No achievements yet</p>
-            )}
-          </div>
+          <AchievementsPane 
+            userId={userId}
+            userDisplayName={profileData.profile?.display_name || 'User'}
+            userHandicap={profileData.profile?.handicap}
+            userProfilePhotoUrl={profileData.profile?.avatar_url}
+            isCurrentUser={isOwnProfile}
+          />
         );
       
       case 'highlights':
