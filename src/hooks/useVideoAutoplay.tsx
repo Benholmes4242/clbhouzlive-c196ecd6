@@ -12,7 +12,7 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const {
     enabled = true,
     threshold = 0.7, // 70% visibility for autoplay as requested
-    rootMargin = '300px' // Preload when within 300px of viewport
+    rootMargin = '0px' // Remove delay, immediate autoplay
   } = options;
 
   const isMobile = useIsMobile();

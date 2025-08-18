@@ -44,14 +44,12 @@ import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
 import AchievementsPane from './AchievementsPane';
-import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
+import EnhancedImmersiveModal from './EnhancedImmersiveModal';
 import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
-import GlassmorphicProfileCard from './GlassmorphicProfileCard';
-import SwipeToReturnZone from './SwipeToReturnZone';
-import PremiumStickyHeader from './PremiumStickyHeader';
-import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
-import ResponsiveGlassCard from './ResponsiveGlassCard';
+import EnhancedStickyHeader from './EnhancedStickyHeader';
+import ResponsiveProfileLayout from './ResponsiveProfileLayout';
+import EnhancedTabNavigation from './EnhancedTabNavigation';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 
 interface Course {
@@ -196,11 +194,8 @@ const HeroProfileHeader = ({
   // Auto-open immersive mode for other users when they have media (default entry)
   useEffect(() => {
     if (shouldAutoOpen && !immersiveLoading && hasImmersiveMedia) {
-      // Delay slightly to ensure smooth page load
-      const timer = setTimeout(() => {
-        openImmersive(0);
-      }, 500);
-      return () => clearTimeout(timer);
+      // Immediate immersive mode for instant engagement
+      openImmersive(0);
     }
   }, [shouldAutoOpen, immersiveLoading, openImmersive, hasImmersiveMedia]);
   
@@ -538,57 +533,32 @@ const HeroProfileHeader = ({
   };
 
   return (
-    <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Sticky Header - Morphed from Identity Dock */}
-      <PremiumStickyHeader
+    <div>
+      {/* Enhanced Sticky Header - Morphed from Identity Dock */}
+      <EnhancedStickyHeader
         isVisible={showStickyHeader && !isImmersiveOpen}
         profile={profile}
         stats={{
-          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+          handicap: profile?.eg_handicap_index,
           posts: postsCount,
           followers: followersCount,
           following: followingCount
         }}
         onStatClick={handleStatClick}
       />
-      {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
-      <div className="relative w-full">
-        <ResponsiveImmersiveHeader
-          mediaItems={mediaItems}
-          isCollapsed={showStickyHeader}
-        />
-      </div>
-
-      {/* Responsive Glass Profile Card */}
-      <div className={`relative z-50 ${hasImmersiveMedia ? '-mt-20' : 'mt-8'}`}>
-        <ResponsiveGlassCard
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          hasImmersiveMedia={hasImmersiveMedia}
-          onPreviewImmersive={previewImmersive}
-          onEditProfile={() => setEditDialogOpen(true)}
-          onMediaManager={() => setMediaManagerOpen(true)}
-        />
-      </div>
-
-      {/* Responsive Stats Display */}
-      <div className={`px-4 md:px-8 py-6 ${isMobile ? 'py-4' : 'py-8'}`}>
-        <ResponsiveStatsDisplay
-          primaryStats={{
-            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-            posts: postsCount,
-            followers: followersCount,
-            following: followingCount
-          }}
-          secondaryStats={{
-            coursesRated: ratedCoursesCount,
-            avgRating: averageRating,
-            achievements: achievements?.length || 0,
-            memberSince: profile?.id ? '2024' : undefined
-          }}
-          onStatClick={handleStatClick}
-        />
-      </div>
+      
+      {/* Responsive Profile Layout */}
+      <ResponsiveProfileLayout
+        profile={profile}
+        stats={{
+          handicap: profile?.eg_handicap_index,
+          posts: postsCount,
+          followers: followersCount,
+          following: followingCount
+        }}
+        isOwnProfile={isOwnProfile}
+        onStatClick={handleStatClick}
+      />
 
       {/* Tab Navigation with Underline Animation */}
       <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-lg border-b border-border/20">
@@ -843,19 +813,14 @@ const HeroProfileHeader = ({
         </div>
       )}
 
-      {/* Immersive Profile Modal */}
-      <ImmersiveProfileModal
+      {/* Enhanced Immersive Modal */}
+      <EnhancedImmersiveModal
         isOpen={isImmersiveOpen}
         onClose={closeImmersive}
-        mediaItems={mediaItems.map(item => ({
-          ...item,
-          media_type: item.media_type as 'image' | 'video'
-        }))}
+        mediaItems={mediaItems}
         userId={profile?.id || ''}
         initialIndex={currentMediaIndex}
         onCurrentIndexChange={setCurrentMediaIndex}
-        uploadMode={isOwnProfile}
-        onUploadComplete={() => refetchMedia()}
       />
 
       {/* Media Manager Modal */}
@@ -869,7 +834,7 @@ const HeroProfileHeader = ({
         }))}
         onMediaUpdate={refetchMedia}
       />
-    </SwipeToReturnZone>
+    </div>
   );
 };
 
