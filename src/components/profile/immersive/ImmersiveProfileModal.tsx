@@ -6,7 +6,7 @@ import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
-import { useImmersiveVideoPreloader } from '@/hooks/useImmersiveVideoPreloader';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 // import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface MediaItem {
@@ -54,22 +54,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
   const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
   const [isVideoPaused, setIsVideoPaused] = useState(false);
-  const [currentVideoElement, setCurrentVideoElement] = useState<HTMLVideoElement | null>(null);
-  const [nextVideoElement, setNextVideoElement] = useState<HTMLVideoElement | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
-  
-  // Video preloader
-  const {
-    getReadyVideo,
-    isImagePreloaded,
-    isVideoReady,
-    getVideoReadyState,
-    logTelemetry
-  } = useImmersiveVideoPreloader(localMediaItems, activeIndex, isGloballyMuted);
   
   const currentItem = localMediaItems[activeIndex];
   const totalItems = localMediaItems.length;
@@ -90,16 +80,16 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
   // Handle video tap to pause/unpause
   const handleVideoTap = useCallback(() => {
-    if (currentItem?.media_type === 'video' && currentVideoElement) {
+    if (currentItem?.media_type === 'video' && videoRef.current) {
       if (isVideoPaused) {
-        currentVideoElement.play();
+        videoRef.current.play();
         setIsVideoPaused(false);
       } else {
-        currentVideoElement.pause();
+        videoRef.current.pause();
         setIsVideoPaused(true);
       }
     }
-  }, [currentItem, isVideoPaused, currentVideoElement]);
+  }, [currentItem, isVideoPaused]);
 
   const logTelemetryEvent = useCallback(async (event: string, data: any = {}) => {
     if (!session?.user?.id) return;
@@ -123,34 +113,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
   }, [session?.user?.id, userId, sessionId, currentItem?.id, activeIndex, totalItems]);
 
-  // Prepare next video for zero-delay transition
-  const prepareVideoTransition = useCallback(async (targetIndex: number) => {
-    const targetItem = localMediaItems[targetIndex];
-    if (!targetItem || targetItem.media_type !== 'video') return null;
-
-    const { videoElement, telemetry } = await getReadyVideo(targetItem.id);
-    logTelemetry(telemetry);
-    
-    if (videoElement && telemetry.playImmediate) {
-      // Video is ready for immediate playback
-      videoElement.currentTime = 0;
-      videoElement.muted = isGloballyMuted;
-      videoElement.style.position = 'absolute';
-      videoElement.style.left = '0';
-      videoElement.style.top = '0';
-      videoElement.style.width = '100%';
-      videoElement.style.height = '100%';
-      videoElement.style.objectFit = 'cover';
-      videoElement.style.zIndex = '10';
-      videoElement.style.opacity = '0';
-      
-      return videoElement;
-    }
-    
-    return null;
-  }, [localMediaItems, getReadyVideo, logTelemetry, isGloballyMuted]);
-
-  const handleNext = useCallback(async () => {
+  const handleNext = useCallback(() => {
     if (isTransitioning) return;
     
     if (activeIndex >= totalItems - 1) {
@@ -171,41 +134,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setIsTransitioning(true);
     const nextIndex = activeIndex + 1;
     
-    // Prepare next video if it's a video
-    const nextVideoEl = await prepareVideoTransition(nextIndex);
-    if (nextVideoEl) {
-      setNextVideoElement(nextVideoEl);
-    }
-    
-    // Immediate transition using requestAnimationFrame for smoothness
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       setActiveIndex(nextIndex);
       onCurrentIndexChange?.(nextIndex);
       setProgress(0);
-      
-      // Start playing next video immediately if ready
-      if (nextVideoEl) {
-        nextVideoEl.play().catch(console.error);
-        // Cross-fade transition
-        requestAnimationFrame(() => {
-          if (currentVideoElement) {
-            currentVideoElement.style.opacity = '0';
-          }
-          nextVideoEl.style.opacity = '1';
-          
-          setTimeout(() => {
-            setCurrentVideoElement(nextVideoEl);
-            setNextVideoElement(null);
-            setIsTransitioning(false);
-          }, 150);
-        });
-      } else {
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 150);
-      }
-    });
-  }, [activeIndex, totalItems, isTransitioning, onCurrentIndexChange, onClose, prepareVideoTransition, currentVideoElement]);
+      setIsTransitioning(false);
+    }, 150);
+  }, [activeIndex, totalItems, isTransitioning, onCurrentIndexChange, onClose]);
 
   const handleClose = useCallback(() => {
     // Smooth fade-out transition
@@ -356,43 +291,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
   }, [handleFileUpload]);
 
-  // Initialize current video when media changes
-  useEffect(() => {
-    const initializeCurrentVideo = async () => {
-      if (!currentItem || currentItem.media_type !== 'video') {
-        setCurrentVideoElement(null);
-        return;
-      }
-
-      const { videoElement, telemetry } = await getReadyVideo(currentItem.id);
-      logTelemetry(telemetry);
-      
-      if (videoElement) {
-        videoElement.currentTime = 0;
-        videoElement.muted = isGloballyMuted;
-        videoElement.style.position = 'absolute';
-        videoElement.style.left = '0';
-        videoElement.style.top = '0';
-        videoElement.style.width = '100%';
-        videoElement.style.height = '100%';
-        videoElement.style.objectFit = 'cover';
-        videoElement.style.zIndex = '10';
-        videoElement.style.opacity = '1';
-        
-        setCurrentVideoElement(videoElement);
-        
-        // Start playing immediately if ready
-        if (telemetry.playImmediate) {
-          videoElement.play().catch(console.error);
-        }
-      }
-    };
-
-    if (!isTransitioning) {
-      initializeCurrentVideo();
-    }
-  }, [activeIndex, currentItem, isGloballyMuted, getReadyVideo, logTelemetry, isTransitioning]);
-
   // Progress timer for current media
   useEffect(() => {
     if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading || isVideoPaused) return;
@@ -402,25 +300,8 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setProgress(0);
 
     const updateProgress = () => {
-      let newProgress = 0;
-      
-      if (currentItem.media_type === 'video' && currentVideoElement) {
-        // For videos, use actual video currentTime for accurate sync
-        const videoDurationMs = currentVideoElement.duration * 1000;
-        const videoCurrentTimeMs = currentVideoElement.currentTime * 1000;
-        
-        // Check if video has ended
-        if (currentVideoElement.ended || videoCurrentTimeMs >= videoDurationMs) {
-          newProgress = 100;
-        } else {
-          newProgress = Math.min((videoCurrentTimeMs / videoDurationMs) * 100, 100);
-        }
-      } else {
-        // For images, use elapsed time as before
-        const elapsed = Date.now() - startTimeRef.current;
-        newProgress = Math.min((elapsed / duration) * 100, 100);
-      }
-      
+      const elapsed = Date.now() - startTimeRef.current;
+      const newProgress = Math.min((elapsed / duration) * 100, 100);
       setProgress(newProgress);
 
       if (newProgress >= 100) {
@@ -434,43 +315,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused, currentVideoElement]);
-
-  // Attach video elements to containers
-  useEffect(() => {
-    const currentContainer = document.getElementById('current-video-container');
-    const nextContainer = document.getElementById('next-video-container');
-    
-    // Attach current video
-    if (currentVideoElement && currentContainer) {
-      currentContainer.appendChild(currentVideoElement);
-      
-      const handlePlay = () => setIsVideoPaused(false);
-      const handlePause = () => setIsVideoPaused(true);
-      
-      currentVideoElement.addEventListener('play', handlePlay);
-      currentVideoElement.addEventListener('pause', handlePause);
-      
-      return () => {
-        currentVideoElement.removeEventListener('play', handlePlay);
-        currentVideoElement.removeEventListener('pause', handlePause);
-        if (currentVideoElement.parentNode === currentContainer) {
-          currentContainer.removeChild(currentVideoElement);
-        }
-      };
-    }
-    
-    // Attach next video
-    if (nextVideoElement && nextContainer) {
-      nextContainer.appendChild(nextVideoElement);
-      
-      return () => {
-        if (nextVideoElement.parentNode === nextContainer) {
-          nextContainer.removeChild(nextVideoElement);
-        }
-      };
-    }
-  }, [currentVideoElement, nextVideoElement]);
+  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused]);
 
   // Reset video pause state when changing media
   useEffect(() => {
@@ -557,31 +402,18 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
         {currentItem.media_type === 'video' ? (
-          <div className="relative w-full h-full">
-            {/* Current video container */}
-            <div 
-              id="current-video-container" 
-              className="absolute inset-0"
-              style={{ zIndex: currentVideoElement ? 10 : 5 }}
-            />
-            
-            {/* Next video container for transitions */}
-            <div 
-              id="next-video-container" 
-              className="absolute inset-0"
-              style={{ zIndex: nextVideoElement ? 15 : 5 }}
-            />
-            
-            {/* Fallback poster if video not ready */}
-            {!currentVideoElement && currentItem.thumbnail_url && (
-              <img
-                src={currentItem.thumbnail_url}
-                alt="Video poster"
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ zIndex: 1 }}
-              />
-            )}
-          </div>
+          <EnhancedVideoPlayer
+            key={`${currentItem.id}-${activeIndex}`}
+            src={currentItem.media_url}
+            poster={currentItem.thumbnail_url}
+            autoplay={true}
+            muted={!isGloballyMuted}
+            loop={true}
+            enableHLS={true}
+            className="w-full h-full"
+            onPlay={() => setIsVideoPaused(false)}
+            onPause={() => setIsVideoPaused(true)}
+          />
         ) : (
           <img
             key={`${currentItem.id}-${activeIndex}`}
