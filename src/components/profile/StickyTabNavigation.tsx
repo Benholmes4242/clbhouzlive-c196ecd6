@@ -33,8 +33,8 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      // Make sticky when scrolled past a certain point
-      setIsSticky(window.scrollY > 400);
+      // Only show sticky tabs when scrolled past the stats section
+      setIsSticky(window.scrollY > 600);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -58,8 +58,8 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
     <div 
       className={`transition-all duration-500 ease-in-out ${
         isSticky 
-          ? 'fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm' 
-          : 'relative bg-transparent'
+          ? 'fixed top-16 left-0 right-0 z-30 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm translate-y-0 opacity-100' 
+          : 'relative bg-transparent -translate-y-full opacity-0 pointer-events-none'
       }`}
     >
       <div className={`max-w-6xl mx-auto ${isMobile ? 'px-4 py-2' : 'px-6 py-3'}`}>

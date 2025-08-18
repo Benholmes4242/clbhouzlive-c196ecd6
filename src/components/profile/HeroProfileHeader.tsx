@@ -589,7 +589,7 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Sticky Tab Navigation */}
+      {/* Sticky Tab Navigation - Only shows on scroll */}
       <StickyTabNavigation
         activeTab={activeSection}
         onTabChange={handleTabChange}
