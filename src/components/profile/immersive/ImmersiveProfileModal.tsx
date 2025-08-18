@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { VolumeX, Volume2, ChevronDown, Check, Upload } from 'lucide-react';
+import { VolumeX, Volume2, ChevronDown, Check, Upload, Play, Pause } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
-import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
-// import { useR2Upload } from '@/hooks/useR2Upload';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
+import LiquidGlassIdentityDock from './LiquidGlassIdentityDock';
 
 interface MediaItem {
   id: string;
@@ -35,6 +35,14 @@ interface ImmersiveProfileModalProps {
   onCurrentIndexChange?: (index: number) => void;
   uploadMode?: boolean;
   onUploadComplete?: (mediaItem: MediaItem) => void;
+  profile?: {
+    id: string;
+    display_name?: string;
+    username?: string;
+    profile_photo_url?: string;
+    home_club?: string;
+  };
+  isOwnProfile?: boolean;
 }
 
 const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
@@ -45,16 +53,21 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   userId,
   onCurrentIndexChange,
   uploadMode = false,
-  onUploadComplete
+  onUploadComplete,
+  profile,
+  isOwnProfile = false
 }) => {
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
   const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
+  const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const soundPref = useSoundPreference();
+  const { isMuted, toggleMute } = soundPref;
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
   
@@ -275,15 +288,30 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
   }, [handleFileUpload]);
 
+  // Handle video/content click to pause/unpause
+  const handleContentClick = useCallback(() => {
+    if (currentItem?.media_type === 'video' && videoRef.current) {
+      if (isPaused) {
+        videoRef.current.play();
+        setIsPaused(false);
+      } else {
+        videoRef.current.pause();
+        setIsPaused(true);
+      }
+    }
+  }, [currentItem, isPaused]);
+
   // Progress timer for current media
   useEffect(() => {
-    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading) return;
+    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading || isPaused) return;
 
     const duration = currentItem.media_type === 'image' ? 3000 : currentItem.duration;
     startTimeRef.current = Date.now();
     setProgress(0);
 
     const updateProgress = () => {
+      if (isPaused) return;
+      
       const elapsed = Date.now() - startTimeRef.current;
       const newProgress = Math.min((elapsed / duration) * 100, 100);
       setProgress(newProgress);
@@ -299,7 +327,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext]);
+  }, [activeIndex, currentItem, isOpen, isTransitioning, isPaused, handleNext]);
 
   // Swipe handlers
   const swipeHandlers = useSwipeable({
@@ -367,11 +395,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
       {/* Mute Button - Top Right */}
       <button
-        onClick={toggleGlobalMute}
+        onClick={toggleMute}
         className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center"
         style={liquidGlassStyle}
       >
-        {isGloballyMuted ? (
+        {isMuted ? (
           <VolumeX className="w-5 h-5 text-white" />
         ) : (
           <Volume2 className="w-5 h-5 text-white" />
@@ -379,23 +407,39 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       </button>
 
       {/* Media Content */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center" onClick={handleContentClick}>
         {currentItem.media_type === 'video' ? (
-          <video
-            key={`${currentItem.id}-${activeIndex}`}
-            src={currentItem.media_url}
-            poster={currentItem.thumbnail_url}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            playsInline
-            onLoadedData={() => {
-              startTimeRef.current = Date.now();
-            }}
-            onCanPlay={(e) => {
-              e.currentTarget.play();
-            }}
-          />
+          <>
+            <video
+              ref={videoRef}
+              key={`${currentItem.id}-${activeIndex}`}
+              src={currentItem.media_url}
+              poster={currentItem.thumbnail_url}
+              className="w-full h-full object-cover cursor-pointer"
+              autoPlay
+              muted={isMuted}
+              playsInline
+              onLoadedData={() => {
+                startTimeRef.current = Date.now();
+              }}
+              onCanPlay={(e) => {
+                if (!isPaused) {
+                  e.currentTarget.play();
+                }
+              }}
+              onPlay={() => setIsPaused(false)}
+              onPause={() => setIsPaused(true)}
+            />
+            
+            {/* Play/Pause Overlay */}
+            {isPaused && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer">
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Play className="w-8 h-8 text-white ml-1" />
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <img
             key={`${currentItem.id}-${activeIndex}`}
@@ -453,6 +497,17 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         />
       )}
 
+
+      {/* Liquid Glass Identity Dock */}
+      {profile && (
+        <LiquidGlassIdentityDock 
+          profile={profile}
+          isOwnProfile={isOwnProfile}
+          onFollowClick={() => {/* Handle follow */}}
+          onMessageClick={() => {/* Handle message */}}
+          onMoreClick={() => {/* Handle more */}}
+        />
+      )}
 
       {/* Down Arrow - Bottom Center */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
