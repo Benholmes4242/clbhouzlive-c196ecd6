@@ -221,20 +221,57 @@ export const useImmersiveVideoPreloader = (
                 resolve();
               };
 
-              const onError = () => {
-                console.error(`📱 Failed to preload video: ${videoId}`);
+              const onError = (error: Event) => {
+                console.log(`📱 Video preload skipped: ${videoId} (network/access issue)`);
                 preloadQueue.current.delete(videoId);
                 videoElement.removeEventListener('loadstart', onLoadStart);
                 videoElement.removeEventListener('canplay', onCanPlay);
+                videoElement.removeEventListener('error', onError);
+                
+                // Clean up the failed element
+                if (videoElement.parentNode) {
+                  videoElement.parentNode.removeChild(videoElement);
+                }
+                delete videoPool.current[videoId];
+                
                 resolve();
               };
 
+              // Add timeout for preload attempts (10 seconds max)
+              const timeout = setTimeout(() => {
+                console.log(`📱 Video preload timeout: ${videoId}`);
+                preloadQueue.current.delete(videoId);
+                videoElement.removeEventListener('loadstart', onLoadStart);
+                videoElement.removeEventListener('canplay', onCanPlay);
+                videoElement.removeEventListener('error', onError);
+                
+                if (videoElement.parentNode) {
+                  videoElement.parentNode.removeChild(videoElement);
+                }
+                delete videoPool.current[videoId];
+                
+                resolve();
+              }, 10000);
+
               videoElement.addEventListener('loadstart', onLoadStart);
-              videoElement.addEventListener('canplay', onCanPlay);
+              videoElement.addEventListener('canplay', () => {
+                clearTimeout(timeout);
+                onCanPlay();
+              });
               videoElement.addEventListener('error', onError);
               
-              // Start loading
-              videoElement.load();
+              // Start loading with error protection
+              try {
+                videoElement.load();
+              } catch (error) {
+                console.log(`📱 Video load failed immediately: ${videoId}`);
+                preloadQueue.current.delete(videoId);
+                if (videoElement.parentNode) {
+                  videoElement.parentNode.removeChild(videoElement);
+                }
+                delete videoPool.current[videoId];
+                resolve();
+              }
             })
           );
         }
