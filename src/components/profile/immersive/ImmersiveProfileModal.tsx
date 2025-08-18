@@ -6,6 +6,7 @@ import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 // import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface MediaItem {
@@ -401,37 +402,15 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
         {currentItem.media_type === 'video' ? (
-          <video
-            ref={videoRef}
+          <EnhancedVideoPlayer
             key={`${currentItem.id}-${activeIndex}`}
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
-            className="w-full h-full object-cover cursor-pointer"
-            autoPlay
-            muted={isGloballyMuted}
-            playsInline
-            loop
-            onLoadedData={() => {
-              startTimeRef.current = Date.now();
-            }}
-            onCanPlayThrough={() => {
-              // Force play when video is ready
-              if (videoRef.current) {
-                videoRef.current.play().catch((error) => {
-                  console.log('Autoplay failed:', error);
-                });
-              }
-            }}
-            onLoadStart={() => {
-              // Ensure video starts playing as soon as possible
-              setTimeout(() => {
-                if (videoRef.current) {
-                  videoRef.current.play().catch((error) => {
-                    console.log('Manual play failed:', error);
-                  });
-                }
-              }, 100);
-            }}
+            autoplay={true}
+            muted={!isGloballyMuted}
+            loop={true}
+            enableHLS={true}
+            className="w-full h-full"
             onPlay={() => setIsVideoPaused(false)}
             onPause={() => setIsVideoPaused(true)}
           />
