@@ -783,7 +783,13 @@ const HeroProfileHeader = ({
             </>
           )}
           {activeSection === 'achievements' && (
-            <div></div> // Content is already rendered in ProfileTabs
+            <AchievementsPane 
+              userId={profile?.id}
+              userDisplayName={profile?.display_name || 'User'}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
           )}
           {activeSection === 'stats' && (
             <HandicapSection 
