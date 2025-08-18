@@ -49,6 +49,9 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
+import PremiumStickyHeader from './PremiumStickyHeader';
+import TieredStatsDisplay from './TieredStatsDisplay';
+import StickyTabNavigation from './StickyTabNavigation';
 
 interface Course {
   id: string;
@@ -506,19 +509,56 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Glassmorphic Profile Card - Pinned below collapsed header */}
+      {/* Glassmorphic Profile Card with Tiered Stats */}
       <div className="relative -mt-16 z-50">
         <GlassmorphicProfileCard
           profile={profile}
           isOwnProfile={isOwnProfile}
           onEditProfile={() => setEditDialogOpen(true)}
         />
+        
+        {/* Tiered Stats Display */}
+        <div className="px-6 pb-6">
+          <TieredStatsDisplay
+            primaryStats={{
+              handicap: profile?.eg_handicap_index,
+              posts: postsCount,
+              followers: followersCount,
+              following: followingCount
+            }}
+            secondaryStats={{
+              coursesRated: ratedCoursesCount,
+              averageRating: averageRating,
+              achievements: achievements?.length || 0,
+              coursesPlayed: userProgressData.coursesPlayed
+            }}
+          />
+        </div>
       </div>
+
+      {/* Premium Sticky Header */}
+      <PremiumStickyHeader
+        profile={profile || { id: '', display_name: '', username: '', profile_photo_url: '', home_club: '' }}
+        isVisible={false} // Will be controlled by scroll
+        stats={{
+          handicap: profile?.eg_handicap_index,
+          posts: postsCount,
+          followers: followersCount,
+          following: followingCount
+        }}
+      />
 
       {/* Spacer */}
       <div className="h-8"></div>
 
       {/* Sticky Tab Navigation */}
+      <StickyTabNavigation
+        activeTab={activeSection}
+        onTabChange={handleTabChange}
+        transitionState={transitionState}
+      />
+
+      {/* Regular Tab Navigation */}
       <ProfileTabs
         activeTab={activeSection}
         onTabChange={handleTabChange}
