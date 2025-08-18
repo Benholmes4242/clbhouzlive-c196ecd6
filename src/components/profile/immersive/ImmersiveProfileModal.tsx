@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { VolumeX, Volume2, ChevronDown, Check, Upload } from 'lucide-react';
+import { VolumeX, Volume2, ChevronDown, Check, Upload, Play, Pause } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
-import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
 // import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface MediaItem {
@@ -52,9 +52,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [progress, setProgress] = useState(0);
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
   const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
+  const [isPlaying, setIsPlaying] = useState(true);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { isMuted, setMuted } = useSoundPreference();
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
   
@@ -267,6 +269,45 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
   }, [session?.user?.id, userId, localMediaItems.length, uploadVideo, onUploadComplete]);
 
+  // Video control handlers
+  const toggleMute = useCallback(() => {
+    setMuted(!isMuted);
+  }, [isMuted, setMuted]);
+
+  const togglePlayPause = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().catch(console.error);
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  }, []);
+
+  const handleVideoClick = useCallback(() => {
+    if (currentItem?.media_type === 'video') {
+      togglePlayPause();
+    }
+  }, [currentItem?.media_type, togglePlayPause]);
+
+  // Auto-play videos when they become active
+  useEffect(() => {
+    if (currentItem?.media_type === 'video' && videoRef.current && !isTransitioning) {
+      const video = videoRef.current;
+      video.muted = isMuted;
+      video.currentTime = 0;
+      
+      // Start playing after a short delay to ensure video is ready
+      setTimeout(() => {
+        video.play().catch(console.error);
+        setIsPlaying(true);
+      }, 100);
+    }
+  }, [activeIndex, currentItem, isMuted, isTransitioning]);
+
   // File input handler
   const handleFileInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -367,11 +408,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
       {/* Mute Button - Top Right */}
       <button
-        onClick={toggleGlobalMute}
+        onClick={toggleMute}
         className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center"
         style={liquidGlassStyle}
       >
-        {isGloballyMuted ? (
+        {isMuted ? (
           <VolumeX className="w-5 h-5 text-white" />
         ) : (
           <Volume2 className="w-5 h-5 text-white" />
@@ -379,23 +420,46 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       </button>
 
       {/* Media Content */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div 
+        className="absolute inset-0 flex items-center justify-center cursor-pointer"
+        onClick={handleVideoClick}
+      >
         {currentItem.media_type === 'video' ? (
-          <video
-            key={`${currentItem.id}-${activeIndex}`}
-            src={currentItem.media_url}
-            poster={currentItem.thumbnail_url}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            playsInline
-            onLoadedData={() => {
-              startTimeRef.current = Date.now();
-            }}
-            onCanPlay={(e) => {
-              e.currentTarget.play();
-            }}
-          />
+          <div className="relative w-full h-full">
+            <video
+              ref={videoRef}
+              key={`${currentItem.id}-${activeIndex}`}
+              src={currentItem.media_url}
+              poster={currentItem.thumbnail_url}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted={isMuted}
+              playsInline
+              loop={false}
+              onLoadedData={() => {
+                startTimeRef.current = Date.now();
+              }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onCanPlay={(e) => {
+                const video = e.currentTarget;
+                video.muted = isMuted;
+                video.play().catch(console.error);
+              }}
+            />
+            
+            {/* Play/Pause Overlay (only visible when paused) */}
+            {!isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
+                <div 
+                  className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105"
+                  style={liquidGlassStyle}
+                >
+                  <Play className="w-8 h-8 text-white ml-1" />
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <img
             key={`${currentItem.id}-${activeIndex}`}
