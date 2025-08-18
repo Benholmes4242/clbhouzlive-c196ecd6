@@ -49,6 +49,9 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
+import PremiumStickyHeader from './PremiumStickyHeader';
+import TieredStatsDisplay from './TieredStatsDisplay';
+import StickyTabNavigation from './StickyTabNavigation';
 
 interface Course {
   id: string;
@@ -123,6 +126,7 @@ const HeroProfileHeader = ({
   } = useImmersiveProfile(profile?.id || '', isOwnProfile);
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
     duration: 300
@@ -324,6 +328,45 @@ const HeroProfileHeader = ({
     fetchStats();
   }, [profile?.id]);
   
+  // Scroll management for morphing transition
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowStickyHeader(scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Handle morphing from identity dock to sticky header
+  const handleMorphTransition = () => {
+    closeImmersive();
+    // Smooth scroll to top of content
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  };
+
+  // Stats handling
+  const handleStatClick = (statType: string) => {
+    switch (statType) {
+      case 'handicap':
+        onSectionChange?.('stats');
+        break;
+      case 'posts':
+      case 'followers':
+      case 'following':
+        onSectionChange?.('activity');
+        break;
+      case 'achievements':
+        onSectionChange?.('achievements');
+        break;
+      case 'coursesRated':
+      case 'avgRating':
+        onSectionChange?.('courses');
+        break;
+    }
+  };
+
   // Derived values
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
@@ -491,6 +534,18 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
+      {/* Premium Sticky Header - Morphed from Identity Dock */}
+      <PremiumStickyHeader
+        isVisible={showStickyHeader && !isImmersiveOpen}
+        profile={profile}
+        stats={{
+          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+          posts: postsCount,
+          followers: followersCount,
+          following: followingCount
+        }}
+        onStatClick={handleStatClick}
+      />
       {/* Cinematic Profile Header */}
       <div className="relative w-full bg-background">
          <CinematicProfileHeader
@@ -515,20 +570,44 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Spacer */}
-      <div className="h-8"></div>
+      {/* Tiered Stats Display */}
+      <div className="px-4 md:px-6 py-6">
+        <TieredStatsDisplay
+          primaryStats={{
+            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+            posts: postsCount,
+            followers: followersCount,
+            following: followingCount
+          }}
+          secondaryStats={{
+            coursesRated: ratedCoursesCount,
+            avgRating: averageRating,
+            achievements: achievements?.length || 0,
+            memberSince: profile?.id ? '2024' : undefined
+          }}
+          onStatClick={handleStatClick}
+        />
+      </div>
 
       {/* Sticky Tab Navigation */}
-      <ProfileTabs
+      <StickyTabNavigation
         activeTab={activeSection}
         onTabChange={handleTabChange}
-        userId={profile?.id || ''}
-        userDisplayName={profile?.display_name}
-        userHandicap={profile?.eg_handicap_index}
-        userProfilePhotoUrl={profile?.profile_photo_url}
-        isCurrentUser={isOwnProfile}
-        transitionState={transitionState}
-      >
+        isVisible={true}
+      />
+
+      {/* Legacy ProfileTabs for content rendering */}
+      <div style={{ display: 'none' }}>
+        <ProfileTabs
+          activeTab={activeSection}
+          onTabChange={handleTabChange}
+          userId={profile?.id || ''}
+          userDisplayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
+          transitionState={transitionState}
+        >
         {{
           activity: (
             <div></div> // Content will be rendered separately below
@@ -549,7 +628,8 @@ const HeroProfileHeader = ({
             <div></div> // Content will be rendered separately below
           )
         }}
-      </ProfileTabs>
+        </ProfileTabs>
+      </div>
 
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
