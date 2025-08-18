@@ -11,7 +11,7 @@ interface ProfileData {
   display_name?: string;
   username?: string;
   profile_photo_url?: string;
-  club_name?: string;
+  location?: string;
 }
 
 interface ImmersiveIdentityDockProps {
@@ -44,7 +44,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('public_profiles')
-          .select('id, display_name, username, profile_photo_url')
+          .select('id, display_name, username, profile_photo_url, location')
           .eq('id', userId)
           .single();
 
@@ -106,7 +106,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-500 ${
+      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-500 ${
         isVisible 
           ? 'translate-y-0 opacity-100 animate-[bounce_0.6s_ease-out]' 
           : 'translate-y-full opacity-0'
@@ -136,10 +136,10 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
                 @{profile.username}
               </div>
             )}
-            {profile.club_name && (
+            {profile.location && (
               <div className="flex items-center gap-1 text-white/80 text-sm truncate">
                 <MapPin className="w-3 h-3" />
-                <span>{profile.club_name}</span>
+                <span>{profile.location}</span>
               </div>
             )}
           </div>
