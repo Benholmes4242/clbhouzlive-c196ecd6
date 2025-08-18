@@ -408,10 +408,17 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             className="w-full h-full object-cover cursor-pointer"
             autoPlay
-            muted={isGloballyMuted}
+            muted
             playsInline
+            loop
             onLoadedData={() => {
               startTimeRef.current = Date.now();
+              // Force play for autoplay
+              if (videoRef.current) {
+                videoRef.current.play().catch(() => {
+                  // Autoplay blocked, user interaction required
+                });
+              }
             }}
             onPlay={() => setIsVideoPaused(false)}
             onPause={() => setIsVideoPaused(true)}
@@ -473,8 +480,8 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         />
       )}
 
-      {/* Upload Button - Bottom Left (Upload Mode) */}
-      {uploadMode && (
+      {/* Upload Button - Bottom Left (Only for own profile) */}
+      {uploadMode && session?.user?.id === userId && (
         <div className="absolute bottom-8 left-8 z-20">
           <label 
             htmlFor="immersive-file-input"
