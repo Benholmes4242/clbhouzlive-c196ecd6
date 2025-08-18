@@ -295,16 +295,37 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
   // Auto-play videos when they become active
   useEffect(() => {
-    if (currentItem?.media_type === 'video' && videoRef.current && !isTransitioning) {
+    if (currentItem?.media_type === 'video' && videoRef.current && !isTransitioning && !currentItem.isUploading) {
       const video = videoRef.current;
+      
+      // Reset video and apply settings
       video.muted = isMuted;
       video.currentTime = 0;
       
-      // Start playing after a short delay to ensure video is ready
-      setTimeout(() => {
-        video.play().catch(console.error);
-        setIsPlaying(true);
-      }, 100);
+      // Force play after ensuring video is ready
+      const attemptPlay = () => {
+        if (video.readyState >= 2) { // HAVE_CURRENT_DATA or better
+          video.play().then(() => {
+            setIsPlaying(true);
+          }).catch((error) => {
+            console.log('Autoplay prevented:', error);
+            setIsPlaying(false);
+          });
+        } else {
+          // Wait for video to be ready
+          video.addEventListener('canplay', () => {
+            video.play().then(() => {
+              setIsPlaying(true);
+            }).catch((error) => {
+              console.log('Autoplay prevented:', error);
+              setIsPlaying(false);
+            });
+          }, { once: true });
+        }
+      };
+
+      // Small delay to ensure DOM is ready
+      setTimeout(attemptPlay, 50);
     }
   }, [activeIndex, currentItem, isMuted, isTransitioning]);
 
@@ -441,11 +462,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
               }}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              onCanPlay={(e) => {
-                const video = e.currentTarget;
-                video.muted = isMuted;
-                video.play().catch(console.error);
-              }}
             />
             
             {/* Play/Pause Overlay (only visible when paused) */}
