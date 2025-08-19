@@ -10,6 +10,7 @@ interface TabPanelsProps {
   isLoading: boolean;
   scrollAreaRef: React.RefObject<any>;
   suggestedPrompts: string[];
+  onPromptClick: (prompt: string) => void;
   isRecording: boolean;
   isProcessing: boolean;
   startRecording: () => void;
@@ -24,6 +25,7 @@ const TabPanels: React.FC<TabPanelsProps> = ({
   isLoading,
   scrollAreaRef,
   suggestedPrompts,
+  onPromptClick,
   isRecording,
   isProcessing,
   startRecording,
@@ -39,7 +41,7 @@ const TabPanels: React.FC<TabPanelsProps> = ({
           isLoading={isLoading}
           scrollAreaRef={scrollAreaRef}
           suggestedPrompts={suggestedPrompts}
-          onPromptClick={() => {}}
+          onPromptClick={onPromptClick}
         />
       </TabsContent>
 

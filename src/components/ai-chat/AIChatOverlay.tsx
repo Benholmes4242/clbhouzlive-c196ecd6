@@ -196,7 +196,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
       const aiMessage: ChatMessageData = {
         id: Date.now().toString() + '_ai',
         type: 'ai',
-        content: data.content || 'I apologize, but I encountered an issue processing your request.',
+        content: data.response || 'I apologize, but I encountered an issue processing your request.',
         timestamp: new Date(),
         metadata: data.metadata
       };
@@ -275,27 +275,31 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
   return (
     <>
-      <CaddieModal
-        isOpen={isOpen}
-        onClose={handleClose}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        messages={messages}
-        isLoading={isLoading}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        handleSendMessage={handleSendMessage}
-        isRecording={isRecording}
-        isProcessing={isProcessing}
-        startRecording={startRecording}
-        stopRecording={stopRecording}
-        userLocation={userLocation}
-        requestLocation={requestLocation}
-        showHistory={showHistory}
-        setShowHistory={setShowHistory}
-        scrollAreaRef={scrollAreaRef}
-        suggestedPrompts={suggestedPrompts}
-      />
+        <CaddieModal
+          isOpen={isOpen}
+          onClose={handleClose}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          messages={messages}
+          isLoading={isLoading}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          handleSendMessage={handleSendMessage}
+          onPromptClick={(prompt) => {
+            setInputValue(prompt);
+            setTimeout(() => handleSendMessage(), 100);
+          }}
+          isRecording={isRecording}
+          isProcessing={isProcessing}
+          startRecording={startRecording}
+          stopRecording={stopRecording}
+          userLocation={userLocation}
+          requestLocation={requestLocation}
+          showHistory={showHistory}
+          setShowHistory={setShowHistory}
+          scrollAreaRef={scrollAreaRef}
+          suggestedPrompts={suggestedPrompts}
+        />
 
       {/* History overlay */}
       {showHistory && (
