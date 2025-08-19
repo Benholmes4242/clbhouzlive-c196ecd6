@@ -170,13 +170,11 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-4 min-h-full flex flex-col">
             {logs.length === 0 ? (
-              <div className="py-8">
-                <div className="text-center text-muted-foreground">
-                  <p className="mb-6">
-                    Your personal yardage book starts here.<br />
-                    Tap the mic, record notes as you walk the course, and I'll store them for you.
-                  </p>
-                </div>
+              <div className="text-center text-muted-foreground pt-4">
+                <p className="mb-6">
+                  Your personal yardage book starts here.<br />
+                  Tap the mic, record notes as you walk the course, and I'll store them for you.
+                </p>
               </div>
             ) : filteredLogs.length === 0 ? (
               <div className="py-8">
