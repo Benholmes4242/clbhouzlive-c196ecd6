@@ -141,6 +141,9 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
         metadata: data.metadata
       });
 
+      // Trigger a storage event to notify other components of the update
+      window.dispatchEvent(new CustomEvent('proAnalysisSaved'));
+
       toast({
         title: "Analysis Complete",
         description: "Your swing has been analyzed by Pro AI",

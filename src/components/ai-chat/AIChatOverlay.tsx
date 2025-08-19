@@ -50,7 +50,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     isProcessing,
     startRecording,
     stopRecording,
-  } = useVoiceRecording();
+  } = useVoiceRecording({
+    onTranscriptionComplete: (transcribedText: string) => {
+      if (activeTab === 'logs') {
+        // Save as caddie log
+        saveCaddieLog(transcribedText);
+      } else {
+        // Set as input for chat
+        setInputValue(transcribedText);
+      }
+    }
+  });
 
   const suggestedPrompts = [
     "Why am I hooking my driver?",
@@ -131,6 +141,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
         title: "Log Saved",
         description: "Your caddie note has been recorded",
       });
+
+      // Trigger a storage event to notify other components of the update
+      window.dispatchEvent(new CustomEvent('caddieLogSaved'));
+
     } catch (error) {
       console.error('Error saving caddie log:', error);
       toast({

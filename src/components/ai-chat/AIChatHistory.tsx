@@ -61,6 +61,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     if (isOpen) {
       loadData();
     }
+
+    // Listen for save events to refresh data
+    const handleCaddieLogSaved = () => loadData();
+    const handleProAnalysisSaved = () => loadData();
+
+    window.addEventListener('caddieLogSaved', handleCaddieLogSaved);
+    window.addEventListener('proAnalysisSaved', handleProAnalysisSaved);
+
+    return () => {
+      window.removeEventListener('caddieLogSaved', handleCaddieLogSaved);
+      window.removeEventListener('proAnalysisSaved', handleProAnalysisSaved);
+    };
   }, [isOpen]);
 
   const loadData = async () => {
