@@ -570,7 +570,7 @@ const ProAI: React.FC<ProAIProps> = ({
       </div>
 
       {/* Input area */}
-      <div className="p-3 border-t flex-shrink-0 bg-background">
+      <div className="p-4 border-t flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 mb-2">
           <Button
             variant="outline"
