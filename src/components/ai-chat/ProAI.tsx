@@ -472,20 +472,21 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Messages */}
-      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+      <div className="flex-1 min-h-0 flex flex-col">
+        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-2">
+              <div className="py-8">
                 <div className="text-center text-muted-foreground">
-                  <p className="mb-2">
+                  <p className="mb-6">
                     Upload your swing for swing analysis<br />
                     Get instant feedback and drills from pro AI.
                   </p>
-                  <div className="mb-2">
-                    <p className="text-sm font-medium mb-1">Best results:</p>
-                    <div className="text-xs space-y-0.5">
+                  <div className="mb-6">
+                    <p className="text-sm font-medium mb-2">Best results:</p>
+                    <div className="text-xs space-y-1">
                       <p>• Face on or down the line, full body, good light</p>
                       <p>• State the club and miss (e.g., Driver • Hook)</p>
                       <p>• Optional: include swing speed or launch data</p>
@@ -523,74 +524,33 @@ const ProAI: React.FC<ProAIProps> = ({
                       <div className="flex-1">
                         <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
                         <p className="text-xs text-muted-foreground mb-2">
-                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)}MB
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                        <p className="text-xs text-green-600">
+                          Video loaded and ready for analysis
                         </p>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={discardVideo}>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={discardVideo}
+                        className="h-8 w-8 p-0"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 )}
-
+                
                 {messages.map((message) => (
                   <ChatMessageComponent
                     key={message.id}
                     message={message}
-                    onSaveToInsights={saveToSwingInsights}
+                    onSaveToInsights={currentAnalysis ? saveToSwingInsights : undefined}
                     onRequestDetail={requestMoreDetail}
                   />
                 ))}
-
-                {currentAnalysis && (
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <div className="flex flex-col gap-2">
-                      <Button 
-                        onClick={saveToSwingInsights}
-                        className="w-full"
-                      >
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Save to Swing Insights
-                      </Button>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => requestMoreDetail(analysisText || 'Explain fully in detail')}
-                          className="flex-1"
-                        >
-                          More Detail
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                        >
-                          <Share2 className="h-4 w-4 mr-1" />
-                          Share to Feed
-                        </Button>
-                      </div>
-                      {!currentAnalysis.voiceNote && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setIsAddingVoiceNote(true);
-                            startRecording();
-                          }}
-                          disabled={isRecording || isProcessing}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Voice Note
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
+                
                 {isAnalyzing && (
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-lg p-3 max-w-[80%]">
@@ -605,7 +565,8 @@ const ProAI: React.FC<ProAIProps> = ({
             )}
           </div>
         </ScrollArea>
-
+      </div>
+      
       {/* Input area */}
       <div className="p-4 border-t flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 mb-2">
@@ -691,8 +652,8 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-     </div>
-   );
- };
+    </div>
+  );
+};
 
 export default ProAI;
