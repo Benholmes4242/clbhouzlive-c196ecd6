@@ -220,7 +220,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">caddie AI . powered by AI</h2>
+            <h2 className="text-lg font-semibold">caddie AI . powered by clbhouz AI</h2>
           </div>
           <div className="flex items-center gap-2">
             <Button

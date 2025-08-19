@@ -38,10 +38,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         }}
       >
         <div className="flex items-center gap-1.5">
-          <div className="relative">
-            <span className="text-lg">🏌️</span>
-          </div>
-          <span className="font-medium text-lg">caddie AI</span>
+          <span className="text-lg">💬</span>
+          <span className="font-medium text-lg">Ask Your Caddie</span>
         </div>
       </Button>
     </>
