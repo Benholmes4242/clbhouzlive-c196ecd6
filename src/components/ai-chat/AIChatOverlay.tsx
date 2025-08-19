@@ -41,6 +41,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [showHistory, setShowHistory] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
+  const [analysisText, setAnalysisText] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -375,7 +376,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="bg-background rounded-2xl w-full max-w-md h-[90vh] md:h-[80vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-background rounded-2xl w-full max-w-md h-[min(90vh,720px)] flex flex-col shadow-2xl overflow-hidden"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -396,7 +397,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header - Fixed at top */}
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <div className="flex-1">
             <h2 className="text-lg font-semibold">caddie AI . powered by clbhouz AI</h2>
@@ -421,44 +422,49 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2 mb-2 flex-shrink-0">
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
-            <TabsTrigger value="proai">Pro AI</TabsTrigger>
-          </TabsList>
+          <div className="px-4 pt-2 pb-0 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
+              <TabsTrigger value="proai">Pro AI</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
-            {/* Messages */}
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-                <div className="p-4 min-h-full flex flex-col">
+          {/* Single scrollable content area */}
+          <div 
+            id="caddie-content"
+            className="flex-1 overflow-y-auto min-h-0"
+            style={{ overscrollBehavior: 'contain' }}
+            ref={scrollAreaRef}
+          >
+            <TabsContent value="chat" className="h-full m-0">
+              <div className="h-full min-h-0">
+                <div className="px-6 py-5">
                   {messages.length === 0 ? (
-                    <div className="py-8">
-                      <div className="text-center text-muted-foreground">
-                        <p className="mb-6">
-                          I'm your personal tour caddie.<br />
-                          Ask me anything, anytime, I've got you.
-                        </p>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Try asking:</p>
-                          {suggestedPrompts.map((prompt, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSuggestedPrompt(prompt)}
-                              className="mx-1 mb-2 text-xs"
-                            >
-                              {prompt}
-                            </Button>
-                          ))}
-                        </div>
+                    <div className="text-center text-muted-foreground">
+                      <p className="mb-6">
+                        I'm your personal tour caddie.<br />
+                        Ask me anything, anytime, I've got you.
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Try asking:</p>
+                        {suggestedPrompts.map((prompt, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSuggestedPrompt(prompt)}
+                            className="mx-1 mb-2 text-xs"
+                          >
+                            {prompt}
+                          </Button>
+                        ))}
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-4 flex-1">
+                    <div className="space-y-4">
                       {messages.map((message) => (
                         <ChatMessageComponent
                           key={message.id}
@@ -480,65 +486,117 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                     </div>
                   )}
                 </div>
-              </ScrollArea>
-            </div>
+              </div>
+            </TabsContent>
 
-          </TabsContent>
+            <TabsContent value="logs" className="h-full m-0">
+              <CaddieLogs 
+                onClose={() => setActiveTab('chat')}
+                isRecording={isRecording}
+                isProcessing={isProcessing}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                userLocation={userLocation}
+                requestLocation={requestLocation}
+              />
+            </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <CaddieLogs 
-              onClose={() => setActiveTab('chat')}
-              isRecording={isRecording}
-              isProcessing={isProcessing}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              userLocation={userLocation}
-              requestLocation={requestLocation}
-            />
-          </TabsContent>
-
-          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <ProAI 
-              onClose={() => setActiveTab('chat')}
-              isRecording={isRecording}
-              isProcessing={isProcessing}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-            />
-          </TabsContent>
+            <TabsContent value="proai" className="h-full m-0">
+              <ProAI 
+                onClose={() => setActiveTab('chat')}
+                isRecording={isRecording}
+                isProcessing={isProcessing}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+              />
+            </TabsContent>
+          </div>
         </Tabs>
         
-        {/* Input area - only shown for chat tab */}
-        {activeTab === 'chat' && (
-          <div className="p-4 border-t flex-shrink-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={requestLocation}
-                className="text-xs"
-              >
-                <MapPin className="h-3 w-3 mr-1" />
-                Use My Location
-              </Button>
-              {userLocation && (
-                <Badge variant="secondary" className="text-xs">
-                  {userLocation}
-                </Badge>
-              )}
+        {/* Shared composer/footer - Fixed at bottom */}
+        <div className="border-t flex-shrink-0">
+          {activeTab === 'chat' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 flex gap-2">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Ask about your swing, clubs, courses..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                    disabled={isLoading || isRecording || isProcessing}
+                  />
+                  <Button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isLoading || isProcessing}
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="sm"
+                    className="px-3"
+                  >
+                    {isRecording ? (
+                      <MicOff className="h-4 w-4" />
+                    ) : isProcessing ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <Button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                  size="sm"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex gap-2">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask about your swing, clubs, courses..."
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                  disabled={isLoading || isRecording || isProcessing}
-                />
+          )}
+          {activeTab === 'logs' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Record course notes and tips..."
+                    disabled={isRecording || isProcessing}
+                    readOnly
+                  />
+                </div>
                 <Button
                   onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isLoading || isProcessing}
+                  disabled={isProcessing}
                   variant={isRecording ? "destructive" : "outline"}
                   size="sm"
                   className="px-3"
@@ -551,17 +609,55 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                     <Mic className="h-4 w-4" />
                   )}
                 </Button>
+                <Button
+                  onClick={() => {
+                    if (!isRecording && !isProcessing) {
+                      startRecording();
+                    }
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
               </div>
-              <Button
-                onClick={() => sendMessage(inputValue)}
-                disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                size="sm"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
             </div>
-          </div>
-        )}
+          )}
+          {activeTab === 'proai' && (
+            <div className="p-4">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Describe your swing for analysis..."
+                    disabled={isRecording || isProcessing}
+                    readOnly
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

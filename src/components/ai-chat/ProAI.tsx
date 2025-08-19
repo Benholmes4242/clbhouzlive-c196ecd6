@@ -496,295 +496,258 @@ const ProAI: React.FC<ProAIProps> = ({
 
   if (showAnalyses) {
     return (
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h3 className="font-semibold">Swing Analyses</h3>
-          <Button variant="ghost" size="sm" onClick={() => setShowAnalyses(false)}>
-            Back
-          </Button>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-4">
-            {analyses.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No analyses yet.</p>
-                <p className="text-sm">Upload a swing to get instant feedback and drills.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {analyses.map((analysis) => (
-                  <Card key={analysis.id} className="p-4">
-                    <div className="flex items-start gap-3">
-                      {analysis.videoThumbnail && (
-                        <img 
-                          src={analysis.videoThumbnail} 
-                          alt="Swing thumbnail"
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {analysis.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {analysis.timestamp.toLocaleDateString()}
-                        </p>
-                        {analysis.voiceNote && (
-                          <Badge variant="outline" className="mt-2 text-xs">
-                            Voice note attached
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <Share2 className="h-3 w-3" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0"
-                          onClick={() => deleteAnalysis(analysis.id)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+      <div className="h-full min-h-0">
+        <div className="px-6 py-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Swing Analyses</h3>
+            <Button variant="ghost" size="sm" onClick={() => setShowAnalyses(false)}>
+              Back
+            </Button>
           </div>
-        </ScrollArea>
+          
+          {analyses.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No analyses yet.</p>
+              <p className="text-sm">Upload a swing to get instant feedback and drills.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {analyses.map((analysis) => (
+                <Card key={analysis.id} className="p-4">
+                  <div className="flex items-start gap-3">
+                    {analysis.videoThumbnail && (
+                      <img 
+                        src={analysis.videoThumbnail} 
+                        alt="Swing thumbnail"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {analysis.tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {analysis.timestamp.toLocaleDateString()}
+                      </p>
+                      {analysis.voiceNote && (
+                        <Badge variant="outline" className="mt-2 text-xs">
+                          Voice note attached
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Share2 className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => deleteAnalysis(analysis.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Content */}
-      <div className="flex-1 min-h-0 flex flex-col max-h-[35vh] md:max-h-[60vh]">
-        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-          <div className="p-4 min-h-full flex flex-col">
-            {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-2">
-                <div className="text-center text-muted-foreground">
-                  <p className="mb-2">
-                    Upload your swing for swing analysis<br />
-                    Get instant feedback and drills from pro AI.
-                  </p>
-                  <div className="mb-2">
-                      <p className="text-sm font-medium mb-1">Best results:</p>
-                      <div className="text-xs space-y-0.5">
-                        <p>• Face-on or down-the-line, full body, good lighting</p>
-                        <p>• State the club and typical miss (e.g., Driver • Hook)</p>
-                        <p>• Include swing speed or ball flight if known</p>
-                        <p>• Camera angle: mention face-on or down-the-line</p>
+    <div className="h-full min-h-0">
+      <div className="px-6 py-5">
+        {messages.length === 0 && !uploadedVideo ? (
+          <div className="text-center text-muted-foreground">
+            <h3 className="text-lg font-medium mb-2">
+              Upload your swing for swing analysis
+            </h3>
+            <p className="mb-6 text-sm">
+              Get instant feedback and drills from Pro AI.
+            </p>
+            
+            <div className="text-left max-w-sm mx-auto">
+              <p className="text-sm font-medium mb-3">Best results:</p>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• Face-on or down-the-line, full body, good lighting</li>
+                <li>• State the club and typical miss (e.g., Driver + Hook)</li>
+                <li>• Include swing speed or ball flight if known</li>
+                <li>• Mention face-on or down-the-line</li>
+              </ul>
+            </div>
+
+            <div className="flex gap-2 mt-6 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs"
+              >
+                <Upload className="h-4 w-4 mr-1" />
+                Upload Swing Video
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAnalyses(true)}
+                className="text-xs"
+              >
+                <BookOpen className="h-3 w-3 mr-1" />
+                Analyses ({analyses.length})
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {uploadedVideo && (
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    {uploadedVideo.type.startsWith('video/') ? (
+                      <div className="w-32 h-32 rounded-lg overflow-hidden">
+                        <video 
+                          src={videoPreview} 
+                          className="w-full h-full object-cover"
+                          controls
+                          preload="metadata"
+                          poster=""
+                        />
                       </div>
+                    ) : (
+                      <img 
+                        src={videoPreview} 
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg"
+                      />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                    </p>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-3 w-3 mr-1" />
+                        Replace
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAnalyses(true)}
+                      >
+                        <BookOpen className="h-3 w-3 mr-1" />
+                        Analyses ({analyses.length})
+                      </Button>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={discardVideo}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {messages.map((message) => (
+              <ChatMessageComponent
+                key={message.id}
+                message={message}
+                onSaveToInsights={saveToSwingInsights}
+                onRequestDetail={requestMoreDetail}
+              />
+            ))}
+
+            {currentAnalysis && (
+              <div className="bg-muted/50 rounded-lg p-4">
+                <div className="flex flex-col gap-2">
+                  <Button 
+                    onClick={saveToSwingInsights}
+                    className="w-full"
+                  >
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Save to Swing Insights
+                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => requestMoreDetail(analysisText || 'Explain fully in detail')}
+                      className="flex-1"
+                    >
+                      More Detail
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                    >
+                      <Share2 className="h-4 w-4 mr-1" />
+                      Share to Feed
+                    </Button>
+                  </div>
+                  {!currentAnalysis.voiceNote && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setIsAddingVoiceNote(true);
+                        startRecording();
+                      }}
+                      disabled={isRecording || isProcessing}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Voice Note
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {isAnalyzing && (
+              <div className="flex justify-start">
+                <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                    <span className="text-sm">Pro AI is analyzing swing positions...</span>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4 flex-1">
-                {uploadedVideo && (
-                  <div className="bg-muted rounded-lg p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        {uploadedVideo.type.startsWith('video/') ? (
-                          <div className="w-32 h-32 rounded-lg overflow-hidden">
-                            <video 
-                              src={videoPreview} 
-                              className="w-full h-full object-cover"
-                              controls
-                              preload="metadata"
-                              poster=""
-                            />
-                          </div>
-                        ) : (
-                          <img 
-                            src={videoPreview} 
-                            alt="Preview"
-                            className="w-32 h-32 object-cover rounded-lg"
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={discardVideo}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {messages.map((message) => (
-                  <ChatMessageComponent
-                    key={message.id}
-                    message={message}
-                    onSaveToInsights={saveToSwingInsights}
-                    onRequestDetail={requestMoreDetail}
-                  />
-                ))}
-
-                {currentAnalysis && (
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <div className="flex flex-col gap-2">
-                      <Button 
-                        onClick={saveToSwingInsights}
-                        className="w-full"
-                      >
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Save to Swing Insights
-                      </Button>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => requestMoreDetail(analysisText || 'Explain fully in detail')}
-                          className="flex-1"
-                        >
-                          More Detail
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                        >
-                          <Share2 className="h-4 w-4 mr-1" />
-                          Share to Feed
-                        </Button>
-                      </div>
-                      {!currentAnalysis.voiceNote && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setIsAddingVoiceNote(true);
-                            startRecording();
-                          }}
-                          disabled={isRecording || isProcessing}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Voice Note
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {isAnalyzing && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                        <span className="text-sm">Pro AI is analyzing swing positions...</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
             )}
           </div>
-        </ScrollArea>
-      </div>
+        )}
 
-      {/* Input area */}
-      <div className="p-4 border-t flex-shrink-0 bg-background">
-        <div className="flex items-center gap-2 mb-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            className="text-xs flex-1"
-          >
-            <Upload className="h-4 w-4 mr-1" />
-            Upload Swing Video
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowAnalyses(true)}
-            className="text-xs"
-          >
-            <BookOpen className="h-3 w-3 mr-1" />
-            Analyses ({analyses.length})
-          </Button>
-        </div>
-        
-        <div className="flex gap-2">
-          <Input
-            value={analysisText}
-            onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : uploadedVideo ? "Add context or question..." : "Type a message..."}
-            onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && (uploadedVideo || analysisText.trim()) && analyzeSwing()}
-            disabled={isAnalyzing || isVoiceNoteRecording}
-            className="flex-1"
-          />
-          
-          {/* Send button - always visible */}
-          <Button
-            onClick={analyzeSwing}
-            disabled={isAnalyzing || isVoiceNoteRecording || (!uploadedVideo && !analysisText.trim())}
-            size="sm"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-          
-          {/* Voice button - always visible */}
-          <Button
-            onClick={() => {
-              if (isVoiceNoteRecording) {
-                stopRecording();
-              } else if (isRecording) {
-                setIsVoiceNoteRecording(true);
-                startRecording();
-              } else {
-                setIsVoiceNoteRecording(true);
-                startRecording();
-              }
-            }}
-            disabled={isAnalyzing || isProcessing}
-            size="sm"
-            variant={isVoiceNoteRecording ? "default" : "outline"}
-          >
-            {isVoiceNoteRecording ? (
-              <Send className="h-4 w-4" />
-            ) : isRecording || isProcessing ? (
-              <Mic className="h-4 w-4 opacity-50" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-        
         {currentGolfClub && (
-          <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+          <div className="mt-4 text-xs text-muted-foreground flex items-center gap-1 justify-center">
             <MapPin className="h-3 w-3" />
             Currently logging notes for {currentGolfClub}
           </div>
         )}
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="video/*,image/*"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/*,image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
     </div>
   );
 };
