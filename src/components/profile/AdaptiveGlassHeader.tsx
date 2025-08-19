@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
@@ -31,8 +29,6 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
   stats,
   onStatClick
 }) => {
-  const [showAllStats, setShowAllStats] = useState(false);
-  const isMobile = useIsMobile();
   const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
 
   if (!profile) return null;
@@ -40,13 +36,8 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
   const primaryStats = [
     { label: 'Handicap', value: stats.handicap?.toString() || '--', key: 'handicap' },
     { label: 'Posts', value: stats.posts.toString(), key: 'posts' },
-    { label: 'Followers', value: stats.followers.toString(), key: 'followers' }
-  ];
-
-  const secondaryStats = [
-    { label: 'Following', value: stats.following?.toString() || '0', key: 'following' },
-    { label: 'Courses', value: stats.ratedCoursesCount?.toString() || '0', key: 'coursesRated' },
-    { label: 'Avg Rating', value: stats.averageRating?.toFixed(1) || '--', key: 'avgRating' }
+    { label: 'Followers', value: stats.followers.toString(), key: 'followers' },
+    { label: 'Following', value: stats.following?.toString() || '0', key: 'following' }
   ];
 
   return (
@@ -153,75 +144,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                   </div>
                 </button>
               ))}
-              
-              {/* Show More Button */}
-              <Button
-                onClick={() => setShowAllStats(!showAllStats)}
-                size="sm"
-                variant="ghost"
-                className={`
-                  px-2 py-1 h-8 transition-all duration-300
-                  ${glassMode === 'elevated' 
-                    ? 'text-black/80 hover:text-black hover:bg-black/5' 
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }
-                `}
-              >
-                {showAllStats ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </Button>
             </div>
-          </div>
-
-          {/* Expandable Secondary Stats Row */}
-          {showAllStats && (
-            <div 
-              className={`
-                mt-3 pt-3 transition-colors duration-300
-                ${glassMode === 'elevated' ? 'border-black/10' : 'border-white/10'}
-              `}
-              style={{ 
-                borderTopWidth: '1px',
-                borderTopStyle: 'solid'
-              }}
-            >
-              <div className="flex items-center justify-center gap-6">
-                {secondaryStats.map((stat) => (
-                  <button
-                    key={stat.key}
-                    onClick={() => onStatClick?.(stat.key)}
-                    className={`
-                      text-center rounded-lg px-3 py-2 transition-all duration-300
-                      ${glassMode === 'elevated' 
-                        ? 'hover:bg-black/5' 
-                        : 'hover:bg-white/10'
-                      }
-                    `}
-                  >
-                    <div 
-                      className={`
-                        font-bold text-sm transition-colors duration-300
-                        ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-                      `}
-                    >
-                      {stat.value}
-                    </div>
-                    <div 
-                      className={`
-                        text-xs transition-colors duration-300
-                        ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
-                      `}
-                    >
-                      {stat.label}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>
