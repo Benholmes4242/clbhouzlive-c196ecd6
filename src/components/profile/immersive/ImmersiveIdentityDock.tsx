@@ -35,6 +35,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
     background: 'rgba(255, 255, 255, 0.08)',
     backdropFilter: 'blur(40px) saturate(180%)',
     WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+    borderRadius: '24px',
     boxShadow: '0 20px 60px -10px rgba(0, 0, 0, 0.4), 0 8px 32px -8px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
   };
 
@@ -116,7 +117,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
       style={liquidGlassStyle}
       onClick={onMorphToHeader}
     >
-      <div className="px-8 py-5 rounded-3xl shadow-2xl backdrop-blur-md">
+      <div className="px-8 py-5">
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <Avatar className="w-16 h-16 rounded-full">
