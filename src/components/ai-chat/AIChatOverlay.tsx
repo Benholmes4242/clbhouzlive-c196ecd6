@@ -428,11 +428,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <TabsTrigger value="proai">Pro AI</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+          <TabsContent value="chat" className="flex-1 flex flex-col">
             {/* Messages */}
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-                <div className="p-4 min-h-full flex flex-col">
+            <div className="flex-1 p-4">
+              <ScrollArea className="h-full" ref={scrollAreaRef}>
+                <div className="min-h-full flex flex-col">
                   {messages.length === 0 ? (
                     <div className="py-8">
                       <div className="text-center text-muted-foreground">
@@ -457,7 +457,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-4 flex-1">
+                    <div className="space-y-4">
                       {messages.map((message) => (
                         <ChatMessageComponent
                           key={message.id}
@@ -481,10 +481,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 </div>
               </ScrollArea>
             </div>
-
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
+          <TabsContent value="logs" className="flex-1 flex flex-col">
             <CaddieLogs 
               onClose={() => setActiveTab('chat')}
               isRecording={isRecording}
@@ -496,7 +495,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             />
           </TabsContent>
 
-          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
+          <TabsContent value="proai" className="flex-1 flex flex-col">
             <ProAI 
               onClose={() => setActiveTab('chat')}
               isRecording={isRecording}
