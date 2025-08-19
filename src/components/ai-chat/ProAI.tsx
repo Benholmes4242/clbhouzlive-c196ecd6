@@ -465,28 +465,30 @@ const ProAI: React.FC<ProAIProps> = ({
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         {uploadedVideo.type.startsWith('video/') ? (
-                          <video 
-                            src={videoPreview} 
-                            className="w-20 h-20 object-cover rounded"
-                            controls
-                          />
+                          <div className="w-32 h-32 rounded-lg overflow-hidden">
+                            <video 
+                              src={videoPreview} 
+                              className="w-full h-full object-cover"
+                              controls
+                              preload="metadata"
+                              poster=""
+                            />
+                          </div>
                         ) : (
                           <img 
                             src={videoPreview} 
                             alt="Preview"
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-32 h-32 object-cover rounded-lg"
                           />
                         )}
-                        <div className="absolute inset-0 bg-black/20 rounded flex items-center justify-center">
-                          {uploadedVideo.type.startsWith('video/') && (
-                            <Play className="h-6 w-6 text-white" />
-                          )}
-                        </div>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{uploadedVideo.name}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
+                        <p className="text-xs text-muted-foreground mb-2">
                           {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
                         </p>
                       </div>
                       <Button variant="ghost" size="sm" onClick={discardVideo}>
@@ -594,39 +596,51 @@ const ProAI: React.FC<ProAIProps> = ({
           <Input
             value={analysisText}
             onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : "Say something or type a message..."}
-            onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && analyzeSwing()}
+            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : uploadedVideo ? "Optional: Add context or question about your swing..." : "Say something or type a message..."}
+            onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && (uploadedVideo || analysisText.trim()) && analyzeSwing()}
             disabled={isAnalyzing || isVoiceNoteRecording}
             className="flex-1"
           />
-          <Button
-            onClick={() => {
-              if (isVoiceNoteRecording) {
-                stopRecording();
-              } else if (isRecording) {
-                setIsVoiceNoteRecording(true);
-                startRecording();
-              } else {
-                if (analysisText.trim()) {
-                  analyzeSwing();
+          
+          {/* Send button - shows when video is uploaded or text is entered */}
+          {(uploadedVideo || analysisText.trim()) && !isVoiceNoteRecording && (
+            <Button
+              onClick={analyzeSwing}
+              disabled={isAnalyzing}
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {/* Voice button - shows when no video uploaded and no text */}
+          {!uploadedVideo && !analysisText.trim() && (
+            <Button
+              onClick={() => {
+                if (isVoiceNoteRecording) {
+                  stopRecording();
+                } else if (isRecording) {
+                  setIsVoiceNoteRecording(true);
+                  startRecording();
                 } else {
                   setIsVoiceNoteRecording(true);
                   startRecording();
                 }
-              }
-            }}
-            disabled={isAnalyzing || isProcessing}
-            size="sm"
-            variant={isVoiceNoteRecording ? "default" : "outline"}
-          >
-            {isVoiceNoteRecording ? (
-              <Send className="h-4 w-4" />
-            ) : isRecording || isProcessing ? (
-              <Mic className="h-4 w-4 opacity-50" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
+              }}
+              disabled={isAnalyzing || isProcessing}
+              size="sm"
+              variant={isVoiceNoteRecording ? "default" : "outline"}
+            >
+              {isVoiceNoteRecording ? (
+                <Send className="h-4 w-4" />
+              ) : isRecording || isProcessing ? (
+                <Mic className="h-4 w-4 opacity-50" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
+          )}
         </div>
         
         {currentGolfClub && (
