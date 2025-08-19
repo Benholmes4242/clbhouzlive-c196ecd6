@@ -220,8 +220,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">clbhouz pro AI</h2>
-            <p className="text-sm text-muted-foreground">powered by AI</p>
+            <h2 className="text-lg font-semibold">clbhouz pro AI . powered by AI</h2>
             <p className="text-xs text-muted-foreground mt-1">
               Ask me anything about golf - your swing, clubs, courses or golf trips
             </p>
