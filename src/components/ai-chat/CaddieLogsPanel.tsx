@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, Edit, Trash2, MapPin, Calendar } from 'lucide-react';
+import { Search, Edit, Trash2, MapPin, Calendar, Mic, MicOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -40,11 +40,63 @@ const CaddieLogsPanel: React.FC<CaddieLogsPanelProps> = ({
   const [editingLog, setEditingLog] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [newLogContent, setNewLogContent] = useState('');
   const { toast } = useToast();
 
   useEffect(() => {
     fetchLogs();
   }, []);
+
+  const createCaddieLog = async (content: string) => {
+    if (!content.trim()) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const autoTagGolfTerms = (text: string): string[] => {
+        const golfTerms = [
+          'tree', 'bunker', 'green', 'slope', 'yardage', 'carry', 'pin', 'flag',
+          'fairway', 'rough', 'water', 'hazard', 'dogleg', 'elevation', 'wind',
+          'left', 'right', 'center', 'front', 'back', 'avoid', 'target'
+        ];
+        
+        return golfTerms.filter(term => 
+          text.toLowerCase().includes(term)
+        );
+      };
+
+      const { data, error } = await supabase
+        .from('caddie_logs')
+        .insert({
+          user_id: user.id,
+          content: content.trim(),
+          transcription: content.trim(),
+          location_name: userLocation || null,
+          course_name: null,
+          tags: autoTagGolfTerms(content)
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLogs(prev => [data, ...prev]);
+      setNewLogContent('');
+      
+      toast({
+        title: "Log Created",
+        description: "Your caddie note has been saved",
+      });
+    } catch (error) {
+      console.error('Error creating caddie log:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to create log",
+        variant: "destructive"
+      });
+    }
+  };
 
   const fetchLogs = async () => {
     try {
@@ -162,13 +214,46 @@ const CaddieLogsPanel: React.FC<CaddieLogsPanelProps> = ({
           </div>
         </div>
 
-        {/* Location indicator */}
-        {userLocation && (
-          <Badge variant="secondary" className="text-xs">
-            <MapPin className="h-3 w-3 mr-1" />
-            {userLocation}
-          </Badge>
-        )}
+        {/* Add New Log Input */}
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Add a new caddie note..."
+              value={newLogContent}
+              onChange={(e) => setNewLogContent(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  createCaddieLog(newLogContent);
+                }
+              }}
+              className="flex-1"
+            />
+            <Button
+              onClick={() => createCaddieLog(newLogContent)}
+              disabled={!newLogContent.trim()}
+              size="sm"
+            >
+              Add
+            </Button>
+            <Button
+              onClick={isRecording ? stopRecording : startRecording}
+              variant={isRecording ? "destructive" : "outline"}
+              size="sm"
+              disabled={isProcessing}
+            >
+              {isRecording ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          {(isRecording || isProcessing) && (
+            <div className="text-center text-sm text-muted-foreground">
+              {isProcessing ? 'Processing recording...' : 'Recording...'}
+            </div>
+          )}
+        </div>
 
         {logs.length === 0 ? (
           <div className="text-center text-muted-foreground pt-4">

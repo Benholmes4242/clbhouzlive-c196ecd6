@@ -65,6 +65,50 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     }
   }, [initialTab]);
 
+  // Tab-specific handlers with routing guards
+  const handleSend = async (text: string, sourceTab: 'chat' | 'logs' | 'pro') => {
+    if (!sourceTab) {
+      console.error('Missing sourceTab for handleSend, blocking write');
+      return;
+    }
+
+    if (sourceTab === 'chat') return saveToConversations(text);
+    if (sourceTab === 'logs') return saveCaddieLog(text);
+    if (sourceTab === 'pro') return saveProAnalysis(text);
+  };
+
+  const saveToConversations = async (content: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const conversationMessages = messages.map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+        timestamp: msg.timestamp.toISOString()
+      }));
+
+      const title = content.length > 50 ? content.substring(0, 50) + '...' : content;
+
+      const { error } = await supabase
+        .from('conversations')
+        .insert({
+          user_id: user.id,
+          title,
+          messages: conversationMessages
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save conversation",
+        variant: "destructive"
+      });
+    }
+  };
+
   const saveCaddieLog = async (content: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -92,6 +136,35 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
       toast({
         title: "Error",
         description: "Failed to save log",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const saveProAnalysis = async (analysisData: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .insert({
+          user_id: user.id,
+          analysis_results: analysisData,
+          swing_context: ''
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Analysis Saved",
+        description: "Your swing analysis has been recorded",
+      });
+    } catch (error) {
+      console.error('Error saving pro analysis:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save analysis",
         variant: "destructive"
       });
     }
@@ -153,26 +226,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
   };
 
   const saveConversationToHistory = async (conversation: ChatMessageData[]) => {
-    // For now, we'll save important conversations to caddie_logs
-    // This can be enhanced later with a dedicated chat_history table
+    if (activeTab !== 'chat') {
+      console.error('Attempted to save conversation from non-chat tab, blocking write');
+      return;
+    }
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user || conversation.length === 0) return;
 
-      const summary = conversation[0]?.content.substring(0, 100) + '...';
+      const title = conversation[0]?.content.substring(0, 50) + '...';
       const { error } = await supabase
-        .from('caddie_logs')
+        .from('conversations')
         .insert({
           user_id: user.id,
-          content: summary,
-          transcription: JSON.stringify(conversation.map(msg => ({
+          title,
+          messages: conversation.map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content,
-            timestamp: msg.timestamp
-          }))),
-          location_name: userLocation || null,
-          course_name: null,
-          tags: ['chat', 'conversation']
+            timestamp: msg.timestamp.toISOString()
+          }))
         });
 
       if (error) throw error;
@@ -183,6 +256,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
+    
+    // Routing guard - only allow from chat tab
+    if (activeTab !== 'chat') {
+      console.error('Attempted to send message from non-chat tab, blocking action');
+      return;
+    }
 
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
@@ -232,8 +311,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
       setMessages(prev => {
         const newMessages = [...prev, aiMessage];
-        // Save conversation to history after AI response
-        saveConversationToHistory(newMessages);
+        // Save conversation to history after AI response - only from chat tab
+        if (activeTab === 'chat') {
+          saveConversationToHistory(newMessages);
+        }
         return newMessages;
       });
 
@@ -272,9 +353,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
   };
 
   const handleSaveToInsights = (message: any) => {
-    // Extract the save_card content or use the main content
+    // Route based on active tab - guardrail against cross-writes
     const contentToSave = message.metadata?.save_card || message.content;
-    saveCaddieLog(contentToSave);
+    if (activeTab === 'logs') {
+      saveCaddieLog(contentToSave);
+    } else if (activeTab === 'chat') {
+      // For chat tab, we might save insights to a different format if needed
+      saveCaddieLog(contentToSave);
+    } else {
+      console.warn('handleSaveToInsights called from unexpected tab:', activeTab);
+    }
   };
 
   const loadConversation = (conversation: any[]) => {
@@ -308,7 +396,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
       <AIChatHistory 
         isOpen={showHistory}
         onClose={() => setShowHistory(false)}
-        onSelectMessage={() => {}}
+          onSelectMessage={sendMessage}
+          activeTab={activeTab}
       />
     );
   }
@@ -348,7 +437,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
         <AIChatHistory 
           isOpen={showHistory}
           onClose={() => setShowHistory(false)}
-          onSelectMessage={() => {}}
+          onSelectMessage={sendMessage}
+          activeTab={activeTab}
         />
       )}
     </>

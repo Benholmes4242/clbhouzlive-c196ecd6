@@ -132,6 +132,15 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
 
       setMessages(prev => [...prev, aiMessage]);
 
+      // Save analysis to pro_ai_analyses table - routing guard
+      await saveAnalysisToDatabase({
+        userMessage: userMessage.content,
+        aiResponse: aiMessage.content,
+        swingContext,
+        videoUrl: videoPreview,
+        metadata: data.metadata
+      });
+
       toast({
         title: "Analysis Complete",
         description: "Your swing has been analyzed by Pro AI",
@@ -146,6 +155,31 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
       });
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const saveAnalysisToDatabase = async (analysisData: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .insert({
+          user_id: user.id,
+          video_url: analysisData.videoUrl,
+          swing_context: analysisData.swingContext || null,
+          analysis_results: {
+            userMessage: analysisData.userMessage,
+            aiResponse: analysisData.aiResponse,
+            metadata: analysisData.metadata,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving analysis to database:', error);
     }
   };
 
