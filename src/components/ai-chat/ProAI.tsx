@@ -602,19 +602,17 @@ const ProAI: React.FC<ProAIProps> = ({
             className="flex-1"
           />
           
-          {/* Send button - shows when video is uploaded or text is entered */}
-          {(uploadedVideo || analysisText.trim()) && (
-            <Button
-              onClick={analyzeSwing}
-              disabled={isAnalyzing || isVoiceNoteRecording}
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          )}
+          {/* Send button - always visible */}
+          <Button
+            onClick={analyzeSwing}
+            disabled={isAnalyzing || isVoiceNoteRecording || (!uploadedVideo && !analysisText.trim())}
+            size="sm"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
           
-          {/* Voice button - always show unless analyzing */}
+          {/* Voice button - always visible */}
           <Button
             onClick={() => {
               if (isVoiceNoteRecording) {
