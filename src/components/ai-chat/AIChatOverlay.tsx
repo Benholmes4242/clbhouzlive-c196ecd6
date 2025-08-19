@@ -220,7 +220,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">clbhouz pro AI . powered by AI</h2>
+            <h2 className="text-lg font-semibold">clbhouz caddie AI</h2>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -247,8 +247,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           {messages.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               <p className="mb-6">
-                Welcome to clbhouz pro AI. Ask me anything about your swing, clubs or golf courses. 
-                I'll give you a quick answer right away — and more detail if you want it.
+                I'm your personal tour caddie. Ask me anything, anytime, I've got you.
               </p>
               <div className="space-y-2">
                 <p className="text-sm font-medium">Try asking:</p>
