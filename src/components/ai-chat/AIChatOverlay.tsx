@@ -56,7 +56,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     "Why am I hooking my driver?",
     "How do I fix my slice?",
     "Golf courses near me",
-    "Can you put together a 5-night golf tour in the USA for 5 friends?"
+    "Can you put together a 5-night golf tour in the USA?"
   ];
 
   useEffect(() => {
