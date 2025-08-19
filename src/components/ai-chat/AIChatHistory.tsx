@@ -283,14 +283,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue={activeTab === 'chat' ? 'history' : activeTab === 'logs' ? 'logs' : 'analyses'} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="history">Chats ({conversations.length})</TabsTrigger>
-            <TabsTrigger value="logs">Caddie Logs ({caddieLogsList.length})</TabsTrigger>
-            <TabsTrigger value="analyses">Pro AI ({proAnalyses.length})</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue={activeTab === 'chat' ? 'history' : activeTab === 'logs' ? 'logs' : 'analyses'} className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-4 pt-2">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="history">Chats ({conversations.length})</TabsTrigger>
+              <TabsTrigger value="logs">Caddie Logs ({caddieLogsList.length})</TabsTrigger>
+              <TabsTrigger value="analyses">Pro AI ({proAnalyses.length})</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="history" className="flex-1 p-4">
+          <TabsContent value="history" className="flex-1 p-4 overflow-hidden">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
                 Ask anything about your golf
@@ -317,8 +319,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
+            <ScrollArea className="flex-1 h-full">
+              <div className="space-y-3 pr-4">
                 {conversations.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No conversations found matching your search' : 'No chat conversations yet'}
@@ -349,7 +351,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 p-4">
+          <TabsContent value="logs" className="flex-1 p-4 overflow-hidden">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
                 Your personal yardage book
@@ -376,8 +378,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
+            <ScrollArea className="flex-1 h-full">
+              <div className="space-y-3 pr-4">
                 {caddieLogsList.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No logs found matching your search' : 'No caddie logs yet'}
@@ -417,7 +419,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="analyses" className="flex-1 p-4">
+          <TabsContent value="analyses" className="flex-1 p-4 overflow-hidden">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
                 Swing analysis
@@ -444,8 +446,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
+            <ScrollArea className="flex-1 h-full">
+              <div className="space-y-3 pr-4">
                 {proAnalyses.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Pro AI to get started.'}
