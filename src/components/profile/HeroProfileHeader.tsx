@@ -49,7 +49,7 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
-import PremiumStickyHeader from './PremiumStickyHeader';
+import AdaptiveGlassHeader from './AdaptiveGlassHeader';
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
@@ -541,8 +541,8 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Sticky Header - Morphed from Identity Dock */}
-      <PremiumStickyHeader
+      {/* Adaptive Glass Header - Auto-switches modes based on background */}
+      <AdaptiveGlassHeader
         isVisible={showStickyHeader && !isImmersiveOpen}
         profile={profile}
         stats={{
