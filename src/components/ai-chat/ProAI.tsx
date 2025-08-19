@@ -477,16 +477,16 @@ const ProAI: React.FC<ProAIProps> = ({
       </div>
 
       {/* Input area */}
-      <div className="p-4 border-t flex-shrink-0">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="p-4 border-t flex-shrink-0 bg-background">
+        <div className="flex items-center gap-2 mb-3">
           <Button
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="text-xs"
+            className="text-xs flex-1"
           >
-            <Upload className="h-3 w-3 mr-1" />
-            Upload Swing
+            <Upload className="h-4 w-4 mr-1" />
+            Upload Swing Video
           </Button>
           <Button
             variant="outline"
@@ -495,7 +495,7 @@ const ProAI: React.FC<ProAIProps> = ({
             className="text-xs"
           >
             <BookOpen className="h-3 w-3 mr-1" />
-            View Analyses ({analyses.length})
+            Analyses ({analyses.length})
           </Button>
         </div>
         
@@ -506,6 +506,7 @@ const ProAI: React.FC<ProAIProps> = ({
             placeholder="Describe your swing issue or add context..."
             onKeyPress={(e) => e.key === 'Enter' && analyzeSwing()}
             disabled={isAnalyzing}
+            className="flex-1"
           />
           <Button
             onClick={analyzeSwing}
