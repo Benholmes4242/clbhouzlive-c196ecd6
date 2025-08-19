@@ -25,8 +25,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   return (
     <div className="text-center space-y-2">
-      {/* Add more spacing for business profiles */}
-      <div className={isIndividual ? "mt-0" : "mt-8"}>
+      <div className="mt-0">
         <h1 className="text-2xl font-bold text-black">{displayName}</h1>
       </div>
       
