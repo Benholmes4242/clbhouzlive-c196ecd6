@@ -109,7 +109,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-20 left-0 right-0 z-30 flex justify-center transition-all duration-700 ease-out ${
+      className={`fixed bottom-12 left-0 right-0 z-30 flex justify-center transition-all duration-700 ease-out ${
         isVisible 
           ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
           : 'translate-y-full opacity-0'

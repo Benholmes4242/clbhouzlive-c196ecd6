@@ -508,10 +508,10 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       />
 
       {/* Down Arrow - Bottom Center */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
         <button
           onClick={handleClose}
-          className="w-10 h-10 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_1.5s_ease-in-out_infinite] p-1"
+          className="w-10 h-10 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_1.5s_ease-in-out_infinite] p-0"
           style={liquidGlassStyle}
         >
           <ChevronDown className="w-6 h-6 text-white mx-auto" />
