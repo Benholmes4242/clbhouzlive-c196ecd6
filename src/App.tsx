@@ -110,6 +110,7 @@ const App: React.FC = () => {
               </GlobalAudioProvider>
               <Toaster />
               <Sonner />
+              <AIChat />
             </BrowserRouter>
           </SiteAccessControl>
       </TooltipProvider>
