@@ -27,6 +27,7 @@ interface ProAIProps {
   isProcessing?: boolean;
   startRecording?: () => void;
   stopRecording?: () => void;
+  onAnalyzeSwing?: (analyzeSwingFn: () => void) => void;
 }
 
 interface ChatMessageData {
@@ -43,6 +44,7 @@ const ProAI: React.FC<ProAIProps> = ({
   isProcessing: parentIsProcessing,
   startRecording: parentStartRecording,
   stopRecording: parentStopRecording,
+  onAnalyzeSwing,
 }) => {
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string>('');
@@ -493,6 +495,13 @@ const ProAI: React.FC<ProAIProps> = ({
       description: "The swing analysis has been removed",
     });
   };
+
+  // Expose analyzeSwing function to parent component
+  React.useEffect(() => {
+    if (onAnalyzeSwing) {
+      onAnalyzeSwing(analyzeSwing);
+    }
+  }, [onAnalyzeSwing, analyzeSwing]);
 
   if (showAnalyses) {
     return (
