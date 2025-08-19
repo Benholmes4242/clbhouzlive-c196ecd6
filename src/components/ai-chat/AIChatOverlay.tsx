@@ -376,21 +376,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       <div 
         className="bg-background rounded-2xl w-full max-w-md h-[90vh] md:h-[80vh] flex flex-col shadow-2xl overflow-hidden"
         onWheel={(e) => {
-          // Allow scrolling within the modal, but prevent it from bubbling up
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
-          
-          if (scrollableElement) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
-            const isAtTop = scrollTop === 0;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            // Only prevent default if we're trying to scroll past boundaries
-            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-              e.preventDefault();
-            }
-          }
-          
+          // Simple scroll prevention - just stop propagation
           e.stopPropagation();
         }}
         onTouchMove={(e) => e.stopPropagation()}

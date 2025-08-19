@@ -250,15 +250,17 @@ const ProAI: React.FC<ProAIProps> = ({
     setIsAnalyzing(true);
 
     try {
-      // Prepare the system prompt for swing analysis
-      const systemPrompt = "You are a professional golf swing analyzer. Analyze the uploaded swing and respond in the Fast Answer format. Focus on observable issues tied to impact laws. Provide quick fixes with setup/feel cues and suggest one simple drill. Always include the ::clbhz_meta:: section for saving.";
+      // Enhanced system prompt that acknowledges video context
+      const systemPrompt = `You are a professional golf swing analyzer. The user has uploaded a video file named "${uploadedVideo?.name || 'swing video'}" for analysis. Even though you cannot directly view the video in this text-based interface, provide helpful swing analysis based on common swing issues and the user's description. Respond in the Fast Answer format with actionable advice.`;
 
-      // For now, we'll simulate the analysis since we need video upload to ChatGPT integration
-      // In production, you'd upload the video and send it to the AI service
+      let analysisMessage = userMessage.content;
+      if (uploadedVideo) {
+        analysisMessage += `\n\nVideo details: ${uploadedVideo.name} (${(uploadedVideo.size / 1024 / 1024).toFixed(1)}MB)`;
+      }
       
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
-          message: `${systemPrompt}\n\nUser request: ${userMessage.content}`,
+          message: `${systemPrompt}\n\nUser request: ${analysisMessage}`,
           conversation: messages.slice(-6).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
@@ -465,12 +467,16 @@ const ProAI: React.FC<ProAIProps> = ({
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         {uploadedVideo.type.startsWith('video/') ? (
-                          <div className="w-32 h-32 rounded-lg overflow-hidden">
+                          <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
                             <video 
                               src={videoPreview} 
                               className="w-full h-full object-cover"
                               controls
                               preload="metadata"
+                              onLoadedData={(e) => {
+                                const video = e.target as HTMLVideoElement;
+                                video.currentTime = 1; // Seek to 1 second for thumbnail
+                              }}
                             />
                           </div>
                         ) : (
