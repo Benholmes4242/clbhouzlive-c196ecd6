@@ -145,6 +145,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                 </button>
               ))}
             </div>
+          </div>
         </div>
       </div>
     </>

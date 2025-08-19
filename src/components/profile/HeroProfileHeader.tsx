@@ -584,12 +584,6 @@ const HeroProfileHeader = ({
             followers: followersCount,
             following: followingCount
           }}
-          secondaryStats={{
-            coursesRated: ratedCoursesCount,
-            avgRating: averageRating,
-            achievements: achievements?.length || 0,
-            memberSince: profile?.id ? '2024' : undefined
-          }}
           onStatClick={handleStatClick}
         />
       </div>
