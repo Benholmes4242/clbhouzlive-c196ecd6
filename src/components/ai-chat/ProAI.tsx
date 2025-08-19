@@ -250,22 +250,56 @@ const ProAI: React.FC<ProAIProps> = ({
     setIsAnalyzing(true);
 
     try {
-      // Enhanced system prompt that acknowledges video context
-      const systemPrompt = `You are a professional golf swing analyzer. The user has uploaded a video file named "${uploadedVideo?.name || 'swing video'}" for analysis. Even though you cannot directly view the video in this text-based interface, provide helpful swing analysis based on common swing issues and the user's description. Respond in the Fast Answer format with actionable advice.`;
-
-      let analysisMessage = userMessage.content;
+      let videoDataUrl = null;
+      
+      // Convert video/image to base64 for AI analysis
       if (uploadedVideo) {
-        analysisMessage += `\n\nVideo details: ${uploadedVideo.name} (${(uploadedVideo.size / 1024 / 1024).toFixed(1)}MB)`;
+        if (uploadedVideo.type.startsWith('image/')) {
+          // For images, convert directly to base64
+          const reader = new FileReader();
+          videoDataUrl = await new Promise<string>((resolve) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(uploadedVideo);
+          });
+        } else if (uploadedVideo.type.startsWith('video/')) {
+          // For videos, extract a frame and convert to base64
+          const video = document.createElement('video');
+          video.src = videoPreview;
+          video.crossOrigin = 'anonymous';
+          
+          await new Promise<void>((resolve) => {
+            video.onloadedmetadata = () => {
+              video.currentTime = Math.min(2, video.duration / 2); // Get frame from middle or at 2 seconds
+              resolve();
+            };
+          });
+          
+          await new Promise<void>((resolve) => {
+            video.onseeked = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(video, 0, 0);
+                videoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+              }
+              resolve();
+            };
+          });
+        }
       }
       
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
-          message: `${systemPrompt}\n\nUser request: ${analysisMessage}`,
+          message: userMessage.content,
           conversation: messages.slice(-6).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
           })),
-          detailMode: false
+          detailMode: false,
+          videoData: videoDataUrl,
+          fileName: uploadedVideo?.name
         }
       });
 
@@ -438,10 +472,9 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <>
+    <div className="flex-1 min-h-0 flex flex-col">
       {/* Messages */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
               <div className="py-2">
@@ -572,7 +605,6 @@ const ProAI: React.FC<ProAIProps> = ({
             )}
           </div>
         </ScrollArea>
-      </div>
 
       {/* Input area */}
       <div className="p-4 border-t flex-shrink-0 bg-background">
@@ -659,8 +691,8 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-    </>
-  );
-};
+     </div>
+   );
+ };
 
 export default ProAI;
