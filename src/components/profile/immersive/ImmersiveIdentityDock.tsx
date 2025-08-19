@@ -35,7 +35,6 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
     background: 'rgba(255, 255, 255, 0.08)',
     backdropFilter: 'blur(40px) saturate(180%)',
     WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
     boxShadow: '0 20px 60px -10px rgba(0, 0, 0, 0.4), 0 8px 32px -8px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
   };
 
@@ -109,7 +108,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-700 ease-out ${
+      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-700 ease-out md:left-1/2 sm:left-20 ${
         isVisible 
           ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
           : 'translate-y-full opacity-0'
