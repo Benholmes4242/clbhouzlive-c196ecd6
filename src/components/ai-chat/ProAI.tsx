@@ -442,15 +442,15 @@ const ProAI: React.FC<ProAIProps> = ({
         <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-4">
+              <div className="py-2">
                 <div className="text-center text-muted-foreground">
-                  <p className="mb-3">
+                  <p className="mb-2">
                     Upload your swing for swing analysis<br />
                     Get instant feedback and drills from pro AI.
                   </p>
-                  <div className="mb-3">
-                    <p className="text-sm font-medium mb-2">Best results:</p>
-                    <div className="text-xs space-y-1">
+                  <div className="mb-2">
+                    <p className="text-sm font-medium mb-1">Best results:</p>
+                    <div className="text-xs space-y-0.5">
                       <p>• Face on or down the line, full body, good light</p>
                       <p>• State the club and miss (e.g., Driver • Hook)</p>
                       <p>• Optional: include swing speed or launch data</p>
