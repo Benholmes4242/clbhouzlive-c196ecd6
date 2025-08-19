@@ -21,13 +21,15 @@ interface AdaptiveGlassHeaderProps {
     averageRating?: number;
   };
   onStatClick?: (statType: string) => void;
+  style?: React.CSSProperties;
 }
 
 const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
   isVisible,
   profile,
   stats,
-  onStatClick
+  onStatClick,
+  style
 }) => {
   const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
 
@@ -52,8 +54,8 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
       <div
         className={`
           fixed top-0 left-0 right-0 z-50 
-          transition-all duration-300 ease-out
-          ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}
+          ${style ? '' : 'transition-all duration-300 ease-out'}
+          ${!style && isVisible ? 'translate-y-0 opacity-100' : !style ? '-translate-y-full opacity-0' : ''}
         `}
         style={{
           ...glassStyles,
@@ -64,6 +66,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
           borderTop: 'none',
           boxShadow: `var(--glass-shadow)`,
           color: `var(--glass-text)`,
+          ...style // Merge external style for scroll handoff
         }}
         data-glass-mode={glassMode}
       >

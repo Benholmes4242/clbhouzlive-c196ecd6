@@ -53,6 +53,7 @@ import AdaptiveGlassHeader from './AdaptiveGlassHeader';
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
+import { useProfileScrollHandoff } from '@/hooks/useProfileScrollHandoff';
 
 interface Course {
   id: string;
@@ -127,6 +128,19 @@ const HeroProfileHeader = ({
   } = useImmersiveProfile(profile?.id || '', isOwnProfile);
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
+  
+  // Profile scroll handoff system
+  const {
+    sentinelRef,
+    showCard,
+    showHeader,
+    cardOpacity,
+    headerOpacity, 
+    cardTransform,
+    headerTransform,
+    cardInteractive,
+    headerInteractive
+  } = useProfileScrollHandoff();
   const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
@@ -541,9 +555,9 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Adaptive Glass Header - Auto-switches modes based on background */}
+      {/* Adaptive Glass Header - Controlled by scroll handoff */}
       <AdaptiveGlassHeader
-        isVisible={showStickyHeader && !isImmersiveOpen}
+        isVisible={showHeader && !isImmersiveOpen}
         profile={profile}
         stats={{
           handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
@@ -554,6 +568,14 @@ const HeroProfileHeader = ({
           averageRating
         }}
         onStatClick={handleStatClick}
+        style={{
+          opacity: headerOpacity,
+          transform: headerTransform,
+          visibility: showHeader ? 'visible' : 'hidden',
+          pointerEvents: headerInteractive ? 'auto' : 'none',
+          willChange: 'transform, opacity',
+          transition: 'opacity 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }}
       />
       {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
       <div className="relative w-full">
@@ -563,8 +585,18 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Responsive Glass Profile Card */}
-      <div className="relative z-50 -mt-20">
+      {/* Responsive Glass Profile Card - Controlled by scroll handoff */}
+      <div 
+        className="relative z-50 -mt-20"
+        style={{
+          opacity: cardOpacity,
+          transform: cardTransform,
+          visibility: showCard ? 'visible' : 'hidden',
+          pointerEvents: cardInteractive ? 'auto' : 'none',
+          willChange: 'transform, opacity',
+          transition: 'opacity 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }}
+      >
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
@@ -574,6 +606,17 @@ const HeroProfileHeader = ({
           onMediaManager={() => setMediaManagerOpen(true)}
         />
       </div>
+
+      {/* Scroll sentinel - positioned right above the stats */}
+      <div 
+        ref={sentinelRef}
+        className="absolute w-full h-16 pointer-events-none"
+        style={{ 
+          top: '50vh', // Position sentinel at 50% viewport height from top
+          opacity: 0,
+          zIndex: 1 
+        }}
+      />
 
       {/* Responsive Stats Display */}
       <div className={`px-4 md:px-8 py-6 ${isMobile ? 'py-4' : 'py-8'}`}>
