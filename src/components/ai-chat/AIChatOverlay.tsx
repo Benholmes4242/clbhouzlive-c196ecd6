@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,209 +6,136 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
-import CaddieLogs from './CaddieLogs';
-import ProAI from './ProAI';
+import CaddieModal from './CaddieModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
+import { X, Send, Mic, MicOff, MapPin, History } from 'lucide-react';
 
 interface ChatMessageData {
   id: string;
   type: 'user' | 'ai';
   content: string;
   timestamp: Date;
-  metadata?: any;
+  metadata?: {
+    save_card?: string;
+    tags?: string[];
+    category?: string;
+  };
 }
 
 interface AIChatOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTab?: string;
 }
 
-const suggestedPrompts = [
-  "Is my grip too strong?",
-  "Where should my ball position be?",
-  "Best golf clubs near me",
-  "Which driver loft should I use at 95 mph swing speed?",
-  "Plan me a 5 course USA golf trip"
-];
-
-const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
+const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ 
+  isOpen, 
+  onClose, 
+  initialTab = 'chat' 
+}) => {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [showHistory, setShowHistory] = useState(false);
-  const [userLocation, setUserLocation] = useState<string>('');
-  const [activeTab, setActiveTab] = useState('chat');
+  const [userLocation, setUserLocation] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  async function handleVoiceNote(transcribedText: string) {
+  // Voice recording hooks
+  const {
+    isRecording,
+    isProcessing,
+    startRecording,
+    stopRecording,
+  } = useVoiceRecording();
+
+  const suggestedPrompts = [
+    "What's the best club for a 150-yard approach?",
+    "How do I fix my slice?", 
+    "Tell me about course management",
+    "What's the proper putting stance?"
+  ];
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
+  const saveCaddieLog = async (content: string) => {
     try {
-      // Get current location for the note
-      let locationData: { lat?: number; lng?: number; name?: string } = {};
-      
-      if (navigator.geolocation) {
-        try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          });
-          
-          locationData.lat = position.coords.latitude;
-          locationData.lng = position.coords.longitude;
-          
-          // Get location name
-          const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
-          );
-          const data = await response.json();
-          locationData.name = `${data.city || data.locality || ''}, ${data.principalSubdivision || ''}`.trim().replace(/^,\s*/, '');
-        } catch (error) {
-          console.log('Location access denied or failed');
-        }
-      }
-
-      // Auto-tag golf terms
-      const autoTagGolfTerms = (content: string): string[] => {
-        const golfTerms = [
-          'tree', 'bunker', 'green', 'slope', 'yardage', 'carry', 'pin', 'flag',
-          'fairway', 'rough', 'water', 'hazard', 'dogleg', 'elevation', 'wind',
-          'left', 'right', 'center', 'front', 'back', 'avoid', 'target'
-        ];
-        
-        const foundTerms = golfTerms.filter(term => 
-          content.toLowerCase().includes(term)
-        );
-        
-        return [...new Set(foundTerms)]; // Remove duplicates
-      };
-
-      const tags = autoTagGolfTerms(transcribedText);
-
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
+      if (!user) return;
 
-      // Save to caddie logs
       const { error } = await supabase
         .from('caddie_logs')
         .insert({
           user_id: user.id,
-          content: transcribedText,
-          transcription: transcribedText,
-          location_lat: locationData.lat,
-          location_lng: locationData.lng,
-          location_name: locationData.name,
-          tags: tags.length > 0 ? tags : null
+          content: content,
+          transcription: content,
+          location_name: userLocation || null,
+          course_name: null,
+          tags: autoTagGolfTerms(content)
         });
 
       if (error) throw error;
 
       toast({
-        title: "Caddie note saved",
-        description: "Your voice note has been added to your caddie logs",
+        title: "Log Saved",
+        description: "Your caddie note has been recorded",
       });
-
-      // Switch to logs tab if we're in the chat
-      if (activeTab === 'chat') {
-        setActiveTab('logs');
-      }
-
     } catch (error) {
-      console.error('Error saving voice note:', error);
+      console.error('Error saving caddie log:', error);
       toast({
-        title: "Error saving note",
-        description: "Failed to save your caddie note. Please try again.",
+        title: "Error",
+        description: "Failed to save log",
         variant: "destructive"
       });
     }
-  }
-
-  const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
-    onTranscriptionComplete: handleVoiceNote
-  });
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-      }
-    }, 100);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      // Lock body scroll
-      const originalStyle = window.getComputedStyle(document.body).overflow;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = '0';
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.bottom = '0';
-      
-      // Prevent scroll events on window
-      const preventScroll = (e: WheelEvent | TouchEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-      };
-      
-      // Add event listeners for all scroll types
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('scroll', preventScroll, { passive: false });
-      
-      return () => {
-        // Restore original styles
-        document.body.style.overflow = originalStyle;
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.bottom = '';
-        
-        // Remove event listeners
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('touchmove', preventScroll);
-        document.removeEventListener('scroll', preventScroll);
-      };
-    }
-  }, [isOpen]);
+  const autoTagGolfTerms = (content: string): string[] => {
+    const golfTerms = [
+      'tree', 'bunker', 'green', 'slope', 'yardage', 'carry', 'pin', 'flag',
+      'fairway', 'rough', 'water', 'hazard', 'dogleg', 'elevation', 'wind',
+      'left', 'right', 'center', 'front', 'back', 'avoid', 'target'
+    ];
+    
+    const foundTerms = golfTerms.filter(term => 
+      content.toLowerCase().includes(term)
+    );
+    
+    return [...new Set(foundTerms)];
+  };
 
   const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
+          const { latitude, longitude } = position.coords;
           try {
             const response = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
+              `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${process.env.VITE_OPENCAGE_API_KEY}`
             );
             const data = await response.json();
-            const location = `${data.city || data.locality || ''}, ${data.principalSubdivision || ''}`.trim().replace(/^,\s*/, '');
+            const location = data.results[0]?.formatted || `${latitude}, ${longitude}`;
             setUserLocation(location);
+            
             toast({
-              title: "Location detected",
-              description: `Using ${location} for location-based queries`,
+              title: "Location Updated",
+              description: location,
             });
           } catch (error) {
-            console.error('Error getting location name:', error);
+            setUserLocation(`${latitude}, ${longitude}`);
           }
         },
-        (error) => {
-          console.error('Error getting location:', error);
+        () => {
           toast({
-            title: "Location access denied",
-            description: "Please enable location access or specify your city manually",
+            title: "Location Error",
+            description: "Unable to get your location",
             variant: "destructive"
           });
         }
@@ -217,36 +143,22 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const saveCurrentChatToHistory = () => {
-    if (messages.length > 0) {
-      // Store current conversation in localStorage for history
-      const storedMessages = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      const conversationMessages = [...messages];
-      storedMessages.push(...conversationMessages);
-      localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
-    }
-  };
-
   const handleClose = () => {
-    // Save current chat to history before closing
-    saveCurrentChatToHistory();
-    
-    // Reset chat for new session
+    onClose();
+    // Reset state when closing
     setMessages([]);
     setInputValue('');
     setActiveTab('chat');
-    
-    // Close modal
-    onClose();
+    setShowHistory(false);
   };
 
-  const sendMessage = async (messageText: string, detailMode = false) => {
-    if (!messageText.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
       type: 'user',
-      content: messageText,
+      content: inputValue.trim(),
       timestamp: new Date()
     };
 
@@ -255,27 +167,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
-      // Prepare conversation context (last 6 messages for context)
-      const conversation = messages.slice(-6).map(msg => ({
+      const conversation = messages.map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: msg.content
       }));
 
-      // Add location context if available and message contains "near me"
-      let finalMessage = messageText;
-      if (messageText.toLowerCase().includes('near me') && userLocation) {
-        finalMessage = messageText.replace(/near me/gi, `near ${userLocation}`);
-      } else if (messageText.toLowerCase().includes('near me') && !userLocation) {
-        // Ask for location if not available
-        const aiMessage: ChatMessageData = {
-          id: Date.now().toString() + '_ai',
-          type: 'ai',
-          content: "I'd love to help you find golf options nearby! Could you please share your city or postcode?",
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setIsLoading(false);
-        return;
+      const finalMessage = userMessage.content;
+      const detailMode = finalMessage.toLowerCase().includes('detail') || 
+                        finalMessage.toLowerCase().includes('more') ||
+                        finalMessage.toLowerCase().includes('explain');
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Please sign in to use AI chat');
       }
 
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
@@ -292,278 +196,116 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       const aiMessage: ChatMessageData = {
         id: Date.now().toString() + '_ai',
         type: 'ai',
-        content: data.response,
+        content: data.content || 'I apologize, but I encountered an issue processing your request.',
         timestamp: new Date(),
         metadata: data.metadata
       };
 
       setMessages(prev => [...prev, aiMessage]);
 
+      // Auto scroll to bottom
+      setTimeout(() => {
+        if (scrollAreaRef.current) {
+          const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          if (viewport) {
+            viewport.scrollTop = viewport.scrollHeight;
+          }
+        }
+      }, 100);
+
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get AI response. Please try again.",
-        variant: "destructive"
-      });
-
       const errorMessage: ChatMessageData = {
         id: Date.now().toString() + '_error',
         type: 'ai',
-        content: "Sorry, I'm having trouble responding right now. Please try again in a moment.",
+        content: 'I apologize, but I encountered an error. Please try again.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSuggestedPrompt = (prompt: string) => {
-    sendMessage(prompt);
+  const handleRequestDetail = (content: string) => {
+    setInputValue(`Please provide more detail about: ${content}`);
   };
 
-  const saveToInsights = (message: ChatMessageData) => {
-    if (!message.metadata) return;
-    
-    const savedInsights = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
-    const insight = {
-      id: message.id,
-      content: message.content,
-      summary: message.metadata.save_card,
-      tags: message.metadata.tags || [],
-      category: message.metadata.category || 'General',
-      timestamp: message.timestamp
-    };
-    
-    savedInsights.push(insight);
-    localStorage.setItem('clbhouz_ai_saved', JSON.stringify(savedInsights));
-    
-    toast({
-      title: "Saved to Insights",
-      description: "This tip has been saved to your AI insights",
-    });
+  const loadConversation = (conversation: any[]) => {
+    const formattedMessages = conversation.map((msg, index) => ({
+      id: `loaded_${index}`,
+      type: msg.role === 'user' ? 'user' as const : 'ai' as const,
+      content: msg.content,
+      timestamp: new Date()
+    }));
+    setMessages(formattedMessages);
+    setShowHistory(false);
+    setActiveTab('chat');
   };
 
-  const requestMoreDetail = (originalMessage: string) => {
-    sendMessage(originalMessage, true);
+  const sendMessage = (messageContent: string) => {
+    setInputValue(messageContent);
+    setActiveTab('chat');
+    // Auto-send after a brief delay to allow tab switch
+    setTimeout(() => {
+      if (messageContent.trim()) {
+        handleSendMessage();
+      }
+    }, 100);
   };
-
 
   if (!isOpen) return null;
 
+  // Show history if requested
   if (showHistory) {
     return (
       <AIChatHistory 
-        isOpen={showHistory} 
+        isOpen={showHistory}
         onClose={() => setShowHistory(false)}
-        onSelectMessage={(message) => {
-          setShowHistory(false);
-          // Re-open the conversation with selected message
-          sendMessage(message);
-        }}
+        onSelectMessage={() => {}}
       />
     );
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-      style={{ zIndex: 9999 }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
-    >
-      <div 
-        className="bg-background rounded-2xl w-full max-w-md h-[90vh] md:h-[80vh] flex flex-col shadow-2xl overflow-hidden"
-        onWheel={(e) => {
-          // Allow scrolling within the modal, but prevent it from bubbling up
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
-          
-          if (scrollableElement) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
-            const isAtTop = scrollTop === 0;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            // Only prevent default if we're trying to scroll past boundaries
-            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-              e.preventDefault();
-            }
-          }
-          
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold">caddie AI . powered by clbhouz AI</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHistory(true)}
-              className="h-8 w-8 p-0"
-            >
-              <History className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+    <>
+      <CaddieModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        messages={messages}
+        isLoading={isLoading}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        handleSendMessage={handleSendMessage}
+        isRecording={isRecording}
+        isProcessing={isProcessing}
+        startRecording={startRecording}
+        stopRecording={stopRecording}
+        userLocation={userLocation}
+        requestLocation={requestLocation}
+        showHistory={showHistory}
+        setShowHistory={setShowHistory}
+        scrollAreaRef={scrollAreaRef}
+        suggestedPrompts={suggestedPrompts}
+      />
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2 mb-2 flex-shrink-0">
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
-            <TabsTrigger value="proai">Pro AI</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
-            {/* Messages */}
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-                <div className="p-4 min-h-full flex flex-col">
-                  {messages.length === 0 ? (
-                    <div className="py-8">
-                      <div className="text-center text-muted-foreground">
-                        <p className="mb-6">
-                          I'm your personal tour caddie.<br />
-                          Ask me anything, anytime, I've got you.
-                        </p>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Try asking:</p>
-                          {suggestedPrompts.map((prompt, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSuggestedPrompt(prompt)}
-                              className="mx-1 mb-2 text-xs"
-                            >
-                              {prompt}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 flex-1">
-                      {messages.map((message) => (
-                        <ChatMessageComponent
-                          key={message.id}
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                        />
-                      ))}
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                              <span className="text-sm">clbhouz pro AI is thinking...</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
-
-          </TabsContent>
-
-          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <CaddieLogs 
-              onClose={() => setActiveTab('chat')}
-              isRecording={isRecording}
-              isProcessing={isProcessing}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              userLocation={userLocation}
-              requestLocation={requestLocation}
-            />
-          </TabsContent>
-
-          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <ProAI 
-              onClose={() => setActiveTab('chat')}
-              isRecording={isRecording}
-              isProcessing={isProcessing}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-            />
-          </TabsContent>
-        </Tabs>
-        
-        {/* Input area - only shown for chat tab */}
-        {activeTab === 'chat' && (
-          <div className="p-4 border-t flex-shrink-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={requestLocation}
-                className="text-xs"
-              >
-                <MapPin className="h-3 w-3 mr-1" />
-                Use My Location
-              </Button>
-              {userLocation && (
-                <Badge variant="secondary" className="text-xs">
-                  {userLocation}
-                </Badge>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1 flex gap-2">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask about your swing, clubs, courses..."
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                  disabled={isLoading || isRecording || isProcessing}
-                />
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isLoading || isProcessing}
-                  variant={isRecording ? "destructive" : "outline"}
-                  size="sm"
-                  className="px-3"
-                >
-                  {isRecording ? (
-                    <MicOff className="h-4 w-4" />
-                  ) : isProcessing ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                  ) : (
-                    <Mic className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <Button
-                onClick={() => sendMessage(inputValue)}
-                disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                size="sm"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+      {/* History overlay */}
+      {showHistory && (
+        <AIChatHistory 
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+          onSelectMessage={() => {}}
+        />
+      )}
+    </>
   );
 };
 
