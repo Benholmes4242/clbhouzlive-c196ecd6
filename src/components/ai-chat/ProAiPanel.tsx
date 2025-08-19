@@ -39,10 +39,10 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      if (file.size > 100 * 1024 * 1024) { // 100MB limit
         toast({
           title: "File too large",
-          description: "Please upload a video smaller than 50MB",
+          description: "Please upload a video smaller than 100MB",
           variant: "destructive"
         });
         return;
@@ -160,10 +160,8 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
           </p>
 
           <ul className="text-left list-disc space-y-1 pl-6 text-sm text-muted-foreground max-w-md mx-auto">
-            <li>Face-on or down-the-line, full body, good lighting</li>
             <li>State the club and typical miss (e.g., Driver + Hook)</li>
             <li>Include swing speed or ball flight if known</li>
-            <li>Mention face-on or down-the-line</li>
           </ul>
         </div>
 
@@ -172,7 +170,7 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
             <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-4">
-              Upload your swing video (max 50MB)
+              Upload your swing video (max 100MB)
             </p>
             <Button
               onClick={() => document.getElementById('video-upload')?.click()}

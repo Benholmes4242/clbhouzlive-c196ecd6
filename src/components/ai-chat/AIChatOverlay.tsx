@@ -53,10 +53,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
   } = useVoiceRecording();
 
   const suggestedPrompts = [
-    "What's the best club for a 150-yard approach?",
-    "How do I fix my slice?", 
-    "Tell me about course management",
-    "What's the proper putting stance?"
+    "Why am I hooking my driver?",
+    "How do I fix my slice?",
+    "Golf courses near me",
+    "Can you put together a 5-night golf tour in the USA for 5 friends?"
   ];
 
   useEffect(() => {
