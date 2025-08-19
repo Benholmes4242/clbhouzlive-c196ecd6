@@ -1,13 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, History, Bookmark, MapPin } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
+import CaddieLogs from './CaddieLogs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 
 interface ChatMessageData {
   id: string;
@@ -36,8 +39,96 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('chat');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  async function handleVoiceNote(transcribedText: string) {
+    try {
+      // Get current location for the note
+      let locationData: { lat?: number; lng?: number; name?: string } = {};
+      
+      if (navigator.geolocation) {
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+          
+          locationData.lat = position.coords.latitude;
+          locationData.lng = position.coords.longitude;
+          
+          // Get location name
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
+          );
+          const data = await response.json();
+          locationData.name = `${data.city || data.locality || ''}, ${data.principalSubdivision || ''}`.trim().replace(/^,\s*/, '');
+        } catch (error) {
+          console.log('Location access denied or failed');
+        }
+      }
+
+      // Auto-tag golf terms
+      const autoTagGolfTerms = (content: string): string[] => {
+        const golfTerms = [
+          'tree', 'bunker', 'green', 'slope', 'yardage', 'carry', 'pin', 'flag',
+          'fairway', 'rough', 'water', 'hazard', 'dogleg', 'elevation', 'wind',
+          'left', 'right', 'center', 'front', 'back', 'avoid', 'target'
+        ];
+        
+        const foundTerms = golfTerms.filter(term => 
+          content.toLowerCase().includes(term)
+        );
+        
+        return [...new Set(foundTerms)]; // Remove duplicates
+      };
+
+      const tags = autoTagGolfTerms(transcribedText);
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Save to caddie logs
+      const { error } = await supabase
+        .from('caddie_logs')
+        .insert({
+          user_id: user.id,
+          content: transcribedText,
+          transcription: transcribedText,
+          location_lat: locationData.lat,
+          location_lng: locationData.lng,
+          location_name: locationData.name,
+          tags: tags.length > 0 ? tags : null
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Caddie note saved",
+        description: "Your voice note has been added to your caddie logs",
+      });
+
+      // Switch to logs tab if we're in the chat
+      if (activeTab === 'chat') {
+        setActiveTab('logs');
+      }
+
+    } catch (error) {
+      console.error('Error saving voice note:', error);
+      toast({
+        title: "Error saving note",
+        description: "Failed to save your caddie note. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }
+
+  const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
+    onTranscriptionComplete: handleVoiceNote
+  });
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -198,6 +289,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     sendMessage(originalMessage, true);
   };
 
+
   if (!isOpen) return null;
 
   if (showHistory) {
@@ -242,88 +334,121 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Messages */}
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-          {messages.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">
-              <p className="mb-6">
-                I'm your personal tour caddie.<br />
-                Ask me anything, anytime, I've got you.
-              </p>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Try asking:</p>
-                {suggestedPrompts.map((prompt, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSuggestedPrompt(prompt)}
-                    className="mx-1 mb-2 text-xs"
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <ChatMessageComponent
-                  key={message.id}
-                  message={message}
-                  onSaveToInsights={saveToInsights}
-                  onRequestDetail={requestMoreDetail}
-                />
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                      <span className="text-sm">clbhouz pro AI is thinking...</span>
-                    </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2">
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0">
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+              {messages.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  <p className="mb-6">
+                    I'm your personal tour caddie.<br />
+                    Ask me anything, anytime, I've got you.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Try asking:</p>
+                    {suggestedPrompts.map((prompt, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSuggestedPrompt(prompt)}
+                        className="mx-1 mb-2 text-xs"
+                      >
+                        {prompt}
+                      </Button>
+                    ))}
                   </div>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message) => (
+                    <ChatMessageComponent
+                      key={message.id}
+                      message={message}
+                      onSaveToInsights={saveToInsights}
+                      onRequestDetail={requestMoreDetail}
+                    />
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                          <span className="text-sm">clbhouz pro AI is thinking...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="logs" className="flex-1 flex flex-col m-0">
+            <CaddieLogs onClose={() => setActiveTab('chat')} />
+          </TabsContent>
+        </Tabs>
+
+        {/* Input - Only show on chat tab */}
+        {activeTab === 'chat' && (
+          <div className="p-4 border-t">
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={requestLocation}
+                className="text-xs"
+              >
+                <MapPin className="h-3 w-3 mr-1" />
+                Use My Location
+              </Button>
+              {userLocation && (
+                <Badge variant="secondary" className="text-xs">
+                  {userLocation}
+                </Badge>
               )}
             </div>
-          )}
-        </ScrollArea>
-
-        {/* Input */}
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-2 mb-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={requestLocation}
-              className="text-xs"
-            >
-              <MapPin className="h-3 w-3 mr-1" />
-              Use My Location
-            </Button>
-            {userLocation && (
-              <Badge variant="secondary" className="text-xs">
-                {userLocation}
-              </Badge>
-            )}
+            <div className="flex gap-2">
+              <div className="flex-1 flex gap-2">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask about your swing, clubs, courses..."
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                  disabled={isLoading || isRecording || isProcessing}
+                />
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isLoading || isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <Button
+                onClick={() => sendMessage(inputValue)}
+                disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                size="sm"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask about your swing, clubs, courses..."
-              onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-              disabled={isLoading}
-            />
-            <Button
-              onClick={() => sendMessage(inputValue)}
-              disabled={isLoading || !inputValue.trim()}
-              size="sm"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
