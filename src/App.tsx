@@ -13,6 +13,7 @@ import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
+import AIChat from "@/components/ai-chat/AIChat";
 
 
 const Auth = lazy(() => import("./pages/Auth"));
