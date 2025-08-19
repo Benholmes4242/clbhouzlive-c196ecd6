@@ -13,10 +13,6 @@ interface TabPanelsProps {
   onPromptClick: (prompt: string) => void;
   onSaveToInsights: (message: any) => void;
   onRequestDetail: (content: string) => void;
-  isRecording: boolean;
-  isProcessing: boolean;
-  startRecording: () => void;
-  stopRecording: () => void;
   userLocation: string;
   requestLocation: () => void;
 }
@@ -30,10 +26,6 @@ const TabPanels: React.FC<TabPanelsProps> = ({
   onPromptClick,
   onSaveToInsights,
   onRequestDetail,
-  isRecording,
-  isProcessing,
-  startRecording,
-  stopRecording,
   userLocation,
   requestLocation
 }) => {
@@ -53,10 +45,6 @@ const TabPanels: React.FC<TabPanelsProps> = ({
 
       <TabsContent value="logs" className="h-full m-0">
         <CaddieLogsPanel 
-          isRecording={isRecording}
-          isProcessing={isProcessing}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
           userLocation={userLocation}
           requestLocation={requestLocation}
         />
@@ -64,10 +52,10 @@ const TabPanels: React.FC<TabPanelsProps> = ({
 
       <TabsContent value="proai" className="h-full m-0">
         <ProAiPanel 
-          isRecording={isRecording}
-          isProcessing={isProcessing}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
+          isRecording={false}
+          isProcessing={false}
+          startRecording={() => {}}
+          stopRecording={() => {}}
         />
       </TabsContent>
     </Tabs>
