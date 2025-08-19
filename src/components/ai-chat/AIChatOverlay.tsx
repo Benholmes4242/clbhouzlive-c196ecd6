@@ -247,7 +247,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           {messages.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               <p className="mb-6">
-                I'm your personal tour caddie. Ask me anything, anytime, I've got you.
+                I'm your personal tour caddie.<br />
+                Ask me anything, anytime, I've got you.
               </p>
               <div className="space-y-2">
                 <p className="text-sm font-medium">Try asking:</p>
