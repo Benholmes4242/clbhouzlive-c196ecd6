@@ -111,13 +111,15 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
     <div
       className={`fixed bottom-20 z-30 transition-all duration-700 ease-out ${
         isVisible 
-          ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
-          : 'translate-y-full opacity-0'
+          ? 'opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
+          : 'opacity-0'
       }`}
       style={{
         ...liquidGlassStyle,
         left: '50%',
-        transform: 'translateX(-50%)',
+        transform: isVisible 
+          ? 'translateX(-50%) translateY(0)' 
+          : 'translateX(-50%) translateY(100%)',
       }}
       onClick={onMorphToHeader}
     >
