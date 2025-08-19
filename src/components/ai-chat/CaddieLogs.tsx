@@ -151,9 +151,122 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({ onClose }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b">
-        <h3 className="text-lg font-semibold mb-3">Caddie Logs</h3>
+      {/* Logs List */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-4 min-h-full flex flex-col">
+            {logs.length === 0 ? (
+              <div className="py-8">
+                <div className="text-center text-muted-foreground">
+                  <p className="mb-6">
+                    Your personal yardage book starts here.<br />
+                    Tap the mic, record notes as you walk the course, and I'll store them for you.
+                  </p>
+                </div>
+              </div>
+            ) : filteredLogs.length === 0 ? (
+              <div className="py-8">
+                <p className="text-center text-muted-foreground">No logs match your search.</p>
+              </div>
+            ) : (
+              <div className="space-y-4 flex-1">
+                {filteredLogs.map((log) => (
+                  <div key={log.id} className="bg-muted rounded-lg p-4">
+                    {editingLog === log.id ? (
+                      <div className="space-y-3">
+                        <Textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => saveEdit(log.id)}
+                            size="sm"
+                            className="h-7"
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            onClick={cancelEdit}
+                            variant="outline"
+                            size="sm"
+                            className="h-7"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <p className="text-sm leading-relaxed">{log.content}</p>
+                          </div>
+                          <div className="flex gap-1 ml-2">
+                            <Button
+                              onClick={() => startEdit(log)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              onClick={() => deleteLog(log.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Metadata */}
+                        <div className="space-y-2">
+                          {log.course_name && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <MapPin className="h-3 w-3" />
+                              <span>{log.course_name}</span>
+                            </div>
+                          )}
+                          
+                          {log.location_name && !log.course_name && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <MapPin className="h-3 w-3" />
+                              <span>{log.location_name}</span>
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <span>{new Date(log.created_at).toLocaleDateString()}</span>
+                          </div>
+
+                          {/* Auto-generated tags */}
+                          {log.tags && log.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {log.tags.map((tag, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* Search bar at bottom */}
+      <div className="p-4 border-t flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -164,114 +277,6 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({ onClose }) => {
           />
         </div>
       </div>
-
-      {/* Logs List */}
-      <ScrollArea className="flex-1 p-4">
-        {filteredLogs.length === 0 ? (
-          <div className="py-8">
-            {logs.length === 0 ? (
-              <div className="text-center text-muted-foreground">
-                <p className="mb-2 font-medium">Your personal yardage book starts here.</p>
-                <p className="text-sm">Tap the mic, record notes as you walk the course, and I'll store them for you.</p>
-              </div>
-            ) : (
-              <p className="text-center text-muted-foreground">No logs match your search.</p>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredLogs.map((log) => (
-              <div key={log.id} className="bg-muted rounded-lg p-4">
-                {editingLog === log.id ? (
-                  <div className="space-y-3">
-                    <Textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      className="min-h-[100px]"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => saveEdit(log.id)}
-                        size="sm"
-                        className="h-7"
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        onClick={cancelEdit}
-                        variant="outline"
-                        size="sm"
-                        className="h-7"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex-1">
-                        <p className="text-sm leading-relaxed">{log.content}</p>
-                      </div>
-                      <div className="flex gap-1 ml-2">
-                        <Button
-                          onClick={() => startEdit(log)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          onClick={() => deleteLog(log.id)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Metadata */}
-                    <div className="space-y-2">
-                      {log.course_name && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span>{log.course_name}</span>
-                        </div>
-                      )}
-                      
-                      {log.location_name && !log.course_name && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span>{log.location_name}</span>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>{new Date(log.created_at).toLocaleDateString()}</span>
-                      </div>
-
-                      {/* Auto-generated tags */}
-                      {log.tags && log.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {log.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </ScrollArea>
     </div>
   );
 };
