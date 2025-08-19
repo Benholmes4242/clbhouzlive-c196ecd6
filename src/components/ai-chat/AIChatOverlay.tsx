@@ -9,7 +9,7 @@ import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 
 interface ChatMessageData {
@@ -176,6 +176,29 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const saveCurrentChatToHistory = () => {
+    if (messages.length > 0) {
+      // Store current conversation in localStorage for history
+      const storedMessages = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
+      const conversationMessages = [...messages];
+      storedMessages.push(...conversationMessages);
+      localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
+    }
+  };
+
+  const handleClose = () => {
+    // Save current chat to history before closing
+    saveCurrentChatToHistory();
+    
+    // Reset chat for new session
+    setMessages([]);
+    setInputValue('');
+    setActiveTab('chat');
+    
+    // Close modal
+    onClose();
+  };
+
   const sendMessage = async (messageText: string, detailMode = false) => {
     if (!messageText.trim()) return;
 
@@ -233,11 +256,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
-
-      // Store in localStorage for history
-      const storedMessages = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      storedMessages.push(userMessage, aiMessage);
-      localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -308,9 +326,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[80vh] sm:h-[70vh] flex flex-col shadow-2xl">
+      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[85vh] sm:h-[75vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <div className="flex-1">
             <h2 className="text-lg font-semibold">caddie AI . powered by clbhouz AI</h2>
           </div>
@@ -326,7 +344,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={onClose}
+              onClick={handleClose}
               className="h-8 w-8 p-0"
             >
               <X className="h-4 w-4" />
@@ -335,69 +353,71 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2 flex-shrink-0">
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0">
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-              {messages.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
-                  <p className="mb-6">
-                    I'm your personal tour caddie.<br />
-                    Ask me anything, anytime, I've got you.
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Try asking:</p>
-                    {suggestedPrompts.map((prompt, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSuggestedPrompt(prompt)}
-                        className="mx-1 mb-2 text-xs"
-                      >
-                        {prompt}
-                      </Button>
-                    ))}
+            <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+              <div className="p-4">
+                {messages.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    <p className="mb-6">
+                      I'm your personal tour caddie.<br />
+                      Ask me anything, anytime, I've got you.
+                    </p>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Try asking:</p>
+                      {suggestedPrompts.map((prompt, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSuggestedPrompt(prompt)}
+                          className="mx-1 mb-2 text-xs"
+                        >
+                          {prompt}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <ChatMessageComponent
-                      key={message.id}
-                      message={message}
-                      onSaveToInsights={saveToInsights}
-                      onRequestDetail={requestMoreDetail}
-                    />
-                  ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                          <span className="text-sm">clbhouz pro AI is thinking...</span>
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <ChatMessageComponent
+                        key={message.id}
+                        message={message}
+                        onSaveToInsights={saveToInsights}
+                        onRequestDetail={requestMoreDetail}
+                      />
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                            <span className="text-sm">clbhouz pro AI is thinking...</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
+              </div>
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 flex flex-col m-0">
+          <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
             <CaddieLogs onClose={() => setActiveTab('chat')} />
           </TabsContent>
         </Tabs>
 
         {/* Input - Only show on chat tab */}
         {activeTab === 'chat' && (
-          <div className="p-4 border-t">
+          <div className="p-4 border-t flex-shrink-0">
             <div className="flex items-center gap-2 mb-2">
               <Button
                 variant="outline"
