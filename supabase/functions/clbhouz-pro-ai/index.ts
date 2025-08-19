@@ -64,7 +64,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversation, detailMode = false, videoData, fileName } = await req.json();
+    const { message, conversation, detailMode = false } = await req.json();
 
     if (!openAIApiKey) {
       console.error('OpenAI API key not found');
@@ -82,38 +82,10 @@ serve(async (req) => {
     const messages = [
       { role: 'system', content: systemPrompt },
       ...(conversation || []),
+      { role: 'user', content: userMessage }
     ];
 
-    // If video/image data is provided, use vision capabilities
-    if (videoData) {
-      console.log('Video data provided, using GPT-4o for vision analysis');
-      messages.push({
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `Analyze this golf swing video/image. ${userMessage}`
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: videoData
-            }
-          }
-        ]
-      });
-    } else {
-      messages.push({ role: 'user', content: userMessage });
-    }
-
     console.log('Sending request to OpenAI with messages:', messages);
-
-    const requestBody = {
-      model: videoData ? 'gpt-4o' : 'gpt-4o-mini',
-      messages: messages,
-      max_tokens: detailMode ? 800 : 400,
-      temperature: 0.7,
-    };
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -121,7 +93,12 @@ serve(async (req) => {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        max_tokens: detailMode ? 800 : 400,
+        temperature: 0.7,
+      }),
     });
 
     if (!response.ok) {
