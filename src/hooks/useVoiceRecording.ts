@@ -81,7 +81,15 @@ export const useVoiceRecording = ({ onTranscriptionComplete }: UseVoiceRecording
       // Convert blob to base64
       const arrayBuffer = await audioBlob.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
-      const base64String = btoa(String.fromCharCode(...uint8Array));
+      
+      // Convert to base64 in chunks to prevent stack overflow
+      let binary = '';
+      const chunkSize = 0x8000; // 32KB chunks
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      const base64String = btoa(binary);
 
       // Send to voice-to-text edge function
       const { data, error } = await supabase.functions.invoke('voice-to-text', {
