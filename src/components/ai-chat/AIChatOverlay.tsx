@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -41,7 +41,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [showHistory, setShowHistory] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
+  const [analysisText, setAnalysisText] = useState('');
+  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   async function handleVoiceNote(transcribedText: string) {
@@ -348,6 +352,51 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     sendMessage(originalMessage, true);
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file type
+      if (!file.type.startsWith('video/') && !file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a video (.mp4, .mov) or image file",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check file size (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please upload a file smaller than 50MB",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setUploadedVideo(file);
+    }
+  };
+
+  const analyzeSwing = async () => {
+    if (!uploadedVideo && !analysisText.trim()) return;
+    setIsAnalyzing(true);
+    
+    try {
+      // Mock analysis - this would integrate with the ProAI component
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        setAnalysisText('');
+        setUploadedVideo(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }, 3000);
+    } catch (error) {
+      setIsAnalyzing(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -481,23 +530,27 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 </div>
               </ScrollArea>
             </div>
-
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <CaddieLogs 
-              onClose={() => setActiveTab('chat')}
-              isRecording={isRecording}
-              isProcessing={isProcessing}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              userLocation={userLocation}
-              requestLocation={requestLocation}
-            />
+          <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col">
+              <ScrollArea className="flex-1 min-h-0">
+                <div className="p-4 min-h-full flex flex-col">
+                  <CaddieLogs 
+                    onClose={() => setActiveTab('chat')}
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    userLocation={userLocation}
+                    requestLocation={requestLocation}
+                  />
+                </div>
+              </ScrollArea>
+            </div>
           </TabsContent>
 
           <TabsContent value="proai" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
-            {/* Messages */}
             <div className="flex-1 min-h-0 flex flex-col">
               <ScrollArea className="flex-1 min-h-0">
                 <div className="p-4 min-h-full flex flex-col">
@@ -514,7 +567,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </TabsContent>
         </Tabs>
         
-        {/* Input area - only shown for chat tab */}
+        {/* Input area - shown for different tabs */}
         {activeTab === 'chat' && (
           <div className="p-4 border-t flex-shrink-0">
             <div className="flex items-center gap-2 mb-2">
@@ -566,6 +619,53 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Pro AI specific input area */}
+        {activeTab === 'proai' && (
+          <div className="p-4 border-t flex-shrink-0">
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Swing Video
+              </Button>
+              <Button
+                variant="outline"
+                className="flex gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="text-xs">Analyses (0)</span>
+              </Button>
+            </div>
+            
+            <div className="flex gap-2">
+              <Input
+                value={analysisText}
+                onChange={(e) => setAnalysisText(e.target.value)}
+                placeholder="Describe your swing or ask a question..."
+                onKeyPress={(e) => e.key === 'Enter' && analyzeSwing()}
+                disabled={isAnalyzing}
+              />
+              <Button
+                onClick={analyzeSwing}
+                disabled={isAnalyzing || (!uploadedVideo && !analysisText.trim())}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*,image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
           </div>
         )}
       </div>

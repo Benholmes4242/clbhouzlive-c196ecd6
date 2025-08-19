@@ -655,51 +655,14 @@ const ProAI: React.FC<ProAIProps> = ({
         </div>
       )}
 
-      {/* Input Area */}
-      <div className="p-4 border-t flex-shrink-0">
-        <div className="flex gap-2 mb-4">
-          <Button
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex-1"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Swing Video
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowAnalyses(true)}
-            className="flex gap-2"
-          >
-            <BookOpen className="h-4 w-4" />
-            <span className="text-xs">Analyses ({analyses.length})</span>
-          </Button>
-        </div>
-        
-        <div className="flex gap-2">
-          <Input
-            value={analysisText}
-            onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder="Describe your swing or ask a question..."
-            onKeyPress={(e) => e.key === 'Enter' && analyzeSwing()}
-            disabled={isAnalyzing}
-          />
-          <Button
-            onClick={analyzeSwing}
-            disabled={isAnalyzing || (!uploadedVideo && !analysisText.trim())}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="video/*,image/*"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-      </div>
+      {/* Hidden file input for parent to access */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/*,image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
     </>
   );
 };
