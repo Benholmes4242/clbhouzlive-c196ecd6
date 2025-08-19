@@ -57,7 +57,6 @@ const ProAI: React.FC<ProAIProps> = ({
   const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Load saved analyses from localStorage
@@ -65,38 +64,6 @@ const ProAI: React.FC<ProAIProps> = ({
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     setAnalyses(savedAnalyses);
   }, []);
-
-  const scrollToTop = () => {
-    setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = 0;
-        }
-      }
-    }, 100);
-  };
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-      }
-    }, 100);
-  };
-
-  React.useEffect(() => {
-    // Scroll to top when starting a new conversation (no messages yet)
-    if (messages.length === 0) {
-      scrollToTop();
-    } else {
-      // Scroll to bottom when new messages are added
-      scrollToBottom();
-    }
-  }, [messages]);
 
   const detectGolfClub = (text: string): string | null => {
     const golfClubPatterns = [
@@ -449,7 +416,7 @@ const ProAI: React.FC<ProAIProps> = ({
         content: "Sorry, I'm having trouble analyzing your swing right now. Please ensure you've uploaded a clear video and try again.",
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => prev.filter(msg => msg.id !== progressMessage.id).concat([errorMessage]));
     } finally {
       setIsAnalyzing(false);
     }
@@ -558,161 +525,154 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Messages */}
-      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-        <div className="p-4 space-y-4">
-          {messages.length === 0 && !uploadedVideo ? (
-            <div className="py-8">
-              <div className="text-center text-muted-foreground">
-                <p className="mb-6">
-                  Upload your swing for swing analysis<br />
-                  Get instant feedback and drills from pro AI.
-                </p>
-                <div className="mb-4">
-                  <p className="text-sm font-medium mb-2">Best results:</p>
-                  <div className="text-xs space-y-1">
-                    <p>• Face on or down the line, full body, good light</p>
-                    <p>• State the club and miss (e.g., Driver • Hook)</p>
-                    <p>• Optional: include swing speed or launch data</p>
-                  </div>
+    <>
+      {messages.length === 0 && !uploadedVideo ? (
+        <div className="py-8">
+          <div className="text-center text-muted-foreground">
+            <p className="mb-6">
+              Upload your swing for swing analysis<br />
+              Get instant feedback and drills from pro AI.
+            </p>
+            <div className="mb-4">
+              <p className="text-sm font-medium mb-2">Best results:</p>
+              <div className="text-xs space-y-1">
+                <p>• Face on or down the line, full body, good light</p>
+                <p>• State the club and miss (e.g., Driver • Hook)</p>
+                <p>• Optional: include swing speed or launch data</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {uploadedVideo && (
+            <div className="bg-muted rounded-lg p-4">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  {uploadedVideo.type.startsWith('video/') ? (
+                    <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                      <video 
+                        src={videoPreview} 
+                        className="w-full h-full object-cover"
+                        controls
+                        preload="metadata"
+                        onLoadedData={(e) => {
+                          const video = e.target as HTMLVideoElement;
+                          video.currentTime = 1; // Seek to 1 second for thumbnail
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <img 
+                      src={videoPreview} 
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={discardVideo}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {messages.map((message) => (
+            <ChatMessageComponent
+              key={message.id}
+              message={message}
+              onSaveToInsights={(msg) => {
+                if (currentAnalysis) {
+                  saveToSwingInsights();
+                }
+              }}
+              onRequestDetail={(originalMessage) => {
+                // Re-analyze with more detail
+                setAnalysisText(originalMessage);
+                const detailMessage: ChatMessageData = {
+                  id: Date.now().toString(),
+                  type: 'user',
+                  content: originalMessage + " - Provide more detailed analysis",
+                  timestamp: new Date()
+                };
+                setMessages(prev => [...prev, detailMessage]);
+                analyzeSwing();
+              }}
+            />
+          ))}
+          
+          {isAnalyzing && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                  <span className="text-sm">Pro AI is analyzing...</span>
                 </div>
               </div>
             </div>
-          ) : (
-            <>
-              {uploadedVideo && (
-                <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      {uploadedVideo.type.startsWith('video/') ? (
-                        <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                          <video 
-                            src={videoPreview} 
-                            className="w-full h-full object-cover"
-                            controls
-                            preload="metadata"
-                            onLoadedData={(e) => {
-                              const video = e.target as HTMLVideoElement;
-                              video.currentTime = 1; // Seek to 1 second for thumbnail
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <img 
-                          src={videoPreview} 
-                          alt="Preview"
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={discardVideo}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {messages.map((message) => (
-                <ChatMessageComponent
-                  key={message.id}
-                  message={message}
-                  onSaveToInsights={(msg) => {
-                    if (currentAnalysis) {
-                      saveToSwingInsights();
-                    }
-                  }}
-                  onRequestDetail={(originalMessage) => {
-                    // Re-analyze with more detail
-                    setAnalysisText(originalMessage);
-                    const detailMessage: ChatMessageData = {
-                      id: Date.now().toString(),
-                      type: 'user',
-                      content: originalMessage + " - Provide more detailed analysis",
-                      timestamp: new Date()
-                    };
-                    setMessages(prev => [...prev, detailMessage]);
-                    analyzeSwing();
-                  }}
-                />
-              ))}
-              
-              {isAnalyzing && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                      <span className="text-sm">Pro AI is analyzing...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Action Buttons - only show for last AI message with metadata */}
-              {currentAnalysis && (
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={saveToSwingInsights}
-                    className="text-xs"
-                  >
-                    <BookOpen className="h-3 w-3 mr-1" />
-                    Save to Swing Insights
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsAddingVoiceNote(true)}
-                    className="text-xs"
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Add Voice Note
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                  >
-                    <Share2 className="h-3 w-3 mr-1" />
-                    Share to Feed
-                  </Button>
-                </div>
-              )}
-            </>
+          )}
+          
+          {/* Action Buttons - only show for last AI message with metadata */}
+          {currentAnalysis && (
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={saveToSwingInsights}
+                className="text-xs"
+              >
+                <BookOpen className="h-3 w-3 mr-1" />
+                Save to Swing Insights
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddingVoiceNote(true)}
+                className="text-xs"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add Voice Note
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                <Share2 className="h-3 w-3 mr-1" />
+                Share to Feed
+              </Button>
+            </div>
           )}
         </div>
-      </ScrollArea>
+      )}
 
       {/* Input Area */}
-      <div className="p-4 border-t flex-shrink-0 bg-background">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="p-4 border-t flex-shrink-0">
+        <div className="flex gap-2 mb-4">
           <Button
             variant="outline"
-            size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="text-xs flex-1"
+            className="flex-1"
           >
-            <Upload className="h-4 w-4 mr-1" />
+            <Upload className="h-4 w-4 mr-2" />
             Upload Swing Video
           </Button>
           <Button
             variant="outline"
-            size="sm"
             onClick={() => setShowAnalyses(true)}
-            className="text-xs"
+            className="flex gap-2"
           >
-            <BookOpen className="h-3 w-3 mr-1" />
-            Analyses ({analyses.length})
+            <BookOpen className="h-4 w-4" />
+            <span className="text-xs">Analyses ({analyses.length})</span>
           </Button>
         </div>
         
@@ -720,56 +680,18 @@ const ProAI: React.FC<ProAIProps> = ({
           <Input
             value={analysisText}
             onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : uploadedVideo ? "Add context or question..." : "Type a message..."}
-            onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && (uploadedVideo || analysisText.trim()) && analyzeSwing()}
-            disabled={isAnalyzing || isVoiceNoteRecording}
-            className="flex-1"
+            placeholder="Describe your swing or ask a question..."
+            onKeyPress={(e) => e.key === 'Enter' && analyzeSwing()}
+            disabled={isAnalyzing}
           />
-          
-          {/* Send button - always visible */}
           <Button
             onClick={analyzeSwing}
-            disabled={isAnalyzing || isVoiceNoteRecording || (!uploadedVideo && !analysisText.trim())}
-            size="sm"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            disabled={isAnalyzing || (!uploadedVideo && !analysisText.trim())}
           >
             <Send className="h-4 w-4" />
           </Button>
-          
-          {/* Voice button - always visible */}
-          <Button
-            onClick={() => {
-              if (isVoiceNoteRecording) {
-                stopRecording();
-              } else if (isRecording) {
-                setIsVoiceNoteRecording(true);
-                startRecording();
-              } else {
-                setIsVoiceNoteRecording(true);
-                startRecording();
-              }
-            }}
-            disabled={isAnalyzing || isProcessing}
-            size="sm"
-            variant={isVoiceNoteRecording ? "default" : "outline"}
-          >
-            {isVoiceNoteRecording ? (
-              <Send className="h-4 w-4" />
-            ) : isRecording || isProcessing ? (
-              <Mic className="h-4 w-4 opacity-50" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
         </div>
         
-        {currentGolfClub && (
-          <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            Currently logging notes for {currentGolfClub}
-          </div>
-        )}
-
         <input
           ref={fileInputRef}
           type="file"
@@ -778,7 +700,7 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-    </div>
+    </>
   );
 };
 
