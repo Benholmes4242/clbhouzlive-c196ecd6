@@ -564,7 +564,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div className={`relative z-50 ${hasImmersiveMedia ? '-mt-20' : 'mt-8'}`}>
+      <div className="relative z-50 -mt-20">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}

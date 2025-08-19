@@ -19,9 +19,8 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
 }) => {
   const isMobile = useIsMobile();
 
-  if (!mediaItems.length) return null;
-
-  const primaryMedia = mediaItems[0];
+  // Always show immersive header, use default background if no media
+  const primaryMedia = mediaItems.length > 0 ? mediaItems[0] : null;
   
   return (
     <div className={`
@@ -35,22 +34,34 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
           : 'h-64' // Desktop full
       }
     `}>
-      {/* Background Media */}
-      {primaryMedia.media_type === 'video' ? (
-        <video
-          src={primaryMedia.media_url}
-          poster={primaryMedia.thumbnail_url}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      {/* Background Media or Default */}
+      {primaryMedia ? (
+        primaryMedia.media_type === 'video' ? (
+          <video
+            src={primaryMedia.media_url}
+            poster={primaryMedia.thumbnail_url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <img
+            src={primaryMedia.media_url}
+            alt="Profile header"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )
       ) : (
-        <img
-          src={primaryMedia.media_url}
-          alt="Profile header"
-          className="absolute inset-0 w-full h-full object-cover"
+        // Default background for profiles without media
+        <div 
+          className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=400&fit=crop&q=80')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
         />
       )}
 
