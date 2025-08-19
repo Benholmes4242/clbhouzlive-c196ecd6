@@ -477,8 +477,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <TabsTrigger value="proai">Pro AI</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 data-[state=active]:flex overflow-hidden">
-            <ScrollArea className="flex-1 overflow-y-auto" ref={scrollAreaRef}>
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 data-[state=active]:flex h-0">
+            <ScrollArea className="flex-1 h-full" ref={scrollAreaRef}>
               <div className="p-4 min-h-full">
                 {messages.length === 0 ? (
                   <div className="py-8">
