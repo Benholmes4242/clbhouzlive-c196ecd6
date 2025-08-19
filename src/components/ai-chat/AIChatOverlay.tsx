@@ -483,7 +483,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </TabsContent>
 
           <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
-            <CaddieLogs onClose={() => setActiveTab('chat')} />
+            <CaddieLogs 
+              onClose={() => setActiveTab('chat')}
+              isRecording={isRecording}
+              isProcessing={isProcessing}
+              startRecording={startRecording}
+              stopRecording={stopRecording}
+              userLocation={userLocation}
+              requestLocation={requestLocation}
+            />
           </TabsContent>
         </Tabs>
         

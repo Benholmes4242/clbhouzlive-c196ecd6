@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, Edit, Trash2, MapPin, Calendar } from 'lucide-react';
+import { Search, Edit, Trash2, MapPin, Calendar, Mic, MicOff, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,9 +21,23 @@ interface CaddieLog {
 
 interface CaddieLogsProps {
   onClose: () => void;
+  isRecording: boolean;
+  isProcessing: boolean;
+  startRecording: () => void;
+  stopRecording: () => void;
+  userLocation: string;
+  requestLocation: () => void;
 }
 
-const CaddieLogs: React.FC<CaddieLogsProps> = ({ onClose }) => {
+const CaddieLogs: React.FC<CaddieLogsProps> = ({ 
+  onClose, 
+  isRecording, 
+  isProcessing, 
+  startRecording, 
+  stopRecording, 
+  userLocation, 
+  requestLocation 
+}) => {
   const [logs, setLogs] = useState<CaddieLog[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingLog, setEditingLog] = useState<string | null>(null);
@@ -156,13 +170,11 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({ onClose }) => {
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-4 min-h-full flex flex-col">
             {logs.length === 0 ? (
-              <div className="py-8">
-                <div className="text-center text-muted-foreground">
-                  <p className="mb-6">
-                    Your personal yardage book starts here.<br />
-                    Tap the mic, record notes as you walk the course, and I'll store them for you.
-                  </p>
-                </div>
+              <div className="text-center text-muted-foreground pt-4">
+                <p className="mb-6">
+                  Your personal yardage book starts here.<br />
+                  Tap the mic, record notes as you walk the course, and I'll store them for you.
+                </p>
               </div>
             ) : filteredLogs.length === 0 ? (
               <div className="py-8">
@@ -265,16 +277,60 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({ onClose }) => {
         </ScrollArea>
       </div>
 
-      {/* Search bar at bottom */}
+      {/* Input area at bottom */}
       <div className="p-4 border-t flex-shrink-0">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search logs, courses, tags..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center gap-2 mb-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={requestLocation}
+            className="text-xs"
+          >
+            <MapPin className="h-3 w-3 mr-1" />
+            Use My Location
+          </Button>
+          {userLocation && (
+            <Badge variant="secondary" className="text-xs">
+              {userLocation}
+            </Badge>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 flex gap-2">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Record course notes and tips..."
+              disabled={isRecording || isProcessing}
+            />
+            <Button
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isProcessing}
+              variant={isRecording ? "destructive" : "outline"}
+              size="sm"
+              className="px-3"
+            >
+              {isRecording ? (
+                <MicOff className="h-4 w-4" />
+              ) : isProcessing ? (
+                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <Button
+            onClick={() => {
+              // This will trigger voice recording for caddie notes
+              if (!isRecording && !isProcessing) {
+                startRecording();
+              }
+            }}
+            disabled={isRecording || isProcessing}
+            size="sm"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>
