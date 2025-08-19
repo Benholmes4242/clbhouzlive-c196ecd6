@@ -440,15 +440,15 @@ const ProAI: React.FC<ProAIProps> = ({
       {/* Content */}
       <div className="flex-1 min-h-0 flex flex-col">
         <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-          <div className="p-4 min-h-full flex flex-col">
+          <div className="p-4 pb-2 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-8">
+              <div className="py-6">
                 <div className="text-center text-muted-foreground">
-                  <p className="mb-6">
+                  <p className="mb-4">
                     Upload your swing for swing analysis<br />
                     Get instant feedback and drills from pro AI.
                   </p>
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <p className="text-sm font-medium mb-2">Best results:</p>
                     <div className="text-xs space-y-1">
                       <p>• Face on or down the line, full body, good light</p>
@@ -568,8 +568,8 @@ const ProAI: React.FC<ProAIProps> = ({
       </div>
 
       {/* Input area */}
-      <div className="p-4 border-t flex-shrink-0 bg-background">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="p-3 border-t flex-shrink-0 bg-background">
+        <div className="flex items-center gap-2 mb-2">
           <Button
             variant="outline"
             size="sm"
@@ -630,7 +630,7 @@ const ProAI: React.FC<ProAIProps> = ({
         </div>
         
         {currentGolfClub && (
-          <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
+          <div className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
             <MapPin className="h-3 w-3" />
             Currently logging notes for {currentGolfClub}
           </div>
