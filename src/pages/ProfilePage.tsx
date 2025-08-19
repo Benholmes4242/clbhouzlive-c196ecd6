@@ -91,17 +91,15 @@ const ProfilePage = () => {
       {/* Header */}
       <Header />
       
-      <div className="md:container md:mx-auto md:px-8">
-        <HeroProfileHeader 
-          profile={profile}
-          isOwnProfile={true} // This is always the user's own profile on this route
-          onProfileUpdate={refreshProfile}
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-        />
-        
-        {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
-      </div>
+      <HeroProfileHeader 
+        profile={profile}
+        isOwnProfile={true} // This is always the user's own profile on this route
+        onProfileUpdate={refreshProfile}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      
+      {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
       
       <BottomNavigation />
     </div>

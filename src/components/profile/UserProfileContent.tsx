@@ -35,18 +35,15 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
 
   return (
     <>
-      
-      <div className="w-full md:px-8">
-        <HeroProfileHeader 
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          onProfileUpdate={() => {
-            // Profile update will be handled by the HeroProfileHeader component
-          }}
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-        />
-      </div>
+      <HeroProfileHeader 
+        profile={profile}
+        isOwnProfile={isOwnProfile}
+        onProfileUpdate={() => {
+          // Profile update will be handled by the HeroProfileHeader component
+        }}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
     </>
   );
 };
