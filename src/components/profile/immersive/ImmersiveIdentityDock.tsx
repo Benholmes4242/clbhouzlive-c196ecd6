@@ -108,7 +108,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-700 ease-out md:left-1/2 sm:left-20 ${
+      className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-700 ease-out ${
         isVisible 
           ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
           : 'translate-y-full opacity-0'
@@ -119,12 +119,12 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
       <div className="px-8 py-5 rounded-3xl shadow-2xl backdrop-blur-md">
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <Avatar className="w-12 h-12 rounded-xl">
+          <Avatar className="w-16 h-16 rounded-full">
             <AvatarImage 
               src={profile.profile_photo_url || undefined}
               alt={profile.display_name || 'User'}
             />
-            <AvatarFallback className="rounded-xl bg-primary/20 text-primary font-semibold">
+            <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold">
               {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
