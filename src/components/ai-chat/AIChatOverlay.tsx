@@ -42,7 +42,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
-  const [proAnalyzeSwing, setProAnalyzeSwing] = useState<(() => void) | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -509,7 +508,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 isProcessing={isProcessing}
                 startRecording={startRecording}
                 stopRecording={stopRecording}
-                onAnalyzeSwing={setProAnalyzeSwing}
               />
             </TabsContent>
           </div>
@@ -651,7 +649,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   )}
                 </Button>
                 <Button
-                  onClick={() => proAnalyzeSwing?.()}
                   disabled={isRecording || isProcessing}
                   size="sm"
                 >

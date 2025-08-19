@@ -27,7 +27,6 @@ interface ProAIProps {
   isProcessing?: boolean;
   startRecording?: () => void;
   stopRecording?: () => void;
-  onAnalyzeSwing?: (analyzeSwingFn: () => void) => void;
 }
 
 interface ChatMessageData {
@@ -44,7 +43,6 @@ const ProAI: React.FC<ProAIProps> = ({
   isProcessing: parentIsProcessing,
   startRecording: parentStartRecording,
   stopRecording: parentStopRecording,
-  onAnalyzeSwing,
 }) => {
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string>('');
@@ -288,7 +286,7 @@ const ProAI: React.FC<ProAIProps> = ({
   };
 
   const analyzeSwing = async () => {
-    if (isAnalyzing || (!uploadedVideo && !analysisText.trim())) return;
+    if (!uploadedVideo && !analysisText.trim()) return;
 
     // Show progress for extracting frames
     if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
@@ -299,7 +297,7 @@ const ProAI: React.FC<ProAIProps> = ({
     }
 
     const userMessage: ChatMessageData = {
-      id: `${Date.now()}_${Math.random()}`,
+      id: Date.now().toString(),
       type: 'user',
       content: analysisText.trim() || 'Please analyze my swing',
       timestamp: new Date()
@@ -400,7 +398,7 @@ const ProAI: React.FC<ProAIProps> = ({
       if (error) throw error;
 
       const aiMessage: ChatMessageData = {
-        id: `${Date.now()}_${Math.random()}_ai`,
+        id: Date.now().toString() + '_ai',
         type: 'ai',
         content: data.response,
         timestamp: new Date(),
@@ -454,7 +452,7 @@ const ProAI: React.FC<ProAIProps> = ({
       });
 
       const errorMessage: ChatMessageData = {
-        id: `${Date.now()}_${Math.random()}_error`,
+        id: Date.now().toString() + '_error',
         type: 'ai',
         content: "Sorry, I'm having trouble analyzing your swing right now. Please ensure you've uploaded a clear video and try again.",
         timestamp: new Date()
@@ -495,13 +493,6 @@ const ProAI: React.FC<ProAIProps> = ({
       description: "The swing analysis has been removed",
     });
   };
-
-  // Expose analyzeSwing function to parent component
-  React.useEffect(() => {
-    if (onAnalyzeSwing) {
-      onAnalyzeSwing(() => analyzeSwing());
-    }
-  }, [onAnalyzeSwing]);
 
   if (showAnalyses) {
     return (
