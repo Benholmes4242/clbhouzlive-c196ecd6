@@ -235,8 +235,59 @@ const ProAI: React.FC<ProAIProps> = ({
     }
   };
 
+  const extractKeyFrames = async (video: HTMLVideoElement): Promise<string[]> => {
+    const frames: string[] = [];
+    const duration = video.duration;
+    
+    // Define key positions as percentages of swing duration
+    const keyPositions = [
+      { name: 'Address (P1)', percent: 0.05 },
+      { name: 'Takeaway (P2)', percent: 0.15 },
+      { name: 'Shaft Parallel Back (P3)', percent: 0.35 },
+      { name: 'Top (P4)', percent: 0.45 },
+      { name: 'Downswing Parallel (P5)', percent: 0.65 },
+      { name: 'Impact (P6)', percent: 0.75 },
+      { name: 'Early Release (P7)', percent: 0.85 },
+      { name: 'Finish (P9)', percent: 0.95 }
+    ];
+    
+    for (const position of keyPositions.slice(0, 8)) { // Max 8 frames
+      const timePoint = duration * position.percent;
+      video.currentTime = timePoint;
+      
+      await new Promise<void>((resolve) => {
+        video.onseeked = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.min(video.videoWidth, 1280); // Max width 1280px
+          canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
+          
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            frames.push(dataUrl);
+          }
+          resolve();
+        };
+      });
+      
+      // Add small delay between frames
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    return frames;
+  };
+
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
+
+    // Show progress message
+    const progressMessage: ChatMessageData = {
+      id: Date.now().toString() + '_progress',
+      type: 'ai',
+      content: uploadedVideo ? 'Extracting swing frames...' : 'Analyzing your question...',
+      timestamp: new Date()
+    };
 
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
@@ -245,12 +296,13 @@ const ProAI: React.FC<ProAIProps> = ({
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage, progressMessage]);
     setAnalysisText('');
     setIsAnalyzing(true);
 
     try {
       let videoDataUrl = null;
+      let frameCount = 0;
       
       // Convert video/image to base64 for AI analysis
       if (uploadedVideo) {
@@ -262,38 +314,54 @@ const ProAI: React.FC<ProAIProps> = ({
             reader.readAsDataURL(uploadedVideo);
           });
         } else if (uploadedVideo.type.startsWith('video/')) {
-          // For videos, extract a frame and convert to base64
+          // Update progress
+          setMessages(prev => prev.map(msg => 
+            msg.id === progressMessage.id 
+              ? { ...msg, content: 'Extracting key swing positions...' }
+              : msg
+          ));
+
+          // For videos, extract key frames
           const video = document.createElement('video');
           video.src = videoPreview;
           video.crossOrigin = 'anonymous';
           
           await new Promise<void>((resolve) => {
-            video.onloadedmetadata = () => {
-              video.currentTime = Math.min(2, video.duration / 2); // Get frame from middle or at 2 seconds
-              resolve();
-            };
+            video.onloadedmetadata = () => resolve();
           });
+
+          if (video.duration < 1) {
+            throw new Error('Video too short for analysis. Please upload a video showing your full swing.');
+          }
+
+          // Extract multiple key frames for better analysis
+          const frames = await extractKeyFrames(video);
+          frameCount = frames.length;
           
-          await new Promise<void>((resolve) => {
-            video.onseeked = () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                ctx.drawImage(video, 0, 0);
-                videoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-              }
-              resolve();
-            };
-          });
+          if (frames.length === 0) {
+            throw new Error('Could not extract frames from video. Please try a different video.');
+          }
+
+          // Use the best frame (usually impact or address) for primary analysis
+          videoDataUrl = frames[Math.floor(frames.length / 2)] || frames[0];
         }
+      }
+
+      // Update progress
+      setMessages(prev => prev.map(msg => 
+        msg.id === progressMessage.id 
+          ? { ...msg, content: uploadedVideo ? `Analyzing swing${frameCount > 1 ? ` (${frameCount} key positions)` : ''}...` : 'Getting AI response...' }
+          : msg
+      ));
+
+      if (uploadedVideo && !videoDataUrl) {
+        throw new Error('We couldn\'t process your video. Please re-upload or try with photos (face-on / down-the-line).');
       }
       
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
-          conversation: messages.slice(-6).map(msg => ({
+          conversation: messages.filter(msg => msg.id !== progressMessage.id).slice(-4).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
           })),
@@ -305,6 +373,7 @@ const ProAI: React.FC<ProAIProps> = ({
 
       if (error) throw error;
 
+      // Remove progress message and add AI response
       const aiMessage: ChatMessageData = {
         id: Date.now().toString() + '_ai',
         type: 'ai',
@@ -313,7 +382,7 @@ const ProAI: React.FC<ProAIProps> = ({
         metadata: data.metadata
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages(prev => prev.filter(msg => msg.id !== progressMessage.id).concat([aiMessage]));
 
       // Create video thumbnail if video was uploaded
       let thumbnailUrl = '';
@@ -472,9 +541,10 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Messages */}
-      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+      <div className="flex-1 min-h-0 flex flex-col">
+        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
               <div className="py-2">
@@ -605,6 +675,7 @@ const ProAI: React.FC<ProAIProps> = ({
             )}
           </div>
         </ScrollArea>
+      </div>
 
       {/* Input area */}
       <div className="p-4 border-t flex-shrink-0 bg-background">
@@ -691,8 +762,8 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-     </div>
-   );
- };
+    </div>
+  );
+};
 
 export default ProAI;

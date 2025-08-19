@@ -8,13 +8,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const systemPrompt = `You are clbhouz caddie AI, an AI golf assistant inside the Clbhouz app.
-Tone: friendly, crisp, practical — like a modern tour coach + concierge.
-Audience: golfers of all abilities.
+const systemPrompt = `You are clbhouz Pro AI, a professional golf swing analyzer inside the Clbhouz app.
+Tone: expert, analytical, precise — like a tour-level swing coach with biomechanics expertise.
+Audience: golfers seeking detailed swing analysis and improvement.
 
-IMPORTANT: All answers must be provided within the Clubhouse chat overlay only. Do not provide, suggest, or link out to any external websites, apps, or companies. If a user asks for something that would normally require an external link, instead give the answer directly in text form or suggest they explore it inside Clubhouse.
+CRITICAL: When you receive visual data (images/video frames), you are analyzing an actual golf swing. Analyze what you see in the visuals and provide specific, actionable feedback based on the swing positions shown.
 
-Scope: Answer any golf-related questions — swing, drills, equipment, courses, trips, rules, etiquette, fitness, travel, and news. If someone asks a non-golf question, reply once: "Let's talk golf! Want to ask about your game, gear, or courses?" and then suggest three golf-related examples.
+IMPORTANT: All answers must be provided within the Clubhouse chat overlay only. Do not provide, suggest, or link out to any external websites, apps, or companies.
+
+Scope: Analyze golf swings from video/images, provide technical feedback on swing mechanics, suggest drills for specific swing faults, and answer swing-related questions. If someone asks a non-swing question, reply: "I specialize in swing analysis. Upload a swing video or ask about swing mechanics for the best help!"
 
 Default Output Shape for swing-related questions (Fast Answer):
 
@@ -86,13 +88,42 @@ serve(async (req) => {
 
     // If video/image data is provided, use vision capabilities
     if (videoData) {
-      console.log('Video data provided, using GPT-4o for vision analysis');
+      console.log('Video data provided, using GPT-4o for swing analysis');
+      
+      // Enhanced swing analysis prompt
+      const analysisPrompt = `You received visual data of a golf swing. Analyze this swing systematically:
+
+1. SETUP & ADDRESS: Check posture, ball position, grip, alignment, stance width
+2. TAKEAWAY: Initial club movement, body rotation, arm/wrist action
+3. BACKSWING: Plane, width, turn, positions at parallel and top
+4. TRANSITION: Hip movement, sequence, club position changes
+5. DOWNSWING: Attack angle, club path, body rotation sequence
+6. IMPACT: Club face, path, body position, weight transfer
+7. FOLLOW-THROUGH: Extension, balance, finish position
+
+Context provided: ${fileName ? `File: ${fileName}` : ''} ${userMessage}
+
+Respond in this exact format:
+
+**Why it's happening**
+- [1-2 bullets diagnosing the main issue you see]
+
+**Fast fix** 
+1) [3-point quick fix with specific setup/feel changes]
+
+**Try this drill**
+- [1 specific drill targeting the main issue]
+
+Want this saved to Insights?
+
+::clbhz_meta:: {"save_card":"[120 char summary of analysis]","tags":["swing","analysis","specific_fault"],"category":"Swing"}`;
+
       messages.push({
         role: 'user',
         content: [
           {
             type: 'text',
-            text: `Analyze this golf swing video/image. ${userMessage}`
+            text: analysisPrompt
           },
           {
             type: 'image_url',
@@ -103,7 +134,23 @@ serve(async (req) => {
         ]
       });
     } else {
-      messages.push({ role: 'user', content: userMessage });
+      // For text-only questions about swing mechanics
+      const textPrompt = `${userMessage}
+
+Provide swing advice in this format:
+
+**Quick answer**
+- [Direct response to the question]
+
+**Key points**
+- [2-3 most important technical points]
+
+**Practice tip**
+- [One actionable drill or practice method]
+
+::clbhz_meta:: {"save_card":"[Summary of advice]","tags":["swing","technique"],"category":"Swing"}`;
+      
+      messages.push({ role: 'user', content: textPrompt });
     }
 
     console.log('Sending request to OpenAI with messages:', messages);
@@ -111,8 +158,8 @@ serve(async (req) => {
     const requestBody = {
       model: videoData ? 'gpt-4o' : 'gpt-4o-mini',
       messages: messages,
-      max_tokens: detailMode ? 800 : 400,
-      temperature: 0.7,
+      max_tokens: detailMode ? 1200 : 800,
+      temperature: 0.3, // Lower temperature for more consistent analysis
     };
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
