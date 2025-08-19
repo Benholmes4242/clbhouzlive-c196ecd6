@@ -145,6 +145,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
+
   const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -325,8 +335,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[85vh] sm:h-[75vh] flex flex-col shadow-2xl overflow-hidden">
+    <div 
+      className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+      onWheel={(e) => e.stopPropagation()} // Prevent scroll from bubbling to body
+    >
+      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[90vh] sm:h-[80vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <div className="flex-1">
@@ -354,60 +367,62 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2 flex-shrink-0">
+          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2 mb-2 flex-shrink-0">
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
             {/* Messages */}
-            <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-              <div className="p-4">
-                {messages.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-8">
-                    <p className="mb-6">
-                      I'm your personal tour caddie.<br />
-                      Ask me anything, anytime, I've got you.
-                    </p>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Try asking:</p>
-                      {suggestedPrompts.map((prompt, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSuggestedPrompt(prompt)}
-                          className="mx-1 mb-2 text-xs"
-                        >
-                          {prompt}
-                        </Button>
-                      ))}
+            <div className="flex-1 min-h-0 flex flex-col">
+              <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+                <div className="p-4 min-h-full flex flex-col">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8 flex-1 flex flex-col justify-center">
+                      <p className="mb-6">
+                        I'm your personal tour caddie.<br />
+                        Ask me anything, anytime, I've got you.
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Try asking:</p>
+                        {suggestedPrompts.map((prompt, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSuggestedPrompt(prompt)}
+                            className="mx-1 mb-2 text-xs"
+                          >
+                            {prompt}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <ChatMessageComponent
-                        key={message.id}
-                        message={message}
-                        onSaveToInsights={saveToInsights}
-                        onRequestDetail={requestMoreDetail}
-                      />
-                    ))}
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                          <div className="flex items-center gap-2">
-                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                            <span className="text-sm">clbhouz pro AI is thinking...</span>
+                  ) : (
+                    <div className="space-y-4 flex-1">
+                      {messages.map((message) => (
+                        <ChatMessageComponent
+                          key={message.id}
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                        />
+                      ))}
+                      {isLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                              <span className="text-sm">clbhouz pro AI is thinking...</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
           </TabsContent>
 
           <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
