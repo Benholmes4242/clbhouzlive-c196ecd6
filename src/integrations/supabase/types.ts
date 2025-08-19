@@ -155,6 +155,51 @@ export type Database = {
         }
         Relationships: []
       }
+      caddie_logs: {
+        Row: {
+          audio_url: string | null
+          content: string
+          course_name: string | null
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string | null
+          tags: string[] | null
+          transcription: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          content: string
+          course_name?: string | null
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          tags?: string[] | null
+          transcription?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          content?: string
+          course_name?: string | null
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          tags?: string[] | null
+          transcription?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_media: {
         Row: {
           course_id: string
