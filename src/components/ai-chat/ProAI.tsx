@@ -442,13 +442,13 @@ const ProAI: React.FC<ProAIProps> = ({
         <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-6">
+              <div className="py-4">
                 <div className="text-center text-muted-foreground">
-                  <p className="mb-4">
+                  <p className="mb-3">
                     Upload your swing for swing analysis<br />
                     Get instant feedback and drills from pro AI.
                   </p>
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <p className="text-sm font-medium mb-2">Best results:</p>
                     <div className="text-xs space-y-1">
                       <p>• Face on or down the line, full body, good light</p>
