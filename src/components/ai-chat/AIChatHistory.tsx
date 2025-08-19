@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface SavedInsight {
   id: string;
@@ -16,6 +16,17 @@ interface SavedInsight {
   tags: string[];
   category: string;
   timestamp: Date;
+}
+
+interface SwingAnalysis {
+  id: string;
+  save_card: string;
+  tags: string[];
+  category: string;
+  content: string;
+  videoThumbnail?: string;
+  timestamp: Date;
+  voiceNote?: string;
 }
 
 interface HistoryMessage {
@@ -38,6 +49,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
+  const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -62,6 +74,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       timestamp: new Date(insight.timestamp)
     }));
     setSavedInsights(parsedSaved);
+
+    // Load swing analyses
+    const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+    const parsedAnalyses = analyses.map((analysis: any) => ({
+      ...analysis,
+      timestamp: new Date(analysis.timestamp)
+    }));
+    setSwingAnalyses(parsedAnalyses);
   };
 
   const clearHistory = () => {
@@ -89,6 +109,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     toast({
       title: "Saved insights cleared",
       description: "All saved insights have been deleted",
+    });
+  };
+
+  const deleteSwingAnalysis = (id: string) => {
+    const updated = swingAnalyses.filter(analysis => analysis.id !== id);
+    setSwingAnalyses(updated);
+    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updated));
+    toast({
+      title: "Analysis deleted",
+      description: "The swing analysis has been removed",
+    });
+  };
+
+  const clearAllAnalyses = () => {
+    localStorage.removeItem('clbhouz_swing_analyses');
+    setSwingAnalyses([]);
+    toast({
+      title: "Swing analyses cleared",
+      description: "All swing analyses have been deleted",
     });
   };
 
@@ -171,9 +210,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
         {/* Tabs */}
         <Tabs defaultValue="history" className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
             <TabsTrigger value="history">History ({historyMessages.length})</TabsTrigger>
             <TabsTrigger value="saved">Saved ({savedInsights.length})</TabsTrigger>
+            <TabsTrigger value="analyses">Analyses ({swingAnalyses.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="flex-1 p-4">
@@ -321,6 +361,116 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       </p>
                     </div>
                   ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="analyses" className="flex-1 p-4">
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-sm text-muted-foreground">
+                Your swing analyses with feedback and drills
+              </p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear Analyses
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear swing analyses?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete all your swing analyses. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={clearAllAnalyses}>Clear Analyses</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {swingAnalyses.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Pro AI to get started.'}
+                  </p>
+                ) : (
+                  swingAnalyses
+                    .filter(analysis => 
+                      analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((analysis) => (
+                      <div
+                        key={analysis.id}
+                        className="p-3 rounded-lg border hover:bg-muted/50"
+                      >
+                        <div className="flex items-start gap-3">
+                          {analysis.videoThumbnail && (
+                            <img 
+                              src={analysis.videoThumbnail} 
+                              alt="Swing thumbnail"
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">{analysis.category}</Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {analysis.timestamp.toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => onSelectMessage(analysis.save_card)}
+                                  className="h-7 px-2"
+                                >
+                                  <RotateCcw className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deleteSwingAnalysis(analysis.id)}
+                                  className="h-7 px-2 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
+                            
+                            {analysis.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {analysis.tags.map((tag, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {analysis.voiceNote && (
+                              <Badge variant="outline" className="mb-2 text-xs">
+                                Voice note attached
+                              </Badge>
+                            )}
+                            
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {analysis.content}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
                 )}
               </div>
             </ScrollArea>

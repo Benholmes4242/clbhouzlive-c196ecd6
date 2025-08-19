@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
+import ProAI from './ProAI';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -421,9 +422,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-2 mx-4 mt-2 mb-2 flex-shrink-0">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2 mb-2 flex-shrink-0">
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
+            <TabsTrigger value="proai">Pro AI</TabsTrigger>
           </TabsList>
 
           <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
@@ -491,6 +493,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               stopRecording={stopRecording}
               userLocation={userLocation}
               requestLocation={requestLocation}
+            />
+          </TabsContent>
+
+          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
+            <ProAI 
+              onClose={() => setActiveTab('chat')}
+              isRecording={isRecording}
+              isProcessing={isProcessing}
+              startRecording={startRecording}
+              stopRecording={stopRecording}
             />
           </TabsContent>
         </Tabs>
