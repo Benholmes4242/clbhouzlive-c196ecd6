@@ -567,29 +567,31 @@ const ProAI: React.FC<ProAIProps> = ({
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Content - no ScrollArea here, parent handles it */}
-      <div className="flex-1 min-h-0">
-        {messages.length === 0 && !uploadedVideo ? (
-          <div className="py-2">
-            <div className="text-center text-muted-foreground">
-              <p className="mb-2">
-                Upload your swing for swing analysis<br />
-                Get instant feedback and drills from pro AI.
-              </p>
-              <div className="mb-2">
-                  <p className="text-sm font-medium mb-1">Best results:</p>
-                  <div className="text-xs space-y-0.5">
-                    <p>• Face-on or down-the-line, full body, good lighting</p>
-                    <p>• State the club and typical miss (e.g., Driver • Hook)</p>
-                    <p>• Include swing speed or ball flight if known</p>
-                    <p>• Camera angle: mention face-on or down-the-line</p>
+      {/* Content */}
+      <div className="flex-1 min-h-0 flex flex-col max-h-[35vh] md:max-h-[60vh]">
+        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+          <div className="p-4 min-h-full flex flex-col">
+            {messages.length === 0 && !uploadedVideo ? (
+              <div className="py-2">
+                <div className="text-center text-muted-foreground">
+                  <p className="mb-2">
+                    Upload your swing for swing analysis<br />
+                    Get instant feedback and drills from pro AI.
+                  </p>
+                  <div className="mb-2">
+                      <p className="text-sm font-medium mb-1">Best results:</p>
+                      <div className="text-xs space-y-0.5">
+                        <p>• Face-on or down-the-line, full body, good lighting</p>
+                        <p>• State the club and typical miss (e.g., Driver • Hook)</p>
+                        <p>• Include swing speed or ball flight if known</p>
+                        <p>• Camera angle: mention face-on or down-the-line</p>
+                      </div>
                   </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {uploadedVideo && (
+            ) : (
+              <div className="space-y-4 flex-1">
+                {uploadedVideo && (
                   <div className="bg-muted rounded-lg p-4">
                     <div className="flex items-center gap-4">
                       <div className="relative">
@@ -693,7 +695,9 @@ const ProAI: React.FC<ProAIProps> = ({
                   </div>
                 )}
               </div>
-        )}
+            )}
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Input area */}

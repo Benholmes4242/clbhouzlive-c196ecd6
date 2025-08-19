@@ -485,38 +485,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1 min-h-0">
-                <div className="p-4 min-h-full flex flex-col">
-                  <CaddieLogs 
-                    onClose={() => setActiveTab('chat')}
-                    isRecording={isRecording}
-                    isProcessing={isProcessing}
-                    startRecording={startRecording}
-                    stopRecording={stopRecording}
-                    userLocation={userLocation}
-                    requestLocation={requestLocation}
-                  />
-                </div>
-              </ScrollArea>
-            </div>
+          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
+            <CaddieLogs 
+              onClose={() => setActiveTab('chat')}
+              isRecording={isRecording}
+              isProcessing={isProcessing}
+              startRecording={startRecording}
+              stopRecording={stopRecording}
+              userLocation={userLocation}
+              requestLocation={requestLocation}
+            />
           </TabsContent>
 
-          <TabsContent value="proai" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
-            <div className="flex-1 min-h-0 flex flex-col">
-              <ScrollArea className="flex-1 min-h-0">
-                <div className="p-4 min-h-full flex flex-col">
-                  <ProAI 
-                    onClose={() => setActiveTab('chat')}
-                    isRecording={isRecording}
-                    isProcessing={isProcessing}
-                    startRecording={startRecording}
-                    stopRecording={stopRecording}
-                  />
-                </div>
-              </ScrollArea>
-            </div>
+          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
+            <ProAI 
+              onClose={() => setActiveTab('chat')}
+              isRecording={isRecording}
+              isProcessing={isProcessing}
+              startRecording={startRecording}
+              stopRecording={stopRecording}
+            />
           </TabsContent>
         </Tabs>
         
