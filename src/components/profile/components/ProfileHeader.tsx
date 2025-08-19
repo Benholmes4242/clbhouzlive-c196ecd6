@@ -5,9 +5,7 @@ import FollowerStats from '../FollowerStats';
 interface ProfileHeaderProps {
   displayName: string;
   username: string;
-  userType: string;
   profileId?: string;
-  isIndividual: boolean;
   bio: string;
   profileUsername?: string;
 }
@@ -15,13 +13,11 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   displayName,
   username,
-  userType,
   profileId,
-  isIndividual,
   bio,
   profileUsername
 }) => {
-  console.log('ProfileHeader - profileId:', profileId, 'userType:', userType, 'profileUsername:', profileUsername);
+  console.log('ProfileHeader - profileId:', profileId, 'profileUsername:', profileUsername);
 
   return (
     <div className="text-center space-y-2">
@@ -29,22 +25,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <h1 className="text-2xl font-bold text-black">{displayName}</h1>
       </div>
       
-      {/* Only show username for individual users */}
-      {isIndividual && username && (
+      {/* Show username for all personal profiles */}
+      {username && (
         <p className="text-black text-lg">{username}</p>
       )}
       
-      {/* Show follower stats under name for non-individual users */}
-      {!isIndividual && profileId && (
-        <FollowerStats 
-          userId={profileId} 
-          userType={userType} 
-          username={profileUsername}
-        />
-      )}
-      
-      {/* Bio - Only show for individual users here */}
-      {isIndividual && bio && (
+      {/* Bio - Show for all personal profiles */}
+      {bio && (
         <p className="text-sm max-w-md mx-auto">{bio}</p>
       )}
     </div>

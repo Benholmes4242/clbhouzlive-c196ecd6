@@ -92,7 +92,7 @@ const HomeClubSection: React.FC<HomeClubSectionProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span>{homeClub || (userType === 'individual' ? 'No home club set' : '')}</span>
+              <span>{homeClub || 'No home club set'}</span>
               {isOwnProfile && (
                 <Button
                   size="sm"

@@ -53,7 +53,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   onPublicToggle,
   onProfileUpdate,
 }) => {
-  const isBusinessProfile = userType === 'business';
+  // All profiles are now personal profiles
+  const isPersonalProfile = true;
 
   const handleHandicapUpdate = (newHandicap: number | null) => {
     // Only update the local form state - no need to trigger full profile refetch
@@ -64,14 +65,14 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
     <div className="space-y-4 py-4">
       <div className="space-y-2">
         <Label htmlFor="displayName">
-          {isBusinessProfile ? 'Business Name' : 'Display Name'}
+          Display Name
         </Label>
         <Input
           id="displayName"
           name="displayName"
           value={formData.displayName}
           onChange={onInputChange}
-          placeholder={isBusinessProfile ? 'Your business name' : 'Your display name'}
+          placeholder="Your display name"
         />
       </div>
 
@@ -92,8 +93,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         )}
       </div>
 
-      {/* Individual-specific fields */}
-      {!isBusinessProfile && (
+      {/* Personal profile fields */}
+      {isPersonalProfile && (
         <>
           <div className="space-y-2">
             <Label htmlFor="homeClub">Home Club</Label>
@@ -121,69 +122,6 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         </>
       )}
 
-      {/* Business-specific fields */}
-      {isBusinessProfile && (
-        <>
-          <div className="space-y-2">
-            <Label htmlFor="businessType">Business Type</Label>
-            <Select value={formData.businessType} onValueChange={(value) => onSelectChange('businessType', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="golf_course">Golf Course</SelectItem>
-                <SelectItem value="pro_shop">Pro Shop</SelectItem>
-                <SelectItem value="golf_academy">Golf Academy</SelectItem>
-                <SelectItem value="golf_brand">Golf Brand</SelectItem>
-                <SelectItem value="golf_media">Golf Media</SelectItem>
-                <SelectItem value="golf_tournament">Golf Tournament</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="contactPersonName">Contact Person Name</Label>
-            <Input
-              id="contactPersonName"
-              name="contactPersonName"
-              value={formData.contactPersonName}
-              onChange={onInputChange}
-              placeholder="Name of main contact person"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={onInputChange}
-              placeholder="Business phone number"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="websiteUrl">Website URL</Label>
-            <Input
-              id="websiteUrl"
-              name="websiteUrl"
-              value={formData.websiteUrl}
-              onChange={onInputChange}
-              placeholder="https://yourwebsite.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={onInputChange}
-              placeholder="City, State/Country"
-            />
-          </div>
-        </>
-      )}
-
       {/* Bio - common for both types */}
       <div className="space-y-2">
         <Label htmlFor="bio">Bio</Label>
@@ -192,7 +130,7 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           name="bio"
           value={formData.bio}
           onChange={onTextareaChange}
-          placeholder={isBusinessProfile ? 'Tell us about your business...' : 'Tell us about yourself...'}
+          placeholder="Tell us about yourself..."
           className="min-h-[80px]"
         />
       </div>

@@ -17,12 +17,12 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
   onEGVisibilityToggle,
   isOwnProfile
 }) => {
-  const userType = profile?.user_type || 'individual';
-  const showPersonalSections = userType === 'individual';
+  // All profiles are now personal profiles
+  const showPersonalSections = true;
 
   return (
     <div className="space-y-8">
-      {/* Only show EG App Integration and Top 100 Courses for individual users */}
+      {/* Show EG App Integration and Top 100 Courses for all personal profiles */}
       {showPersonalSections && (
         <>
           {/* EG App Integration */}

@@ -32,8 +32,8 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Handicap Card - only for individual users */}
-      {profile?.user_type === 'individual' && (
+      {/* Handicap Card - show for all personal profiles */}
+      {profile && (
         <HandicapCard
           handicapIndex={profile?.eg_handicap_index}
           egAppConnected={profile?.eg_app_connected || false}

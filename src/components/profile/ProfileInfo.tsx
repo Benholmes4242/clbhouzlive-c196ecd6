@@ -32,8 +32,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     );
   }
 
-  const userType = profile?.user_type || 'individual';
-  const isIndividual = userType === 'individual';
+  // All profiles are now personal profiles
   const displayName = profile?.display_name || profile?.username || userEmail?.split('@')[0] || 'User';
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
@@ -52,37 +51,27 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       <ProfileHeader
         displayName={displayName}
         username={username}
-        userType={userType}
         profileId={profile?.id}
-        isIndividual={isIndividual}
         bio={bio}
         profileUsername={profile?.username}
       />
 
-      {/* Home Club - Only show for individual users */}
-      {isIndividual && (homeClub || isOwnProfile) && (
+      {/* Home Club - Show for all personal profiles */}
+      {(homeClub || isOwnProfile) && (
         <HomeClubSection
           homeClub={homeClub}
           isOwnProfile={isOwnProfile}
           userId={userId}
           onProfileUpdate={handleProfileUpdate}
-          userType={userType}
+          userType="individual"
         />
       )}
 
-      {/* Business Information Section - Only show for non-individual users */}
-      {!isIndividual && (
-        <BusinessInfoSection
-          profile={profile}
-          bio={bio}
-        />
-      )}
-
-      {/* Show follower stats for individual profiles only */}
-      {isIndividual && profileUserId && (
+      {/* Show follower stats for all personal profiles */}
+      {profileUserId && (
         <FollowerStats 
           userId={profileUserId} 
-          userType={userType} 
+          userType="individual"
           username={profile?.username}
         />
       )}

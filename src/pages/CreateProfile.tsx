@@ -13,7 +13,8 @@ import SocialLinksForm from "@/components/profile/SocialLinksForm";
 
 const CreateProfile = () => {
   const [step, setStep] = useState(1);
-  const [userType, setUserType] = useState<'individual' | 'business'>('individual');
+  // All profiles are now personal profiles
+  const userType = 'individual';
   const [formData, setFormData] = useState({
     // Individual fields
     name: '',
@@ -99,27 +100,18 @@ const CreateProfile = () => {
     // Prepare profile data based on user type
     const profileData: any = {
       id: user.id,
-      user_type: userType === 'individual' ? 'individual' : 'club',
+      user_type: 'individual',
       
       bio: formData.bio,
       location: formData.location,
+      display_name: formData.name,
+      // Clean username one more time before saving to ensure no spaces
+      username: formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase(),
     };
 
-    if (userType === 'individual') {
-      profileData.display_name = formData.name;
-      // Clean username one more time before saving to ensure no spaces
-      profileData.username = formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase();
-      // Only set home_club if it's not "Not applicable" or empty
-      if (formData.homeClub && formData.homeClub.toLowerCase() !== 'not applicable') {
-        profileData.home_club = formData.homeClub;
-      }
-    } else {
-      profileData.business_name = formData.businessName;
-      profileData.business_type = formData.businessType;
-      profileData.contact_person_name = formData.contactPersonName;
-      profileData.phone = formData.phone;
-      profileData.website_url = formData.websiteUrl;
-      profileData.social_links = socialLinks;
+    // Only set home_club if it's not "Not applicable" or empty
+    if (formData.homeClub && formData.homeClub.toLowerCase() !== 'not applicable') {
+      profileData.home_club = formData.homeClub;
     }
 
     const { error } = await supabase.from("user_profiles").upsert(profileData);
@@ -138,13 +130,15 @@ const CreateProfile = () => {
     switch (step) {
       case 1:
         return (
-          <UserTypeSelector
-            userType={userType}
-            onUserTypeChange={setUserType}
-          />
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Personal Profile</h2>
+            <p className="text-muted-foreground">
+              Create your personal golf profile to connect with other golfers and track your journey.
+            </p>
+          </div>
         );
       case 2:
-        return userType === 'individual' ? (
+        return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Basic Information</h2>
             <BasicInfoForm formData={formData} onChange={handleInputChange} />
@@ -161,15 +155,9 @@ const CreateProfile = () => {
               </div>
             )}
           </div>
-        ) : (
-          <BusinessInfoForm
-            formData={formData}
-            onChange={handleInputChange}
-            onSelectChange={handleSelectChange}
-          />
         );
       case 3:
-        return userType === 'individual' ? (
+        return (
           <GolfInfoForm
             formData={{
               handicap: formData.handicap,
@@ -177,11 +165,6 @@ const CreateProfile = () => {
               yearsPlaying: formData.yearsPlaying
             }}
             onChange={handleInputChange}
-          />
-        ) : (
-          <SocialLinksForm
-            socialLinks={socialLinks}
-            onChange={handleSocialLinkChange}
           />
         );
       default:
@@ -191,10 +174,9 @@ const CreateProfile = () => {
 
   const getStepTitle = () => {
     switch (step) {
-      case 1: return 'Account Type';
-      
-      case 2: return userType === 'individual' ? 'Basic Information' : 'Business Information';
-      case 3: return userType === 'individual' ? 'Golf Information' : 'Social Links';
+      case 1: return 'Personal Profile';
+      case 2: return 'Basic Information';
+      case 3: return 'Golf Information';
       default: return 'Create Profile';
     }
   };
@@ -203,14 +185,7 @@ const CreateProfile = () => {
   const canProceed = () => {
     switch (step) {
       case 1: return true;
-      case 2:
-        if (userType === 'individual') {
-          return formData.name.trim() !== '';
-        } else {
-          return formData.businessName.trim() !== '' && 
-                 formData.businessType !== '' && 
-                 formData.contactPersonName.trim() !== '';
-        }
+      case 2: return formData.name.trim() !== '';
       case 3: return true;
       default: return false;
     }
