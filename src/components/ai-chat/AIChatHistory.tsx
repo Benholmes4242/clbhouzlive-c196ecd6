@@ -189,6 +189,40 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     return matchesSearch && matchesCategory && matchesTag;
   });
 
+  const clearCaddieLogs = async () => {
+    try {
+      const { error } = await supabase
+        .from('caddie_logs')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      setCaddieLogsList([]);
+      toast({
+        title: "Logs cleared",
+        description: "All caddie logs have been deleted",
+      });
+    } catch (error) {
+      console.error('Error clearing logs:', error);
+    }
+  };
+
+  const clearProAnalyses = async () => {
+    try {
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      setProAnalyses([]);
+      toast({
+        title: "Analyses cleared",
+        description: "All swing analyses have been deleted",
+      });
+    } catch (error) {
+      console.error('Error clearing analyses:', error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -456,41 +490,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       </div>
     </div>
   );
-
-  const clearCaddieLogs = async () => {
-    try {
-      const { error } = await supabase
-        .from('caddie_logs')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      if (error) throw error;
-      setCaddieLogsList([]);
-      toast({
-        title: "Logs cleared",
-        description: "All caddie logs have been deleted",
-      });
-    } catch (error) {
-      console.error('Error clearing logs:', error);
-    }
-  };
-
-  const clearProAnalyses = async () => {
-    try {
-      const { error } = await supabase
-        .from('pro_ai_analyses')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      if (error) throw error;
-      setProAnalyses([]);
-      toast({
-        title: "Analyses cleared",
-        description: "All swing analyses have been deleted",
-      });
-    } catch (error) {
-      console.error('Error clearing analyses:', error);
-    }
-  };
-};
 };
 
 export default AIChatHistory;
