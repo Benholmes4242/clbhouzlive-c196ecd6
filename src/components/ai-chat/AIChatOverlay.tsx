@@ -376,7 +376,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       <div 
         className="bg-background rounded-2xl w-full max-w-md h-[90vh] md:h-[80vh] flex flex-col shadow-2xl overflow-hidden"
         onWheel={(e) => {
-          // Allow scrolling within the modal, prevent body scroll
+          // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
           const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
           
@@ -428,11 +428,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <TabsTrigger value="proai">Pro AI</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col">
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
             {/* Messages */}
-            <div className="flex-1 p-4">
-              <ScrollArea className="h-full" ref={scrollAreaRef}>
-                <div className="min-h-full flex flex-col">
+            <div className="flex-1 min-h-0 flex flex-col">
+              <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+                <div className="p-4 min-h-full flex flex-col">
                   {messages.length === 0 ? (
                     <div className="py-8">
                       <div className="text-center text-muted-foreground">
@@ -457,7 +457,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex-1">
                       {messages.map((message) => (
                         <ChatMessageComponent
                           key={message.id}
@@ -481,9 +481,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 </div>
               </ScrollArea>
             </div>
+
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 flex flex-col">
+          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
             <CaddieLogs 
               onClose={() => setActiveTab('chat')}
               isRecording={isRecording}
@@ -495,7 +496,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             />
           </TabsContent>
 
-          <TabsContent value="proai" className="flex-1 flex flex-col">
+          <TabsContent value="proai" className="flex-1 m-0 min-h-0 overflow-hidden">
             <ProAI 
               onClose={() => setActiveTab('chat')}
               isRecording={isRecording}
