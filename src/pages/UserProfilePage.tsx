@@ -72,16 +72,11 @@ const UserProfilePage = () => {
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png" />
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" />
       
-      {/* Fixed Header with transparent overlay */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <div className="absolute inset-0 backdrop-blur-md bg-background/70 border-b border-border/20" />
-        <div className="relative z-10">
-          <Header />
-        </div>
-      </div>
+      {/* Header integrated into profile layout */}
+      <Header />
       
-      {/* Content that flows under header */}
-      <div className="relative pt-0">
+      {/* Content flows naturally without fixed positioning */}
+      <div className="relative">
         <UserProfileLoader isLoading={isLoading} profile={profile} />
         
         {profile && (
