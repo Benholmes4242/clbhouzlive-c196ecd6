@@ -471,7 +471,6 @@ const ProAI: React.FC<ProAIProps> = ({
                               className="w-full h-full object-cover"
                               controls
                               preload="metadata"
-                              poster=""
                             />
                           </div>
                         ) : (
