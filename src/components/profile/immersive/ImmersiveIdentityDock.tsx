@@ -109,85 +109,80 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
   return (
     <div
-      className={`fixed z-30 transition-all duration-700 ease-out ${
+      className={`fixed bottom-20 left-0 right-0 z-30 flex justify-center transition-all duration-700 ease-out ${
         isVisible 
-          ? 'opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
-          : 'opacity-0'
+          ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
+          : 'translate-y-full opacity-0'
       }`}
-      style={{
-        ...liquidGlassStyle,
-        bottom: '80px',
-        left: '50%',
-        transform: isVisible 
-          ? 'translateX(-50%) translateY(0)' 
-          : 'translateX(-50%) translateY(100%)',
-        maxWidth: 'calc(100vw - 32px)',
-        width: 'max-content',
-      }}
-      onClick={onMorphToHeader}
     >
-      <div className="px-8 py-5">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          <Avatar className="w-16 h-16 rounded-full">
-            <AvatarImage 
-              src={profile.profile_photo_url || undefined}
-              alt={profile.display_name || 'User'}
-            />
-            <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold">
-              {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+      <div
+        style={liquidGlassStyle}
+        onClick={onMorphToHeader}
+        className="flex-shrink-0"
+      >
+        <div className="px-8 py-5">
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <Avatar className="w-16 h-16 rounded-full">
+              <AvatarImage 
+                src={profile.profile_photo_url || undefined}
+                alt={profile.display_name || 'User'}
+              />
+              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold">
+                {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
 
-          {/* Profile Info */}
-          <div className="flex-1 min-w-0">
-            <div className="text-white font-bold text-lg truncate">
-              {profile.display_name || profile.username || 'Unknown User'}
-            </div>
-            {profile.username && (
-              <div className="text-white/70 text-sm truncate">
-                @{profile.username}
+            {/* Profile Info */}
+            <div className="flex-1 min-w-0">
+              <div className="text-white font-bold text-lg truncate">
+                {profile.display_name || profile.username || 'Unknown User'}
               </div>
-            )}
-            {profile.club_name && (
-              <div className="flex items-center gap-1 text-white/80 text-sm truncate">
-                <MapPin className="w-3 h-3" />
-                <span>{profile.club_name}</span>
+              {profile.username && (
+                <div className="text-white/70 text-sm truncate">
+                  @{profile.username}
+                </div>
+              )}
+              {profile.club_name && (
+                <div className="flex items-center gap-1 text-white/80 text-sm truncate">
+                  <MapPin className="w-3 h-3" />
+                  <span>{profile.club_name}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            {!isOwnProfile && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleFollow}
+                  size="sm"
+                  variant={isFollowing ? "secondary" : "default"}
+                  className="rounded-full px-4 h-8 text-xs font-medium"
+                >
+                  <UserPlus className="w-3 h-3 mr-1" />
+                  {isFollowing ? 'Following' : 'Follow'}
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full px-4 h-8 text-xs font-medium text-white border-white/30 hover:bg-white/10"
+                >
+                  <MessageCircle className="w-3 h-3 mr-1" />
+                  Message
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full w-8 h-8 p-0 text-white/80 hover:text-white hover:bg-white/10"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
               </div>
             )}
           </div>
-
-          {/* Actions */}
-          {!isOwnProfile && (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleFollow}
-                size="sm"
-                variant={isFollowing ? "secondary" : "default"}
-                className="rounded-full px-4 h-8 text-xs font-medium"
-              >
-                <UserPlus className="w-3 h-3 mr-1" />
-                {isFollowing ? 'Following' : 'Follow'}
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                className="rounded-full px-4 h-8 text-xs font-medium text-white border-white/30 hover:bg-white/10"
-              >
-                <MessageCircle className="w-3 h-3 mr-1" />
-                Message
-              </Button>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                className="rounded-full w-8 h-8 p-0 text-white/80 hover:text-white hover:bg-white/10"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </div>
