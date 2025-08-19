@@ -66,6 +66,17 @@ const ProAI: React.FC<ProAIProps> = ({
     setAnalyses(savedAnalyses);
   }, []);
 
+  const scrollToTop = () => {
+    setTimeout(() => {
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+          scrollContainer.scrollTop = 0;
+        }
+      }
+    }, 100);
+  };
+
   const scrollToBottom = () => {
     setTimeout(() => {
       if (scrollAreaRef.current) {
@@ -78,7 +89,13 @@ const ProAI: React.FC<ProAIProps> = ({
   };
 
   React.useEffect(() => {
-    scrollToBottom();
+    // Scroll to top when starting a new conversation (no messages yet)
+    if (messages.length === 0) {
+      scrollToTop();
+    } else {
+      // Scroll to bottom when new messages are added
+      scrollToBottom();
+    }
   }, [messages]);
 
   const detectGolfClub = (text: string): string | null => {
@@ -543,141 +560,140 @@ const ProAI: React.FC<ProAIProps> = ({
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Messages */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
-          <div className="p-4 min-h-full flex flex-col">
-            {messages.length === 0 && !uploadedVideo ? (
-              <div className="py-2">
-                <div className="text-center text-muted-foreground">
-                  <p className="mb-2">
-                    Upload your swing for swing analysis<br />
-                    Get instant feedback and drills from pro AI.
-                  </p>
-                  <div className="mb-2">
-                    <p className="text-sm font-medium mb-1">Best results:</p>
-                    <div className="text-xs space-y-0.5">
-                      <p>• Face on or down the line, full body, good light</p>
-                      <p>• State the club and miss (e.g., Driver • Hook)</p>
-                      <p>• Optional: include swing speed or launch data</p>
-                    </div>
+      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+        <div className="p-4 space-y-4">
+          {messages.length === 0 && !uploadedVideo ? (
+            <div className="py-8">
+              <div className="text-center text-muted-foreground">
+                <p className="mb-6">
+                  Upload your swing for swing analysis<br />
+                  Get instant feedback and drills from pro AI.
+                </p>
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Best results:</p>
+                  <div className="text-xs space-y-1">
+                    <p>• Face on or down the line, full body, good light</p>
+                    <p>• State the club and miss (e.g., Driver • Hook)</p>
+                    <p>• Optional: include swing speed or launch data</p>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4 flex-1">
-                {uploadedVideo && (
-                  <div className="bg-muted rounded-lg p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        {uploadedVideo.type.startsWith('video/') ? (
-                          <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                            <video 
-                              src={videoPreview} 
-                              className="w-full h-full object-cover"
-                              controls
-                              preload="metadata"
-                              onLoadedData={(e) => {
-                                const video = e.target as HTMLVideoElement;
-                                video.currentTime = 1; // Seek to 1 second for thumbnail
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <img 
+            </div>
+          ) : (
+            <>
+              {uploadedVideo && (
+                <div className="bg-muted rounded-lg p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      {uploadedVideo.type.startsWith('video/') ? (
+                        <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                          <video 
                             src={videoPreview} 
-                            alt="Preview"
-                            className="w-32 h-32 object-cover rounded-lg"
+                            className="w-full h-full object-cover"
+                            controls
+                            preload="metadata"
+                            onLoadedData={(e) => {
+                              const video = e.target as HTMLVideoElement;
+                              video.currentTime = 1; // Seek to 1 second for thumbnail
+                            }}
                           />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={discardVideo}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {messages.map((message) => (
-                  <ChatMessageComponent
-                    key={message.id}
-                    message={message}
-                    onSaveToInsights={saveToSwingInsights}
-                    onRequestDetail={requestMoreDetail}
-                  />
-                ))}
-
-                {currentAnalysis && (
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <div className="flex flex-col gap-2">
-                      <Button 
-                        onClick={saveToSwingInsights}
-                        className="w-full"
-                      >
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Save to Swing Insights
-                      </Button>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => requestMoreDetail(analysisText || 'Explain fully in detail')}
-                          className="flex-1"
-                        >
-                          More Detail
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                        >
-                          <Share2 className="h-4 w-4 mr-1" />
-                          Share to Feed
-                        </Button>
-                      </div>
-                      {!currentAnalysis.voiceNote && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setIsAddingVoiceNote(true);
-                            startRecording();
-                          }}
-                          disabled={isRecording || isProcessing}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Voice Note
-                        </Button>
+                        </div>
+                      ) : (
+                        <img 
+                          src={videoPreview} 
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg"
+                        />
                       )}
                     </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={discardVideo}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                )}
+                </div>
+              )}
 
-                {isAnalyzing && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                        <span className="text-sm">Analyzing your swing...</span>
-                      </div>
+              {messages.map((message) => (
+                <ChatMessageComponent
+                  key={message.id}
+                  message={message}
+                  onSaveToInsights={(msg) => {
+                    if (currentAnalysis) {
+                      saveToSwingInsights();
+                    }
+                  }}
+                  onRequestDetail={(originalMessage) => {
+                    // Re-analyze with more detail
+                    setAnalysisText(originalMessage);
+                    const detailMessage: ChatMessageData = {
+                      id: Date.now().toString(),
+                      type: 'user',
+                      content: originalMessage + " - Provide more detailed analysis",
+                      timestamp: new Date()
+                    };
+                    setMessages(prev => [...prev, detailMessage]);
+                    analyzeSwing();
+                  }}
+                />
+              ))}
+              
+              {isAnalyzing && (
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                      <span className="text-sm">Pro AI is analyzing...</span>
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
+                </div>
+              )}
+              
+              {/* Action Buttons - only show for last AI message with metadata */}
+              {currentAnalysis && (
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={saveToSwingInsights}
+                    className="text-xs"
+                  >
+                    <BookOpen className="h-3 w-3 mr-1" />
+                    Save to Swing Insights
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsAddingVoiceNote(true)}
+                    className="text-xs"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Voice Note
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                  >
+                    <Share2 className="h-3 w-3 mr-1" />
+                    Share to Feed
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </ScrollArea>
 
-      {/* Input area */}
+      {/* Input Area */}
       <div className="p-4 border-t flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 mb-2">
           <Button
