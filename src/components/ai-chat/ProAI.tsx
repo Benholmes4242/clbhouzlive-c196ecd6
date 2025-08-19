@@ -603,10 +603,10 @@ const ProAI: React.FC<ProAIProps> = ({
           />
           
           {/* Send button - shows when video is uploaded or text is entered */}
-          {(uploadedVideo || analysisText.trim()) && !isVoiceNoteRecording && (
+          {(uploadedVideo || analysisText.trim()) && (
             <Button
               onClick={analyzeSwing}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || isVoiceNoteRecording}
               size="sm"
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
@@ -614,33 +614,31 @@ const ProAI: React.FC<ProAIProps> = ({
             </Button>
           )}
           
-          {/* Voice button - shows when no video uploaded and no text */}
-          {!uploadedVideo && !analysisText.trim() && (
-            <Button
-              onClick={() => {
-                if (isVoiceNoteRecording) {
-                  stopRecording();
-                } else if (isRecording) {
-                  setIsVoiceNoteRecording(true);
-                  startRecording();
-                } else {
-                  setIsVoiceNoteRecording(true);
-                  startRecording();
-                }
-              }}
-              disabled={isAnalyzing || isProcessing}
-              size="sm"
-              variant={isVoiceNoteRecording ? "default" : "outline"}
-            >
-              {isVoiceNoteRecording ? (
-                <Send className="h-4 w-4" />
-              ) : isRecording || isProcessing ? (
-                <Mic className="h-4 w-4 opacity-50" />
-              ) : (
-                <Mic className="h-4 w-4" />
-              )}
-            </Button>
-          )}
+          {/* Voice button - always show unless analyzing */}
+          <Button
+            onClick={() => {
+              if (isVoiceNoteRecording) {
+                stopRecording();
+              } else if (isRecording) {
+                setIsVoiceNoteRecording(true);
+                startRecording();
+              } else {
+                setIsVoiceNoteRecording(true);
+                startRecording();
+              }
+            }}
+            disabled={isAnalyzing || isProcessing}
+            size="sm"
+            variant={isVoiceNoteRecording ? "default" : "outline"}
+          >
+            {isVoiceNoteRecording ? (
+              <Send className="h-4 w-4" />
+            ) : isRecording || isProcessing ? (
+              <Mic className="h-4 w-4 opacity-50" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
         </div>
         
         {currentGolfClub && (
