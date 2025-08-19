@@ -470,66 +470,63 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2 mb-2 flex-shrink-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2 mb-0 flex-shrink-0">
             <TabsTrigger value="chat">Chat</TabsTrigger>
             <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
             <TabsTrigger value="proai">Pro AI</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col m-0 overflow-hidden">
-            {/* Messages */}
-            <div className="flex-1 flex flex-col">
-              <ScrollArea className="flex-1 h-full" ref={scrollAreaRef}>
-                <div className="p-4 min-h-full flex flex-col">
-                  {messages.length === 0 ? (
-                    <div className="py-8">
-                      <div className="text-center text-muted-foreground">
-                        <p className="mb-6">
-                          I'm your personal tour caddie.<br />
-                          Ask me anything, anytime, I've got you.
-                        </p>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Try asking:</p>
-                          {suggestedPrompts.map((prompt, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSuggestedPrompt(prompt)}
-                              className="mx-1 mb-2 text-xs"
-                            >
-                              {prompt}
-                            </Button>
-                          ))}
-                        </div>
+          <TabsContent value="chat" className="flex-1 flex flex-col m-0 data-[state=active]:flex">
+            <ScrollArea className="flex-1" ref={scrollAreaRef}>
+              <div className="p-4">
+                {messages.length === 0 ? (
+                  <div className="py-8">
+                    <div className="text-center text-muted-foreground">
+                      <p className="mb-6">
+                        I'm your personal tour caddie.<br />
+                        Ask me anything, anytime, I've got you.
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Try asking:</p>
+                        {suggestedPrompts.map((prompt, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSuggestedPrompt(prompt)}
+                            className="mx-1 mb-2 text-xs"
+                          >
+                            {prompt}
+                          </Button>
+                        ))}
                       </div>
                     </div>
-                  ) : (
-                    <div className="space-y-4 flex-1">
-                      {messages.map((message) => (
-                        <ChatMessageComponent
-                          key={message.id}
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                        />
-                      ))}
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                              <span className="text-sm">clbhouz pro AI is thinking...</span>
-                            </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 flex-1">
+                    {messages.map((message) => (
+                      <ChatMessageComponent
+                        key={message.id}
+                        message={message}
+                        onSaveToInsights={saveToInsights}
+                        onRequestDetail={requestMoreDetail}
+                      />
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                            <span className="text-sm">clbhouz pro AI is thinking...</span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </TabsContent>
 
           <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
