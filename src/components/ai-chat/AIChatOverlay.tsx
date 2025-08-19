@@ -148,9 +148,39 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
+      // Lock body scroll
+      const originalStyle = window.getComputedStyle(document.body).overflow;
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = '0';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.bottom = '0';
+      
+      // Prevent scroll events on window
+      const preventScroll = (e: WheelEvent | TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      // Add event listeners for all scroll types
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('scroll', preventScroll, { passive: false });
+      
       return () => {
-        document.body.style.overflow = 'unset';
+        // Restore original styles
+        document.body.style.overflow = originalStyle;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.bottom = '';
+        
+        // Remove event listeners
+        document.removeEventListener('wheel', preventScroll);
+        document.removeEventListener('touchmove', preventScroll);
+        document.removeEventListener('scroll', preventScroll);
       };
     }
   }, [isOpen]);
@@ -336,10 +366,34 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
-      onWheel={(e) => e.stopPropagation()} // Prevent scroll from bubbling to body
+      className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-4"
+      style={{ zIndex: 9999 }}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
     >
-      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[90vh] sm:h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+      <div 
+        className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[90vh] sm:h-[80vh] flex flex-col shadow-2xl overflow-hidden"
+        onWheel={(e) => {
+          // Allow scrolling within the modal, but prevent it from bubbling up
+          const target = e.currentTarget;
+          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+          
+          if (scrollableElement) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+            const isAtTop = scrollTop === 0;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            // Only prevent default if we're trying to scroll past boundaries
+            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+              e.preventDefault();
+            }
+          }
+          
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <div className="flex-1">
