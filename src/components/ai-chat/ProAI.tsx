@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus } from 'lucide-react';
+import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -53,6 +53,8 @@ const ProAI: React.FC<ProAIProps> = ({
   const [showAnalyses, setShowAnalyses] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
+  const [currentGolfClub, setCurrentGolfClub] = useState<string>('');
+  const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -79,6 +81,70 @@ const ProAI: React.FC<ProAIProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  const detectGolfClub = (text: string): string | null => {
+    const golfClubPatterns = [
+      /(?:today|playing|at|visiting)\s+(?:i'm\s+)?(?:playing\s+)?(?:at\s+)?([A-Za-z\s&'.-]+(?:golf|country|club|links|course|resort))/gi,
+      /(?:i'm|we're|playing)\s+(?:at\s+)?([A-Za-z\s&'.-]+(?:golf|country|club|links|course|resort))/gi,
+      /([A-Za-z\s&'.-]+(?:golf|country|club|links|course|resort))/gi
+    ];
+    
+    for (const pattern of golfClubPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        return match[1]?.trim() || null;
+      }
+    }
+    return null;
+  };
+
+  const extractHoleNumber = (text: string): number | null => {
+    const holePatterns = [
+      /hole\s+(\d+)/gi,
+      /(\d+)(?:st|nd|rd|th)\s+hole/gi,
+      /on\s+(\d+)/gi
+    ];
+    
+    for (const pattern of holePatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        const holeNum = parseInt(match[1]);
+        if (holeNum >= 1 && holeNum <= 18) {
+          return holeNum;
+        }
+      }
+    }
+    return null;
+  };
+
+  const saveToCaddieLogs = async (text: string, golfClub?: string, holeNumber?: number) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const logData = {
+        user_id: user.id,
+        content: text,
+        transcription: text,
+        course_name: golfClub || currentGolfClub || null,
+        tags: holeNumber ? [`hole-${holeNumber}`] : [],
+        location_name: golfClub || currentGolfClub || null
+      };
+
+      const { error } = await supabase
+        .from('caddie_logs')
+        .insert([logData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Note saved",
+        description: `Saved to ${golfClub || currentGolfClub || 'caddie logs'}${holeNumber ? ` (Hole ${holeNumber})` : ''}`,
+      });
+    } catch (error) {
+      console.error('Error saving to caddie logs:', error);
+    }
+  };
+
   const handleVoiceNoteComplete = useCallback((transcribedText: string) => {
     if (currentAnalysis) {
       const updatedAnalysis = {
@@ -98,9 +164,34 @@ const ProAI: React.FC<ProAIProps> = ({
         title: "Voice note added",
         description: "Your note has been attached to this analysis",
       });
+    } else {
+      // Handle regular voice notes for caddie logs
+      const detectedGolfClub = detectGolfClub(transcribedText);
+      const holeNumber = extractHoleNumber(transcribedText);
+      
+      if (detectedGolfClub) {
+        setCurrentGolfClub(detectedGolfClub);
+        toast({
+          title: "Golf club detected",
+          description: `Now logging notes for ${detectedGolfClub}`,
+        });
+      }
+      
+      // Add to chat messages
+      const voiceMessage: ChatMessageData = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: transcribedText,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, voiceMessage]);
+      
+      // Save to caddie logs
+      saveToCaddieLogs(transcribedText, detectedGolfClub || undefined, holeNumber || undefined);
     }
     setIsAddingVoiceNote(false);
-  }, [currentAnalysis, analyses, toast]);
+    setIsVoiceNoteRecording(false);
+  }, [currentAnalysis, analyses, toast, currentGolfClub]);
 
   const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
     onTranscriptionComplete: handleVoiceNoteComplete
@@ -503,19 +594,47 @@ const ProAI: React.FC<ProAIProps> = ({
           <Input
             value={analysisText}
             onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder="Describe your swing issue or add context..."
-            onKeyPress={(e) => e.key === 'Enter' && analyzeSwing()}
-            disabled={isAnalyzing}
+            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : "Say something or type a message..."}
+            onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && analyzeSwing()}
+            disabled={isAnalyzing || isVoiceNoteRecording}
             className="flex-1"
           />
           <Button
-            onClick={analyzeSwing}
-            disabled={isAnalyzing || (!uploadedVideo && !analysisText.trim())}
+            onClick={() => {
+              if (isVoiceNoteRecording) {
+                stopRecording();
+              } else if (isRecording) {
+                setIsVoiceNoteRecording(true);
+                startRecording();
+              } else {
+                if (analysisText.trim()) {
+                  analyzeSwing();
+                } else {
+                  setIsVoiceNoteRecording(true);
+                  startRecording();
+                }
+              }
+            }}
+            disabled={isAnalyzing || isProcessing}
             size="sm"
+            variant={isVoiceNoteRecording ? "default" : "outline"}
           >
-            <Send className="h-4 w-4" />
+            {isVoiceNoteRecording ? (
+              <Send className="h-4 w-4" />
+            ) : isRecording || isProcessing ? (
+              <Mic className="h-4 w-4 opacity-50" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
           </Button>
         </div>
+        
+        {currentGolfClub && (
+          <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            Currently logging notes for {currentGolfClub}
+          </div>
+        )}
 
         <input
           ref={fileInputRef}
