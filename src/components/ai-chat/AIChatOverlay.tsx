@@ -480,64 +480,67 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               </ScrollArea>
             </div>
 
-            {/* Input - Moved inside chat tab content */}
-            <div className="p-4 border-t flex-shrink-0">
-              <div className="flex items-center gap-2 mb-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={requestLocation}
-                  className="text-xs"
-                >
-                  <MapPin className="h-3 w-3 mr-1" />
-                  Use My Location
-                </Button>
-                {userLocation && (
-                  <Badge variant="secondary" className="text-xs">
-                    {userLocation}
-                  </Badge>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1 flex gap-2">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Ask about your swing, clubs, courses..."
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                    disabled={isLoading || isRecording || isProcessing}
-                  />
-                  <Button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isLoading || isProcessing}
-                    variant={isRecording ? "destructive" : "outline"}
-                    size="sm"
-                    className="px-3"
-                  >
-                    {isRecording ? (
-                      <MicOff className="h-4 w-4" />
-                    ) : isProcessing ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                    ) : (
-                      <Mic className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                <Button
-                  onClick={() => sendMessage(inputValue)}
-                  disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 flex flex-col m-0 min-h-0 overflow-hidden">
+          <TabsContent value="logs" className="flex-1 m-0 min-h-0 overflow-hidden">
             <CaddieLogs onClose={() => setActiveTab('chat')} />
           </TabsContent>
         </Tabs>
+        
+        {/* Input area - only shown for chat tab */}
+        {activeTab === 'chat' && (
+          <div className="p-4 border-t flex-shrink-0">
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={requestLocation}
+                className="text-xs"
+              >
+                <MapPin className="h-3 w-3 mr-1" />
+                Use My Location
+              </Button>
+              {userLocation && (
+                <Badge variant="secondary" className="text-xs">
+                  {userLocation}
+                </Badge>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 flex gap-2">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask about your swing, clubs, courses..."
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                  disabled={isLoading || isRecording || isProcessing}
+                />
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isLoading || isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <Button
+                onClick={() => sendMessage(inputValue)}
+                disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                size="sm"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
