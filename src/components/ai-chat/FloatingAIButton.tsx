@@ -21,7 +21,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
       
       <Button
         onClick={onClick}
-        className="fixed bottom-20 right-4 z-50 h-14 px-4 rounded-full text-white shadow-lg border-0 transition-all duration-300 hover:scale-105"
+        className="fixed bottom-20 right-4 z-50 h-12 px-3 py-2 rounded-full text-white shadow-lg border-0 transition-all duration-300 hover:scale-105"
         style={{
           ...glassStyles,
           background: `var(--glass-bg)`,
@@ -31,7 +31,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           color: `var(--glass-text)`,
         }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <div className="relative">
             <span className="text-lg">🏌️</span>
           </div>
