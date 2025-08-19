@@ -596,7 +596,7 @@ const ProAI: React.FC<ProAIProps> = ({
           <Input
             value={analysisText}
             onChange={(e) => setAnalysisText(e.target.value)}
-            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : uploadedVideo ? "Optional: Add context or question about your swing..." : "Say something or type a message..."}
+            placeholder={isVoiceNoteRecording ? "Recording voice note..." : currentGolfClub ? `Adding note to ${currentGolfClub}...` : uploadedVideo ? "Add context or question..." : "Type a message..."}
             onKeyPress={(e) => e.key === 'Enter' && !isVoiceNoteRecording && (uploadedVideo || analysisText.trim()) && analyzeSwing()}
             disabled={isAnalyzing || isVoiceNoteRecording}
             className="flex-1"
