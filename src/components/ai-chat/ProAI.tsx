@@ -250,20 +250,56 @@ const ProAI: React.FC<ProAIProps> = ({
     setIsAnalyzing(true);
 
     try {
-      // Prepare the system prompt for swing analysis
-      const systemPrompt = "You are a professional golf swing analyzer. Analyze the uploaded swing and respond in the Fast Answer format. Focus on observable issues tied to impact laws. Provide quick fixes with setup/feel cues and suggest one simple drill. Always include the ::clbhz_meta:: section for saving.";
-
-      // For now, we'll simulate the analysis since we need video upload to ChatGPT integration
-      // In production, you'd upload the video and send it to the AI service
+      let videoDataUrl = null;
+      
+      // Convert video/image to base64 for AI analysis
+      if (uploadedVideo) {
+        if (uploadedVideo.type.startsWith('image/')) {
+          // For images, convert directly to base64
+          const reader = new FileReader();
+          videoDataUrl = await new Promise<string>((resolve) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(uploadedVideo);
+          });
+        } else if (uploadedVideo.type.startsWith('video/')) {
+          // For videos, extract a frame and convert to base64
+          const video = document.createElement('video');
+          video.src = videoPreview;
+          video.crossOrigin = 'anonymous';
+          
+          await new Promise<void>((resolve) => {
+            video.onloadedmetadata = () => {
+              video.currentTime = Math.min(2, video.duration / 2); // Get frame from middle or at 2 seconds
+              resolve();
+            };
+          });
+          
+          await new Promise<void>((resolve) => {
+            video.onseeked = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(video, 0, 0);
+                videoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+              }
+              resolve();
+            };
+          });
+        }
+      }
       
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
-          message: `${systemPrompt}\n\nUser request: ${userMessage.content}`,
+          message: userMessage.content,
           conversation: messages.slice(-6).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
           })),
-          detailMode: false
+          detailMode: false,
+          videoData: videoDataUrl,
+          fileName: uploadedVideo?.name
         }
       });
 
@@ -436,10 +472,9 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Content */}
-      <div className="flex-1 min-h-0 flex flex-col max-h-[35vh] md:max-h-[60vh]">
-        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+    <div className="flex-1 min-h-0 flex flex-col">
+      {/* Messages */}
+      <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
               <div className="py-2">
@@ -465,13 +500,16 @@ const ProAI: React.FC<ProAIProps> = ({
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         {uploadedVideo.type.startsWith('video/') ? (
-                          <div className="w-32 h-32 rounded-lg overflow-hidden">
+                          <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
                             <video 
                               src={videoPreview} 
                               className="w-full h-full object-cover"
                               controls
                               preload="metadata"
-                              poster=""
+                              onLoadedData={(e) => {
+                                const video = e.target as HTMLVideoElement;
+                                video.currentTime = 1; // Seek to 1 second for thumbnail
+                              }}
                             />
                           </div>
                         ) : (
@@ -567,7 +605,6 @@ const ProAI: React.FC<ProAIProps> = ({
             )}
           </div>
         </ScrollArea>
-      </div>
 
       {/* Input area */}
       <div className="p-4 border-t flex-shrink-0 bg-background">
@@ -654,8 +691,8 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-    </div>
-  );
-};
+     </div>
+   );
+ };
 
 export default ProAI;
