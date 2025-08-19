@@ -167,8 +167,8 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
     <div className="flex flex-col h-full">
       {/* Logs List */}
       <div className="flex-1 min-h-0 flex flex-col">
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="p-4 min-h-full flex flex-col">
+        <ScrollArea className="flex-1 h-full">
+          <div className="p-4 space-y-4">
             {logs.length === 0 ? (
               <div className="text-center text-muted-foreground pt-2">
                 <p className="mb-4">
@@ -181,7 +181,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
                 <p className="text-center text-muted-foreground">No logs match your search.</p>
               </div>
             ) : (
-              <div className="space-y-4 flex-1">
+              <div className="space-y-4">
                 {filteredLogs.map((log) => (
                   <div key={log.id} className="bg-muted rounded-lg p-4">
                     {editingLog === log.id ? (
