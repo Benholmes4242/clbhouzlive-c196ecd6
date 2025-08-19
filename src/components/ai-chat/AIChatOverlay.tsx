@@ -367,14 +367,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
       style={{ zIndex: 9999 }}
       onWheel={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md h-[80vh] sm:h-[85vh] md:h-[80vh] lg:h-[75vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-background rounded-2xl w-full max-w-md h-[80vh] flex flex-col shadow-2xl overflow-hidden"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
