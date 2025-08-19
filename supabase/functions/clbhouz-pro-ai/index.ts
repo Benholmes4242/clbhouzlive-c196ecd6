@@ -14,7 +14,58 @@ Audience: golfers of all abilities.
 
 IMPORTANT: All answers must be provided within the Clubhouse chat overlay only. Do not provide, suggest, or link out to any external websites, apps, or companies. If a user asks for something that would normally require an external link, instead give the answer directly in text form or suggest they explore it inside Clubhouse.
 
-Scope: Answer any golf-related questions — swing, drills, equipment, courses, trips, rules, etiquette, fitness, travel, and news. If someone asks a non-golf question, reply once: "Let's talk golf! Want to ask about your game, gear, or courses?" and then suggest three golf-related examples.
+Scope: Answer any golf-related questions — swing, drills, equipment, courses, trips, rules, etiquette, fitness, travel, and news. If someone asks a non-swing question, reply once: "Let's talk golf! Want to ask about your game, gear, or courses?" and then suggest three golf-related examples.
+
+Default Output Shape for swing-related questions (Fast Answer):
+
+**Why it's happening**
+- [1–2 bullets diagnosing the issue]
+
+**Fast fix**
+1) [3-point quick fix]
+
+**Try this drill**
+- [1 short drill]
+
+Want this saved to Insights?
+
+::clbhz_meta:: {"save_card":"[120 char summary]","tags":["tag1","tag2"],"category":"Swing"}
+
+For travel requests (Trip Planning Template):
+
+**Trip Idea: [Trip Title]**
+- Course 1 (Day 1)
+- Course 2 (Day 2)
+- Course 3 (Day 3)
+- Course 4 (Day 4)
+- Course 5 (Day 5)
+
+**Why it works**
+- [3 bullets on region, variety, logistics]
+
+**Tip**
+- [1–2 bullets with booking/travel tips]
+
+Want this saved to Insights?
+
+::clbhz_meta:: {"save_card":"[Trip summary]","tags":["travel","courses","destination"],"category":"Courses"}
+
+Rules:
+- Always use headings + bullets
+- Fast Answer = concise, under 1 min read
+- Always append ::clbhz_meta:: JSON at the end
+- If location missing for "near me" queries, ask once for city/postcode
+- Always finish Fast Answers with: "Want this saved to Insights?"`;
+
+const proAISystemPrompt = `You are clbhouz Pro AI, a professional golf swing analyzer inside the Clbhouz app.
+Tone: expert, analytical, precise — like a tour-level swing coach with biomechanics expertise.
+Audience: golfers seeking detailed swing analysis and improvement.
+
+CRITICAL: When you receive visual data (images/video frames), you are analyzing an actual golf swing. Analyze what you see in the visuals and provide specific, actionable feedback based on the swing positions shown.
+
+IMPORTANT: All answers must be provided within the Clubhouse chat overlay only. Do not provide, suggest, or link out to any external websites, apps, or companies.
+
+Scope: Analyze golf swings from video/images, provide technical feedback on swing mechanics, suggest drills for specific swing faults, and answer swing-related questions. If someone asks a non-swing question, reply: "I specialize in swing analysis. Upload a swing video or ask about swing mechanics for the best help!"
 
 Default Output Shape for swing-related questions (Fast Answer):
 
@@ -64,7 +115,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversation, detailMode = false } = await req.json();
+    const { message, conversation, detailMode = false, images, isProAI = false, swingContext } = await req.json();
 
     if (!openAIApiKey) {
       console.error('OpenAI API key not found');
@@ -74,18 +125,83 @@ serve(async (req) => {
       });
     }
 
+    // Choose system prompt based on mode
+    const selectedSystemPrompt = isProAI ? proAISystemPrompt : systemPrompt;
+
     let userMessage = message;
-    if (detailMode) {
+    let messageContent = [];
+
+    // Handle swing analysis with visual data
+    if (images && images.length > 0) {
+      console.log('Video data provided, using GPT-4o for swing analysis');
+      
+      // Create analysis instruction for frames
+      const analysisInstruction = `You received visual data of a golf swing. Analyze this swing systematically:
+
+1. SETUP & ADDRESS: Check posture, ball position, grip, alignment, stance width
+2. TAKEAWAY: Initial club movement, body rotation, arm/wrist action
+3. BACKSWING: Plane, width, turn, positions at parallel and top
+4. TRANSITION: Hip movement, sequence, club position changes
+5. DOWNSWING: Attack angle, club path, body rotation sequence
+6. IMPACT: Club face, path, body position, weight transfer
+7. FOLLOW-THROUGH: Extension, balance, finish position
+
+Context provided: ${swingContext ? `${swingContext.club || 'Unknown club'} • ${swingContext.miss || 'No specific miss mentioned'} • ${swingContext.angle || 'Unknown angle'}` : 'No additional context provided'}
+
+Respond in this exact format:
+
+**Why it's happening**
+- [1-2 bullets diagnosing the main issue you see]
+
+**Fast fix** 
+1) [3-point quick fix with specific setup/feel changes]
+
+**Try this drill**
+- [1 specific drill targeting the main issue]
+
+Want this saved to Insights?
+
+::clbhz_meta:: {"save_card":"[120 char summary of analysis]","tags":["swing","analysis","specific_fault"],"category":"Swing"}`;
+
+      messageContent = [
+        {
+          type: "text",
+          text: analysisInstruction
+        },
+        ...images.map((image: string) => ({
+          type: "image_url",
+          image_url: {
+            url: image
+          }
+        }))
+      ];
+    } else if (detailMode) {
       userMessage = `${message} - Explain fully with more detail.`;
+      messageContent = userMessage;
+    } else {
+      messageContent = userMessage;
     }
 
     const messages = [
-      { role: 'system', content: systemPrompt },
+      { role: 'system', content: selectedSystemPrompt },
       ...(conversation || []),
-      { role: 'user', content: userMessage }
+      { role: 'user', content: messageContent }
     ];
 
     console.log('Sending request to OpenAI with messages:', messages);
+
+    // Use vision model for image analysis
+    const model = images && images.length > 0 ? 'gpt-4o' : 'gpt-4o-mini';
+    const requestBody: any = {
+      model: model,
+      messages: messages,
+    };
+
+    // Add appropriate token limits based on model
+    if (model === 'gpt-4o' || model === 'gpt-4o-mini') {
+      requestBody.max_tokens = detailMode ? 800 : 400;
+      requestBody.temperature = 0.7;
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -93,12 +209,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        max_tokens: detailMode ? 800 : 400,
-        temperature: 0.7,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

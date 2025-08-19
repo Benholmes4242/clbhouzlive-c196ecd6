@@ -200,11 +200,12 @@ const ProAI: React.FC<ProAIProps> = ({
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Check file type
-      if (!file.type.startsWith('video/') && !file.type.startsWith('image/')) {
+      // Check file type - Accept video (.mp4, .mov) and image files
+      const allowedTypes = ['video/mp4', 'video/quicktime', 'image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.some(type => file.type === type || file.type.startsWith('video/') || file.type.startsWith('image/'))) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a video (.mp4, .mov) or image file",
+          description: "Please upload a video (.mp4, .mov) or image (.jpg, .png) file",
           variant: "destructive"
         });
         return;
@@ -214,10 +215,9 @@ const ProAI: React.FC<ProAIProps> = ({
       if (file.size > 50 * 1024 * 1024) {
         toast({
           title: "File too large",
-          description: "Please upload a file smaller than 50MB",
-          variant: "destructive"
+          description: "Video too large; we'll analyze key frames instead.",
         });
-        return;
+        // Continue with upload despite size warning
       }
 
       setUploadedVideo(file);
@@ -235,8 +235,66 @@ const ProAI: React.FC<ProAIProps> = ({
     }
   };
 
+  const extractFramesFromVideo = async (videoFile: File): Promise<string[]> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const frames: string[] = [];
+      
+      video.onloadedmetadata = () => {
+        canvas.width = Math.min(video.videoWidth, 1280);
+        canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
+        
+        const duration = video.duration;
+        const framePositions = [
+          0.1, // Address (P1)
+          0.2, // Takeaway (P2) 
+          0.35, // Shaft parallel back (P3)
+          0.5, // Top (P4)
+          0.65, // Downswing parallel (P5)
+          0.8, // Impact (P6)
+          0.9, // Early release (P7)
+          0.95 // Finish (P9)
+        ].map(pos => pos * duration);
+
+        let frameIndex = 0;
+        
+        const captureFrame = () => {
+          if (frameIndex >= framePositions.length) {
+            resolve(frames);
+            return;
+          }
+          
+          video.currentTime = framePositions[frameIndex];
+          video.onseeked = () => {
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const frameData = canvas.toDataURL('image/jpeg', 0.8);
+              frames.push(frameData);
+              frameIndex++;
+              captureFrame();
+            }
+          };
+        };
+        
+        captureFrame();
+      };
+      
+      video.src = URL.createObjectURL(videoFile);
+    });
+  };
+
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
+
+    // Show progress for extracting frames
+    if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
+      toast({
+        title: "Extracting swing frames...",
+        description: "Analyzing key positions from your video",
+      });
+    }
 
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
@@ -250,20 +308,90 @@ const ProAI: React.FC<ProAIProps> = ({
     setIsAnalyzing(true);
 
     try {
-      // Prepare the system prompt for swing analysis
-      const systemPrompt = "You are a professional golf swing analyzer. Analyze the uploaded swing and respond in the Fast Answer format. Focus on observable issues tied to impact laws. Provide quick fixes with setup/feel cues and suggest one simple drill. Always include the ::clbhz_meta:: section for saving.";
+      let extractedFrames: string[] = [];
+      let swingContext: any = {};
 
-      // For now, we'll simulate the analysis since we need video upload to ChatGPT integration
-      // In production, you'd upload the video and send it to the AI service
-      
+      // Extract frames from video or use image directly
+      if (uploadedVideo) {
+        if (uploadedVideo.type.startsWith('video/')) {
+          // Check video size
+          if (uploadedVideo.size > 50 * 1024 * 1024) {
+            toast({
+              title: "Video too large",
+              description: "We'll analyze key frames instead.",
+            });
+          }
+          
+          extractedFrames = await extractFramesFromVideo(uploadedVideo);
+          
+          if (extractedFrames.length === 0) {
+            throw new Error("Couldn't extract frames from video");
+          }
+
+          toast({
+            title: "Analyzing...",
+            description: `Extracted ${extractedFrames.length} key swing positions`,
+          });
+        } else if (uploadedVideo.type.startsWith('image/')) {
+          // Convert image to base64
+          const reader = new FileReader();
+          const imageData = await new Promise<string>((resolve) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(uploadedVideo);
+          });
+          extractedFrames = [imageData];
+        }
+
+        // Extract swing context from user message
+        const message = userMessage.content.toLowerCase();
+        if (message.includes('driver')) swingContext.club = 'Driver';
+        else if (message.includes('iron')) swingContext.club = 'Iron';
+        else if (message.includes('wedge')) swingContext.club = 'Wedge';
+        else if (message.includes('putter')) swingContext.club = 'Putter';
+
+        if (message.includes('hook')) swingContext.miss = 'Hook';
+        else if (message.includes('slice')) swingContext.miss = 'Slice';
+        else if (message.includes('pull')) swingContext.miss = 'Pull';
+        else if (message.includes('push')) swingContext.miss = 'Push';
+
+        if (message.includes('face on')) swingContext.angle = 'Face on';
+        else if (message.includes('down the line')) swingContext.angle = 'Down the line';
+      }
+
+      // Fallback if no visuals could be attached
+      if (uploadedVideo && extractedFrames.length === 0) {
+        toast({
+          title: "We couldn't attach your video",
+          description: "Retrying by extracting key frames...",
+          variant: "destructive"
+        });
+        
+        // Try once more
+        if (uploadedVideo.type.startsWith('video/')) {
+          extractedFrames = await extractFramesFromVideo(uploadedVideo);
+        }
+        
+        if (extractedFrames.length === 0) {
+          toast({
+            title: "Analysis failed to receive visuals",
+            description: "Please re-upload or switch to photos (face-on / down-the-line).",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
-          message: `${systemPrompt}\n\nUser request: ${userMessage.content}`,
+          message: userMessage.content,
           conversation: messages.slice(-6).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
           })),
-          detailMode: false
+          detailMode: false,
+          isProAI: true,
+          images: extractedFrames,
+          swingContext: swingContext
         }
       });
 
@@ -298,6 +426,8 @@ const ProAI: React.FC<ProAIProps> = ({
             resolve(null);
           };
         });
+      } else if (uploadedVideo && uploadedVideo.type.startsWith('image/')) {
+        thumbnailUrl = videoPreview;
       }
 
       // Set current analysis for potential saving
@@ -449,12 +579,13 @@ const ProAI: React.FC<ProAIProps> = ({
                     Get instant feedback and drills from pro AI.
                   </p>
                   <div className="mb-2">
-                    <p className="text-sm font-medium mb-1">Best results:</p>
-                    <div className="text-xs space-y-0.5">
-                      <p>• Face on or down the line, full body, good light</p>
-                      <p>• State the club and miss (e.g., Driver • Hook)</p>
-                      <p>• Optional: include swing speed or launch data</p>
-                    </div>
+                      <p className="text-sm font-medium mb-1">Best results:</p>
+                      <div className="text-xs space-y-0.5">
+                        <p>• Face-on or down-the-line, full body, good lighting</p>
+                        <p>• State the club and typical miss (e.g., Driver • Hook)</p>
+                        <p>• Include swing speed or ball flight if known</p>
+                        <p>• Camera angle: mention face-on or down-the-line</p>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -558,7 +689,7 @@ const ProAI: React.FC<ProAIProps> = ({
                     <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                       <div className="flex items-center gap-2">
                         <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                        <span className="text-sm">Analyzing your swing...</span>
+                        <span className="text-sm">Pro AI is analyzing swing positions...</span>
                       </div>
                     </div>
                   </div>
