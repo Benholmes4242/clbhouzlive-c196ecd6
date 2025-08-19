@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface SavedInsight {
   id: string;
@@ -42,98 +41,47 @@ interface AIChatHistoryProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectMessage: (message: string) => void;
-  activeTab?: string;
 }
 
-const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, activeTab = 'chat' }) => {
+const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [caddieLogsList, setCaddieLogsList] = useState<any[]>([]);
-  const [proAnalyses, setProAnalyses] = useState<any[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
       loadData();
     }
-
-    // Listen for save events to refresh data
-    const handleCaddieLogSaved = () => loadData();
-    const handleProAnalysisSaved = () => loadData();
-
-    window.addEventListener('caddieLogSaved', handleCaddieLogSaved);
-    window.addEventListener('proAnalysisSaved', handleProAnalysisSaved);
-
-    return () => {
-      window.removeEventListener('caddieLogSaved', handleCaddieLogSaved);
-      window.removeEventListener('proAnalysisSaved', handleProAnalysisSaved);
-    };
   }, [isOpen]);
 
-  const loadData = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  const loadData = () => {
+    // Load history
+    const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
+    const parsedHistory = history.map((msg: any) => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }));
+    setHistoryMessages(parsedHistory);
 
-      // Load based on active tab - tab-scoped reads only
-      if (activeTab === 'chat') {
-        // Load conversations from database
-        const { data: convData, error: convError } = await supabase
-          .from('conversations')
-          .select('*')
-          .order('created_at', { ascending: false });
+    // Load saved insights
+    const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
+    const parsedSaved = saved.map((insight: any) => ({
+      ...insight,
+      timestamp: new Date(insight.timestamp)
+    }));
+    setSavedInsights(parsedSaved);
 
-        if (convError) throw convError;
-        setConversations(convData || []);
-      } else if (activeTab === 'logs') {
-        // Load caddie logs from database
-        const { data: logsData, error: logsError } = await supabase
-          .from('caddie_logs')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (logsError) throw logsError;
-        setCaddieLogsList(logsData || []);
-      } else if (activeTab === 'pro') {
-        // Load pro AI analyses from database
-        const { data: proData, error: proError } = await supabase
-          .from('pro_ai_analyses')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (proError) throw proError;
-        setProAnalyses(proData || []);
-      }
-
-      // Legacy localStorage fallback (will be phased out)
-      const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      const parsedHistory = history.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp)
-      }));
-      setHistoryMessages(parsedHistory);
-
-      const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
-      const parsedSaved = saved.map((insight: any) => ({
-        ...insight,
-        timestamp: new Date(insight.timestamp)
-      }));
-      setSavedInsights(parsedSaved);
-
-      const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-      const parsedAnalyses = analyses.map((analysis: any) => ({
-        ...analysis,
-        timestamp: new Date(analysis.timestamp)
-      }));
-      setSwingAnalyses(parsedAnalyses);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
+    // Load swing analyses
+    const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+    const parsedAnalyses = analyses.map((analysis: any) => ({
+      ...analysis,
+      timestamp: new Date(analysis.timestamp)
+    }));
+    setSwingAnalyses(parsedAnalyses);
   };
 
   const clearHistory = () => {
@@ -201,40 +149,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     return matchesSearch && matchesCategory && matchesTag;
   });
 
-  const clearCaddieLogs = async () => {
-    try {
-      const { error } = await supabase
-        .from('caddie_logs')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      if (error) throw error;
-      setCaddieLogsList([]);
-      toast({
-        title: "Logs cleared",
-        description: "All caddie logs have been deleted",
-      });
-    } catch (error) {
-      console.error('Error clearing logs:', error);
-    }
-  };
-
-  const clearProAnalyses = async () => {
-    try {
-      const { error } = await supabase
-        .from('pro_ai_analyses')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      if (error) throw error;
-      setProAnalyses([]);
-      toast({
-        title: "Analyses cleared",
-        description: "All swing analyses have been deleted",
-      });
-    } catch (error) {
-      console.error('Error clearing analyses:', error);
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -295,146 +209,167 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue={activeTab === 'chat' ? 'history' : activeTab === 'logs' ? 'logs' : 'analyses'} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-4 pt-2">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="history">Chats ({conversations.length})</TabsTrigger>
-              <TabsTrigger value="logs">Caddie Logs ({caddieLogsList.length})</TabsTrigger>
-              <TabsTrigger value="analyses">Pro AI ({proAnalyses.length})</TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs defaultValue="history" className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
+            <TabsTrigger value="history">History ({historyMessages.length})</TabsTrigger>
+            <TabsTrigger value="saved">Saved ({savedInsights.length})</TabsTrigger>
+            <TabsTrigger value="analyses">Analyses ({swingAnalyses.length})</TabsTrigger>
+          </TabsList>
 
-          <TabsContent value="history" className="flex-1 p-4 overflow-hidden">
+          <TabsContent value="history" className="flex-1 p-4">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
-                Ask anything about your golf
+                Chronological list of all previous queries
               </p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Clear Chats
+                    Clear History
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear chat history?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete all your chat conversations. This action cannot be undone.
+                      This will permanently delete all your chat history. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearHistory}>Clear Chats</AlertDialogAction>
+                    <AlertDialogAction onClick={clearHistory}>Clear History</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1 h-full">
-              <div className="space-y-3 pr-4">
-                {conversations.length === 0 ? (
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {filteredHistory.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No conversations found matching your search' : 'No chat conversations yet'}
+                    {searchQuery ? 'No history found matching your search' : 'No chat history yet'}
                   </p>
                 ) : (
-                  conversations
-                    .filter(conv =>
-                      conv.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      JSON.stringify(conv.messages).toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((conversation) => (
-                      <div
-                        key={conversation.id}
-                        className="p-3 rounded-lg border cursor-pointer hover:bg-muted/50"
-                        onClick={() => onSelectMessage(conversation.title || conversation.messages[0]?.content || '')}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="default">Chat</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(conversation.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm font-medium line-clamp-2">{conversation.title || 'Untitled conversation'}</p>
+                  filteredHistory.map((message, index) => (
+                    <div
+                      key={`${message.id}-${index}`}
+                      className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
+                        message.type === 'user' ? 'bg-primary/5' : 'bg-muted/20'
+                      }`}
+                      onClick={() => {
+                        if (message.type === 'user') {
+                          onSelectMessage(message.content);
+                        }
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant={message.type === 'user' ? 'default' : 'secondary'}>
+                          {message.type === 'user' ? 'You' : 'AI'}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {message.timestamp.toLocaleDateString()} {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
-                    ))
+                      <p className="text-sm line-clamp-3">{message.content}</p>
+                    </div>
+                  ))
                 )}
               </div>
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="logs" className="flex-1 p-4 overflow-hidden">
+          <TabsContent value="saved" className="flex-1 p-4">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
-                Your personal yardage book
+                Tips and insights you've saved
               </p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Clear Logs
+                    Clear Saved
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Clear caddie logs?</AlertDialogTitle>
+                    <AlertDialogTitle>Clear saved insights?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete all your caddie logs. This action cannot be undone.
+                      This will permanently delete all your saved insights. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearCaddieLogs}>Clear Logs</AlertDialogAction>
+                    <AlertDialogAction onClick={clearAllSaved}>Clear Saved</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1 h-full">
-              <div className="space-y-3 pr-4">
-                {caddieLogsList.length === 0 ? (
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {filteredSaved.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No logs found matching your search' : 'No caddie logs yet'}
+                    {searchQuery ? 'No saved insights found matching your search' : 'No saved insights yet'}
                   </p>
                 ) : (
-                  caddieLogsList
-                    .filter(log =>
-                      log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      log.course_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      log.tags?.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-                    )
-                    .map((log) => (
-                      <div
-                        key={log.id}
-                        className="p-3 rounded-lg border hover:bg-muted/50"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="outline">Caddie Log</Badge>
+                  filteredSaved.map((insight) => (
+                    <div
+                      key={insight.id}
+                      className="p-3 rounded-lg border hover:bg-muted/50"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{insight.category}</Badge>
                           <span className="text-xs text-muted-foreground">
-                            {new Date(log.created_at).toLocaleDateString()}
+                            {insight.timestamp.toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm line-clamp-2">{log.content}</p>
-                        {log.tags && log.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {log.tags.map((tag: string, index: number) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onSelectMessage(insight.summary)}
+                            className="h-7 px-2"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteSavedInsight(insight.id)}
+                            className="h-7 px-2 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
-                    ))
+                      
+                      <p className="text-sm font-medium mb-2">{insight.summary}</p>
+                      
+                      {insight.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {insight.tags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {insight.content}
+                      </p>
+                    </div>
+                  ))
                 )}
               </div>
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="analyses" className="flex-1 p-4 overflow-hidden">
+          <TabsContent value="analyses" className="flex-1 p-4">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
-                Swing analysis
+                Your swing analyses with feedback and drills
               </p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -452,41 +387,88 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearProAnalyses}>Clear Analyses</AlertDialogAction>
+                    <AlertDialogAction onClick={clearAllAnalyses}>Clear Analyses</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
 
-            <ScrollArea className="flex-1 h-full">
-              <div className="space-y-3 pr-4">
-                {proAnalyses.length === 0 ? (
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {swingAnalyses.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Pro AI to get started.'}
                   </p>
                 ) : (
-                  proAnalyses
-                    .filter(analysis =>
-                      analysis.swing_context?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      JSON.stringify(analysis.analysis_results).toLowerCase().includes(searchQuery.toLowerCase())
+                  swingAnalyses
+                    .filter(analysis => 
+                      analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .map((analysis) => (
                       <div
                         key={analysis.id}
                         className="p-3 rounded-lg border hover:bg-muted/50"
                       >
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="outline">Pro AI</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(analysis.created_at).toLocaleDateString()}
-                          </span>
+                        <div className="flex items-start gap-3">
+                          {analysis.videoThumbnail && (
+                            <img 
+                              src={analysis.videoThumbnail} 
+                              alt="Swing thumbnail"
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">{analysis.category}</Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {analysis.timestamp.toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => onSelectMessage(analysis.save_card)}
+                                  className="h-7 px-2"
+                                >
+                                  <RotateCcw className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deleteSwingAnalysis(analysis.id)}
+                                  className="h-7 px-2 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
+                            
+                            {analysis.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {analysis.tags.map((tag, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {analysis.voiceNote && (
+                              <Badge variant="outline" className="mb-2 text-xs">
+                                Voice note attached
+                              </Badge>
+                            )}
+                            
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {analysis.content}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-sm font-medium mb-2">
-                          {analysis.swing_context || 'Swing Analysis'}
-                        </p>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {analysis.analysis_results?.aiResponse || 'Analysis complete'}
-                        </p>
                       </div>
                     ))
                 )}

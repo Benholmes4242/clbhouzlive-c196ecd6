@@ -200,33 +200,6 @@ export type Database = {
         }
         Relationships: []
       }
-      conversations: {
-        Row: {
-          created_at: string
-          id: string
-          messages: Json
-          title: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          messages?: Json
-          title?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          messages?: Json
-          title?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       course_media: {
         Row: {
           course_id: string
@@ -743,36 +716,6 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      pro_ai_analyses: {
-        Row: {
-          analysis_results: Json
-          created_at: string
-          id: string
-          swing_context: string | null
-          updated_at: string
-          user_id: string
-          video_url: string | null
-        }
-        Insert: {
-          analysis_results?: Json
-          created_at?: string
-          id?: string
-          swing_context?: string | null
-          updated_at?: string
-          user_id: string
-          video_url?: string | null
-        }
-        Update: {
-          analysis_results?: Json
-          created_at?: string
-          id?: string
-          swing_context?: string | null
-          updated_at?: string
-          user_id?: string
-          video_url?: string | null
         }
         Relationships: []
       }
