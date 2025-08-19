@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Search, Edit, Trash2, MapPin, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 
 interface CaddieLog {
   id: string;
@@ -20,11 +19,19 @@ interface CaddieLog {
 }
 
 interface CaddieLogsPanelProps {
+  isRecording: boolean;
+  isProcessing: boolean;
+  startRecording: () => void;
+  stopRecording: () => void;
   userLocation: string;
   requestLocation: () => void;
 }
 
 const CaddieLogsPanel: React.FC<CaddieLogsPanelProps> = ({
+  isRecording,
+  isProcessing,
+  startRecording,
+  stopRecording,
   userLocation,
   requestLocation
 }) => {
@@ -34,65 +41,6 @@ const CaddieLogsPanel: React.FC<CaddieLogsPanelProps> = ({
   const [editContent, setEditContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-
-  const autoTagGolfTerms = (content: string): string[] => {
-    const golfTerms = [
-      'tree', 'bunker', 'green', 'slope', 'yardage', 'carry', 'pin', 'flag',
-      'fairway', 'rough', 'water', 'hazard', 'dogleg', 'elevation', 'wind',
-      'left', 'right', 'center', 'front', 'back', 'avoid', 'target'
-    ];
-    
-    const foundTerms = golfTerms.filter(term => 
-      content.toLowerCase().includes(term)
-    );
-    
-    return [...new Set(foundTerms)];
-  };
-
-  const saveCaddieLog = async (content: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('caddie_logs')
-        .insert({
-          user_id: user.id,
-          content: content,
-          transcription: content,
-          location_name: userLocation || null,
-          course_name: null,
-          tags: autoTagGolfTerms(content)
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Log Saved",
-        description: "Your caddie note has been recorded",
-      });
-
-      // Refresh the logs list
-      fetchLogs();
-    } catch (error) {
-      console.error('Error saving caddie log:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save log",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Voice recording hook
-  const {
-    isRecording,
-    isProcessing,
-    startRecording,
-    stopRecording,
-  } = useVoiceRecording({
-    onTranscriptionComplete: saveCaddieLog
-  });
 
   useEffect(() => {
     fetchLogs();

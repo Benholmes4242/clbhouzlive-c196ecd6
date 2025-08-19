@@ -71,18 +71,22 @@ const CaddieModal: React.FC<CaddieModalProps> = ({
           id="caddie-content"
           className="flex-1 overflow-y-auto min-h-0"
         >
-        <TabPanels 
-          activeTab={activeTab}
-          messages={messages}
-          isLoading={isLoading}
-          scrollAreaRef={scrollAreaRef}
-          suggestedPrompts={suggestedPrompts}
-          onPromptClick={onPromptClick}
-          onSaveToInsights={onSaveToInsights}
-          onRequestDetail={onRequestDetail}
-          userLocation={userLocation}
-          requestLocation={requestLocation}
-        />
+          <TabPanels 
+            activeTab={activeTab}
+            messages={messages}
+            isLoading={isLoading}
+            scrollAreaRef={scrollAreaRef}
+            suggestedPrompts={suggestedPrompts}
+            onPromptClick={onPromptClick}
+            onSaveToInsights={onSaveToInsights}
+            onRequestDetail={onRequestDetail}
+            isRecording={isRecording}
+            isProcessing={isProcessing}
+            startRecording={startRecording}
+            stopRecording={stopRecording}
+            userLocation={userLocation}
+            requestLocation={requestLocation}
+          />
         </div>
 
         {/* Divider + Footer (composer) */}
