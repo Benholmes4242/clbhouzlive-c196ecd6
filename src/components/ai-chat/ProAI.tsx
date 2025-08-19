@@ -288,7 +288,7 @@ const ProAI: React.FC<ProAIProps> = ({
   };
 
   const analyzeSwing = async () => {
-    if (!uploadedVideo && !analysisText.trim()) return;
+    if (isAnalyzing || (!uploadedVideo && !analysisText.trim())) return;
 
     // Show progress for extracting frames
     if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
@@ -299,7 +299,7 @@ const ProAI: React.FC<ProAIProps> = ({
     }
 
     const userMessage: ChatMessageData = {
-      id: Date.now().toString(),
+      id: `${Date.now()}_${Math.random()}`,
       type: 'user',
       content: analysisText.trim() || 'Please analyze my swing',
       timestamp: new Date()
@@ -400,7 +400,7 @@ const ProAI: React.FC<ProAIProps> = ({
       if (error) throw error;
 
       const aiMessage: ChatMessageData = {
-        id: Date.now().toString() + '_ai',
+        id: `${Date.now()}_${Math.random()}_ai`,
         type: 'ai',
         content: data.response,
         timestamp: new Date(),
@@ -454,7 +454,7 @@ const ProAI: React.FC<ProAIProps> = ({
       });
 
       const errorMessage: ChatMessageData = {
-        id: Date.now().toString() + '_error',
+        id: `${Date.now()}_${Math.random()}_error`,
         type: 'ai',
         content: "Sorry, I'm having trouble analyzing your swing right now. Please ensure you've uploaded a clear video and try again.",
         timestamp: new Date()
@@ -499,9 +499,9 @@ const ProAI: React.FC<ProAIProps> = ({
   // Expose analyzeSwing function to parent component
   React.useEffect(() => {
     if (onAnalyzeSwing) {
-      onAnalyzeSwing(analyzeSwing);
+      onAnalyzeSwing(() => analyzeSwing());
     }
-  }, [onAnalyzeSwing, analyzeSwing]);
+  }, [onAnalyzeSwing]);
 
   if (showAnalyses) {
     return (
