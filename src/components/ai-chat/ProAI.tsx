@@ -438,8 +438,8 @@ const ProAI: React.FC<ProAIProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Content */}
+    <>
+      {/* Messages */}
       <div className="flex-1 min-h-0 flex flex-col">
         <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="p-4 min-h-full flex flex-col">
@@ -659,7 +659,7 @@ const ProAI: React.FC<ProAIProps> = ({
           className="hidden"
         />
       </div>
-    </div>
+    </>
   );
 };
 
