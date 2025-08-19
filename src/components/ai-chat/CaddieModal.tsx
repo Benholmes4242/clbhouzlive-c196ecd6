@@ -24,6 +24,8 @@ interface CaddieModalProps {
   scrollAreaRef: React.RefObject<any>;
   suggestedPrompts: string[];
   onPromptClick: (prompt: string) => void;
+  onSaveToInsights: (message: any) => void;
+  onRequestDetail: (content: string) => void;
 }
 
 const CaddieModal: React.FC<CaddieModalProps> = ({
@@ -46,7 +48,9 @@ const CaddieModal: React.FC<CaddieModalProps> = ({
   setShowHistory,
   scrollAreaRef,
   suggestedPrompts,
-  onPromptClick
+  onPromptClick,
+  onSaveToInsights,
+  onRequestDetail
 }) => {
   if (!isOpen) return null;
 
@@ -74,6 +78,8 @@ const CaddieModal: React.FC<CaddieModalProps> = ({
             scrollAreaRef={scrollAreaRef}
             suggestedPrompts={suggestedPrompts}
             onPromptClick={onPromptClick}
+            onSaveToInsights={onSaveToInsights}
+            onRequestDetail={onRequestDetail}
             isRecording={isRecording}
             isProcessing={isProcessing}
             startRecording={startRecording}

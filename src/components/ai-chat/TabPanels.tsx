@@ -11,6 +11,8 @@ interface TabPanelsProps {
   scrollAreaRef: React.RefObject<any>;
   suggestedPrompts: string[];
   onPromptClick: (prompt: string) => void;
+  onSaveToInsights: (message: any) => void;
+  onRequestDetail: (content: string) => void;
   isRecording: boolean;
   isProcessing: boolean;
   startRecording: () => void;
@@ -26,6 +28,8 @@ const TabPanels: React.FC<TabPanelsProps> = ({
   scrollAreaRef,
   suggestedPrompts,
   onPromptClick,
+  onSaveToInsights,
+  onRequestDetail,
   isRecording,
   isProcessing,
   startRecording,
@@ -42,6 +46,8 @@ const TabPanels: React.FC<TabPanelsProps> = ({
           scrollAreaRef={scrollAreaRef}
           suggestedPrompts={suggestedPrompts}
           onPromptClick={onPromptClick}
+          onSaveToInsights={onSaveToInsights}
+          onRequestDetail={onRequestDetail}
         />
       </TabsContent>
 

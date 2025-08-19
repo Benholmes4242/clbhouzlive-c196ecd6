@@ -152,6 +152,35 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     setShowHistory(false);
   };
 
+  const saveConversationToHistory = async (conversation: ChatMessageData[]) => {
+    // For now, we'll save important conversations to caddie_logs
+    // This can be enhanced later with a dedicated chat_history table
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || conversation.length === 0) return;
+
+      const summary = conversation[0]?.content.substring(0, 100) + '...';
+      const { error } = await supabase
+        .from('caddie_logs')
+        .insert({
+          user_id: user.id,
+          content: summary,
+          transcription: JSON.stringify(conversation.map(msg => ({
+            role: msg.type === 'user' ? 'user' : 'assistant',
+            content: msg.content,
+            timestamp: msg.timestamp
+          }))),
+          location_name: userLocation || null,
+          course_name: null,
+          tags: ['chat', 'conversation']
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving conversation:', error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -201,7 +230,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
         metadata: data.metadata
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages(prev => {
+        const newMessages = [...prev, aiMessage];
+        // Save conversation to history after AI response
+        saveConversationToHistory(newMessages);
+        return newMessages;
+      });
 
       // Auto scroll to bottom
       setTimeout(() => {
@@ -235,6 +269,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
   const handleRequestDetail = (content: string) => {
     setInputValue(`Please provide more detail about: ${content}`);
+  };
+
+  const handleSaveToInsights = (message: any) => {
+    // Extract the save_card content or use the main content
+    const contentToSave = message.metadata?.save_card || message.content;
+    saveCaddieLog(contentToSave);
   };
 
   const loadConversation = (conversation: any[]) => {
@@ -289,6 +329,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
             setInputValue(prompt);
             setTimeout(() => handleSendMessage(), 100);
           }}
+          onSaveToInsights={handleSaveToInsights}
+          onRequestDetail={handleRequestDetail}
           isRecording={isRecording}
           isProcessing={isProcessing}
           startRecording={startRecording}

@@ -125,8 +125,9 @@ const ProAiPanel: React.FC<ProAiPanelProps> = ({
       const aiMessage: ChatMessageData = {
         id: Date.now().toString() + '_ai',
         type: 'ai',
-        content: data.content || 'Analysis complete!',
-        timestamp: new Date()
+        content: data.response || 'Analysis complete!',
+        timestamp: new Date(),
+        metadata: data.metadata
       };
 
       setMessages(prev => [...prev, aiMessage]);

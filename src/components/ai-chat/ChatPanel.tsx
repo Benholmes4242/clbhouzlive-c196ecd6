@@ -8,6 +8,8 @@ interface ChatPanelProps {
   scrollAreaRef: React.RefObject<any>;
   suggestedPrompts: string[];
   onPromptClick: (prompt: string) => void;
+  onSaveToInsights: (message: any) => void;
+  onRequestDetail: (content: string) => void;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -15,7 +17,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   isLoading,
   scrollAreaRef,
   suggestedPrompts,
-  onPromptClick
+  onPromptClick,
+  onSaveToInsights,
+  onRequestDetail
 }) => {
   return (
     <div className="h-full min-h-0">
@@ -49,8 +53,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <ChatMessageComponent
                 key={message.id || index}
                 message={message}
-                onSaveToInsights={() => {}}
-                onRequestDetail={() => {}}
+                onSaveToInsights={onSaveToInsights}
+                onRequestDetail={onRequestDetail}
               />
             ))}
             {isLoading && (
