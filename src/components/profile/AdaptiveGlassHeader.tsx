@@ -128,17 +128,12 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                   key={stat.key}
                   onClick={() => onStatClick?.(stat.key)}
                   className={`
-                    text-center rounded-lg px-2 py-1 transition-all duration-300
+                    text-center px-2 py-1 transition-all duration-300
                     ${glassMode === 'elevated' 
-                      ? 'hover:bg-black/5 border border-black/8' 
-                      : 'hover:bg-white/10 border border-white/16'
+                      ? 'hover:bg-black/5' 
+                      : 'hover:bg-white/10'
                     }
                   `}
-                  style={{
-                    background: glassMode === 'elevated' 
-                      ? 'rgba(0, 0, 0, 0.04)' 
-                      : 'rgba(255, 255, 255, 0.16)'
-                  }}
                 >
                   <div 
                     className={`
