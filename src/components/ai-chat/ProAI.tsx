@@ -439,7 +439,7 @@ const ProAI: React.FC<ProAIProps> = ({
     <div className="flex-1 flex flex-col min-h-0">
       {/* Content */}
       <div className="flex-1 min-h-0 flex flex-col">
-        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
+        <ScrollArea className="flex-1 min-h-0 pb-20" ref={scrollAreaRef}>
           <div className="p-4 pb-2 min-h-full flex flex-col">
             {messages.length === 0 && !uploadedVideo ? (
               <div className="py-6">
