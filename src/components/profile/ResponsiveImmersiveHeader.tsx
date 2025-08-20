@@ -30,8 +30,8 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
           ? 'h-32' // Mobile collapsed
           : 'h-40' // Desktop collapsed
         : isMobile 
-          ? 'h-64' // Mobile full - 256px
-          : 'h-80' // Desktop full - 320px
+          ? 'h-80' // Mobile full - increased from h-64 (320px)
+          : 'h-96' // Desktop full - increased from h-80 (384px)
       }
     `}>
       {/* Background Media or Default */}
