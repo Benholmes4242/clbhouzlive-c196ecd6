@@ -565,6 +565,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   onClick={() => sendMessage(inputValue)}
                   disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
                   size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -620,6 +621,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   }}
                   disabled={isRecording || isProcessing}
                   size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -663,8 +665,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                     window.dispatchEvent(proAIEvent);
                     setProAIAnalysisText('');
                   }}
-                  disabled={isRecording || isProcessing || !proAIAnalysisText.trim()}
+                  disabled={isRecording || isProcessing}
                   size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Analyze"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

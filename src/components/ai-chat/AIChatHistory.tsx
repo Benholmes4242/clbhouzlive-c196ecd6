@@ -141,13 +141,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredSaved = savedInsights.filter(insight => {
+  const filteredCaddieLogs = savedInsights.filter(insight => {
+    // For caddie logs tab, only show items that are actual caddie logs
+    const isCaddieLog = insight.category === 'caddie' || insight.tags.includes('caddie');
     const matchesSearch = insight.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          insight.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || insight.category === selectedCategory;
-    const matchesTag = selectedTag === 'all' || insight.tags.includes(selectedTag);
-    return matchesSearch && matchesCategory && matchesTag;
+    return isCaddieLog && matchesSearch;
   });
+
+  const filteredProAI = swingAnalyses.filter(analysis => 
+    analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (!isOpen) return null;
 
@@ -167,8 +172,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           </Button>
         </div>
 
-        {/* Search and filters */}
-        <div className="p-4 border-b space-y-3">
+        {/* Search header */}
+        <div className="px-6 py-4 border-b">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -178,69 +183,23 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               className="pl-10"
             />
           </div>
-          
-          <div className="flex gap-2">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category === 'all' ? 'All Categories' : category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Tag" />
-              </SelectTrigger>
-              <SelectContent>
-                {tags.map(tag => (
-                  <SelectItem key={tag} value={tag}>
-                    {tag === 'all' ? 'All Tags' : tag}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="history" className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="history">History ({historyMessages.length})</TabsTrigger>
-            <TabsTrigger value="saved">Saved ({savedInsights.length})</TabsTrigger>
-            <TabsTrigger value="analyses">Analyses ({swingAnalyses.length})</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="chat" className="flex-1 flex flex-col">
+          <div className="px-6">
+            <TabsList className="w-full px-0 gap-2 justify-start box-border">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="caddie-logs">Caddie Logs</TabsTrigger>
+              <TabsTrigger value="proai">Pro AI ({swingAnalyses.length})</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="history" className="flex-1 p-4">
-            <div className="flex justify-between items-center mb-4">
+          <TabsContent value="chat" className="flex-1 p-4">
+            <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Chronological list of all previous queries
+                Your chat conversations with AI
               </p>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Clear History
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Clear chat history?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete all your chat history. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearHistory}>Clear History</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </div>
 
             <ScrollArea className="flex-1">
@@ -278,41 +237,29 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="saved" className="flex-1 p-4">
-            <div className="flex justify-between items-center mb-4">
+          <TabsContent value="caddie-logs" className="flex-1 p-4">
+            <div className="mb-4">
+              <div className="mb-3">
+                <Input
+                  placeholder="Search your caddie logs..."
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full"
+                />
+              </div>
               <p className="text-sm text-muted-foreground">
-                Tips and insights you've saved
+                Your saved caddie logs and notes
               </p>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Clear Saved
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Clear saved insights?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete all your saved insights. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearAllSaved}>Clear Saved</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </div>
 
             <ScrollArea className="flex-1">
               <div className="space-y-3">
-                {filteredSaved.length === 0 ? (
+                {filteredCaddieLogs.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No saved insights found matching your search' : 'No saved insights yet'}
+                    {searchQuery ? 'No caddie logs found matching your search' : 'No caddie logs yet. Start recording voice notes to see them here.'}
                   </p>
                 ) : (
-                  filteredSaved.map((insight) => (
+                  filteredCaddieLogs.map((insight) => (
                     <div
                       key={insight.id}
                       className="p-3 rounded-lg border hover:bg-muted/50"
@@ -366,111 +313,74 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="analyses" className="flex-1 p-4">
-            <div className="flex justify-between items-center mb-4">
+          <TabsContent value="proai" className="flex-1 p-4">
+            <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Your swing analyses with feedback and drills
+                Your Pro AI swing analyses
               </p>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Clear Analyses
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Clear swing analyses?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete all your swing analyses. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={clearAllAnalyses}>Clear Analyses</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </div>
 
             <ScrollArea className="flex-1">
               <div className="space-y-3">
-                {swingAnalyses.length === 0 ? (
+                {filteredProAI.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Pro AI to get started.'}
                   </p>
                 ) : (
-                  swingAnalyses
-                    .filter(analysis => 
-                      analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((analysis) => (
-                      <div
-                        key={analysis.id}
-                        className="p-3 rounded-lg border hover:bg-muted/50"
-                      >
-                        <div className="flex items-start gap-3">
-                          {analysis.videoThumbnail && (
-                            <img 
-                              src={analysis.videoThumbnail} 
-                              alt="Swing thumbnail"
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">{analysis.category}</Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {analysis.timestamp.toLocaleDateString()}
-                                </span>
-                              </div>
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => onSelectMessage(analysis.save_card)}
-                                  className="h-7 px-2"
-                                >
-                                  <RotateCcw className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => deleteSwingAnalysis(analysis.id)}
-                                  className="h-7 px-2 text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
+                  filteredProAI.map((analysis) => (
+                    <div
+                      key={analysis.id}
+                      className="p-3 rounded-lg border hover:bg-muted/50"
+                    >
+                      <div className="flex items-start gap-3">
+                        {analysis.videoThumbnail && (
+                          <img 
+                            src={analysis.videoThumbnail} 
+                            alt="Swing thumbnail"
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{analysis.category}</Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {analysis.timestamp.toLocaleDateString()}
+                              </span>
                             </div>
-                            
-                            <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
-                            
-                            {analysis.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {analysis.tags.map((tag, index) => (
-                                  <Badge key={index} variant="secondary" className="text-xs">
-                                    {tag}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                            
-                            {analysis.voiceNote && (
-                              <Badge variant="outline" className="mb-2 text-xs">
-                                Voice note attached
-                              </Badge>
-                            )}
-                            
-                            <p className="text-xs text-muted-foreground line-clamp-2">
-                              {analysis.content}
-                            </p>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteSwingAnalysis(analysis.id)}
+                                className="h-7 px-2 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </div>
+                          
+                          <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
+                          
+                          {analysis.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-2">
+                              {analysis.tags.map((tag, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {analysis.voiceNote && (
+                            <Badge variant="outline" className="mb-2 text-xs">
+                              Voice note attached
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                 )}
               </div>
             </ScrollArea>

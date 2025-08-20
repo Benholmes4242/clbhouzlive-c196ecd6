@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,30 +65,24 @@ const ProAI: React.FC<ProAIProps> = ({
   const { toast } = useToast();
 
   // Load saved analyses from localStorage
-  React.useEffect(() => {
+  useEffect(() => {
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     setAnalyses(savedAnalyses);
   }, []);
 
-  // Listen for swing analysis trigger from shared composer
-  React.useEffect(() => {
-    const handleSwingAnalysisEvent = (event: CustomEvent) => {
-      const { analysisText: text } = event.detail;
-      if (text && text.trim()) {
-        setAnalysisText(text);
-        // Trigger analysis after a short delay to ensure state is updated
-        setTimeout(() => {
-          analyzeSwing();
-        }, 100);
+  useEffect(() => {
+    const handleSwingAnalysis = (event: any) => {
+      const analysisText = event.detail?.analysisText || '';
+      // Allow analysis with video even if no text is provided
+      if (uploadedVideo || analysisText.trim()) {
+        setAnalysisText(analysisText);
+        analyzeSwing();
       }
     };
 
-    window.addEventListener('triggerSwingAnalysis', handleSwingAnalysisEvent as EventListener);
-    
-    return () => {
-      window.removeEventListener('triggerSwingAnalysis', handleSwingAnalysisEvent as EventListener);
-    };
-  }, [uploadedVideo]); // Include uploadedVideo as dependency so it captures current state
+    window.addEventListener('triggerSwingAnalysis', handleSwingAnalysis);
+    return () => window.removeEventListener('triggerSwingAnalysis', handleSwingAnalysis);
+  }, [uploadedVideo]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -101,7 +95,7 @@ const ProAI: React.FC<ProAIProps> = ({
     }, 100);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
@@ -620,40 +614,42 @@ const ProAI: React.FC<ProAIProps> = ({
                 <Upload className="h-4 w-4 mr-1" />
                 Upload Swing Video
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAnalyses(true)}
-                className="text-xs"
-              >
-                <BookOpen className="h-3 w-3 mr-1" />
-                Analyses ({analyses.length})
-              </Button>
+              {!videoPreview && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAnalyses(true)}
+                  className="text-xs"
+                >
+                  <BookOpen className="h-3 w-3 mr-1" />
+                  Analyses ({analyses.length})
+                </Button>
+              )}
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             {uploadedVideo && (
               <div className="bg-muted rounded-lg p-4">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    {uploadedVideo.type.startsWith('video/') ? (
-                      <div className="w-32 h-32 rounded-lg overflow-hidden">
+                <div className="flex flex-col gap-4">
+                  <div className="w-full">
+                    <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
+                      {uploadedVideo.type.startsWith('video/') ? (
                         <video 
                           src={videoPreview} 
-                          className="w-full h-full object-cover"
-                          controls
-                          preload="metadata"
-                          poster=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                          playsInline
+                          muted
+                          loop
                         />
-                      </div>
-                    ) : (
-                      <img 
-                        src={videoPreview} 
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
-                    )}
+                      ) : (
+                        <img 
+                          src={videoPreview} 
+                          alt="Preview"
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      )}
+                    </div>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
@@ -672,14 +668,16 @@ const ProAI: React.FC<ProAIProps> = ({
                         <Upload className="h-3 w-3 mr-1" />
                         Replace
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowAnalyses(true)}
-                      >
-                        <BookOpen className="h-3 w-3 mr-1" />
-                        Analyses ({analyses.length})
-                      </Button>
+                      {!videoPreview && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowAnalyses(true)}
+                        >
+                          <BookOpen className="h-3 w-3 mr-1" />
+                          Analyses ({analyses.length})
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" onClick={discardVideo}>
