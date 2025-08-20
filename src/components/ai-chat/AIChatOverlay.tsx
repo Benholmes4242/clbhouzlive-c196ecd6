@@ -227,6 +227,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       storedMessages.push(...conversationMessages);
       localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
     }
+    
+    // Also save SwingCoach conversations to history if they exist
+    const swingCoachMessages = JSON.parse(localStorage.getItem('clbhouz_swing_chat_history') || '[]');
+    if (swingCoachMessages.length > 0) {
+      const allEchoHistory = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
+      allEchoHistory.push(...swingCoachMessages);
+      localStorage.setItem('clbhouz_ai_history', JSON.stringify(allEchoHistory.slice(-100)));
+      // Clear temporary SwingCoach history
+      localStorage.removeItem('clbhouz_swing_chat_history');
+    }
   };
 
   const handleClose = () => {
@@ -285,7 +295,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           message: finalMessage,
           conversation,
           detailMode,
-          isSwingCoach: false
+          isProAI: false // Keep original parameter name
         }
       });
 
@@ -479,7 +489,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                           <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                             <div className="flex items-center gap-2">
                               <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                              <span className="text-sm">SwingCoach is thinking...</span>
+                              <span className="text-sm">Echo is thinking...</span>
                             </div>
                           </div>
                         </div>
