@@ -41,7 +41,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
 
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
-    { id: 'courses', label: isMobile ? 'Courses' : 'Courses Played', icon: MapPin },
+    { id: 'courses', label: 'Courses', icon: MapPin },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
