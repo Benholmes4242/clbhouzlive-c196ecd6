@@ -562,8 +562,7 @@ const HeroProfileHeader = ({
         onStatClick={handleStatClick}
       />
       {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
-      {/* Responsive Immersive Header - Starts from top like clubhouse */}
-      <div className="absolute top-0 left-0 right-0 w-full">
+      <div className="relative w-full">
         <ResponsiveImmersiveHeader
           mediaItems={profile?.header_photo_url ? [{
             id: 'header',
@@ -575,7 +574,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div ref={profileCardRef} className="relative z-50 pt-80">
+      <div ref={profileCardRef} className="relative z-50 -mt-32">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
