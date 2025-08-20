@@ -425,9 +425,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Save SwingCoach conversations to temporary storage for main history
+      // Save SwingCoach conversations to SwingCoach history (separate from Chat)
       const allSwingCoachMessages = [...messages, userMessage, aiMessage];
-      localStorage.setItem('clbhouz_swing_chat_history', JSON.stringify(allSwingCoachMessages));
+      localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
 
       // Create video thumbnail if video was uploaded
       let thumbnailUrl = '';

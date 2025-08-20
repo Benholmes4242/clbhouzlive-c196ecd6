@@ -88,9 +88,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }));
     setSavedInsights(parsedSaved);
 
-    // Load swing analyses
+    // Load swing analyses from both analyses and SwingCoach history
     const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const parsedAnalyses = analyses.map((analysis: any) => ({
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    
+    // Convert SwingCoach conversations to analysis format
+    const swingCoachAnalyses = swingCoachHistory
+      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
+      .map((msg: any) => ({
+        id: msg.id,
+        save_card: msg.metadata.save_card || 'Swing Analysis',
+        tags: msg.metadata.tags || [],
+        category: msg.metadata.category || 'Swing',
+        content: msg.content,
+        videoThumbnail: msg.metadata.videoThumbnail,
+        timestamp: new Date(msg.timestamp)
+      }));
+    
+    const allAnalyses = [...analyses, ...swingCoachAnalyses];
+    const parsedAnalyses = allAnalyses.map((analysis: any) => ({
       ...analysis,
       timestamp: new Date(analysis.timestamp)
     }));

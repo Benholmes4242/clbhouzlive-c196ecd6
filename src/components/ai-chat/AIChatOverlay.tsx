@@ -228,15 +228,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
     }
     
-    // Also save SwingCoach conversations to history if they exist
-    const swingCoachMessages = JSON.parse(localStorage.getItem('clbhouz_swing_chat_history') || '[]');
-    if (swingCoachMessages.length > 0) {
-      const allEchoHistory = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      allEchoHistory.push(...swingCoachMessages);
-      localStorage.setItem('clbhouz_ai_history', JSON.stringify(allEchoHistory.slice(-100)));
-      // Clear temporary SwingCoach history
-      localStorage.removeItem('clbhouz_swing_chat_history');
-    }
+    // SwingCoach conversations are now saved separately and don't merge with chat history
   };
 
   const handleClose = () => {
