@@ -103,7 +103,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
     // Load swing analyses from both analyses and Swing Coach history
     const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swing_coach_history') || '[]');
     
     // Convert Swing Coach conversations to analysis format
     const swingCoachAnalyses = swingCoachHistory
