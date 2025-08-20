@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
@@ -130,10 +130,6 @@ const HeroProfileHeader = ({
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  
-  // Header ref for dynamic height measurement
-  const headerRef = useRef<HTMLDivElement>(null);
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -354,34 +350,6 @@ const HeroProfileHeader = ({
 
     return () => clearTimeout(timer);
   }, [isProfileCardInView]);
-
-  // Dynamically measure header height and update profile card position
-  useEffect(() => {
-    const measureHeaderHeight = () => {
-      if (headerRef.current) {
-        const height = headerRef.current.clientHeight;
-        setHeaderHeight(height);
-      }
-    };
-
-    // Initial measurement
-    measureHeaderHeight();
-
-    // Remeasure on window resize
-    const handleResize = () => {
-      measureHeaderHeight();
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    // Also remeasure when showStickyHeader changes (header collapses/expands)
-    const timer = setTimeout(measureHeaderHeight, 100);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(timer);
-    };
-  }, [showStickyHeader]); // Re-run when header state changes
   const handleMorphTransition = () => {
     closeImmersive();
     // Smooth scroll to trigger sticky header
@@ -595,7 +563,7 @@ const HeroProfileHeader = ({
       />
       {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
       {/* Responsive Immersive Header - Starts from top like clubhouse */}
-      <div ref={headerRef} className="absolute top-0 left-0 right-0 w-full">
+      <div className="absolute top-0 left-0 right-0 w-full">
         <ResponsiveImmersiveHeader
           mediaItems={profile?.header_photo_url ? [{
             id: 'header',
@@ -606,14 +574,8 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Responsive Glass Profile Card - Positioned to straddle 50/50 based on measured header height */}
-      <div ref={profileCardRef} className="relative z-50" style={{ 
-        paddingTop: headerHeight > 0 ? `${headerHeight - 150}px` : ( // Card center at header bottom edge (assuming 300px card height)
-          isMobile 
-            ? showStickyHeader ? '4rem' : '20rem'  // Fallback values
-            : showStickyHeader ? '6rem' : '24rem'
-        )
-      }}>
+      {/* Responsive Glass Profile Card */}
+      <div ref={profileCardRef} className="relative z-50 pt-32">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
