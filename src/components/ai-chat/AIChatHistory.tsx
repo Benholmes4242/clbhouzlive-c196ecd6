@@ -83,7 +83,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const loadData = async () => {
     // Load history
     const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-    console.log('Loading chat history:', history.length, 'messages');
     const parsedHistory = history.map((msg: any) => ({
       ...msg,
       timestamp: new Date(msg.timestamp)
@@ -104,7 +103,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
     // Load swing analyses from both analyses and Swing Coach history
     const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swing_coach_history') || '[]');
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
     
     // Convert Swing Coach conversations to analysis format
     const swingCoachAnalyses = swingCoachHistory
