@@ -425,10 +425,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Save SwingCoach conversations to SwingCoach history (separate from Chat)
-      const allSwingCoachMessages = [...messages, userMessage, aiMessage];
-      localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
-
       // Create video thumbnail if video was uploaded
       let thumbnailUrl = '';
       if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
@@ -451,6 +447,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       } else if (uploadedVideo && uploadedVideo.type.startsWith('image/')) {
         thumbnailUrl = videoPreview;
       }
+
+      // Update AI message with thumbnail in metadata
+      const updatedAiMessage = {
+        ...aiMessage,
+        metadata: {
+          ...aiMessage.metadata,
+          videoThumbnail: thumbnailUrl
+        }
+      };
+
+      // Save SwingCoach conversations to SwingCoach history (separate from Chat) with updated metadata
+      const allSwingCoachMessages = [...messages, userMessage, updatedAiMessage];
+      localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
 
       // Set current analysis for potential saving
       if (data.metadata) {
