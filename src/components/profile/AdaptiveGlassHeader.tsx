@@ -52,8 +52,8 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
       <div
         className={`
           fixed top-0 left-0 right-0 z-50 
-          transition-all duration-300 ease-out
-          ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}
+          transition-all duration-500 ease-out
+          ${isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-4 opacity-0 scale-95'}
         `}
         style={{
           ...glassStyles,

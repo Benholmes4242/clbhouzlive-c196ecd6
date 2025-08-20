@@ -132,8 +132,8 @@ const HeroProfileHeader = ({
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
-    threshold: 0,
-    rootMargin: '-50px 0px 0px 0px' // Only trigger when card is completely out of view with 50px buffer
+    threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5], // Multiple thresholds for smoother transition
+    rootMargin: '-20px 0px 0px 0px' // Smaller buffer for earlier transition start
   });
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
@@ -340,9 +340,14 @@ const HeroProfileHeader = ({
     fetchStats();
   }, [profile?.id]);
   
-  // Update sticky header visibility based on profile card intersection
+  // Update sticky header visibility based on profile card intersection with smooth transition
   useEffect(() => {
-    setShowStickyHeader(!isProfileCardInView);
+    // Add a small delay to create smoother transition
+    const timer = setTimeout(() => {
+      setShowStickyHeader(!isProfileCardInView);
+    }, isProfileCardInView ? 150 : 0); // Delay when card comes back into view for smoother transition
+
+    return () => clearTimeout(timer);
   }, [isProfileCardInView]);
   const handleMorphTransition = () => {
     closeImmersive();
