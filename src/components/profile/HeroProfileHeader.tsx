@@ -575,7 +575,11 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div ref={profileCardRef} className="relative z-50" style={{ paddingTop: 'calc(75vh - 150px)' }}>
+      <div ref={profileCardRef} className="relative z-50" style={{ 
+        paddingTop: isMobile 
+          ? showStickyHeader ? '4rem' : '20rem'  // Mobile: 64px collapsed, 320px full (80% of header)
+          : showStickyHeader ? '6rem' : '24rem'   // Desktop: 96px collapsed, 384px full (85% of header)
+      }}>
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
