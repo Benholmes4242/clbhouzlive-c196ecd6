@@ -37,6 +37,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
     return null;
   }
 
+  console.log('FloatingAIButton rendering on:', location.pathname);
+
   const handleMouseEnter = () => {
     setIsExpanded(true);
   };
