@@ -42,6 +42,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
+  const [proAIAnalysisText, setProAIAnalysisText] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -508,6 +509,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 isProcessing={isProcessing}
                 startRecording={startRecording}
                 stopRecording={stopRecording}
+                analysisText={proAIAnalysisText}
+                onAnalysisTextChange={setProAIAnalysisText}
               />
             </TabsContent>
           </div>
@@ -628,9 +631,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               <div className="flex gap-2">
                 <div className="flex-1">
                   <Input
+                    value={proAIAnalysisText}
+                    onChange={(e) => setProAIAnalysisText(e.target.value)}
                     placeholder="Describe your swing for analysis..."
+                    onKeyPress={(e) => e.key === 'Enter' && proAIAnalysisText.trim() && document.getElementById('proai-send-btn')?.click()}
                     disabled={isRecording || isProcessing}
-                    readOnly
                   />
                 </div>
                 <Button
@@ -649,7 +654,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   )}
                 </Button>
                 <Button
-                  disabled={isRecording || isProcessing}
+                  id="proai-send-btn"
+                  onClick={() => {
+                    // Trigger swing analysis in ProAI component
+                    const proAIEvent = new CustomEvent('triggerSwingAnalysis', { 
+                      detail: { analysisText: proAIAnalysisText } 
+                    });
+                    window.dispatchEvent(proAIEvent);
+                    setProAIAnalysisText('');
+                  }}
+                  disabled={isRecording || isProcessing || !proAIAnalysisText.trim()}
                   size="sm"
                 >
                   <Send className="h-4 w-4" />

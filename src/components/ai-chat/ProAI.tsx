@@ -27,6 +27,8 @@ interface ProAIProps {
   isProcessing?: boolean;
   startRecording?: () => void;
   stopRecording?: () => void;
+  analysisText?: string;
+  onAnalysisTextChange?: (text: string) => void;
 }
 
 interface ChatMessageData {
@@ -43,6 +45,8 @@ const ProAI: React.FC<ProAIProps> = ({
   isProcessing: parentIsProcessing,
   startRecording: parentStartRecording,
   stopRecording: parentStopRecording,
+  analysisText: externalAnalysisText,
+  onAnalysisTextChange,
 }) => {
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string>('');
@@ -65,6 +69,26 @@ const ProAI: React.FC<ProAIProps> = ({
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     setAnalyses(savedAnalyses);
   }, []);
+
+  // Listen for swing analysis trigger from shared composer
+  React.useEffect(() => {
+    const handleSwingAnalysisEvent = (event: CustomEvent) => {
+      const { analysisText: text } = event.detail;
+      if (text && text.trim()) {
+        setAnalysisText(text);
+        // Trigger analysis after a short delay to ensure state is updated
+        setTimeout(() => {
+          analyzeSwing();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('triggerSwingAnalysis', handleSwingAnalysisEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('triggerSwingAnalysis', handleSwingAnalysisEvent as EventListener);
+    };
+  }, [uploadedVideo]); // Include uploadedVideo as dependency so it captures current state
 
   const scrollToBottom = () => {
     setTimeout(() => {
