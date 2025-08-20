@@ -604,7 +604,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               Upload your swing for swing analysis
             </h3>
             <p className="mb-6 text-sm">
-              Get instant feedback and drills from SwingCoach.
+              Get instant feedback and drills from Swing Coach.
             </p>
             
             <div className="text-left max-w-sm mx-auto">
@@ -760,7 +760,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                   <div className="flex items-center gap-2">
                     <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                    <span className="text-sm">SwingCoach is analyzing swing positions...</span>
+                    <span className="text-sm">Swing Coach is analyzing swing positions...</span>
                   </div>
                 </div>
               </div>

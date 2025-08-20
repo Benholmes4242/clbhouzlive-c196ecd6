@@ -431,7 +431,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="swingcoach">SwingCoach</TabsTrigger>
+              <TabsTrigger value="swing-coach">Swing Coach</TabsTrigger>
             </TabsList>
           </div>
 
@@ -504,7 +504,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               />
             </TabsContent>
 
-            <TabsContent value="swingcoach" className="h-full m-0">
+            <TabsContent value="swing-coach" className="h-full m-0">
               <SwingCoach 
                 onClose={() => setActiveTab('chat')}
                 isRecording={isRecording}
@@ -630,7 +630,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
-          {activeTab === 'swingcoach' && (
+          {activeTab === 'swing-coach' && (
             <div className="p-4">
               <div className="flex gap-2">
                 <div className="flex-1">
@@ -638,7 +638,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                     value={swingCoachAnalysisText}
                     onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
                     placeholder="Describe your swing for analysis..."
-                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swingcoach-send-btn')?.click()}
+                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swing-coach-send-btn')?.click()}
                     disabled={isRecording || isProcessing}
                   />
                 </div>
@@ -658,9 +658,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   )}
                 </Button>
                 <Button
-                  id="swingcoach-send-btn"
+                  id="swing-coach-send-btn"
                   onClick={() => {
-                    // Trigger swing analysis in SwingCoach component
+                    // Trigger swing analysis in Swing Coach component
                     const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
                       detail: { analysisText: swingCoachAnalysisText } 
                     });

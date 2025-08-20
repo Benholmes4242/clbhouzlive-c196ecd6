@@ -49,6 +49,13 @@ interface HistoryMessage {
   metadata?: any;
 }
 
+interface ChatConversation {
+  id: string;
+  title: string;
+  messages: HistoryMessage[];
+  timestamp: Date;
+}
+
 interface AIChatHistoryProps {
   isOpen: boolean;
   onClose: () => void;
@@ -60,6 +67,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [expandedConversation, setExpandedConversation] = useState<string | null>(null);
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
   const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
@@ -79,6 +88,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       timestamp: new Date(msg.timestamp)
     }));
     setHistoryMessages(parsedHistory);
+    
+    // Group messages into conversations
+    const groupedConversations = groupMessagesIntoConversations(parsedHistory);
+    setConversations(groupedConversations);
 
     // Load saved insights
     const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
@@ -88,11 +101,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }));
     setSavedInsights(parsedSaved);
 
-    // Load swing analyses from both analyses and SwingCoach history
+    // Load swing analyses from both analyses and Swing Coach history
     const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
     
-    // Convert SwingCoach conversations to analysis format
+    // Convert Swing Coach conversations to analysis format
     const swingCoachAnalyses = swingCoachHistory
       .filter((msg: any) => msg.type === 'ai' && msg.metadata)
       .map((msg: any) => ({
@@ -126,12 +139,76 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   };
 
+  const groupMessagesIntoConversations = (messages: HistoryMessage[]): ChatConversation[] => {
+    const conversations: ChatConversation[] = [];
+    let currentConversation: HistoryMessage[] = [];
+    
+    messages.forEach((message, index) => {
+      if (message.type === 'user') {
+        // Start new conversation on user message
+        if (currentConversation.length > 0) {
+          // Save previous conversation
+          const firstUserMessage = currentConversation.find(m => m.type === 'user');
+          if (firstUserMessage) {
+            conversations.push({
+              id: `conv-${conversations.length}`,
+              title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
+              messages: [...currentConversation],
+              timestamp: firstUserMessage.timestamp
+            });
+          }
+        }
+        currentConversation = [message];
+      } else {
+        currentConversation.push(message);
+      }
+      
+      // Handle last conversation
+      if (index === messages.length - 1 && currentConversation.length > 0) {
+        const firstUserMessage = currentConversation.find(m => m.type === 'user');
+        if (firstUserMessage) {
+          conversations.push({
+            id: `conv-${conversations.length}`,
+            title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
+            messages: [...currentConversation],
+            timestamp: firstUserMessage.timestamp
+          });
+        }
+      }
+    });
+    
+    return conversations.reverse(); // Most recent first
+  };
+
   const clearHistory = () => {
     localStorage.removeItem('clbhouz_ai_history');
     setHistoryMessages([]);
+    setConversations([]);
     toast({
       title: "History cleared",
       description: "All chat history has been deleted",
+    });
+  };
+
+  const deleteConversation = (conversationId: string) => {
+    const conversationToDelete = conversations.find(conv => conv.id === conversationId);
+    if (!conversationToDelete) return;
+    
+    // Remove messages from this conversation from the stored history
+    const remainingMessages = historyMessages.filter(msg => 
+      !conversationToDelete.messages.some(convMsg => convMsg.id === msg.id)
+    );
+    
+    localStorage.setItem('clbhouz_ai_history', JSON.stringify(remainingMessages));
+    setHistoryMessages(remainingMessages);
+    
+    // Update conversations
+    const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
+    setConversations(updatedConversations);
+    
+    toast({
+      title: "Conversation deleted",
+      description: "The conversation has been removed from your history",
     });
   };
 
@@ -179,8 +256,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const tags = ['all', ...Array.from(allTags)];
 
   // Filter functions
-  const filteredHistory = historyMessages.filter(msg =>
-    msg.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredConversations = conversations.filter(conv =>
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conv.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const filteredCaddieLogs = caddieLogs.filter(log => {
@@ -233,7 +311,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             <TabsList className="w-full px-4 justify-between box-border">
               <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
               <TabsTrigger value="caddie-logs" className="flex-1">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="swingcoach" className="flex-1">SwingCoach ({swingAnalyses.length})</TabsTrigger>
+              <TabsTrigger value="swing-coach" className="flex-1">Swing Coach ({swingAnalyses.length})</TabsTrigger>
             </TabsList>
           </div>
 
@@ -246,32 +324,79 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
             <ScrollArea className="flex-1">
               <div className="space-y-3">
-                {filteredHistory.length === 0 ? (
+                {filteredConversations.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No history found matching your search' : 'No chat history yet'}
+                    {searchQuery ? 'No conversations found matching your search' : 'No chat history yet'}
                   </p>
                 ) : (
-                  filteredHistory.map((message, index) => (
-                    <div
-                      key={`${message.id}-${index}`}
-                      className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
-                        message.type === 'user' ? 'bg-gray-100/50' : 'bg-muted/20'
-                      }`}
-                      onClick={() => {
-                        if (message.type === 'user') {
-                          onSelectMessage(message.content);
-                        }
-                      }}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant="secondary">
-                          {message.type === 'user' ? 'You' : 'AI'}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {message.timestamp.toLocaleDateString()} {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                  filteredConversations.map((conversation) => (
+                    <div key={conversation.id} className="border rounded-lg">
+                      <div
+                        className="p-3 cursor-pointer hover:bg-muted/50 flex justify-between items-start"
+                        onClick={() => setExpandedConversation(
+                          expandedConversation === conversation.id ? null : conversation.id
+                        )}
+                      >
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge variant="secondary">Conversation</Badge>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">
+                                {conversation.timestamp.toLocaleDateString()} {conversation.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteConversation(conversation.id);
+                                }}
+                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-sm font-medium">{conversation.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {conversation.messages.length} messages
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm line-clamp-3">{message.content}</p>
+                      
+                      {expandedConversation === conversation.id && (
+                        <div className="border-t p-3 bg-muted/20">
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {conversation.messages.map((message, index) => (
+                              <div
+                                key={`${message.id}-${index}`}
+                                className={`p-2 rounded text-sm ${
+                                  message.type === 'user' 
+                                    ? 'bg-primary/10 text-foreground' 
+                                    : 'bg-muted text-foreground'
+                                }`}
+                              >
+                                <div className="flex justify-between items-start mb-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {message.type === 'user' ? 'You' : 'Echo'}
+                                  </Badge>
+                                  {message.type === 'user' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => onSelectMessage(message.content)}
+                                      className="h-5 px-2 text-xs"
+                                    >
+                                      Use
+                                    </Button>
+                                  )}
+                                </div>
+                                <p className="text-xs leading-relaxed">{message.content}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
@@ -355,10 +480,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="swingcoach" className="flex-1 p-4">
+          <TabsContent value="swing-coach" className="flex-1 p-4">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Your SwingCoach swing analyses
+                Your Swing Coach swing analyses
               </p>
             </div>
 
@@ -366,7 +491,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               <div className="space-y-3">
                 {filteredSwingCoach.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in SwingCoach to get started.'}
+                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Swing Coach to get started.'}
                   </p>
                 ) : (
                   filteredSwingCoach.map((analysis) => (
