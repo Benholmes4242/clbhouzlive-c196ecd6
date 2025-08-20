@@ -28,18 +28,19 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
       
       <Button
         onClick={onClick}
-        className="fixed bottom-24 right-6 z-50 h-8 px-2 py-1 rounded-full text-white shadow-lg transition-all duration-300 hover:scale-105"
+        className="fixed bottom-24 right-6 z-50 transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-100 bg-white border border-black/[0.08] shadow-[0_2px_6px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]"
         style={{
-          ...glassStyles,
-          background: `var(--glass-bg)`,
-          backdropFilter: `var(--glass-blur)`,
-          boxShadow: `var(--glass-shadow)`,
-          color: `var(--glass-text)`,
+          minHeight: '44px',
+          minWidth: '44px',
         }}
+        aria-label="Open Echo"
       >
-        <div className="flex items-center gap-1">
-          <span className="text-sm">💬</span>
-          <span className="font-medium text-sm">Ask Your Caddie</span>
+        <div className="flex items-center gap-2">
+          {/* Mobile: icon only, Tablet: compact label, Desktop: full label */}
+          <span className="text-lg text-[#f7931e]">🤖</span>
+          <span className="font-medium text-sm text-black hidden sm:inline lg:inline">
+            Echo
+          </span>
         </div>
       </Button>
     </>

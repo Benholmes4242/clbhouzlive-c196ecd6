@@ -401,7 +401,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         {/* Header - Fixed at top */}
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">caddie AI . powered by clbhouz AI</h2>
+            <h2 className="text-lg font-semibold">Echo</h2>
           </div>
           <div className="flex items-center gap-2">
             <Button

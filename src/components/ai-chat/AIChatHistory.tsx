@@ -161,7 +161,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-2xl h-[80vh] sm:h-[70vh] flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Chat History & Saved</h2>
+          <h2 className="text-lg font-semibold">Echo History</h2>
           <Button
             variant="ghost"
             size="sm"

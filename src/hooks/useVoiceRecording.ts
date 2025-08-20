@@ -50,7 +50,7 @@ export const useVoiceRecording = ({ onTranscriptionComplete }: UseVoiceRecording
 
       toast({
         title: "Recording started",
-        description: "Speak your caddie note...",
+        description: "Speak your note...",
       });
 
     } catch (error) {
