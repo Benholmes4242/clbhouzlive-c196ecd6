@@ -191,7 +191,6 @@ export const useProfileForm = (
     formData,
     saving,
     isUsernameSet,
-    profile,
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,

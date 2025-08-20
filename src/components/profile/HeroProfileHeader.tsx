@@ -392,7 +392,6 @@ const HeroProfileHeader = ({
     formData,
     saving,
     isUsernameSet,
-    profile: profileFromHook,
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
@@ -825,7 +824,7 @@ const HeroProfileHeader = ({
             isUsernameSet={isUsernameSet}
             userId={user?.id || ''}
             userType={profile?.user_type}
-            profile={profileFromHook}
+            profile={profile}
             onInputChange={handleInputChange}
             onTextareaChange={handleTextareaChange}
             onSelectChange={handleSelectChange}

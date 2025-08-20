@@ -45,13 +45,12 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     formData,
     saving,
     isUsernameSet,
-    profile: profileFromHook,
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
-    handleFileChange,
+    handleFileChange,  
     handleSave,
   } = useProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
 
