@@ -21,7 +21,7 @@ interface SwingAnalysis {
   voiceNote?: string;
 }
 
-interface ProAIProps {
+interface SwingCoachProps {
   onClose?: () => void;
   isRecording?: boolean;
   isProcessing?: boolean;
@@ -39,7 +39,7 @@ interface ChatMessageData {
   metadata?: any;
 }
 
-const ProAI: React.FC<ProAIProps> = ({
+const SwingCoach: React.FC<SwingCoachProps> = ({
   onClose,
   isRecording: parentIsRecording,
   isProcessing: parentIsProcessing,
@@ -407,7 +407,7 @@ const ProAI: React.FC<ProAIProps> = ({
             content: msg.content
           })),
           detailMode: false,
-          isProAI: true,
+          isSwingCoach: true,
           images: extractedFrames,
           swingContext: swingContext
         }
@@ -591,7 +591,7 @@ const ProAI: React.FC<ProAIProps> = ({
               Upload your swing for swing analysis
             </h3>
             <p className="mb-6 text-sm">
-              Get instant feedback and drills from Pro AI.
+              Get instant feedback and drills from SwingCoach.
             </p>
             
             <div className="text-left max-w-sm mx-auto">
@@ -747,7 +747,7 @@ const ProAI: React.FC<ProAIProps> = ({
                 <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                   <div className="flex items-center gap-2">
                     <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                    <span className="text-sm">Pro AI is analyzing swing positions...</span>
+                    <span className="text-sm">SwingCoach is analyzing swing positions...</span>
                   </div>
                 </div>
               </div>
@@ -774,4 +774,4 @@ const ProAI: React.FC<ProAIProps> = ({
   );
 };
 
-export default ProAI;
+export default SwingCoach;

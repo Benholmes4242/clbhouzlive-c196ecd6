@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
-import ProAI from './ProAI';
+import SwingCoach from './SwingCoach';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -42,7 +42,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
-  const [proAIAnalysisText, setProAIAnalysisText] = useState('');
+  const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -285,7 +285,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           message: finalMessage,
           conversation,
           detailMode,
-          isProAI: false
+          isSwingCoach: false
         }
       });
 
@@ -429,7 +429,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="proai">Pro AI</TabsTrigger>
+              <TabsTrigger value="swingcoach">SwingCoach</TabsTrigger>
             </TabsList>
           </div>
 
@@ -479,7 +479,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                           <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                             <div className="flex items-center gap-2">
                               <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                              <span className="text-sm">clbhouz pro AI is thinking...</span>
+                              <span className="text-sm">SwingCoach is thinking...</span>
                             </div>
                           </div>
                         </div>
@@ -502,15 +502,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               />
             </TabsContent>
 
-            <TabsContent value="proai" className="h-full m-0">
-              <ProAI 
+            <TabsContent value="swingcoach" className="h-full m-0">
+              <SwingCoach 
                 onClose={() => setActiveTab('chat')}
                 isRecording={isRecording}
                 isProcessing={isProcessing}
                 startRecording={startRecording}
                 stopRecording={stopRecording}
-                analysisText={proAIAnalysisText}
-                onAnalysisTextChange={setProAIAnalysisText}
+                analysisText={swingCoachAnalysisText}
+                onAnalysisTextChange={setSwingCoachAnalysisText}
               />
             </TabsContent>
           </div>
@@ -628,15 +628,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
-          {activeTab === 'proai' && (
+          {activeTab === 'swingcoach' && (
             <div className="p-4">
               <div className="flex gap-2">
                 <div className="flex-1">
                   <Input
-                    value={proAIAnalysisText}
-                    onChange={(e) => setProAIAnalysisText(e.target.value)}
+                    value={swingCoachAnalysisText}
+                    onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
                     placeholder="Describe your swing for analysis..."
-                    onKeyPress={(e) => e.key === 'Enter' && proAIAnalysisText.trim() && document.getElementById('proai-send-btn')?.click()}
+                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swingcoach-send-btn')?.click()}
                     disabled={isRecording || isProcessing}
                   />
                 </div>
@@ -656,14 +656,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                   )}
                 </Button>
                 <Button
-                  id="proai-send-btn"
+                  id="swingcoach-send-btn"
                   onClick={() => {
-                    // Trigger swing analysis in ProAI component
-                    const proAIEvent = new CustomEvent('triggerSwingAnalysis', { 
-                      detail: { analysisText: proAIAnalysisText } 
+                    // Trigger swing analysis in SwingCoach component
+                    const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
+                      detail: { analysisText: swingCoachAnalysisText } 
                     });
-                    window.dispatchEvent(proAIEvent);
-                    setProAIAnalysisText('');
+                    window.dispatchEvent(swingCoachEvent);
+                    setSwingCoachAnalysisText('');
                   }}
                   disabled={isRecording || isProcessing}
                   size="sm"

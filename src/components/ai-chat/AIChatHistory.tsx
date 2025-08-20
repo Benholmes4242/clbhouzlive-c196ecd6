@@ -149,7 +149,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     return isCaddieLog && matchesSearch;
   });
 
-  const filteredProAI = swingAnalyses.filter(analysis => 
+  const filteredSwingCoach = swingAnalyses.filter(analysis => 
     analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
     analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -191,14 +191,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             <TabsList className="w-full px-4 justify-between box-border">
               <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
               <TabsTrigger value="caddie-logs" className="flex-1">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="proai" className="flex-1">Pro AI ({swingAnalyses.length})</TabsTrigger>
+              <TabsTrigger value="swingcoach" className="flex-1">SwingCoach ({swingAnalyses.length})</TabsTrigger>
             </TabsList>
           </div>
 
           <TabsContent value="chat" className="flex-1 p-4">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Your chat conversations with AI
+                Your chat conversations with Echo
               </p>
             </div>
 
@@ -313,21 +313,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="proai" className="flex-1 p-4">
+          <TabsContent value="swingcoach" className="flex-1 p-4">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Your Pro AI swing analyses
+                Your SwingCoach swing analyses
               </p>
             </div>
 
             <ScrollArea className="flex-1">
               <div className="space-y-3">
-                {filteredProAI.length === 0 ? (
+                {filteredSwingCoach.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Pro AI to get started.'}
+                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in SwingCoach to get started.'}
                   </p>
                 ) : (
-                  filteredProAI.map((analysis) => (
+                  filteredSwingCoach.map((analysis) => (
                     <div
                       key={analysis.id}
                       className="p-3 rounded-lg border hover:bg-muted/50"
