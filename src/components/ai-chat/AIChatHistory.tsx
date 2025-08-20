@@ -188,10 +188,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         {/* Tabs */}
         <Tabs defaultValue="chat" className="flex-1 flex flex-col">
           <div className="px-6">
-            <TabsList className="w-full px-0 gap-2 justify-start box-border">
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="caddie-logs">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="proai">Pro AI ({swingAnalyses.length})</TabsTrigger>
+            <TabsList className="w-full px-4 justify-between box-border">
+              <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
+              <TabsTrigger value="caddie-logs" className="flex-1">Caddie Logs</TabsTrigger>
+              <TabsTrigger value="proai" className="flex-1">Pro AI ({swingAnalyses.length})</TabsTrigger>
             </TabsList>
           </div>
 
