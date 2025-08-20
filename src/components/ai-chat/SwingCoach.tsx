@@ -457,8 +457,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       };
 
-      // Save SwingCoach conversations to SwingCoach history (separate from Chat) with updated metadata
+      // Update messages state with the updated AI message
       const allSwingCoachMessages = [...messages, userMessage, updatedAiMessage];
+      setMessages(allSwingCoachMessages);
+
+      // Save SwingCoach conversations to SwingCoach history (separate from Chat) with updated metadata
       localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
 
       // Set current analysis for potential saving
