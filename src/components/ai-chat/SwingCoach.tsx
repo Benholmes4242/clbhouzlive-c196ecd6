@@ -64,22 +64,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Load saved analyses and messages from localStorage
+  // Load saved analyses from localStorage
   useEffect(() => {
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const parsedAnalyses = savedAnalyses.map((analysis: any) => ({
-      ...analysis,
-      timestamp: new Date(analysis.timestamp)
-    }));
-    setAnalyses(parsedAnalyses);
-
-    // Load swing coach message history
-    const savedMessages = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-    const parsedMessages = savedMessages.map((msg: any) => ({
-      ...msg,
-      timestamp: new Date(msg.timestamp)
-    }));
-    setMessages(parsedMessages);
+    setAnalyses(savedAnalyses);
   }, []);
 
   useEffect(() => {
