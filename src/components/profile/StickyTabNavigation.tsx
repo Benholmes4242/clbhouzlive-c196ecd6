@@ -26,7 +26,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
 
   const tabs: Tab[] = [
     { id: 'activity', label: 'Activity', icon: Activity },
-    { id: 'courses', label: 'Courses Played', icon: MapPin },
+    { id: 'courses', label: 'Courses', icon: MapPin },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
