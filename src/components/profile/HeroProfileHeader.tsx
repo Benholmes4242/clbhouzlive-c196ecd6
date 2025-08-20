@@ -392,11 +392,13 @@ const HeroProfileHeader = ({
     formData,
     saving,
     isUsernameSet,
+    profile: profileFromHook,
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
+    handleFileChange,
     handleSave,
   } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
@@ -559,10 +561,10 @@ const HeroProfileHeader = ({
         }}
         onStatClick={handleStatClick}
       />
-      {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
+      {/* Responsive Immersive Header - Uses header photo from profile */}
       <div className="relative w-full">
         <ResponsiveImmersiveHeader
-          mediaItems={mediaItems}
+          headerImageUrl={profile?.cover_photo_url}
           isCollapsed={showStickyHeader}
         />
       </div>
@@ -823,11 +825,13 @@ const HeroProfileHeader = ({
             isUsernameSet={isUsernameSet}
             userId={user?.id || ''}
             userType={profile?.user_type}
+            profile={profileFromHook}
             onInputChange={handleInputChange}
             onTextareaChange={handleTextareaChange}
             onSelectChange={handleSelectChange}
             onHandicapChange={handleHandicapChange}
             onPublicToggle={handlePublicToggle}
+            onFileChange={handleFileChange}
             onProfileUpdate={onProfileUpdate}
           />
           <div className="flex justify-end gap-2 mt-4">

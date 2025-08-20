@@ -27,13 +27,14 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
     <button
       onClick={onClick}
       className={`
-        flex flex-col items-center gap-1 p-3 rounded-xl bg-background/60 
+        flex flex-col items-center gap-2 p-4 rounded-xl bg-background/60 
         hover:bg-background/80 transition-all duration-200 backdrop-blur-sm 
-        border border-border/30 hover:scale-105
-        ${isMobile ? 'min-w-[70px] flex-shrink-0' : 'flex-1'}
+        border border-gray-200/50 hover:border-gray-300/70 hover:scale-105
+        focus:ring-2 focus:ring-gray-300 focus:ring-offset-2
+        ${isMobile ? 'min-w-[80px] flex-shrink-0' : 'flex-1'}
       `}
     >
-      <Icon className="w-5 h-5 text-primary" />
+      <Icon className="w-5 h-5 text-gray-600" />
       <div className="text-lg font-bold text-foreground">{value}</div>
       <div className="text-xs text-muted-foreground font-medium text-center">{label}</div>
     </button>

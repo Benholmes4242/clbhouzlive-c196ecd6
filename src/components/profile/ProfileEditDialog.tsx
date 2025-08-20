@@ -27,6 +27,8 @@ interface ProfileEditDialogProps {
     website_url?: string | null;
     location?: string | null;
     bio?: string | null;
+    profile_photo_url?: string | null;
+    cover_photo_url?: string | null;
   } | null;
   userId: string;
   onProfileUpdate: () => void;
@@ -43,11 +45,13 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     formData,
     saving,
     isUsernameSet,
+    profile: profileFromHook,
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
+    handleFileChange,
     handleSave,
   } = useProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
 
@@ -68,11 +72,13 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
           isUsernameSet={isUsernameSet}
           userId={userId}
           userType={profile?.user_type}
+          profile={profile}
           onInputChange={handleInputChange}
           onTextareaChange={handleTextareaChange}
           onSelectChange={handleSelectChange}
           onHandicapChange={handleHandicapChange}
           onPublicToggle={handlePublicToggle}
+          onFileChange={handleFileChange}
           onProfileUpdate={onProfileUpdate}
         />
         <div className="flex justify-end gap-2">

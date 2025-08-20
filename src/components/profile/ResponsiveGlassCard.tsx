@@ -44,16 +44,17 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
       relative z-20 bg-background/80 backdrop-blur-xl border border-border/30 rounded-2xl
       transition-all duration-500 ease-out
       ${isMobile 
-        ? 'mx-4 p-4 scale-90' // Mobile: smaller scale, tighter margins
-        : 'mx-auto max-w-md p-6 scale-100' // Desktop: centered with breathing space
+        ? 'mx-4 p-6 -mt-20' // Mobile: overlap header by moving up
+        : 'mx-auto max-w-2xl p-8 -mt-24' // Desktop: more overlap and wider
       }
       shadow-2xl shadow-black/20
     `}>
-      {/* Profile Photo with Enhanced Blur Background */}
-      <div className="relative flex flex-col items-center mb-4">
+      {/* Profile Layout - Avatar left, Name/Username right */}
+      <div className="flex items-start gap-6">
+        {/* Larger Avatar */}
         <div className={`
-          relative rounded-full overflow-hidden border-4 border-primary/20
-          ${isMobile ? 'w-20 h-20' : 'w-24 h-24'}
+          relative rounded-full overflow-hidden border-4 border-gray-200/20 flex-shrink-0
+          ${isMobile ? 'w-24 h-24' : 'w-28 h-28'}
         `}>
           {/* Blur background behind photo */}
           {profile?.profile_photo_url && (
@@ -73,86 +74,80 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
           />
         </div>
         
-        {/* Name and Username */}
-        <div className="text-center mt-3">
-          <h1 className={`font-bold text-foreground ${isMobile ? 'text-lg' : 'text-xl'}`}>
+        {/* Name and Username - Left aligned */}
+        <div className="flex-1 min-w-0">
+          <h1 className={`font-bold text-foreground ${isMobile ? 'text-xl' : 'text-2xl'} leading-tight`}>
             {displayName}
           </h1>
           {username && (
-            <p className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+            <p className={`text-muted-foreground ${isMobile ? 'text-base' : 'text-lg'} mt-1`}>
               @{username}
+            </p>
+          )}
+          
+          {/* Bio below name */}
+          {bio && (
+            <p className={`text-muted-foreground leading-relaxed mt-3 ${
+              isMobile ? 'text-sm' : 'text-base'
+            }`}>
+              {bio}  
             </p>
           )}
         </div>
       </div>
 
-      {/* Bio */}
-      {bio && (
-        <div className="mb-4">
-          <p className={`text-center text-muted-foreground leading-relaxed ${
-            isMobile ? 'text-sm' : 'text-base'
-          }`}>
-            {bio}
+      {/* Meta Info - Centered titles above values */}
+      <div className="grid grid-cols-2 gap-6 mt-6">
+        <div className="text-center p-4 rounded-lg bg-background/40">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
+            Home Club
+          </p>
+          <p className={`font-medium text-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+            {homeClub}
           </p>
         </div>
-      )}
-
-      {/* Quick Info */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-background/40">
-          <MapPin className="w-4 h-4 text-primary" />
-          <div>
-            <p className="text-xs text-muted-foreground">Home Club</p>
-            <p className={`font-medium text-foreground ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {homeClub}
-            </p>
-          </div>
-        </div>
         
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-background/40">
-          <BarChart3 className="w-4 h-4 text-primary" />
-          <div>
-            <p className="text-xs text-muted-foreground">Handicap</p>
-            <p className={`font-medium text-foreground ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {handicap ? handicap.toFixed(1) : 'N/A'}
-            </p>
-          </div>
+        <div className="text-center p-4 rounded-lg bg-background/40">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">
+            Handicap
+          </p>
+          <p className={`font-medium text-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+            {handicap ? handicap.toFixed(1) : 'N/A'}
+          </p>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Only for own profile */}
       {isOwnProfile && (
-        <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        <div className={`grid gap-3 mt-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
           <Button
             variant="outline"
-            size={isMobile ? "sm" : "default"}
+            size={isMobile ? "default" : "default"}
             onClick={onEditProfile}
-            className="w-full"
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
           >
             Edit Profile
           </Button>
           <Button
-            variant="default"
-            size={isMobile ? "sm" : "default"}
+            variant="outline"
+            size={isMobile ? "default" : "default"}
             onClick={onMediaManager}
-            className="w-full"
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
           >
             <Camera className="w-4 h-4 mr-2" />
-            {isMobile ? 'Media' : 'Manage Media'}
+            Media
           </Button>
+          {hasImmersiveMedia && (
+            <Button
+              variant="outline"
+              size={isMobile ? "default" : "default"}
+              onClick={onPreviewImmersive}
+              className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+            >
+              Preview Profile
+            </Button>
+          )}
         </div>
-      )}
-
-      {/* Preview Button for Own Profile with Media */}
-      {isOwnProfile && hasImmersiveMedia && (
-        <Button
-          variant="secondary"
-          size={isMobile ? "sm" : "default"}
-          onClick={onPreviewImmersive}
-          className="w-full mt-2"
-        >
-          Preview Profile
-        </Button>
       )}
     </div>
   );
