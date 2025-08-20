@@ -575,7 +575,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div ref={profileCardRef} className="relative z-50 pt-80">
+      <div ref={profileCardRef} className="relative z-50 pt-32">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
