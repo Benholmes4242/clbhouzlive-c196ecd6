@@ -97,7 +97,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         onTouchEnd={handleTouchEnd}
         style={{
           position: 'fixed',
-          bottom: '24px',
+          bottom: '80px',
           right: '24px',
           zIndex: 10000
         }}
