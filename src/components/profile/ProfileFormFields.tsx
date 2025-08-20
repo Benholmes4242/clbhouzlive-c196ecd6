@@ -86,11 +86,11 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
       <div className="space-y-2">
         <Label htmlFor="profilePhoto">Profile Photo</Label>
         <div className="flex items-center gap-4">
-          {profile?.profile_photo_url && (
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+          {(profile?.profile_photo_url || formData.profilePhoto) && (
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
               <img 
-                src={profile.profile_photo_url} 
-                alt="Current profile" 
+                src={formData.profilePhoto ? URL.createObjectURL(formData.profilePhoto) : profile?.profile_photo_url} 
+                alt="Profile photo preview" 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -114,11 +114,11 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
       <div className="space-y-2">
         <Label htmlFor="headerPhoto">Header Photo</Label>
         <div className="flex items-center gap-4">
-          {profile?.header_photo_url && (
-            <div className="w-20 h-12 rounded overflow-hidden bg-gray-200">
+          {(profile?.header_photo_url || formData.headerPhoto) && (
+            <div className="w-20 h-12 rounded overflow-hidden bg-gray-200 flex-shrink-0">
               <img 
-                src={profile.header_photo_url} 
-                alt="Current header" 
+                src={formData.headerPhoto ? URL.createObjectURL(formData.headerPhoto) : profile?.header_photo_url} 
+                alt="Header photo preview" 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -134,6 +134,11 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
             <p className="text-xs text-muted-foreground mt-1">
               Images only. Recommended 1600×600+
             </p>
+            {formData.headerPhoto && (
+              <p className="text-xs text-green-600 mt-1">
+                File selected: {formData.headerPhoto.name}
+              </p>
+            )}
           </div>
         </div>
       </div>

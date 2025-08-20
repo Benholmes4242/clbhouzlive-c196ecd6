@@ -16,6 +16,8 @@ interface Profile {
   website_url?: string | null;
   location?: string | null;
   bio?: string | null;
+  profile_photo_url?: string | null;
+  header_photo_url?: string | null;
 }
 
 interface ProfileFormData {
@@ -141,16 +143,19 @@ export const useProfileForm = (
       // Handle profile photo upload
       if (formData.profilePhoto) {
         const fileExt = formData.profilePhoto.name.split('.').pop();
-        const fileName = `${userId}-profile-${Date.now()}.${fileExt}`;
+        const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
         
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('profile-images')
           .upload(fileName, formData.profilePhoto, {
             cacheControl: '3600',
             upsert: true
           });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Profile photo upload error:', uploadError);
+          throw uploadError;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('profile-images')
@@ -162,16 +167,19 @@ export const useProfileForm = (
       // Handle header photo upload
       if (formData.headerPhoto) {
         const fileExt = formData.headerPhoto.name.split('.').pop();
-        const fileName = `${userId}-header-${Date.now()}.${fileExt}`;
+        const fileName = `${userId}/header-${Date.now()}.${fileExt}`;
         
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('profile-images')
           .upload(fileName, formData.headerPhoto, {
             cacheControl: '3600',
             upsert: true
           });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Header photo upload error:', uploadError);
+          throw uploadError;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('profile-images')
@@ -180,10 +188,15 @@ export const useProfileForm = (
         updateData.header_photo_url = publicUrl;
       }
 
-      await supabase
+      const { error } = await supabase
         .from('user_profiles')
         .update(updateData)
         .eq('id', userId);
+
+      if (error) {
+        console.error('Profile update error:', error);
+        throw error;
+      }
 
       onProfileUpdate();
       onClose();

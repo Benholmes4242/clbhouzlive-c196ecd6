@@ -27,6 +27,8 @@ interface ProfileEditDialogProps {
     website_url?: string | null;
     location?: string | null;
     bio?: string | null;
+    profile_photo_url?: string | null;
+    header_photo_url?: string | null;
   } | null;
   userId: string;
   onProfileUpdate: () => void;
