@@ -106,6 +106,11 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
             <p className="text-xs text-muted-foreground mt-1">
               Square images work best for profile photos
             </p>
+            {formData.profilePhoto && (
+              <p className="text-xs text-green-600 mt-1">
+                File selected: {formData.profilePhoto.name}
+              </p>
+            )}
           </div>
         </div>
       </div>

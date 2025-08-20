@@ -142,6 +142,7 @@ export const useProfileForm = (
 
       // Handle profile photo upload
       if (formData.profilePhoto) {
+        console.log('Uploading profile photo:', formData.profilePhoto.name);
         const fileExt = formData.profilePhoto.name.split('.').pop();
         const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
         
@@ -162,10 +163,12 @@ export const useProfileForm = (
           .getPublicUrl(fileName);
 
         updateData.profile_photo_url = publicUrl;
+        console.log('Profile photo uploaded successfully:', publicUrl);
       }
 
       // Handle header photo upload
       if (formData.headerPhoto) {
+        console.log('Uploading header photo:', formData.headerPhoto.name);
         const fileExt = formData.headerPhoto.name.split('.').pop();
         const fileName = `${userId}/header-${Date.now()}.${fileExt}`;
         
@@ -186,7 +189,10 @@ export const useProfileForm = (
           .getPublicUrl(fileName);
 
         updateData.header_photo_url = publicUrl;
+        console.log('Header photo uploaded successfully:', publicUrl);
       }
+
+      console.log('Updating profile with data:', updateData);
 
       const { error } = await supabase
         .from('user_profiles')
@@ -198,6 +204,7 @@ export const useProfileForm = (
         throw error;
       }
 
+      console.log('Profile updated successfully');
       onProfileUpdate();
       onClose();
     } catch (error) {
