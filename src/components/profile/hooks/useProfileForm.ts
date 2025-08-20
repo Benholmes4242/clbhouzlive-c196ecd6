@@ -16,8 +16,6 @@ interface Profile {
   website_url?: string | null;
   location?: string | null;
   bio?: string | null;
-  profile_photo_url?: string | null;
-  cover_photo_url?: string | null;
 }
 
 interface ProfileFormData {
@@ -33,8 +31,6 @@ interface ProfileFormData {
   websiteUrl: string;
   location: string;
   bio: string;
-  profilePhoto: File | null;
-  headerPhoto: File | null;
 }
 
 export const useProfileForm = (
@@ -56,8 +52,6 @@ export const useProfileForm = (
     websiteUrl: profile?.website_url || "",
     location: profile?.location || "",
     bio: profile?.bio || "",
-    profilePhoto: null,
-    headerPhoto: null,
   });
   const [saving, setSaving] = useState(false);
 
@@ -110,47 +104,9 @@ export const useProfileForm = (
     }));
   };
 
-  const handleFileChange = (field: 'profilePhoto' | 'headerPhoto', file: File | null) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: file
-    }));
-  };
-
-  const uploadFile = async (file: File, bucket: string, folder: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${folder}/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    return publicUrl;
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
-      let profilePhotoUrl = profile?.profile_photo_url;
-      let headerPhotoUrl = profile?.cover_photo_url;
-
-      // Upload profile photo if new file selected
-      if (formData.profilePhoto) {
-        profilePhotoUrl = await uploadFile(formData.profilePhoto, 'avatars', 'profile-photos');
-      }
-
-      // Upload header photo if new file selected
-      if (formData.headerPhoto) {
-        headerPhotoUrl = await uploadFile(formData.headerPhoto, 'avatars', 'header-photos');
-      }
-
       const updateData: any = {
         display_name: formData.displayName,
         home_club: formData.homeClub || null,
@@ -163,8 +119,6 @@ export const useProfileForm = (
         website_url: formData.websiteUrl || null,
         location: formData.location || null,
         bio: formData.bio || null,
-        profile_photo_url: profilePhotoUrl,
-        cover_photo_url: headerPhotoUrl,
         updated_at: new Date().toISOString(),
       };
 
@@ -196,7 +150,6 @@ export const useProfileForm = (
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
-    handleFileChange,
     handleSave,
   };
 };

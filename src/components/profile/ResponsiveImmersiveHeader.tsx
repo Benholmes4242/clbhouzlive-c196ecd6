@@ -1,16 +1,26 @@
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+interface MediaItem {
+  id: string;
+  media_type: string;
+  media_url: string;
+  thumbnail_url?: string;
+}
+
 interface ResponsiveImmersiveHeaderProps {
-  headerImageUrl?: string;
+  mediaItems: MediaItem[];
   isCollapsed?: boolean;
 }
 
 const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
-  headerImageUrl,
+  mediaItems,
   isCollapsed = false
 }) => {
   const isMobile = useIsMobile();
+
+  // Always show immersive header, use default background if no media
+  const primaryMedia = mediaItems.length > 0 ? mediaItems[0] : null;
   
   return (
     <div className={`
@@ -24,15 +34,27 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
           : 'h-80' // Desktop full - increased from h-72
       }
     `}>
-      {/* Header Image or Default Background */}
-      {headerImageUrl ? (
-        <img
-          src={headerImageUrl}
-          alt="Profile header"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      {/* Background Media or Default */}
+      {primaryMedia ? (
+        primaryMedia.media_type === 'video' ? (
+          <video
+            src={primaryMedia.media_url}
+            poster={primaryMedia.thumbnail_url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <img
+            src={primaryMedia.media_url}
+            alt="Profile header"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )
       ) : (
-        // Default background for profiles without header image
+        // Default background for profiles without media
         <div 
           className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black"
           style={{

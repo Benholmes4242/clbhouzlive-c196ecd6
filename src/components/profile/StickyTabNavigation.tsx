@@ -77,8 +77,8 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
                   onClick={() => onTabChange(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 ${
                     isActive
-                      ? 'text-gray-700 bg-gray-100/80'
-                      : 'text-muted-foreground hover:text-gray-700 hover:bg-gray-50/50'
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   } ${isMobile ? 'text-sm' : 'text-base'}`}
                 >
                   <Icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -93,7 +93,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
 
           {/* Animated Underline */}
           <div 
-            className="absolute bottom-0 h-0.5 bg-gray-400 transition-all duration-300 ease-out rounded-full"
+            className="absolute bottom-0 h-0.5 bg-primary transition-all duration-300 ease-out rounded-full"
             style={{
               left: underlineStyle.left,
               width: underlineStyle.width,
