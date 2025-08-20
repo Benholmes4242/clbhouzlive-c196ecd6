@@ -608,7 +608,7 @@ const HeroProfileHeader = ({
 
       {/* Responsive Glass Profile Card - Positioned to straddle 50/50 based on measured header height */}
       <div ref={profileCardRef} className="relative z-50" style={{ 
-        paddingTop: headerHeight > 0 ? `${headerHeight * 0.75}px` : (
+        paddingTop: headerHeight > 0 ? `${headerHeight - 150}px` : ( // Card center at header bottom edge (assuming 300px card height)
           isMobile 
             ? showStickyHeader ? '4rem' : '20rem'  // Fallback values
             : showStickyHeader ? '6rem' : '24rem'
