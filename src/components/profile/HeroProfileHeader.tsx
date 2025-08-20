@@ -563,7 +563,7 @@ const HeroProfileHeader = ({
       />
       {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
       {/* Responsive Immersive Header - Now extends underneath main header */}
-      <div className="relative w-full -mt-16 pt-16">
+      <div className="relative w-full -mt-16">
         <ResponsiveImmersiveHeader
           mediaItems={profile?.header_photo_url ? [{
             id: 'header',
