@@ -158,7 +158,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+        <div className="animate-spin h-8 w-8 border-2 border-gray-400 border-t-transparent rounded-full"></div>
       </div>
     );
   }
@@ -197,7 +197,7 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
                       <Button
                         onClick={() => saveEdit(log.id)}
                         size="sm"
-                        className="h-7"
+                        className="h-7 bg-gray-100 text-gray-800 hover:bg-gray-200 border-0"
                       >
                         Save
                       </Button>

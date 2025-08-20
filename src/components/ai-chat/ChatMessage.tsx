@@ -36,14 +36,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className={`max-w-[80%] ${isUser ? 'order-2' : 'order-1'}`}>
         <div className={`flex items-start gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
           <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-            isUser ? 'bg-primary text-primary-foreground' : 'bg-muted'
+            isUser ? 'bg-gray-100 text-gray-800' : 'bg-muted'
           }`}>
             {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
           </div>
           
           <div className={`rounded-lg p-3 ${
             isUser 
-              ? 'bg-primary text-primary-foreground' 
+              ? 'bg-gray-100 text-gray-800' 
               : 'bg-muted'
           }`}>
             <div className="prose prose-sm max-w-none dark:prose-invert">

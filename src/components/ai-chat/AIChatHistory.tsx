@@ -213,7 +213,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     <div
                       key={`${message.id}-${index}`}
                       className={`p-3 rounded-lg border cursor-pointer hover:bg-muted/50 ${
-                        message.type === 'user' ? 'bg-primary/5' : 'bg-muted/20'
+                        message.type === 'user' ? 'bg-gray-100/50' : 'bg-muted/20'
                       }`}
                       onClick={() => {
                         if (message.type === 'user') {
@@ -222,7 +222,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <Badge variant={message.type === 'user' ? 'default' : 'secondary'}>
+                        <Badge variant="secondary">
                           {message.type === 'user' ? 'You' : 'AI'}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
