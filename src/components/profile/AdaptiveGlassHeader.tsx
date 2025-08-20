@@ -72,7 +72,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
           <div className="flex items-center justify-between">
             {/* Profile Info */}
             <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10 rounded-xl">
+              <Avatar className="w-12 h-12 rounded-xl">
                 <AvatarImage 
                   src={profile.profile_photo_url || undefined}
                   alt={profile.display_name || 'User'}
@@ -93,7 +93,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
               <div className="min-w-0">
                 <div 
                   className={`
-                    font-bold text-base truncate transition-colors duration-300
+                    font-bold text-lg truncate transition-colors duration-300
                     ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
                   `}
                 >
@@ -102,7 +102,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                 {profile.username && (
                   <div 
                     className={`
-                      text-xs truncate transition-colors duration-300
+                      text-sm truncate transition-colors duration-300
                       ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
                     `}
                   >
@@ -128,7 +128,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                 >
                   <div 
                     className={`
-                      font-bold text-sm transition-colors duration-300
+                      font-bold text-base transition-colors duration-300
                       ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
                     `}
                   >
@@ -136,7 +136,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                   </div>
                   <div 
                     className={`
-                      text-xs transition-colors duration-300
+                      text-sm transition-colors duration-300
                       ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
                     `}
                   >

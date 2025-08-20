@@ -26,6 +26,8 @@ interface ProfileFormData {
   websiteUrl: string;
   location: string;
   bio: string;
+  profilePhoto: File | null;
+  headerPhoto: File | null;
 }
 
 interface ProfileFormFieldsProps {
@@ -33,11 +35,13 @@ interface ProfileFormFieldsProps {
   isUsernameSet: boolean;
   userId: string;
   userType?: string;
+  profile?: any;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTextareaChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
   onHandicapChange: (value: string) => void;
   onPublicToggle: (checked: boolean) => void;
+  onFileChange: (field: 'profilePhoto' | 'headerPhoto', file: File | null) => void;
   onProfileUpdate: () => void;
 }
 
@@ -46,11 +50,13 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   isUsernameSet,
   userId,
   userType = 'individual',
+  profile,
   onInputChange,
   onTextareaChange,
   onSelectChange,
   onHandicapChange,
   onPublicToggle,
+  onFileChange,
   onProfileUpdate,
 }) => {
   // All profiles are now personal profiles
@@ -74,6 +80,62 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           onChange={onInputChange}
           placeholder="Your display name"
         />
+      </div>
+
+      {/* Profile Photo Upload */}
+      <div className="space-y-2">
+        <Label htmlFor="profilePhoto">Profile Photo</Label>
+        <div className="flex items-center gap-4">
+          {profile?.profile_photo_url && (
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+              <img 
+                src={profile.profile_photo_url} 
+                alt="Current profile" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div className="flex-1">
+            <Input
+              id="profilePhoto"
+              type="file"
+              accept="image/*"
+              onChange={(e) => onFileChange('profilePhoto', e.target.files?.[0] || null)}
+              className="cursor-pointer"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Square images work best for profile photos
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Header Photo Upload */}
+      <div className="space-y-2">
+        <Label htmlFor="headerPhoto">Header Photo</Label>
+        <div className="flex items-center gap-4">
+          {profile?.header_photo_url && (
+            <div className="w-20 h-12 rounded overflow-hidden bg-gray-200">
+              <img 
+                src={profile.header_photo_url} 
+                alt="Current header" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div className="flex-1">
+            <Input
+              id="headerPhoto"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={(e) => onFileChange('headerPhoto', e.target.files?.[0] || null)}
+              className="cursor-pointer"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Images only. Recommended 1600×600+
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Username - common for both types */}

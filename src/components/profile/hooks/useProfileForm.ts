@@ -31,6 +31,8 @@ interface ProfileFormData {
   websiteUrl: string;
   location: string;
   bio: string;
+  profilePhoto: File | null;
+  headerPhoto: File | null;
 }
 
 export const useProfileForm = (
@@ -52,6 +54,8 @@ export const useProfileForm = (
     websiteUrl: profile?.website_url || "",
     location: profile?.location || "",
     bio: profile?.bio || "",
+    profilePhoto: null,
+    headerPhoto: null,
   });
   const [saving, setSaving] = useState(false);
 
@@ -104,6 +108,13 @@ export const useProfileForm = (
     }));
   };
 
+  const handleFileChange = (field: 'profilePhoto' | 'headerPhoto', file: File | null) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: file
+    }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -125,6 +136,48 @@ export const useProfileForm = (
       if (!isUsernameSet) {
         // Clean username one more time before saving to ensure no spaces
         updateData.username = formData.username ? formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase() : null;
+      }
+
+      // Handle profile photo upload
+      if (formData.profilePhoto) {
+        const fileExt = formData.profilePhoto.name.split('.').pop();
+        const fileName = `${userId}-profile-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('profile-images')
+          .upload(fileName, formData.profilePhoto, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(fileName);
+
+        updateData.profile_photo_url = publicUrl;
+      }
+
+      // Handle header photo upload
+      if (formData.headerPhoto) {
+        const fileExt = formData.headerPhoto.name.split('.').pop();
+        const fileName = `${userId}-header-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('profile-images')
+          .upload(fileName, formData.headerPhoto, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(fileName);
+
+        updateData.header_photo_url = publicUrl;
       }
 
       await supabase
@@ -150,6 +203,7 @@ export const useProfileForm = (
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
+    handleFileChange,
     handleSave,
   };
 };

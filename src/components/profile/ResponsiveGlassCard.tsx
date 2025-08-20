@@ -76,11 +76,13 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         }}
         data-glass-mode={glassMode}
       >
-      {/* Profile Photo with Enhanced Blur Background */}
-      <div className="relative flex flex-col items-center mb-4">
+{/* Profile Photo with Enhanced Blur Background */}
+      <div className="relative flex items-center mb-4">
+        {/* Larger Avatar positioned to half overlap header */}
         <div className={`
-          relative rounded-full overflow-hidden border-4 border-primary/20
-          ${isMobile ? 'w-20 h-20' : 'w-24 h-24'}
+          relative rounded-full overflow-hidden
+          ${isMobile ? 'w-32 h-32' : 'w-40 h-40'}
+          flex-shrink-0
         `}>
           {/* Blur background behind photo */}
           {profile?.profile_photo_url && (
@@ -100,12 +102,12 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
           />
         </div>
         
-        {/* Name and Username */}
-        <div className="text-center mt-3">
+        {/* Name and Username to the right of avatar */}
+        <div className="ml-4 flex-1">
           <h1 className={`
             font-bold transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-            ${isMobile ? 'text-lg' : 'text-xl'}
+            ${isMobile ? 'text-xl' : 'text-2xl'}
           `}>
             {displayName}
           </h1>
@@ -134,80 +136,72 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       )}
 
-      {/* Quick Info */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className={`
-          flex flex-col items-center p-3 rounded-lg transition-colors duration-300
-          ${glassMode === 'elevated' ? 'bg-black/5' : 'bg-white/10'}
-        `}>
+      {/* Home Club & Handicap in two columns */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="text-center">
           <p className={`
             text-xs mb-1 transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-black/60' : 'text-white/60'}
+            ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
           `}>
             Home Club
           </p>
           <p className={`
-            font-medium text-center transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-            ${isMobile ? 'text-xs' : 'text-sm'}
+            font-normal text-center transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
+            ${isMobile ? 'text-sm' : 'text-base'}
           `}>
             {homeClub}
           </p>
         </div>
         
-        <div className={`
-          flex flex-col items-center p-3 rounded-lg transition-colors duration-300
-          ${glassMode === 'elevated' ? 'bg-black/5' : 'bg-white/10'}
-        `}>
+        <div className="text-center">
           <p className={`
             text-xs mb-1 transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-black/60' : 'text-white/60'}
+            ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
           `}>
             Handicap
           </p>
           <p className={`
-            font-medium text-center transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-            ${isMobile ? 'text-xs' : 'text-sm'}
+            font-semibold text-center transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
+            ${isMobile ? 'text-sm' : 'text-base'}
           `}>
             {handicap ? handicap.toFixed(1) : 'N/A'}
           </p>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons with gray styling */}
       {isOwnProfile && (
-        <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
           <Button
             variant="outline"
             size={isMobile ? "sm" : "default"}
             onClick={onEditProfile}
-            className="w-full"
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
           >
             Edit Profile
           </Button>
           <Button
-            variant="default"
+            variant="outline"
             size={isMobile ? "sm" : "default"}
             onClick={onMediaManager}
-            className="w-full"
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
           >
             <Camera className="w-4 h-4 mr-2" />
             {isMobile ? 'Media' : 'Manage Media'}
           </Button>
+          {hasImmersiveMedia && (
+            <Button
+              variant="outline"
+              size={isMobile ? "sm" : "default"}
+              onClick={onPreviewImmersive}
+              className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            >
+              Preview Profile
+            </Button>
+          )}
         </div>
-      )}
-
-      {/* Preview Button for Own Profile with Media */}
-      {isOwnProfile && hasImmersiveMedia && (
-        <Button
-          variant="secondary"
-          size={isMobile ? "sm" : "default"}
-          onClick={onPreviewImmersive}
-          className="w-full mt-2"
-        >
-          Preview Profile
-        </Button>
       )}
     </div>
     </>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Zap, Trophy, Star, TrendingUp } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ResponsiveStatsDisplayProps {
@@ -18,8 +17,7 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
 }) => {
   const isMobile = useIsMobile();
 
-  const PrimaryStat = ({ icon: Icon, label, value, onClick }: {
-    icon: React.ElementType;
+  const PrimaryStat = ({ label, value, onClick }: {
     label: string;
     value: string | number;
     onClick?: () => void;
@@ -27,15 +25,14 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
     <button
       onClick={onClick}
       className={`
-        flex flex-col items-center gap-1 p-3 rounded-xl bg-background/60 
-        hover:bg-background/80 transition-all duration-200 backdrop-blur-sm 
-        border border-border/30 hover:scale-105
+        flex flex-col items-center gap-1 p-3 rounded-lg bg-white/80 
+        hover:bg-white/90 transition-all duration-200 backdrop-blur-sm 
+        border border-gray-200 hover:border-gray-300 hover:scale-105
         ${isMobile ? 'min-w-[70px] flex-shrink-0' : 'flex-1'}
       `}
     >
-      <Icon className="w-5 h-5 text-primary" />
-      <div className="text-lg font-bold text-foreground">{value}</div>
-      <div className="text-xs text-muted-foreground font-medium text-center">{label}</div>
+      <div className="text-lg font-semibold text-gray-900">{value}</div>
+      <div className="text-xs text-gray-600 font-medium text-center">{label}</div>
     </button>
   );
 
@@ -49,25 +46,21 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
         }
       `}>
         <PrimaryStat 
-          icon={Zap} 
           label="Handicap" 
           value={primaryStats.handicap}
           onClick={() => onStatClick?.('handicap')}
         />
         <PrimaryStat 
-          icon={Trophy} 
           label="Posts" 
           value={primaryStats.posts}
           onClick={() => onStatClick?.('posts')}
         />
         <PrimaryStat 
-          icon={Star} 
           label="Followers" 
           value={primaryStats.followers}
           onClick={() => onStatClick?.('followers')}
         />
         <PrimaryStat 
-          icon={TrendingUp} 
           label="Following" 
           value={primaryStats.following}
           onClick={() => onStatClick?.('following')}

@@ -70,6 +70,7 @@ interface UserProfile {
   username?: string;
   home_club?: string;
   profile_photo_url?: string;
+  header_photo_url?: string;
   profile_video_url?: string;
   profile_video_thumbnail_url?: string;
   has_profile_video?: boolean;
@@ -397,6 +398,7 @@ const HeroProfileHeader = ({
     handlePublicToggle,
     handleTextareaChange,
     handleSelectChange,
+    handleFileChange,
     handleSave,
   } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
@@ -562,13 +564,17 @@ const HeroProfileHeader = ({
       {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
       <div className="relative w-full">
         <ResponsiveImmersiveHeader
-          mediaItems={mediaItems}
+          mediaItems={profile?.header_photo_url ? [{
+            id: 'header',
+            media_type: 'image',
+            media_url: profile.header_photo_url
+          }] : []}
           isCollapsed={showStickyHeader}
         />
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div ref={profileCardRef} className="relative z-50 -mt-20">
+      <div ref={profileCardRef} className="relative z-50 -mt-32">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
@@ -592,8 +598,8 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Underline Animation */}
-      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-lg border-b border-border/20">
+      {/* Tab Navigation with Underline Animation - Gray styling */}
+      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200">
         <div className="relative">
           <div className={`flex ${isMobile ? 'px-4' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
@@ -603,16 +609,16 @@ const HeroProfileHeader = ({
                 className={`
                   relative py-4 px-4 text-sm font-medium transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? 'text-primary' 
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-gray-900' 
+                    : 'text-gray-600 hover:text-gray-800'
                   }
                   flex-1 text-center
                 `}
               >
                 {tab.label}
-                {/* Underline animation */}
+                {/* Gray underline animation */}
                 <div className={`
-                  absolute bottom-0 left-0 right-0 h-0.5 bg-primary
+                  absolute bottom-0 left-0 right-0 h-0.5 bg-gray-400
                   transition-all duration-300 ease-out
                   ${activeSection === tab.id 
                     ? 'scale-x-100 opacity-100' 
@@ -823,11 +829,13 @@ const HeroProfileHeader = ({
             isUsernameSet={isUsernameSet}
             userId={user?.id || ''}
             userType={profile?.user_type}
+            profile={profile}
             onInputChange={handleInputChange}
             onTextareaChange={handleTextareaChange}
             onSelectChange={handleSelectChange}
             onHandicapChange={handleHandicapChange}
             onPublicToggle={handlePublicToggle}
+            onFileChange={handleFileChange}
             onProfileUpdate={onProfileUpdate}
           />
           <div className="flex justify-end gap-2 mt-4">
