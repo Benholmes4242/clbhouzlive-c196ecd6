@@ -67,7 +67,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   // Load saved analyses from localStorage
   useEffect(() => {
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    setAnalyses(savedAnalyses);
+    // Convert timestamp strings/numbers back to Date objects
+    const parsedAnalyses = savedAnalyses.map((analysis: any) => ({
+      ...analysis,
+      timestamp: new Date(analysis.timestamp)
+    }));
+    setAnalyses(parsedAnalyses);
   }, []);
 
   useEffect(() => {
