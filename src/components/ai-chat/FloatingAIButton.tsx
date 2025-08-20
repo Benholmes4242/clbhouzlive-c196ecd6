@@ -96,7 +96,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={`
-          fixed bottom-24 right-6 z-[9999] cursor-pointer
+          fixed bottom-6 right-6 z-[9999] cursor-pointer
           transition-all duration-200 ease-out
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
