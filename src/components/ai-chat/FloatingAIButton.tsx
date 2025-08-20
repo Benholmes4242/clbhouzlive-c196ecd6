@@ -73,13 +73,13 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
       {/* Invisible sentinel for background sampling */}
       <div
         ref={sentinelRef}
-        className="fixed bottom-28 right-6 w-16 h-16 pointer-events-none z-0"
+        className="fixed bottom-28 right-6 w-16 h-16 pointer-events-none z-[9998]"
         style={{ opacity: 0 }}
       />
       
       {/* Onboarding Tooltip */}
       {showOnboarding && (
-        <div className="fixed bottom-24 right-6 z-[60] mb-16 animate-fade-in">
+        <div className="fixed bottom-24 right-6 z-[9999] mb-16 animate-fade-in">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
             <div className="font-medium text-sm mb-1">Meet Echo — your personal AI caddy</div>
             <div className="text-xs text-slate-300">Ask Echo about news, golf tips, swing guidance & more.</div>
