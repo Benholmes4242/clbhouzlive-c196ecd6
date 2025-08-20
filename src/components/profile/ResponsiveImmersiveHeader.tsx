@@ -24,14 +24,14 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
   
   return (
     <div className={`
-      relative w-full overflow-hidden transition-all duration-700 ease-out
+      w-full overflow-hidden transition-all duration-700 ease-out
       ${isCollapsed 
         ? isMobile 
           ? 'h-32' // Mobile collapsed
           : 'h-40' // Desktop collapsed
         : isMobile 
-          ? 'h-96 pt-16' // Mobile full - 384px + 64px padding for header
-          : 'h-[28rem] pt-16' // Desktop full - 448px + 64px padding for header
+          ? 'h-96' // Mobile full 
+          : 'h-[28rem]' // Desktop full 
       }
     `}>
       {/* Background Media or Default */}
