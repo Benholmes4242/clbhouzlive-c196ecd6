@@ -53,6 +53,7 @@ import AdaptiveGlassHeader from './AdaptiveGlassHeader';
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface Course {
   id: string;
@@ -128,6 +129,12 @@ const HeroProfileHeader = ({
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  
+  // Use intersection observer to detect when profile card is out of view
+  const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '-50px 0px 0px 0px' // Only trigger when card is completely out of view with 50px buffer
+  });
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
     duration: 300
@@ -333,18 +340,10 @@ const HeroProfileHeader = ({
     fetchStats();
   }, [profile?.id]);
   
-  // Scroll management for morphing transition
+  // Update sticky header visibility based on profile card intersection
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setShowStickyHeader(scrollY > (isMobile ? 150 : 200));
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMobile]);
-
-  // Handle morphing from identity dock to sticky header
+    setShowStickyHeader(!isProfileCardInView);
+  }, [isProfileCardInView]);
   const handleMorphTransition = () => {
     closeImmersive();
     // Smooth scroll to trigger sticky header
@@ -564,7 +563,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Responsive Glass Profile Card */}
-      <div className="relative z-50 -mt-20">
+      <div ref={profileCardRef} className="relative z-50 -mt-20">
         <ResponsiveGlassCard
           profile={profile}
           isOwnProfile={isOwnProfile}
