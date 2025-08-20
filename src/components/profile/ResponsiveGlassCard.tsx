@@ -1,6 +1,7 @@
 import React from 'react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 import { Button } from '@/components/ui/button';
 
 interface UserProfile {
@@ -32,6 +33,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
   onMediaManager
 }) => {
   const isMobile = useIsMobile();
+  const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
 
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
@@ -40,15 +42,40 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
   const handicap = profile?.eg_handicap_index;
 
   return (
-    <div className={`
-      relative z-20 bg-background/80 backdrop-blur-xl border border-border/30 rounded-2xl
-      transition-all duration-500 ease-out
-      ${isMobile 
-        ? 'mx-4 p-4 scale-90' // Mobile: smaller scale, tighter margins
-        : 'mx-auto max-w-md p-6 scale-100' // Desktop: centered with breathing space
-      }
-      shadow-2xl shadow-black/20
-    `}>
+    <>
+      {/* Invisible sentinel for background sampling */}
+      <div
+        ref={sentinelRef}
+        className="fixed pointer-events-none z-0"
+        style={{ 
+          opacity: 0,
+          top: isMobile ? '180px' : '200px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100px',
+          height: '100px'
+        }}
+      />
+      
+      <div 
+        className={`
+          relative z-20 rounded-2xl transition-all duration-500 ease-out
+          ${isMobile 
+            ? 'mx-4 p-4 scale-90' // Mobile: smaller scale, tighter margins
+            : 'mx-auto max-w-md p-6 scale-100' // Desktop: centered with breathing space
+          }
+        `}
+        style={{
+          ...glassStyles,
+          background: `var(--glass-bg)`,
+          backdropFilter: `var(--glass-blur) saturate(180%)`,
+          WebkitBackdropFilter: `var(--glass-blur) saturate(180%)`,
+          border: `var(--glass-border)`,
+          boxShadow: `var(--glass-shadow)`,
+          color: `var(--glass-text)`,
+        }}
+        data-glass-mode={glassMode}
+      >
       {/* Profile Photo with Enhanced Blur Background */}
       <div className="relative flex flex-col items-center mb-4">
         <div className={`
@@ -75,11 +102,19 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         
         {/* Name and Username */}
         <div className="text-center mt-3">
-          <h1 className={`font-bold text-foreground ${isMobile ? 'text-lg' : 'text-xl'}`}>
+          <h1 className={`
+            font-bold transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
+            ${isMobile ? 'text-lg' : 'text-xl'}
+          `}>
             {displayName}
           </h1>
           {username && (
-            <p className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+            <p className={`
+              transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
+              ${isMobile ? 'text-sm' : 'text-base'}
+            `}>
               @{username}
             </p>
           )}
@@ -89,9 +124,11 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
       {/* Bio */}
       {bio && (
         <div className="mb-4">
-          <p className={`text-center text-muted-foreground leading-relaxed ${
-            isMobile ? 'text-sm' : 'text-base'
-          }`}>
+          <p className={`
+            text-center leading-relaxed transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black/80' : 'text-white/80'}
+            ${isMobile ? 'text-sm' : 'text-base'}
+          `}>
             {bio}
           </p>
         </div>
@@ -99,24 +136,42 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
 
       {/* Quick Info */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-background/40">
-          <MapPin className="w-4 h-4 text-primary" />
-          <div>
-            <p className="text-xs text-muted-foreground">Home Club</p>
-            <p className={`font-medium text-foreground ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {homeClub}
-            </p>
-          </div>
+        <div className={`
+          flex flex-col items-center p-3 rounded-lg transition-colors duration-300
+          ${glassMode === 'elevated' ? 'bg-black/5' : 'bg-white/10'}
+        `}>
+          <p className={`
+            text-xs mb-1 transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black/60' : 'text-white/60'}
+          `}>
+            Home Club
+          </p>
+          <p className={`
+            font-medium text-center transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
+            ${isMobile ? 'text-xs' : 'text-sm'}
+          `}>
+            {homeClub}
+          </p>
         </div>
         
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-background/40">
-          <BarChart3 className="w-4 h-4 text-primary" />
-          <div>
-            <p className="text-xs text-muted-foreground">Handicap</p>
-            <p className={`font-medium text-foreground ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {handicap ? handicap.toFixed(1) : 'N/A'}
-            </p>
-          </div>
+        <div className={`
+          flex flex-col items-center p-3 rounded-lg transition-colors duration-300
+          ${glassMode === 'elevated' ? 'bg-black/5' : 'bg-white/10'}
+        `}>
+          <p className={`
+            text-xs mb-1 transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black/60' : 'text-white/60'}
+          `}>
+            Handicap
+          </p>
+          <p className={`
+            font-medium text-center transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
+            ${isMobile ? 'text-xs' : 'text-sm'}
+          `}>
+            {handicap ? handicap.toFixed(1) : 'N/A'}
+          </p>
         </div>
       </div>
 
@@ -155,6 +210,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </Button>
       )}
     </div>
+    </>
   );
 };
 
