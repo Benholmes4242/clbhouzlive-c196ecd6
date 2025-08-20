@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SavedInsight {
   id: string;
@@ -27,6 +28,17 @@ interface SwingAnalysis {
   videoThumbnail?: string;
   timestamp: Date;
   voiceNote?: string;
+}
+
+interface CaddieLog {
+  id: string;
+  content: string;
+  transcription: string | null;
+  location_name: string | null;
+  course_name: string | null;
+  tags: string[] | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface HistoryMessage {
@@ -50,6 +62,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
+  const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,7 +71,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   }, [isOpen]);
 
-  const loadData = () => {
+  const loadData = async () => {
     // Load history
     const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
     const parsedHistory = history.map((msg: any) => ({
@@ -82,6 +95,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       timestamp: new Date(analysis.timestamp)
     }));
     setSwingAnalyses(parsedAnalyses);
+
+    // Load caddie logs from Supabase
+    try {
+      const { data, error } = await supabase
+        .from('caddie_logs')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCaddieLogs(data || []);
+    } catch (error) {
+      console.error('Error fetching caddie logs:', error);
+    }
   };
 
   const clearHistory = () => {
@@ -141,12 +167,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredCaddieLogs = savedInsights.filter(insight => {
-    // For caddie logs tab, only show items that are actual caddie logs
-    const isCaddieLog = insight.category === 'caddie' || insight.tags.includes('caddie');
-    const matchesSearch = insight.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         insight.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    return isCaddieLog && matchesSearch;
+  const filteredCaddieLogs = caddieLogs.filter(log => {
+    const matchesSearch = log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.course_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.location_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesSearch;
   });
 
   const filteredSwingCoach = swingAnalyses.filter(analysis => 
@@ -259,53 +285,53 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     {searchQuery ? 'No caddie logs found matching your search' : 'No caddie logs yet. Start recording voice notes to see them here.'}
                   </p>
                 ) : (
-                  filteredCaddieLogs.map((insight) => (
+                  filteredCaddieLogs.map((log) => (
                     <div
-                      key={insight.id}
+                      key={log.id}
                       className="p-3 rounded-lg border hover:bg-muted/50"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline">{insight.category}</Badge>
+                          <Badge variant="outline">Caddie Log</Badge>
                           <span className="text-xs text-muted-foreground">
-                            {insight.timestamp.toLocaleDateString()}
+                            {new Date(log.created_at).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => onSelectMessage(insight.summary)}
+                            onClick={() => onSelectMessage(log.content)}
                             className="h-7 px-2"
                           >
                             <RotateCcw className="h-3 w-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteSavedInsight(insight.id)}
-                            className="h-7 px-2 text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
                         </div>
                       </div>
                       
-                      <p className="text-sm font-medium mb-2">{insight.summary}</p>
+                      <p className="text-sm font-medium mb-2">{log.content}</p>
                       
-                      {insight.tags.length > 0 && (
+                      {log.course_name && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          📍 {log.course_name}
+                        </p>
+                      )}
+                      
+                      {log.location_name && !log.course_name && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          📍 {log.location_name}
+                        </p>
+                      )}
+                      
+                      {log.tags && log.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {insight.tags.map((tag, index) => (
+                          {log.tags.map((tag, index) => (
                             <Badge key={index} variant="secondary" className="text-xs">
                               {tag}
                             </Badge>
                           ))}
                         </div>
                       )}
-                      
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {insight.content}
-                      </p>
                     </div>
                   ))
                 )}
