@@ -79,7 +79,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
       
       {/* Onboarding Tooltip */}
       {showOnboarding && (
-        <div className="fixed bottom-24 right-6 z-[10000] mb-16 animate-fade-in">
+        <div className="fixed bottom-40 right-6 z-[10000] animate-fade-in">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
             <div className="font-medium text-sm mb-1">Meet Echo — your personal AI caddy</div>
             <div className="text-xs text-slate-300">Ask Echo about news, golf tips, swing guidance & more.</div>
@@ -95,8 +95,14 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 10000
+        }}
         className={`
-          fixed bottom-24 right-6 z-[10000] cursor-pointer
+          cursor-pointer
           transition-all duration-200 ease-out
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
