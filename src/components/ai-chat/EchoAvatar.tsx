@@ -6,59 +6,65 @@ interface EchoAvatarProps {
 }
 
 const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
-  const getAnimationClass = () => {
+  const barCount = 11; // Based on the waveform image
+  const centerIndex = 5; // Middle bar index
+  
+  // Create animation delays and heights for each bar
+  const getBarHeight = (index: number) => {
+    const distanceFromCenter = Math.abs(index - centerIndex);
+    
     switch (state) {
-      case 'idle': return 'animate-pulse-gentle';
-      case 'listening': return 'animate-pulse-active';
-      case 'processing': return 'animate-pulse-fast';
-      default: return 'animate-pulse-gentle';
+      case 'idle':
+        // Gentle looping wave with varying heights
+        return 20 + (5 - distanceFromCenter) * 4;
+      case 'listening':
+        // More active waveform
+        return 15 + (5 - distanceFromCenter) * 6;
+      case 'processing':
+        // Lower amplitude, faster wave
+        return 18 + (5 - distanceFromCenter) * 3;
+      default:
+        return 20;
     }
   };
 
-  const getWaveformSize = () => {
-    // Scale the waveform to be about 60% of the container
-    return size * 0.6;
+  const getAnimationDelay = (index: number) => {
+    return index * 0.1; // Stagger the animations
+  };
+
+  const getAnimationDuration = () => {
+    switch (state) {
+      case 'idle': return '3s';
+      case 'listening': return '1.5s';
+      case 'processing': return '1s';
+      default: return '2s';
+    }
   };
 
   return (
     <div 
-      className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg"
+      className="flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg"
       style={{ width: size, height: size }}
     >
-      {/* Waveform SVG */}
-      <div
-        className={`${getAnimationClass()} transition-all duration-200 ease-in-out`}
-        style={{
-          width: getWaveformSize(),
-          height: getWaveformSize(),
-        }}
-      >
-        <svg
-          viewBox="0 0 100 100"
-          className="w-full h-full fill-white/90"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Recreating the waveform pattern from your image */}
-          <circle cx="8" cy="85" r="3" />
-          <rect x="15" y="70" width="3" height="20" rx="1.5" />
-          <rect x="22" y="50" width="3" height="40" rx="1.5" />
-          <rect x="29" y="35" width="3" height="55" rx="1.5" />
-          <rect x="36" y="45" width="3" height="45" rx="1.5" />
-          <rect x="43" y="30" width="3" height="60" rx="1.5" />
-          <rect x="50" y="15" width="3" height="70" rx="1.5" />
-          <rect x="57" y="25" width="3" height="60" rx="1.5" />
-          <rect x="64" y="40" width="3" height="50" rx="1.5" />
-          <rect x="71" y="55" width="3" height="35" rx="1.5" />
-          <rect x="78" y="65" width="3" height="25" rx="1.5" />
-          <rect x="85" y="75" width="3" height="15" rx="1.5" />
-          <circle cx="92" cy="85" r="3" />
-        </svg>
+      <div className="flex items-end justify-center gap-0.5" style={{ height: size * 0.6 }}>
+        {Array.from({ length: barCount }, (_, index) => (
+          <div
+            key={index}
+            className="bg-white/90 rounded-full transition-all duration-200 ease-in-out"
+            style={{
+              width: Math.max(1.5, size * 0.05),
+              height: `${Math.max(20, (getBarHeight(index) / 100) * (size * 0.6))}%`,
+              animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`,
+              animationDelay: `${getAnimationDelay(index)}s`
+            }}
+          />
+        ))}
       </div>
       
       {/* Shimmer effect for processing state */}
       {state === 'processing' && (
         <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"
           style={{
             animation: 'shimmer 2s ease-in-out infinite',
             background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)'
