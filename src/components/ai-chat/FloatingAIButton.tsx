@@ -123,6 +123,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
             src={soundwaveIcon}
             alt="Echo Soundwave"
             className="w-6 h-6 relative z-10"
+            style={{ backgroundColor: 'transparent', background: 'transparent' }}
           />
           
           {/* Echo Text (shown when expanded) */}
