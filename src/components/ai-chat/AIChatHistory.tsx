@@ -137,7 +137,7 @@ const VideoPlayerDialog: React.FC<{
             </div>
           )}
           
-          {tags.length > 0 && (
+          {tags && tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {tags.map((tag, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
@@ -173,7 +173,7 @@ const ConversationDetailsDialog: React.FC<{
               <Calendar className="h-3 w-3" />
               {analysis.timestamp.toLocaleDateString()} at {analysis.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
-            {analysis.tags.length > 0 && (
+            {analysis.tags && analysis.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {analysis.tags.map((tag, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
@@ -365,7 +365,7 @@ const SwingAnalysisCard: React.FC<{
             
             <h3 className="text-sm font-medium mb-2 line-clamp-2">{analysis.save_card}</h3>
             
-            {analysis.tags.length > 0 && (
+            {analysis.tags && analysis.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-2">
                 {analysis.tags.slice(0, 3).map((tag, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
@@ -494,8 +494,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     const localAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
     
-    // Combine localStorage data
-    const combined = [...localAnalyses, ...swingCoachHistory];
+    // Combine localStorage data and ensure proper structure
+    const combined = [...localAnalyses, ...swingCoachHistory].map(item => ({
+      ...item,
+      tags: item.tags || [], // Ensure tags is always an array
+      conversation: item.conversation || [] // Ensure conversation is always an array
+    }));
     const unique = combined.filter((item, index, self) => 
       index === self.findIndex(t => t.id === item.id)
     );
@@ -1037,12 +1041,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             <TabsContent value="swing-coach" className="h-full m-0">
               <div className="h-full min-h-0">
                 <div className="px-6 py-5">
-                  {swingAnalyses.length > 0 ? (
+                  {swingAnalyses.filter(item => item && item.tags).length > 0 ? (
                     <div className="space-y-3">
-                      {swingAnalyses.map((analysis) => (
+                      {swingAnalyses.filter(item => item && item.tags).map((analysis) => (
                         <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-160">
                           <SwingAnalysisCard
-                            analysis={analysis}
+                            analysis={{
+                              ...analysis,
+                              tags: analysis.tags || [], // Ensure tags is always an array
+                              conversation: analysis.conversation || [] // Ensure conversation is always an array
+                            }}
                             onDelete={() => deleteSwingAnalysis(analysis.id)}
                           />
                         </div>
