@@ -243,7 +243,12 @@ Want this saved to Insights?
       { role: 'user', content: messageContent }
     ];
 
-    console.log('Sending request to OpenAI with messages:', messages);
+    console.log('=== DEBUGGING INFO ===');
+    console.log('User message:', messageContent);
+    console.log('Has images:', !!(images && images.length > 0));
+    console.log('Selected system prompt (first 200 chars):', selectedSystemPrompt.substring(0, 200));
+    console.log('Total messages:', messages.length);
+    console.log('Sending request to OpenAI with messages:', JSON.stringify(messages, null, 2));
 
     // Use vision model for image analysis
     const model = images && images.length > 0 ? 'gpt-4o' : 'gpt-4o-mini';
