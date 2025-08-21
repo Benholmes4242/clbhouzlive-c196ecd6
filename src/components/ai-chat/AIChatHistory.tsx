@@ -612,7 +612,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const deleteSwingAnalysis = (id: string) => {
     const updated = swingAnalyses.filter(analysis => analysis.id !== id);
     setSwingAnalyses(updated);
-    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updated));
+    
+    // Update both storage locations
+    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updated.filter(a => !a.conversation)));
+    
+    // Also remove from Swing Coach history if it exists there
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    const updatedSwingCoachHistory = swingCoachHistory.filter((msg: any) => msg.id !== id);
+    localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(updatedSwingCoachHistory));
+    
     toast({
       title: "Analysis deleted",
       description: "The swing analysis has been removed",
