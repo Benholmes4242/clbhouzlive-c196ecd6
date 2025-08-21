@@ -1,4 +1,5 @@
 import React from 'react';
+import { Waves } from 'lucide-react';
 
 interface EchoAvatarProps {
   state: 'idle' | 'listening' | 'processing';
@@ -6,32 +7,6 @@ interface EchoAvatarProps {
 }
 
 const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
-  const barCount = 11; // Based on the waveform image
-  const centerIndex = 5; // Middle bar index
-  
-  // Create animation delays and heights for each bar
-  const getBarHeight = (index: number) => {
-    const distanceFromCenter = Math.abs(index - centerIndex);
-    
-    switch (state) {
-      case 'idle':
-        // Gentle looping wave with varying heights
-        return 20 + (5 - distanceFromCenter) * 4;
-      case 'listening':
-        // More active waveform
-        return 15 + (5 - distanceFromCenter) * 6;
-      case 'processing':
-        // Lower amplitude, faster wave
-        return 18 + (5 - distanceFromCenter) * 3;
-      default:
-        return 20;
-    }
-  };
-
-  const getAnimationDelay = (index: number) => {
-    return index * 0.1; // Stagger the animations
-  };
-
   const getAnimationDuration = () => {
     switch (state) {
       case 'idle': return '3s';
@@ -41,25 +16,22 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
     }
   };
 
+  const getIconSize = () => {
+    return Math.max(16, size * 0.5);
+  };
+
   return (
     <div 
       className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg overflow-hidden"
       style={{ width: size, height: size }}
     >
-      <div className="flex items-end justify-center gap-0.5" style={{ height: size * 0.4, width: size * 0.7 }}>
-        {Array.from({ length: barCount }, (_, index) => (
-          <div
-            key={index}
-            className="bg-white/90 rounded-full transition-all duration-200 ease-in-out"
-            style={{
-              width: Math.max(1.2, size * 0.04),
-              height: `${Math.max(15, (getBarHeight(index) / 100) * (size * 0.4))}%`,
-              animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`,
-              animationDelay: `${getAnimationDelay(index)}s`
-            }}
-          />
-        ))}
-      </div>
+      <Waves 
+        size={getIconSize()} 
+        className="text-white/90 transition-all duration-200 ease-in-out"
+        style={{
+          animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`
+        }}
+      />
       
       {/* Shimmer effect for processing state */}
       {state === 'processing' && (
