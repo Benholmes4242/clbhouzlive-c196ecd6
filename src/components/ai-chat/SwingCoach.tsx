@@ -379,6 +379,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           
           extractedFrames = await extractFramesFromVideo(uploadedVideo);
           
+          console.log('🎥 Video Analysis Debug:', {
+            videoSize: uploadedVideo.size,
+            videoType: uploadedVideo.type,
+            extractedFramesCount: extractedFrames.length,
+            firstFrameLength: extractedFrames[0]?.length || 0
+          });
+          
           if (extractedFrames.length === 0) {
             throw new Error("Couldn't extract frames from video");
           }
@@ -435,6 +442,15 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           return;
         }
       }
+
+      console.log('🚀 AI Request Debug:', {
+        message: userMessage.content,
+        hasImages: extractedFrames.length > 0,
+        imageCount: extractedFrames.length,
+        swingContext,
+        detailMode: false,
+        isProAI: true
+      });
 
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
