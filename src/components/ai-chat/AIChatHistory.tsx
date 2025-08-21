@@ -430,26 +430,31 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const loadData = async () => {
     try {
-      // Load conversations from database
+      // Load conversations from both database AND localStorage
       const { data: conversationsData, error: conversationsError } = await supabase
         .from('conversations')
         .select('*')
         .order('updated_at', { ascending: false });
 
-      if (conversationsError) {
-        console.error('Error loading conversations:', conversationsError);
-      } else {
-        const parsedConversations = conversationsData?.map((conv: any) => ({
+      // Also load from localStorage for any local conversations
+      const localHistory = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
+      const localConversations = JSON.parse(localStorage.getItem('clbhouz_ai_conversations') || '[]');
+
+      let allConversations: ChatConversation[] = [];
+      let allMessages: HistoryMessage[] = [];
+
+      // Add database conversations
+      if (conversationsData && !conversationsError) {
+        const dbConversations = conversationsData.map((conv: any) => ({
           id: conv.id,
           title: conv.title || 'Chat Conversation',
           messages: conv.messages || [],
           timestamp: new Date(conv.updated_at)
-        })) || [];
-        setConversations(parsedConversations);
-        
-        // Extract all messages for the flat history
-        const allMessages: HistoryMessage[] = [];
-        parsedConversations.forEach(conv => {
+        }));
+        allConversations.push(...dbConversations);
+
+        // Extract messages from database conversations
+        dbConversations.forEach(conv => {
           conv.messages.forEach((msg: any) => {
             allMessages.push({
               id: `${conv.id}-${msg.id || Math.random()}`,
@@ -460,8 +465,28 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             });
           });
         });
-        setHistoryMessages(allMessages);
       }
+
+      // Add localStorage conversations
+      if (localConversations.length > 0) {
+        const localConvs = localConversations.map((conv: any) => ({
+          ...conv,
+          timestamp: new Date(conv.timestamp)
+        }));
+        allConversations.push(...localConvs);
+      }
+
+      // Add individual localStorage messages
+      if (localHistory.length > 0) {
+        const localMessages = localHistory.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+        allMessages.push(...localMessages);
+      }
+
+      setConversations(allConversations);
+      setHistoryMessages(allMessages);
 
       // Load caddie logs from database
       const { data: caddieData, error: caddieError } = await supabase
@@ -475,16 +500,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         setCaddieLogs(caddieData || []);
       }
 
-      // Load pro AI analyses from database for swing coach
+      // Load swing analyses from BOTH database AND localStorage
       const { data: proAiData, error: proAiError } = await supabase
         .from('pro_ai_analyses')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (proAiError) {
-        console.error('Error loading pro AI analyses:', proAiError);
-      } else {
-        const swingAnalyses = proAiData?.map((analysis: any) => ({
+      // Load from localStorage as well
+      const localSwingAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+      const localSwingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+
+      let allSwingAnalyses: SwingAnalysis[] = [];
+
+      // Add database swing analyses
+      if (proAiData && !proAiError) {
+        const dbSwingAnalyses = proAiData.map((analysis: any) => ({
           id: analysis.id,
           save_card: 'Swing Analysis',
           tags: [],
@@ -493,9 +523,63 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           videoUrl: analysis.video_url,
           timestamp: new Date(analysis.created_at),
           conversation: analysis.analysis_results?.conversation || []
-        })) || [];
-        setSwingAnalyses(swingAnalyses);
+        }));
+        allSwingAnalyses.push(...dbSwingAnalyses);
       }
+
+      // Add localStorage swing analyses
+      if (localSwingAnalyses.length > 0) {
+        const localAnalyses = localSwingAnalyses.map((analysis: any) => ({
+          ...analysis,
+          timestamp: new Date(analysis.timestamp)
+        }));
+        allSwingAnalyses.push(...localAnalyses);
+      }
+
+      // Convert Swing Coach history to analysis format
+      if (localSwingCoachHistory.length > 0) {
+        const swingCoachAnalyses = localSwingCoachHistory
+          .filter((msg: any) => msg.type === 'ai' && msg.metadata)
+          .map((msg: any, index: number) => {
+            const userMessageIndex = localSwingCoachHistory.findIndex((m: any, i: number) => 
+              i < index && m.type === 'user' && Math.abs(new Date(m.timestamp).getTime() - new Date(msg.timestamp).getTime()) < 30000
+            );
+            const userMessage = userMessageIndex >= 0 ? localSwingCoachHistory[userMessageIndex] : null;
+            
+            const conversation = [];
+            if (userMessage) {
+              conversation.push({
+                role: 'user' as const, 
+                content: userMessage.content, 
+                timestamp: userMessage.timestamp
+              });
+            }
+            conversation.push({
+              role: 'coach' as const, 
+              content: msg.content, 
+              timestamp: msg.timestamp
+            });
+            
+            return {
+              id: msg.id,
+              save_card: msg.metadata.save_card || 'Swing Analysis',
+              title: msg.metadata.save_card || 'Swing Analysis',
+              tags: msg.metadata.tags || [],
+              category: msg.metadata.category || 'Swing',
+              content: msg.content,
+              videoThumbnail: msg.metadata.videoThumbnail,
+              videoPoster: msg.metadata.videoThumbnail,
+              videoSrc: userMessage?.videoPreview && !userMessage.videoPreview.startsWith('blob:') 
+                ? userMessage.videoPreview : undefined,
+              conversation,
+              timestamp: new Date(msg.timestamp)
+            };
+          });
+        allSwingAnalyses.push(...swingCoachAnalyses);
+      }
+
+      setSwingAnalyses(allSwingAnalyses);
+
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
