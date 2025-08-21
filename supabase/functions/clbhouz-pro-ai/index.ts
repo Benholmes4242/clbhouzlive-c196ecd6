@@ -11,6 +11,15 @@ const corsHeaders = {
 
 async function searchWeb(query: string): Promise<string> {
   try {
+    console.log('🔍 Searching with Perplexity API for:', query);
+    
+    if (!perplexityApiKey) {
+      console.log('❌ No Perplexity API key found');
+      return 'Search functionality not configured. Please check API key.';
+    }
+    
+    console.log('✅ Perplexity API key found, making request...');
+    
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -22,7 +31,7 @@ async function searchWeb(query: string): Promise<string> {
         messages: [
           {
             role: 'system',
-            content: 'Be precise and concise. Provide factual, up-to-date information.'
+            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances.'
           },
           {
             role: 'user',
@@ -37,14 +46,24 @@ async function searchWeb(query: string): Promise<string> {
       }),
     });
 
+    console.log('📡 Perplexity API response status:', response.status);
+    
     if (!response.ok) {
-      return 'Unable to search for current information at this time.';
+      const errorText = await response.text();
+      console.log('❌ Perplexity API error:', response.status, errorText);
+      return `Search temporarily unavailable (${response.status}). Please try again.`;
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || 'No current information found.';
+    console.log('✅ Perplexity API success, processing result...');
+    
+    const result = data.choices?.[0]?.message?.content || 'No current information found.';
+    console.log('📊 Search result length:', result.length);
+    
+    return result;
   } catch (error) {
-    return 'Unable to search for current information at this time.';
+    console.log('❌ Search error:', error.message);
+    return `Search error: ${error.message}`;
   }
 }
 
