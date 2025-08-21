@@ -89,14 +89,32 @@ serve(async (req) => {
     } else {
       // Use OpenAI for non-current information or image analysis
       const systemPrompt = isProAI ? 
-        "You are Echo Pro AI, a professional golf swing analysis assistant." :
+        "You are Echo Pro AI, a professional golf swing analysis assistant. When you receive images or video frames, analyze them directly and provide detailed swing analysis without asking for additional information." :
         "You are Echo, the AI assistant inside the Clbhouz app. Be helpful and friendly.";
       
       const messages = [
         { role: 'system', content: systemPrompt },
-        ...(conversation || []),
-        { role: 'user', content: message }
+        ...(conversation || [])
       ];
+
+      // Create user message with images if provided
+      const userMessage: any = { 
+        role: 'user', 
+        content: images && images.length > 0 ? [
+          { type: 'text', text: message },
+          ...images.map((image: string) => ({
+            type: 'image_url',
+            image_url: {
+              url: image,
+              detail: 'high'
+            }
+          }))
+        ] : message
+      };
+
+      messages.push(userMessage);
+
+      console.log('🚀 Sending to OpenAI with images:', images?.length || 0);
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -107,12 +125,14 @@ serve(async (req) => {
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: messages,
-          max_tokens: 400,
+          max_tokens: 800,
           temperature: 0.7
         }),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI API error:', response.status, errorText);
         throw new Error(`OpenAI API error: ${response.status}`);
       }
 
