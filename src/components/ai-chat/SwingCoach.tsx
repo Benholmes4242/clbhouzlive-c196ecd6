@@ -37,6 +37,9 @@ interface ChatMessageData {
   content: string;
   timestamp: Date;
   metadata?: any;
+  videoPreview?: string;
+  videoFileName?: string;
+  videoType?: string;
 }
 
 const SwingCoach: React.FC<SwingCoachProps> = ({
@@ -334,7 +337,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       id: Date.now().toString(),
       type: 'user',
       content: analysisText.trim() || 'Please analyze my swing',
-      timestamp: new Date()
+      timestamp: new Date(),
+      videoPreview: uploadedVideo ? videoPreview : undefined,
+      videoFileName: uploadedVideo?.name,
+      videoType: uploadedVideo?.type
     };
 
     setMessages(prev => [...prev, userMessage]);

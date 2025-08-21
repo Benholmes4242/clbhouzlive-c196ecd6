@@ -94,7 +94,7 @@ const VideoPlayerDialog: React.FC<{
         </DialogHeader>
         
         <div className="space-y-4">
-          {videoSrc ? (
+          {videoSrc && !videoSrc.startsWith('blob:') ? (
             <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
               {isVideoLoading && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -110,6 +110,21 @@ const VideoPlayerDialog: React.FC<{
                 onCanPlay={() => setIsVideoLoading(false)}
                 onError={() => setIsVideoLoading(false)}
               />
+            </div>
+          ) : videoPoster ? (
+            <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+              <img 
+                src={videoPoster} 
+                alt="Swing analysis"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <div className="text-white text-center p-4">
+                  <FileText className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm font-medium mb-1">Video Preview</p>
+                  <p className="text-xs opacity-80">Video playback not available for historical analyses</p>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
@@ -170,7 +185,7 @@ const ConversationDetailsDialog: React.FC<{
         
         <div className="space-y-6">
           {/* Video Section */}
-          {analysis.videoSrc ? (
+          {analysis.videoSrc && !analysis.videoSrc.startsWith('blob:') ? (
             <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
               {isVideoLoading && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -194,10 +209,11 @@ const ConversationDetailsDialog: React.FC<{
                 alt="Swing analysis"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <div className="text-white text-center">
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <div className="text-white text-center p-4">
                   <FileText className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">Video playback not available</p>
+                  <p className="text-sm font-medium mb-1">Video Preview</p>
+                  <p className="text-xs opacity-80">Video playback not available for historical analyses</p>
                 </div>
               </div>
             </div>
@@ -440,13 +456,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       .filter((msg: any) => msg.type === 'ai' && msg.metadata)
       .map((msg: any, index: number) => {
         // Get the user message that triggered this analysis (should be the previous message)
-        const userMessage = swingCoachHistory[index - 1];
+        const userMessageIndex = swingCoachHistory.findIndex((m: any, i: number) => 
+          i < index && m.type === 'user' && Math.abs(new Date(m.timestamp).getTime() - new Date(msg.timestamp).getTime()) < 30000
+        );
+        const userMessage = userMessageIndex >= 0 ? swingCoachHistory[userMessageIndex] : null;
+        
         const conversation = [];
         
-        if (userMessage && userMessage.type === 'user') {
-          conversation.push({role: 'user' as const, content: userMessage.content, timestamp: userMessage.timestamp});
+        if (userMessage) {
+          conversation.push({
+            role: 'user' as const, 
+            content: userMessage.content, 
+            timestamp: userMessage.timestamp
+          });
         }
-        conversation.push({role: 'coach' as const, content: msg.content, timestamp: msg.timestamp});
+        conversation.push({
+          role: 'coach' as const, 
+          content: msg.content, 
+          timestamp: msg.timestamp
+        });
         
         return {
           id: msg.id,
@@ -457,7 +485,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           content: msg.content,
           videoThumbnail: msg.metadata.videoThumbnail,
           videoPoster: msg.metadata.videoThumbnail,
-          videoSrc: userMessage?.videoUrl || userMessage?.videoPreview, // Add video source if available
+          // Try to use the video data from user message, but it might be invalid blob URL
+          videoSrc: userMessage?.videoPreview && userMessage.videoPreview.startsWith('blob:') 
+            ? undefined // Don't use invalid blob URLs
+            : userMessage?.videoPreview,
           conversation,
           timestamp: new Date(msg.timestamp)
         };
