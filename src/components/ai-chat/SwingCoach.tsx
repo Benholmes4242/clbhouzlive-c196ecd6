@@ -348,56 +348,14 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
 
-    let videoId = '';
-    let videoUrl = '';
-    let thumbnailUrl = '';
-
-    // Upload video to Cloudflare Stream first if it's a video
-    if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
-      toast({
-        title: "Uploading video...",
-        description: "Preparing your swing video for analysis",
-      });
-
-      const uploadResult = await uploadVideo(uploadedVideo);
-
-      if (!uploadResult.success) {
-        toast({
-          title: "Upload failed",
-          description: "Could not upload video. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      videoId = uploadResult.videoId || '';
-      videoUrl = videoId ? getPlaybackUrl(videoId) : '';
-      thumbnailUrl = videoId ? getThumbnailUrl(videoId) : '';
-
-      toast({
-        title: "Video uploaded successfully",
-        description: "Now analyzing your swing...",
-      });
-    }
-
-    // Show progress for extracting frames
-    if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
-      toast({
-        title: "Extracting swing frames...",
-        description: "Analyzing key positions from your video",
-      });
-    }
-
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
       type: 'user',
       content: analysisText.trim() || 'Please analyze my swing',
       timestamp: new Date(),
-      videoPreview: uploadedVideo ? (thumbnailUrl || videoPreview) : undefined,
+      videoPreview: uploadedVideo ? videoPreview : undefined,
       videoFileName: uploadedVideo?.name,
-      videoType: uploadedVideo?.type,
-      videoId: videoId,
-      videoUrl: videoUrl
+      videoType: uploadedVideo?.type
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -503,6 +461,25 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       };
 
       setMessages(prev => [...prev, aiMessage]);
+
+      // Upload video to Cloudflare Stream in background after successful analysis
+      let videoId = '';
+      let videoUrl = '';
+      let thumbnailUrl = '';
+
+      if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
+        try {
+          const uploadResult = await uploadVideo(uploadedVideo);
+
+          if (uploadResult.success && uploadResult.videoId) {
+            videoId = uploadResult.videoId;
+            videoUrl = getPlaybackUrl(videoId);
+            thumbnailUrl = getThumbnailUrl(videoId);
+          }
+        } catch (error) {
+          console.error('Background video upload failed:', error);
+        }
+      }
 
       // Use Cloudflare Stream thumbnail if available, otherwise create one for images
       if (!thumbnailUrl && uploadedVideo && uploadedVideo.type.startsWith('image/')) {
