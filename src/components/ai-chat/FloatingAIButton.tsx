@@ -119,12 +119,17 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         
         {/* Soundwave Icon */}
         <div className={`flex items-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
-          <img 
-            src={soundwaveIcon}
-            alt="Echo Soundwave"
-            className="w-6 h-6 relative z-10"
-            style={{ backgroundColor: 'transparent', background: 'transparent' }}
-          />
+          <div className="w-6 h-6 relative z-10 flex items-center justify-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white"/>
+              <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white"/>
+              <rect x="8" y="6" width="1.5" height="12" rx="0.75" fill="white"/>
+              <rect x="11" y="4" width="1.5" height="16" rx="0.75" fill="white"/>
+              <rect x="14" y="7" width="1.5" height="10" rx="0.75" fill="white"/>
+              <rect x="17" y="9" width="1.5" height="6" rx="0.75" fill="white"/>
+              <rect x="20" y="11" width="1.5" height="2" rx="0.75" fill="white"/>
+            </svg>
+          </div>
           
           {/* Echo Text (shown when expanded) */}
           {isExpanded && (
