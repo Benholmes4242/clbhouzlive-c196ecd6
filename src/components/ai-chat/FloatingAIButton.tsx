@@ -119,8 +119,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         
         {/* Soundwave Icon */}
         <div className={`flex items-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
-          <div className="w-6 h-6 relative z-10 flex items-center justify-center">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div className="w-8 h-8 relative z-10 flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white"/>
               <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white"/>
               <rect x="8" y="6" width="1.5" height="12" rx="0.75" fill="white"/>
