@@ -254,6 +254,7 @@ Want this saved to Insights?
 
     // Add function calling for web search (only for non-image requests)
     if (!images || images.length === 0) {
+      console.log('Adding search_web tool for non-image request');
       requestBody.tools = [
         {
           type: "function",
@@ -274,6 +275,9 @@ Want this saved to Insights?
         }
       ];
       requestBody.tool_choice = "auto";
+      console.log('Tool configuration added:', JSON.stringify(requestBody.tools));
+    } else {
+      console.log('Skipping tool configuration for image request');
     }
 
     // Add appropriate token limits based on model
