@@ -67,7 +67,23 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   // Load saved analyses from localStorage
   useEffect(() => {
     const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    setAnalyses(savedAnalyses);
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    
+    // Convert Swing Coach conversations to analysis format
+    const swingCoachAnalyses = swingCoachHistory
+      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
+      .map((msg: any) => ({
+        id: msg.id,
+        save_card: msg.metadata.save_card || 'Swing Analysis',
+        tags: msg.metadata.tags || [],
+        category: msg.metadata.category || 'Swing',
+        content: msg.content,
+        videoThumbnail: msg.metadata.videoThumbnail,
+        timestamp: msg.timestamp
+      }));
+    
+    const allAnalyses = [...savedAnalyses, ...swingCoachAnalyses];
+    setAnalyses(allAnalyses);
   }, []);
 
   useEffect(() => {
