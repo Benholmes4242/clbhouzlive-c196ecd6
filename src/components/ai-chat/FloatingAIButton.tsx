@@ -130,18 +130,16 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           border border-white/10
         `}
       >
-        {/* Pulse ripples */}
+        {/* Subtle pulse ripples */}
         {showPulse && (
           <>
-            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(247, 147, 30, 0.28)',
-              animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
+            <div className="absolute inset-0 rounded-full border border-white/8 animate-ping scale-100" style={{
+              animation: 'ping 1200ms ease-out forwards',
               animationDelay: '0ms'
             }} />
-            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(247, 147, 30, 0.14)',
-              animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
-              animationDelay: '150ms'
+            <div className="absolute inset-0 rounded-full border border-white/4 animate-ping scale-100" style={{
+              animation: 'ping 1200ms ease-out forwards',
+              animationDelay: '200ms'
             }} />
           </>
         )}
