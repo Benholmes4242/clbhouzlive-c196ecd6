@@ -133,7 +133,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           
           {/* Echo Text (shown when expanded) */}
           {isExpanded && (
-            <span className="font-medium text-lg text-white/90 pr-2 animate-fade-in whitespace-nowrap">
+            <span className="font-medium text-lg text-white/90 pr-2 animate-fade-in whitespace-nowrap flex items-center">
               Echo
             </span>
           )}
