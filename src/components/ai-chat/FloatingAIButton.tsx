@@ -121,9 +121,9 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           transition-all duration-200 ease-out
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
-          bg-gradient-to-br from-slate-800 via-orange-600/80 to-orange-500
+          bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
           shadow-[0_0_20px_0_rgba(0,0,0,0.16)]
-          hover:shadow-[0_0_24px_0_rgba(0,0,0,0.18)]
+          hover:shadow-[0_0_24px_0_rgba(0,0,0,0.18),0_0_14px_rgba(247,147,30,0.18)]
           active:scale-95
           flex items-center justify-center
           relative overflow-hidden
@@ -133,11 +133,13 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         {/* Pulse ripples */}
         {showPulse && (
           <>
-            <div className="absolute inset-0 rounded-full bg-orange-400/10 animate-ping scale-100" style={{
+            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
+              backgroundColor: 'rgba(247, 147, 30, 0.28)',
               animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
               animationDelay: '0ms'
             }} />
-            <div className="absolute inset-0 rounded-full bg-orange-400/5 animate-ping scale-100" style={{
+            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
+              backgroundColor: 'rgba(247, 147, 30, 0.14)',
               animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
               animationDelay: '150ms'
             }} />
@@ -151,13 +153,13 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
           <div className="w-10 h-10 flex items-center justify-center">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white"/>
-              <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white"/>
-              <rect x="8" y="6" width="1.5" height="12" rx="0.75" fill="white"/>
-              <rect x="11" y="4" width="1.5" height="16" rx="0.75" fill="white"/>
-              <rect x="14" y="7" width="1.5" height="10" rx="0.75" fill="white"/>
-              <rect x="17" y="9" width="1.5" height="6" rx="0.75" fill="white"/>
-              <rect x="20" y="11" width="1.5" height="2" rx="0.75" fill="white"/>
+              <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="8" y="6" width="1.5" height="12" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="11" y="4" width="1.5" height="16" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="14" y="7" width="1.5" height="10" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="17" y="9" width="1.5" height="6" rx="0.75" fill="white" fillOpacity="0.9"/>
+              <rect x="20" y="11" width="1.5" height="2" rx="0.75" fill="white" fillOpacity="0.9"/>
             </svg>
           </div>
           
