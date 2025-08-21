@@ -287,7 +287,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           message: finalMessage,
           conversation,
           detailMode,
-          isProAI: false // Keep original parameter name
+          isEcho: false
         }
       });
 

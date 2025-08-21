@@ -445,7 +445,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             content: msg.content
           })),
           detailMode: false,
-          isProAI: true,
+          isEcho: true,
           images: extractedFrames,
           swingContext: swingContext
         }

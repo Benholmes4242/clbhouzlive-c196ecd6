@@ -68,7 +68,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversation, images, detailMode, isProAI } = await req.json();
+    const { message, conversation, images, detailMode, isEcho } = await req.json();
 
     if (!message) {
       throw new Error('Message is required');
