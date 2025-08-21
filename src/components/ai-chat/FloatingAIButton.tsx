@@ -118,8 +118,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60" />
         
         {/* Soundwave Icon */}
-        <div className={`flex items-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
-          <div className="w-10 h-10 relative z-10 flex items-center justify-center">
+        <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
+          <div className="w-10 h-10 flex items-center justify-center">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white"/>
               <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white"/>
