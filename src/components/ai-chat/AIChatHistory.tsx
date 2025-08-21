@@ -429,91 +429,80 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadData = async () => {
-    // Load history
-    const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-    const parsedHistory = history.map((msg: any) => ({
-      ...msg,
-      timestamp: new Date(msg.timestamp)
-    }));
-    setHistoryMessages(parsedHistory);
-    
-    // Group messages into conversations
-    const groupedConversations = groupMessagesIntoConversations(parsedHistory);
-    setConversations(groupedConversations);
-
-    // Load saved insights
-    const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
-    const parsedSaved = saved.map((insight: any) => ({
-      ...insight,
-      timestamp: new Date(insight.timestamp)
-    }));
-    setSavedInsights(parsedSaved);
-
-    // Load swing analyses from both analyses and Swing Coach history
-    const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-    
-    // Convert Swing Coach conversations to analysis format with full conversation data
-    const swingCoachAnalyses = swingCoachHistory
-      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
-      .map((msg: any, index: number) => {
-        // Get the user message that triggered this analysis (should be the previous message)
-        const userMessageIndex = swingCoachHistory.findIndex((m: any, i: number) => 
-          i < index && m.type === 'user' && Math.abs(new Date(m.timestamp).getTime() - new Date(msg.timestamp).getTime()) < 30000
-        );
-        const userMessage = userMessageIndex >= 0 ? swingCoachHistory[userMessageIndex] : null;
-        
-        const conversation = [];
-        
-        if (userMessage) {
-          conversation.push({
-            role: 'user' as const, 
-            content: userMessage.content, 
-            timestamp: userMessage.timestamp
-          });
-        }
-        conversation.push({
-          role: 'coach' as const, 
-          content: msg.content, 
-          timestamp: msg.timestamp
-        });
-        
-        return {
-          id: msg.id,
-          save_card: msg.metadata.save_card || 'Swing Analysis',
-          title: msg.metadata.save_card || 'Swing Analysis',
-          tags: msg.metadata.tags || [],
-          category: msg.metadata.category || 'Swing',
-          content: msg.content,
-          videoThumbnail: msg.metadata.videoThumbnail,
-          videoPoster: msg.metadata.videoThumbnail,
-          // Try to use the video data from user message, but it might be invalid blob URL
-          videoSrc: userMessage?.videoPreview && userMessage.videoPreview.startsWith('blob:') 
-            ? undefined // Don't use invalid blob URLs
-            : userMessage?.videoPreview,
-          conversation,
-          timestamp: new Date(msg.timestamp)
-        };
-      });
-    
-    const allAnalyses = [...analyses, ...swingCoachAnalyses];
-    const parsedAnalyses = allAnalyses.map((analysis: any) => ({
-      ...analysis,
-      timestamp: new Date(analysis.timestamp)
-    }));
-    setSwingAnalyses(parsedAnalyses);
-
-    // Load caddie logs from Supabase
     try {
-      const { data, error } = await supabase
+      // Load conversations from database
+      const { data: conversationsData, error: conversationsError } = await supabase
+        .from('conversations')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (conversationsError) {
+        console.error('Error loading conversations:', conversationsError);
+      } else {
+        const parsedConversations = conversationsData?.map((conv: any) => ({
+          id: conv.id,
+          title: conv.title || 'Chat Conversation',
+          messages: conv.messages || [],
+          timestamp: new Date(conv.updated_at)
+        })) || [];
+        setConversations(parsedConversations);
+        
+        // Extract all messages for the flat history
+        const allMessages: HistoryMessage[] = [];
+        parsedConversations.forEach(conv => {
+          conv.messages.forEach((msg: any) => {
+            allMessages.push({
+              id: `${conv.id}-${msg.id || Math.random()}`,
+              type: msg.role === 'user' ? 'user' : 'ai',
+              content: msg.content,
+              timestamp: new Date(msg.timestamp || conv.timestamp),
+              metadata: { conversationId: conv.id }
+            });
+          });
+        });
+        setHistoryMessages(allMessages);
+      }
+
+      // Load caddie logs from database
+      const { data: caddieData, error: caddieError } = await supabase
         .from('caddie_logs')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setCaddieLogs(data || []);
+      if (caddieError) {
+        console.error('Error loading caddie logs:', caddieError);
+      } else {
+        setCaddieLogs(caddieData || []);
+      }
+
+      // Load pro AI analyses from database for swing coach
+      const { data: proAiData, error: proAiError } = await supabase
+        .from('pro_ai_analyses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (proAiError) {
+        console.error('Error loading pro AI analyses:', proAiError);
+      } else {
+        const swingAnalyses = proAiData?.map((analysis: any) => ({
+          id: analysis.id,
+          save_card: 'Swing Analysis',
+          tags: [],
+          category: 'swing',
+          content: JSON.stringify(analysis.analysis_results),
+          videoUrl: analysis.video_url,
+          timestamp: new Date(analysis.created_at),
+          conversation: analysis.analysis_results?.conversation || []
+        })) || [];
+        setSwingAnalyses(swingAnalyses);
+      }
     } catch (error) {
-      console.error('Error fetching caddie logs:', error);
+      console.error('Error loading data:', error);
+      toast({
+        title: "Error loading history",
+        description: "Failed to load chat history and logs.",
+        variant: "destructive",
+      });
     }
   };
 
