@@ -122,11 +122,12 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
           bg-gradient-to-br from-slate-800 via-orange-600/80 to-orange-500
-          shadow-[0_4px_12px_rgba(0,0,0,0.15),0_0_20px_rgba(249,115,22,0.2)]
-          hover:shadow-[0_6px_20px_rgba(0,0,0,0.2),0_0_30px_rgba(249,115,22,0.3)]
+          shadow-[0_0_20px_0_rgba(0,0,0,0.16)]
+          hover:shadow-[0_0_24px_0_rgba(0,0,0,0.18)]
           active:scale-95
           flex items-center justify-center
           relative overflow-hidden
+          border border-white/10
         `}
       >
         {/* Pulse ripples */}
