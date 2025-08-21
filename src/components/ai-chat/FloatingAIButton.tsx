@@ -14,14 +14,29 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [showPulse, setShowPulse] = useState(false);
 
-  // Check for first-time onboarding
+  // Check for first-time onboarding (only first 3 sessions)
   useEffect(() => {
-    const hasSeenEcho = localStorage.getItem('echo-onboarding-seen');
-    if (!hasSeenEcho) {
-      setTimeout(() => setShowOnboarding(true), 500);
-      localStorage.setItem('echo-onboarding-seen', 'true');
+    const echoSessionCount = parseInt(localStorage.getItem('echo-session-count') || '0');
+    
+    if (echoSessionCount < 3) {
+      // Increment session count
+      localStorage.setItem('echo-session-count', (echoSessionCount + 1).toString());
+      
+      // Show onboarding for first 3 sessions
+      setTimeout(() => setShowOnboarding(true), 3000);
     }
+  }, []);
+
+  // Idle pulse animation every 6-8 seconds
+  useEffect(() => {
+    const pulseInterval = setInterval(() => {
+      setShowPulse(true);
+      setTimeout(() => setShowPulse(false), 900);
+    }, 7000); // Every 7 seconds
+
+    return () => clearInterval(pulseInterval);
   }, []);
 
   // Auto-hide onboarding after 3 seconds
@@ -81,8 +96,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
       {showOnboarding && (
         <div className="fixed bottom-40 right-6 z-[10000] animate-fade-in">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
-            <div className="font-medium text-sm mb-1">Meet Echo — your personal AI caddy</div>
-            <div className="text-xs text-slate-300">Ask Echo about news, golf tips, swing guidance & more.</div>
+            <div className="font-medium text-sm mb-1">Meet Echo - your personal caddie</div>
+            <div className="text-xs text-slate-300">Analyse swing or ask about swing tips, courses, golf news, or trips.</div>
             <div className="absolute -bottom-2 right-8 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-slate-900"></div>
           </div>
         </div>
@@ -106,14 +121,28 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           transition-all duration-200 ease-out
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
-          bg-gradient-to-br from-slate-800 via-slate-700 to-teal-600
-          shadow-[0_4px_12px_rgba(0,0,0,0.15),0_0_20px_rgba(20,184,166,0.2)]
-          hover:shadow-[0_6px_20px_rgba(0,0,0,0.2),0_0_30px_rgba(20,184,166,0.3)]
+          bg-gradient-to-br from-slate-800 via-orange-600/80 to-orange-500
+          shadow-[0_4px_12px_rgba(0,0,0,0.15),0_0_20px_rgba(249,115,22,0.2)]
+          hover:shadow-[0_6px_20px_rgba(0,0,0,0.2),0_0_30px_rgba(249,115,22,0.3)]
           active:scale-95
           flex items-center justify-center
           relative overflow-hidden
         `}
       >
+        {/* Pulse ripples */}
+        {showPulse && (
+          <>
+            <div className="absolute inset-0 rounded-full bg-orange-400/10 animate-ping scale-100" style={{
+              animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
+              animationDelay: '0ms'
+            }} />
+            <div className="absolute inset-0 rounded-full bg-orange-400/5 animate-ping scale-100" style={{
+              animation: 'ping 900ms cubic-bezier(0.4, 0, 0.6, 1) forwards',
+              animationDelay: '150ms'
+            }} />
+          </>
+        )}
+        
         {/* Inner gradient highlight */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60" />
         
