@@ -567,7 +567,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {analysis.timestamp.toLocaleDateString()}
+                        {new Date(analysis.timestamp).toLocaleDateString()}
                       </p>
                       {analysis.voiceNote && (
                         <Badge variant="outline" className="mt-2 text-xs">

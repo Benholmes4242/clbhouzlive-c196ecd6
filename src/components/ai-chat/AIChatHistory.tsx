@@ -512,7 +512,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             <div className="flex items-center gap-2">
                               <Badge variant="outline">{analysis.category}</Badge>
                               <span className="text-xs text-muted-foreground">
-                                {analysis.timestamp.toLocaleDateString()}
+                                {new Date(analysis.timestamp).toLocaleDateString()}
                               </span>
                             </div>
                             <div className="flex gap-1">
