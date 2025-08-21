@@ -68,7 +68,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   return (
     <div className="w-full">
       {/* Sticky Tab Bar */}
-      <div className="sticky top-0 z-50 bg-background backdrop-blur-sm w-full border-b border-border/50">
+      <div className="sticky top-0 z-50 bg-background backdrop-blur-sm w-full">
         <div className="relative w-full">
           {/* Left fade gradient */}
           {canScrollLeft && (
@@ -98,7 +98,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                       : 'text-muted-foreground hover:text-foreground'
                   } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
                 >
-                  <span className="whitespace-nowrap text-lg md:text-xl text-black font-medium">{tab.label}</span>
+                  <span className="whitespace-nowrap text-xl md:text-2xl text-black font-medium">{tab.label}</span>
                   {/* Underline only under text label */}
                   {isActive && (
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gray-600 dark:bg-gray-400 w-1/2" />
