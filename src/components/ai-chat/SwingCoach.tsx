@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
+import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import ChatMessageComponent from './ChatMessage';
 
 interface SwingAnalysis {
@@ -17,8 +18,15 @@ interface SwingAnalysis {
   category: string;
   content: string;
   videoThumbnail?: string;
+  videoId?: string;
+  videoUrl?: string;
   timestamp: Date;
   voiceNote?: string;
+  conversation?: Array<{
+    role: 'user' | 'ai';
+    content: string;
+    timestamp: Date;
+  }>;
 }
 
 interface SwingCoachProps {
@@ -37,6 +45,11 @@ interface ChatMessageData {
   content: string;
   timestamp: Date;
   metadata?: any;
+  videoPreview?: string;
+  videoFileName?: string;
+  videoType?: string;
+  videoId?: string;
+  videoUrl?: string;
 }
 
 const SwingCoach: React.FC<SwingCoachProps> = ({
@@ -63,6 +76,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { uploadVideo, uploading } = useCloudflareStream();
+  
+  // Helper functions for Cloudflare Stream URLs
+  const getPlaybackUrl = (videoId: string): string => {
+    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+  };
+  
+  const getThumbnailUrl = (videoId: string): string => {
+    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+  };
 
   // Load saved analyses from localStorage
   useEffect(() => {
@@ -79,7 +102,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         category: msg.metadata.category || 'Swing',
         content: msg.content,
         videoThumbnail: msg.metadata.videoThumbnail,
-        timestamp: msg.timestamp
+        videoId: msg.metadata.videoId,
+        videoUrl: msg.metadata.videoUrl,
+        timestamp: msg.timestamp,
+        conversation: msg.metadata.conversation || []
       }));
     
     const allAnalyses = [...savedAnalyses, ...swingCoachAnalyses];
@@ -322,30 +348,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
 
-    // Show progress for extracting frames
-    if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
-      toast({
-        title: "Extracting swing frames...",
-        description: "Analyzing key positions from your video",
-      });
-    }
-
-    const userMessage: ChatMessageData = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: analysisText.trim() || 'Please analyze my swing',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setAnalysisText('');
     setIsAnalyzing(true);
-
+    
     try {
       let extractedFrames: string[] = [];
       let swingContext: any = {};
 
-      // Extract frames from video or use image directly
+      // Extract frames from video or use image directly BEFORE creating user message
       if (uploadedVideo) {
         if (uploadedVideo.type.startsWith('video/')) {
           // Check video size
@@ -377,7 +386,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
 
         // Extract swing context from user message
-        const message = userMessage.content.toLowerCase();
+        const message = (analysisText.trim() || 'Please analyze my swing').toLowerCase();
         if (message.includes('driver')) swingContext.club = 'Driver';
         else if (message.includes('iron')) swingContext.club = 'Iron';
         else if (message.includes('wedge')) swingContext.club = 'Wedge';
@@ -415,6 +424,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       }
 
+      const userMessage: ChatMessageData = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: analysisText.trim() || 'Please analyze my swing',
+        timestamp: new Date(),
+        videoPreview: uploadedVideo ? videoPreview : undefined,
+        videoFileName: uploadedVideo?.name,
+        videoType: uploadedVideo?.type
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+      setAnalysisText('');
+
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
@@ -441,35 +463,42 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Create video thumbnail if video was uploaded
+      // Upload video to Cloudflare Stream in background after successful analysis
+      let videoId = '';
+      let videoUrl = '';
       let thumbnailUrl = '';
+
       if (uploadedVideo && uploadedVideo.type.startsWith('video/')) {
-        const video = document.createElement('video');
-        video.src = videoPreview;
-        video.currentTime = 1; // Get frame at 1 second
-        await new Promise((resolve) => {
-          video.onloadeddata = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(video, 0, 0);
-              thumbnailUrl = canvas.toDataURL();
-            }
-            resolve(null);
-          };
-        });
-      } else if (uploadedVideo && uploadedVideo.type.startsWith('image/')) {
+        try {
+          const uploadResult = await uploadVideo(uploadedVideo);
+
+          if (uploadResult.success && uploadResult.videoId) {
+            videoId = uploadResult.videoId;
+            videoUrl = getPlaybackUrl(videoId);
+            thumbnailUrl = getThumbnailUrl(videoId);
+          }
+        } catch (error) {
+          console.error('Background video upload failed:', error);
+        }
+      }
+
+      // Use Cloudflare Stream thumbnail if available, otherwise create one for images
+      if (!thumbnailUrl && uploadedVideo && uploadedVideo.type.startsWith('image/')) {
         thumbnailUrl = videoPreview;
       }
 
-      // Update AI message with thumbnail in metadata
+      // Update AI message with video data in metadata
       const updatedAiMessage = {
         ...aiMessage,
         metadata: {
           ...aiMessage.metadata,
-          videoThumbnail: thumbnailUrl
+          videoThumbnail: thumbnailUrl,
+          videoId: videoId,
+          videoUrl: videoUrl,
+          conversation: [
+            { role: 'user' as const, content: userMessage.content, timestamp: userMessage.timestamp },
+            { role: 'ai' as const, content: aiMessage.content, timestamp: aiMessage.timestamp }
+          ]
         }
       };
 
@@ -489,7 +518,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           category: data.metadata.category || 'Swing',
           content: data.response,
           videoThumbnail: thumbnailUrl,
-          timestamp: new Date()
+          videoId: videoId,
+          videoUrl: videoUrl,
+          timestamp: new Date(),
+          conversation: [
+            { role: 'user', content: userMessage.content, timestamp: userMessage.timestamp },
+            { role: 'ai', content: aiMessage.content, timestamp: aiMessage.timestamp }
+          ]
         });
       }
 
