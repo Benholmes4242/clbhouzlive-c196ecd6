@@ -9,6 +9,7 @@ import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
 import SwingCoach from './SwingCoach';
+import EchoAvatar from './EchoAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -370,16 +371,46 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     );
   }
 
+  // Determine avatar state based on recording/processing state
+  const getAvatarState = () => {
+    if (isProcessing) return 'processing';
+    if (isRecording) return 'listening';
+    return 'idle';
+  };
+
   return (
     <div 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-      style={{ zIndex: 9999 }}
+      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
+      style={{ 
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.24)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
       onWheel={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="bg-background rounded-2xl w-full max-w-md h-[min(90vh,720px)] flex flex-col shadow-2xl overflow-hidden"
+        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        style={{
+          height: 'min(72vh, 576px)', // Reduced by 20% from 720px
+          background: 'rgba(246, 247, 246, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: `
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08)
+          `
+        }}
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -401,16 +432,30 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         onTouchMove={(e) => e.stopPropagation()}
       >
         {/* Header - Fixed at top */}
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold">Echo</h2>
+        <div 
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <EchoAvatar 
+              state={getAvatarState()} 
+              size={window.innerWidth <= 768 ? 28 : 32} 
+            />
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
+              <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowHistory(true)}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
             >
               <History className="h-4 w-4" />
             </Button>
@@ -418,7 +463,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -427,11 +472,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <div className="px-4 pt-2 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="logs">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="swing-coach">Swing Coach</TabsTrigger>
+          <div className="px-6 pt-3 pb-0 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+              <TabsTrigger 
+                value="chat" 
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Chat
+              </TabsTrigger>
+              <TabsTrigger 
+                value="logs"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Caddie Logs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="swing-coach"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Swing Coach
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -519,7 +579,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         </Tabs>
         
         {/* Shared composer/footer - Fixed at bottom */}
-        <div className="border-t flex-shrink-0">
+        <div 
+          className="flex-shrink-0"
+          style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
+          }}
+        >
           {activeTab === 'chat' && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-2">
