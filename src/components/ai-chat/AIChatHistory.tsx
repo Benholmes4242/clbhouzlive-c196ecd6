@@ -778,10 +778,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     >
       {/* Desktop/Tablet Layout */}
       <div 
-        className={`w-full flex flex-col overflow-hidden animate-scale-in ${
+        className={`w-full flex flex-col overflow-hidden ${
           window.innerWidth <= 768 
-            ? 'fixed inset-x-0 bottom-0 rounded-t-3xl' 
-            : 'max-w-2xl rounded-3xl'
+            ? 'fixed inset-x-0 bottom-0 rounded-t-3xl animate-slide-up' 
+            : 'max-w-2xl rounded-3xl animate-scale-in'
         }`}
         style={{
           height: window.innerWidth <= 768 ? '88vh' : 'min(78vh, 640px)',
@@ -826,24 +826,26 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search history..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-48 bg-white/30 backdrop-blur-sm border border-white/20 focus:bg-white/50 transition-all duration-160"
+                className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.3)',
+                  background: 'rgba(255, 255, 255, 0.5)',
                   backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                  WebkitBackdropFilter: 'blur(8px)'
                 }}
+                aria-label="Search chat history, caddie logs, and swing analyses"
               />
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-100"
+              aria-label="Close Echo History modal"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -853,22 +855,38 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent border-none p-1">
+            <TabsList 
+              className="grid w-full grid-cols-3 bg-transparent border-none p-1"
+              role="tablist"
+              aria-label="Echo History sections"
+            >
               <TabsTrigger 
                 value="chat" 
-                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                role="tab"
+                aria-selected={activeTab === 'chat'}
+                aria-controls="chat-panel"
+                id="chat-tab"
               >
                 Chat
               </TabsTrigger>
               <TabsTrigger 
                 value="logs"
-                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                role="tab"
+                aria-selected={activeTab === 'logs'}
+                aria-controls="logs-panel"
+                id="logs-tab"
               >
                 Caddie Logs
               </TabsTrigger>
               <TabsTrigger 
                 value="swing-coach"
-                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                role="tab"
+                aria-selected={activeTab === 'swing-coach'}
+                aria-controls="swing-coach-panel"
+                id="swing-coach-tab"
               >
                 Swing Coach
               </TabsTrigger>
@@ -880,7 +898,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             className="flex-1 overflow-y-auto min-h-0"
             style={{ overscrollBehavior: 'contain' }}
           >
-            <TabsContent value="chat" className="h-full m-0">
+            <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
               <div className="h-full min-h-0">
                 <div className="px-6 py-5">
                   {filteredConversations.length > 0 ? (
@@ -888,7 +906,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation) => (
                         <div
                           key={conversation.id}
-                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200"
+                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="font-medium truncate flex-1 text-gray-900">{conversation.title}</h3>
@@ -900,7 +918,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => deleteConversation(conversation.id)}
-                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50"
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                aria-label={`Delete conversation: ${conversation.title}`}
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
@@ -971,7 +990,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </div>
             </TabsContent>
 
-            <TabsContent value="logs" className="h-full m-0">
+            <TabsContent value="logs" className="h-full m-0" role="tabpanel" id="logs-panel" aria-labelledby="logs-tab">
               <div className="h-full min-h-0">
                 <div className="px-6 py-5">
                   {filteredCaddieLogs.length > 0 ? (
@@ -979,7 +998,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredCaddieLogs.map((log) => (
                         <div
                           key={log.id}
-                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200"
+                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
@@ -1017,7 +1036,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => deleteCaddieLog(log.id)}
-                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50"
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
@@ -1038,13 +1058,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </div>
             </TabsContent>
 
-            <TabsContent value="swing-coach" className="h-full m-0">
+            <TabsContent value="swing-coach" className="h-full m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
               <div className="h-full min-h-0">
                 <div className="px-6 py-5">
                   {swingAnalyses.length > 0 ? (
                     <div className="space-y-3">
                       {swingAnalyses.map((analysis) => (
-                        <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-160">
+                        <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-100">
                           <SwingAnalysisCard
                             analysis={{
                               ...analysis,
