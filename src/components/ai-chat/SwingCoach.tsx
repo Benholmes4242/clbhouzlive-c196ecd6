@@ -348,25 +348,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
 
-    const userMessage: ChatMessageData = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: analysisText.trim() || 'Please analyze my swing',
-      timestamp: new Date(),
-      videoPreview: uploadedVideo ? videoPreview : undefined,
-      videoFileName: uploadedVideo?.name,
-      videoType: uploadedVideo?.type
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setAnalysisText('');
     setIsAnalyzing(true);
-
+    
     try {
       let extractedFrames: string[] = [];
       let swingContext: any = {};
 
-      // Extract frames from video or use image directly
+      // Extract frames from video or use image directly BEFORE creating user message
       if (uploadedVideo) {
         if (uploadedVideo.type.startsWith('video/')) {
           // Check video size
@@ -378,13 +366,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           }
           
           extractedFrames = await extractFramesFromVideo(uploadedVideo);
-          
-          console.log('🎥 Video Analysis Debug:', {
-            videoSize: uploadedVideo.size,
-            videoType: uploadedVideo.type,
-            extractedFramesCount: extractedFrames.length,
-            firstFrameLength: extractedFrames[0]?.length || 0
-          });
           
           if (extractedFrames.length === 0) {
             throw new Error("Couldn't extract frames from video");
@@ -405,7 +386,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
 
         // Extract swing context from user message
-        const message = userMessage.content.toLowerCase();
+        const message = (analysisText.trim() || 'Please analyze my swing').toLowerCase();
         if (message.includes('driver')) swingContext.club = 'Driver';
         else if (message.includes('iron')) swingContext.club = 'Iron';
         else if (message.includes('wedge')) swingContext.club = 'Wedge';
@@ -443,14 +424,18 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       }
 
-      console.log('🚀 AI Request Debug:', {
-        message: userMessage.content,
-        hasImages: extractedFrames.length > 0,
-        imageCount: extractedFrames.length,
-        swingContext,
-        detailMode: false,
-        isProAI: true
-      });
+      const userMessage: ChatMessageData = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: analysisText.trim() || 'Please analyze my swing',
+        timestamp: new Date(),
+        videoPreview: uploadedVideo ? videoPreview : undefined,
+        videoFileName: uploadedVideo?.name,
+        videoType: uploadedVideo?.type
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+      setAnalysisText('');
 
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
