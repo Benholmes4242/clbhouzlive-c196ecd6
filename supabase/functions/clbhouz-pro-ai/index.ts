@@ -84,8 +84,8 @@ serve(async (req) => {
       const searchQuery = `${message} golf PGA tour recent results`;
       const searchResult = await searchWeb(searchQuery);
       
-      // Create a simple response with search results
-      finalResponse = `Based on the latest information I found:\n\n${searchResult}\n\nWant this saved to Insights?`;
+      // Create a response with search results (no "Want this saved to Insights?" prompt)
+      finalResponse = `Based on the latest information I found:\n\n${searchResult}`;
     } else {
       // Use OpenAI for non-current information or image analysis
       const systemPrompt = isProAI ? 
