@@ -76,8 +76,7 @@ serve(async (req) => {
 
     console.log('📥 Request received:', { 
       message: message.substring(0, 100), 
-      imagesCount: images?.length || 0, 
-      isProAI 
+      imagesCount: images?.length || 0
     });
 
     // Check if this looks like a request for current information
@@ -85,13 +84,11 @@ serve(async (req) => {
     
     let finalResponse = '';
     
-    // Priority 1: If we have images or this is ProAI, use OpenAI for analysis
-    if (isProAI || (images && images.length > 0)) {
+    // Priority 1: If we have images, use OpenAI for analysis
+    if (images && images.length > 0) {
       console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
       
-      const systemPrompt = isProAI ? 
-        "You are Echo Pro AI, a professional golf swing analysis assistant. When you receive images or video frames, analyze them directly and provide detailed swing analysis without asking for additional information. Provide specific feedback on stance, grip, takeaway, backswing, downswing, impact, and follow-through. Look at each frame and provide actionable insights." :
-        "You are Echo, the AI assistant inside the Clbhouz app. Be helpful and friendly.";
+      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app specializing in golf swing analysis. When you receive images or video frames, analyze them directly and provide detailed swing analysis without asking for additional information. Provide specific feedback on stance, grip, takeaway, backswing, downswing, impact, and follow-through. Look at each frame and provide actionable insights.";
       
       const messages = [
         { role: 'system', content: systemPrompt },
