@@ -853,22 +853,22 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+            <TabsList className="grid w-full grid-cols-3 bg-transparent border-none p-1">
               <TabsTrigger 
                 value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
               >
                 Chat
               </TabsTrigger>
               <TabsTrigger 
                 value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
               >
                 Caddie Logs
               </TabsTrigger>
               <TabsTrigger 
                 value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+                className="transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
               >
                 Swing Coach
               </TabsTrigger>
@@ -888,7 +888,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation) => (
                         <div
                           key={conversation.id}
-                          className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:scale-[1.01] hover:shadow-md"
+                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="font-medium truncate flex-1 text-gray-900">{conversation.title}</h3>
@@ -916,21 +916,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               onClick={() => setExpandedConversation(
                                 expandedConversation === conversation.id ? null : conversation.id
                               )}
-                              className="bg-white/30 border-white/30 hover:bg-white/50"
+                              className="bg-gray-100 border-gray-200 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm"
                             >
                               {expandedConversation === conversation.id ? 'Hide' : 'Show'} Messages
                             </Button>
                           </div>
                           
                           {expandedConversation === conversation.id && (
-                            <div className="mt-4 space-y-2 border-t border-white/20 pt-4">
+                            <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
                               {conversation.messages.map((message) => (
                                 <div
                                   key={message.id}
                                   className={`p-3 rounded-lg ${
                                     message.type === 'user' 
-                                      ? 'bg-primary/10 border-l-4 border-primary' 
-                                      : 'bg-white/40 border-l-4 border-gray-300'
+                                      ? 'bg-orange-50 border-l-4 border-orange-500' 
+                                      : 'bg-gray-50 border-l-4 border-gray-300'
                                   }`}
                                 >
                                   <div className="flex justify-between items-start mb-1">
@@ -979,13 +979,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredCaddieLogs.map((log) => (
                         <div
                           key={log.id}
-                          className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:scale-[1.01] hover:shadow-md"
+                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200"
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
                               <p className="text-sm leading-relaxed text-gray-900 mb-2">{log.content}</p>
                               {log.transcription && log.transcription !== log.content && (
-                                <div className="text-xs text-gray-600 bg-white/40 p-2 rounded-lg">
+                                <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">
                                   <strong>Transcription:</strong> {log.transcription}
                                 </div>
                               )}
@@ -1002,7 +1002,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               {log.tags && log.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-2">
                                   {log.tags.map((tag, index) => (
-                                    <Badge key={index} variant="secondary" className="text-xs bg-white/30 border-white/30">
+                                    <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
                                       {tag}
                                     </Badge>
                                   ))}
