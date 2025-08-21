@@ -1041,9 +1041,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             <TabsContent value="swing-coach" className="h-full m-0">
               <div className="h-full min-h-0">
                 <div className="px-6 py-5">
-                  {swingAnalyses.filter(item => item && item.tags).length > 0 ? (
+                  {swingAnalyses.length > 0 ? (
                     <div className="space-y-3">
-                      {swingAnalyses.filter(item => item && item.tags).map((analysis) => (
+                      {swingAnalyses.map((analysis) => (
                         <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-160">
                           <SwingAnalysisCard
                             analysis={{
