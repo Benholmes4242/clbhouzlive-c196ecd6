@@ -925,9 +925,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               </Button>
                             </div>
                           </div>
-                          <div className="text-sm text-gray-600 mb-3">
-                            {conversation.messages.length} messages
-                          </div>
                           <div className="flex justify-between items-center">
                             <Button
                               variant="outline"
