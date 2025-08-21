@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Activity } from 'lucide-react';
+import soundwaveIcon from '@/assets/soundwave-icon.png';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
@@ -120,9 +120,10 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         
         {/* Soundwave Icon */}
         <div className={`flex items-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
-          <Activity 
-            className="w-6 h-6 text-white/90 animate-pulse relative z-10" 
-            strokeWidth={2}
+          <img 
+            src={soundwaveIcon}
+            alt="Echo Soundwave"
+            className="w-6 h-6 animate-pulse relative z-10 brightness-0 invert"
           />
           
           {/* Echo Text (shown when expanded) */}
