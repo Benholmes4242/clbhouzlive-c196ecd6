@@ -43,17 +43,17 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
 
   return (
     <div 
-      className="flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg"
+      className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg overflow-hidden"
       style={{ width: size, height: size }}
     >
-      <div className="flex items-end justify-center gap-0.5" style={{ height: size * 0.6 }}>
+      <div className="flex items-end justify-center gap-0.5" style={{ height: size * 0.4, width: size * 0.7 }}>
         {Array.from({ length: barCount }, (_, index) => (
           <div
             key={index}
             className="bg-white/90 rounded-full transition-all duration-200 ease-in-out"
             style={{
-              width: Math.max(1.5, size * 0.05),
-              height: `${Math.max(20, (getBarHeight(index) / 100) * (size * 0.6))}%`,
+              width: Math.max(1.2, size * 0.04),
+              height: `${Math.max(15, (getBarHeight(index) / 100) * (size * 0.4))}%`,
               animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`,
               animationDelay: `${getAnimationDelay(index)}s`
             }}
