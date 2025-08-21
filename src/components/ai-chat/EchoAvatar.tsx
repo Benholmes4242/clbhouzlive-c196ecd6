@@ -1,5 +1,5 @@
 import React from 'react';
-import { AudioWaveform } from 'lucide-react';
+import { PiWaveform } from 'react-icons/pi';
 
 interface EchoAvatarProps {
   state: 'idle' | 'listening' | 'processing';
@@ -25,7 +25,7 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
       className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg overflow-hidden"
       style={{ width: size, height: size }}
     >
-      <AudioWaveform 
+      <PiWaveform 
         size={getIconSize()} 
         className="text-white/90 transition-all duration-200 ease-in-out"
         style={{
