@@ -129,7 +129,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
         <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
           <div className="w-10 h-10 flex items-center justify-center">
             <PiWaveform 
-              size={28} 
+              size={36} 
               className="text-white/90 transition-all duration-200 ease-in-out"
               style={{
                 animation: 'echoWave 2s ease-in-out infinite'
