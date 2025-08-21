@@ -293,11 +293,11 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className="p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+      <div className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:shadow-md">
         <div className="flex items-start gap-3">
           {/* Left Column - Video Thumbnail */}
           <div className="flex-shrink-0">
-            <div className="relative w-28 sm:w-36 aspect-video bg-muted rounded-lg overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+            <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
               {analysis.videoThumbnail && !thumbnailError ? (
                 <>
                   {thumbnailLoading && (
@@ -420,6 +420,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
   const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
+  const [activeTab, setActiveTab] = useState('chat');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -428,8 +429,48 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   }, [isOpen]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Lock body scroll
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = '0';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.bottom = '0';
+      
+      // Prevent scroll events on window
+      const preventScroll = (e: WheelEvent | TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      // Add event listeners for all scroll types
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('scroll', preventScroll, { passive: false });
+      
+      return () => {
+        // Restore original styles
+        document.body.style.overflow = originalStyle;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.bottom = '';
+        
+        // Remove event listeners
+        document.removeEventListener('wheel', preventScroll);
+        document.removeEventListener('touchmove', preventScroll);
+        document.removeEventListener('scroll', preventScroll);
+      };
+    }
+  }, [isOpen]);
+
   const loadData = async () => {
-    // Load history
+    // Load history from localStorage (existing chat messages)
     const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
     const parsedHistory = history.map((msg: any) => ({
       ...msg,
@@ -449,9 +490,34 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }));
     setSavedInsights(parsedSaved);
 
-    // Load swing analyses from both analyses and Swing Coach history
-    const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+    // Load swing analyses from localStorage AND database
+    const localAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    
+    // Combine localStorage data
+    const combined = [...localAnalyses, ...swingCoachHistory];
+    const unique = combined.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
+
+    // Load caddie logs from database
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: logs, error } = await supabase
+          .from('caddie_logs')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (!error && logs) {
+          setCaddieLogs(logs);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading caddie logs:', error);
+    }
     
     // Convert Swing Coach conversations to analysis format with full conversation data
     const swingCoachAnalyses = swingCoachHistory
@@ -496,7 +562,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         };
       });
     
-    const allAnalyses = [...analyses, ...swingCoachAnalyses];
+    const allAnalyses = [...unique, ...swingCoachAnalyses];
     const parsedAnalyses = allAnalyses.map((analysis: any) => ({
       ...analysis,
       timestamp: new Date(analysis.timestamp)
@@ -660,245 +726,341 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const deleteCaddieLog = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('caddie_logs')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setCaddieLogs(prev => prev.filter(log => log.id !== id));
+      
+      toast({
+        title: "Caddie log deleted",
+        description: "The log has been removed from your history",
+      });
+    } catch (error) {
+      console.error('Error deleting caddie log:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the caddie log",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-2xl h-[80vh] sm:h-[70vh] flex flex-col shadow-2xl">
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
+      style={{ 
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.24)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
+    >
+      {/* Desktop/Tablet Layout */}
+      <div 
+        className={`w-full flex flex-col overflow-hidden animate-scale-in ${
+          window.innerWidth <= 768 
+            ? 'fixed inset-x-0 bottom-0 rounded-t-3xl' 
+            : 'max-w-2xl rounded-3xl'
+        }`}
+        style={{
+          height: window.innerWidth <= 768 ? '88vh' : 'min(78vh, 640px)',
+          background: 'rgba(246, 247, 246, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '20px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: `
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08)
+          `
+        }}
+        onWheel={(e) => {
+          const target = e.currentTarget;
+          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+          
+          if (scrollableElement) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+            const isAtTop = scrollTop === 0;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+              e.preventDefault();
+            }
+          }
+          
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Echo History</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Search header */}
-        <div className="px-6 py-4 border-b">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search your history..."
-              className="pl-10"
-            />
+        <div 
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}
+        >
+          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search history..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-48 bg-white/30 backdrop-blur-sm border border-white/20 focus:bg-white/50 transition-all duration-160"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.3)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="chat" className="flex-1 flex flex-col">
-          <div className="px-6">
-            <TabsList className="w-full px-4 justify-between box-border">
-              <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
-              <TabsTrigger value="caddie-logs" className="flex-1">Caddie Logs</TabsTrigger>
-              <TabsTrigger value="swing-coach" className="flex-1">Swing Coach ({swingAnalyses.length})</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="px-6 pt-3 pb-0 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+              <TabsTrigger 
+                value="chat" 
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+              >
+                Chat
+              </TabsTrigger>
+              <TabsTrigger 
+                value="logs"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+              >
+                Caddie Logs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="swing-coach"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-orange-500"
+              >
+                Swing Coach
+              </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="chat" className="flex-1 p-4">
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground">
-                Your chat conversations with Echo
-              </p>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
-                {filteredConversations.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No conversations found matching your search' : 'No chat history yet'}
-                  </p>
-                ) : (
-                  filteredConversations.map((conversation) => (
-                    <div key={conversation.id} className="border rounded-lg">
-                      <div
-                        className="p-3 cursor-pointer hover:bg-muted/50 flex justify-between items-start"
-                        onClick={() => setExpandedConversation(
-                          expandedConversation === conversation.id ? null : conversation.id
-                        )}
-                      >
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <Badge variant="secondary">Conversation</Badge>
+          {/* Single scrollable content area */}
+          <div 
+            className="flex-1 overflow-y-auto min-h-0"
+            style={{ overscrollBehavior: 'contain' }}
+          >
+            <TabsContent value="chat" className="h-full m-0">
+              <div className="h-full min-h-0">
+                <div className="px-6 py-5">
+                  {filteredConversations.length > 0 ? (
+                    <div className="space-y-3">
+                      {filteredConversations.map((conversation) => (
+                        <div
+                          key={conversation.id}
+                          className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:scale-[1.01] hover:shadow-md"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium truncate flex-1 text-gray-900">{conversation.title}</h3>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">
-                                {conversation.timestamp.toLocaleDateString()} {conversation.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              <span className="text-sm text-gray-600">
+                                {conversation.timestamp.toLocaleDateString()}
                               </span>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteConversation(conversation.id);
-                                }}
-                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                                onClick={() => deleteConversation(conversation.id)}
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
-                          <p className="text-sm font-medium">{conversation.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <div className="text-sm text-gray-600 mb-3">
                             {conversation.messages.length} messages
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {expandedConversation === conversation.id && (
-                        <div className="border-t p-3 bg-muted/20">
-                          <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {conversation.messages.map((message, index) => (
-                              <div
-                                key={`${message.id}-${index}`}
-                                className={`p-2 rounded text-sm ${
-                                  message.type === 'user' 
-                                    ? 'bg-primary/10 text-foreground' 
-                                    : 'bg-muted text-foreground'
-                                }`}
-                              >
-                                <div className="flex justify-between items-start mb-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {message.type === 'user' ? 'You' : 'Echo'}
-                                  </Badge>
-                                  {message.type === 'user' && (
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setExpandedConversation(
+                                expandedConversation === conversation.id ? null : conversation.id
+                              )}
+                              className="bg-white/30 border-white/30 hover:bg-white/50"
+                            >
+                              {expandedConversation === conversation.id ? 'Hide' : 'Show'} Messages
+                            </Button>
+                          </div>
+                          
+                          {expandedConversation === conversation.id && (
+                            <div className="mt-4 space-y-2 border-t border-white/20 pt-4">
+                              {conversation.messages.map((message) => (
+                                <div
+                                  key={message.id}
+                                  className={`p-3 rounded-lg ${
+                                    message.type === 'user' 
+                                      ? 'bg-primary/10 border-l-4 border-primary' 
+                                      : 'bg-white/40 border-l-4 border-gray-300'
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start mb-1">
+                                    <Badge variant={message.type === 'user' ? 'default' : 'secondary'}>
+                                      {message.type === 'user' ? 'You' : 'Echo'}
+                                    </Badge>
+                                    <span className="text-xs text-gray-600">
+                                      {message.timestamp.toLocaleTimeString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed">{message.content}</p>
+                                  {message.type === 'ai' && (
                                     <Button
-                                      variant="ghost"
+                                      variant="link"
                                       size="sm"
                                       onClick={() => onSelectMessage(message.content)}
-                                      className="h-5 px-2 text-xs"
+                                      className="p-0 h-auto mt-2 text-xs text-primary hover:text-primary/80"
                                     >
-                                      Use
+                                      Use this response
                                     </Button>
                                   )}
                                 </div>
-                                <p className="text-xs leading-relaxed">{message.content}</p>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No chat history found</p>
+                        <p className="text-xs mt-1 opacity-70">Start a conversation with Echo to see it here</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="logs" className="h-full m-0">
+              <div className="h-full min-h-0">
+                <div className="px-6 py-5">
+                  {filteredCaddieLogs.length > 0 ? (
+                    <div className="space-y-3">
+                      {filteredCaddieLogs.map((log) => (
+                        <div
+                          key={log.id}
+                          className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:scale-[1.01] hover:shadow-md"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <p className="text-sm leading-relaxed text-gray-900 mb-2">{log.content}</p>
+                              {log.transcription && log.transcription !== log.content && (
+                                <div className="text-xs text-gray-600 bg-white/40 p-2 rounded-lg">
+                                  <strong>Transcription:</strong> {log.transcription}
+                                </div>
+                              )}
+                              {log.location_name && (
+                                <div className="flex items-center gap-1 mt-2">
+                                  <span className="text-xs text-gray-600">{log.location_name}</span>
+                                </div>
+                              )}
+                              {log.course_name && (
+                                <div className="text-xs text-gray-600 mt-1">
+                                  Course: {log.course_name}
+                                </div>
+                              )}
+                              {log.tags && log.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {log.tags.map((tag, index) => (
+                                    <Badge key={index} variant="secondary" className="text-xs bg-white/30 border-white/30">
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              <span className="text-xs text-gray-600">
+                                {new Date(log.created_at).toLocaleDateString()}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteCaddieLog(log.id)}
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="caddie-logs" className="flex-1 p-4">
-            <div className="mb-4">
-              <div className="mb-3">
-                <Input
-                  placeholder="Search your caddie logs..."
-                  value={searchQuery} 
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Your saved caddie logs and notes
-              </p>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
-                {filteredCaddieLogs.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No caddie logs found matching your search' : 'No caddie logs yet. Start recording voice notes to see them here.'}
-                  </p>
-                ) : (
-                  filteredCaddieLogs.map((log) => (
-                    <div
-                      key={log.id}
-                      className="p-3 rounded-lg border hover:bg-muted/50"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">Caddie Log</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(log.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onSelectMessage(log.content)}
-                            className="h-7 px-2"
-                          >
-                            <RotateCcw className="h-3 w-3" />
-                          </Button>
-                        </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No caddie logs found</p>
+                        <p className="text-xs mt-1 opacity-70">Record voice notes during your rounds to see them here</p>
                       </div>
-                      
-                      <p className="text-sm font-medium mb-2">{log.content}</p>
-                      
-                      {log.course_name && (
-                        <p className="text-xs text-muted-foreground mb-1">
-                          📍 {log.course_name}
-                        </p>
-                      )}
-                      
-                      {log.location_name && !log.course_name && (
-                        <p className="text-xs text-muted-foreground mb-1">
-                          📍 {log.location_name}
-                        </p>
-                      )}
-                      
-                      {log.tags && log.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {log.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
                     </div>
-                  ))
-                )}
+                  )}
+                </div>
               </div>
-            </ScrollArea>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="swing-coach" className="flex-1 p-4">
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground">
-                Your Swing Coach swing analyses
-              </p>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="space-y-3">
-                {filteredSwingCoach.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Swing Coach to get started.'}
-                  </p>
-                ) : (
-                  filteredSwingCoach.map((analysis) => (
-                    <SwingAnalysisCard 
-                      key={analysis.id} 
-                      analysis={analysis} 
-                      onDelete={() => deleteSwingAnalysis(analysis.id)}
-                    />
-                  ))
-                )}
+            <TabsContent value="swing-coach" className="h-full m-0">
+              <div className="h-full min-h-0">
+                <div className="px-6 py-5">
+                  {swingAnalyses.length > 0 ? (
+                    <div className="space-y-3">
+                      {swingAnalyses.map((analysis) => (
+                        <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-160">
+                          <SwingAnalysisCard
+                            analysis={analysis}
+                            onDelete={() => deleteSwingAnalysis(analysis.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No swing analyses found</p>
+                        <p className="text-xs mt-1 opacity-70">Upload swing videos to Swing Coach to see them here</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </ScrollArea>
-          </TabsContent>
+            </TabsContent>
+          </div>
         </Tabs>
-
-        {/* Footer */}
-        <div className="p-4 border-t">
-          <p className="text-xs text-muted-foreground text-center">
-            Your history is only visible to you. You can delete items or clear all anytime.
-          </p>
-        </div>
       </div>
     </div>
   );
