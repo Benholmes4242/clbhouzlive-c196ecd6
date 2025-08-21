@@ -29,6 +29,8 @@ interface SwingAnalysis {
   videoThumbnail?: string;
   videoSrc?: string;
   videoPoster?: string;
+  videoUrl?: string;
+  videoId?: string;
   timestamp: Date;
   voiceNote?: string;
   conversation?: Array<{role: 'user' | 'coach', content: string, timestamp?: string}>;
@@ -185,7 +187,7 @@ const ConversationDetailsDialog: React.FC<{
         
         <div className="space-y-6">
           {/* Video Section */}
-          {analysis.videoSrc && !analysis.videoSrc.startsWith('blob:') ? (
+          {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
             <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
               {isVideoLoading && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -193,8 +195,8 @@ const ConversationDetailsDialog: React.FC<{
                 </div>
               )}
               <video
-                src={analysis.videoSrc}
-                poster={analysis.videoPoster}
+                src={analysis.videoUrl || analysis.videoSrc}
+                poster={analysis.videoThumbnail || analysis.videoPoster}
                 controls
                 className="w-full h-full object-cover"
                 onLoadStart={() => setIsVideoLoading(true)}
@@ -213,7 +215,7 @@ const ConversationDetailsDialog: React.FC<{
                 <div className="text-white text-center p-4">
                   <FileText className="h-8 w-8 mx-auto mb-2" />
                   <p className="text-sm font-medium mb-1">Video Preview</p>
-                  <p className="text-xs opacity-80">Video playback not available for historical analyses</p>
+                  <p className="text-xs opacity-80">New swing analyses will have permanent video links</p>
                 </div>
               </div>
             </div>
@@ -391,8 +393,8 @@ const SwingAnalysisCard: React.FC<{
       <VideoPlayerDialog
         isOpen={videoDialogOpen}
         onClose={() => setVideoDialogOpen(false)}
-        videoSrc={analysis.videoSrc}
-        videoPoster={analysis.videoPoster}
+        videoSrc={analysis.videoUrl || analysis.videoSrc}
+        videoPoster={analysis.videoThumbnail || analysis.videoPoster}
         title={analysis.title || analysis.save_card}
         date={analysis.timestamp.toLocaleDateString()}
         tags={analysis.tags}
