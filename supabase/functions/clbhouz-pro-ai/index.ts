@@ -27,7 +27,7 @@ async function searchWeb(query: string): Promise<string> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar',
         messages: [
           {
             role: 'system',
@@ -37,12 +37,7 @@ async function searchWeb(query: string): Promise<string> {
             role: 'user',
             content: query
           }
-        ],
-        temperature: 0.2,
-        max_tokens: 1000,
-        return_images: false,
-        return_related_questions: false,
-        search_recency_filter: 'week'
+        ]
       }),
     });
 
