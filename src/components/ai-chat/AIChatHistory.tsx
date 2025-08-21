@@ -937,7 +937,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               )}
                               className="bg-gray-100 border-gray-200 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm"
                             >
-                              {expandedConversation === conversation.id ? 'Hide' : 'Show'} Messages
+                              {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
                             </Button>
                           </div>
                           
