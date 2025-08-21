@@ -17,7 +17,7 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
   };
 
   const getIconSize = () => {
-    return Math.max(16, size * 0.5);
+    return Math.max(20, size * 0.6);
   };
 
   return (
