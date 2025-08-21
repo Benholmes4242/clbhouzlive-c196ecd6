@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import soundwaveIcon from '@/assets/soundwave-icon.png';
+import soundwaveIcon from '@/assets/soundwave-white-icon.png';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
@@ -109,7 +109,6 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           bg-gradient-to-br from-slate-800 via-slate-700 to-teal-600
           shadow-[0_4px_12px_rgba(0,0,0,0.15),0_0_20px_rgba(20,184,166,0.2)]
           hover:shadow-[0_6px_20px_rgba(0,0,0,0.2),0_0_30px_rgba(20,184,166,0.3)]
-          animate-pulse
           active:scale-95
           flex items-center justify-center
           relative overflow-hidden
@@ -123,7 +122,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           <img 
             src={soundwaveIcon}
             alt="Echo Soundwave"
-            className="w-6 h-6 animate-pulse relative z-10 brightness-0 invert"
+            className="w-6 h-6 relative z-10"
           />
           
           {/* Echo Text (shown when expanded) */}
