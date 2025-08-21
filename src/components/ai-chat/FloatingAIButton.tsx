@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import soundwaveIcon from '@/assets/soundwave-white-icon.png';
+import { PiWaveform } from 'react-icons/pi';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
@@ -29,15 +29,6 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
     }
   }, []);
 
-  // Idle pulse animation every 6-8 seconds
-  useEffect(() => {
-    const pulseInterval = setInterval(() => {
-      setShowPulse(true);
-      setTimeout(() => setShowPulse(false), 900);
-    }, 7000); // Every 7 seconds
-
-    return () => clearInterval(pulseInterval);
-  }, []);
 
   // Auto-hide onboarding after 3 seconds
   useEffect(() => {
@@ -130,37 +121,20 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           border border-white/10
         `}
       >
-        {/* Subtle pulse ripples */}
-        {showPulse && (
-          <>
-            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(42, 157, 143, 0.12)',
-              animation: 'ping 1200ms ease-out forwards',
-              animationDelay: '0ms'
-            }} />
-            <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(29, 53, 87, 0.08)',
-              animation: 'ping 1200ms ease-out forwards',
-              animationDelay: '200ms'
-            }} />
-          </>
-        )}
         
         {/* Inner gradient highlight */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60" />
         
-        {/* Soundwave Icon */}
+        {/* PiWaveform Icon */}
         <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
           <div className="w-10 h-10 flex items-center justify-center">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="10" width="1.5" height="4" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="5" y="8" width="1.5" height="8" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="8" y="6" width="1.5" height="12" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="11" y="4" width="1.5" height="16" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="14" y="7" width="1.5" height="10" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="17" y="9" width="1.5" height="6" rx="0.75" fill="white" fillOpacity="0.9"/>
-              <rect x="20" y="11" width="1.5" height="2" rx="0.75" fill="white" fillOpacity="0.9"/>
-            </svg>
+            <PiWaveform 
+              size={28} 
+              className="text-white/90 transition-all duration-200 ease-in-out"
+              style={{
+                animation: 'echoWave 2s ease-in-out infinite'
+              }}
+            />
           </div>
           
           {/* Echo Text (shown when expanded) */}
