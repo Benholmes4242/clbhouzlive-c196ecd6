@@ -29,12 +29,19 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
     }
   }, []);
 
-  // Idle pulse animation every 6-8 seconds
+  // Heartbeat pulse animation every 6-8 seconds
   useEffect(() => {
     const pulseInterval = setInterval(() => {
+      // First beat
       setShowPulse(true);
-      setTimeout(() => setShowPulse(false), 900);
-    }, 7000); // Every 7 seconds
+      setTimeout(() => setShowPulse(false), 300);
+      
+      // Second beat (heartbeat pattern)
+      setTimeout(() => {
+        setShowPulse(true);
+        setTimeout(() => setShowPulse(false), 300);
+      }, 400);
+    }, 6500); // Every 6.5 seconds
 
     return () => clearInterval(pulseInterval);
   }, []);
@@ -130,18 +137,18 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           border border-white/10
         `}
       >
-        {/* Subtle pulse ripples */}
+        {/* Heartbeat pulse ripples */}
         {showPulse && (
           <>
             <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(42, 157, 143, 0.12)',
-              animation: 'ping 1200ms ease-out forwards',
+              backgroundColor: 'rgba(42, 157, 143, 0.15)',
+              animation: 'ping 400ms ease-out forwards',
               animationDelay: '0ms'
             }} />
             <div className="absolute inset-0 rounded-full animate-ping scale-100" style={{
-              backgroundColor: 'rgba(29, 53, 87, 0.08)',
-              animation: 'ping 1200ms ease-out forwards',
-              animationDelay: '200ms'
+              backgroundColor: 'rgba(29, 53, 87, 0.10)',
+              animation: 'ping 400ms ease-out forwards',
+              animationDelay: '50ms'
             }} />
           </>
         )}
