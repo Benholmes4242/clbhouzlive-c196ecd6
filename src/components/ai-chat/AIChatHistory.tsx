@@ -856,13 +856,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
             <TabsList 
-              className="grid w-full grid-cols-3 bg-transparent border-none p-1"
+              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20"
               role="tablist"
               aria-label="Echo History sections"
             >
               <TabsTrigger 
                 value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 role="tab"
                 aria-selected={activeTab === 'chat'}
                 aria-controls="chat-panel"
@@ -872,7 +872,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </TabsTrigger>
               <TabsTrigger 
                 value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 role="tab"
                 aria-selected={activeTab === 'logs'}
                 aria-controls="logs-panel"
@@ -882,7 +882,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </TabsTrigger>
               <TabsTrigger 
                 value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-400 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 border border-gray-200/40 hover:border-gray-300/60 data-[state=active]:border-transparent rounded-full font-medium"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
                 role="tab"
                 aria-selected={activeTab === 'swing-coach'}
                 aria-controls="swing-coach-panel"
