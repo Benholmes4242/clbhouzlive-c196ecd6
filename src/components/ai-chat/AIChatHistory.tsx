@@ -293,7 +293,7 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className="p-4 rounded-xl transition-all duration-100">
+      <div className="p-3 rounded-lg border hover:bg-muted/50 transition-colors">
         <div className="flex items-start gap-3">
           {/* Left Column - Video Thumbnail */}
           <div className="flex-shrink-0">
@@ -429,164 +429,91 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadData = async () => {
-    try {
-      // Load conversations from both database AND localStorage
-      const { data: conversationsData, error: conversationsError } = await supabase
-        .from('conversations')
-        .select('*')
-        .order('updated_at', { ascending: false });
+    // Load history
+    const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
+    const parsedHistory = history.map((msg: any) => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }));
+    setHistoryMessages(parsedHistory);
+    
+    // Group messages into conversations
+    const groupedConversations = groupMessagesIntoConversations(parsedHistory);
+    setConversations(groupedConversations);
 
-      // Also load from localStorage for any local conversations
-      const localHistory = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      const localConversations = JSON.parse(localStorage.getItem('clbhouz_ai_conversations') || '[]');
+    // Load saved insights
+    const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
+    const parsedSaved = saved.map((insight: any) => ({
+      ...insight,
+      timestamp: new Date(insight.timestamp)
+    }));
+    setSavedInsights(parsedSaved);
 
-      let allConversations: ChatConversation[] = [];
-      let allMessages: HistoryMessage[] = [];
-
-      // Add database conversations
-      if (conversationsData && !conversationsError) {
-        const dbConversations = conversationsData.map((conv: any) => ({
-          id: conv.id,
-          title: conv.title || 'Chat Conversation',
-          messages: conv.messages || [],
-          timestamp: new Date(conv.updated_at)
-        }));
-        allConversations.push(...dbConversations);
-
-        // Extract messages from database conversations
-        dbConversations.forEach(conv => {
-          conv.messages.forEach((msg: any) => {
-            allMessages.push({
-              id: `${conv.id}-${msg.id || Math.random()}`,
-              type: msg.role === 'user' ? 'user' : 'ai',
-              content: msg.content,
-              timestamp: new Date(msg.timestamp || conv.timestamp),
-              metadata: { conversationId: conv.id }
-            });
+    // Load swing analyses from both analyses and Swing Coach history
+    const analyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    
+    // Convert Swing Coach conversations to analysis format with full conversation data
+    const swingCoachAnalyses = swingCoachHistory
+      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
+      .map((msg: any, index: number) => {
+        // Get the user message that triggered this analysis (should be the previous message)
+        const userMessageIndex = swingCoachHistory.findIndex((m: any, i: number) => 
+          i < index && m.type === 'user' && Math.abs(new Date(m.timestamp).getTime() - new Date(msg.timestamp).getTime()) < 30000
+        );
+        const userMessage = userMessageIndex >= 0 ? swingCoachHistory[userMessageIndex] : null;
+        
+        const conversation = [];
+        
+        if (userMessage) {
+          conversation.push({
+            role: 'user' as const, 
+            content: userMessage.content, 
+            timestamp: userMessage.timestamp
           });
+        }
+        conversation.push({
+          role: 'coach' as const, 
+          content: msg.content, 
+          timestamp: msg.timestamp
         });
-      }
-
-      // Add localStorage conversations
-      if (localConversations.length > 0) {
-        const localConvs = localConversations.map((conv: any) => ({
-          ...conv,
-          timestamp: new Date(conv.timestamp)
-        }));
-        allConversations.push(...localConvs);
-      }
-
-      // Add individual localStorage messages
-      if (localHistory.length > 0) {
-        const localMessages = localHistory.map((msg: any) => ({
-          ...msg,
+        
+        return {
+          id: msg.id,
+          save_card: msg.metadata.save_card || 'Swing Analysis',
+          title: msg.metadata.save_card || 'Swing Analysis',
+          tags: msg.metadata.tags || [],
+          category: msg.metadata.category || 'Swing',
+          content: msg.content,
+          videoThumbnail: msg.metadata.videoThumbnail,
+          videoPoster: msg.metadata.videoThumbnail,
+          // Try to use the video data from user message, but it might be invalid blob URL
+          videoSrc: userMessage?.videoPreview && userMessage.videoPreview.startsWith('blob:') 
+            ? undefined // Don't use invalid blob URLs
+            : userMessage?.videoPreview,
+          conversation,
           timestamp: new Date(msg.timestamp)
-        }));
-        allMessages.push(...localMessages);
-      }
+        };
+      });
+    
+    const allAnalyses = [...analyses, ...swingCoachAnalyses];
+    const parsedAnalyses = allAnalyses.map((analysis: any) => ({
+      ...analysis,
+      timestamp: new Date(analysis.timestamp)
+    }));
+    setSwingAnalyses(parsedAnalyses);
 
-      setConversations(allConversations);
-      setHistoryMessages(allMessages);
-
-      // Load caddie logs from database
-      const { data: caddieData, error: caddieError } = await supabase
+    // Load caddie logs from Supabase
+    try {
+      const { data, error } = await supabase
         .from('caddie_logs')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (caddieError) {
-        console.error('Error loading caddie logs:', caddieError);
-      } else {
-        setCaddieLogs(caddieData || []);
-      }
-
-      // Load swing analyses from BOTH database AND localStorage
-      const { data: proAiData, error: proAiError } = await supabase
-        .from('pro_ai_analyses')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      // Load from localStorage as well
-      const localSwingAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-      const localSwingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-
-      let allSwingAnalyses: SwingAnalysis[] = [];
-
-      // Add database swing analyses
-      if (proAiData && !proAiError) {
-        const dbSwingAnalyses = proAiData.map((analysis: any) => ({
-          id: analysis.id,
-          save_card: 'Swing Analysis',
-          tags: [],
-          category: 'swing',
-          content: JSON.stringify(analysis.analysis_results),
-          videoUrl: analysis.video_url,
-          timestamp: new Date(analysis.created_at),
-          conversation: analysis.analysis_results?.conversation || []
-        }));
-        allSwingAnalyses.push(...dbSwingAnalyses);
-      }
-
-      // Add localStorage swing analyses
-      if (localSwingAnalyses.length > 0) {
-        const localAnalyses = localSwingAnalyses.map((analysis: any) => ({
-          ...analysis,
-          timestamp: new Date(analysis.timestamp)
-        }));
-        allSwingAnalyses.push(...localAnalyses);
-      }
-
-      // Convert Swing Coach history to analysis format
-      if (localSwingCoachHistory.length > 0) {
-        const swingCoachAnalyses = localSwingCoachHistory
-          .filter((msg: any) => msg.type === 'ai' && msg.metadata)
-          .map((msg: any, index: number) => {
-            const userMessageIndex = localSwingCoachHistory.findIndex((m: any, i: number) => 
-              i < index && m.type === 'user' && Math.abs(new Date(m.timestamp).getTime() - new Date(msg.timestamp).getTime()) < 30000
-            );
-            const userMessage = userMessageIndex >= 0 ? localSwingCoachHistory[userMessageIndex] : null;
-            
-            const conversation = [];
-            if (userMessage) {
-              conversation.push({
-                role: 'user' as const, 
-                content: userMessage.content, 
-                timestamp: userMessage.timestamp
-              });
-            }
-            conversation.push({
-              role: 'coach' as const, 
-              content: msg.content, 
-              timestamp: msg.timestamp
-            });
-            
-            return {
-              id: msg.id,
-              save_card: msg.metadata.save_card || 'Swing Analysis',
-              title: msg.metadata.save_card || 'Swing Analysis',
-              tags: msg.metadata.tags || [],
-              category: msg.metadata.category || 'Swing',
-              content: msg.content,
-              videoThumbnail: msg.metadata.videoThumbnail,
-              videoPoster: msg.metadata.videoThumbnail,
-              videoSrc: userMessage?.videoPreview && !userMessage.videoPreview.startsWith('blob:') 
-                ? userMessage.videoPreview : undefined,
-              conversation,
-              timestamp: new Date(msg.timestamp)
-            };
-          });
-        allSwingAnalyses.push(...swingCoachAnalyses);
-      }
-
-      setSwingAnalyses(allSwingAnalyses);
-
+      if (error) throw error;
+      setCaddieLogs(data || []);
     } catch (error) {
-      console.error('Error loading data:', error);
-      toast({
-        title: "Error loading history",
-        description: "Failed to load chat history and logs.",
-        variant: "destructive",
-      });
+      console.error('Error fetching caddie logs:', error);
     }
   };
 
@@ -736,328 +663,238 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
-      style={{ 
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.24)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)'
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <div 
-        className="w-full max-w-2xl flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          height: window.innerWidth <= 768 ? '88vh' : 'min(78vh, 640px)',
-          maxWidth: window.innerWidth <= 768 ? '100%' : '640px',
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '20px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
-        }}
-      >
-        {/* Header - Fixed at top */}
-        <div 
-          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-          style={{
-            height: window.innerWidth <= 768 ? '56px' : '64px',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-          }}
-        >
-          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
-          
-          {/* Search bar - Center */}
-          <div className="flex-1 mx-6 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search your history..."
-                className="pl-10 bg-white/30 backdrop-blur-sm border border-white/20 rounded-xl placeholder:text-gray-500/70 focus:border-orange-400/50 focus:ring-orange-400/30 transition-all duration-160"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.3)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)'
-                }}
-              />
-            </div>
-          </div>
-          
-          {/* Close button - Right */}
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-2xl h-[80vh] sm:h-[70vh] flex flex-col shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-lg font-semibold">Echo History</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+            className="h-8 w-8 p-0"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Tabs - Fixed header */}
-        <Tabs defaultValue="chat" className="flex-1 flex flex-col min-h-0">
-          <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
-              <TabsTrigger 
-                value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative"
-              >
-                Chat
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-500 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-160" />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="caddie-logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative"
-              >
-                Caddie Logs
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-500 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-160" />
-              </TabsTrigger>
-              <TabsTrigger 
-                value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm relative"
-              >
-                Swing Coach ({swingAnalyses.length})
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-orange-500 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-160" />
-              </TabsTrigger>
+        {/* Search header */}
+        <div className="px-6 py-4 border-b">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search your history..."
+              className="pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="chat" className="flex-1 flex flex-col">
+          <div className="px-6">
+            <TabsList className="w-full px-4 justify-between box-border">
+              <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
+              <TabsTrigger value="caddie-logs" className="flex-1">Caddie Logs</TabsTrigger>
+              <TabsTrigger value="swing-coach" className="flex-1">Swing Coach ({swingAnalyses.length})</TabsTrigger>
             </TabsList>
           </div>
 
-          {/* Content Area - Scrollable */}
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="chat" className="h-full m-0">
-              <ScrollArea className="h-full">
-                <div className="px-6 py-5">
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      Your chat conversations with Echo
-                    </p>
-                  </div>
+          <TabsContent value="chat" className="flex-1 p-4">
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground">
+                Your chat conversations with Echo
+              </p>
+            </div>
 
-                  <div className="space-y-3">
-                    {filteredConversations.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        {searchQuery ? 'No conversations found matching your search' : 'No chat history yet'}
-                      </p>
-                    ) : (
-                      filteredConversations.map((conversation) => (
-                        <div 
-                          key={conversation.id} 
-                          className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <div
-                            className="p-4 cursor-pointer hover:bg-white/20 rounded-xl transition-colors duration-160 flex justify-between items-start"
-                            onClick={() => setExpandedConversation(
-                              expandedConversation === conversation.id ? null : conversation.id
-                            )}
-                          >
-                            <div className="flex-1">
-                              <div className="flex justify-between items-start mb-2">
-                                <Badge variant="secondary" className="bg-gray-100/80 text-gray-700">Conversation</Badge>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs text-muted-foreground">
-                                    {conversation.timestamp.toLocaleDateString()} {conversation.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      deleteConversation(conversation.id);
-                                    }}
-                                    className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-red-50/60 transition-colors duration-100"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                              <p className="text-sm font-medium text-gray-900">{conversation.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {conversation.messages.length} messages
-                              </p>
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {filteredConversations.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    {searchQuery ? 'No conversations found matching your search' : 'No chat history yet'}
+                  </p>
+                ) : (
+                  filteredConversations.map((conversation) => (
+                    <div key={conversation.id} className="border rounded-lg">
+                      <div
+                        className="p-3 cursor-pointer hover:bg-muted/50 flex justify-between items-start"
+                        onClick={() => setExpandedConversation(
+                          expandedConversation === conversation.id ? null : conversation.id
+                        )}
+                      >
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge variant="secondary">Conversation</Badge>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">
+                                {conversation.timestamp.toLocaleDateString()} {conversation.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteConversation(conversation.id);
+                                }}
+                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
                           </div>
-                          
-                          {expandedConversation === conversation.id && (
-                            <div className="border-t border-white/20 p-4 bg-white/30 backdrop-blur-sm rounded-b-xl">
-                              <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {conversation.messages.map((message, index) => (
-                                  <div
-                                    key={`${message.id}-${index}`}
-                                    className={`p-3 rounded-xl text-sm transition-all duration-160 ${
-                                      message.type === 'user' 
-                                        ? 'bg-primary/10 text-foreground border border-primary/20' 
-                                        : 'bg-white/50 text-foreground border border-white/30'
-                                    }`}
-                                  >
-                                    <div className="flex justify-between items-start mb-1">
-                                      <Badge variant="outline" className="text-xs">
-                                        {message.type === 'user' ? 'You' : 'Echo'}
-                                      </Badge>
-                                      {message.type === 'user' && (
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => onSelectMessage(message.content)}
-                                          className="h-5 px-2 text-xs hover:bg-white/40 transition-colors duration-100"
-                                        >
-                                          Use
-                                        </Button>
-                                      )}
-                                    </div>
-                                    <p className="text-xs leading-relaxed">{message.content}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <p className="text-sm font-medium">{conversation.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {conversation.messages.length} messages
+                          </p>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </ScrollArea>
-            </TabsContent>
-
-            <TabsContent value="caddie-logs" className="h-full m-0">
-              <ScrollArea className="h-full">
-                <div className="px-6 py-5">
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      Your saved caddie logs and notes
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {filteredCaddieLogs.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        {searchQuery ? 'No caddie logs found matching your search' : 'No caddie logs yet. Start recording voice notes to see them here.'}
-                      </p>
-                    ) : (
-                      filteredCaddieLogs.map((log) => (
-                        <div
-                          key={log.id}
-                          className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <div className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="bg-gray-100/80 text-gray-700">Caddie Log</Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(log.created_at).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => onSelectMessage(log.content)}
-                                  className="h-7 px-2 hover:bg-white/40 transition-colors duration-100"
-                                >
-                                  <RotateCcw className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                            
-                            <p className="text-sm font-medium mb-2 text-gray-900">{log.content}</p>
-                            
-                            {log.course_name && (
-                              <p className="text-xs text-muted-foreground mb-1">
-                                📍 {log.course_name}
-                              </p>
-                            )}
-                            
-                            {log.location_name && !log.course_name && (
-                              <p className="text-xs text-muted-foreground mb-1">
-                                📍 {log.location_name}
-                              </p>
-                            )}
-                            
-                            {log.tags && log.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {log.tags.map((tag, index) => (
-                                  <Badge key={index} variant="secondary" className="text-xs bg-gray-100/80 text-gray-700">
-                                    {tag}
+                      </div>
+                      
+                      {expandedConversation === conversation.id && (
+                        <div className="border-t p-3 bg-muted/20">
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {conversation.messages.map((message, index) => (
+                              <div
+                                key={`${message.id}-${index}`}
+                                className={`p-2 rounded text-sm ${
+                                  message.type === 'user' 
+                                    ? 'bg-primary/10 text-foreground' 
+                                    : 'bg-muted text-foreground'
+                                }`}
+                              >
+                                <div className="flex justify-between items-start mb-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {message.type === 'user' ? 'You' : 'Echo'}
                                   </Badge>
-                                ))}
+                                  {message.type === 'user' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => onSelectMessage(message.content)}
+                                      className="h-5 px-2 text-xs"
+                                    >
+                                      Use
+                                    </Button>
+                                  )}
+                                </div>
+                                <p className="text-xs leading-relaxed">{message.content}</p>
                               </div>
-                            )}
+                            ))}
                           </div>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </ScrollArea>
-            </TabsContent>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
 
-            <TabsContent value="swing-coach" className="h-full m-0">
-              <ScrollArea className="h-full">
-                <div className="px-6 py-5">
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      Your Swing Coach swing analyses
-                    </p>
-                  </div>
+          <TabsContent value="caddie-logs" className="flex-1 p-4">
+            <div className="mb-4">
+              <div className="mb-3">
+                <Input
+                  placeholder="Search your caddie logs..."
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Your saved caddie logs and notes
+              </p>
+            </div>
 
-                  <div className="space-y-3">
-                    {filteredSwingCoach.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Swing Coach to get started.'}
-                      </p>
-                    ) : (
-                      filteredSwingCoach.map((analysis) => (
-                        <div key={analysis.id} className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <SwingAnalysisCard 
-                            analysis={analysis} 
-                            onDelete={() => deleteSwingAnalysis(analysis.id)}
-                          />
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {filteredCaddieLogs.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    {searchQuery ? 'No caddie logs found matching your search' : 'No caddie logs yet. Start recording voice notes to see them here.'}
+                  </p>
+                ) : (
+                  filteredCaddieLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      className="p-3 rounded-lg border hover:bg-muted/50"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">Caddie Log</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(log.created_at).toLocaleDateString()}
+                          </span>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </ScrollArea>
-            </TabsContent>
-          </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onSelectMessage(log.content)}
+                            className="h-7 px-2"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm font-medium mb-2">{log.content}</p>
+                      
+                      {log.course_name && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          📍 {log.course_name}
+                        </p>
+                      )}
+                      
+                      {log.location_name && !log.course_name && (
+                        <p className="text-xs text-muted-foreground mb-1">
+                          📍 {log.location_name}
+                        </p>
+                      )}
+                      
+                      {log.tags && log.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {log.tags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="swing-coach" className="flex-1 p-4">
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground">
+                Your Swing Coach swing analyses
+              </p>
+            </div>
+
+            <ScrollArea className="flex-1">
+              <div className="space-y-3">
+                {filteredSwingCoach.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    {searchQuery ? 'No analyses found matching your search' : 'No swing analyses yet. Upload a swing in Swing Coach to get started.'}
+                  </p>
+                ) : (
+                  filteredSwingCoach.map((analysis) => (
+                    <SwingAnalysisCard 
+                      key={analysis.id} 
+                      analysis={analysis} 
+                      onDelete={() => deleteSwingAnalysis(analysis.id)}
+                    />
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
         </Tabs>
 
         {/* Footer */}
-        <div 
-          className="p-4 flex-shrink-0"
-          style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
-          }}
-        >
+        <div className="p-4 border-t">
           <p className="text-xs text-muted-foreground text-center">
             Your history is only visible to you. You can delete items or clear all anytime.
           </p>
