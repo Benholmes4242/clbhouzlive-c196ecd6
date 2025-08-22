@@ -575,55 +575,61 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative">
-          {/* Header media area (full-bleed, 72vh, passes under main header) */}
-          <div ref={profileCardRef} className="relative w-full overflow-hidden -mt-16 pt-16" style={{ height: '72vh' }}>
-            <img
-              src={profile?.profile_photo_url || '/placeholder.svg'}
-              alt={profile?.display_name || 'Profile'}
-              className="w-full h-full object-cover"
-              style={{ 
-                objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning
-                objectFit: 'cover'
-              }}
-            />
-            {/* Subtle overlay for better text contrast */}
-            <div className="absolute inset-0 bg-black/10" />
-          </div>
-          
-          {/* Profile content on white background below media */}
-          <div className="bg-white px-4 py-6 space-y-6">
-            {/* User name (immediately below header media) */}
-            <div className="text-left">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {profile?.display_name || 'User'}
-              </h1>
-              {profile?.username && (
-                <p className="text-gray-600 text-base">@{profile.username}</p>
-              )}
-            </div>
-            
-            {/* Bio section */}
-            {profile?.bio && (
-              <p className="text-gray-700 text-base leading-relaxed">
-                {profile.bio}
-              </p>
-            )}
-            
-            {/* Meta row with Home Club (left) and Handicap (right) */}
-            <div className="flex justify-between items-center">
-              <div className="text-left">
-                <p className="text-xs text-gray-500 mb-1">Home Club</p>
-                <p className="text-sm font-medium text-gray-900">
-                  {profile?.home_club || 'No Club'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-gray-500 mb-1">Handicap</p>
-                <p className="text-sm font-semibold text-gray-900">
-                  {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
-                </p>
-              </div>
-            </div>
+           {/* Header media area (full-bleed, 72vh, passes under main header) */}
+           <div ref={profileCardRef} className="relative w-full overflow-hidden -mt-16 pt-16" style={{ height: '72vh' }}>
+             <img
+               src={profile?.profile_photo_url || '/placeholder.svg'}
+               alt={profile?.display_name || 'Profile'}
+               className="w-full h-full object-cover"
+               style={{ 
+                 objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning
+                 objectFit: 'cover'
+               }}
+             />
+             {/* Overlay for better text contrast */}
+             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+             
+             {/* User name, handicap and home club overlaid on media */}
+             <div className="absolute bottom-0 left-0 right-0 p-6">
+               <div className="text-white">
+                 {/* User name */}
+                 <div className="mb-3">
+                   <h1 className="text-3xl font-bold">
+                     {profile?.display_name || 'User'}
+                   </h1>
+                   {profile?.username && (
+                     <p className="text-white/80 text-lg">@{profile.username}</p>
+                   )}
+                 </div>
+                 
+                 {/* Bio section */}
+                 {profile?.bio && (
+                   <p className="text-white/90 text-sm leading-relaxed mb-4">
+                     {profile.bio}
+                   </p>
+                 )}
+                 
+                 {/* Meta row with Home Club (left) and Handicap (right) */}
+                 <div className="flex justify-between items-center">
+                   <div className="text-left">
+                     <p className="text-xs text-white/70 mb-1">Home Club</p>
+                     <p className="text-sm font-medium text-white">
+                       {profile?.home_club || 'No Club'}
+                     </p>
+                   </div>
+                   <div className="text-right">
+                     <p className="text-xs text-white/70 mb-1">Handicap</p>
+                     <p className="text-sm font-semibold text-white">
+                       {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
+                     </p>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           
+           {/* Action buttons on white background below media */}
+           <div className="bg-white px-4 py-6">
 
             {/* Three buttons stacked vertically (only for own profile) */}
             {isOwnProfile && (
