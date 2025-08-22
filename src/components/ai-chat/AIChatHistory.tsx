@@ -155,11 +155,7 @@ const SwingAnalysisCard: React.FC<{
               <h4 className="font-medium text-sm text-gray-900 line-clamp-1 mb-1">
                 Swing Analysis
               </h4>
-              {analysis.save_card && analysis.save_card !== "Swing Analysis" && (
-                <p className="text-xs text-gray-600 line-clamp-1">
-                  {analysis.save_card}
-                </p>
-              )}
+              {/* Remove the save_card text display */}
             </div>
           </div>
         </div>
@@ -567,6 +563,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             // Extract video thumbnail if available
             if (results.videoThumbnail) {
               videoThumbnail = results.videoThumbnail;
+            } else if (results.metadata?.videoThumbnail) {
+              videoThumbnail = results.metadata.videoThumbnail;
             }
           }
         } catch (parseError) {
@@ -804,7 +802,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="swing-coach" className="data-[state=active]:bg-white/80">
+              <TabsTrigger value="swing-coach" className="data-[state=active]:bg-white/80 data-[state=active]:border-transparent">
                 Swing Coach
                 {swingAnalyses.length > 0 && (
                   <Badge variant="secondary" className="ml-2 h-5 text-xs">
