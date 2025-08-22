@@ -528,16 +528,24 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         if (!error && data && data.length > 0) {
           const dbConversations = data.map(conv => {
             const messages = (conv.messages as any[]) || [];
-      return {
-        id: conv.id,
-        title: conv.title || "New conversation",
-        customTitle: conv.title,
-        messages: messages.map((msg, index) => ({
-          id: `${conv.id}-${index}`,
-          type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-          content: msg.content || '',
-          timestamp: new Date(msg.timestamp || conv.created_at),
-          metadata: msg.metadata
+            console.log('📝 Conversation DB debug:', {
+              id: conv.id,
+              title: conv.title,
+              totalMessages: messages.length,
+              messageTypes: messages.map(m => m.type),
+              messageContent: messages.map(m => ({ type: m.type, content: m.content?.substring(0, 30) + '...' }))
+            });
+            
+            return {
+              id: conv.id,
+              title: conv.title || "New conversation",
+              customTitle: conv.title,
+              messages: messages.map((msg, index) => ({
+                id: `${conv.id}-${index}`,
+                type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+                content: msg.content || '',
+                timestamp: new Date(msg.timestamp || conv.created_at),
+                metadata: msg.metadata
                })),
               timestamp: new Date(conv.updated_at),
               createdAt: new Date(conv.created_at),
