@@ -135,7 +135,7 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     setCurrentSession(newSession);
   };
 
-  const addMessage = (message: ConversationMessage) => {
+  const addMessage = async (message: ConversationMessage) => {
     console.log('➕ Adding message:', { 
       hasSession: !!currentSession, 
       messageType: message.type,
@@ -162,6 +162,51 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
     console.log('✅ Session updated, now has', updatedSession.messages.length, 'messages');
     setCurrentSession(updatedSession);
+
+    // Auto-save after each AI message to ensure both user and AI messages are persisted
+    if (message.type === 'ai') {
+      console.log('🤖 AI message added, auto-saving session...');
+      // Save the updated session immediately
+      await saveSessionToDB(updatedSession);
+    }
+  };
+
+  const saveSessionToDB = async (session: ConversationSession) => {
+    console.log('💾 Saving specific session to DB:', {
+      sessionId: session.id,
+      messageCount: session.messages.length,
+      title: session.title
+    });
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('❌ No authenticated user for save');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .upsert({
+          id: session.id,
+          user_id: user.id,
+          title: session.customTitle || session.title,
+          messages: session.messages as any
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Supabase upsert error:', error);
+        return;
+      }
+
+      console.log('✅ Session saved successfully to DB:', data);
+      // Reload conversations to sync with UI
+      await loadConversations();
+    } catch (error) {
+      console.error('❌ Exception during session save:', error);
+    }
   };
 
   const saveCurrentSession = async () => {
