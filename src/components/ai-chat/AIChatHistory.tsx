@@ -1077,7 +1077,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
             <TabsList 
-              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20"
+              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20 [&>*]:border-0 [&>*]:focus:ring-0 [&>*]:focus-visible:ring-0"
               role="tablist"
               aria-label="Echo History sections"
             >
