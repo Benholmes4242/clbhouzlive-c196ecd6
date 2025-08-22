@@ -494,6 +494,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     const localAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
     const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
     
+    console.log('🔍 Loading swing analyses data:', {
+      localAnalyses: localAnalyses.length,
+      swingCoachHistory: swingCoachHistory.length,
+      swingCoachMessages: swingCoachHistory.filter((msg: any) => msg.type === 'ai').length
+    });
+    
     // Combine localStorage data and ensure proper structure
     const combined = [...localAnalyses, ...swingCoachHistory].map(item => ({
       ...item,
@@ -525,11 +531,28 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     
     // Convert Swing Coach conversations to analysis format with full conversation data
     const swingCoachAnalyses = swingCoachHistory
-      .filter((msg: any) => 
-        msg.type === 'ai' && 
-        msg.metadata &&
-        (msg.metadata.videoThumbnail || msg.metadata.videoId || msg.metadata.videoUrl) // Only include entries with actual video data
-      )
+      .filter((msg: any) => {
+        const isAI = msg.type === 'ai';
+        const hasMetadata = !!msg.metadata;
+        const hasVideoData = msg.metadata && (
+          msg.metadata.videoThumbnail || 
+          msg.metadata.videoId || 
+          msg.metadata.videoUrl ||
+          msg.metadata.save_card || // Include if it has analysis data
+          msg.content?.includes('swing') // Include if content mentions swing
+        );
+        
+        console.log('🎯 Filtering swing coach message:', {
+          id: msg.id,
+          isAI,
+          hasMetadata,
+          hasVideoData,
+          metadata: msg.metadata,
+          included: isAI && hasMetadata && hasVideoData
+        });
+        
+        return isAI && hasMetadata && hasVideoData;
+      })
       .map((msg: any, index: number) => {
         // Get the user message that triggered this analysis (should be the previous message)
         const userMessageIndex = swingCoachHistory.findIndex((m: any, i: number) => 
@@ -575,6 +598,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       ...analysis,
       timestamp: new Date(analysis.timestamp)
     }));
+    
+    console.log('📊 Final swing analyses count:', {
+      unique: unique.length,
+      swingCoachAnalyses: swingCoachAnalyses.length,
+      total: parsedAnalyses.length
+    });
+    
     setSwingAnalyses(parsedAnalyses);
 
     // Load caddie logs from Supabase
