@@ -301,9 +301,9 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className={`rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-300 hover:shadow-md ${isExpanded ? 'shadow-lg' : ''}`}>
+      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 ${isExpanded ? 'shadow-lg' : ''}`}>
         {/* Collapsed Header */}
-        <div className="p-4">
+        <div className="p-0">
           <div className="flex items-start gap-3">
             {/* Left Column - Video Thumbnail */}
             <div className="flex-shrink-0">
@@ -400,9 +400,9 @@ const SwingAnalysisCard: React.FC<{
 
         {/* Expanded Content */}
         {isExpanded && (
-          <div className="border-t border-white/30 bg-white/30 animate-accordion-down">
+          <div className="border-t border-gray-100 bg-white/30 animate-accordion-down">
             {/* Sticky Mini Header */}
-            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-white/20 px-4 py-2 z-10">
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-4 py-2 z-10">
               <div className="flex items-center gap-2">
                 <h4 className="font-medium text-sm">{analysis.title || analysis.save_card}</h4>
                 <span className="text-xs text-muted-foreground">
