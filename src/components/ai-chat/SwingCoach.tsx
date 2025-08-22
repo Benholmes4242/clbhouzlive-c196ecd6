@@ -560,7 +560,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       // Set current analysis for potential saving
       if (data.metadata) {
-        setCurrentAnalysis({
+        const analysisToSave = {
           id: aiMessage.id,
           save_card: data.metadata.save_card || 'Swing analysis',
           tags: data.metadata.tags || [],
@@ -571,10 +571,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           videoUrl: videoUrl,
           timestamp: new Date(),
           conversation: [
-            { role: 'user', content: userMessage.content, timestamp: userMessage.timestamp },
-            { role: 'ai', content: aiMessage.content, timestamp: aiMessage.timestamp }
+            { role: 'user' as const, content: userMessage.content, timestamp: userMessage.timestamp },
+            { role: 'ai' as const, content: aiMessage.content, timestamp: aiMessage.timestamp }
           ]
-        });
+        };
+        
+        setCurrentAnalysis(analysisToSave);
+        
+        // Auto-save to Supabase after successful analysis
+        console.log('🤖 Analysis complete, auto-saving to Supabase...');
+        await autoSaveAnalysisToSupabase(analysisToSave);
       }
 
     } catch (error) {
@@ -594,6 +600,61 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const autoSaveAnalysisToSupabase = async (analysisToSave: SwingAnalysis) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('❌ No authenticated user for auto-save');
+        return;
+      }
+
+      // Save to Supabase database
+      const { data, error } = await supabase
+        .from('pro_ai_analyses')
+        .insert({
+          user_id: user.id,
+          analysis_results: {
+            aiResponse: analysisToSave.content,
+            metadata: {
+              category: analysisToSave.category,
+              save_card: analysisToSave.save_card,
+              tags: analysisToSave.tags,
+              videoThumbnail: analysisToSave.videoThumbnail,
+              videoId: analysisToSave.videoId,
+              videoUrl: analysisToSave.videoUrl
+            },
+            timestamp: analysisToSave.timestamp.toISOString(),
+            userMessage: analysisToSave.conversation?.[0]?.content || "Swing analysis request",
+            conversation: analysisToSave.conversation?.map(msg => ({
+              ...msg,
+              timestamp: msg.timestamp.toISOString()
+            }))
+          },
+          video_url: analysisToSave.videoUrl || null,
+          swing_context: JSON.stringify({
+            conversation: analysisToSave.conversation,
+            videoId: analysisToSave.videoId,
+            videoThumbnail: analysisToSave.videoThumbnail
+          })
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Auto-save error:', error);
+        return;
+      }
+
+      console.log('✅ Swing analysis auto-saved to database:', data);
+      
+      // Reload analyses from Supabase to sync with UI
+      await loadAnalysesFromSupabase();
+      
+    } catch (error) {
+      console.error('❌ Exception during auto-save:', error);
     }
   };
 
