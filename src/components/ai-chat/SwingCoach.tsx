@@ -767,27 +767,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium mb-1">{uploadedVideo.name}</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">{uploadedVideo.name}</p>
+                      <Button variant="ghost" size="sm" onClick={discardVideo}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <p className="text-xs text-muted-foreground mb-2">
                       {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
                     </p>
-                    <div className="flex gap-2 mt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload className="h-3 w-3 mr-1" />
-                        Replace
-                      </Button>
-                    </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={discardVideo}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             )}
