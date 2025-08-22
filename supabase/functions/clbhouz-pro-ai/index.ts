@@ -4,6 +4,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
+// Debug logging
+console.log('🔑 Environment check:');
+console.log('OpenAI key present:', !!openAIApiKey);
+console.log('Perplexity key present:', !!perplexityApiKey);
+console.log('Perplexity key length:', perplexityApiKey?.length || 0);
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
