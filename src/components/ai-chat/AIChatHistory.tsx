@@ -524,6 +524,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null);
+  const [expandedCaddieLogId, setExpandedCaddieLogId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Conversation session management for new grouped conversations
@@ -1274,59 +1275,146 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="px-6 py-5">
-                  {filteredCaddieLogs.length > 0 ? (
-                    <div className="space-y-3">
-                      {filteredCaddieLogs.map((log) => (
-                         <div
-                           key={log.id}
-                           className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col"
-                         >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <p className="text-sm leading-relaxed text-gray-900 mb-2">{log.content}</p>
-                              {log.transcription && log.transcription !== log.content && (
-                                <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">
-                                  <strong>Transcription:</strong> {log.transcription}
-                                </div>
-                              )}
-                              {log.location_name && (
-                                <div className="flex items-center gap-1 mt-2">
-                                  <span className="text-xs text-gray-600">{log.location_name}</span>
-                                </div>
-                              )}
-                              {log.course_name && (
-                                <div className="text-xs text-gray-600 mt-1">
-                                  Course: {log.course_name}
-                                </div>
-                              )}
-                              {log.tags && log.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {log.tags.map((tag, index) => (
-                                    <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
-                                      {tag}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
-                              <span className="text-xs text-gray-600">
-                                {new Date(log.created_at).toLocaleDateString()}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deleteCaddieLog(log.id)}
-                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                   {filteredCaddieLogs.length > 0 ? (
+                     <div className="space-y-3">
+                       {filteredCaddieLogs.map((log) => {
+                         const isExpanded = expandedCaddieLogId === log.id;
+                         const contentPreview = log.content.length > 120 ? log.content.slice(0, 120) + '...' : log.content;
+                         const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
+                         
+                         return (
+                           <div
+                             key={log.id}
+                             className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 ${isExpanded ? 'shadow-lg' : ''}`}
+                           >
+                             {/* Collapsed Content */}
+                             <div className="p-4">
+                               <div className="flex items-start justify-between mb-2">
+                                 <div className="flex-1">
+                                   <p className="text-sm leading-relaxed text-gray-900 mb-2">
+                                     {isExpanded ? log.content : contentPreview}
+                                   </p>
+                                   {!isExpanded && log.location_name && (
+                                     <div className="flex items-center gap-1 mt-2">
+                                       <span className="text-xs text-gray-600">{log.location_name}</span>
+                                     </div>
+                                   )}
+                                   {!isExpanded && log.course_name && (
+                                     <div className="text-xs text-gray-600 mt-1">
+                                       Course: {log.course_name}
+                                     </div>
+                                   )}
+                                   {!isExpanded && log.tags && log.tags.length > 0 && (
+                                     <div className="flex flex-wrap gap-1 mt-2">
+                                       {log.tags.slice(0, 3).map((tag, index) => (
+                                         <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                           {tag}
+                                         </Badge>
+                                       ))}
+                                       {log.tags.length > 3 && (
+                                         <Badge variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                           +{log.tags.length - 3} more
+                                         </Badge>
+                                       )}
+                                     </div>
+                                   )}
+                                 </div>
+                                 <div className="flex items-center gap-2 ml-4">
+                                   <span className="text-xs text-gray-600">
+                                     {new Date(log.created_at).toLocaleDateString()}
+                                   </span>
+                                   {hasMoreContent && (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
+                                       className="h-7 px-2 text-xs"
+                                       title={isExpanded ? "Minimize" : "View details"}
+                                     >
+                                       {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                     </Button>
+                                   )}
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => deleteCaddieLog(log.id)}
+                                     className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                     aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
+                                   >
+                                     <Trash2 className="h-3 w-3" />
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+
+                             {/* Expanded Content */}
+                             {isExpanded && (
+                               <div className="border-t border-gray-100 bg-white/30 animate-accordion-down">
+                                 {/* Sticky Mini Header */}
+                                 <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-4 py-2 z-10">
+                                   <div className="flex items-center gap-2">
+                                     <h4 className="font-medium text-sm">
+                                       {log.location_name || 'Caddie Log'}
+                                     </h4>
+                                     <span className="text-xs text-muted-foreground">
+                                       {new Date(log.created_at).toLocaleDateString()} at {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                     </span>
+                                   </div>
+                                 </div>
+
+                                 <div className="p-4 space-y-4">
+                                   {/* Full Content */}
+                                   <div className="space-y-3">
+                                     <div>
+                                       <h5 className="text-sm font-medium mb-2">Content</h5>
+                                       <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                         {log.content}
+                                       </p>
+                                     </div>
+                                     
+                                     {log.transcription && log.transcription !== log.content && (
+                                       <div>
+                                         <h5 className="text-sm font-medium mb-2">Transcription</h5>
+                                         <p className="text-sm leading-relaxed text-gray-700 bg-gray-50 p-3 rounded-lg">
+                                           {log.transcription}
+                                         </p>
+                                       </div>
+                                     )}
+                                     
+                                     {log.location_name && (
+                                       <div>
+                                         <h5 className="text-sm font-medium mb-2">Location</h5>
+                                         <p className="text-sm text-gray-700">{log.location_name}</p>
+                                       </div>
+                                     )}
+                                     
+                                     {log.course_name && (
+                                       <div>
+                                         <h5 className="text-sm font-medium mb-2">Course</h5>
+                                         <p className="text-sm text-gray-700">{log.course_name}</p>
+                                       </div>
+                                     )}
+                                     
+                                     {log.tags && log.tags.length > 0 && (
+                                       <div>
+                                         <h5 className="text-sm font-medium mb-2">Tags</h5>
+                                         <div className="flex flex-wrap gap-2">
+                                           {log.tags.map((tag, index) => (
+                                             <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                               {tag}
+                                             </Badge>
+                                           ))}
+                                         </div>
+                                       </div>
+                                     )}
+                                   </div>
+                                 </div>
+                               </div>
+                             )}
+                           </div>
+                         );
+                       })}
+                     </div>
                   ) : (
                     <div className="text-center text-gray-600 py-8">
                       <div className="text-center">
