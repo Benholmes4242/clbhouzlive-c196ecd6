@@ -162,38 +162,42 @@ const SwingAnalysisCard: React.FC<{
           </div>
         </div>
 
-        {/* Action Row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
-              Analysis
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleExpand();
-              }}
-              className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
-              title={isExpanded ? "Minimize" : "View details"}
-            >
-              {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-            </Button>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50"
-            title="Delete analysis"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
+         {/* Action Row */}
+         <div className="flex items-center justify-between">
+           <div className="flex items-center gap-2">
+             <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+               Analysis
+             </div>
+           </div>
+           <div className="flex items-center gap-1">
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onToggleExpand();
+               }}
+               className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+               title={isExpanded ? "Collapse" : "Expand"}
+             >
+               {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+             </Button>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 if (window.confirm('Are you sure you want to delete this swing analysis? This action cannot be undone.')) {
+                   onDelete();
+                 }
+               }}
+               className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+               title="Delete"
+             >
+               <Trash2 className="h-4 w-4" />
+             </Button>
+           </div>
+         </div>
       </div>
 
       {/* Expanded Content */}
@@ -685,44 +689,48 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    })()}
                                  </div>
 
-                                {/* Action Row */}
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleExpansion('chat', conversation.id)}
-                                      className="bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700 rounded-full px-3 py-1.5 text-xs h-auto"
-                                    >
-                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Hide" : "Show"} Conversation
-                                    </Button>
-                                    {conversation.messageCount && (
-                                      <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
-                                        {conversation.messageCount}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleExpansion('chat', conversation.id)}
-                                      className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
-                                      title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Minimize" : "View details"}
-                                    >
-                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteConversation(conversation.id)}
-                                      className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
-                                      aria-label={`Delete conversation: ${conversation.title}`}
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                </div>
+                                 {/* Action Row */}
+                                 <div className="flex items-center justify-between">
+                                   <div className="flex items-center gap-2">
+                                     <Button
+                                       variant="outline"
+                                       size="sm"
+                                       onClick={() => handleExpansion('chat', conversation.id)}
+                                       className="bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
+                                     >
+                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Hide" : "Show"} Conversation
+                                     </Button>
+                                     {conversation.messageCount && (
+                                       <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+                                         {conversation.messageCount}
+                                       </div>
+                                     )}
+                                   </div>
+                                   <div className="flex items-center gap-1">
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => handleExpansion('chat', conversation.id)}
+                                       className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                       title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Collapse" : "Expand"}
+                                     >
+                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                     </Button>
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => {
+                                         if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                                           deleteConversation(conversation.id);
+                                         }
+                                       }}
+                                       className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                       title="Delete"
+                                     >
+                                       <Trash2 className="h-4 w-4" />
+                                     </Button>
+                                   </div>
+                                 </div>
                               </div>
                             )}
                           </div>
@@ -819,32 +827,38 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                 </p>
                               </div>
                               
-                              {/* Action Row */}
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
-                                    Caddie Log
-                                  </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleExpansion('caddie', log.id)}
-                                    className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
-                                    title={isExpanded ? "Minimize" : "View details"}
-                                  >
-                                    {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                                  </Button>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => deleteCaddieLog(log.id)}
-                                  className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
-                                  aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
+                               {/* Action Row */}
+                               <div className="flex justify-between items-center">
+                                 <div className="flex items-center gap-2">
+                                   <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+                                     Caddie Log
+                                   </div>
+                                 </div>
+                                 <div className="flex items-center gap-1">
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => handleExpansion('caddie', log.id)}
+                                     className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                     title={isExpanded ? "Collapse" : "Expand"}
+                                   >
+                                     {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                   </Button>
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => {
+                                       if (window.confirm('Are you sure you want to delete this caddie log? This action cannot be undone.')) {
+                                         deleteCaddieLog(log.id);
+                                       }
+                                     }}
+                                     className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                     title="Delete"
+                                   >
+                                     <Trash2 className="h-4 w-4" />
+                                   </Button>
+                                 </div>
+                               </div>
                             </div>
 
                             {/* Expanded Content */}
