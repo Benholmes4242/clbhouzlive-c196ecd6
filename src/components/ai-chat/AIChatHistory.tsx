@@ -838,7 +838,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation, index) => (
                         <div
                           key={`conversation-${conversation.id || index}`}
-                          className={`min-h-[140px] max-h-[160px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${
+                          className={`min-h-[112px] sm:min-h-[120px] max-h-[160px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${
                             expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'h-auto max-h-none shadow-lg' : ''
                           }`}
                         >
@@ -884,7 +884,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             ) : (
                                <div className="flex-1 flex flex-col">
                                  {/* Header Row */}
-                                  <div className="flex items-start justify-between mb-3">
+                                 <div className="flex items-start justify-between mb-2">
                                     <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages.find(msg => msg.type === 'user')?.content || "New conversation"}>
                                       {conversation.messages.find(msg => msg.type === 'user')?.content || "New conversation"}
                                     </h3>
@@ -894,11 +894,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                   </div>
 
                                   {/* Body Preview - First AI Response */}
-                                  <div className="flex-1 mb-4">
+                                  <div className="flex-1 mb-3">
                                     {(() => {
                                       const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
                                       return firstAIMessage ? (
-                                        <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed">
+                                        <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
                                           {firstAIMessage.content}
                                         </p>
                                       ) : (
