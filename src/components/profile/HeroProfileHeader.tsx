@@ -575,8 +575,8 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative">
-          {/* Full-bleed profile photo for mobile - passes under header */}
-          <div ref={profileCardRef} className="relative w-full h-80 overflow-hidden -mt-16 pt-16">
+          {/* Full-bleed profile photo for mobile - passes under main app header */}
+          <div ref={profileCardRef} className="relative w-full h-80 overflow-hidden -mt-20 pt-20">
             <img
               src={profile?.profile_photo_url || '/placeholder.svg'}
               alt={profile?.display_name || 'Profile'}
