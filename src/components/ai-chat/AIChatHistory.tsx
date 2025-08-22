@@ -528,14 +528,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         if (!error && data && data.length > 0) {
           const dbConversations = data.map(conv => {
             const messages = (conv.messages as any[]) || [];
-            console.log('DB Conversation messages for conv', conv.id, ':', messages);
             return {
               id: conv.id,
               title: conv.title || "New conversation",
               customTitle: conv.title,
                messages: messages.map((msg, index) => ({
                  id: `${conv.id}-${index}`,
-                  type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+                 type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
                  content: msg.content || '',
                  timestamp: new Date(msg.timestamp || conv.created_at),
                  metadata: msg.metadata
@@ -972,7 +971,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        variant="outline"
                                        size="sm"
                                        onClick={() => handleExpansion('chat', conversation.id)}
-                                       className="bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
+                                       className="bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors focus:ring-0 focus:outline-none focus:border-0"
                                      >
                                        {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Hide" : "Show"} Conversation
                                      </Button>
@@ -1019,35 +1018,35 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      key={message.id}
                                      className={`p-3 rounded-lg ${
                                        message.type === 'user' 
-                                        ? 'bg-orange-50 border-l-4 border-orange-500' 
-                                        : 'bg-gray-50 border-l-4 border-gray-300'
-                                    }`}
-                                  >
-                                    <div className="flex justify-between items-start mb-1">
-                                      <div className="bg-gray-100 text-gray-600 border-gray-200 text-xs px-2 py-1 rounded-full">
-                                        {message.type === 'user' ? 'You' : 'Echo'}
-                                      </div>
-                                      <span className="text-xs text-gray-600">
-                                        {message.timestamp.toLocaleTimeString()}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm leading-relaxed">{message.content}</p>
-                                    {message.type === 'ai' && (
-                                      <Button
-                                        variant="link"
-                                        size="sm"
-                                        onClick={() => onSelectMessage(message.content)}
-                                        className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
-                                      >
-                                        Use this response
-                                      </Button>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                                         ? 'bg-orange-50 border-l-4 border-orange-500' 
+                                         : 'bg-gray-50 border-l-4 border-gray-300'
+                                     }`}
+                                   >
+                                     <div className="flex justify-between items-start mb-1">
+                                       <div className="bg-gray-100 text-gray-600 border-gray-200 text-xs px-2 py-1 rounded-full">
+                                         {message.type === 'user' ? 'You' : 'Echo'}
+                                       </div>
+                                       <span className="text-xs text-gray-600">
+                                         {message.timestamp.toLocaleTimeString()}
+                                       </span>
+                                     </div>
+                                     <p className="text-sm leading-relaxed">{message.content}</p>
+                                     {message.type === 'ai' && (
+                                       <Button
+                                         variant="link"
+                                         size="sm"
+                                         onClick={() => onSelectMessage(message.content)}
+                                         className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
+                                       >
+                                         Use this response
+                                       </Button>
+                                     )}
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
+                         </div>
                       ))}
                     </div>
                   ) : (
