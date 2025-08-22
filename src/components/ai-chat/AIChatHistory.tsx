@@ -525,7 +525,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     
     // Convert Swing Coach conversations to analysis format with full conversation data
     const swingCoachAnalyses = swingCoachHistory
-      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
+      .filter((msg: any) => 
+        msg.type === 'ai' && 
+        msg.metadata &&
+        (msg.metadata.videoThumbnail || msg.metadata.videoId || msg.metadata.videoUrl) // Only include entries with actual video data
+      )
       .map((msg: any, index: number) => {
         // Get the user message that triggered this analysis (should be the previous message)
         const userMessageIndex = swingCoachHistory.findIndex((m: any, i: number) => 
