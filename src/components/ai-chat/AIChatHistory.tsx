@@ -279,280 +279,6 @@ const ConversationDetailsDialog: React.FC<{
   );
 };
 
-// Chat Conversation Card Component
-const ChatConversationCard: React.FC<{
-  conversation: ChatConversation;
-  onDelete: () => void;
-  onEdit: (id: string, title: string) => void;
-  isEditing: boolean;
-  editTitle: string;
-  onEditTitleChange: (title: string) => void;
-  onSaveEdit: () => void;
-  onCancelEdit: () => void;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-  onSelectMessage: (message: string) => void;
-}> = ({ conversation, onDelete, onEdit, isEditing, editTitle, onEditTitleChange, onSaveEdit, onCancelEdit, isExpanded, onToggleExpand, onSelectMessage }) => {
-  const firstUserMessage = conversation.messages.find(m => m.type === 'user');
-  const firstAiMessage = conversation.messages.find(m => m.type === 'ai');
-
-  return (
-    <div 
-      className={`bg-card rounded-xl shadow-sm transition-all duration-200 overflow-hidden ${
-        isExpanded ? 'shadow-md' : 'hover:shadow-md'
-      }`}
-      style={{
-        minHeight: isExpanded ? 'auto' : 'min(112px, 120px)',
-        maxHeight: isExpanded ? 'none' : '160px'
-      }}
-    >
-      <div className="p-4 md:p-5">
-        {/* Header Row */}
-        <div className="flex items-start justify-between mb-2">
-          {isEditing ? (
-            <div className="flex items-center gap-2 flex-1">
-              <Input
-                value={editTitle}
-                onChange={(e) => onEditTitleChange(e.target.value)}
-                className="flex-1"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') onSaveEdit();
-                  else if (e.key === 'Escape') onCancelEdit();
-                }}
-                autoFocus
-              />
-              <Button variant="ghost" size="sm" onClick={onSaveEdit} className="h-7 px-2 border-0">
-                Save
-              </Button>
-              <Button variant="ghost" size="sm" onClick={onCancelEdit} className="h-7 px-2 border-0">
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <>
-              <h3 className="font-semibold text-sm line-clamp-1 flex-1 pr-2">
-                {firstUserMessage?.content || conversation.customTitle || conversation.title}
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {conversation.timestamp.toLocaleDateString()}
-                </span>
-                {conversation.id.startsWith('session_') && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEdit(conversation.id, conversation.customTitle || conversation.title)}
-                    className="h-7 px-2 border-0"
-                    title="Edit title"
-                  >
-                    <Edit2 className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Body Preview */}
-        {!isExpanded && !isEditing && firstAiMessage && (
-          <div className="mb-3">
-            <p className="text-sm text-muted-foreground line-clamp-2 md:line-clamp-3">
-              {firstAiMessage.content}
-            </p>
-          </div>
-        )}
-
-        {/* Expanded Content */}
-        {isExpanded && (
-          <div className="space-y-3 animate-accordion-down">
-            {conversation.messages.map((message) => (
-              <div
-                key={message.id}
-                className={`p-3 rounded-lg ${
-                  message.type === 'user' 
-                    ? 'bg-primary/10 border-l-4 border-primary' 
-                    : 'bg-muted border-l-4 border-muted-foreground'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <Badge variant={message.type === 'user' ? 'default' : 'secondary'} className="border-0">
-                    {message.type === 'user' ? 'You' : 'Echo'}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {message.timestamp.toLocaleTimeString()}
-                  </span>
-                </div>
-                <p className="text-sm leading-relaxed">{message.content}</p>
-                {message.type === 'ai' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onSelectMessage(message.content)}
-                    className="p-0 h-auto mt-2 text-xs border-0"
-                  >
-                    Use this response
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Action Row */}
-        <div className="flex items-center justify-between mt-3 pt-3">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleExpand}
-              className="h-7 px-3 text-xs bg-muted hover:bg-muted/80 border-0 rounded-full"
-            >
-              {isExpanded ? 'Hide' : 'Show'} Conversation
-            </Button>
-            {conversation.messageCount && (
-              <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-                {conversation.messageCount}
-              </Badge>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleExpand}
-              className="h-7 px-2 text-xs hover:bg-muted border-0"
-              title={isExpanded ? "Collapse" : "Expand"}
-            >
-              {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-            </Button>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-0"
-            title="Delete"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Caddie Log Card Component
-const CaddieLogCard: React.FC<{
-  log: CaddieLog;
-  onDelete: () => void;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-}> = ({ log, onDelete, isExpanded, onToggleExpand }) => {
-  const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
-  
-  return (
-    <div 
-      className={`bg-card rounded-xl shadow-sm transition-all duration-200 overflow-hidden ${
-        isExpanded ? 'shadow-md' : 'hover:shadow-md'
-      }`}
-      style={{
-        minHeight: isExpanded ? 'auto' : 'min(112px, 120px)'
-      }}
-    >
-      <div className="p-4 md:p-5">
-        {/* Header Row */}
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-sm line-clamp-1 flex-1">
-            {new Date(log.created_at).toLocaleDateString()}
-          </h3>
-          {log.location_name && (
-            <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-              {log.location_name}
-            </span>
-          )}
-        </div>
-
-        {/* Body Preview */}
-        {!isExpanded && (
-          <div className="mb-3">
-            <p className="text-sm text-foreground line-clamp-4 md:line-clamp-5">
-              {log.content}
-            </p>
-          </div>
-        )}
-
-        {/* Expanded Content */}
-        {isExpanded && (
-          <div className="space-y-4 animate-accordion-down">
-            <div>
-              <h5 className="text-sm font-medium mb-2">Content</h5>
-              <p className="text-sm leading-relaxed text-foreground bg-muted p-3 rounded-lg">
-                {log.content}
-              </p>
-            </div>
-            
-            {log.transcription && log.transcription !== log.content && (
-              <div>
-                <h5 className="text-sm font-medium mb-2">Transcription</h5>
-                <p className="text-sm leading-relaxed text-muted-foreground bg-muted p-3 rounded-lg">
-                  {log.transcription}
-                </p>
-              </div>
-            )}
-            
-            {log.course_name && (
-              <div>
-                <h5 className="text-sm font-medium mb-2">Course</h5>
-                <p className="text-sm text-muted-foreground">{log.course_name}</p>
-              </div>
-            )}
-            
-            {log.tags && log.tags.length > 0 && (
-              <div>
-                <h5 className="text-sm font-medium mb-2">Tags</h5>
-                <div className="flex flex-wrap gap-2">
-                  {log.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Action Row */}
-        <div className="flex items-center justify-between mt-3 pt-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-              Caddie Log
-            </Badge>
-            {hasMoreContent && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleExpand}
-                className="h-7 px-2 text-xs hover:bg-muted border-0"
-                title={isExpanded ? "Collapse" : "Expand"}
-              >
-                {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-              </Button>
-            )}
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-0"
-            title="Delete"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Swing Analysis Card Component
 const SwingAnalysisCard: React.FC<{
   analysis: SwingAnalysis;
@@ -574,188 +300,227 @@ const SwingAnalysisCard: React.FC<{
   };
 
   return (
-    <div 
-      className={`bg-card rounded-xl shadow-sm transition-all duration-200 overflow-hidden ${
-        isExpanded ? 'shadow-md' : 'hover:shadow-md'
-      }`}
-      style={{
-        minHeight: isExpanded ? 'auto' : 'min(112px, 120px)'
-      }}
-    >
-      <div className="p-4 md:p-5">
-        {/* Header Row */}
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-sm line-clamp-1 flex-1 pr-2">
-            {analysis.title || analysis.save_card || 'Swing Analysis'}
-          </h3>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {analysis.timestamp.toLocaleDateString()}
-          </span>
-        </div>
-
-        {/* Body Preview */}
-        {!isExpanded && (
-          <div className="flex gap-3 mb-3">
-            {/* Video Thumbnail */}
+    <>
+      <div 
+        className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+        onClick={!isExpanded ? onToggleExpand : undefined}
+        style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
+      >
+        {/* Collapsed Header */}
+        <div className="p-0 flex-1 flex flex-col">
+          <div className="flex items-start gap-3 flex-1">
+            {/* Left Column - Video Thumbnail */}
             <div className="flex-shrink-0">
-              <div className="relative w-20 h-11 md:w-24 md:h-[54px] bg-muted rounded-lg overflow-hidden">
+              <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
                 {analysis.videoThumbnail && !thumbnailError ? (
                   <>
                     {thumbnailLoading && (
                       <div className="absolute inset-0 bg-muted animate-pulse" />
                     )}
-                    <img 
-                      src={analysis.videoThumbnail} 
-                      alt="Swing thumbnail"
-                      className="w-full h-full object-cover"
-                      onError={handleThumbnailError}
-                      onLoad={handleThumbnailLoad}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <div className="bg-white/90 rounded-full p-1">
-                        <Play className="h-3 w-3 text-black" fill="currentColor" />
-                      </div>
-                    </div>
+                     <img 
+                       src={analysis.videoThumbnail} 
+                       alt="Swing thumbnail"
+                       className="w-full h-full object-cover"
+                       onError={handleThumbnailError}
+                       onLoad={handleThumbnailLoad}
+                     />
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group">
+                       <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
+                         <Play className="h-4 w-4 text-black" fill="currentColor" />
+                       </div>
+                     </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-muted">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <div className="text-center text-muted-foreground">
+                      <FileText className="h-6 w-6 mx-auto mb-1" />
+                      <p className="text-xs">No video</p>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
-            
-            {/* Analysis Title */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm line-clamp-1 text-foreground">
-                Swing Analysis
-              </p>
-              {analysis.content && (
-                <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
-                  {analysis.content.substring(0, 60)}...
-                </p>
+
+            {/* Right Column - Text Content */}
+            <div className="flex-1 min-w-0 flex flex-col">
+              <div className="flex items-center gap-2 flex-wrap mb-2">
+                <Badge variant="outline">{analysis.category}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {analysis.timestamp.toLocaleDateString()}
+                </span>
+              </div>
+              
+              <h3 className="text-sm font-medium mb-2 flex-1">{analysis.save_card}</h3>
+              
+              {analysis.tags && analysis.tags.length > 0 && !isExpanded && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {analysis.tags.slice(0, 2).map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {analysis.tags.length > 2 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{analysis.tags.length - 2} more
+                    </Badge>
+                  )}
+                </div>
+              )}
+              
+              {analysis.voiceNote && !isExpanded && (
+                <Badge variant="outline" className="text-xs mb-2">
+                  Voice note attached
+                </Badge>
               )}
             </div>
           </div>
-        )}
+
+          {/* Bottom Section - Pills and Controls */}
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                Analysis
+              </Badge>
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleExpand();
+                }}
+                className="h-7 px-2 text-xs"
+                title={isExpanded ? "Minimize" : "View details"}
+              >
+                {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="h-7 px-2 text-destructive hover:text-destructive"
+                title="Delete analysis"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Expanded Content */}
         {isExpanded && (
-          <div className="space-y-4 animate-accordion-down">
-            {/* Video Section */}
-            {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
-              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                {isVideoLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                )}
-                <video
-                  src={analysis.videoUrl || analysis.videoSrc}
-                  poster={analysis.videoThumbnail || analysis.videoPoster}
-                  controls
-                  className="w-full h-full object-cover"
-                  onLoadStart={() => setIsVideoLoading(true)}
-                  onCanPlay={() => setIsVideoLoading(false)}
-                  onError={() => setIsVideoLoading(false)}
-                />
+          <div className="border-t border-gray-100 bg-white/30 animate-accordion-down">
+            {/* Sticky Mini Header */}
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-4 py-2 z-10">
+              <div className="flex items-center gap-2">
+                <h4 className="font-medium text-sm">{analysis.title || analysis.save_card}</h4>
+                <span className="text-xs text-muted-foreground">
+                  {analysis.timestamp.toLocaleDateString()} at {analysis.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
-            ) : analysis.videoThumbnail ? (
-              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                <img 
-                  src={analysis.videoThumbnail} 
-                  alt="Swing analysis"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                  <div className="text-white text-center p-4">
-                    <FileText className="h-8 w-8 mx-auto mb-2" />
-                    <p className="text-sm font-medium mb-1">Video Preview</p>
-                    <p className="text-xs opacity-80">New swing analyses will have permanent video links</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <FileText className="h-8 w-8 mx-auto mb-2" />
-                  <p className="text-sm">No video available</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Analysis Content */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Analysis</h4>
-              {analysis.conversation && analysis.conversation.length > 0 ? (
-                <div className="space-y-3">
-                  {analysis.conversation.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg ${
-                        message.role === 'user' 
-                          ? 'bg-primary/10 border-l-4 border-primary' 
-                          : 'bg-muted border-l-4 border-muted-foreground'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant={message.role === 'user' ? 'default' : 'secondary'} className="border-0">
-                          {message.role === 'user' ? 'You' : 'Echo Coach'}
-                        </Badge>
-                        {message.timestamp && (
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                        {message.content}
-                      </div>
+            </div>
+
+            <div className="p-4 space-y-4">
+              {/* Video Section */}
+              {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  {isVideoLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-                  ))}
+                  )}
+                  <video
+                    src={analysis.videoUrl || analysis.videoSrc}
+                    poster={analysis.videoThumbnail || analysis.videoPoster}
+                    controls
+                    className="w-full h-full object-cover"
+                    onLoadStart={() => setIsVideoLoading(true)}
+                    onCanPlay={() => setIsVideoLoading(false)}
+                    onError={() => setIsVideoLoading(false)}
+                  />
+                </div>
+              ) : analysis.videoThumbnail ? (
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  <img 
+                    src={analysis.videoThumbnail} 
+                    alt="Swing analysis"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <div className="text-white text-center p-4">
+                  <FileText className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm font-medium mb-1">Video Preview</p>
+                  <p className="text-xs opacity-80">Video playback available - expand to view</p>
+                </div>
+                  </div>
                 </div>
               ) : (
-                <div className="p-4 rounded-lg bg-muted">
-                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <FileText className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">No video available</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Analysis Content */}
+              <div className="space-y-3">
+                <h5 className="text-sm font-semibold">Analysis Conversation</h5>
+                {analysis.conversation && analysis.conversation.length > 0 ? (
+                  <div className="space-y-2">
+                    {analysis.conversation.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg text-sm ${
+                          message.role === 'user' 
+                            ? 'bg-primary/10 border-l-4 border-primary' 
+                            : 'bg-muted border-l-4 border-muted-foreground'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <Badge variant={message.role === 'user' ? 'default' : 'secondary'} className="text-xs">
+                            {message.role === 'user' ? 'You' : 'Echo Coach'}
+                          </Badge>
+                          {message.timestamp && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </div>
+                        <div className="leading-relaxed whitespace-pre-wrap">
+                          {message.content}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted text-sm leading-relaxed whitespace-pre-wrap">
                     {analysis.content}
                   </div>
+                )}
+              </div>
+
+              {/* Actions Row */}
+              {analysis.tags && analysis.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-white/20">
+                  {analysis.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
               )}
             </div>
           </div>
         )}
-
-        {/* Action Row */}
-        <div className="flex items-center justify-between mt-3 pt-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground border-0">
-              Analysis
-            </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleExpand}
-              className="h-7 px-2 text-xs hover:bg-muted border-0"
-              title={isExpanded ? "Collapse" : "Expand"}
-            >
-              {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-            </Button>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-0"
-            title="Delete"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
       </div>
-    </div>
+
+    </>
   );
 };
 
@@ -1034,182 +799,109 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       if (error) throw error;
       setCaddieLogs(data || []);
     } catch (error) {
-      console.error('Error loading caddie logs:', error);
+      console.error('Error fetching caddie logs:', error);
     }
   };
 
-  // Helper function to group individual messages into conversations
   const groupMessagesIntoConversations = (messages: HistoryMessage[]): ChatConversation[] => {
     const conversations: ChatConversation[] = [];
     let currentConversation: HistoryMessage[] = [];
     
-    // Sort messages by timestamp
-    const sortedMessages = [...messages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-    
-    for (let i = 0; i < sortedMessages.length; i++) {
-      const message = sortedMessages[i];
-      
-      // If this is a user message and we have a current conversation, close it
-      if (message.type === 'user' && currentConversation.length > 0) {
-        // Create conversation from current messages
-        const firstUserMessage = currentConversation.find(m => m.type === 'user');
-        const lastMessage = currentConversation[currentConversation.length - 1];
-        
-        conversations.push({
-          id: `legacy-${Date.now()}-${Math.random()}`,
-          title: firstUserMessage?.content.substring(0, 50) + '...' || 'Conversation',
-          messages: [...currentConversation],
-          timestamp: lastMessage.timestamp,
-          createdAt: currentConversation[0].timestamp,
-          lastActivityAt: lastMessage.timestamp,
-          messageCount: currentConversation.length
-        });
-        
-        currentConversation = [];
-      }
-      
-      currentConversation.push(message);
-    }
-    
-    // Handle any remaining conversation
-    if (currentConversation.length > 0) {
-      const firstUserMessage = currentConversation.find(m => m.type === 'user');
-      const lastMessage = currentConversation[currentConversation.length - 1];
-      
-      conversations.push({
-        id: `legacy-${Date.now()}-${Math.random()}`,
-        title: firstUserMessage?.content.substring(0, 50) + '...' || 'Conversation',
-        messages: [...currentConversation],
-        timestamp: lastMessage.timestamp,
-        createdAt: currentConversation[0].timestamp,
-        lastActivityAt: lastMessage.timestamp,
-        messageCount: currentConversation.length
-      });
-    }
-    
-    return conversations.reverse(); // Latest first
-  };
-
-  const filteredConversations = conversations.filter(conversation => {
-    if (!searchQuery) return true;
-    
-    const query = searchQuery.toLowerCase();
-    return (
-      conversation.title.toLowerCase().includes(query) ||
-      conversation.messages.some(message => 
-        message.content.toLowerCase().includes(query)
-      )
-    );
-  }).sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
-
-  const filteredCaddieLogs = caddieLogs.filter(log => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      log.content.toLowerCase().includes(query) ||
-      (log.transcription && log.transcription.toLowerCase().includes(query)) ||
-      (log.location_name && log.location_name.toLowerCase().includes(query)) ||
-      (log.course_name && log.course_name.toLowerCase().includes(query))
-    );
-  });
-
-  const deleteConversation = async (conversationId: string) => {
-    try {
-      if (conversationId.startsWith('session_')) {
-        // Delete from session storage
-        conversationSession.deleteConversation(conversationId);
-        
-        // Update local state
-        setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-        
-        toast({
-          title: "Conversation deleted",
-          description: "The conversation has been removed from your history.",
-        });
+    messages.forEach((message, index) => {
+      if (message.type === 'user') {
+        // Start new conversation on user message
+        if (currentConversation.length > 0) {
+          // Save previous conversation
+          const firstUserMessage = currentConversation.find(m => m.type === 'user');
+          if (firstUserMessage) {
+            conversations.push({
+              id: `conv-${conversations.length}`,
+              title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
+              messages: [...currentConversation],
+              timestamp: firstUserMessage.timestamp,
+              createdAt: firstUserMessage.timestamp, // Use first message time as created time
+              lastActivityAt: currentConversation[currentConversation.length - 1]?.timestamp || firstUserMessage.timestamp,
+              messageCount: currentConversation.length
+            });
+          }
+        }
+        currentConversation = [message];
       } else {
-        // For legacy conversations, we can't delete individual messages easily
-        // since they're stored as a flat array
-        toast({
-          title: "Cannot delete",
-          description: "Legacy conversations cannot be deleted individually.",
-          variant: "destructive"
-        });
+        currentConversation.push(message);
       }
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete conversation.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const deleteCaddieLog = async (logId: string) => {
-    try {
-      const { error } = await supabase
-        .from('caddie_logs')
-        .delete()
-        .eq('id', logId);
-
-      if (error) throw error;
-
-      setCaddieLogs(prev => prev.filter(log => log.id !== logId));
-      toast({
-        title: "Caddie log deleted",
-        description: "The log has been removed from your history.",
-      });
-    } catch (error) {
-      console.error('Error deleting caddie log:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete caddie log.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const deleteSwingAnalysis = async (analysisId: string) => {
-    try {
-      // Try to delete from database first
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error } = await supabase
-          .from('pro_ai_analyses')
-          .delete()
-          .eq('id', analysisId)
-          .eq('user_id', user.id);
-
-        if (!error) {
-          // Successfully deleted from database
-          setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
-          toast({
-            title: "Analysis deleted",
-            description: "The swing analysis has been removed from your history.",
+      
+      // Handle last conversation
+      if (index === messages.length - 1 && currentConversation.length > 0) {
+        const firstUserMessage = currentConversation.find(m => m.type === 'user');
+        if (firstUserMessage) {
+          conversations.push({
+            id: `conv-${conversations.length}`,
+            title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
+            messages: [...currentConversation],
+            timestamp: firstUserMessage.timestamp,
+            createdAt: firstUserMessage.timestamp, // Use first message time as created time
+            lastActivityAt: currentConversation[currentConversation.length - 1]?.timestamp || firstUserMessage.timestamp,
+            messageCount: currentConversation.length
           });
-          return;
         }
       }
+    });
+    
+    return conversations.reverse(); // Most recent first
+  };
 
-      // Fall back to local storage deletion
-      const localAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-      const updatedAnalyses = localAnalyses.filter((analysis: any) => analysis.id !== analysisId);
-      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
+  const clearHistory = () => {
+    localStorage.removeItem('clbhouz_ai_history');
+    setHistoryMessages([]);
+    setConversations([]);
+    toast({
+      title: "History cleared",
+      description: "All chat history has been deleted",
+    });
+  };
 
-      const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-      const updatedHistory = swingCoachHistory.filter((msg: any) => msg.id !== analysisId);
-      localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(updatedHistory));
+  const deleteConversation = (conversationId: string) => {
+    // Check if this is a session conversation or legacy conversation
+    if (conversationId.startsWith('session_')) {
+      // Delete from session conversations
+      conversationSession.deleteConversation(conversationId);
+      // Reload conversations to refresh the UI
+      setTimeout(() => loadData(), 100);
+    } else {
+      // Handle legacy conversations
+      const conversationToDelete = conversations.find(conv => conv.id === conversationId);
+      if (!conversationToDelete) return;
+      
+      // Remove messages from this conversation from the stored history
+      const remainingMessages = historyMessages.filter(msg => 
+        !conversationToDelete.messages.some(convMsg => convMsg.id === msg.id)
+      );
+      
+      localStorage.setItem('clbhouz_ai_history', JSON.stringify(remainingMessages));
+      setHistoryMessages(remainingMessages);
+      
+      // Update conversations
+      const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
+      setConversations(updatedConversations);
+    }
+    
+    toast({
+      title: "Conversation deleted",
+      description: "The conversation has been removed from your history",
+    });
+  };
 
-      setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
+  const renameConversation = (conversationId: string, newTitle: string) => {
+    if (conversationId.startsWith('session_')) {
+      // Rename session conversation
+      conversationSession.renameConversation(conversationId, newTitle);
+      // Reload conversations to refresh the UI
+      setTimeout(() => loadData(), 100);
+    } else {
+      // Handle legacy conversations - not supported for now
       toast({
-        title: "Analysis deleted",
-        description: "The swing analysis has been removed from your history.",
-      });
-    } catch (error) {
-      console.error('Error deleting swing analysis:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete swing analysis.",
+        title: "Renaming not supported",
+        description: "Legacy conversations cannot be renamed",
         variant: "destructive"
       });
     }
@@ -1221,20 +913,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const handleSaveEdit = (conversationId: string) => {
-    // Update local state
-    setConversations(prev => prev.map(conv => 
-      conv.id === conversationId 
-        ? { ...conv, customTitle: editTitle, title: editTitle }
-        : conv
-    ));
-    
+    if (editTitle.trim()) {
+      renameConversation(conversationId, editTitle.trim());
+    }
     setEditingConversationId(null);
     setEditTitle('');
-    
-    toast({
-      title: "Title updated",
-      description: "Conversation title has been updated.",
-    });
   };
 
   const handleCancelEdit = () => {
@@ -1242,200 +925,590 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setEditTitle('');
   };
 
-  const clearAllHistory = () => {
-    localStorage.removeItem('clbhouz_ai_history');
-    localStorage.removeItem('clbhouz_ai_saved');
-    setHistoryMessages([]);
-    setSavedInsights([]);
-    setConversations([]);
-    
+  const deleteSavedInsight = (id: string) => {
+    const updated = savedInsights.filter(insight => insight.id !== id);
+    setSavedInsights(updated);
+    localStorage.setItem('clbhouz_ai_saved', JSON.stringify(updated));
     toast({
-      title: "History cleared",
-      description: "All chat history has been removed.",
+      title: "Insight deleted",
+      description: "The saved insight has been removed",
     });
   };
 
-  const handleToggleExpansion = (conversationId: string) => {
-    setExpandedConversation(prev => prev === conversationId ? null : conversationId);
+  const clearAllSaved = () => {
+    localStorage.removeItem('clbhouz_ai_saved');
+    setSavedInsights([]);
+    toast({
+      title: "Saved insights cleared",
+      description: "All saved insights have been deleted",
+    });
+  };
+
+  const deleteSwingAnalysis = async (id: string) => {
+    console.log('🗑️ Deleting swing analysis:', id);
+    
+    try {
+      // Try to delete from database first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error } = await supabase
+          .from('pro_ai_analyses')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id); // Safety check to ensure user can only delete their own analyses
+
+        if (error) {
+          console.error('Error deleting from database:', error);
+          // Continue with local deletion even if database deletion fails
+        } else {
+          console.log('✅ Deleted analysis from database');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete from database:', error);
+      // Continue with local deletion
+    }
+    
+    // Remove from current state
+    const updated = swingAnalyses.filter(analysis => analysis.id !== id);
+    setSwingAnalyses(updated);
+    
+    // Clean up localStorage completely
+    const localAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
+    const cleanedLocalAnalyses = localAnalyses.filter((a: any) => a.id !== id);
+    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(cleanedLocalAnalyses));
+    
+    // Clean up Swing Coach history - remove both user and AI messages
+    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
+    const cleanedHistory = swingCoachHistory.filter((msg: any) => {
+      // Remove the specific AI message and any related user messages
+      const isTargetMessage = msg.id === id || msg.id === id.replace('_ai', '') || (msg.id + '_ai') === id;
+      const isCorruptedMessage = !msg.content || msg.content.trim() === '' || 
+        (msg.type === 'ai' && msg.content.includes("I can't analyze images"));
+      
+      return !isTargetMessage && !isCorruptedMessage;
+    });
+    localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(cleanedHistory));
+    
+    // Force re-render
+    setSwingAnalyses([...updated]);
+    
+    toast({
+      title: "Analysis deleted",
+      description: "The swing analysis has been permanently removed",
+    });
+  };
+
+  const clearAllAnalyses = () => {
+    localStorage.removeItem('clbhouz_swing_analyses');
+    setSwingAnalyses([]);
+    toast({
+      title: "Swing analyses cleared",
+      description: "All swing analyses have been deleted",
+    });
+  };
+
+  // Get unique categories and tags
+  const categories = ['all', ...new Set(savedInsights.map(insight => insight.category))];
+  const allTags = new Set(savedInsights.flatMap(insight => insight.tags));
+  const tags = ['all', ...Array.from(allTags)];
+
+  // Filter functions
+  const filteredConversations = conversations.filter(conv =>
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conv.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const filteredCaddieLogs = caddieLogs.filter(log => {
+    const matchesSearch = log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.course_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.location_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         log.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesSearch;
+  });
+
+  const filteredSwingCoach = swingAnalyses.filter(analysis => 
+    analysis.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const deleteCaddieLog = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('caddie_logs')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setCaddieLogs(prev => prev.filter(log => log.id !== id));
+      
+      toast({
+        title: "Caddie log deleted",
+        description: "The log has been removed from your history",
+      });
+    } catch (error) {
+      console.error('Error deleting caddie log:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the caddie log",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-2xl shadow-xl w-full max-w-4xl h-[80vh] flex flex-col">
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ 
+        zIndex: 9999
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
+    >
+      <div
+        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+      style={{
+        height: 'min(72vh, 576px)',
+        background: 'rgba(246, 247, 246, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: `
+          0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 8px 32px rgba(0, 0, 0, 0.12),
+          0 2px 8px rgba(0, 0, 0, 0.08)
+        `
+      }}
+        onWheel={(e) => {
+          const target = e.currentTarget;
+          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+          
+          if (scrollableElement) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+            const isAtTop = scrollTop === 0;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+              e.preventDefault();
+            }
+          }
+          
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold">Echo History</h2>
-            {onNewConversation && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  onNewConversation();
-                  onClose();
-                }}
-                className="gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                New Chat
-              </Button>
-            )}
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="p-6 border-b">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div 
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}
+        >
+          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search conversations, logs, or analyses..."
+                placeholder="Search history..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)'
+                }}
+                aria-label="Search chat history, caddie logs, and swing analyses"
               />
             </div>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Trash2 className="h-4 w-4" />
-                  Clear All
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Clear All History</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete all your chat history, saved insights, and conversations. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={clearAllHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                    Clear All
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-100"
+              aria-label="Close Echo History modal"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-6 mt-4">
-            <TabsTrigger value="chat" id="chat-tab" aria-controls="chat-panel">Chat</TabsTrigger>
-            <TabsTrigger value="logs" id="logs-tab" aria-controls="logs-panel">Caddie Logs</TabsTrigger>
-            <TabsTrigger value="swing-coach" id="swing-coach-tab" aria-controls="swing-coach-panel">Swing Coach</TabsTrigger>
-          </TabsList>
-
-          {/* Chat Tab */}
-          <TabsContent value="chat" className="flex-1 m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-            <ScrollArea 
-              ref={chatAutoScroll.scrollAreaRef}
-              className="flex-1"
-              style={{ overscrollBehavior: 'contain' }}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="px-6 pt-3 pb-0 flex-shrink-0">
+            <TabsList 
+              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20 [&>*]:border-0 [&>*]:focus:ring-0 [&>*]:focus-visible:ring-0"
+              role="tablist"
+              aria-label="Echo History sections"
             >
-              <div className="p-6">
-                {filteredConversations.length > 0 ? (
-                  <div className="space-y-4 md:space-y-5">
-                    {filteredConversations.map((conversation) => (
-                      <ChatConversationCard
-                        key={conversation.id}
-                        conversation={conversation}
-                        onDelete={() => deleteConversation(conversation.id)}
-                        onEdit={handleStartEdit}
-                        isEditing={editingConversationId === conversation.id}
-                        editTitle={editTitle}
-                        onEditTitleChange={setEditTitle}
-                        onSaveEdit={() => handleSaveEdit(conversation.id)}
-                        onCancelEdit={handleCancelEdit}
-                        isExpanded={expandedConversation === conversation.id}
-                        onToggleExpand={() => handleToggleExpansion(conversation.id)}
-                        onSelectMessage={onSelectMessage}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <MessageSquare className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-lg font-medium mb-2">No history yet</p>
-                    <p className="text-sm text-muted-foreground">Your conversations and logs will appear here.</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+               <TabsTrigger 
+                 value="chat" 
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
+                aria-selected={activeTab === 'chat'}
+                aria-controls="chat-panel"
+                id="chat-tab"
+              >
+                Chat
+              </TabsTrigger>
+               <TabsTrigger 
+                 value="logs"
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
+                aria-selected={activeTab === 'logs'}
+                aria-controls="logs-panel"
+                id="logs-tab"
+              >
+                Caddie Logs
+              </TabsTrigger>
+               <TabsTrigger 
+                 value="swing-coach"
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
+                aria-selected={activeTab === 'swing-coach'}
+                aria-controls="swing-coach-panel"
+                id="swing-coach-tab"
+              >
+                Swing Coach
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          {/* Caddie Logs Tab */}
-          <TabsContent value="logs" className="flex-1 m-0" role="tabpanel" id="logs-panel" aria-labelledby="logs-tab">
-            <ScrollArea 
-              ref={logsAutoScroll.scrollAreaRef}
-              className="flex-1"
-              style={{ overscrollBehavior: 'contain' }}
-            >
-              <div className="p-6">
-                {filteredCaddieLogs.length > 0 ? (
-                  <div className="space-y-4 md:space-y-5">
-                    {filteredCaddieLogs.map((log) => (
-                      <CaddieLogCard
-                        key={log.id}
-                        log={log}
-                        onDelete={() => deleteCaddieLog(log.id)}
-                        isExpanded={expandedCaddieLogId === log.id}
-                        onToggleExpand={() => setExpandedCaddieLogId(expandedCaddieLogId === log.id ? null : log.id)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-lg font-medium mb-2">No history yet</p>
-                    <p className="text-sm text-muted-foreground">Your conversations and logs will appear here.</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+          {/* Single scrollable content area */}
+          <div className="flex-1 min-h-0">
+            <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+              <ScrollArea 
+                ref={chatAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                  {filteredConversations.length > 0 ? (
+                    <div className="space-y-3">
+                      {filteredConversations.map((conversation, index) => (
+                          <div
+                            key={`conversation-${conversation.id || index}`}
+                            className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col"
+                          >
+                           <div className="flex items-start gap-2 flex-1">
+                             {editingConversationId === conversation.id ? (
+                               <div className="flex items-center gap-2 flex-1">
+                                 <Input
+                                   value={editTitle}
+                                   onChange={(e) => setEditTitle(e.target.value)}
+                                   className="flex-1"
+                                   onKeyDown={(e) => {
+                                     if (e.key === 'Enter') {
+                                       handleSaveEdit(conversation.id);
+                                     } else if (e.key === 'Escape') {
+                                       handleCancelEdit();
+                                     }
+                                   }}
+                                   autoFocus
+                                 />
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={() => handleSaveEdit(conversation.id)}
+                                   className="h-7 px-2"
+                                 >
+                                   Save
+                                 </Button>
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={handleCancelEdit}
+                                   className="h-7 px-2"
+                                 >
+                                   Cancel
+                                 </Button>
+                               </div>
+                             ) : (
+                               <div className="flex-1 flex flex-col">
+                                 <div className="flex items-center justify-between mb-2">
+                                   <h3 className="font-medium text-gray-900 text-wrap break-words">
+                                     {conversation.customTitle || conversation.title}
+                                   </h3>
+                                   <div className="flex items-center gap-2 ml-2">
+                                     <span className="text-sm text-gray-600 whitespace-nowrap">
+                                       {conversation.timestamp.toLocaleDateString()}
+                                     </span>
+                                     {conversation.id.startsWith('session_') && (
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
+                                         className="h-7 px-2 text-gray-600 hover:text-gray-900"
+                                         title="Rename conversation"
+                                       >
+                                         <Edit2 className="h-3 w-3" />
+                                       </Button>
+                                     )}
+                                   </div>
+                                 </div>
+                               </div>
+                             )}
+                           </div>
+                           
+                           {/* Bottom Section - Controls */}
+                           <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                             <div className="flex items-center gap-2">
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={() => setExpandedConversation(
+                                   expandedConversation === conversation.id ? null : conversation.id
+                                 )}
+                                 className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
+                               >
+                                 {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
+                               </Button>
+                               {conversation.messageCount && (
+                                 <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
+                                   <MessageSquare className="h-3 w-3 mr-1" />
+                                   {conversation.messageCount}
+                                 </Badge>
+                               )}
+                             </div>
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => deleteConversation(conversation.id)}
+                               className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                               aria-label={`Delete conversation: ${conversation.title}`}
+                             >
+                               <Trash2 className="h-3 w-3" />
+                             </Button>
+                           </div>
+                          
+                          {expandedConversation === conversation.id && (
+                            <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
+                              {conversation.messages.map((message) => (
+                                <div
+                                  key={message.id}
+                                  className={`p-3 rounded-lg ${
+                                    message.type === 'user' 
+                                      ? 'bg-orange-50 border-l-4 border-orange-500' 
+                                      : 'bg-gray-50 border-l-4 border-gray-300'
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start mb-1">
+                                    <Badge variant={message.type === 'user' ? 'secondary' : 'secondary'} className={message.type === 'user' ? 'bg-gray-100 text-gray-600 border-gray-200' : 'bg-gray-100 text-gray-600 border-gray-200'}>
+                                      {message.type === 'user' ? 'You' : 'Echo'}
+                                    </Badge>
+                                    <span className="text-xs text-gray-600">
+                                      {message.timestamp.toLocaleTimeString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed">{message.content}</p>
+                                  {message.type === 'ai' && (
+                                    <Button
+                                      variant="link"
+                                      size="sm"
+                                      onClick={() => onSelectMessage(message.content)}
+                                      className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
+                                    >
+                                      Use this response
+                                    </Button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No chat history found</p>
+                        <p className="text-xs mt-1 opacity-70">Start a conversation with Echo to see it here</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
 
-          {/* Swing Coach Tab */}
-          <TabsContent value="swing-coach" className="flex-1 m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
-            <ScrollArea 
-              ref={swingAutoScroll.scrollAreaRef}
-              className="flex-1"
-              style={{ overscrollBehavior: 'contain' }}
-            >
-              <div className="p-6">
-                {swingAnalyses.length > 0 ? (
-                  <div className="space-y-4 md:space-y-5">
-                    {swingAnalyses.map((analysis) => (
-                      <SwingAnalysisCard
-                        key={analysis.id}
-                        analysis={{
-                          ...analysis,
-                          tags: analysis.tags || [],
-                          conversation: analysis.conversation || []
-                        }}
-                        onDelete={() => deleteSwingAnalysis(analysis.id)}
-                        isExpanded={expandedAnalysisId === analysis.id}
-                        onToggleExpand={() => setExpandedAnalysisId(expandedAnalysisId === analysis.id ? null : analysis.id)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Play className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-lg font-medium mb-2">No history yet</p>
-                    <p className="text-sm text-muted-foreground">Your conversations and logs will appear here.</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+            <TabsContent value="logs" className="h-full m-0" role="tabpanel" id="logs-panel" aria-labelledby="logs-tab">
+              <ScrollArea 
+                ref={logsAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                   {filteredCaddieLogs.length > 0 ? (
+                     <div className="space-y-3">
+                       {filteredCaddieLogs.map((log) => {
+                         const isExpanded = expandedCaddieLogId === log.id;
+                         const contentPreview = log.content.length > 120 ? log.content.slice(0, 120) + '...' : log.content;
+                         const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
+                         
+                          return (
+                            <div
+                              key={log.id}
+                              className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+                            >
+                              {/* Collapsed Content */}
+                              <div className="p-4 flex-1 flex flex-col">
+                                <div className="flex-1 flex flex-col">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">
+                                      {new Date(log.created_at).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed text-gray-900 flex-1">
+                                    {isExpanded ? log.content : contentPreview}
+                                  </p>
+                                </div>
+                                
+                                {/* Bottom Section - Metadata and Controls */}
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                      Caddie Log
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {hasMoreContent && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
+                                        className="h-7 px-2 text-xs"
+                                        title={isExpanded ? "Minimize" : "View details"}
+                                      >
+                                        {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => deleteCaddieLog(log.id)}
+                                      className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                      aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                               </div>
+                             </div>
+
+                              {/* Expanded Content */}
+                              {isExpanded && (
+                                <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                                  {/* Full Content */}
+                                  <div className="space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-medium mb-2">Content</h5>
+                                      <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                        {log.content}
+                                      </p>
+                                    </div>
+                                    
+                                    {log.transcription && log.transcription !== log.content && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Transcription</h5>
+                                        <p className="text-sm leading-relaxed text-gray-700 bg-gray-50 p-3 rounded-lg">
+                                          {log.transcription}
+                                        </p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.location_name && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Location</h5>
+                                        <p className="text-sm text-gray-700">{log.location_name}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.course_name && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Course</h5>
+                                        <p className="text-sm text-gray-700">{log.course_name}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.tags && log.tags.length > 0 && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Tags</h5>
+                                        <div className="flex flex-wrap gap-2">
+                                          {log.tags.map((tag, index) => (
+                                            <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                              {tag}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                           </div>
+                         );
+                       })}
+                     </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No caddie logs found</p>
+                        <p className="text-xs mt-1 opacity-70">Record voice notes during your rounds to see them here</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="swing-coach" className="h-full m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
+              <ScrollArea 
+                ref={swingAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                  {swingAnalyses.length > 0 ? (
+                    <div className="space-y-3">
+                      {swingAnalyses.map((analysis) => (
+                        <div key={analysis.id} className="transition-transform duration-100">
+                          <SwingAnalysisCard
+                            analysis={{
+                              ...analysis,
+                              tags: analysis.tags || [], // Ensure tags is always an array
+                              conversation: analysis.conversation || [] // Ensure conversation is always an array
+                            }}
+                            onDelete={() => deleteSwingAnalysis(analysis.id)}
+                            isExpanded={expandedAnalysisId === analysis.id}
+                            onToggleExpand={() => setExpandedAnalysisId(expandedAnalysisId === analysis.id ? null : analysis.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-600 py-8">
+                      <div className="text-center">
+                        <p className="text-sm">No swing analyses found</p>
+                        <p className="text-xs mt-1 opacity-70">Upload swing videos to Swing Coach to see them here</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>
