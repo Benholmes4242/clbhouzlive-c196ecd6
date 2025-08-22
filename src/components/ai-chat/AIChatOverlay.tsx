@@ -51,7 +51,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   // Conversation session management - for history only, don't restore messages in modal
   const conversationSession = useConversationSession({
     storageKey: 'clbhouz_ai_chat',
-    isModalOpen: false // Always false to prevent auto-restoration of messages
+    isModalOpen: isOpen // Use actual modal state to properly save conversations
   });
 
   async function handleVoiceNote(transcribedText: string) {
@@ -242,25 +242,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Save conversation to history only, don't persist in modal
-  const saveCurrentChatToHistory = () => {
-    if (messages.length > 0) {
-      // Manually start session for history saving
-      conversationSession.startNewConversationManually();
-      
-      // Add all messages to the session
-      messages.forEach(message => {
-        conversationSession.addMessage(message);
-      });
-      
-      // Save the session to history
-      conversationSession.saveCurrentSession();
-    }
-  };
-
   const handleClose = () => {
-    // Save current chat to history before closing
-    saveCurrentChatToHistory();
+    // The conversation session hook will automatically save when modal closes
+    // due to isModalOpen changing from true to false
     
     // Always reset chat for fresh session - don't restore previous messages
     setMessages([]);
@@ -282,7 +266,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    // Don't add to session during conversation - only save to history when closing
+    // Add user message to conversation session for history tracking
+    conversationSession.addMessage(userMessage);
     setInputValue('');
     setIsLoading(true);
 
@@ -330,7 +315,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
-      // Don't add to session during conversation - only save to history when closing
+      // Add AI response to conversation session for history tracking
+      conversationSession.addMessage(aiMessage);
 
     } catch (error) {
       console.error('Error sending message:', error);
