@@ -680,6 +680,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const deleteSwingAnalysis = (id: string) => {
+    console.log('🗑️ Deleting swing analysis:', id);
+    
     const updated = swingAnalyses.filter(analysis => analysis.id !== id);
     setSwingAnalyses(updated);
     
@@ -688,8 +690,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     
     // Also remove from Swing Coach history if it exists there
     const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-    const updatedSwingCoachHistory = swingCoachHistory.filter((msg: any) => msg.id !== id);
+    const updatedSwingCoachHistory = swingCoachHistory.filter((msg: any) => msg.id !== id && msg.id !== id + '_ai');
     localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(updatedSwingCoachHistory));
+    
+    // Force re-render by updating the key
+    setSwingAnalyses([...updated]);
     
     toast({
       title: "Analysis deleted",

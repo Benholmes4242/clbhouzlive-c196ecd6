@@ -348,6 +348,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
 
+    console.log('🚀 Starting swing analysis with:', {
+      hasVideo: !!uploadedVideo,
+      videoType: uploadedVideo?.type,
+      message: analysisText || 'Please analyze my swing'
+    });
+
     setIsAnalyzing(true);
     
     try {
@@ -437,6 +443,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       setMessages(prev => [...prev, userMessage]);
       setAnalysisText('');
 
+      console.log('📡 Sending to Edge Function:', {
+        message: userMessage.content,
+        imageCount: extractedFrames.length,
+        hasSwingContext: Object.keys(swingContext).length > 0
+      });
+
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
@@ -451,7 +463,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       });
 
-      if (error) throw error;
+      console.log('✅ Edge Function response:', { error, hasData: !!data });
+
+      if (error) {
+        console.error('❌ Edge Function error:', error);
+        throw error;
+      }
 
       const aiMessage: ChatMessageData = {
         id: Date.now().toString() + '_ai',
