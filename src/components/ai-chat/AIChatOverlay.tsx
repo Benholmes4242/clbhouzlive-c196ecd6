@@ -13,6 +13,7 @@ import EchoAvatar from './EchoAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 
 interface ChatMessageData {
@@ -45,8 +46,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Auto-scroll for chat messages
+  const chatAutoScroll = useAutoScroll({
+    dependencies: [messages],
+    enabled: activeTab === 'chat',
+    direction: 'bottom' // Live chat messages are added at the bottom
+  });
 
   // Conversation session management - for history only, don't restore messages in modal
   const conversationSession = useConversationSession({
@@ -141,20 +148,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     onTranscriptionComplete: handleVoiceNote
   });
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-      }
-    }, 100);
-  };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   // Ensure fresh start when modal opens
   useEffect(() => {
@@ -593,11 +587,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Single scrollable content area */}
-          <div 
-            id="caddie-content"
-            className="flex-1 overflow-y-auto min-h-0"
+          <ScrollArea 
+            ref={chatAutoScroll.scrollAreaRef}
+            className="flex-1"
             style={{ overscrollBehavior: 'contain' }}
-            ref={scrollAreaRef}
           >
             <TabsContent value="chat" className="h-full m-0">
               <div className="h-full min-h-0">
@@ -672,7 +665,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 onAnalysisTextChange={setSwingCoachAnalysisText}
               />
             </TabsContent>
-          </div>
+          </ScrollArea>
         </Tabs>
         
         {/* Shared composer/footer - Fixed at bottom */}
