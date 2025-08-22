@@ -1028,65 +1028,42 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <div className="flex items-center justify-between mb-3">
-              <TabsList 
-                className="grid grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20 flex-1 mr-3"
-                role="tablist"
-                aria-label="Echo History sections"
+            <TabsList 
+              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20"
+              role="tablist"
+              aria-label="Echo History sections"
+            >
+              <TabsTrigger 
+                value="chat" 
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                role="tab"
+                aria-selected={activeTab === 'chat'}
+                aria-controls="chat-panel"
+                id="chat-tab"
               >
-                <TabsTrigger 
-                  value="chat" 
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                  role="tab"
-                  aria-selected={activeTab === 'chat'}
-                  aria-controls="chat-panel"
-                  id="chat-tab"
-                >
-                  Chat
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="logs"
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                  role="tab"
-                  aria-selected={activeTab === 'logs'}
-                  aria-controls="logs-panel"
-                  id="logs-tab"
-                >
-                  Caddie Logs
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="swing-coach"
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                  role="tab"
-                  aria-selected={activeTab === 'swing-coach'}
-                  aria-controls="swing-coach-panel"
-                  id="swing-coach-tab"
-                >
-                  Swing Coach
-                </TabsTrigger>
-              </TabsList>
-              
-              {/* New Conversation Button - only show on chat tab */}
-              {activeTab === 'chat' && onNewConversation && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    onNewConversation();
-                    onClose();
-                  }}
-                  className="bg-white/60 border-white/30 hover:bg-white/80 px-3 py-1.5 text-sm flex items-center gap-2"
-                  title="Start a new conversation"
-                >
-                  <Plus className="h-3 w-3" />
-                  New
-                </Button>
-              )}
-            </div>
-            
-            {/* Move TabsList content here - it's already included above */}
-            <div className="hidden">
-            </div>
+                Chat
+              </TabsTrigger>
+              <TabsTrigger 
+                value="logs"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                role="tab"
+                aria-selected={activeTab === 'logs'}
+                aria-controls="logs-panel"
+                id="logs-tab"
+              >
+                Caddie Logs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="swing-coach"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                role="tab"
+                aria-selected={activeTab === 'swing-coach'}
+                aria-controls="swing-coach-panel"
+                id="swing-coach-tab"
+              >
+                Swing Coach
+              </TabsTrigger>
+            </TabsList>
           </div>
 
           {/* Single scrollable content area */}
