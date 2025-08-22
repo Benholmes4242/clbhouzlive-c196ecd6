@@ -547,22 +547,20 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Desktop-only Adaptive Glass Header */}
-      {!isMobile && (
-        <AdaptiveGlassHeader
-          isVisible={showStickyHeader && !isImmersiveOpen}
-          profile={profile}
-          stats={{
-            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-            posts: postsCount,
-            followers: followersCount,
-            following: followingCount,
-            ratedCoursesCount,
-            averageRating
-          }}
-          onStatClick={handleStatClick}
-        />
-      )}
+      {/* Adaptive Glass Header for both desktop and mobile */}
+      <AdaptiveGlassHeader
+        isVisible={showStickyHeader && !isImmersiveOpen}
+        profile={profile}
+        stats={{
+          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+          posts: postsCount,
+          followers: followersCount,
+          following: followingCount,
+          ratedCoursesCount,
+          averageRating
+        }}
+        onStatClick={handleStatClick}
+      />
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
