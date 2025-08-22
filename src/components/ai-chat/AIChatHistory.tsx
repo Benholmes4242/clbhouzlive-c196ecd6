@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
+import Hls from 'hls.js';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,60 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 
+// HLS Video Player Component
+const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Check if it's an HLS stream
+    const isHLS = src.includes('.m3u8') || src.includes('cloudflarestream.com');
+    
+    if (isHLS && Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: false,
+        lowLatencyMode: true,
+        backBufferLength: 90
+      });
+      
+      hlsRef.current = hls;
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error('HLS error:', data);
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS support
+      video.src = src;
+    } else {
+      // Fallback for non-HLS
+      video.src = src;
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      poster={poster}
+      className={className}
+      controls
+      muted
+      playsInline
+      preload="metadata"
+    />
+  );
+};
 
 interface SavedInsight {
   id: string;
@@ -176,7 +231,7 @@ const SwingAnalysisCard: React.FC<{
                  e.stopPropagation();
                  onToggleExpand();
                }}
-               className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
                title={isExpanded ? "Collapse" : "Expand"}
              >
                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
@@ -205,22 +260,18 @@ const SwingAnalysisCard: React.FC<{
           <div className="space-y-4 max-h-80 overflow-y-auto">
             {/* Video Section */}
              {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
-               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                 {isVideoLoading && (
-                   <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                   </div>
-                 )}
-                 <video
-                   src={analysis.videoUrl || analysis.videoSrc}
-                   poster={analysis.videoThumbnail || analysis.videoPoster}
-                   className="w-full h-full"
-                   controls
-                   muted
-                   playsInline
-                   preload="metadata"
-                 />
-               </div>
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  {isVideoLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-muted-foreground/30"></div>
+                    </div>
+                  )}
+                  <HLSVideoPlayer
+                    src={analysis.videoUrl || analysis.videoSrc}
+                    poster={analysis.videoThumbnail || analysis.videoPoster}
+                    className="w-full h-full"
+                  />
+                </div>
             ) : analysis.videoThumbnail ? (
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
                 <img 
@@ -935,7 +986,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        variant="ghost"
                                        size="sm"
                                        onClick={() => handleExpansion('chat', conversation.id)}
-                                       className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                        className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
                                        title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Collapse" : "Expand"}
                                      >
                                        {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
@@ -1073,7 +1124,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      variant="ghost"
                                      size="sm"
                                      onClick={() => handleExpansion('caddie', log.id)}
-                                     className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                     className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
                                      title={isExpanded ? "Collapse" : "Expand"}
                                    >
                                      {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
