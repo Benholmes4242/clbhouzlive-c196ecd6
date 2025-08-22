@@ -310,20 +310,17 @@ const SwingAnalysisCard: React.FC<{
         <div className="flex-1 flex flex-col">
           {/* Header Row */}
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={analysis.save_card}>
-              {analysis.save_card}
-            </h3>
-            <span className="text-xs text-gray-500 flex-shrink-0">
+            <span className="font-semibold text-sm text-gray-900 flex-shrink-0">
               {analysis.timestamp.toLocaleDateString()}
             </span>
           </div>
 
           {/* Body Preview */}
-          <div className="flex-1 mb-3">
+          <div className="flex-1 mb-3 overflow-hidden">
             <div className="flex items-start gap-3">
               {/* Left Column - Video Thumbnail */}
               <div className="flex-shrink-0">
-                <div className="relative w-20 sm:w-24 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+                <div className="relative w-20 sm:w-24 aspect-video bg-gray-100 rounded-[10px] overflow-hidden shadow-sm">
                   {analysis.videoThumbnail && !thumbnailError ? (
                     <>
                       {thumbnailLoading && (
@@ -336,15 +333,15 @@ const SwingAnalysisCard: React.FC<{
                          onError={handleThumbnailError}
                          onLoad={handleThumbnailLoad}
                        />
-                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group">
-                         <div className="bg-white/90 rounded-full p-1.5 group-hover:scale-110 transition-transform">
+                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                         <div className="bg-white/90 rounded-full p-1.5">
                            <Play className="h-3 w-3 text-black" fill="currentColor" />
                          </div>
                        </div>
                     </>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                      <div className="text-center text-muted-foreground">
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <div className="text-center text-gray-400">
                         <FileText className="h-4 w-4 mx-auto mb-1" />
                         <p className="text-xs">No video</p>
                       </div>
@@ -354,10 +351,15 @@ const SwingAnalysisCard: React.FC<{
               </div>
 
               {/* Right Column - Text Content */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-600 line-clamp-1">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h4 className="font-medium text-sm text-gray-900 line-clamp-1 mb-1">
                   Swing Analysis
-                </p>
+                </h4>
+                {analysis.save_card && analysis.save_card !== "Swing Analysis" && (
+                  <p className="text-xs text-gray-600 line-clamp-1">
+                    {analysis.save_card}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -368,8 +370,6 @@ const SwingAnalysisCard: React.FC<{
               <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
                 Analysis
               </div>
-            </div>
-            <div className="flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"
@@ -382,19 +382,19 @@ const SwingAnalysisCard: React.FC<{
               >
                 {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-                className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50"
-                title="Delete analysis"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50"
+              title="Delete analysis"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
           </div>
         </div>
 
