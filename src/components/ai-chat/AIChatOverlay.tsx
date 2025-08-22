@@ -240,7 +240,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     setMessages([]);
     setInputValue('');
     setActiveTab('chat');
-    setShowHistory(false);
     
     // Close modal
     onClose();
@@ -357,6 +356,28 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     sendMessage(originalMessage, true);
   };
 
+
+  if (!isOpen) return null;
+
+  if (showHistory) {
+    return (
+      <AIChatHistory 
+        isOpen={showHistory} 
+        onClose={() => setShowHistory(false)}
+        onSelectMessage={(message) => {
+          setShowHistory(false);
+          // Re-open the conversation with selected message
+          sendMessage(message);
+        }}
+        onNewConversation={() => {
+          conversationSession.startNewConversationManually();
+          setMessages([]); // Clear current messages
+          setShowHistory(false);
+        }}
+      />
+    );
+  }
+
   // Determine avatar state based on recording/processing state
   const getAvatarState = () => {
     if (isProcessing) return 'processing';
@@ -364,11 +385,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     return 'idle';
   };
 
-  if (!isOpen) return null;
-
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
+      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
       style={{ 
         zIndex: 9999,
         backgroundColor: 'rgba(0, 0, 0, 0.24)',
@@ -377,11 +396,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          if (showHistory) {
-            setShowHistory(false);
-          } else {
-            handleClose();
-          }
+          handleClose();
         }
       }}
       onWheel={(e) => e.stopPropagation()}
@@ -389,9 +404,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="w-full max-w-md flex flex-col overflow-hidden relative"
+        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
         style={{
-          height: 'min(72vh, 576px)',
+          height: 'min(72vh, 576px)', // Reduced by 20% from 720px
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
@@ -423,348 +438,317 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Chat Content */}
+        {/* Header - Fixed at top */}
         <div 
-          className={`absolute inset-0 transition-opacity duration-300 ${
-            showHistory ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}
         >
-          {/* Header - Fixed at top */}
-          <div 
-            className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-            style={{
-              height: window.innerWidth <= 768 ? '56px' : '64px',
-              background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <EchoAvatar 
-                state={getAvatarState()} 
-                size={window.innerWidth <= 768 ? 28 : 32} 
-              />
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
-                <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowHistory(true)}
-                className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
-              >
-                <History className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClose}
-                className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+          <div className="flex items-center gap-3">
+            <EchoAvatar 
+              state={getAvatarState()} 
+              size={window.innerWidth <= 768 ? 28 : 32} 
+            />
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
+              <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
             </div>
           </div>
-
-          {/* Tabs - Fixed header */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-            <div className="px-6 pt-3 pb-0 flex-shrink-0">
-              <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
-                <TabsTrigger 
-                  value="chat" 
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                >
-                  Chat
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="logs"
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                >
-                  Caddie Logs
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="swing-coach"
-                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                >
-                  Swing Coach
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            {/* Single scrollable content area */}
-            <div 
-              id="caddie-content"
-              className="flex-1 overflow-y-auto min-h-0"
-              style={{ overscrollBehavior: 'contain' }}
-              ref={scrollAreaRef}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHistory(true)}
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
             >
-              <TabsContent value="chat" className="h-full m-0">
-                <div className="h-full min-h-0">
-                  <div className="px-6 py-5">
-                    {messages.length === 0 ? (
-                      <div className="text-center text-muted-foreground">
-                        <p className="mb-6">
-                          I'm your personal tour caddie.<br />
-                          Ask me anything, anytime, I've got you.
-                        </p>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Try asking:</p>
-                          {suggestedPrompts.map((prompt, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSuggestedPrompt(prompt)}
-                              className="mx-1 mb-2 text-xs"
-                            >
-                              {prompt}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {messages.map((message) => (
-                          <ChatMessageComponent
-                            key={message.id}
-                            message={message}
-                            onSaveToInsights={saveToInsights}
-                            onRequestDetail={requestMoreDetail}
-                          />
-                        ))}
-                        {isLoading && (
-                          <div className="flex justify-start">
-                            <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                              <div className="flex items-center gap-2">
-                                <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                                <span className="text-sm">Echo is thinking...</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="logs" className="h-full m-0">
-                <CaddieLogs 
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  userLocation={userLocation}
-                  requestLocation={requestLocation}
-                />
-              </TabsContent>
-
-              <TabsContent value="swing-coach" className="h-full m-0">
-                <SwingCoach 
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  analysisText={swingCoachAnalysisText}
-                  onAnalysisTextChange={setSwingCoachAnalysisText}
-                />
-              </TabsContent>
-            </div>
-          </Tabs>
-          
-          {/* Shared composer/footer - Fixed at bottom */}
-          <div 
-            className="flex-shrink-0"
-            style={{
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
-            }}
-          >
-            {activeTab === 'chat' && (
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={requestLocation}
-                    className="text-xs"
-                  >
-                    <MapPin className="h-3 w-3 mr-1" />
-                    Use My Location
-                  </Button>
-                  {userLocation && (
-                    <Badge variant="secondary" className="text-xs">
-                      {userLocation}
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1 flex gap-2">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Ask about your swing, clubs, courses..."
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                      disabled={isLoading || isRecording || isProcessing}
-                    />
-                    <Button
-                      onClick={isRecording ? stopRecording : startRecording}
-                      disabled={isLoading || isProcessing}
-                      variant={isRecording ? "destructive" : "outline"}
-                      size="sm"
-                      className="px-3"
-                    >
-                      {isRecording ? (
-                        <MicOff className="h-4 w-4" />
-                      ) : isProcessing ? (
-                        <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
-                      ) : (
-                        <Mic className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  <Button
-                    onClick={() => sendMessage(inputValue)}
-                    disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                    size="sm"
-                    className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            {activeTab === 'logs' && (
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={requestLocation}
-                    className="text-xs"
-                  >
-                    <MapPin className="h-3 w-3 mr-1" />
-                    Use My Location
-                  </Button>
-                  {userLocation && (
-                    <Badge variant="secondary" className="text-xs">
-                      {userLocation}
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Record course notes and tips..."
-                      disabled={isRecording || isProcessing}
-                      readOnly
-                    />
-                  </div>
-                  <Button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isProcessing}
-                    variant={isRecording ? "destructive" : "outline"}
-                    size="sm"
-                    className="px-3"
-                  >
-                    {isRecording ? (
-                      <MicOff className="h-4 w-4" />
-                    ) : isProcessing ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
-                    ) : (
-                      <Mic className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (!isRecording && !isProcessing) {
-                        startRecording();
-                      }
-                    }}
-                    disabled={isRecording || isProcessing}
-                    size="sm"
-                    className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            {activeTab === 'swing-coach' && (
-              <div className="p-4">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      value={swingCoachAnalysisText}
-                      onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
-                      placeholder="Describe your swing for analysis..."
-                      onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swing-coach-send-btn')?.click()}
-                      disabled={isRecording || isProcessing}
-                    />
-                  </div>
-                  <Button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isProcessing}
-                    variant={isRecording ? "destructive" : "outline"}
-                    size="sm"
-                    className="px-3"
-                  >
-                    {isRecording ? (
-                      <MicOff className="h-4 w-4" />
-                    ) : isProcessing ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
-                    ) : (
-                      <Mic className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    id="swing-coach-send-btn"
-                    onClick={() => {
-                      // Trigger swing analysis in Swing Coach component
-                      const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
-                        detail: { analysisText: swingCoachAnalysisText } 
-                      });
-                      window.dispatchEvent(swingCoachEvent);
-                      setSwingCoachAnalysisText('');
-                    }}
-                    disabled={isRecording || isProcessing}
-                    size="sm"
-                    className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Analyze"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+              <History className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        {/* History Content */}
+        {/* Tabs - Fixed header */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="px-6 pt-3 pb-0 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+              <TabsTrigger 
+                value="chat" 
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Chat
+              </TabsTrigger>
+              <TabsTrigger 
+                value="logs"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Caddie Logs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="swing-coach"
+                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Swing Coach
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Single scrollable content area */}
+          <div 
+            id="caddie-content"
+            className="flex-1 overflow-y-auto min-h-0"
+            style={{ overscrollBehavior: 'contain' }}
+            ref={scrollAreaRef}
+          >
+            <TabsContent value="chat" className="h-full m-0">
+              <div className="h-full min-h-0">
+                <div className="px-6 py-5">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-muted-foreground">
+                      <p className="mb-6">
+                        I'm your personal tour caddie.<br />
+                        Ask me anything, anytime, I've got you.
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Try asking:</p>
+                        {suggestedPrompts.map((prompt, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSuggestedPrompt(prompt)}
+                            className="mx-1 mb-2 text-xs"
+                          >
+                            {prompt}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message) => (
+                        <ChatMessageComponent
+                          key={message.id}
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                        />
+                      ))}
+                      {isLoading && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                              <span className="text-sm">Echo is thinking...</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="logs" className="h-full m-0">
+              <CaddieLogs 
+                onClose={() => setActiveTab('chat')}
+                isRecording={isRecording}
+                isProcessing={isProcessing}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                userLocation={userLocation}
+                requestLocation={requestLocation}
+              />
+            </TabsContent>
+
+            <TabsContent value="swing-coach" className="h-full m-0">
+              <SwingCoach 
+                onClose={() => setActiveTab('chat')}
+                isRecording={isRecording}
+                isProcessing={isProcessing}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                analysisText={swingCoachAnalysisText}
+                onAnalysisTextChange={setSwingCoachAnalysisText}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+        
+        {/* Shared composer/footer - Fixed at bottom */}
         <div 
-          className={`absolute inset-0 transition-opacity duration-300 ${
-            showHistory ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+          className="flex-shrink-0"
+          style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
+          }}
         >
-          {showHistory && (
-            <AIChatHistory 
-              isOpen={showHistory} 
-              onClose={() => setShowHistory(false)}
-              onSelectMessage={(message) => {
-                setShowHistory(false);
-                // Re-open the conversation with selected message
-                sendMessage(message);
-              }}
-              onNewConversation={() => {
-                conversationSession.startNewConversationManually();
-                setMessages([]); // Clear current messages
-                setShowHistory(false);
-              }}
-            />
+          {activeTab === 'chat' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 flex gap-2">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Ask about your swing, clubs, courses..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                    disabled={isLoading || isRecording || isProcessing}
+                  />
+                  <Button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isLoading || isProcessing}
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="sm"
+                    className="px-3"
+                  >
+                    {isRecording ? (
+                      <MicOff className="h-4 w-4" />
+                    ) : isProcessing ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <Button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          {activeTab === 'logs' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Record course notes and tips..."
+                    disabled={isRecording || isProcessing}
+                    readOnly
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!isRecording && !isProcessing) {
+                      startRecording();
+                    }
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          {activeTab === 'swing-coach' && (
+            <div className="p-4">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    value={swingCoachAnalysisText}
+                    onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
+                    placeholder="Describe your swing for analysis..."
+                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swing-coach-send-btn')?.click()}
+                    disabled={isRecording || isProcessing}
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  id="swing-coach-send-btn"
+                  onClick={() => {
+                    // Trigger swing analysis in Swing Coach component
+                    const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
+                      detail: { analysisText: swingCoachAnalysisText } 
+                    });
+                    window.dispatchEvent(swingCoachEvent);
+                    setSwingCoachAnalysisText('');
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Analyze"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       </div>
