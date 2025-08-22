@@ -14,7 +14,7 @@ async function searchWeb(query: string): Promise<string> {
     console.log('🔍 Searching with Perplexity API for:', query);
     
     if (!perplexityApiKey) {
-      console.log('❌ No Perplexity API key found');
+      console.log('❌ No Perplexity API key found in environment');
       return 'Search functionality not configured. Please check API key.';
     }
     
