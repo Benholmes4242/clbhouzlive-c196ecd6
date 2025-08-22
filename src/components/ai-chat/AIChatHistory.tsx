@@ -1022,9 +1022,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id && (
                             <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
                                <div className="space-y-3 max-h-80 overflow-y-auto">
-                                 <div className="text-xs text-gray-400 mb-2">
-                                   Debug: {conversation.messages.length} messages | Types: {conversation.messages.map(m => `${m.type}(${m.content?.substring(0, 20)}...)`).join(', ')}
-                                 </div>
                                  {conversation.messages
                                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
                                    .map((message) => (
