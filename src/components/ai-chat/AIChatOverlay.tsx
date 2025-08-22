@@ -359,25 +359,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  if (showHistory) {
-    return (
-      <AIChatHistory 
-        isOpen={showHistory} 
-        onClose={() => setShowHistory(false)}
-        onSelectMessage={(message) => {
-          setShowHistory(false);
-          // Re-open the conversation with selected message
-          sendMessage(message);
-        }}
-        onNewConversation={() => {
-          conversationSession.startNewConversationManually();
-          setMessages([]); // Clear current messages
-          setShowHistory(false);
-        }}
-      />
-    );
-  }
-
   // Determine avatar state based on recording/processing state
   const getAvatarState = () => {
     if (isProcessing) return 'processing';
@@ -387,7 +368,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 flex items-center justify-center p-4"
       style={{ 
         zIndex: 9999,
         backgroundColor: 'rgba(0, 0, 0, 0.24)',
@@ -404,7 +385,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        className="w-full max-w-md flex flex-col overflow-hidden relative"
         style={{
           height: 'min(72vh, 576px)', // Reduced by 20% from 720px
           background: 'rgba(246, 247, 246, 0.85)',
@@ -438,6 +419,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
+        {/* Chat Content Layer */}
+        <div 
+          className={`absolute inset-0 transition-opacity duration-300 ${
+            showHistory ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
         {/* Header - Fixed at top */}
         <div 
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
@@ -751,6 +738,30 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+        </div>
+        
+        {/* History Content Layer */}
+        {showHistory && (
+          <div 
+            className={`absolute inset-0 transition-opacity duration-300 ${
+              showHistory ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            <AIChatHistory 
+              isOpen={true} 
+              onClose={() => setShowHistory(false)}
+              onSelectMessage={(message) => {
+                setShowHistory(false);
+                sendMessage(message);
+              }}
+              onNewConversation={() => {
+                conversationSession.startNewConversationManually();
+                setMessages([]);
+                setShowHistory(false);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
