@@ -379,10 +379,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         onScroll={(e) => e.stopPropagation()}
       >
         <div 
-          className="transition-opacity duration-500 ease-in-out"
+          className="transition-opacity duration-300 ease-in-out"
           style={{
-            opacity: showHistory ? 1 : 0,
-            transform: showHistory ? 'scale(1)' : 'scale(0.98)'
+            opacity: showHistory ? 1 : 0
           }}
         >
           <AIChatHistory 
@@ -429,10 +428,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="transition-opacity duration-500 ease-in-out animate-scale-in"
+        className="transition-opacity duration-300 ease-in-out animate-scale-in"
         style={{
-          opacity: !showHistory ? 1 : 0,
-          transform: !showHistory ? 'scale(1)' : 'scale(0.98)'
+          opacity: !showHistory ? 1 : 0
         }}
       >
       <div 
