@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -286,7 +286,6 @@ const SwingAnalysisCard: React.FC<{
   isExpanded: boolean;
   onToggleExpand: () => void;
 }> = ({ analysis, onDelete, isExpanded, onToggleExpand }) => {
-  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
@@ -314,23 +313,22 @@ const SwingAnalysisCard: React.FC<{
                     {thumbnailLoading && (
                       <div className="absolute inset-0 bg-muted animate-pulse" />
                     )}
-                    <img 
-                      src={analysis.videoThumbnail} 
-                      alt="Swing thumbnail"
-                      className="w-full h-full object-cover cursor-pointer"
-                      onError={handleThumbnailError}
-                      onLoad={handleThumbnailLoad}
-                      onClick={() => setVideoDialogOpen(true)}
-                    />
-                    <button
-                      onClick={() => setVideoDialogOpen(true)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group"
-                      aria-label="Play swing video"
-                    >
-                      <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
-                        <Play className="h-4 w-4 text-black" fill="currentColor" />
-                      </div>
-                    </button>
+                     <img 
+                       src={analysis.videoThumbnail} 
+                       alt="Swing thumbnail"
+                       className="w-full h-full object-cover"
+                       onError={handleThumbnailError}
+                       onLoad={handleThumbnailLoad}
+                     />
+                     <button
+                       onClick={onToggleExpand}
+                       className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group"
+                       aria-label="Expand swing analysis"
+                     >
+                       <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
+                         <Play className="h-4 w-4 text-black" fill="currentColor" />
+                       </div>
+                     </button>
                   </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-muted">
@@ -353,15 +351,15 @@ const SwingAnalysisCard: React.FC<{
                   </span>
                 </div>
                 <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onToggleExpand}
-                    className="h-7 px-2 text-xs"
-                    title={isExpanded ? "Minimize" : "View details"}
-                  >
-                    {isExpanded ? <MessageSquare className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                  </Button>
+                   <Button
+                     variant="ghost"
+                     size="sm"
+                     onClick={onToggleExpand}
+                     className="h-7 px-2 text-xs"
+                     title={isExpanded ? "Minimize" : "View details"}
+                   >
+                     {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -411,15 +409,15 @@ const SwingAnalysisCard: React.FC<{
                   {analysis.timestamp.toLocaleDateString()} at {analysis.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleExpand}
-                className="h-7 px-2 text-xs"
-                title="Minimize"
-              >
-                <MessageSquare className="h-3 w-3" />
-              </Button>
+               <Button
+                 variant="ghost"
+                 size="sm"
+                 onClick={onToggleExpand}
+                 className="h-7 px-2 text-xs"
+                 title="Minimize"
+               >
+                 <Minimize2 className="h-3 w-3" />
+               </Button>
             </div>
 
             <div className="p-4 space-y-4">
@@ -517,16 +515,6 @@ const SwingAnalysisCard: React.FC<{
         )}
       </div>
 
-      {/* Video Player Dialog (for thumbnail clicks) */}
-      <VideoPlayerDialog
-        isOpen={videoDialogOpen}
-        onClose={() => setVideoDialogOpen(false)}
-        videoSrc={analysis.videoUrl || analysis.videoSrc}
-        videoPoster={analysis.videoThumbnail || analysis.videoPoster}
-        title={analysis.title || analysis.save_card}
-        date={analysis.timestamp.toLocaleDateString()}
-        tags={analysis.tags}
-      />
     </>
   );
 };
