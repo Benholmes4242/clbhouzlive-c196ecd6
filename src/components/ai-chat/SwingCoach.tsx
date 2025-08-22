@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
+import { useConversationSession } from '@/hooks/useConversationSession';
 import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
@@ -67,8 +68,22 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [videoPreview, setVideoPreview] = useState<string>('');
   const [analysisText, setAnalysisText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [messages, setMessages] = useState<ChatMessageData[]>([]);
-  const [analyses, setAnalyses] = useState<SwingAnalysis[]>([]);
+  // Use conversation session hook for Supabase integration
+  const {
+    currentSession,
+    conversations,
+    addMessage,
+    saveCurrentSession,
+    renameConversation,
+    deleteConversation,
+    clearAllConversations,
+    startNewConversationManually,
+    getDisplayTitle,
+    loadConversations
+  } = useConversationSession({ 
+    storageKey: 'swing-coach',
+    isModalOpen: true 
+  });
   
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
@@ -81,7 +96,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
   // Auto-scroll for messages
   const messagesAutoScroll = useAutoScroll({
-    dependencies: [messages],
+    dependencies: [currentSession?.messages],
     enabled: true,
     direction: 'bottom' // Live chat messages are added at the bottom
   });
@@ -95,60 +110,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
   };
 
-  // Load saved analyses from Supabase
+  // Load conversations on component mount
   useEffect(() => {
-    loadAnalysesFromSupabase();
+    loadConversations();
   }, []);
-
-  const loadAnalysesFromSupabase = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('pro_ai_analyses')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading analyses:', error);
-        return;
-      }
-
-      if (data) {
-        const formattedAnalyses = data.map(analysis => {
-          const analysisResults = analysis.analysis_results as any;
-          const swingContextData = analysis.swing_context as string;
-          
-          let swingContext: any = {};
-          try {
-            if (swingContextData) {
-              swingContext = JSON.parse(swingContextData);
-            }
-          } catch (e) {
-            console.error('Error parsing swing context:', e);
-          }
-
-          return {
-            id: analysis.id,
-            save_card: analysisResults?.metadata?.save_card || 'Swing Analysis',
-            tags: analysisResults?.metadata?.tags || [],
-            category: analysisResults?.metadata?.category || 'Swing',
-            content: analysisResults?.aiResponse || '',
-            videoUrl: analysis.video_url,
-            timestamp: new Date(analysis.created_at),
-            conversation: swingContext.conversation || [],
-            videoId: swingContext.videoId || null,
-            videoThumbnail: swingContext.videoThumbnail || null
-          };
-        });
-        setAnalyses(formattedAnalyses);
-      }
-    } catch (error) {
-      console.error('Error loading analyses from Supabase:', error);
-    }
-  };
 
   useEffect(() => {
     const handleSwingAnalysis = (event: any) => {
@@ -255,21 +220,22 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         });
       }
       
-      // Add to chat messages
-      const voiceMessage: ChatMessageData = {
-        id: Date.now().toString(),
-        type: 'user',
-        content: transcribedText,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, voiceMessage]);
+      // Add to conversation session
+      if (currentSession) {
+        addMessage({
+          id: Date.now().toString(),
+          type: 'user',
+          content: transcribedText,
+          timestamp: new Date()
+        });
+      }
       
       // Save to caddie logs
       saveToCaddieLogs(transcribedText, detectedGolfClub || undefined, holeNumber || undefined);
     }
     setIsAddingVoiceNote(false);
     setIsVoiceNoteRecording(false);
-  }, [currentAnalysis, analyses, toast, currentGolfClub]);
+  }, [currentAnalysis, toast, currentGolfClub]);
 
   const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
     onTranscriptionComplete: handleVoiceNoteComplete
@@ -470,7 +436,20 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         videoType: uploadedVideo?.type
       };
 
-      setMessages(prev => [...prev, userMessage]);
+      // Add user message to conversation
+      if (currentSession) {
+        addMessage({
+          id: userMessage.id,
+          type: 'user',
+          content: userMessage.content,
+          timestamp: userMessage.timestamp,
+          metadata: {
+            videoPreview: userMessage.videoPreview,
+            videoFileName: userMessage.videoFileName,
+            videoType: userMessage.videoType
+          }
+        });
+      }
       setAnalysisText('');
 
       console.log('📡 Sending to Edge Function:', {
@@ -483,10 +462,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
-          conversation: messages.slice(-6).map(msg => ({
+          conversation: currentSession ? currentSession.messages.slice(-6).map(msg => ({
             role: msg.type === 'user' ? 'user' : 'assistant',
             content: msg.content
-          })),
+          })) : [],
           detailMode: false,
           isEcho: true,
           images: extractedFrames,
@@ -509,7 +488,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         metadata: data.metadata
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      // Add AI response to conversation
+      if (currentSession) {
+        addMessage({
+          id: aiMessage.id,
+          type: 'ai',
+          content: data.response,
+          timestamp: aiMessage.timestamp,
+          metadata: data.metadata
+        });
+      }
 
       // Upload video to Cloudflare Stream in background after successful analysis
       let videoId = '';
@@ -550,12 +538,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       };
 
-      // Update messages state with the updated AI message
-      const allSwingCoachMessages = [...messages, userMessage, updatedAiMessage];
-      setMessages(allSwingCoachMessages);
-
-      // Save SwingCoach conversations to SwingCoach history (separate from Chat) with updated metadata
-      localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
+      // Update session title if not already set
+      if (currentSession && !currentSession.title) {
+        const title = userMessage.content.slice(0, 50) + (userMessage.content.length > 50 ? '...' : '');
+        renameConversation(currentSession.id, title);
+      }
 
       // Set current analysis for potential saving
       if (data.metadata) {
@@ -584,13 +571,15 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         variant: "destructive"
       });
 
-      const errorMessage: ChatMessageData = {
-        id: Date.now().toString() + '_error',
-        type: 'ai',
-        content: "Sorry, I'm having trouble analyzing your swing right now. Please ensure you've uploaded a clear video and try again.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      // Add error message to conversation
+      if (currentSession) {
+        addMessage({
+          id: Date.now().toString() + '_error',
+          type: 'ai',
+          content: "Sorry, I'm having trouble analyzing your swing right now. Please ensure you've uploaded a clear video and try again.",
+          timestamp: new Date()
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -643,8 +632,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       console.log('✅ Swing analysis saved to database:', data);
 
-      // Reload analyses from Supabase to get the latest data
-      await loadAnalysesFromSupabase();
+      // Analysis is automatically saved via conversation session
       
       toast({
         title: "Saved to Swing Insights",
@@ -668,36 +656,20 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     analyzeSwing();
   };
 
-  const deleteAnalysis = async (analysisId: string) => {
+  const deleteAnalysis = async (sessionId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('pro_ai_analyses')
-        .delete()
-        .eq('id', analysisId)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error deleting analysis:', error);
-        toast({
-          title: "Delete failed",
-          description: "Failed to delete analysis from database.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Reload analyses from Supabase
-      await loadAnalysesFromSupabase();
-      
+      deleteConversation(sessionId);
       toast({
         title: "Analysis deleted",
         description: "The swing analysis has been removed",
       });
     } catch (error) {
       console.error('Error deleting analysis:', error);
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete analysis.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -710,7 +682,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         style={{ overscrollBehavior: 'contain' }}
       >
         <div className="px-6 py-5">
-        {messages.length === 0 && !uploadedVideo ? (
+        {(!currentSession || currentSession.messages.length === 0) && !uploadedVideo ? (
           <div className="text-center text-muted-foreground">
             <h3 className="text-lg font-medium mb-2">
               Upload your swing for swing analysis
@@ -791,10 +763,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </div>
             )}
 
-            {messages.map((message) => (
+            {currentSession && currentSession.messages.map((message, index) => (
               <ChatMessageComponent
-                key={message.id}
-                message={message}
+                key={`${message.timestamp}-${index}`}
+                message={{
+                  id: `${message.timestamp}-${index}`,
+                  type: message.type,
+                  content: message.content,
+                  timestamp: message.timestamp,
+                  metadata: message.metadata
+                }}
                 onSaveToInsights={saveToSwingInsights}
                 onRequestDetail={requestMoreDetail}
               />
@@ -850,6 +828,33 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               <div className="flex justify-start">
                 <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                   <SwingAnalysisLoader isAnalyzing={isAnalyzing} />
+                </div>
+              </div>
+            )}
+
+            {/* Previous swing analyses */}
+            {conversations.length > 0 && (
+              <div className="border-t pt-4 mt-6">
+                <h4 className="font-medium mb-2 text-sm">Previous Analyses</h4>
+                <div className="space-y-2">
+                  {conversations.slice(0, 5).map((session) => (
+                    <div key={session.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
+                      <button
+                        onClick={() => window.location.reload()} // Simple reload to load the session
+                        className="truncate text-left flex-1 hover:text-primary"
+                      >
+                        {getDisplayTitle(session)}
+                      </button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteAnalysis(session.id)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
