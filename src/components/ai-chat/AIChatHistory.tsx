@@ -533,7 +533,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               title: conv.title,
               totalMessages: messages.length,
               messageTypes: messages.map(m => m.type),
-              messageContent: messages.map(m => ({ type: m.type, content: m.content?.substring(0, 30) + '...' }))
+              messageContent: messages.map(m => ({ type: m.type, content: m.content?.substring(0, 30) + '...' })),
+              fullMessages: messages // Let's see the complete structure
             });
             
             return {
