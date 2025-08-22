@@ -67,7 +67,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [analyses, setAnalyses] = useState<SwingAnalysis[]>([]);
-  const [showAnalyses, setShowAnalyses] = useState(false);
+  
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
   const [currentGolfClub, setCurrentGolfClub] = useState<string>('');
@@ -596,75 +596,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     });
   };
 
-  if (showAnalyses) {
-    return (
-      <div className="h-full min-h-0">
-        <div className="px-6 py-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Swing Analyses</h3>
-            <Button variant="ghost" size="sm" onClick={() => setShowAnalyses(false)}>
-              Back
-            </Button>
-          </div>
-          
-          {analyses.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No analyses yet.</p>
-              <p className="text-sm">Upload a swing to get instant feedback and drills.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {analyses.map((analysis) => (
-                <Card key={analysis.id} className="p-4">
-                  <div className="flex items-start gap-3">
-                    {analysis.videoThumbnail && (
-                      <img 
-                        src={analysis.videoThumbnail} 
-                        alt="Swing thumbnail"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <p className="text-sm font-medium mb-2">{analysis.save_card}</p>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {analysis.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(analysis.timestamp).toLocaleDateString()}
-                      </p>
-                      {analysis.voiceNote && (
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          Voice note attached
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Share2 className="h-3 w-3" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0"
-                        onClick={() => deleteAnalysis(analysis.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-full min-h-0">
@@ -698,17 +629,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 <Upload className="h-4 w-4 mr-1" />
                 Upload Swing Video
               </Button>
-              {!videoPreview && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAnalyses(true)}
-                  className="text-xs"
-                >
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  Analyses ({analyses.length})
-                </Button>
-              )}
             </div>
           </div>
         ) : (
@@ -752,16 +672,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         <Upload className="h-3 w-3 mr-1" />
                         Replace
                       </Button>
-                      {!videoPreview && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowAnalyses(true)}
-                        >
-                          <BookOpen className="h-3 w-3 mr-1" />
-                          Analyses ({analyses.length})
-                        </Button>
-                      )}
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" onClick={discardVideo}>
