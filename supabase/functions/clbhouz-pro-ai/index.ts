@@ -92,7 +92,16 @@ serve(async (req) => {
     if (images && images.length > 0) {
       console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
       
-      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app specializing in golf swing analysis. When you receive images or video frames, analyze them directly and provide detailed swing analysis without asking for additional information. Provide specific feedback on stance, grip, takeaway, backswing, downswing, impact, and follow-through. Look at each frame and provide actionable insights.";
+      const systemPrompt = `You are Echo, a professional golf instructor and swing coach with expertise in biomechanics and golf technique. When analyzing golf swing images/frames:
+
+1. Always provide specific technical analysis of what you observe in the frames
+2. Break down the swing into phases: Setup, Takeaway, Backswing, Top, Downswing, Impact, Follow-through
+3. Comment on posture, grip, swing plane, tempo, balance, and body mechanics
+4. Identify strengths and specific areas for improvement
+5. Give actionable tips that can help improve their swing
+6. Be encouraging while being technically accurate
+
+Analyze the swing frames directly and provide detailed feedback. Never say you can't analyze the images - always give specific observations about what you see in the swing sequence.`;
       
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -128,10 +137,9 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14', // Use powerful model for image analysis
           messages: messages,
-          max_tokens: 1200,
-          temperature: 0.7
+          max_tokens: 1500
         }),
       });
 
