@@ -301,9 +301,9 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col ${isExpanded ? 'shadow-lg' : ''}`}>
+      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}>
         {/* Collapsed Header */}
-        <div className="p-0">
+        <div className="p-0 flex-1 flex flex-col">
           <div className="flex items-start gap-3">
             {/* Left Column - Video Thumbnail */}
             <div className="flex-shrink-0">
@@ -1129,7 +1129,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation, index) => (
                           <div
                             key={`conversation-${conversation.id || index}`}
-                            className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col"
+                            className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col"
                           >
                            <div className="flex items-center justify-between mb-2">
                              {editingConversationId === conversation.id ? (
@@ -1285,10 +1285,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                          return (
                            <div
                              key={log.id}
-                             className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 ${isExpanded ? 'shadow-lg' : ''}`}
+                             className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
                            >
                              {/* Collapsed Content */}
-                             <div className="p-4">
+                             <div className="p-4 flex-1 flex flex-col">
                                <div className="flex items-start justify-between mb-2">
                                  <div className="flex-1">
                                    <p className="text-sm leading-relaxed text-gray-900 mb-2">
