@@ -954,10 +954,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         className={`w-full flex flex-col overflow-hidden ${
           window.innerWidth <= 768 
             ? 'fixed inset-x-0 bottom-0 rounded-t-3xl animate-slide-up' 
-            : 'max-w-2xl rounded-3xl animate-scale-in'
+            : 'max-w-md rounded-3xl animate-scale-in'
         }`}
         style={{
-          height: window.innerWidth <= 768 ? '88vh' : 'min(78vh, 640px)',
+          height: window.innerWidth <= 768 ? '88vh' : 'min(72vh, 576px)',
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
