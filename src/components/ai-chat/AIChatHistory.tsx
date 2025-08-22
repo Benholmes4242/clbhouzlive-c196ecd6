@@ -302,86 +302,72 @@ const SwingAnalysisCard: React.FC<{
   return (
     <>
       <div 
-        className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+        className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
         onClick={!isExpanded ? onToggleExpand : undefined}
         style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
       >
         {/* Collapsed Header */}
-        <div className="p-0 flex-1 flex flex-col">
-          <div className="flex items-start gap-3 flex-1">
-            {/* Left Column - Video Thumbnail */}
-            <div className="flex-shrink-0">
-              <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
-                {analysis.videoThumbnail && !thumbnailError ? (
-                  <>
-                    {thumbnailLoading && (
-                      <div className="absolute inset-0 bg-muted animate-pulse" />
-                    )}
-                     <img 
-                       src={analysis.videoThumbnail} 
-                       alt="Swing thumbnail"
-                       className="w-full h-full object-cover"
-                       onError={handleThumbnailError}
-                       onLoad={handleThumbnailLoad}
-                     />
-                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group">
-                       <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
-                         <Play className="h-4 w-4 text-black" fill="currentColor" />
-                       </div>
-                     </div>
-                  </>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-muted">
-                    <div className="text-center text-muted-foreground">
-                      <FileText className="h-6 w-6 mx-auto mb-1" />
-                      <p className="text-xs">No video</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="flex-1 flex flex-col">
+          {/* Header Row */}
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={analysis.save_card}>
+              {analysis.save_card}
+            </h3>
+            <span className="text-xs text-gray-500 flex-shrink-0">
+              {analysis.timestamp.toLocaleDateString()}
+            </span>
+          </div>
 
-            {/* Right Column - Text Content */}
-            <div className="flex-1 min-w-0 flex flex-col">
-              <div className="flex items-center gap-2 flex-wrap mb-2">
-                <Badge variant="outline">{analysis.category}</Badge>
-                <span className="text-xs text-muted-foreground">
-                  {analysis.timestamp.toLocaleDateString()}
-                </span>
-              </div>
-              
-              <h3 className="text-sm font-medium mb-2 flex-1">{analysis.save_card}</h3>
-              
-              {analysis.tags && analysis.tags.length > 0 && !isExpanded && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {analysis.tags.slice(0, 2).map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                  {analysis.tags.length > 2 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{analysis.tags.length - 2} more
-                    </Badge>
+          {/* Body Preview */}
+          <div className="flex-1 mb-3">
+            <div className="flex items-start gap-3">
+              {/* Left Column - Video Thumbnail */}
+              <div className="flex-shrink-0">
+                <div className="relative w-20 sm:w-24 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+                  {analysis.videoThumbnail && !thumbnailError ? (
+                    <>
+                      {thumbnailLoading && (
+                        <div className="absolute inset-0 bg-muted animate-pulse" />
+                      )}
+                       <img 
+                         src={analysis.videoThumbnail} 
+                         alt="Swing thumbnail"
+                         className="w-full h-full object-cover"
+                         onError={handleThumbnailError}
+                         onLoad={handleThumbnailLoad}
+                       />
+                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group">
+                         <div className="bg-white/90 rounded-full p-1.5 group-hover:scale-110 transition-transform">
+                           <Play className="h-3 w-3 text-black" fill="currentColor" />
+                         </div>
+                       </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                      <div className="text-center text-muted-foreground">
+                        <FileText className="h-4 w-4 mx-auto mb-1" />
+                        <p className="text-xs">No video</p>
+                      </div>
+                    </div>
                   )}
                 </div>
-              )}
-              
-              {analysis.voiceNote && !isExpanded && (
-                <Badge variant="outline" className="text-xs mb-2">
-                  Voice note attached
-                </Badge>
-              )}
+              </div>
+
+              {/* Right Column - Text Content */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-600 line-clamp-1">
+                  Swing Analysis
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Bottom Section - Pills and Controls */}
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+          {/* Action Row */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                <MessageSquare className="h-3 w-3 mr-1" />
+              <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
                 Analysis
-              </Badge>
+              </div>
             </div>
             <div className="flex gap-1">
               <Button
@@ -391,7 +377,7 @@ const SwingAnalysisCard: React.FC<{
                   e.stopPropagation();
                   onToggleExpand();
                 }}
-                className="h-7 px-2 text-xs"
+                className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
                 title={isExpanded ? "Minimize" : "View details"}
               >
                 {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
@@ -403,7 +389,7 @@ const SwingAnalysisCard: React.FC<{
                   e.stopPropagation();
                   onDelete();
                 }}
-                className="h-7 px-2 text-destructive hover:text-destructive"
+                className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50"
                 title="Delete analysis"
               >
                 <Trash2 className="h-3 w-3" />
@@ -1201,7 +1187,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation, index) => (
                           <div
                             key={`conversation-${conversation.id || index}`}
-                            className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col"
+                            className="min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col"
                           >
                            <div className="flex items-start gap-2 flex-1">
                              {editingConversationId === conversation.id ? (
@@ -1358,54 +1344,60 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                          const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
                          
                           return (
-                            <div
-                              key={log.id}
-                              className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
-                            >
-                              {/* Collapsed Content */}
-                              <div className="p-4 flex-1 flex flex-col">
-                                <div className="flex-1 flex flex-col">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-gray-600">
-                                      {new Date(log.created_at).toLocaleDateString()}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed text-gray-900 flex-1">
-                                    {isExpanded ? log.content : contentPreview}
-                                  </p>
+                             <div
+                               key={log.id}
+                               className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+                             >
+                               {/* Collapsed Content */}
+                               <div className="flex-1 flex flex-col">
+                                 {/* Header Row */}
+                                 <div className="flex items-start justify-between mb-2">
+                                   <h3 className="font-semibold text-sm text-gray-900 flex-shrink-0">
+                                     Caddie Log
+                                   </h3>
+                                   <span className="text-xs text-gray-500 flex-shrink-0">
+                                     {new Date(log.created_at).toLocaleDateString()}
+                                   </span>
+                                 </div>
+
+                                 {/* Body Preview */}
+                                 <div className="flex-1 mb-3">
+                                   <p className="text-sm text-gray-600 line-clamp-4 sm:line-clamp-5">
+                                     {isExpanded ? log.content : contentPreview}
+                                   </p>
+                                 </div>
+                                 
+                                 {/* Action Row */}
+                                 <div className="flex justify-between items-center">
+                                   <div className="flex items-center gap-2">
+                                     <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
+                                       Caddie Log
+                                     </div>
+                                   </div>
+                                   <div className="flex items-center gap-1">
+                                     {hasMoreContent && (
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
+                                         className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
+                                         title={isExpanded ? "Minimize" : "View details"}
+                                       >
+                                         {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                       </Button>
+                                     )}
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => deleteCaddieLog(log.id)}
+                                       className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
+                                       aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
+                                     >
+                                       <Trash2 className="h-3 w-3" />
+                                     </Button>
+                                   </div>
                                 </div>
-                                
-                                {/* Bottom Section - Metadata and Controls */}
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
-                                      Caddie Log
-                                    </Badge>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    {hasMoreContent && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
-                                        className="h-7 px-2 text-xs"
-                                        title={isExpanded ? "Minimize" : "View details"}
-                                      >
-                                        {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                                      </Button>
-                                    )}
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteCaddieLog(log.id)}
-                                      className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                      aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                               </div>
-                             </div>
+                              </div>
 
                               {/* Expanded Content */}
                               {isExpanded && (
