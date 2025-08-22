@@ -1072,7 +1072,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                              ) : (
                                <>
                                   <div className="flex items-center gap-2 flex-1">
-                                    <h3 className="font-medium truncate text-gray-900" style={{ maxWidth: '75%' }}>
+                                    <h3 className="font-medium truncate text-gray-900 ml-3" style={{ maxWidth: '75%' }}>
                                       {conversation.customTitle || conversation.title}
                                     </h3>
                                   </div>
