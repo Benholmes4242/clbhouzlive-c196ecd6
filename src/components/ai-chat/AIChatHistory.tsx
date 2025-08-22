@@ -933,37 +933,20 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4 animate-fade-in"
-      style={{ 
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.24)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)'
+      className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+      style={{
+        height: 'min(72vh, 576px)',
+        background: 'rgba(246, 247, 246, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: `
+          0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 8px 32px rgba(0, 0, 0, 0.12),
+          0 2px 8px rgba(0, 0, 0, 0.08)
+        `
       }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
-    >
-      <div 
-        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          height: 'min(72vh, 576px)',
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
-        }}
         onWheel={(e) => {
           const target = e.currentTarget;
           const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
@@ -1320,7 +1303,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           </div>
         </Tabs>
       </div>
-    </div>
   );
 };
 
