@@ -301,7 +301,7 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 ${isExpanded ? 'shadow-lg' : ''}`}>
+      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col ${isExpanded ? 'shadow-lg' : ''}`}>
         {/* Collapsed Header */}
         <div className="p-0">
           <div className="flex items-start gap-3">
@@ -1081,30 +1081,30 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               role="tablist"
               aria-label="Echo History sections"
             >
-              <TabsTrigger 
-                value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
+               <TabsTrigger 
+                 value="chat" 
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
                 aria-selected={activeTab === 'chat'}
                 aria-controls="chat-panel"
                 id="chat-tab"
               >
                 Chat
               </TabsTrigger>
-              <TabsTrigger 
-                value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
+               <TabsTrigger 
+                 value="logs"
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
                 aria-selected={activeTab === 'logs'}
                 aria-controls="logs-panel"
                 id="logs-tab"
               >
                 Caddie Logs
               </TabsTrigger>
-              <TabsTrigger 
-                value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
+               <TabsTrigger 
+                 value="swing-coach"
+                 className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm border-0 focus:ring-0"
+                 role="tab"
                 aria-selected={activeTab === 'swing-coach'}
                 aria-controls="swing-coach-panel"
                 id="swing-coach-tab"
@@ -1126,10 +1126,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {filteredConversations.length > 0 ? (
                     <div className="space-y-3">
                       {filteredConversations.map((conversation, index) => (
-                         <div
-                           key={`conversation-${conversation.id || index}`}
-                           className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                         >
+                          <div
+                            key={`conversation-${conversation.id || index}`}
+                            className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col"
+                          >
                            <div className="flex items-center justify-between mb-2">
                              {editingConversationId === conversation.id ? (
                                <div className="flex items-center gap-2 flex-1">
@@ -1277,10 +1277,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {filteredCaddieLogs.length > 0 ? (
                     <div className="space-y-3">
                       {filteredCaddieLogs.map((log) => (
-                        <div
-                          key={log.id}
-                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                        >
+                         <div
+                           key={log.id}
+                           className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 min-h-[120px] flex flex-col"
+                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
                               <p className="text-sm leading-relaxed text-gray-900 mb-2">{log.content}</p>
