@@ -53,8 +53,7 @@ serve(async (req) => {
                 role: 'user',
                 content: message
               }
-            ],
-            max_tokens: 500
+            ]
           }),
         });
 
@@ -66,20 +65,40 @@ serve(async (req) => {
           const result = perplexityData.choices?.[0]?.message?.content || 'No response';
           
           return new Response(JSON.stringify({ 
-            response: result, 
-            metadata: { source: 'perplexity' }
+            response: `✅ PERPLEXITY SUCCESS! ${result}`, 
+            metadata: { source: 'perplexity_working' }
           }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         } else {
           const errorText = await perplexityResponse.text();
           console.log('❌ Perplexity failed:', perplexityResponse.status, errorText);
+          
+          // Return the error details in the response since logs aren't working
+          return new Response(JSON.stringify({ 
+            response: `❌ PERPLEXITY FAILED: Status ${perplexityResponse.status} - ${errorText.substring(0, 200)}. This is why you're getting 2023 data instead of current information.`,
+            metadata: { source: 'perplexity_error', status: perplexityResponse.status, error: errorText }
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
       } catch (error) {
         console.log('❌ Perplexity error:', error.message);
+        
+        return new Response(JSON.stringify({ 
+          response: `❌ PERPLEXITY ERROR: ${error.message}. This is why you're getting 2023 data instead of current information.`,
+          metadata: { source: 'perplexity_exception', error: error.message }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
     } else {
-      console.log('❌ No Perplexity key found');
+      return new Response(JSON.stringify({ 
+        response: `❌ NO PERPLEXITY KEY FOUND. API key length: ${perplexityKey?.length || 0}. This is why you're getting 2023 data instead of current information.`,
+        metadata: { source: 'no_perplexity_key' }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Fallback to OpenAI
