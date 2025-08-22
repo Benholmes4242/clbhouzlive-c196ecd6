@@ -74,10 +74,14 @@ async function searchWeb(query: string): Promise<string> {
 }
 
 serve(async (req) => {
+  console.log('🚀 EDGE FUNCTION STARTED - This should always appear');
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  
+  console.log('🔥 PROCESSING REQUEST - Method:', req.method);
+  
   try {
     const { message, conversation, images, detailMode, isEcho } = await req.json();
 
@@ -95,11 +99,11 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // Check if this looks like a request for current information
-    const needsSearch = /(?:2024|2025|this year|last week|recent|current|latest|today|yesterday|this week|this season|won.*year|tournaments.*year|wins.*year|what.*shoot|scores?|results?|standings?|news|how many.*this|how many.*won)/i.test(message);
+    // FORCE SEARCH FOR DEBUGGING - Always try Perplexity first
+    const needsSearch = true; // Force search to always trigger
     
-    console.log('🔍 Search detection result:', needsSearch);
-    console.log('🔍 Message being tested:', message);
+    console.log('🔍 FORCED SEARCH MODE - Will always attempt Perplexity');
+    console.log('🔍 Message:', message);
     
     let finalResponse = '';
     
