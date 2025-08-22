@@ -1187,7 +1187,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       {filteredConversations.map((conversation, index) => (
                           <div
                             key={`conversation-${conversation.id || index}`}
-                            className="min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col"
+                            className="min-h-[112px] sm:min-h-[120px] max-h-[160px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col"
                           >
                            <div className="flex items-start gap-2 flex-1">
                              {editingConversationId === conversation.id ? (
@@ -1223,64 +1223,73 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  </Button>
                                </div>
                              ) : (
-                               <div className="flex-1 flex flex-col">
-                                 <div className="flex items-center justify-between mb-2">
-                                   <h3 className="font-medium text-gray-900 text-wrap break-words">
-                                     {conversation.customTitle || conversation.title}
-                                   </h3>
-                                   <div className="flex items-center gap-2 ml-2">
-                                     <span className="text-sm text-gray-600 whitespace-nowrap">
-                                       {conversation.timestamp.toLocaleDateString()}
-                                     </span>
-                                     {conversation.id.startsWith('session_') && (
-                                       <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
-                                         className="h-7 px-2 text-gray-600 hover:text-gray-900"
-                                         title="Rename conversation"
-                                       >
-                                         <Edit2 className="h-3 w-3" />
-                                       </Button>
-                                     )}
-                                   </div>
+                                <div className="flex-1 flex flex-col">
+                                  {/* Header Row */}
+                                  <div className="flex items-start justify-between mb-2">
+                                    <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages[0]?.content || conversation.title}>
+                                      {conversation.messages[0]?.content || conversation.title}
+                                    </h3>
+                                    <span className="text-xs text-gray-500 flex-shrink-0">
+                                      {conversation.timestamp.toLocaleDateString()}
+                                    </span>
+                                  </div>
+
+                                  {/* Body Preview */}
+                                  <div className="flex-1 mb-3">
+                                    {conversation.messages.length > 1 && conversation.messages[1]?.type === 'ai' && (
+                                      <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
+                                        {conversation.messages[1].content}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  {/* Action Row */}
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setExpandedConversation(
+                                          expandedConversation === conversation.id ? null : conversation.id
+                                        )}
+                                        className="bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700 rounded-full px-3 py-1.5 text-xs h-auto"
+                                      >
+                                        {expandedConversation === conversation.id ? "Hide" : "Show"} Conversation
+                                      </Button>
+                                      {conversation.messageCount && (
+                                        <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
+                                          {conversation.messageCount}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setExpandedConversation(
+                                          expandedConversation === conversation.id ? null : conversation.id
+                                        )}
+                                        className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
+                                        title={expandedConversation === conversation.id ? "Minimize" : "View details"}
+                                      >
+                                        {expandedConversation === conversation.id ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => deleteConversation(conversation.id)}
+                                        className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
+                                        aria-label={`Delete conversation: ${conversation.title}`}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  </div>
                                  </div>
-                               </div>
-                             )}
-                           </div>
+                              )}
+                            </div>
                            
-                           {/* Bottom Section - Controls */}
-                           <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-                             <div className="flex items-center gap-2">
-                               <Button
-                                 variant="outline"
-                                 size="sm"
-                                 onClick={() => setExpandedConversation(
-                                   expandedConversation === conversation.id ? null : conversation.id
-                                 )}
-                                 className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
-                               >
-                                 {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
-                               </Button>
-                               {conversation.messageCount && (
-                                 <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
-                                   <MessageSquare className="h-3 w-3 mr-1" />
-                                   {conversation.messageCount}
-                                 </Badge>
-                               )}
-                             </div>
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               onClick={() => deleteConversation(conversation.id)}
-                               className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                               aria-label={`Delete conversation: ${conversation.title}`}
-                             >
-                               <Trash2 className="h-3 w-3" />
-                             </Button>
-                           </div>
-                          
-                          {expandedConversation === conversation.id && (
+                           {expandedConversation === conversation.id && (
                             <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
                               {conversation.messages.map((message) => (
                                 <div
