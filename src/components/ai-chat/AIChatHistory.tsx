@@ -1072,7 +1072,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                              ) : (
                                <>
                                   <div className="flex items-center gap-2 flex-1">
-                                    <h3 className="font-medium truncate text-gray-900" style={{ maxWidth: '50%' }}>
+                                    <h3 className="font-medium truncate text-gray-900" style={{ maxWidth: '75%' }}>
                                       {conversation.customTitle || conversation.title}
                                     </h3>
                                   </div>
@@ -1102,15 +1102,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                onClick={() => setExpandedConversation(
                                  expandedConversation === conversation.id ? null : conversation.id
                                )}
-                               className="bg-gray-100 border-gray-200 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm"
+                               className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
                              >
                                {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
                              </Button>
-                             <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-shrink-0">
                                {conversation.messageCount && (
-                                 <Badge variant="secondary" className="text-xs">
-                                   {conversation.messageCount} messages
-                                 </Badge>
+                                  <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
+                                    {conversation.messageCount} messages
+                                  </Badge>
                                )}
                                <Button
                                  variant="ghost"
@@ -1136,7 +1136,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                   }`}
                                 >
                                   <div className="flex justify-between items-start mb-1">
-                                    <Badge variant={message.type === 'user' ? 'default' : 'secondary'}>
+                                    <Badge variant={message.type === 'user' ? 'secondary' : 'secondary'} className={message.type === 'user' ? 'bg-gray-100 text-gray-600 border-gray-200' : 'bg-gray-100 text-gray-600 border-gray-200'}>
                                       {message.type === 'user' ? 'You' : 'Echo'}
                                     </Badge>
                                     <span className="text-xs text-gray-600">
@@ -1149,7 +1149,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                       variant="link"
                                       size="sm"
                                       onClick={() => onSelectMessage(message.content)}
-                                      className="p-0 h-auto mt-2 text-xs text-primary hover:text-primary/80"
+                                      className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
                                     >
                                       Use this response
                                     </Button>
