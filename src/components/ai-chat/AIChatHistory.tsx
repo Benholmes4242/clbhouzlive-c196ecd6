@@ -895,16 +895,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                                   {/* Body Preview - First AI Response */}
                                   <div className="flex-1 mb-3">
-                                    {(() => {
-                                      const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
-                                      return firstAIMessage ? (
-                                        <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
-                                          {firstAIMessage.content}
-                                        </p>
-                                      ) : (
-                                        <p className="text-sm text-gray-400 italic">No response yet</p>
-                                      );
-                                    })()}
+                                     {(() => {
+                                       const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
+                                       return firstAIMessage ? (
+                                         <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed">
+                                           {firstAIMessage.content}
+                                         </p>
+                                       ) : (
+                                         <p className="text-sm text-gray-400 italic">No response yet</p>
+                                       );
+                                     })()}
                                  </div>
 
                                  {/* Action Row */}
