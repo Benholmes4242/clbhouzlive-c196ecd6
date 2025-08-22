@@ -1,15 +1,5 @@
-// Updated: Force restart to pick up new environment variables
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
-
-// Debug logging
-console.log('🔑 Environment check:');
-console.log('OpenAI key present:', !!openAIApiKey);
-console.log('Perplexity key present:', !!perplexityApiKey);
-console.log('Perplexity key length:', perplexityApiKey?.length || 0);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,18 +8,18 @@ const corsHeaders = {
 
 async function searchWeb(query: string): Promise<string> {
   try {
-    console.log('🔍 Searching with Perplexity API for:', query);
+    console.log('🔍 Starting Perplexity search for:', query);
     
-    // Get API key directly within function
     const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY');
-    console.log('🔑 Perplexity key check inside function:', !!perplexityKey);
+    console.log('🔑 API Key status:', perplexityKey ? 'FOUND' : 'MISSING');
+    console.log('🔑 API Key length:', perplexityKey?.length || 0);
     
     if (!perplexityKey) {
-      console.log('❌ No Perplexity API key found in environment');
-      return 'Search functionality not configured. Please check API key.';
+      console.log('❌ PERPLEXITY_API_KEY environment variable not found');
+      return 'Real-time search unavailable. Using general knowledge instead.';
     }
     
-    console.log('✅ Perplexity API key found, making request...');
+    console.log('✅ Making Perplexity API request...');
     
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -57,11 +47,11 @@ async function searchWeb(query: string): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       console.log('❌ Perplexity API error:', response.status, errorText);
-      return `Search temporarily unavailable (${response.status}). Please try again.`;
+      return `Real-time search temporarily unavailable (Status: ${response.status}). Using general knowledge instead.`;
     }
 
     const data = await response.json();
-    console.log('✅ Perplexity API success, processing result...');
+    console.log('✅ Perplexity API success');
     
     const result = data.choices?.[0]?.message?.content || 'No current information found.';
     console.log('📊 Search result length:', result.length);
@@ -69,7 +59,7 @@ async function searchWeb(query: string): Promise<string> {
     return result;
   } catch (error) {
     console.log('❌ Search error:', error.message);
-    return `Search error: ${error.message}`;
+    return `Search error occurred. Using general knowledge instead.`;
   }
 }
 
@@ -85,6 +75,7 @@ serve(async (req) => {
       throw new Error('Message is required');
     }
 
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
@@ -128,9 +119,6 @@ serve(async (req) => {
       messages.push(userMessage);
 
       console.log('🚀 Sending to OpenAI with images:', images?.length || 0);
-      if (images && images.length > 0) {
-        console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
-      }
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -156,12 +144,48 @@ serve(async (req) => {
       finalResponse = data.choices[0].message.content.trim();
       
     } else if (needsSearch) {
-      // Priority 2: Use web search for current information
-      console.log('🔍 Using web search for current information');
+      // Priority 2: Try web search for current information, fallback to OpenAI
+      console.log('🔍 Attempting real-time search for current information');
       const searchQuery = `${message} PGA Tour 2025 golf tournaments wins`;
       const searchResult = await searchWeb(searchQuery);
       
-      finalResponse = searchResult;
+      // If search failed, fall back to OpenAI with a disclaimer
+      if (searchResult.includes('unavailable') || searchResult.includes('error')) {
+        console.log('🔄 Search failed, falling back to OpenAI with disclaimer');
+        
+        const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. IMPORTANT: Your knowledge cutoff is October 2023, so for questions about current events in 2024/2025, you must clearly state that you don't have access to current information and recommend checking official sources like PGA Tour website or golf news outlets for the most recent data.";
+        
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          ...(conversation || []),
+          { role: 'user', content: message }
+        ];
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: messages,
+            max_tokens: 800,
+            temperature: 0.7
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI API error:', response.status, errorText);
+          throw new Error(`OpenAI API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        finalResponse = data.choices[0].message.content.trim();
+      } else {
+        finalResponse = searchResult;
+      }
       
     } else {
       // Priority 3: Use OpenAI for general questions
