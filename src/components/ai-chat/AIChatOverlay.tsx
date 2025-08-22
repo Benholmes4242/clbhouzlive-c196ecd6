@@ -13,7 +13,6 @@ import EchoAvatar from './EchoAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
-import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 
 interface ChatMessageData {
@@ -46,14 +45,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  // Auto-scroll for chat messages
-  const chatAutoScroll = useAutoScroll({
-    dependencies: [messages],
-    enabled: activeTab === 'chat',
-    direction: 'bottom' // Live chat messages are added at the bottom
-  });
 
   // Conversation session management - for history only, don't restore messages in modal
   const conversationSession = useConversationSession({
@@ -148,7 +141,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     onTranscriptionComplete: handleVoiceNote
   });
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+      }
+    }, 100);
+  };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Ensure fresh start when modal opens
   useEffect(() => {
@@ -236,31 +242,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Save conversation to Supabase
-  const saveCurrentChatToHistory = async () => {
+  // Save conversation to history only, don't persist in modal
+  const saveCurrentChatToHistory = () => {
     if (messages.length > 0) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const conversation = {
-          id: `conversation_${Date.now()}`,
-          user_id: user.id,
-          title: messages[0]?.content.slice(0, 50) || 'New conversation',
-          messages: JSON.stringify(messages.map(msg => ({
-            ...msg,
-            timestamp: msg.timestamp.toISOString()
-          })))
-        };
-
-        const { error } = await supabase
-          .from('conversations')
-          .insert(conversation);
-
-        if (error) throw error;
-      } catch (error) {
-        console.error('Error saving conversation:', error);
-      }
+      // Manually start session for history saving
+      conversationSession.startNewConversationManually();
+      
+      // Add all messages to the session
+      messages.forEach(message => {
+        conversationSession.addMessage(message);
+      });
+      
+      // Save the session to history
+      conversationSession.saveCurrentSession();
     }
   };
 
@@ -362,45 +356,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     sendMessage(prompt);
   };
 
-  const saveToInsights = async (message: ChatMessageData) => {
+  const saveToInsights = (message: ChatMessageData) => {
     if (!message.metadata) return;
     
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Save as conversation to Supabase with properly typed messages
-      const insight = {
-        id: `insight_${Date.now()}`,
-        user_id: user.id,
-        title: message.metadata.save_card || 'Saved Insight',
-        messages: JSON.stringify([{
-          id: message.id,
-          type: message.type,
-          content: message.content,
-          timestamp: message.timestamp.toISOString(),
-          metadata: message.metadata
-        }])
-      };
-
-      const { error } = await supabase
-        .from('conversations')
-        .insert(insight);
-
-      if (error) throw error;
-      
-      toast({
-        title: "Saved to Insights",
-        description: "This tip has been saved to your AI insights",
-      });
-    } catch (error) {
-      console.error('Error saving insight:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save insight",
-        variant: "destructive"
-      });
-    }
+    const savedInsights = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
+    const insight = {
+      id: message.id,
+      content: message.content,
+      summary: message.metadata.save_card,
+      tags: message.metadata.tags || [],
+      category: message.metadata.category || 'General',
+      timestamp: message.timestamp
+    };
+    
+    savedInsights.push(insight);
+    localStorage.setItem('clbhouz_ai_saved', JSON.stringify(savedInsights));
+    
+    toast({
+      title: "Saved to Insights",
+      description: "This tip has been saved to your AI insights",
+    });
   };
 
   const requestMoreDetail = (originalMessage: string) => {
@@ -587,10 +562,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Single scrollable content area */}
-          <ScrollArea 
-            ref={chatAutoScroll.scrollAreaRef}
-            className="flex-1"
+          <div 
+            id="caddie-content"
+            className="flex-1 overflow-y-auto min-h-0"
             style={{ overscrollBehavior: 'contain' }}
+            ref={scrollAreaRef}
           >
             <TabsContent value="chat" className="h-full m-0">
               <div className="h-full min-h-0">
@@ -665,7 +641,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 onAnalysisTextChange={setSwingCoachAnalysisText}
               />
             </TabsContent>
-          </ScrollArea>
+          </div>
         </Tabs>
         
         {/* Shared composer/footer - Fixed at bottom */}

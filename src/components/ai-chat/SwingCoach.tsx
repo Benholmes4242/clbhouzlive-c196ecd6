@@ -455,7 +455,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         firstFramePreview: extractedFrames[0]?.substring(0, 100) + '...'
       });
 
-      const { data, error } = await supabase.functions.invoke('swing-coach-analysis', {
+      const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
           conversation: messages.slice(-6).map(msg => ({

@@ -32,10 +32,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.clbhouz-pro-ai]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-progress-motivation]
-verify_jwt = false
-
-[functions.swing-coach-analysis]
 verify_jwt = false
