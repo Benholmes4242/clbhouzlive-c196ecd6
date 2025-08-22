@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { useConversationSession } from '@/hooks/useConversationSession';
+
 
 interface SavedInsight {
   id: string;
@@ -355,6 +357,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   
+  // Get conversation session for chat history  
+  const conversationSession = useConversationSession({
+    storageKey: 'echo_chat',
+    isModalOpen: false // We don't want to trigger auto-save behavior
+  });
+  
   // Loading and error states
   const [loadingStates, setLoadingStates] = useState({
     conversations: false,
@@ -391,6 +399,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const { toast } = useToast();
 
+
   // Auto-scroll hooks for each tab
   const chatAutoScroll = useAutoScroll({
     dependencies: [conversations, expandedCard],
@@ -420,732 +429,819 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadChatConversations = async () => {
-    console.log('🔍 Loading chat conversations from Supabase only...');
+    console.log('🔍 Loading chat conversations...');
     setLoadingStates(prev => ({ ...prev, conversations: true }));
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user?.id) {
-        console.log('❌ No authenticated user found');
-        setLoadingStates(prev => ({ ...prev, conversations: false }));
-        return;
+      // Load from conversation session hook (localStorage) first
+      console.log('📱 Loading from conversation session...');
+      conversationSession.loadConversations();
+      console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
+      
+      // Convert conversation session format to our chat conversation format
+      const sessionConversations = conversationSession.conversations.map(conv => ({
+        id: conv.id,
+        title: conv.title || "New conversation",
+        customTitle: conv.title,
+        messages: conv.messages.map((msg, index) => ({
+          id: `${conv.id}-${index}`,
+          type: msg.type,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp),
+          metadata: msg.metadata
+        })),
+        timestamp: new Date(conv.lastActivityAt),
+        createdAt: new Date(conv.createdAt),
+        lastActivityAt: new Date(conv.lastActivityAt),
+        messageCount: conv.messages.length
+      }));
+
+      console.log('📱 Session conversations processed:', sessionConversations.length);
+      setConversations(sessionConversations);
+
+      // Also try to load from Supabase database if available
+      const { data: user } = await supabase.auth.getUser();
+      console.log('👤 Current user:', user.user?.id);
+      if (user.user) {
+        console.log('💾 Loading from Supabase conversations table...');
+        const { data, error } = await supabase
+          .from('conversations')
+          .select('*')
+          .eq('user_id', user.user.id)
+          .order('updated_at', { ascending: false });
+
+        console.log('💾 Supabase conversations result:', { data: data?.length || 0, error });
+
+        if (!error && data && data.length > 0) {
+          const dbConversations = data.map(conv => {
+            const messages = (conv.messages as any[]) || [];
+            return {
+              id: conv.id,
+              title: conv.title || "New conversation",
+              customTitle: conv.title,
+              messages: messages.map((msg, index) => ({
+                id: `${conv.id}-${index}`,
+                type: msg.role as 'user' | 'ai',
+                content: msg.content,
+                timestamp: new Date(msg.timestamp || conv.created_at),
+                metadata: msg.metadata
+              })),
+              timestamp: new Date(conv.updated_at),
+              createdAt: new Date(conv.created_at),
+              lastActivityAt: new Date(conv.updated_at),
+              messageCount: messages.length
+            };
+          });
+
+          // Merge database conversations with local storage conversations
+          const allConversations = [...sessionConversations];
+          dbConversations.forEach(dbConv => {
+            if (!allConversations.find(localConv => localConv.id === dbConv.id)) {
+              allConversations.push(dbConv);
+            }
+          });
+
+          // Sort by last activity
+          allConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
+          setConversations(allConversations);
+        }
       }
-
-      console.log('👤 Loading conversations for user:', user.data.user.id);
-
-      // Load conversations from Supabase only
-      const { data: conversationsData, error } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('user_id', user.data.user.id)
-        .order('updated_at', { ascending: false });
-
-      if (error) {
-        console.error('❌ Error loading conversations:', error);
-        setErrorStates(prev => ({ ...prev, conversations: `Failed to load conversations: ${error.message}` }));
-        setLoadingStates(prev => ({ ...prev, conversations: false }));
-        return;
-      }
-
-      console.log('✅ Loaded conversations from Supabase:', conversationsData?.length || 0);
-
-      // Convert Supabase format to our chat conversation format
-      const formattedConversations = conversationsData?.map(conv => {
-        const messages = (conv.messages as any[]) || [];
-        return {
-          id: conv.id,
-          title: conv.title || "New conversation",
-          customTitle: conv.title,
-          messages: messages.map((msg, index) => ({
-            id: `${conv.id}-${index}`,
-            type: msg.type,
-            content: msg.content,
-            timestamp: new Date(msg.timestamp),
-            metadata: msg.metadata
-          })),
-          timestamp: new Date(conv.updated_at),
-          createdAt: new Date(conv.created_at),
-          lastActivityAt: new Date(conv.updated_at),
-          messageCount: messages.length
-        };
-      }) || [];
-
-      console.log('📱 Formatted conversations:', formattedConversations.length);
-      setConversations(formattedConversations);
-      
-      // Also create a flat array of all messages for search functionality  
-      const allMessages: HistoryMessage[] = [];
-      formattedConversations.forEach(conv => {
-        conv.messages.forEach(msg => {
-          allMessages.push(msg);
-        });
-      });
-      
-      setHistoryMessages(allMessages);
-      console.log('📨 Total messages loaded:', allMessages.length);
-      
     } catch (error) {
-      console.error('❌ Unexpected error loading conversations:', error);
-      setErrorStates(prev => ({ ...prev, conversations: `Unexpected error: ${error}` }));
+      console.error('Error loading chat conversations:', error);
+      setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, conversations: false }));
     }
-    
-    setLoadingStates(prev => ({ ...prev, conversations: false }));
   };
 
   const loadCaddieLogs = async () => {
-    console.log('🔍 Loading caddie logs from Supabase...');
+    console.log('🏌️ Loading caddie logs...');
     setLoadingStates(prev => ({ ...prev, caddieLogs: true }));
     setErrorStates(prev => ({ ...prev, caddieLogs: null }));
     
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user?.id) {
-        console.log('❌ No authenticated user found');
-        setLoadingStates(prev => ({ ...prev, caddieLogs: false }));
-        return;
-      }
+      const { data: user } = await supabase.auth.getUser();
+      console.log('👤 User for caddie logs:', user.user?.id);
+      if (!user.user) return;
 
-      const { data: caddieLogs, error } = await supabase
+      const { data, error } = await supabase
         .from('caddie_logs')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('❌ Error loading caddie logs:', error);
-        setErrorStates(prev => ({ ...prev, caddieLogs: `Failed to load caddie logs: ${error.message}` }));
-      } else {
-        console.log('✅ Loaded caddie logs:', caddieLogs?.length || 0);
-        setCaddieLogs(caddieLogs || []);
-      }
+      console.log('🏌️ Caddie logs result:', { data: data?.length || 0, error });
+      if (error) throw error;
+      setCaddieLogs(data || []);
     } catch (error) {
-      console.error('❌ Unexpected error loading caddie logs:', error);
-      setErrorStates(prev => ({ ...prev, caddieLogs: `Unexpected error: ${error}` }));
+      console.error('Error loading caddie logs:', error);
+      setErrorStates(prev => ({ ...prev, caddieLogs: 'Failed to load caddie logs. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, caddieLogs: false }));
     }
-    
-    setLoadingStates(prev => ({ ...prev, caddieLogs: false }));
   };
 
   const loadSwingAnalyses = async () => {
-    console.log('🔍 Loading swing analyses from Supabase...');
+    console.log('🏌️‍♂️ Loading swing analyses...');
     setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user?.id) {
-        console.log('❌ No authenticated user found');
-        setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
-        return;
-      }
+      const { data: user } = await supabase.auth.getUser();
+      console.log('👤 User for swing analyses:', user.user?.id);
+      if (!user.user) return;
 
-      const { data: analyses, error } = await supabase
+      const { data, error } = await supabase
         .from('pro_ai_analyses')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('❌ Error loading swing analyses:', error);
-        setErrorStates(prev => ({ ...prev, swingAnalyses: `Failed to load swing analyses: ${error.message}` }));
-      } else {
-        console.log('✅ Loaded swing analyses:', analyses?.length || 0);
+      console.log('🏌️‍♂️ Swing analyses result:', { data: data?.length || 0, error });
+      if (error) throw error;
+
+      const analysesWithFormatted = data?.map(analysis => {
+        let conversation: Array<{role: 'user' | 'coach', content: string, timestamp?: string}> = [];
+        let videoThumbnail = '';
+        let videoUrl = analysis.video_url || '';
         
-        // Convert to SwingAnalysis format
-        const formattedAnalyses = analyses?.map(analysis => ({
+        // Parse analysis results for conversation and video data
+        try {
+          if (analysis.analysis_results && typeof analysis.analysis_results === 'object') {
+            const results = analysis.analysis_results as any;
+            
+            // Extract conversation from various possible formats
+            if (results.conversation && Array.isArray(results.conversation)) {
+              conversation = results.conversation.map((msg: any) => ({
+                role: msg.role === 'user' ? 'user' : 'coach',
+                content: msg.content || msg.message || '',
+                timestamp: msg.timestamp
+              }));
+            } else if (results.messages && Array.isArray(results.messages)) {
+              conversation = results.messages.map((msg: any) => ({
+                role: msg.role === 'user' ? 'user' : 'coach',
+                content: msg.content || msg.message || '',
+                timestamp: msg.timestamp
+              }));
+            }
+            
+            // Extract video thumbnail if available
+            if (results.videoThumbnail) {
+              videoThumbnail = results.videoThumbnail;
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing analysis results:', parseError);
+        }
+
+        return {
           id: analysis.id,
           save_card: analysis.swing_context || 'Swing Analysis',
           tags: [],
-          category: 'Analysis',
-          content: JSON.stringify(analysis.analysis_results || {}),
-          videoUrl: analysis.video_url,
+          category: 'swing-analysis',
+          content: conversation.length > 0 
+            ? conversation.map(msg => `${msg.role === 'user' ? 'You' : 'Coach'}: ${msg.content}`).join('\n\n')
+            : analysis.swing_context || 'Swing analysis',
+          videoThumbnail,
+          videoUrl,
           timestamp: new Date(analysis.created_at),
-          conversation: (analysis.analysis_results as any)?.conversation || []
-        })) || [];
-        
-        setSwingAnalyses(formattedAnalyses);
-      }
+          conversation,
+          title: 'Swing Analysis'
+        };
+      }) || [];
+
+      console.log('🏌️‍♂️ Processed swing analyses:', analysesWithFormatted.length);
+      setSwingAnalyses(analysesWithFormatted);
     } catch (error) {
-      console.error('❌ Unexpected error loading swing analyses:', error);
-      setErrorStates(prev => ({ ...prev, swingAnalyses: `Unexpected error: ${error}` }));
+      console.error('Error loading swing analyses:', error);
+      setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
     }
-    
-    setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
   };
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      // Delete from Supabase database only
-      const user = await supabase.auth.getUser();
-      if (user.data.user) {
+      // Delete from local storage first
+      conversationSession.deleteConversation(conversationId);
+      
+      // Also try to delete from database if it exists there
+      const { data: user } = await supabase.auth.getUser();
+      if (user.user) {
         const { error } = await supabase
           .from('conversations')
           .delete()
           .eq('id', conversationId)
-          .eq('user_id', user.data.user.id);
+          .eq('user_id', user.user.id);
 
+        // Don't throw error if database deletion fails - local deletion succeeded
         if (error) {
-          console.error('❌ Error deleting conversation:', error);
-          toast({
-            title: "Error",
-            description: "Failed to delete conversation",
-            variant: "destructive",
-          });
-          return;
+          console.warn('Failed to delete conversation from database:', error);
         }
       }
-      
+
       // Update local state
-      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-      
-      // If expanded conversation was deleted, collapse
-      if (expandedCard?.type === 'chat' && expandedCard?.id === conversationId) {
-        setExpandedCard(null);
-      }
-      
+      setConversations(prev => prev.filter(c => c.id !== conversationId));
       toast({
         title: "Conversation deleted",
-        description: "The conversation has been removed from your history",
+        description: "The conversation has been removed from your history."
       });
-      
     } catch (error) {
-      console.error('❌ Error deleting conversation:', error);
+      console.error('Error deleting conversation:', error);
       toast({
         title: "Error",
-        description: "Failed to delete conversation",
-        variant: "destructive",
+        description: "Failed to delete conversation. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
   const deleteCaddieLog = async (logId: string) => {
     try {
-      const user = await supabase.auth.getUser();
-      if (user.data.user) {
-        const { error } = await supabase
-          .from('caddie_logs')
-          .delete()
-          .eq('id', logId)
-          .eq('user_id', user.data.user.id);
+      const { error } = await supabase
+        .from('caddie_logs')
+        .delete()
+        .eq('id', logId);
 
-        if (error) {
-          console.error('❌ Error deleting caddie log:', error);
-          toast({
-            title: "Error",
-            description: "Failed to delete caddie log",
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-      
+      if (error) throw error;
+
       setCaddieLogs(prev => prev.filter(log => log.id !== logId));
-      
-      if (expandedCard?.type === 'caddie' && expandedCard?.id === logId) {
-        setExpandedCard(null);
-      }
-      
       toast({
         title: "Caddie log deleted",
-        description: "The log has been removed from your history",
+        description: "The log has been removed from your history."
       });
-      
     } catch (error) {
-      console.error('❌ Error deleting caddie log:', error);
+      console.error('Error deleting caddie log:', error);
       toast({
         title: "Error",
-        description: "Failed to delete caddie log",
-        variant: "destructive",
+        description: "Failed to delete caddie log. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
   const deleteSwingAnalysis = async (analysisId: string) => {
     try {
-      const user = await supabase.auth.getUser();
-      if (user.data.user) {
-        const { error } = await supabase
-          .from('pro_ai_analyses')
-          .delete()
-          .eq('id', analysisId)
-          .eq('user_id', user.data.user.id);
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
 
-        if (error) {
-          console.error('❌ Error deleting swing analysis:', error);
-          toast({
-            title: "Error",
-            description: "Failed to delete swing analysis",
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-      
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .delete()
+        .eq('id', analysisId)
+        .eq('user_id', user.user.id);
+
+      if (error) throw error;
+
       setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
-      
-      if (expandedCard?.type === 'swing' && expandedCard?.id === analysisId) {
-        setExpandedCard(null);
-      }
-      
       toast({
-        title: "Swing analysis deleted",
-        description: "The analysis has been removed from your history",
+        title: "Analysis deleted",
+        description: "The swing analysis has been removed from your history."
       });
-      
     } catch (error) {
-      console.error('❌ Error deleting swing analysis:', error);
+      console.error('Error deleting swing analysis:', error);
       toast({
         title: "Error",
-        description: "Failed to delete swing analysis",
+        description: "Failed to delete swing analysis. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const filteredConversations = conversations.filter(conv => 
-    conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    conv.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Filter conversations based on search
+  const filteredConversations = conversations.filter(conversation =>
+    conversation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conversation.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const filteredCaddieLogs = caddieLogs.filter(log => 
-    (log.content?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
-    (log.course_name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
-    (log.transcription?.toLowerCase().includes(searchQuery.toLowerCase()) || false)
+  // Filter caddie logs based on search  
+  const filteredCaddieLogs = caddieLogs.filter(log =>
+    log.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredSwingAnalyses = swingAnalyses.filter(analysis => 
+  // Filter swing analyses based on search
+  const filteredSwingAnalyses = swingAnalyses.filter(analysis =>
     analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase()) ||
     analysis.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const categories = [...new Set([
-    ...savedInsights.map(insight => insight.category),
-    ...swingAnalyses.map(analysis => analysis.category)
-  ])];
-
-  const allTags = [...new Set([
-    ...savedInsights.flatMap(insight => insight.tags),
-    ...swingAnalyses.flatMap(analysis => analysis.tags),
-    ...(caddieLogs.flatMap(log => log.tags || []))
-  ])];
+  if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 gap-0 bg-gradient-to-br from-blue-50/30 via-white to-cyan-50/30 border border-blue-100/50 shadow-2xl">
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
+      style={{ 
+        zIndex: 9999
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
+    >
+      <div
+        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        style={{
+          height: 'min(72vh, 576px)',
+          background: 'rgba(246, 247, 246, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: `
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08)
+          `
+        }}
+        onWheel={(e) => {
+          const target = e.currentTarget;
+          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+          
+          if (scrollableElement) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+            const isAtTop = scrollTop === 0;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+            
+            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+              e.preventDefault();
+            }
+          }
+          
+          e.stopPropagation();
+        }}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b border-blue-100/30 bg-white/50 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
-              Echo History
-            </DialogTitle>
+        <div 
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          }}
+        >
+          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search history..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)'
+                }}
+                aria-label="Search chat history, caddie logs, and swing analyses"
+              />
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full"
+              className="h-8 w-8 p-0 hover:bg-white/20 rounded-full"
+              aria-label="Close history modal"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 text-gray-900" />
             </Button>
-          </div>
-        </DialogHeader>
-
-        {/* Search and Filters */}
-        <div className="p-6 pb-4 bg-white/30 backdrop-blur-sm border-b border-blue-100/30">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search conversations, insights, and analyses..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/80 border-blue-200/50 focus:border-blue-400 focus:ring-blue-400/20"
-              />
-            </div>
-            <div className="flex gap-2">
-              {onNewConversation && (
-                <Button
-                  onClick={onNewConversation}
-                  size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Chat
-                </Button>
-              )}
-            </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="mx-6 mt-4 bg-white/50 border border-blue-200/30">
-            <TabsTrigger 
-              value="chat" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Chat ({conversations.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="insights" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"
-            >
-              <Mic className="h-4 w-4" />
-              Caddie ({caddieLogs.length})
-            </TabsTrigger>
-            <TabsTrigger 
-              value="swing-coach" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Swing Coach ({swingAnalyses.length})
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-6 py-2 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm">
+              <TabsTrigger value="chat" className="data-[state=active]:bg-white/80">
+                Chat
+                {conversations.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
+                    {conversations.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="data-[state=active]:bg-white/80">
+                Caddie Logs
+                {caddieLogs.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
+                    {caddieLogs.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="swing-coach" className="data-[state=active]:bg-white/80">
+                Swing Coach
+                {swingAnalyses.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
+                    {swingAnalyses.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          {/* Chat Tab */}
-          <TabsContent value="chat" className="flex-1 m-0 p-6 pt-4">
-            <ScrollArea 
-              className="h-[60vh]" 
-              ref={chatAutoScroll.scrollAreaRef}
-            >
-              <div className="space-y-4 pr-4">
-                {loadingStates.conversations ? (
-                  Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-                ) : errorStates.conversations ? (
-                  <ErrorState 
-                    message={errorStates.conversations} 
-                    onRetry={loadChatConversations}
-                  />
-                ) : filteredConversations.length === 0 ? (
-                  <EmptyState
-                    icon={<MessageCircle className="h-12 w-12" />}
-                    title="No conversations found"
-                    subtitle={searchQuery ? "Try adjusting your search terms" : "Start a conversation to see your chat history here"}
-                  />
-                ) : (
-                  filteredConversations.map((conversation) => (
-                    <div key={conversation.id} className="group">
-                      <div 
-                        className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${
-                          expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'shadow-lg h-auto' : ''
-                        }`}
-                        onClick={() => handleExpansion('chat', conversation.id)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {/* Conversation Header */}
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1 min-w-0">
+          <div className="flex-1 overflow-hidden">
+            {/* Chat Tab */}
+            <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+              <ScrollArea 
+                ref={chatAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                  {loadingStates.conversations ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.conversations ? (
+                    <ErrorState
+                      message={errorStates.conversations}
+                      onRetry={loadChatConversations}
+                    />
+                  ) : filteredConversations.length > 0 ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {filteredConversations.map((conversation, index) => (
+                        <div
+                          key={`conversation-${conversation.id || index}`}
+                          className={`min-h-[112px] sm:min-h-[120px] max-h-[160px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${
+                            expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'h-auto max-h-none shadow-lg' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-2 flex-1">
                             {editingConversationId === conversation.id ? (
-                              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center gap-2 flex-1">
                                 <Input
                                   value={editTitle}
                                   onChange={(e) => setEditTitle(e.target.value)}
+                                  className="flex-1"
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
-                                      // TODO: Save title
-                                      setEditingConversationId(null);
+                                      // Handle save edit
                                     } else if (e.key === 'Escape') {
                                       setEditingConversationId(null);
+                                      setEditTitle('');
                                     }
                                   }}
-                                  className="text-sm font-semibold bg-white border-blue-200 focus:border-blue-400"
                                   autoFocus
                                 />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    // Handle save edit
+                                  }}
+                                  className="h-7 px-2"
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingConversationId(null);
+                                    setEditTitle('');
+                                  }}
+                                  className="h-7 px-2"
+                                >
+                                  Cancel
+                                </Button>
                               </div>
                             ) : (
-                              <h4 className="font-semibold text-sm text-gray-900 truncate">
-                                {conversation.title}
-                              </h4>
+                               <div className="flex-1 flex flex-col">
+                                 {/* Header Row */}
+                                 <div className="flex items-start justify-between mb-2">
+                                   <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages.find(msg => msg.type === 'user')?.content || conversation.title}>
+                                     {conversation.messages.find(msg => msg.type === 'user')?.content || conversation.title}
+                                   </h3>
+                                   <span className="text-xs text-gray-500 flex-shrink-0">
+                                     {conversation.timestamp.toLocaleDateString()}
+                                   </span>
+                                 </div>
+
+                                 {/* Body Preview - First AI Response */}
+                                 <div className="flex-1 mb-3">
+                                   {(() => {
+                                     const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
+                                     return firstAIMessage ? (
+                                       <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
+                                         {firstAIMessage.content}
+                                       </p>
+                                     ) : (
+                                       <p className="text-sm text-gray-400 italic">No response yet</p>
+                                     );
+                                   })()}
+                                 </div>
+
+                                 {/* Action Row */}
+                                 <div className="flex items-center justify-between">
+                                   <div className="flex items-center gap-2">
+                                     <Button
+                                       variant="outline"
+                                       size="sm"
+                                       onClick={() => handleExpansion('chat', conversation.id)}
+                                       className="bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
+                                     >
+                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Hide" : "Show"} Conversation
+                                     </Button>
+                                     {conversation.messageCount && (
+                                       <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+                                         {conversation.messageCount}
+                                       </div>
+                                     )}
+                                   </div>
+                                   <div className="flex items-center gap-1">
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => handleExpansion('chat', conversation.id)}
+                                       className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                       title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Collapse" : "Expand"}
+                                     >
+                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                     </Button>
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => {
+                                         if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                                           deleteConversation(conversation.id);
+                                         }
+                                       }}
+                                       className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                       title="Delete"
+                                     >
+                                       <Trash2 className="h-4 w-4" />
+                                     </Button>
+                                   </div>
+                                 </div>
+                              </div>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
-                            {conversation.timestamp.toLocaleDateString()}
-                          </span>
-                        </div>
 
-                        {/* Preview Messages */}
-                        <div className="flex-1 mb-3 overflow-hidden">
-                          <div className="space-y-1">
-                            {conversation.messages.slice(0, 2).map((message, index) => (
-                              <div key={index} className="text-xs text-gray-600 line-clamp-1">
-                                <span className="font-medium">
-                                  {message.type === 'user' ? 'You' : 'Echo'}:
-                                </span>{' '}
-                                {message.content}
-                              </div>
-                            ))}
-                            {conversation.messages.length > 2 && (
-                              <div className="text-xs text-gray-400">
-                                +{conversation.messages.length - 2} more messages
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Action Row */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="bg-blue-100 text-blue-600 text-xs px-2.5 py-1 rounded-full font-medium">
-                              {conversation.messages.length} messages
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditTitle(conversation.title);
-                                setEditingConversationId(conversation.id);
-                              }}
-                              className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                              title="Rename"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleExpansion('chat', conversation.id);
-                              }}
-                              className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                              title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Collapse" : "Expand"}
-                            >
-                              {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 
-                                <Minimize2 className="h-4 w-4" /> : 
-                                <Maximize2 className="h-4 w-4" />
-                              }
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
-                                  deleteConversation(conversation.id);
-                                }
-                              }}
-                              className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Expanded Content */}
-                        {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id && (
-                          <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
-                            <div className="space-y-3 max-h-80 overflow-y-auto">
-                              {conversation.messages.map((message, index) => (
-                                <div
-                                  key={index}
-                                  className={`p-3 rounded-lg ${
-                                    message.type === 'user' 
-                                      ? 'bg-blue-50 border-l-4 border-blue-500' 
-                                      : 'bg-gray-50 border-l-4 border-gray-300'
-                                  }`}
-                                >
-                                  <div className="flex justify-between items-start mb-2">
-                                    <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                                      {message.type === 'user' ? 'You' : 'Echo'}
+                          {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id && (
+                            <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
+                              <div className="space-y-3 max-h-80 overflow-y-auto">
+                                {conversation.messages.map((message) => (
+                                  <div
+                                    key={message.id}
+                                    className={`p-3 rounded-lg ${
+                                      message.type === 'user' 
+                                        ? 'bg-orange-50 border-l-4 border-orange-500' 
+                                        : 'bg-gray-50 border-l-4 border-gray-300'
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-start mb-1">
+                                      <div className="bg-gray-100 text-gray-600 border-gray-200 text-xs px-2 py-1 rounded-full">
+                                        {message.type === 'user' ? 'You' : 'Echo'}
+                                      </div>
+                                      <span className="text-xs text-gray-600">
+                                        {message.timestamp.toLocaleTimeString()}
+                                      </span>
                                     </div>
-                                    <span className="text-xs text-gray-500">
-                                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                  </div>
-                                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                                    {message.content}
-                                  </div>
-                                  {message.type === 'user' && (
-                                    <div className="mt-2 pt-2 border-t border-gray-200">
+                                    <p className="text-sm leading-relaxed">{message.content}</p>
+                                    {message.type === 'ai' && (
                                       <Button
-                                        variant="outline"
+                                        variant="link"
                                         size="sm"
-                                        onClick={() => {
-                                          onSelectMessage(message.content);
-                                          onClose();
-                                        }}
-                                        className="text-xs bg-white hover:bg-gray-50 border-gray-300"
+                                        onClick={() => onSelectMessage(message.content)}
+                                        className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
                                       >
-                                        Use This Message
+                                        Use this response
                                       </Button>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          {/* Caddie Logs Tab */}
-          <TabsContent value="insights" className="flex-1 m-0 p-6 pt-4">
-            <ScrollArea 
-              className="h-[60vh]" 
-              ref={logsAutoScroll.scrollAreaRef}
-            >
-              <div className="space-y-4 pr-4">
-                {loadingStates.caddieLogs ? (
-                  Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-                ) : errorStates.caddieLogs ? (
-                  <ErrorState 
-                    message={errorStates.caddieLogs} 
-                    onRetry={loadCaddieLogs}
-                  />
-                ) : filteredCaddieLogs.length === 0 ? (
-                  <EmptyState
-                    icon={<Mic className="h-12 w-12" />}
-                    title="No caddie logs found"
-                    subtitle={searchQuery ? "Try adjusting your search terms" : "Record some caddie notes to see them here"}
-                  />
-                ) : (
-                  filteredCaddieLogs.map((log) => (
-                    <div key={log.id} className="group">
-                      <div 
-                        className="min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col cursor-pointer"
-                        onClick={() => handleExpansion('caddie', log.id)}
-                      >
-                        {/* Header */}
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-sm text-gray-900 truncate">
-                            {log.course_name || 'Caddie Note'}
-                          </h4>
-                          <span className="text-xs text-gray-500 flex-shrink-0">
-                            {new Date(log.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        {/* Content Preview */}
-                        <div className="flex-1 mb-3 overflow-hidden">
-                          <p className="text-xs text-gray-600 line-clamp-2">
-                            {log.content || log.transcription || 'No content'}
-                          </p>
-                        </div>
-
-                        {/* Action Row */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="bg-green-100 text-green-600 text-xs px-2.5 py-1 rounded-full font-medium">
-                              Caddie Log
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleExpansion('caddie', log.id);
-                              }}
-                              className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                              title={expandedCard?.type === 'caddie' && expandedCard?.id === log.id ? "Collapse" : "Expand"}
-                            >
-                              {expandedCard?.type === 'caddie' && expandedCard?.id === log.id ? 
-                                <Minimize2 className="h-4 w-4" /> : 
-                                <Maximize2 className="h-4 w-4" />
-                              }
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm('Are you sure you want to delete this caddie log? This action cannot be undone.')) {
-                                  deleteCaddieLog(log.id);
-                                }
-                              }}
-                              className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Expanded Content */}
-                        {expandedCard?.type === 'caddie' && expandedCard?.id === log.id && (
-                          <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
-                            <div className="space-y-3 max-h-80 overflow-y-auto">
-                              <div className="p-4 rounded-lg bg-gray-50">
-                                <h5 className="text-sm font-semibold mb-2">Content</h5>
-                                <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                                  {log.content}
-                                </div>
-                              </div>
-                              {log.transcription && log.transcription !== log.content && (
-                                <div className="p-4 rounded-lg bg-blue-50">
-                                  <h5 className="text-sm font-semibold mb-2">Transcription</h5>
-                                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                                    {log.transcription}
+                                    )}
                                   </div>
-                                </div>
-                              )}
-                              {log.location_name && (
-                                <div className="p-3 rounded-lg bg-gray-50">
-                                  <h5 className="text-sm font-semibold mb-1">Location</h5>
-                                  <div className="text-sm text-gray-600">
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={<MessageCircle className="h-12 w-12" />}
+                      title="No conversations yet"
+                      subtitle="Your chat history with Echo will appear here"
+                    />
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Caddie Logs Tab */}
+            <TabsContent value="insights" className="h-full m-0" role="tabpanel" id="insights-panel" aria-labelledby="insights-tab">
+              <ScrollArea 
+                ref={logsAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                  {loadingStates.caddieLogs ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.caddieLogs ? (
+                    <ErrorState
+                      message={errorStates.caddieLogs}
+                      onRetry={loadCaddieLogs}
+                    />
+                  ) : filteredCaddieLogs.length > 0 ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {filteredCaddieLogs.map((log) => {
+                        const isExpanded = expandedCard?.type === 'caddie' && expandedCard?.id === log.id;
+                        const contentPreview = log.content.length > 120 ? log.content.slice(0, 120) + '...' : log.content;
+                        const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
+                        
+                        return (
+                          <div
+                            key={log.id}
+                            className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+                          >
+                            {/* Collapsed Content */}
+                            <div className="flex-1 flex flex-col">
+                              {/* Header Row */}
+                              <div className="flex items-start justify-between mb-2">
+                                <span className="font-semibold text-sm text-gray-900 flex-shrink-0">
+                                  {new Date(log.created_at).toLocaleDateString()}
+                                </span>
+                                {log.location_name && (
+                                  <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200 flex-shrink-0">
                                     {log.location_name}
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+                                )}
+                              </div>
 
-          {/* Swing Coach Tab */}
-          <TabsContent value="swing-coach" className="flex-1 m-0 p-6 pt-4">
-            <ScrollArea 
-              className="h-[60vh]" 
-              ref={swingAutoScroll.scrollAreaRef}
-            >
-              <div className="space-y-4 pr-4">
-                {loadingStates.swingAnalyses ? (
-                  Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-                ) : errorStates.swingAnalyses ? (
-                  <ErrorState 
-                    message={errorStates.swingAnalyses} 
-                    onRetry={loadSwingAnalyses}
-                  />
-                ) : filteredSwingAnalyses.length === 0 ? (
-                  <EmptyState
-                    icon={<BarChart3 className="h-12 w-12" />}
-                    title="No swing analyses found"
-                    subtitle={searchQuery ? "Try adjusting your search terms" : "Upload a swing video to get started"}
-                  />
-                ) : (
-                  filteredSwingAnalyses.map((analysis) => (
-                    <SwingAnalysisCard
-                      key={analysis.id}
-                      analysis={analysis}
-                      onDelete={() => deleteSwingAnalysis(analysis.id)}
-                      isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                      onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                              {/* Body Preview */}
+                              <div className="flex-1 mb-3 overflow-hidden">
+                                <p className="text-sm text-gray-600 line-clamp-4 sm:line-clamp-5 break-words">
+                                  {isExpanded ? log.content : contentPreview}
+                                </p>
+                              </div>
+                              
+                               {/* Action Row */}
+                               <div className="flex justify-between items-center">
+                                 <div className="flex items-center gap-2">
+                                   <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+                                     Caddie Log
+                                   </div>
+                                 </div>
+                                 <div className="flex items-center gap-1">
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => handleExpansion('caddie', log.id)}
+                                     className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                                     title={isExpanded ? "Collapse" : "Expand"}
+                                   >
+                                     {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                   </Button>
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => {
+                                       if (window.confirm('Are you sure you want to delete this caddie log? This action cannot be undone.')) {
+                                         deleteCaddieLog(log.id);
+                                       }
+                                     }}
+                                     className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                     title="Delete"
+                                   >
+                                     <Trash2 className="h-4 w-4" />
+                                   </Button>
+                                 </div>
+                               </div>
+                            </div>
+
+                            {/* Expanded Content */}
+                            {isExpanded && (
+                              <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
+                                <div className="space-y-4 max-h-80 overflow-y-auto">
+                                  {/* Full Content */}
+                                  <div className="space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-medium mb-2">Content</h5>
+                                      <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                        {log.content}
+                                      </p>
+                                    </div>
+
+                                    {log.transcription && log.transcription !== log.content && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Transcription</h5>
+                                        <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                          {log.transcription}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {(log.location_name || log.course_name) && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Location Details</h5>
+                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                          {log.course_name && (
+                                            <p className="text-sm text-gray-700 mb-1">
+                                              <strong>Course:</strong> {log.course_name}
+                                            </p>
+                                          )}
+                                          {log.location_name && (
+                                            <p className="text-sm text-gray-700">
+                                              <strong>Location:</strong> {log.location_name}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {log.tags && log.tags.length > 0 && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Tags</h5>
+                                        <div className="flex flex-wrap gap-2">
+                                          {log.tags.map((tag, index) => (
+                                            <div key={index} className="bg-gray-100 border-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                                              {tag}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={<Mic className="h-12 w-12" />}
+                      title="No caddie logs yet"
+                      subtitle="Record voice notes during your rounds to see them here"
                     />
-                  ))
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Swing Coach Tab */}
+            <TabsContent value="swing-coach" className="h-full m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
+              <ScrollArea 
+                ref={swingAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="px-6 py-5">
+                  {loadingStates.swingAnalyses ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.swingAnalyses ? (
+                    <ErrorState
+                      message={errorStates.swingAnalyses}
+                      onRetry={loadSwingAnalyses}
+                    />
+                  ) : filteredSwingAnalyses.length > 0 ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {filteredSwingAnalyses.map((analysis) => (
+                        <div key={analysis.id} className="transition-transform duration-100">
+                          <SwingAnalysisCard
+                            analysis={{
+                              ...analysis,
+                              tags: analysis.tags || [], // Ensure tags is always an array
+                              conversation: analysis.conversation || [] // Ensure conversation is always an array
+                            }}
+                            onDelete={() => deleteSwingAnalysis(analysis.id)}
+                            isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                            onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={<BarChart3 className="h-12 w-12" />}
+                      title="No swing analyses yet"
+                      subtitle="Upload swing videos to Swing Coach to see them here"
+                    />
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </div>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

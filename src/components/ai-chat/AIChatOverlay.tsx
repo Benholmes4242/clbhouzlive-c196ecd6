@@ -242,29 +242,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Save conversation to Supabase when modal closes
-  const saveCurrentChatToHistory = async () => {
+  // Save conversation to history only, don't persist in modal
+  const saveCurrentChatToHistory = () => {
     if (messages.length > 0) {
-      console.log('💾 Saving current chat to Supabase with', messages.length, 'messages');
-      
-      // Start a new session manually (this will save any existing session first)
+      // Manually start session for history saving
       conversationSession.startNewConversationManually();
       
-      // Add all messages to the new session
+      // Add all messages to the session
       messages.forEach(message => {
-        conversationSession.addMessage({
-          id: message.id,
-          type: message.type,
-          content: message.content,
-          timestamp: message.timestamp,
-          metadata: message.metadata
-        });
+        conversationSession.addMessage(message);
       });
       
-      // Save the session immediately to Supabase
-      await conversationSession.saveCurrentSession();
-      
-      console.log('💾 Chat saved successfully to Supabase');
+      // Save the session to history
+      conversationSession.saveCurrentSession();
     }
   };
 
