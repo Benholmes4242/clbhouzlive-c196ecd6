@@ -27,11 +27,11 @@ async function searchWeb(query: string): Promise<string> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar',
+        model: 'llama-3.1-sonar-small-128k-online',
         messages: [
           {
             role: 'system',
-            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances.'
+            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances. Always specify the current year and provide the most recent data available.'
           },
           {
             role: 'user',
@@ -84,7 +84,7 @@ serve(async (req) => {
     });
 
     // Check if this looks like a request for current information
-    const needsSearch = /(?:last week|recent|current|latest|today|yesterday|this week|what.*shoot|scores?|results?|standings?|news)/i.test(message);
+    const needsSearch = /(?:2024|2025|this year|last week|recent|current|latest|today|yesterday|this week|this season|won.*year|tournaments.*year|wins.*year|what.*shoot|scores?|results?|standings?|news|how many.*this|how many.*won)/i.test(message);
     
     let finalResponse = '';
     
@@ -147,10 +147,10 @@ serve(async (req) => {
     } else if (needsSearch) {
       // Priority 2: Use web search for current information
       console.log('🔍 Using web search for current information');
-      const searchQuery = `${message} golf PGA tour recent results`;
+      const searchQuery = `${message} PGA Tour 2025 golf tournaments wins`;
       const searchResult = await searchWeb(searchQuery);
       
-      finalResponse = `Based on the latest information I found:\n\n${searchResult}`;
+      finalResponse = searchResult;
       
     } else {
       // Priority 3: Use OpenAI for general questions
