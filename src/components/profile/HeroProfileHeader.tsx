@@ -577,52 +577,76 @@ const HeroProfileHeader = ({
         <div className="relative">
           {/* Header media area (full-bleed, 72vh, passes under main header) */}
           <div ref={profileCardRef} className="relative w-full overflow-hidden -mt-16 pt-16" style={{ height: '72vh' }}>
-            <img
-              src={profile?.profile_photo_url || '/placeholder.svg'}
-              alt={profile?.display_name || 'Profile'}
-              className="w-full h-full object-cover"
-              style={{ 
-                objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning
-                objectFit: 'cover'
-              }}
-            />
-            {/* Subtle overlay for better text contrast */}
-            <div className="absolute inset-0 bg-black/20" />
+            {/* Loading state with neutral color */}
+            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             
-            {/* Centered user info overlay */}
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-              <h1 className="text-3xl font-bold mb-2 drop-shadow-lg">
-                {profile?.display_name || 'User'}
-              </h1>
-              {profile?.username && (
-                <p className="text-lg mb-3 drop-shadow-md opacity-90">@{profile.username}</p>
-              )}
-              {profile?.bio && (
-                <p className="text-base leading-relaxed mb-4 max-w-xs drop-shadow-md opacity-85">
-                  {profile.bio}
+            {profile?.profile_photo_url ? (
+              <img
+                src={profile.profile_photo_url}
+                alt={profile?.display_name || 'Profile'}
+                className="w-full h-full object-cover transition-opacity duration-300"
+                style={{ 
+                  objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning with fallbacks
+                  objectFit: 'cover' // Always cover (no letterboxing), crop as needed
+                }}
+                onLoad={(e) => {
+                  // Hide loading state once image loads sharply
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.previousElementSibling?.remove();
+                }}
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
+            ) : (
+              // No profile photo: show placeholder and prompt to upload
+              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                <Camera className="w-16 h-16 mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                <p className="text-sm text-center px-4">
+                  {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
                 </p>
-              )}
-              
-              {/* Meta row with Home Club (left) and Handicap (right) */}
-              <div className="flex justify-between items-center w-full max-w-xs">
-                <div className="text-left">
-                  <p className="text-xs opacity-75 mb-1">Home Club</p>
-                  <p className="text-sm font-medium drop-shadow-md">
-                    {profile?.home_club || 'No Club'}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs opacity-75 mb-1">Handicap</p>
-                  <p className="text-sm font-semibold drop-shadow-md">
-                    {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
-                  </p>
-                </div>
               </div>
-            </div>
+            )}
+            {/* Subtle overlay for better text contrast */}
+            <div className="absolute inset-0 bg-black/10" />
           </div>
           
           {/* Profile content on white background below media */}
           <div className="bg-white px-4 py-6 space-y-6">
+            {/* User name (immediately below header media) */}
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {profile?.display_name || 'User'}
+              </h1>
+              {profile?.username && (
+                <p className="text-gray-600 text-base">@{profile.username}</p>
+              )}
+            </div>
+            
+            {/* Bio section */}
+            {profile?.bio && (
+              <p className="text-gray-700 text-base leading-relaxed text-center">
+                {profile.bio}
+              </p>
+            )}
+            
+            {/* Meta row with Home Club (left) and Handicap (right) */}
+            <div className="flex justify-between items-center">
+              <div className="text-left">
+                <p className="text-xs text-gray-500 mb-1">Home Club</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {profile?.home_club || 'No Club'}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500 mb-1">Handicap</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
+                </p>
+              </div>
+            </div>
 
             {/* Three buttons stacked vertically (only for own profile) */}
             {isOwnProfile && (

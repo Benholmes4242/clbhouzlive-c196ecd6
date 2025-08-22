@@ -27,21 +27,26 @@ export const getMobileCropPosition = (profile: ProfileCropData | null): string =
   
   const { mobile_crop_x, mobile_crop_y, mobile_crop_width, mobile_crop_height } = profile;
   
-  // If no mobile crop is set, return centered fill
+  // If no mobile crop is set, center the image and fill the header area (no letterboxing)
   if (
     mobile_crop_x === null || mobile_crop_x === undefined ||
     mobile_crop_y === null || mobile_crop_y === undefined ||
     mobile_crop_width === null || mobile_crop_width === undefined ||
     mobile_crop_height === null || mobile_crop_height === undefined
   ) {
-    return 'center';
+    return 'center'; // Default: center and fill, crop equally from opposite edges as needed
   }
   
   // Calculate the center of the crop rectangle
   const centerX = mobile_crop_x + (mobile_crop_width / 2);
   const centerY = mobile_crop_y + (mobile_crop_height / 2);
   
-  return `${centerX}% ${centerY}%`;
+  // Ensure minimum zoom so header area is always fully covered
+  // Enforce bounds to prevent extreme crops
+  const boundedCenterX = Math.max(10, Math.min(90, centerX));
+  const boundedCenterY = Math.max(10, Math.min(90, centerY));
+  
+  return `${boundedCenterX}% ${boundedCenterY}%`;
 };
 
 /**
