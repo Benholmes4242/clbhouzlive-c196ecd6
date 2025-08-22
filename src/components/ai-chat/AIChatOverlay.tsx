@@ -159,8 +159,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      // Lock body scroll
+      // Lock body scroll - ensure it stays locked regardless of showHistory state
       const originalStyle = window.getComputedStyle(document.body).overflow;
+      const originalPosition = window.getComputedStyle(document.body).position;
+      const originalTop = window.getComputedStyle(document.body).top;
+      const originalLeft = window.getComputedStyle(document.body).left;
+      const originalRight = window.getComputedStyle(document.body).right;
+      const originalBottom = window.getComputedStyle(document.body).bottom;
+      
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = '0';
@@ -182,11 +188,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       return () => {
         // Restore original styles
         document.body.style.overflow = originalStyle;
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.bottom = '';
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.left = originalLeft;
+        document.body.style.right = originalRight;
+        document.body.style.bottom = originalBottom;
         
         // Remove event listeners
         document.removeEventListener('wheel', preventScroll);
@@ -194,7 +200,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         document.removeEventListener('scroll', preventScroll);
       };
     }
-  }, [isOpen]);
+  }, [isOpen]); // Only depend on isOpen, not showHistory
 
   const requestLocation = () => {
     if (navigator.geolocation) {
