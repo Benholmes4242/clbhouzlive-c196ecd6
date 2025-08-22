@@ -446,7 +446,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       console.log('📡 Sending to Edge Function:', {
         message: userMessage.content,
         imageCount: extractedFrames.length,
-        hasSwingContext: Object.keys(swingContext).length > 0
+        hasSwingContext: Object.keys(swingContext).length > 0,
+        firstFramePreview: extractedFrames[0]?.substring(0, 100) + '...'
       });
 
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
