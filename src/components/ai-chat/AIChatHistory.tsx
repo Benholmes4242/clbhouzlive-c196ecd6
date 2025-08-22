@@ -301,10 +301,14 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}>
+      <div 
+        className={`p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+        onClick={!isExpanded ? onToggleExpand : undefined}
+        style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
+      >
         {/* Collapsed Header */}
         <div className="p-0 flex-1 flex flex-col">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 flex-1">
             {/* Left Column - Video Thumbnail */}
             <div className="flex-shrink-0">
               <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
@@ -320,15 +324,11 @@ const SwingAnalysisCard: React.FC<{
                        onError={handleThumbnailError}
                        onLoad={handleThumbnailLoad}
                      />
-                     <button
-                       onClick={onToggleExpand}
-                       className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group"
-                       aria-label="Expand swing analysis"
-                     >
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group">
                        <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
                          <Play className="h-4 w-4 text-black" fill="currentColor" />
                        </div>
-                     </button>
+                     </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-muted">
@@ -342,58 +342,72 @@ const SwingAnalysisCard: React.FC<{
             </div>
 
             {/* Right Column - Text Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline">{analysis.category}</Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {analysis.timestamp.toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     onClick={onToggleExpand}
-                     className="h-7 px-2 text-xs"
-                     title={isExpanded ? "Minimize" : "View details"}
-                   >
-                     {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onDelete}
-                    className="h-7 px-2 text-destructive hover:text-destructive"
-                    title="Delete analysis"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
+            <div className="flex-1 min-w-0 flex flex-col">
+              <div className="flex items-center gap-2 flex-wrap mb-2">
+                <Badge variant="outline">{analysis.category}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {analysis.timestamp.toLocaleDateString()}
+                </span>
               </div>
               
-              <h3 className="text-sm font-medium mb-2 line-clamp-2">{analysis.save_card}</h3>
+              <h3 className="text-sm font-medium mb-2 flex-1">{analysis.save_card}</h3>
               
-              {analysis.tags && analysis.tags.length > 0 && (
+              {analysis.tags && analysis.tags.length > 0 && !isExpanded && (
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {analysis.tags.slice(0, 3).map((tag, index) => (
+                  {analysis.tags.slice(0, 2).map((tag, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {tag}
                     </Badge>
                   ))}
-                  {analysis.tags.length > 3 && (
+                  {analysis.tags.length > 2 && (
                     <Badge variant="secondary" className="text-xs">
-                      +{analysis.tags.length - 3} more
+                      +{analysis.tags.length - 2} more
                     </Badge>
                   )}
                 </div>
               )}
               
-              {analysis.voiceNote && (
-                <Badge variant="outline" className="text-xs">
+              {analysis.voiceNote && !isExpanded && (
+                <Badge variant="outline" className="text-xs mb-2">
                   Voice note attached
                 </Badge>
               )}
+            </div>
+          </div>
+
+          {/* Bottom Section - Pills and Controls */}
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                Analysis
+              </Badge>
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleExpand();
+                }}
+                className="h-7 px-2 text-xs"
+                title={isExpanded ? "Minimize" : "View details"}
+              >
+                {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="h-7 px-2 text-destructive hover:text-destructive"
+                title="Delete analysis"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
             </div>
           </div>
         </div>
@@ -1131,7 +1145,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             key={`conversation-${conversation.id || index}`}
                             className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col"
                           >
-                           <div className="flex items-center justify-between mb-2">
+                           <div className="flex items-start gap-2 flex-1">
                              {editingConversationId === conversation.id ? (
                                <div className="flex items-center gap-2 flex-1">
                                  <Input
@@ -1165,58 +1179,61 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  </Button>
                                </div>
                              ) : (
-                               <>
-                                  <div className="flex items-center gap-2 flex-1">
-                                    <h3 className="font-medium truncate text-gray-900 ml-3" style={{ maxWidth: '75%' }}>
-                                      {conversation.customTitle || conversation.title}
-                                    </h3>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-600">
-                                      {conversation.timestamp.toLocaleDateString()}
-                                    </span>
-                                    {conversation.id.startsWith('session_') && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
-                                        className="h-7 px-2 text-gray-600 hover:text-gray-900"
-                                        title="Rename conversation"
-                                      >
-                                        <Edit2 className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                               </>
+                               <div className="flex-1 flex flex-col">
+                                 <div className="flex items-center justify-between mb-2">
+                                   <h3 className="font-medium text-gray-900 text-wrap break-words">
+                                     {conversation.customTitle || conversation.title}
+                                   </h3>
+                                   <div className="flex items-center gap-2 ml-2">
+                                     <span className="text-sm text-gray-600 whitespace-nowrap">
+                                       {conversation.timestamp.toLocaleDateString()}
+                                     </span>
+                                     {conversation.id.startsWith('session_') && (
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
+                                         className="h-7 px-2 text-gray-600 hover:text-gray-900"
+                                         title="Rename conversation"
+                                       >
+                                         <Edit2 className="h-3 w-3" />
+                                       </Button>
+                                     )}
+                                   </div>
+                                 </div>
+                               </div>
                              )}
                            </div>
-                           <div className="flex justify-between items-center">
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               onClick={() => setExpandedConversation(
-                                 expandedConversation === conversation.id ? null : conversation.id
-                               )}
-                               className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
-                             >
-                               {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
-                             </Button>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                               {conversation.messageCount && (
-                                  <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
-                                    {conversation.messageCount} messages
-                                  </Badge>
-                               )}
+                           
+                           {/* Bottom Section - Controls */}
+                           <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                             <div className="flex items-center gap-2">
                                <Button
-                                 variant="ghost"
+                                 variant="outline"
                                  size="sm"
-                                 onClick={() => deleteConversation(conversation.id)}
-                                 className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                 aria-label={`Delete conversation: ${conversation.title}`}
+                                 onClick={() => setExpandedConversation(
+                                   expandedConversation === conversation.id ? null : conversation.id
+                                 )}
+                                 className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
                                >
-                                 <Trash2 className="h-3 w-3" />
+                                 {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
                                </Button>
+                               {conversation.messageCount && (
+                                 <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
+                                   <MessageSquare className="h-3 w-3 mr-1" />
+                                   {conversation.messageCount}
+                                 </Badge>
+                               )}
                              </div>
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => deleteConversation(conversation.id)}
+                               className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                               aria-label={`Delete conversation: ${conversation.title}`}
+                             >
+                               <Trash2 className="h-3 w-3" />
+                             </Button>
                            </div>
                           
                           {expandedConversation === conversation.id && (
@@ -1282,135 +1299,106 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                          const contentPreview = log.content.length > 120 ? log.content.slice(0, 120) + '...' : log.content;
                          const hasMoreContent = log.content.length > 120 || (log.transcription && log.transcription !== log.content);
                          
-                         return (
-                           <div
-                             key={log.id}
-                             className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
-                           >
-                             {/* Collapsed Content */}
-                             <div className="p-4 flex-1 flex flex-col">
-                               <div className="flex items-start justify-between mb-2">
-                                 <div className="flex-1">
-                                   <p className="text-sm leading-relaxed text-gray-900 mb-2">
-                                     {isExpanded ? log.content : contentPreview}
-                                   </p>
-                                   {!isExpanded && log.location_name && (
-                                     <div className="flex items-center gap-1 mt-2">
-                                       <span className="text-xs text-gray-600">{log.location_name}</span>
-                                     </div>
-                                   )}
-                                   {!isExpanded && log.course_name && (
-                                     <div className="text-xs text-gray-600 mt-1">
-                                       Course: {log.course_name}
-                                     </div>
-                                   )}
-                                   {!isExpanded && log.tags && log.tags.length > 0 && (
-                                     <div className="flex flex-wrap gap-1 mt-2">
-                                       {log.tags.slice(0, 3).map((tag, index) => (
-                                         <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
-                                           {tag}
-                                         </Badge>
-                                       ))}
-                                       {log.tags.length > 3 && (
-                                         <Badge variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
-                                           +{log.tags.length - 3} more
-                                         </Badge>
-                                       )}
-                                     </div>
-                                   )}
-                                 </div>
-                                 <div className="flex items-center gap-2 ml-4">
-                                   <span className="text-xs text-gray-600">
-                                     {new Date(log.created_at).toLocaleDateString()}
-                                   </span>
-                                   {hasMoreContent && (
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
-                                       className="h-7 px-2 text-xs"
-                                       title={isExpanded ? "Minimize" : "View details"}
-                                     >
-                                       {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                                     </Button>
-                                   )}
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={() => deleteCaddieLog(log.id)}
-                                     className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                     aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
-                                   >
-                                     <Trash2 className="h-3 w-3" />
-                                   </Button>
-                                 </div>
+                          return (
+                            <div
+                              key={log.id}
+                              className={`rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 h-[120px] flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+                            >
+                              {/* Collapsed Content */}
+                              <div className="p-4 flex-1 flex flex-col">
+                                <div className="flex-1 flex flex-col">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">
+                                      {new Date(log.created_at).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed text-gray-900 flex-1">
+                                    {isExpanded ? log.content : contentPreview}
+                                  </p>
+                                </div>
+                                
+                                {/* Bottom Section - Metadata and Controls */}
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                      Caddie Log
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {hasMoreContent && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
+                                        className="h-7 px-2 text-xs"
+                                        title={isExpanded ? "Minimize" : "View details"}
+                                      >
+                                        {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => deleteCaddieLog(log.id)}
+                                      className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                      aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
                                </div>
                              </div>
 
-                             {/* Expanded Content */}
-                             {isExpanded && (
-                               <div className="border-t border-gray-100 bg-white/30 animate-accordion-down">
-                                 {/* Sticky Mini Header */}
-                                 <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 px-4 py-2 z-10">
-                                   <div className="flex items-center gap-2">
-                                     <h4 className="font-medium text-sm">
-                                       {log.location_name || 'Caddie Log'}
-                                     </h4>
-                                     <span className="text-xs text-muted-foreground">
-                                       {new Date(log.created_at).toLocaleDateString()} at {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                     </span>
-                                   </div>
-                                 </div>
-
-                                 <div className="p-4 space-y-4">
-                                   {/* Full Content */}
-                                   <div className="space-y-3">
-                                     <div>
-                                       <h5 className="text-sm font-medium mb-2">Content</h5>
-                                       <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
-                                         {log.content}
-                                       </p>
-                                     </div>
-                                     
-                                     {log.transcription && log.transcription !== log.content && (
-                                       <div>
-                                         <h5 className="text-sm font-medium mb-2">Transcription</h5>
-                                         <p className="text-sm leading-relaxed text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                           {log.transcription}
-                                         </p>
-                                       </div>
-                                     )}
-                                     
-                                     {log.location_name && (
-                                       <div>
-                                         <h5 className="text-sm font-medium mb-2">Location</h5>
-                                         <p className="text-sm text-gray-700">{log.location_name}</p>
-                                       </div>
-                                     )}
-                                     
-                                     {log.course_name && (
-                                       <div>
-                                         <h5 className="text-sm font-medium mb-2">Course</h5>
-                                         <p className="text-sm text-gray-700">{log.course_name}</p>
-                                       </div>
-                                     )}
-                                     
-                                     {log.tags && log.tags.length > 0 && (
-                                       <div>
-                                         <h5 className="text-sm font-medium mb-2">Tags</h5>
-                                         <div className="flex flex-wrap gap-2">
-                                           {log.tags.map((tag, index) => (
-                                             <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
-                                               {tag}
-                                             </Badge>
-                                           ))}
-                                         </div>
-                                       </div>
-                                     )}
-                                   </div>
-                                 </div>
-                               </div>
-                             )}
+                              {/* Expanded Content */}
+                              {isExpanded && (
+                                <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                                  {/* Full Content */}
+                                  <div className="space-y-3">
+                                    <div>
+                                      <h5 className="text-sm font-medium mb-2">Content</h5>
+                                      <p className="text-sm leading-relaxed text-gray-900 bg-gray-50 p-3 rounded-lg">
+                                        {log.content}
+                                      </p>
+                                    </div>
+                                    
+                                    {log.transcription && log.transcription !== log.content && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Transcription</h5>
+                                        <p className="text-sm leading-relaxed text-gray-700 bg-gray-50 p-3 rounded-lg">
+                                          {log.transcription}
+                                        </p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.location_name && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Location</h5>
+                                        <p className="text-sm text-gray-700">{log.location_name}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.course_name && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Course</h5>
+                                        <p className="text-sm text-gray-700">{log.course_name}</p>
+                                      </div>
+                                    )}
+                                    
+                                    {log.tags && log.tags.length > 0 && (
+                                      <div>
+                                        <h5 className="text-sm font-medium mb-2">Tags</h5>
+                                        <div className="flex flex-wrap gap-2">
+                                          {log.tags.map((tag, index) => (
+                                            <Badge key={index} variant="secondary" className="text-xs bg-gray-100 border-gray-200 text-gray-700">
+                                              {tag}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                            </div>
                          );
                        })}
