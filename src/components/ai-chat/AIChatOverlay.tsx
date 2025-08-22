@@ -245,16 +245,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   // Save conversation to history only, don't persist in modal
   const saveCurrentChatToHistory = () => {
     if (messages.length > 0) {
-      // Manually start session for history saving
+      console.log('💾 Saving current chat to history with', messages.length, 'messages');
+      
+      // Start a new session manually (this will save any existing session first)
       conversationSession.startNewConversationManually();
       
-      // Add all messages to the session
+      // Add all messages to the new session
       messages.forEach(message => {
-        conversationSession.addMessage(message);
+        conversationSession.addMessage({
+          id: message.id,
+          type: message.type,
+          content: message.content,
+          timestamp: message.timestamp,
+          metadata: message.metadata
+        });
       });
       
-      // Save the session to history
+      // Save the session immediately
       conversationSession.saveCurrentSession();
+      
+      console.log('💾 Chat saved successfully');
     }
   };
 
