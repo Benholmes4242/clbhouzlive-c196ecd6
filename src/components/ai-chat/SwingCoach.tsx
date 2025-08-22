@@ -472,6 +472,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       setMessages(prev => [...prev, userMessage]);
       setAnalysisText('');
+      setAnalysisText('');
 
       console.log('📡 Sending to Edge Function:', {
         message: userMessage.content,
@@ -850,6 +851,31 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               <div className="flex justify-start">
                 <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                   <SwingAnalysisLoader isAnalyzing={isAnalyzing} />
+                </div>
+              </div>
+            )}
+
+            {/* Previous analyses */}
+            {analyses.length > 0 && (
+              <div className="border-t pt-4 mt-6">
+                <h4 className="font-medium mb-2 text-sm">Previous Analyses</h4>
+                <div className="space-y-2">
+                  {analyses.slice(0, 5).map((analysis) => (
+                    <div key={analysis.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
+                      <span className="truncate">
+                        {analysis.timestamp.toLocaleDateString()} - 
+                        {analysis.conversation[0]?.content?.slice(0, 30)}...
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteAnalysis(analysis.id)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

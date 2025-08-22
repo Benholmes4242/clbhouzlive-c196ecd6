@@ -202,6 +202,7 @@ export type Database = {
       }
       conversations: {
         Row: {
+          conversation_type: string
           created_at: string
           id: string
           messages: Json
@@ -210,6 +211,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          conversation_type?: string
           created_at?: string
           id?: string
           messages?: Json
@@ -218,6 +220,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          conversation_type?: string
           created_at?: string
           id?: string
           messages?: Json
