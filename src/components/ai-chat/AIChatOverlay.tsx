@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import EchoProtection from './EchoProtection';
+import { useEchoProtection } from '@/hooks/useEchoProtection';
 
 interface ChatMessageData {
   id: string;
@@ -48,6 +50,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Echo Protection System
+  const {
+    isProtectionOpen,
+    pendingOperation,
+    requestEchoAccess,
+    handleProtectionSuccess,
+    handleProtectionClose
+  } = useEchoProtection();
 
   // Conversation session management - for history only, don't restore messages in modal
   const conversationSession = useConversationSession({
@@ -418,6 +429,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
             }}
           />
         </div>
+
+        {/* Echo Protection Dialog */}
+        <EchoProtection
+          isOpen={isProtectionOpen}
+          onClose={handleProtectionClose}
+          onSuccess={handleProtectionSuccess}
+          operation={pendingOperation}
+        />
       </div>
     );
   }
