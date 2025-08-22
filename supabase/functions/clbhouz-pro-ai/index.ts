@@ -1,4 +1,3 @@
-// FIXED: Updated config and forced redeployment - Should work now!
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -7,245 +6,119 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function searchWeb(query: string): Promise<string> {
-  try {
-    console.log('🔍 Starting Perplexity search for:', query);
-    
-    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY');
-    console.log('🔑 API Key status:', perplexityKey ? 'FOUND' : 'MISSING');
-    console.log('🔑 API Key length:', perplexityKey?.length || 0);
-    
-    if (!perplexityKey) {
-      console.log('❌ PERPLEXITY_API_KEY environment variable not found');
-      return 'Real-time search unavailable. Using general knowledge instead.';
-    }
-    
-    console.log('✅ Making Perplexity API request...');
-    
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${perplexityKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful assistant that provides accurate, up-to-date information about golf and sports. Focus on recent events and provide specific details with dates when possible.'
-          },
-          {
-            role: 'user',
-            content: query
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.2,
-        top_p: 0.9,
-        return_images: false,
-        return_related_questions: false,
-        search_domain_filter: ["pgatour.com", "espn.com", "golf.com"],
-        search_recency_filter: "month",
-        frequency_penalty: 1,
-        presence_penalty: 0
-      }),
-    });
-
-    console.log('📡 Perplexity API response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log('❌ Perplexity API error:', response.status, errorText);
-      return `Real-time search temporarily unavailable (Status: ${response.status}). Using general knowledge instead.`;
-    }
-
-    const data = await response.json();
-    console.log('✅ Perplexity API success');
-    console.log('📊 Full response:', JSON.stringify(data, null, 2));
-    
-    const result = data.choices?.[0]?.message?.content || 'No current information found.';
-    console.log('📊 Search result length:', result.length);
-    
-    return result;
-  } catch (error) {
-    console.log('❌ Search error:', error.message);
-    return `Search error occurred. Using general knowledge instead.`;
-  }
-}
-
 serve(async (req) => {
-  console.log('🚀 EDGE FUNCTION STARTED - This should always appear');
+  console.log('🚀 FUNCTION STARTED - This MUST appear in logs');
+  
   if (req.method === 'OPTIONS') {
+    console.log('📝 OPTIONS request received');
     return new Response(null, { headers: corsHeaders });
   }
 
-  
-  console.log('🔥 PROCESSING REQUEST - Method:', req.method);
-  
+  console.log('📝 POST request received');
+
   try {
-    const { message, conversation, images, detailMode, isEcho } = await req.json();
+    const body = await req.json();
+    console.log('📝 Body parsed:', JSON.stringify(body, null, 2));
+    
+    const { message } = body;
+    console.log('📝 Message extracted:', message);
 
-    if (!message) {
-      throw new Error('Message is required');
-    }
-
+    // Get API keys
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY');
+    
+    console.log('🔑 OpenAI key present:', !!openAIApiKey);
+    console.log('🔑 Perplexity key present:', !!perplexityKey);
+
     if (!openAIApiKey) {
+      console.log('❌ No OpenAI key found');
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('📥 Request received:', { 
-      message: message.substring(0, 100), 
-      imagesCount: images?.length || 0
-    });
-
-    // FORCE SEARCH FOR DEBUGGING - Always try Perplexity first
-    const needsSearch = true; // Force search to always trigger
-    
-    console.log('🔍 FORCED SEARCH MODE - Will always attempt Perplexity');
-    console.log('🔍 Message:', message);
-    
-    let finalResponse = '';
-    
-    // Priority 1: If we have images, use OpenAI for analysis
-    if (images && images.length > 0) {
-      console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
+    // ALWAYS try Perplexity first for testing
+    if (perplexityKey) {
+      console.log('🔍 Attempting Perplexity API call...');
       
-      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app specializing in golf swing analysis. When you receive images or video frames, analyze them directly and provide detailed swing analysis without asking for additional information. Provide specific feedback on stance, grip, takeaway, backswing, downswing, impact, and follow-through. Look at each frame and provide actionable insights.";
-      
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        ...(conversation || [])
-      ];
-
-      // Create user message with images if provided
-      const userMessage: any = { 
-        role: 'user', 
-        content: images && images.length > 0 ? [
-          { type: 'text', text: message },
-          ...images.map((image: string) => ({
-            type: 'image_url',
-            image_url: {
-              url: image,
-              detail: 'high'
-            }
-          }))
-        ] : message
-      };
-
-      messages.push(userMessage);
-
-      console.log('🚀 Sending to OpenAI with images:', images?.length || 0);
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: messages,
-          max_tokens: 1200,
-          temperature: 0.7
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI API error:', response.status, errorText);
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      finalResponse = data.choices[0].message.content.trim();
-      
-    } else if (needsSearch) {
-      // Priority 2: Try web search for current information, fallback to OpenAI
-      console.log('🔍 Attempting real-time search for current information');
-      const searchQuery = `${message} PGA Tour 2025 golf tournaments wins`;
-      const searchResult = await searchWeb(searchQuery);
-      
-      // If search failed, fall back to OpenAI with a disclaimer
-      if (searchResult.includes('unavailable') || searchResult.includes('error')) {
-        console.log('🔄 Search failed, falling back to OpenAI with disclaimer');
-        
-        const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. IMPORTANT: Your knowledge cutoff is October 2023, so for questions about current events in 2024/2025, you must clearly state that you don't have access to current information and recommend checking official sources like PGA Tour website or golf news outlets for the most recent data.";
-        
-        const messages = [
-          { role: 'system', content: systemPrompt },
-          ...(conversation || []),
-          { role: 'user', content: message }
-        ];
-
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      try {
+        const perplexityResponse = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${openAIApiKey}`,
+            'Authorization': `Bearer ${perplexityKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: messages,
-            max_tokens: 800,
-            temperature: 0.7
+            model: 'llama-3.1-sonar-small-128k-online',
+            messages: [
+              {
+                role: 'user',
+                content: message
+              }
+            ],
+            max_tokens: 500
           }),
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('OpenAI API error:', response.status, errorText);
-          throw new Error(`OpenAI API error: ${response.status}`);
+        console.log('📡 Perplexity response status:', perplexityResponse.status);
+
+        if (perplexityResponse.ok) {
+          const perplexityData = await perplexityResponse.json();
+          console.log('✅ Perplexity success!');
+          const result = perplexityData.choices?.[0]?.message?.content || 'No response';
+          
+          return new Response(JSON.stringify({ 
+            response: result, 
+            metadata: { source: 'perplexity' }
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        } else {
+          const errorText = await perplexityResponse.text();
+          console.log('❌ Perplexity failed:', perplexityResponse.status, errorText);
         }
-
-        const data = await response.json();
-        finalResponse = data.choices[0].message.content.trim();
-      } else {
-        finalResponse = searchResult;
+      } catch (error) {
+        console.log('❌ Perplexity error:', error.message);
       }
-      
     } else {
-      // Priority 3: Use OpenAI for general questions
-      console.log('💬 Using OpenAI for general conversation');
-      
-      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. Be helpful and friendly.";
-      
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        ...(conversation || []),
-        { role: 'user', content: message }
-      ];
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: messages,
-          max_tokens: 800,
-          temperature: 0.7
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI API error:', response.status, errorText);
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      finalResponse = data.choices[0].message.content.trim();
+      console.log('❌ No Perplexity key found');
     }
 
-    console.log('✅ Response generated, length:', finalResponse.length);
+    // Fallback to OpenAI
+    console.log('🔄 Falling back to OpenAI...');
+    
+    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are Echo, an AI assistant. IMPORTANT: Your knowledge cutoff is October 2023. For questions about current events in 2024/2025, clearly state that you don\'t have access to current information and recommend checking official sources like PGA Tour website.' 
+          },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 800,
+        temperature: 0.7
+      }),
+    });
+
+    if (!openAIResponse.ok) {
+      const errorText = await openAIResponse.text();
+      console.error('❌ OpenAI error:', openAIResponse.status, errorText);
+      throw new Error(`OpenAI API error: ${openAIResponse.status}`);
+    }
+
+    const openAIData = await openAIResponse.json();
+    const result = openAIData.choices[0].message.content.trim();
+    
+    console.log('✅ OpenAI fallback successful');
 
     return new Response(JSON.stringify({ 
-      response: finalResponse, 
-      metadata: null 
+      response: result, 
+      metadata: { source: 'openai_fallback' }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
