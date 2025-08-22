@@ -405,7 +405,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadSwingAnalyses = async () => {
-    // No swing analyses table exists yet - using empty data
+    // No swing analyses table exists in the database yet
     setSwingAnalyses([]);
   };
 
