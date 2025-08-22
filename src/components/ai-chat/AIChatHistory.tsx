@@ -528,13 +528,20 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         if (!error && data && data.length > 0) {
           const dbConversations = data.map(conv => {
             const messages = (conv.messages as any[]) || [];
+            console.log('Raw conversation messages from DB:', conv.id, messages.map(m => ({ 
+              role: m.role, 
+              type: m.type, 
+              content: m.content?.substring(0, 30) + '...',
+              hasRole: !!m.role,
+              hasType: !!m.type
+            })));
             return {
               id: conv.id,
               title: conv.title || "New conversation",
               customTitle: conv.title,
                messages: messages.map((msg, index) => ({
                  id: `${conv.id}-${index}`,
-                  type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+                 type: ((msg.role || msg.type) === 'user' ? 'user' : 'ai') as 'user' | 'ai',
                  content: msg.content || '',
                  timestamp: new Date(msg.timestamp || conv.created_at),
                  metadata: msg.metadata
