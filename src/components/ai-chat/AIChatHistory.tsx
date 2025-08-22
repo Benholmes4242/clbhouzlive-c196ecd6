@@ -903,9 +903,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 <div className="px-6 py-5">
                   {filteredConversations.length > 0 ? (
                     <div className="space-y-3">
-                      {filteredConversations.map((conversation) => (
+                      {filteredConversations.map((conversation, index) => (
                         <div
-                          key={conversation.id}
+                          key={`conversation-${conversation.id || index}`}
                           className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
                         >
                           <div className="flex items-center justify-between mb-2">

@@ -74,6 +74,10 @@ serve(async (req) => {
       throw new Error('Message is required');
     }
 
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     console.log('📥 Request received:', { 
       message: message.substring(0, 100), 
       imagesCount: images?.length || 0
