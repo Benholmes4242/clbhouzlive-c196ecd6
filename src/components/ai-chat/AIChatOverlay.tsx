@@ -404,7 +404,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       onScroll={(e) => e.stopPropagation()}
     >
       <div 
-        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        className="w-full max-w-md flex flex-col overflow-hidden animate-fade-in"
         style={{
           height: 'min(72vh, 576px)', // Reduced by 20% from 720px
           background: 'rgba(246, 247, 246, 0.85)',
