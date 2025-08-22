@@ -135,7 +135,14 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   };
 
   const saveCurrentSession = async () => {
+    console.log('💾 Attempting to save session:', {
+      hasSession: !!currentSession,
+      messageCount: currentSession?.messages.length || 0,
+      sessionId: currentSession?.id
+    });
+    
     if (!currentSession || currentSession.messages.length === 0) {
+      console.log('⚠️ No session to save or no messages');
       return;
     }
 
@@ -147,11 +154,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       const { data, error } = await supabase
         .from('conversations')
         .upsert({
+          id: currentSession.id,
           user_id: user.id,
           title: currentSession.customTitle || currentSession.title,
           messages: currentSession.messages as any
-        }, {
-          onConflict: 'user_id,title'
         })
         .select()
         .single();
@@ -161,19 +167,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         return;
       }
 
-      // Update local state
-      const existingIndex = conversations.findIndex(conv => conv.id === currentSession.id);
-      
-      let updatedConversations: ConversationSession[];
-      if (existingIndex >= 0) {
-        updatedConversations = [...conversations];
-        updatedConversations[existingIndex] = currentSession;
-      } else {
-        updatedConversations = [currentSession, ...conversations];
-      }
+      console.log('✅ Conversation saved successfully:', data);
 
-      updatedConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
-      setConversations(updatedConversations);
+      // Reload conversations from Supabase to ensure sync
+      await loadConversations();
       
     } catch (error) {
       console.error('Error saving session:', error);
