@@ -496,13 +496,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         id: conv.id,
         title: conv.title || "New conversation",
         customTitle: conv.title,
-        messages: conv.messages.map((msg, index) => ({
-          id: `${conv.id}-${index}`,
-          type: msg.type,
-          content: msg.content,
-          timestamp: new Date(msg.timestamp),
-          metadata: msg.metadata
-        })),
+         messages: conv.messages.map((msg, index) => ({
+           id: `${conv.id}-${index}`,
+           type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+           content: msg.content || '',
+           timestamp: new Date(msg.timestamp),
+           metadata: msg.metadata
+         })),
         timestamp: new Date(conv.lastActivityAt),
         createdAt: new Date(conv.createdAt),
         lastActivityAt: new Date(conv.lastActivityAt),
@@ -532,13 +532,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               id: conv.id,
               title: conv.title || "New conversation",
               customTitle: conv.title,
-              messages: messages.map((msg, index) => ({
-                id: `${conv.id}-${index}`,
-                type: msg.role as 'user' | 'ai',
-                content: msg.content,
-                timestamp: new Date(msg.timestamp || conv.created_at),
-                metadata: msg.metadata
-              })),
+               messages: messages.map((msg, index) => ({
+                 id: `${conv.id}-${index}`,
+                 type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+                 content: msg.content || '',
+                 timestamp: new Date(msg.timestamp || conv.created_at),
+                 metadata: msg.metadata
+               })),
               timestamp: new Date(conv.updated_at),
               createdAt: new Date(conv.created_at),
               lastActivityAt: new Date(conv.updated_at),
