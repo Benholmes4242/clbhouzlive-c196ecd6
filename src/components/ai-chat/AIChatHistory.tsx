@@ -83,7 +83,7 @@ const VideoPlayerDialog: React.FC<{
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl z-[10000]" style={{ zIndex: 10000 }}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Play className="h-4 w-4" />
