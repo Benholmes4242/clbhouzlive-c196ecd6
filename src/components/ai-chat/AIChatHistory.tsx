@@ -752,7 +752,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl h-[85vh] p-0">
+      <DialogContent className="max-w-4xl w-[90vw] h-[80vh] p-0">
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-lg font-semibold">Echo History</DialogTitle>
         </DialogHeader>
