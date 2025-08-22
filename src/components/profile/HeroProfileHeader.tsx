@@ -55,6 +55,7 @@ import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
 
 interface Course {
   id: string;
@@ -121,6 +122,9 @@ const HeroProfileHeader = ({
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const isMobile = useIsMobile();
+
+  // Analytics tracking
+  const { trackScrollDepth } = useProfileAnalytics(profile?.id);
 
   // Immersive profile functionality
   const {
@@ -360,6 +364,20 @@ const HeroProfileHeader = ({
 
     return () => clearTimeout(timer);
   }, [isProfileCardInView]);
+
+  // Scroll depth tracking for mobile header
+  useEffect(() => {
+    if (!isMobile || !profile?.id) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const headerHeight = window.innerHeight * 0.72; // 72vh header height
+      trackScrollDepth(scrollTop, headerHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobile, profile?.id, trackScrollDepth]);
   const handleMorphTransition = () => {
     closeImmersive();
     // Smooth scroll to trigger sticky header
@@ -574,9 +592,9 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative">
+        <div className="relative -mt-16">
           {/* Header media area (full-bleed, 72vh, passes under main header) */}
-          <div ref={profileCardRef} className="relative w-full overflow-hidden -mt-16 pt-16" style={{ height: '72vh' }}>
+          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '72vh' }}>
             {/* Loading state with neutral color */}
             <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             

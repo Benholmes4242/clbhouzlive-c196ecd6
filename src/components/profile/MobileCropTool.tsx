@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
 
 interface CropData {
   x: number; // percentage
@@ -15,14 +16,18 @@ interface MobileCropToolProps {
   initialCrop?: CropData;
   onSave: (cropData: CropData) => void;
   onCancel: () => void;
+  userId?: string;
 }
 
 const MobileCropTool: React.FC<MobileCropToolProps> = ({
   imageUrl,
   initialCrop,
   onSave,
-  onCancel
+  onCancel,
+  userId
 }) => {
+  const { toast } = useToast();
+  const { trackMobileCropOpened, trackMobileCropSaved } = useProfileAnalytics(userId);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const cropBoxRef = useRef<HTMLDivElement>(null);
@@ -65,12 +70,16 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     setCropData({ x, y, width, height });
   }, [calculateCropDimensions]);
 
-  // Initialize crop on image load
+  // Initialize crop on image load and track analytics
   useEffect(() => {
     if (imageLoaded && !initialCrop) {
       resetCrop();
     }
-  }, [imageLoaded, initialCrop, resetCrop]);
+    // Track that mobile crop tool was opened
+    if (imageLoaded) {
+      trackMobileCropOpened();
+    }
+  }, [imageLoaded, initialCrop, resetCrop, trackMobileCropOpened]);
 
   // Handle mouse/touch events for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -125,6 +134,8 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   const handleSave = () => {
+    // Track mobile crop save with crop data
+    trackMobileCropSaved(cropData);
     onSave(cropData);
   };
 

@@ -365,6 +365,7 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           initialCrop={mobileCropData}
           onSave={handleMobileCropSave}
           onCancel={() => setShowMobileCrop(false)}
+          userId={userId}
         />
       )}
     </div>
