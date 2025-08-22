@@ -29,8 +29,13 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   const sessionStartTimeRef = useRef<Date | null>(null);
   const lastOpenStateRef = useRef<boolean>(false);
 
-  // Initialize conversation session on modal open
+  // Initialize conversation session on modal open - only when isModalOpen is true
   useEffect(() => {
+    // Skip session management if isModalOpen is explicitly false
+    if (isModalOpen === false) {
+      return;
+    }
+    
     if (isModalOpen && !lastOpenStateRef.current) {
       // Modal just opened - start new session
       startNewSession();

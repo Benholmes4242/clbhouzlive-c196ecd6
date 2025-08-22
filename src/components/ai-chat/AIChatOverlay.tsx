@@ -48,10 +48,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Conversation session management
+  // Conversation session management - for history only, don't restore messages in modal
   const conversationSession = useConversationSession({
     storageKey: 'clbhouz_ai_chat',
-    isModalOpen: isOpen
+    isModalOpen: false // Always false to prevent auto-restoration of messages
   });
 
   async function handleVoiceNote(transcribedText: string) {
@@ -156,6 +156,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Ensure fresh start when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMessages([]);
+      setInputValue('');
+      setActiveTab('chat');
+    }
+  }, [isOpen]);
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -233,16 +242,27 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Conversation session management 
+  // Save conversation to history only, don't persist in modal
   const saveCurrentChatToHistory = () => {
-    // Messages are automatically saved to session via useEffect
+    if (messages.length > 0) {
+      // Manually start session for history saving
+      conversationSession.startNewConversationManually();
+      
+      // Add all messages to the session
+      messages.forEach(message => {
+        conversationSession.addMessage(message);
+      });
+      
+      // Save the session to history
+      conversationSession.saveCurrentSession();
+    }
   };
 
   const handleClose = () => {
     // Save current chat to history before closing
     saveCurrentChatToHistory();
     
-    // Reset chat for new session
+    // Always reset chat for fresh session - don't restore previous messages
     setMessages([]);
     setInputValue('');
     setActiveTab('chat');
@@ -262,7 +282,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    conversationSession.addMessage(userMessage); // Add to session
+    // Don't add to session during conversation - only save to history when closing
     setInputValue('');
     setIsLoading(true);
 
@@ -310,7 +330,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
-      conversationSession.addMessage(aiMessage); // Add to session
+      // Don't add to session during conversation - only save to history when closing
 
     } catch (error) {
       console.error('Error sending message:', error);
