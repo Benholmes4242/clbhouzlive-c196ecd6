@@ -402,22 +402,13 @@ const SwingAnalysisCard: React.FC<{
         {isExpanded && (
           <div className="border-t border-white/30 bg-white/30 animate-accordion-down">
             {/* Sticky Mini Header */}
-            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-white/20 px-4 py-2 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-white/20 px-4 py-2 z-10">
               <div className="flex items-center gap-2">
                 <h4 className="font-medium text-sm">{analysis.title || analysis.save_card}</h4>
                 <span className="text-xs text-muted-foreground">
                   {analysis.timestamp.toLocaleDateString()} at {analysis.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-               <Button
-                 variant="ghost"
-                 size="sm"
-                 onClick={onToggleExpand}
-                 className="h-7 px-2 text-xs"
-                 title="Minimize"
-               >
-                 <Minimize2 className="h-3 w-3" />
-               </Button>
             </div>
 
             <div className="p-4 space-y-4">
