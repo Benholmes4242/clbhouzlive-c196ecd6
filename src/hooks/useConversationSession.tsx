@@ -163,12 +163,9 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     console.log('✅ Session updated, now has', updatedSession.messages.length, 'messages');
     setCurrentSession(updatedSession);
 
-    // Auto-save after each AI message to ensure both user and AI messages are persisted
-    if (message.type === 'ai') {
-      console.log('🤖 AI message added, auto-saving session...');
-      // Save the updated session immediately
-      await saveSessionToDB(updatedSession);
-    }
+    // Auto-save after EVERY message to ensure both user and AI messages are persisted
+    console.log('💾 Auto-saving session after message:', message.type);
+    await saveSessionToDB(updatedSession);
   };
 
   const saveSessionToDB = async (session: ConversationSession) => {
