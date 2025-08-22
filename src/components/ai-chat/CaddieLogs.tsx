@@ -70,7 +70,13 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
         }, (payload) => {
           console.log('New caddie log received:', payload);
           const newLog = payload.new as CaddieLog;
-          setLogs(currentLogs => [newLog, ...currentLogs]);
+          setLogs(currentLogs => {
+            // Check if log already exists to prevent duplicates
+            if (currentLogs.some(log => log.id === newLog.id)) {
+              return currentLogs;
+            }
+            return [newLog, ...currentLogs];
+          });
         })
         .on('postgres_changes', {
           event: 'UPDATE',
@@ -96,7 +102,9 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
             currentLogs.filter(log => log.id !== deletedLog.id)
           );
         })
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Caddie logs subscription status:', status);
+        });
     };
 
     setupSubscription();
