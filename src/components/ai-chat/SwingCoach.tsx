@@ -308,14 +308,20 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         
         const duration = video.duration;
         const framePositions = [
-          0.1, // Address (P1)
-          0.2, // Takeaway (P2) 
-          0.35, // Shaft parallel back (P3)
-          0.5, // Top (P4)
-          0.65, // Downswing parallel (P5)
-          0.8, // Impact (P6)
-          0.9, // Early release (P7)
-          0.95 // Finish (P9)
+          0.05, // Setup/Address (P1)
+          0.15, // Early takeaway 
+          0.25, // Mid takeaway (P2)
+          0.35, // Late takeaway
+          0.45, // Shaft parallel back (P3)
+          0.55, // Three-quarter back
+          0.65, // Top of backswing (P4)
+          0.72, // Early downswing
+          0.78, // Mid downswing (P5)
+          0.84, // Pre-impact
+          0.88, // Impact (P6)
+          0.92, // Early follow-through (P7)
+          0.96, // Mid follow-through
+          0.98  // Finish (P8/P9)
         ].map(pos => pos * duration);
 
         let frameIndex = 0;
