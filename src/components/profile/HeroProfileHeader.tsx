@@ -650,19 +650,21 @@ const HeroProfileHeader = ({
               </p>
             )}
             
-            {/* Meta info with Home Club and Handicap centered */}
-            <div className="flex flex-col items-center space-y-4">
-              <div className="text-center">
-                <p className="text-xs text-gray-500 mb-1">Home Club</p>
-                <p className="text-sm font-medium text-gray-900">
-                  {profile?.home_club || 'No Club'}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 mb-1">Handicap</p>
-                <p className="text-sm font-semibold text-gray-900">
-                  {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
-                </p>
+            {/* Meta info with Home Club and Handicap in same row, centered */}
+            <div className="flex justify-center">
+              <div className="flex items-center gap-8">
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-1">Home Club</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {profile?.home_club || 'No Club'}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-1">Handicap</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
+                  </p>
+                </div>
               </div>
             </div>
 
