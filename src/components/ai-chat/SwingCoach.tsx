@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import ChatMessageComponent from './ChatMessage';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface SwingAnalysis {
   id: string;
@@ -74,9 +75,14 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { uploadVideo, uploading } = useCloudflareStream();
+
+  // Auto-scroll for messages
+  const messagesAutoScroll = useAutoScroll({
+    dependencies: [messages],
+    enabled: true
+  });
   
   // Helper functions for Cloudflare Stream URLs
   const getPlaybackUrl = (videoId: string): string => {
@@ -126,20 +132,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     return () => window.removeEventListener('triggerSwingAnalysis', handleSwingAnalysis);
   }, [uploadedVideo]);
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
-      }
-    }, 100);
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const detectGolfClub = (text: string): string | null => {
     const golfClubPatterns = [
@@ -612,7 +604,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
   return (
     <div className="h-full min-h-0">
-      <div className="px-6 py-5">
+      <ScrollArea 
+        ref={messagesAutoScroll.scrollAreaRef}
+        className="h-full"
+        style={{ overscrollBehavior: 'contain' }}
+      >
+        <div className="px-6 py-5">
         {messages.length === 0 && !uploadedVideo ? (
           <div className="text-center text-muted-foreground">
             <h3 className="text-lg font-medium mb-2">
@@ -768,7 +765,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             Currently logging notes for {currentGolfClub}
           </div>
         )}
-      </div>
+        </div>
+      </ScrollArea>
 
       <input
         ref={fileInputRef}

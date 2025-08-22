@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface SavedInsight {
   id: string;
@@ -422,6 +423,22 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
   const [activeTab, setActiveTab] = useState('chat');
   const { toast } = useToast();
+
+  // Auto-scroll hooks for each tab
+  const chatAutoScroll = useAutoScroll({
+    dependencies: [conversations, expandedConversation],
+    enabled: activeTab === 'chat'
+  });
+  
+  const logsAutoScroll = useAutoScroll({
+    dependencies: [caddieLogs],
+    enabled: activeTab === 'logs'
+  });
+  
+  const swingAutoScroll = useAutoScroll({
+    dependencies: [swingAnalyses],
+    enabled: activeTab === 'swing-coach'
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -960,12 +977,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           </div>
 
           {/* Single scrollable content area */}
-          <div 
-            className="flex-1 overflow-y-auto min-h-0"
-            style={{ overscrollBehavior: 'contain' }}
-          >
+          <div className="flex-1 min-h-0">
             <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-              <div className="h-full min-h-0">
+              <ScrollArea 
+                ref={chatAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
                 <div className="px-6 py-5">
                   {filteredConversations.length > 0 ? (
                     <div className="space-y-3">
@@ -1050,11 +1068,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     </div>
                   )}
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
 
             <TabsContent value="logs" className="h-full m-0" role="tabpanel" id="logs-panel" aria-labelledby="logs-tab">
-              <div className="h-full min-h-0">
+              <ScrollArea 
+                ref={logsAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
                 <div className="px-6 py-5">
                   {filteredCaddieLogs.length > 0 ? (
                     <div className="space-y-3">
@@ -1118,11 +1140,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     </div>
                   )}
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
 
             <TabsContent value="swing-coach" className="h-full m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
-              <div className="h-full min-h-0">
+              <ScrollArea 
+                ref={swingAutoScroll.scrollAreaRef}
+                className="h-full"
+                style={{ overscrollBehavior: 'contain' }}
+              >
                 <div className="px-6 py-5">
                   {swingAnalyses.length > 0 ? (
                     <div className="space-y-3">
@@ -1148,7 +1174,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     </div>
                   )}
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
           </div>
         </Tabs>
