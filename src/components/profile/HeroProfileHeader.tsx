@@ -631,42 +631,8 @@ const HeroProfileHeader = ({
             <div className="absolute inset-0 bg-black/10" />
           </div>
           
-          {/* Profile content on white background below media */}
-          <div className="bg-white px-4 py-6 space-y-6">
-            {/* User name (immediately below header media) */}
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {profile?.display_name || 'User'}
-              </h1>
-              {profile?.username && (
-                <p className="text-gray-600 text-base">@{profile.username}</p>
-              )}
-            </div>
-            
-            {/* Bio section */}
-            {profile?.bio && (
-              <p className="text-gray-700 text-base leading-relaxed text-center">
-                {profile.bio}
-              </p>
-            )}
-            
-            {/* Meta row with Home Club (left) and Handicap (right) */}
-            <div className="flex justify-between items-center">
-              <div className="text-left">
-                <p className="text-xs text-gray-500 mb-1">Home Club</p>
-                <p className="text-sm font-medium text-gray-900">
-                  {profile?.home_club || 'No Club'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-gray-500 mb-1">Handicap</p>
-                <p className="text-sm font-semibold text-gray-900">
-                  {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
-                </p>
-              </div>
-            </div>
-
-            {/* Three buttons stacked vertically (only for own profile) */}
+          {/* Three buttons stacked vertically (only for own profile) - moved from white card */}
+          <div className="bg-white px-4 py-6">
             {isOwnProfile && (
               <div className="space-y-3">
                 <Button
