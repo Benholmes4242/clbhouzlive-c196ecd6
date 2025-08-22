@@ -32,20 +32,20 @@ async function searchWeb(query: string): Promise<string> {
         messages: [
           {
             role: 'system',
-            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances. Always specify the current year and provide the most recent data available.'
+            content: 'You are a helpful assistant that provides accurate, up-to-date information about golf and sports. Focus on recent events and provide specific details with dates when possible.'
           },
           {
             role: 'user',
             content: query
           }
         ],
+        max_tokens: 1000,
         temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 1000,
         return_images: false,
         return_related_questions: false,
-        search_domain_filter: [],
-        search_recency_filter: 'month',
+        search_domain_filter: ["pgatour.com", "espn.com", "golf.com"],
+        search_recency_filter: "month",
         frequency_penalty: 1,
         presence_penalty: 0
       }),
@@ -61,6 +61,7 @@ async function searchWeb(query: string): Promise<string> {
 
     const data = await response.json();
     console.log('✅ Perplexity API success');
+    console.log('📊 Full response:', JSON.stringify(data, null, 2));
     
     const result = data.choices?.[0]?.message?.content || 'No current information found.';
     console.log('📊 Search result length:', result.length);
