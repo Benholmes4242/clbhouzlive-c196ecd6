@@ -348,8 +348,42 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadChatConversations = async () => {
-    // Mock data for now - replace with actual database calls when tables exist
-    setConversations([]);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', user.user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      const conversationsWithMessages = data?.map(conv => {
+        const messages = (conv.messages as any[]) || [];
+        return {
+          id: conv.id,
+          title: conv.title || "New conversation",
+          customTitle: conv.title,
+          messages: messages.map((msg, index) => ({
+            id: `${conv.id}-${index}`,
+            type: msg.role as 'user' | 'ai',
+            content: msg.content,
+            timestamp: new Date(msg.timestamp || conv.created_at),
+            metadata: msg.metadata
+          })),
+          timestamp: new Date(conv.updated_at),
+          createdAt: new Date(conv.created_at),
+          lastActivityAt: new Date(conv.updated_at),
+          messageCount: messages.length
+        };
+      }) || [];
+
+      setConversations(conversationsWithMessages);
+    } catch (error) {
+      console.error('Error loading chat conversations:', error);
+    }
   };
 
   const loadCaddieLogs = async () => {
@@ -371,14 +405,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadSwingAnalyses = async () => {
-    // Mock data for now - replace with actual database calls when tables exist
+    // No swing analyses table exists yet - using empty data
     setSwingAnalyses([]);
   };
 
   const deleteConversation = async (conversationId: string) => {
     try {
       const { error } = await supabase
-        .from('chat_conversations')
+        .from('conversations')
         .delete()
         .eq('id', conversationId);
 
@@ -424,27 +458,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const deleteSwingAnalysis = async (analysisId: string) => {
-    try {
-      const { error } = await supabase
-        .from('swing_analyses')
-        .delete()
-        .eq('id', analysisId);
-
-      if (error) throw error;
-
-      setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
-      toast({
-        title: "Analysis deleted",
-        description: "The swing analysis has been removed from your history."
-      });
-    } catch (error) {
-      console.error('Error deleting swing analysis:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete analysis. Please try again.",
-        variant: "destructive"
-      });
-    }
+    // No swing analyses table exists yet
+    setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
+    toast({
+      title: "Analysis deleted",
+      description: "The swing analysis has been removed from your history."
+    });
   };
 
   // Filter conversations based on search
