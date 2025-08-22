@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CropData {
   x: number; // percentage

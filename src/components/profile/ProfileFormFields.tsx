@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Crop } from "lucide-react";
 import HandicapEditModal from "./HandicapEditModal";
 import MobileCropTool from "./MobileCropTool";
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfileFormData {
   displayName: string;
@@ -63,6 +64,7 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
 }) => {
   // All profiles are now personal profiles
   const isPersonalProfile = true;
+  const { toast } = useToast();
   const [showMobileCrop, setShowMobileCrop] = useState(false);
   const [mobileCropData, setMobileCropData] = useState(() => {
     if (profile?.mobile_crop_data) {
@@ -83,8 +85,27 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   const handleMobileCropSave = (cropData: any) => {
     setMobileCropData(cropData);
     setShowMobileCrop(false);
+    
+    // Show success message
+    toast({
+      title: "Mobile crop saved",
+      description: "Your mobile profile photo crop has been updated successfully.",
+    });
+    
     // TODO: Save crop data to profile
     console.log('Saving mobile crop data:', cropData);
+  };
+
+  const handleMobileCropClick = () => {
+    const imageUrl = getCurrentImageUrl();
+    if (!imageUrl) {
+      toast({
+        title: "Upload a profile photo first under Desktop profile photo.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowMobileCrop(true);
   };
 
   const getCurrentImageUrl = () => {
@@ -184,7 +205,7 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setShowMobileCrop(true)}
+                  onClick={handleMobileCropClick}
                   className="gap-2"
                 >
                   <Crop className="w-4 h-4" />
