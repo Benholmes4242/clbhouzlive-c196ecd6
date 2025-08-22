@@ -1357,56 +1357,54 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                key={log.id}
                                className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
                              >
-                               {/* Collapsed Content */}
-                               <div className="flex-1 flex flex-col">
-                                 {/* Header Row */}
-                                 <div className="flex items-start justify-between mb-2">
-                                   <h3 className="font-semibold text-sm text-gray-900 flex-shrink-0">
-                                     Caddie Log
-                                   </h3>
-                                   <span className="text-xs text-gray-500 flex-shrink-0">
-                                     {new Date(log.created_at).toLocaleDateString()}
-                                   </span>
-                                 </div>
+                                {/* Collapsed Content */}
+                                <div className="flex-1 flex flex-col">
+                                  {/* Header Row */}
+                                  <div className="flex items-start justify-between mb-2">
+                                    <span className="font-semibold text-sm text-gray-900 flex-shrink-0">
+                                      {new Date(log.created_at).toLocaleDateString()}
+                                    </span>
+                                    {log.location_name && (
+                                      <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200 flex-shrink-0">
+                                        {log.location_name}
+                                      </div>
+                                    )}
+                                  </div>
 
-                                 {/* Body Preview */}
-                                 <div className="flex-1 mb-3">
-                                   <p className="text-sm text-gray-600 line-clamp-4 sm:line-clamp-5">
-                                     {isExpanded ? log.content : contentPreview}
-                                   </p>
-                                 </div>
-                                 
-                                 {/* Action Row */}
-                                 <div className="flex justify-between items-center">
-                                   <div className="flex items-center gap-2">
-                                     <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
-                                       Caddie Log
-                                     </div>
-                                   </div>
-                                   <div className="flex items-center gap-1">
-                                     {hasMoreContent && (
-                                       <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
-                                         className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
-                                         title={isExpanded ? "Minimize" : "View details"}
-                                       >
-                                         {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
-                                       </Button>
-                                     )}
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => deleteCaddieLog(log.id)}
-                                       className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
-                                       aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
-                                     >
-                                       <Trash2 className="h-3 w-3" />
-                                     </Button>
-                                   </div>
+                                  {/* Body Preview */}
+                                  <div className="flex-1 mb-3 overflow-hidden">
+                                    <p className="text-sm text-gray-600 line-clamp-4 sm:line-clamp-5 break-words">
+                                      {log.content}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Action Row */}
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
+                                        Caddie Log
+                                      </div>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setExpandedCaddieLogId(isExpanded ? null : log.id)}
+                                        className="h-7 px-2 text-xs text-gray-400 hover:text-gray-600"
+                                        title={isExpanded ? "Minimize" : "View details"}
+                                      >
+                                        {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                                      </Button>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => deleteCaddieLog(log.id)}
+                                      className="h-7 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-100"
+                                      aria-label={`Delete caddie log from ${new Date(log.created_at).toLocaleDateString()}`}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
 
                               {/* Expanded Content */}
                               {isExpanded && (
