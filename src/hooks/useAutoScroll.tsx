@@ -5,19 +5,21 @@ interface UseAutoScrollOptions {
   enabled?: boolean;
   behavior?: ScrollBehavior;
   threshold?: number;
+  direction?: 'top' | 'bottom'; // New: specify scroll direction
 }
 
 export const useAutoScroll = ({
   dependencies,
   enabled = true,
   behavior = 'smooth',
-  threshold = 100
+  threshold = 100,
+  direction = 'bottom' // Default to bottom for backward compatibility
 }: UseAutoScrollOptions) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [userHasScrolledUp, setUserHasScrolledUp] = useState(false);
-  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [userHasScrolledAway, setUserHasScrolledAway] = useState(false);
+  const [isAtTarget, setIsAtTarget] = useState(true);
 
-  // Check if user is near bottom of scroll area
+  // Check if user is at the target position (top or bottom)
   const checkScrollPosition = useCallback(() => {
     if (!scrollAreaRef.current) return;
     
@@ -25,33 +27,46 @@ export const useAutoScroll = ({
     if (!scrollContainer) return;
 
     const { scrollTop, scrollHeight, clientHeight } = scrollContainer as HTMLElement;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight <= threshold;
     
-    setIsAtBottom(isNearBottom);
-    setUserHasScrolledUp(!isNearBottom);
-  }, [threshold]);
+    let isAtTargetPosition: boolean;
+    if (direction === 'top') {
+      // For top direction, check if we're near the top
+      isAtTargetPosition = scrollTop <= threshold;
+    } else {
+      // For bottom direction, check if we're near the bottom
+      isAtTargetPosition = scrollHeight - scrollTop - clientHeight <= threshold;
+    }
+    
+    setIsAtTarget(isAtTargetPosition);
+    setUserHasScrolledAway(!isAtTargetPosition);
+  }, [threshold, direction]);
 
-  // Scroll to bottom function
-  const scrollToBottom = useCallback(() => {
+  // Scroll to target position function
+  const scrollToTarget = useCallback(() => {
     if (!scrollAreaRef.current || !enabled) return;
     
     setTimeout(() => {
       const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollContainer) {
-        scrollContainer.scrollTo({
-          top: scrollContainer.scrollHeight,
-          behavior
-        });
-        setUserHasScrolledUp(false);
-        setIsAtBottom(true);
+        const scrollOptions: ScrollToOptions = { behavior };
+        
+        if (direction === 'top') {
+          scrollOptions.top = 0;
+        } else {
+          scrollOptions.top = scrollContainer.scrollHeight;
+        }
+        
+        scrollContainer.scrollTo(scrollOptions);
+        setUserHasScrolledAway(false);
+        setIsAtTarget(true);
       }
     }, 100);
-  }, [enabled, behavior]);
+  }, [enabled, behavior, direction]);
 
-  // Auto-scroll when dependencies change (new messages)
+  // Auto-scroll when dependencies change (new content)
   useEffect(() => {
-    if (!userHasScrolledUp && enabled) {
-      scrollToBottom();
+    if (!userHasScrolledAway && enabled) {
+      scrollToTarget();
     }
   }, dependencies);
 
@@ -76,16 +91,17 @@ export const useAutoScroll = ({
     };
   }, [checkScrollPosition]);
 
-  // Force scroll to bottom (for manual trigger)
-  const forceScrollToBottom = useCallback(() => {
-    setUserHasScrolledUp(false);
-    scrollToBottom();
-  }, [scrollToBottom]);
+  // Force scroll to target (for manual trigger)
+  const forceScrollToTarget = useCallback(() => {
+    setUserHasScrolledAway(false);
+    scrollToTarget();
+  }, [scrollToTarget]);
 
   return {
     scrollAreaRef,
-    scrollToBottom: forceScrollToBottom,
-    isAtBottom,
-    userHasScrolledUp
+    scrollToTarget: forceScrollToTarget,
+    isAtTarget,
+    userHasScrolledAway,
+    direction
   };
 };

@@ -81,7 +81,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   // Auto-scroll for messages
   const messagesAutoScroll = useAutoScroll({
     dependencies: [messages],
-    enabled: true
+    enabled: true,
+    direction: 'bottom' // Live chat messages are added at the bottom
   });
   
   // Helper functions for Cloudflare Stream URLs

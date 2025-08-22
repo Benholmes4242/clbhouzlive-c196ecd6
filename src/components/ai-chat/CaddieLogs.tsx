@@ -50,7 +50,8 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
   // Auto-scroll for logs
   const logsAutoScroll = useAutoScroll({
     dependencies: [logs],
-    enabled: true
+    enabled: true,
+    direction: 'top' // Latest logs are at the top (ordered by created_at desc)
   });
 
   useEffect(() => {

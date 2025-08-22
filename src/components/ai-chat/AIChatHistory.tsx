@@ -427,17 +427,20 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   // Auto-scroll hooks for each tab
   const chatAutoScroll = useAutoScroll({
     dependencies: [conversations, expandedConversation],
-    enabled: activeTab === 'chat'
+    enabled: activeTab === 'chat',
+    direction: 'top' // Latest conversations are at the top
   });
   
   const logsAutoScroll = useAutoScroll({
     dependencies: [caddieLogs],
-    enabled: activeTab === 'logs'
+    enabled: activeTab === 'logs',
+    direction: 'top' // Latest logs are at the top
   });
   
   const swingAutoScroll = useAutoScroll({
     dependencies: [swingAnalyses],
-    enabled: activeTab === 'swing-coach'
+    enabled: activeTab === 'swing-coach',
+    direction: 'top' // Latest analyses are at the top
   });
 
   useEffect(() => {
