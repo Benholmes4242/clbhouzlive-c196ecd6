@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
 import UniversalProfileTabs from './UniversalProfileTabs';
+import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -81,6 +82,15 @@ interface UserProfile {
   eg_app_connected?: boolean;
   user_type?: string;
   is_public?: boolean;
+  // Mobile and desktop crop fields
+  mobile_crop_x?: number;
+  mobile_crop_y?: number;
+  mobile_crop_width?: number;
+  mobile_crop_height?: number;
+  desktop_crop_x?: number;
+  desktop_crop_y?: number;
+  desktop_crop_width?: number;
+  desktop_crop_height?: number;
 }
 
 interface AchievementRing {
@@ -565,13 +575,16 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative">
-          {/* Full-bleed profile photo for mobile */}
-          <div ref={profileCardRef} className="relative w-full h-80 overflow-hidden">
+          {/* Full-bleed profile photo for mobile - passes under header */}
+          <div ref={profileCardRef} className="relative w-full h-80 overflow-hidden -mt-16 pt-16">
             <img
               src={profile?.profile_photo_url || '/placeholder.svg'}
               alt={profile?.display_name || 'Profile'}
               className="w-full h-full object-cover"
-              style={{ objectPosition: 'center' }} // Mobile crop positioning
+              style={{ 
+                objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning
+                objectFit: 'cover'
+              }}
             />
             {/* Subtle overlay for better text contrast */}
             <div className="absolute inset-0 bg-black/10" />

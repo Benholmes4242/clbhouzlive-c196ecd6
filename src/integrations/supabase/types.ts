@@ -1255,6 +1255,10 @@ export type Database = {
           contact_person_name: string | null
           cover_photo_url: string | null
           created_at: string | null
+          desktop_crop_height: number | null
+          desktop_crop_width: number | null
+          desktop_crop_x: number | null
+          desktop_crop_y: number | null
           display_name: string | null
           eg_app_connected: boolean | null
           eg_handicap_index: number | null
@@ -1271,6 +1275,10 @@ export type Database = {
           is_public: boolean | null
           location: string | null
           logo_url: string | null
+          mobile_crop_height: number | null
+          mobile_crop_width: number | null
+          mobile_crop_x: number | null
+          mobile_crop_y: number | null
           notification_preferences: Json | null
           pending_email: string | null
           phone: string | null
@@ -1297,6 +1305,10 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          desktop_crop_height?: number | null
+          desktop_crop_width?: number | null
+          desktop_crop_x?: number | null
+          desktop_crop_y?: number | null
           display_name?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
@@ -1313,6 +1325,10 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mobile_crop_height?: number | null
+          mobile_crop_width?: number | null
+          mobile_crop_x?: number | null
+          mobile_crop_y?: number | null
           notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
@@ -1339,6 +1355,10 @@ export type Database = {
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
+          desktop_crop_height?: number | null
+          desktop_crop_width?: number | null
+          desktop_crop_x?: number | null
+          desktop_crop_y?: number | null
           display_name?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
@@ -1355,6 +1375,10 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mobile_crop_height?: number | null
+          mobile_crop_width?: number | null
+          mobile_crop_x?: number | null
+          mobile_crop_y?: number | null
           notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
