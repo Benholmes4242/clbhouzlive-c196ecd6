@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
+import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -203,27 +204,21 @@ const SwingAnalysisCard: React.FC<{
         <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
           <div className="space-y-4 max-h-80 overflow-y-auto">
             {/* Video Section */}
-            {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
-              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                {isVideoLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                )}
-                 <video
+             {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
+               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                 {isVideoLoading && (
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div>
+                 )}
+                 <FeedVideoPlayer
                    src={analysis.videoUrl || analysis.videoSrc}
-                   poster={analysis.videoThumbnail || analysis.videoPoster}
-                   controls
-                   className="w-full h-full object-cover"
-                   onLoadStart={() => setIsVideoLoading(true)}
-                   onCanPlay={() => setIsVideoLoading(false)}
-                   onError={(e) => {
-                     setIsVideoLoading(false);
-                     console.log('❌ Video load error for:', analysis.videoUrl || analysis.videoSrc, e);
-                     console.log('📊 Video element error details:', e.currentTarget.error);
-                   }}
+                   className="w-full h-full"
+                   muted={false}
+                   loop={false}
+                   playsInline={true}
                  />
-              </div>
+               </div>
             ) : analysis.videoThumbnail ? (
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
                 <img 
