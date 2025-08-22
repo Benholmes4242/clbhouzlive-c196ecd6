@@ -528,13 +528,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         if (!error && data && data.length > 0) {
           const dbConversations = data.map(conv => {
             const messages = (conv.messages as any[]) || [];
+            console.log('DB Conversation messages for conv', conv.id, ':', messages);
             return {
               id: conv.id,
               title: conv.title || "New conversation",
               customTitle: conv.title,
                messages: messages.map((msg, index) => ({
                  id: `${conv.id}-${index}`,
-                 type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+                  type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
                  content: msg.content || '',
                  timestamp: new Date(msg.timestamp || conv.created_at),
                  metadata: msg.metadata
@@ -937,8 +938,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  {/* Header Row */}
                                    <div className="flex items-start justify-between mb-2">
                                      {(() => {
-                                       const firstUserMessage = conversation.messages.find(msg => msg.type === 'user')?.content;
-                                       const displayTitle = firstUserMessage || conversation.title || "New conversation";
+                                        const firstUserMessage = conversation.messages.find(msg => msg.type === 'user')?.content;
+                                        const displayTitle = firstUserMessage || conversation.title || "New conversation";
                                        return (
                                          <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={displayTitle}>
                                            {displayTitle}
@@ -1012,12 +1013,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                           {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id && (
                             <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
-                              <div className="space-y-3 max-h-80 overflow-y-auto">
-                                {conversation.messages.map((message) => (
-                                  <div
-                                    key={message.id}
-                                    className={`p-3 rounded-lg ${
-                                      message.type === 'user' 
+                               <div className="space-y-3 max-h-80 overflow-y-auto">
+                                 {conversation.messages.map((message) => (
+                                   <div
+                                     key={message.id}
+                                     className={`p-3 rounded-lg ${
+                                       message.type === 'user' 
                                         ? 'bg-orange-50 border-l-4 border-orange-500' 
                                         : 'bg-gray-50 border-l-4 border-gray-300'
                                     }`}
