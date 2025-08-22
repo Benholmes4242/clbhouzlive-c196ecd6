@@ -167,9 +167,21 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('❌ No authenticated user for save');
+        return;
+      }
+
+      console.log('👤 User authenticated, proceeding with save:', user.id);
 
       // Save to Supabase
+      console.log('💾 Calling Supabase upsert with data:', {
+        id: currentSession.id,
+        user_id: user.id,
+        title: currentSession.customTitle || currentSession.title,
+        messageCount: currentSession.messages.length
+      });
+
       const { data, error } = await supabase
         .from('conversations')
         .upsert({
@@ -182,17 +194,18 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         .single();
 
       if (error) {
-        console.error('Error saving conversation to Supabase:', error);
+        console.error('❌ Supabase upsert error:', error);
         return;
       }
 
-      console.log('✅ Conversation saved successfully:', data);
+      console.log('✅ Conversation saved successfully to DB:', data);
 
       // Reload conversations from Supabase to ensure sync
+      console.log('🔄 Reloading conversations after save...');
       await loadConversations();
       
     } catch (error) {
-      console.error('Error saving session:', error);
+      console.error('❌ Exception during save:', error);
     }
   };
 
