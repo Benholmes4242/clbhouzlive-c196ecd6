@@ -219,7 +219,8 @@ const SwingAnalysisCard: React.FC<{
                    onCanPlay={() => setIsVideoLoading(false)}
                    onError={(e) => {
                      setIsVideoLoading(false);
-                     console.log('❌ Video load error for:', analysis.videoUrl || analysis.videoSrc);
+                     console.log('❌ Video load error for:', analysis.videoUrl || analysis.videoSrc, e);
+                     console.log('📊 Video element error details:', e.currentTarget.error);
                    }}
                  />
               </div>
@@ -256,14 +257,16 @@ const SwingAnalysisCard: React.FC<{
                       key={index}
                       className={`p-3 rounded-lg ${
                         message.role === 'user' 
-                          ? 'bg-primary/10 border-l-4 border-primary' 
+                          ? 'bg-orange-50 border-l-4 border-orange-400' 
                           : 'bg-muted border-l-4 border-muted-foreground'
                       }`}
                     >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                          {message.role === 'user' ? 'You' : 'Echo Coach'}
-                        </div>
+                       <div className="flex justify-between items-start mb-2">
+                         <div className={`text-xs px-2 py-1 rounded-full ${
+                           message.role === 'user' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'
+                         }`}>
+                           {message.role === 'user' ? 'You' : 'Echo Coach'}
+                         </div>
                         {message.timestamp && (
                           <span className="text-xs text-muted-foreground">
                             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
