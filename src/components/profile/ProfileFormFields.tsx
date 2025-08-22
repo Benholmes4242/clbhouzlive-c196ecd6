@@ -83,35 +83,87 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
       </div>
 
       {/* Profile Photo Upload */}
-      <div className="space-y-2">
-        <Label htmlFor="profilePhoto">Profile Photo</Label>
-        <div className="flex items-center gap-4">
-          {(profile?.profile_photo_url || formData.profilePhoto) && (
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-              <img 
-                src={formData.profilePhoto ? URL.createObjectURL(formData.profilePhoto) : profile?.profile_photo_url} 
-                alt="Profile photo preview" 
-                className="w-full h-full object-cover"
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Profile Photo</Label>
+        
+        {/* Option 1: Desktop profile photo & crop */}
+        <div className="space-y-3 p-4 border rounded-lg">
+          <div className="space-y-1">
+            <Label htmlFor="profilePhoto" className="text-sm font-medium">
+              Desktop profile photo & crop
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              This controls how your profile photo appears on desktop.
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            {(profile?.profile_photo_url || formData.profilePhoto) && (
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                <img 
+                  src={formData.profilePhoto ? URL.createObjectURL(formData.profilePhoto) : profile?.profile_photo_url} 
+                  alt="Profile photo preview" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="flex-1">
+              <Input
+                id="profilePhoto"
+                type="file"
+                accept="image/*"
+                onChange={(e) => onFileChange('profilePhoto', e.target.files?.[0] || null)}
+                className="cursor-pointer"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Square images work best for profile photos
+              </p>
+              {formData.profilePhoto && (
+                <p className="text-xs text-green-600 mt-1">
+                  File selected: {formData.profilePhoto.name}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Option 2: Mobile profile photo crop */}
+        <div className="space-y-3 p-4 border rounded-lg">
+          <div className="space-y-1">
+            <Label className="text-sm font-medium">
+              Mobile profile photo crop
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              This controls which part of the same photo appears on your mobile profile.
+            </p>
+          </div>
+          
+          {(profile?.profile_photo_url || formData.profilePhoto) ? (
+            <div className="space-y-3">
+              <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                Mobile crop functionality coming soon. Your mobile profile will use the desktop crop for now.
+              </div>
+              {/* Preview of current mobile crop */}
+              <div className="flex items-center gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Current mobile crop:</p>
+                  <div className="w-16 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                    <img 
+                      src={formData.profilePhoto ? URL.createObjectURL(formData.profilePhoto) : profile?.profile_photo_url} 
+                      alt="Mobile crop preview" 
+                      className="w-full h-full object-cover"
+                      style={{ 
+                        objectPosition: profile?.mobile_crop_position || 'center center'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs text-amber-600 bg-amber-50 p-3 rounded">
+              Upload your profile photo in the Desktop option first.
             </div>
           )}
-          <div className="flex-1">
-            <Input
-              id="profilePhoto"
-              type="file"
-              accept="image/*"
-              onChange={(e) => onFileChange('profilePhoto', e.target.files?.[0] || null)}
-              className="cursor-pointer"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Square images work best for profile photos
-            </p>
-            {formData.profilePhoto && (
-              <p className="text-xs text-green-600 mt-1">
-                File selected: {formData.profilePhoto.name}
-              </p>
-            )}
-          </div>
         </div>
       </div>
 
