@@ -434,8 +434,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         }}
       >
       <div 
-        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        className="w-full flex flex-col overflow-hidden animate-scale-in"
         style={{
+          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
+          minWidth: '448px',
+          maxWidth: '448px',
           height: 'min(72vh, 576px)', // Reduced by 20% from 720px
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
