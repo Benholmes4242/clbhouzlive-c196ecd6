@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Search, Edit, Trash2, MapPin, Calendar, Mic, MicOff, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { channelManager } from '@/utils/supabaseChannelManager';
 
 interface CaddieLog {
   id: string;
@@ -47,6 +48,67 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
 
   useEffect(() => {
     fetchLogs();
+  }, []);
+
+  // Set up real-time subscription for caddie logs
+  useEffect(() => {
+    const setupSubscription = async () => {
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      if (!currentUser) return;
+
+      console.log('Setting up caddie logs subscription for user:', currentUser.id);
+      const channelName = `caddie_logs_${currentUser.id}`;
+      
+      const channel = channelManager.createChannel(channelName);
+      
+      channel
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'caddie_logs',
+          filter: `user_id=eq.${currentUser.id}`
+        }, (payload) => {
+          console.log('New caddie log received:', payload);
+          const newLog = payload.new as CaddieLog;
+          setLogs(currentLogs => [newLog, ...currentLogs]);
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'caddie_logs',
+          filter: `user_id=eq.${currentUser.id}`
+        }, (payload) => {
+          console.log('Caddie log updated:', payload);
+          const updatedLog = payload.new as CaddieLog;
+          setLogs(currentLogs => 
+            currentLogs.map(log => log.id === updatedLog.id ? updatedLog : log)
+          );
+        })
+        .on('postgres_changes', {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'caddie_logs',
+          filter: `user_id=eq.${currentUser.id}`
+        }, (payload) => {
+          console.log('Caddie log deleted:', payload);
+          const deletedLog = payload.old as CaddieLog;
+          setLogs(currentLogs => 
+            currentLogs.filter(log => log.id !== deletedLog.id)
+          );
+        })
+        .subscribe();
+    };
+
+    setupSubscription();
+
+    return () => {
+      console.log('Cleaning up caddie logs subscription');
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) {
+          channelManager.removeChannel(`caddie_logs_${user.id}`);
+        }
+      });
+    };
   }, []);
 
   const fetchLogs = async () => {
