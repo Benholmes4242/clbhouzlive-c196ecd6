@@ -98,6 +98,9 @@ serve(async (req) => {
     // Check if this looks like a request for current information
     const needsSearch = /(?:2024|2025|this year|last week|recent|current|latest|today|yesterday|this week|this season|won.*year|tournaments.*year|wins.*year|what.*shoot|scores?|results?|standings?|news|how many.*this|how many.*won)/i.test(message);
     
+    console.log('🔍 Search detection result:', needsSearch);
+    console.log('🔍 Message being tested:', message);
+    
     let finalResponse = '';
     
     // Priority 1: If we have images, use OpenAI for analysis
