@@ -95,30 +95,60 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
   };
 
-  // Load saved analyses from localStorage
+  // Load saved analyses from Supabase
   useEffect(() => {
-    const savedAnalyses = JSON.parse(localStorage.getItem('clbhouz_swing_analyses') || '[]');
-    const swingCoachHistory = JSON.parse(localStorage.getItem('clbhouz_swingcoach_history') || '[]');
-    
-    // Convert Swing Coach conversations to analysis format
-    const swingCoachAnalyses = swingCoachHistory
-      .filter((msg: any) => msg.type === 'ai' && msg.metadata)
-      .map((msg: any) => ({
-        id: msg.id,
-        save_card: msg.metadata.save_card || 'Swing Analysis',
-        tags: msg.metadata.tags || [],
-        category: msg.metadata.category || 'Swing',
-        content: msg.content,
-        videoThumbnail: msg.metadata.videoThumbnail,
-        videoId: msg.metadata.videoId,
-        videoUrl: msg.metadata.videoUrl,
-        timestamp: msg.timestamp,
-        conversation: msg.metadata.conversation || []
-      }));
-    
-    const allAnalyses = [...savedAnalyses, ...swingCoachAnalyses];
-    setAnalyses(allAnalyses);
+    loadAnalysesFromSupabase();
   }, []);
+
+  const loadAnalysesFromSupabase = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('pro_ai_analyses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading analyses:', error);
+        return;
+      }
+
+      if (data) {
+        const formattedAnalyses = data.map(analysis => {
+          const analysisResults = analysis.analysis_results as any;
+          const swingContextData = analysis.swing_context as string;
+          
+          let swingContext: any = {};
+          try {
+            if (swingContextData) {
+              swingContext = JSON.parse(swingContextData);
+            }
+          } catch (e) {
+            console.error('Error parsing swing context:', e);
+          }
+
+          return {
+            id: analysis.id,
+            save_card: analysisResults?.metadata?.save_card || 'Swing Analysis',
+            tags: analysisResults?.metadata?.tags || [],
+            category: analysisResults?.metadata?.category || 'Swing',
+            content: analysisResults?.aiResponse || '',
+            videoUrl: analysis.video_url,
+            timestamp: new Date(analysis.created_at),
+            conversation: swingContext.conversation || [],
+            videoId: swingContext.videoId || null,
+            videoThumbnail: swingContext.videoThumbnail || null
+          };
+        });
+        setAnalyses(formattedAnalyses);
+      }
+    } catch (error) {
+      console.error('Error loading analyses from Supabase:', error);
+    }
+  };
 
   useEffect(() => {
     const handleSwingAnalysis = (event: any) => {
@@ -201,18 +231,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
   const handleVoiceNoteComplete = useCallback((transcribedText: string) => {
     if (currentAnalysis) {
+      // Update current analysis with voice note
       const updatedAnalysis = {
         ...currentAnalysis,
         voiceNote: transcribedText
       };
       setCurrentAnalysis(updatedAnalysis);
-      
-      // Update saved analyses
-      const updatedAnalyses = analyses.map(analysis => 
-        analysis.id === currentAnalysis.id ? updatedAnalysis : analysis
-      );
-      setAnalyses(updatedAnalyses);
-      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
       
       toast({
         title: "Voice note added",
@@ -619,10 +643,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       console.log('✅ Swing analysis saved to database:', data);
 
-      // Also save to localStorage for immediate access
-      const updatedAnalyses = [...analyses, currentAnalysis];
-      setAnalyses(updatedAnalyses);
-      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
+      // Reload analyses from Supabase to get the latest data
+      await loadAnalysesFromSupabase();
       
       toast({
         title: "Saved to Swing Insights",
@@ -634,14 +656,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       console.error('Failed to save analysis:', error);
       toast({
         title: "Save failed",
-        description: "Failed to save analysis to database. It's still available locally.",
+        description: "Failed to save analysis to database.",
         variant: "destructive"
       });
-      
-      // Still save locally even if database save fails
-      const updatedAnalyses = [...analyses, currentAnalysis];
-      setAnalyses(updatedAnalyses);
-      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
     }
   };
 
@@ -651,14 +668,37 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     analyzeSwing();
   };
 
-  const deleteAnalysis = (analysisId: string) => {
-    const updatedAnalyses = analyses.filter(analysis => analysis.id !== analysisId);
-    setAnalyses(updatedAnalyses);
-    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
-    toast({
-      title: "Analysis deleted",
-      description: "The swing analysis has been removed",
-    });
+  const deleteAnalysis = async (analysisId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .delete()
+        .eq('id', analysisId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error deleting analysis:', error);
+        toast({
+          title: "Delete failed",
+          description: "Failed to delete analysis from database.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Reload analyses from Supabase
+      await loadAnalysesFromSupabase();
+      
+      toast({
+        title: "Analysis deleted",
+        description: "The swing analysis has been removed",
+      });
+    } catch (error) {
+      console.error('Error deleting analysis:', error);
+    }
   };
 
 

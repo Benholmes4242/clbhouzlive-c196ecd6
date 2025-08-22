@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
+import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 
 
 interface SavedInsight {
@@ -379,7 +380,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [expandedCard, setExpandedCard] = useState<{type: 'chat' | 'caddie' | 'swing', id: string} | null>(null);
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
-  const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
+
+  // Use the caddie logs hook
+  const { caddieLogs, loading: caddieLogsLoading, deleteCaddieLog: deleteCaddieLogHook } = useCaddieLogs();
   const [activeTab, setActiveTab] = useState('chat');
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -423,7 +426,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   useEffect(() => {
     if (isOpen) {
       loadChatConversations();
-      loadCaddieLogs();
+      // loadCaddieLogs(); // Now handled by hook
       loadSwingAnalyses();
     }
   }, [isOpen]);
@@ -512,33 +515,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
     } finally {
       setLoadingStates(prev => ({ ...prev, conversations: false }));
-    }
-  };
-
-  const loadCaddieLogs = async () => {
-    console.log('🏌️ Loading caddie logs...');
-    setLoadingStates(prev => ({ ...prev, caddieLogs: true }));
-    setErrorStates(prev => ({ ...prev, caddieLogs: null }));
-    
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      console.log('👤 User for caddie logs:', user.user?.id);
-      if (!user.user) return;
-
-      const { data, error } = await supabase
-        .from('caddie_logs')
-        .select('*')
-        .eq('user_id', user.user.id)
-        .order('created_at', { ascending: false });
-
-      console.log('🏌️ Caddie logs result:', { data: data?.length || 0, error });
-      if (error) throw error;
-      setCaddieLogs(data || []);
-    } catch (error) {
-      console.error('Error loading caddie logs:', error);
-      setErrorStates(prev => ({ ...prev, caddieLogs: 'Failed to load caddie logs. Please try again.' }));
-    } finally {
-      setLoadingStates(prev => ({ ...prev, caddieLogs: false }));
     }
   };
 
@@ -657,22 +633,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   };
 
-  const deleteCaddieLog = async (logId: string) => {
-    try {
-      const { error } = await supabase
-        .from('caddie_logs')
-        .delete()
-        .eq('id', logId);
-
-      if (error) throw error;
-
-      setCaddieLogs(prev => prev.filter(log => log.id !== logId));
+  const handleDeleteCaddieLog = async (logId: string) => {
+    const success = await deleteCaddieLogHook(logId);
+    if (success) {
       toast({
         title: "Caddie log deleted",
         description: "The log has been removed from your history."
       });
-    } catch (error) {
-      console.error('Error deleting caddie log:', error);
+    } else {
       toast({
         title: "Error",
         description: "Failed to delete caddie log. Please try again.",
@@ -1043,16 +1011,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="px-6 py-5">
-                  {loadingStates.caddieLogs ? (
+                  {caddieLogsLoading ? (
                     <div className="space-y-4 sm:space-y-5">
                       {[1, 2, 3].map((i) => (
                         <SkeletonCard key={i} />
                       ))}
                     </div>
-                  ) : errorStates.caddieLogs ? (
+                  ) : false ? ( // No error states from hook
                     <ErrorState
                       message={errorStates.caddieLogs}
-                      onRetry={loadCaddieLogs}
+                      onRetry={() => {}} // Handled by hook
                     />
                   ) : filteredCaddieLogs.length > 0 ? (
                     <div className="space-y-4 sm:space-y-5">
@@ -1109,7 +1077,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      size="sm"
                                      onClick={() => {
                                        if (window.confirm('Are you sure you want to delete this caddie log? This action cannot be undone.')) {
-                                         deleteCaddieLog(log.id);
+                                         handleDeleteCaddieLog(log.id);
                                        }
                                      }}
                                      className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
