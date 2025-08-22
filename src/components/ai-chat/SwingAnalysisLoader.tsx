@@ -63,7 +63,7 @@ export const SwingAnalysisLoader = ({ isAnalyzing }: SwingAnalysisLoaderProps) =
 
   return (
     <div className="flex items-center space-x-3 py-4">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground/50"></div>
       <div className="text-sm text-muted-foreground animate-fade-in">
         {displayText}
       </div>
