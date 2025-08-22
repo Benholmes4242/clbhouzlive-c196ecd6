@@ -32,6 +32,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
   // Initialize conversation session on modal open - only when isModalOpen is true
   useEffect(() => {
+    console.log('🔄 Modal state changed:', { isModalOpen, lastOpen: lastOpenStateRef.current });
+    
     // Skip session management if isModalOpen is explicitly false
     if (isModalOpen === false) {
       return;
@@ -39,10 +41,12 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     
     if (isModalOpen && !lastOpenStateRef.current) {
       // Modal just opened - start new session
+      console.log('📂 Modal opened, starting new session');
       startNewSession();
       sessionStartTimeRef.current = new Date();
     } else if (!isModalOpen && lastOpenStateRef.current && currentSession) {
       // Modal just closed - save current session
+      console.log('🔚 Modal closed, saving session with', currentSession.messages.length, 'messages');
       saveCurrentSession();
       setCurrentSession(null);
       sessionStartTimeRef.current = null;
@@ -57,9 +61,13 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   }, []);
 
   const loadConversations = async () => {
+    console.log('📖 Loading conversations from Supabase...');
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('❌ No user authenticated');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('conversations')
@@ -68,10 +76,11 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         .order('updated_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading conversations from Supabase:', error);
+        console.error('❌ Error loading conversations:', error);
         return;
       }
 
+      console.log('📊 Loaded conversations from DB:', data?.length || 0);
       if (data) {
         const conversationsWithDates = data.map((conv: any) => ({
           id: conv.id,
@@ -83,9 +92,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
           sessionStartTime: new Date(conv.created_at)
         }));
         setConversations(conversationsWithDates);
+        console.log('✅ Conversations loaded:', conversationsWithDates.length);
       }
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      console.error('❌ Error loading conversations:', error);
     }
   };
 
@@ -115,7 +125,15 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   };
 
   const addMessage = (message: ConversationMessage) => {
+    console.log('➕ Adding message:', { 
+      hasSession: !!currentSession, 
+      messageType: message.type,
+      sessionId: currentSession?.id,
+      currentMessageCount: currentSession?.messages.length || 0
+    });
+    
     if (!currentSession) {
+      console.log('❌ No current session, starting new one');
       startNewSession();
       return;
     }
@@ -131,6 +149,7 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
     }
 
+    console.log('✅ Session updated, now has', updatedSession.messages.length, 'messages');
     setCurrentSession(updatedSession);
   };
 

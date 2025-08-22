@@ -79,30 +79,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
             
             {/* Action buttons for AI messages */}
-            {!isUser && (
+            {!isUser && showSaveOption && message.metadata && (
               <div className="flex gap-2 mt-3">
-                {showSaveOption && message.metadata && (
-                  <Button
-                    onClick={() => onSaveToInsights(message)}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7"
-                  >
-                    <Bookmark className="h-3 w-3 mr-1" />
-                    Save to Insights
-                  </Button>
-                )}
-                {showDetailOption && (
-                  <Button
-                    onClick={() => onRequestDetail(message.content)}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7"
-                  >
-                    <MoreHorizontal className="h-3 w-3 mr-1" />
-                    More Detail
-                  </Button>
-                )}
+                <Button
+                  onClick={() => onSaveToInsights(message)}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7"
+                >
+                  <Bookmark className="h-3 w-3 mr-1" />
+                  Save to Insights
+                </Button>
               </div>
             )}
           </div>
