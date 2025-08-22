@@ -242,19 +242,31 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Save conversation to history only, don't persist in modal
-  const saveCurrentChatToHistory = () => {
+  // Save conversation to Supabase
+  const saveCurrentChatToHistory = async () => {
     if (messages.length > 0) {
-      // Manually start session for history saving
-      conversationSession.startNewConversationManually();
-      
-      // Add all messages to the session
-      messages.forEach(message => {
-        conversationSession.addMessage(message);
-      });
-      
-      // Save the session to history
-      conversationSession.saveCurrentSession();
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const conversation = {
+          id: `conversation_${Date.now()}`,
+          user_id: user.id,
+          title: messages[0]?.content.slice(0, 50) || 'New conversation',
+          messages: JSON.stringify(messages.map(msg => ({
+            ...msg,
+            timestamp: msg.timestamp.toISOString()
+          })))
+        };
+
+        const { error } = await supabase
+          .from('conversations')
+          .insert(conversation);
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error saving conversation:', error);
+      }
     }
   };
 
@@ -356,26 +368,45 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     sendMessage(prompt);
   };
 
-  const saveToInsights = (message: ChatMessageData) => {
+  const saveToInsights = async (message: ChatMessageData) => {
     if (!message.metadata) return;
     
-    const savedInsights = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
-    const insight = {
-      id: message.id,
-      content: message.content,
-      summary: message.metadata.save_card,
-      tags: message.metadata.tags || [],
-      category: message.metadata.category || 'General',
-      timestamp: message.timestamp
-    };
-    
-    savedInsights.push(insight);
-    localStorage.setItem('clbhouz_ai_saved', JSON.stringify(savedInsights));
-    
-    toast({
-      title: "Saved to Insights",
-      description: "This tip has been saved to your AI insights",
-    });
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Save as conversation to Supabase with properly typed messages
+      const insight = {
+        id: `insight_${Date.now()}`,
+        user_id: user.id,
+        title: message.metadata.save_card || 'Saved Insight',
+        messages: JSON.stringify([{
+          id: message.id,
+          type: message.type,
+          content: message.content,
+          timestamp: message.timestamp.toISOString(),
+          metadata: message.metadata
+        }])
+      };
+
+      const { error } = await supabase
+        .from('conversations')
+        .insert(insight);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Saved to Insights",
+        description: "This tip has been saved to your AI insights",
+      });
+    } catch (error) {
+      console.error('Error saving insight:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save insight",
+        variant: "destructive"
+      });
+    }
   };
 
   const requestMoreDetail = (originalMessage: string) => {

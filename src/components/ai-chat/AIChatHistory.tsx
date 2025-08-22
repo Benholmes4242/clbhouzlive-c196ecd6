@@ -434,79 +434,49 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // Load from conversation session hook (localStorage) first
-      console.log('📱 Loading from conversation session...');
-      conversationSession.loadConversations();
-      console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
-      
-      // Convert conversation session format to our chat conversation format
-      const sessionConversations = conversationSession.conversations.map(conv => ({
-        id: conv.id,
-        title: conv.title || "New conversation",
-        customTitle: conv.title,
-        messages: conv.messages.map((msg, index) => ({
-          id: `${conv.id}-${index}`,
-          type: msg.type,
-          content: msg.content,
-          timestamp: new Date(msg.timestamp),
-          metadata: msg.metadata
-        })),
-        timestamp: new Date(conv.lastActivityAt),
-        createdAt: new Date(conv.createdAt),
-        lastActivityAt: new Date(conv.lastActivityAt),
-        messageCount: conv.messages.length
-      }));
-
-      console.log('📱 Session conversations processed:', sessionConversations.length);
-      setConversations(sessionConversations);
-
-      // Also try to load from Supabase database if available
-      const { data: user } = await supabase.auth.getUser();
-      console.log('👤 Current user:', user.user?.id);
-      if (user.user) {
-        console.log('💾 Loading from Supabase conversations table...');
-        const { data, error } = await supabase
-          .from('conversations')
-          .select('*')
-          .eq('user_id', user.user.id)
-          .order('updated_at', { ascending: false });
-
-        console.log('💾 Supabase conversations result:', { data: data?.length || 0, error });
-
-        if (!error && data && data.length > 0) {
-          const dbConversations = data.map(conv => {
-            const messages = (conv.messages as any[]) || [];
-            return {
-              id: conv.id,
-              title: conv.title || "New conversation",
-              customTitle: conv.title,
-              messages: messages.map((msg, index) => ({
-                id: `${conv.id}-${index}`,
-                type: msg.role as 'user' | 'ai',
-                content: msg.content,
-                timestamp: new Date(msg.timestamp || conv.created_at),
-                metadata: msg.metadata
-              })),
-              timestamp: new Date(conv.updated_at),
-              createdAt: new Date(conv.created_at),
-              lastActivityAt: new Date(conv.updated_at),
-              messageCount: messages.length
-            };
-          });
-
-          // Merge database conversations with local storage conversations
-          const allConversations = [...sessionConversations];
-          dbConversations.forEach(dbConv => {
-            if (!allConversations.find(localConv => localConv.id === dbConv.id)) {
-              allConversations.push(dbConv);
-            }
-          });
-
-          // Sort by last activity
-          allConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
-          setConversations(allConversations);
-        }
+      // Load directly from Supabase conversations table
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setConversations([]);
+        return;
       }
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Convert Supabase format to our chat conversation format
+      const dbConversations = (data || []).map(conv => {
+        const messages = Array.isArray(conv.messages) 
+          ? conv.messages 
+          : typeof conv.messages === 'string' 
+            ? JSON.parse(conv.messages) 
+            : [];
+        
+        return {
+          id: conv.id,
+          title: conv.title || "New conversation",
+          customTitle: conv.title,
+          messages: messages.map((msg: any, index: number) => ({
+            id: `${conv.id}-${index}`,
+            type: msg.type,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp),
+            metadata: msg.metadata
+          })),
+          timestamp: new Date(conv.updated_at),
+          createdAt: new Date(conv.created_at),
+          lastActivityAt: new Date(conv.updated_at),
+          messageCount: messages.length
+        };
+      });
+
+      console.log('📱 Loaded conversations from Supabase:', dbConversations.length);
+      setConversations(dbConversations);
     } catch (error) {
       console.error('Error loading chat conversations:', error);
       setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
