@@ -1095,19 +1095,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                </>
                              )}
                            </div>
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setExpandedConversation(
-                                    expandedConversation === conversation.id ? null : conversation.id
-                                  )}
-                                  className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
-                                >
-                                  {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
-                                </Button>
-                              </div>
+                           <div className="flex justify-between items-center">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => setExpandedConversation(
+                                 expandedConversation === conversation.id ? null : conversation.id
+                               )}
+                               className="bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm border-none"
+                             >
+                               {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
+                             </Button>
                               <div className="flex items-center gap-2 flex-shrink-0">
                                {conversation.messageCount && (
                                   <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-gray-200">
