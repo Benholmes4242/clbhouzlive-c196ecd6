@@ -72,14 +72,14 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
           <div className="flex items-center justify-between">
             {/* Profile Info */}
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 rounded-xl">
+              <Avatar className="w-12 h-12 rounded-full">
                 <AvatarImage 
                   src={profile.profile_photo_url || undefined}
                   alt={profile.display_name || 'User'}
                 />
                 <AvatarFallback 
                   className={`
-                    rounded-xl font-semibold text-sm transition-colors duration-300
+                    rounded-full font-semibold text-sm transition-colors duration-300
                     ${glassMode === 'elevated' 
                       ? 'bg-black/10 text-black' 
                       : 'bg-white/20 text-white'

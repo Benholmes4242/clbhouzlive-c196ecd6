@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Crop } from "lucide-react";
 import HandicapEditModal from "./HandicapEditModal";
+import MobileCropTool from "./MobileCropTool";
 
 interface ProfileFormData {
   displayName: string;
@@ -61,10 +63,47 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
 }) => {
   // All profiles are now personal profiles
   const isPersonalProfile = true;
+  const [showMobileCrop, setShowMobileCrop] = useState(false);
+  const [mobileCropData, setMobileCropData] = useState(() => {
+    if (profile?.mobile_crop_data) {
+      try {
+        return JSON.parse(profile.mobile_crop_data);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
 
   const handleHandicapUpdate = (newHandicap: number | null) => {
     // Only update the local form state - no need to trigger full profile refetch
     onHandicapChange(newHandicap?.toString() || "");
+  };
+
+  const handleMobileCropSave = (cropData: any) => {
+    setMobileCropData(cropData);
+    setShowMobileCrop(false);
+    // TODO: Save crop data to profile
+    console.log('Saving mobile crop data:', cropData);
+  };
+
+  const getCurrentImageUrl = () => {
+    if (formData.profilePhoto) {
+      return URL.createObjectURL(formData.profilePhoto);
+    }
+    return profile?.profile_photo_url || '';
+  };
+
+  const getMobileCropStyle = () => {
+    if (!mobileCropData) return { objectPosition: 'center center' };
+    
+    const centerX = mobileCropData.x + mobileCropData.width / 2;
+    const centerY = mobileCropData.y + mobileCropData.height / 2;
+    
+    return {
+      objectPosition: `${centerX}% ${centerY}%`,
+      transform: `scale(${100 / mobileCropData.width})`
+    };
   };
 
   return (
@@ -139,23 +178,47 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           
           {(profile?.profile_photo_url || formData.profilePhoto) ? (
             <div className="space-y-3">
-              <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                Mobile crop functionality coming soon. Your mobile profile will use the desktop crop for now.
+              {/* Mobile crop controls */}
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMobileCrop(true)}
+                  className="gap-2"
+                >
+                  <Crop className="w-4 h-4" />
+                  Adjust Mobile Crop
+                </Button>
+                {mobileCropData && (
+                  <span className="text-xs text-green-600">
+                    Custom crop applied
+                  </span>
+                )}
               </div>
+              
               {/* Preview of current mobile crop */}
               <div className="flex items-center gap-4">
                 <div className="space-y-1">
-                  <p className="text-xs font-medium">Current mobile crop:</p>
+                  <p className="text-xs font-medium">Mobile preview:</p>
                   <div className="w-16 h-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                     <img 
-                      src={formData.profilePhoto ? URL.createObjectURL(formData.profilePhoto) : profile?.profile_photo_url} 
+                      src={getCurrentImageUrl()} 
                       alt="Mobile crop preview" 
                       className="w-full h-full object-cover"
-                      style={{ 
-                        objectPosition: profile?.mobile_crop_position || 'center center'
-                      }}
+                      style={getMobileCropStyle()}
                     />
                   </div>
+                </div>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>This is how your photo will appear</p>
+                  <p>in the mobile header (3:4 aspect ratio)</p>
+                  {mobileCropData && (
+                    <div className="mt-2 text-xs">
+                      <p>Crop: {mobileCropData.x.toFixed(1)}%, {mobileCropData.y.toFixed(1)}%</p>
+                      <p>Size: {mobileCropData.width.toFixed(1)}% × {mobileCropData.height.toFixed(1)}%</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -273,6 +336,16 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           onCheckedChange={onPublicToggle}
         />
       </div>
+
+      {/* Mobile Crop Tool Modal */}
+      {showMobileCrop && getCurrentImageUrl() && (
+        <MobileCropTool
+          imageUrl={getCurrentImageUrl()}
+          initialCrop={mobileCropData}
+          onSave={handleMobileCropSave}
+          onCancel={() => setShowMobileCrop(false)}
+        />
+      )}
     </div>
   );
 };
