@@ -533,25 +533,26 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     const swingCoachAnalyses = swingCoachHistory
       .filter((msg: any) => {
         const isAI = msg.type === 'ai';
-        const hasMetadata = !!msg.metadata;
-        const hasVideoData = msg.metadata && (
-          msg.metadata.videoThumbnail || 
-          msg.metadata.videoId || 
-          msg.metadata.videoUrl ||
-          msg.metadata.save_card || // Include if it has analysis data
-          msg.content?.includes('swing') // Include if content mentions swing
+        const hasAnalysisContent = msg.content && (
+          msg.content.includes('swing') ||
+          msg.content.includes('analysis') ||
+          msg.content.includes('position') ||
+          msg.content.includes('backswing') ||
+          msg.content.includes('downswing') ||
+          msg.content.includes('impact') ||
+          msg.content.includes('follow')
         );
         
         console.log('🎯 Filtering swing coach message:', {
           id: msg.id,
           isAI,
-          hasMetadata,
-          hasVideoData,
+          hasAnalysisContent,
+          content: msg.content?.substring(0, 100),
           metadata: msg.metadata,
-          included: isAI && hasMetadata && hasVideoData
+          included: isAI && hasAnalysisContent
         });
         
-        return isAI && hasMetadata && hasVideoData;
+        return isAI && hasAnalysisContent;
       })
       .map((msg: any, index: number) => {
         // Get the user message that triggered this analysis (should be the previous message)
