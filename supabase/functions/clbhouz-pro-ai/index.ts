@@ -20,7 +20,11 @@ async function searchWeb(query: string): Promise<string> {
   try {
     console.log('🔍 Searching with Perplexity API for:', query);
     
-    if (!perplexityApiKey) {
+    // Get API key directly within function
+    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY');
+    console.log('🔑 Perplexity key check inside function:', !!perplexityKey);
+    
+    if (!perplexityKey) {
       console.log('❌ No Perplexity API key found in environment');
       return 'Search functionality not configured. Please check API key.';
     }
@@ -30,7 +34,7 @@ async function searchWeb(query: string): Promise<string> {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Authorization': `Bearer ${perplexityKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
