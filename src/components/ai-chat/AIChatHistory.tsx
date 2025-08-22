@@ -884,10 +884,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             ) : (
                                <div className="flex-1 flex flex-col">
                                  {/* Header Row */}
-                                 <div className="flex items-start justify-between mb-2">
-                                    <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages.find(msg => msg.type === 'user')?.content || "New conversation"}>
-                                      {conversation.messages.find(msg => msg.type === 'user')?.content || "New conversation"}
-                                    </h3>
+                                   <div className="flex items-start justify-between mb-2">
+                                     {(() => {
+                                       const firstUserMessage = conversation.messages.find(msg => msg.type === 'user')?.content;
+                                       const displayTitle = firstUserMessage || conversation.title || "New conversation";
+                                       return (
+                                         <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={displayTitle}>
+                                           {displayTitle}
+                                         </h3>
+                                       );
+                                     })()}
                                     <span className="text-xs text-gray-500 flex-shrink-0">
                                       {conversation.timestamp.toLocaleDateString()}
                                     </span>
