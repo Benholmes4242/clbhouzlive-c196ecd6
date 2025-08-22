@@ -118,11 +118,12 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   };
 
   const startNewSession = () => {
-    const sessionId = `session_${Date.now()}`;
+    // Generate proper UUID instead of timestamp-based ID
+    const uuid = crypto.randomUUID();
     const now = new Date();
     
     const newSession: ConversationSession = {
-      id: sessionId,
+      id: uuid,
       title: '', // Will be set with first user message
       messages: [],
       createdAt: now,
@@ -130,6 +131,7 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       sessionStartTime: now
     };
     
+    console.log('📝 Created new session with UUID:', uuid);
     setCurrentSession(newSession);
   };
 
