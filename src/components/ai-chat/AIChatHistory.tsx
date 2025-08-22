@@ -500,13 +500,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       swingCoachMessages: swingCoachHistory.filter((msg: any) => msg.type === 'ai').length
     });
     
-    // Combine localStorage data and ensure proper structure
-    const combined = [...localAnalyses, ...swingCoachHistory].map(item => ({
+    // First, get unique localStorage analyses (exclude SwingCoach history for now)
+    const localAnalysesOnly = localAnalyses.map(item => ({
       ...item,
-      tags: item.tags || [], // Ensure tags is always an array
-      conversation: item.conversation || [] // Ensure conversation is always an array
+      tags: item.tags || [],
+      conversation: item.conversation || []
     }));
-    const unique = combined.filter((item, index, self) => 
+    
+    const uniqueLocalAnalyses = localAnalysesOnly.filter((item, index, self) => 
       index === self.findIndex(t => t.id === item.id)
     );
 
@@ -528,7 +529,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     } catch (error) {
       console.error('Error loading caddie logs:', error);
     }
-    
+
     // Convert Swing Coach conversations to analysis format with full conversation data
     const swingCoachAnalyses = swingCoachHistory
       .filter((msg: any) => {
@@ -587,13 +588,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         
         return {
           id: msg.id,
-          save_card: msg.metadata.save_card || 'Swing Analysis',
-          title: msg.metadata.save_card || 'Swing Analysis',
-          tags: msg.metadata.tags || [],
-          category: msg.metadata.category || 'Swing',
+          save_card: msg.metadata?.save_card || 'Swing Analysis',
+          title: msg.metadata?.save_card || 'Swing Analysis',
+          tags: msg.metadata?.tags || [],
+          category: msg.metadata?.category || 'Swing',
           content: msg.content,
-          videoThumbnail: msg.metadata.videoThumbnail,
-          videoPoster: msg.metadata.videoThumbnail,
+          videoThumbnail: msg.metadata?.videoThumbnail,
+          videoPoster: msg.metadata?.videoThumbnail,
           // Try to use the video data from user message, but it might be invalid blob URL
           videoSrc: userMessage?.videoPreview && userMessage.videoPreview.startsWith('blob:') 
             ? undefined // Don't use invalid blob URLs
@@ -603,15 +604,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         };
       });
     
-    const allAnalyses = [...unique, ...swingCoachAnalyses];
-    const parsedAnalyses = allAnalyses.map((analysis: any) => ({
+    // Combine and deduplicate everything properly
+    const allAnalyses = [...uniqueLocalAnalyses, ...swingCoachAnalyses];
+    const finalUniqueAnalyses = allAnalyses.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
+    
+    const parsedAnalyses = finalUniqueAnalyses.map((analysis: any) => ({
       ...analysis,
       timestamp: new Date(analysis.timestamp)
     }));
     
     console.log('📊 Final swing analyses count:', {
-      unique: unique.length,
+      uniqueLocalAnalyses: uniqueLocalAnalyses.length,
       swingCoachAnalyses: swingCoachAnalyses.length,
+      finalUnique: finalUniqueAnalyses.length,
       total: parsedAnalyses.length
     });
     
