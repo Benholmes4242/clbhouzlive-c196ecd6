@@ -47,7 +47,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'sonar-medium-online',
+            model: 'sonar_medium_online',
             messages: [
               {
                 role: 'user',
