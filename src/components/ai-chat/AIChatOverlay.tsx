@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useConversationSession } from '@/hooks/useConversationSession';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface ChatMessageData {
   id: string;
@@ -52,6 +53,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const conversationSession = useConversationSession({
     storageKey: 'clbhouz_ai_chat',
     isModalOpen: isOpen // Use actual modal state to properly save conversations
+  });
+
+  // Auto-scroll for chat messages
+  const chatAutoScroll = useAutoScroll({
+    dependencies: [messages],
+    enabled: true,
+    direction: 'bottom' // Chat messages are added at the bottom
   });
 
   async function handleVoiceNote(transcribedText: string) {
@@ -548,11 +556,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Single scrollable content area */}
-          <div 
-            id="caddie-content"
-            className="flex-1 overflow-y-auto min-h-0"
+          <ScrollArea 
+            className="flex-1 min-h-0"
             style={{ overscrollBehavior: 'contain' }}
-            ref={scrollAreaRef}
+            ref={chatAutoScroll.scrollAreaRef}
           >
             <TabsContent value="chat" className="h-full m-0">
               <div className="h-full min-h-0">
@@ -627,7 +634,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
                 onAnalysisTextChange={setSwingCoachAnalysisText}
               />
             </TabsContent>
-          </div>
+          </ScrollArea>
         </Tabs>
         
         {/* Shared composer/footer - Fixed at bottom */}
