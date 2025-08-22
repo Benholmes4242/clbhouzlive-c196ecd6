@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
-import VideoPlayer from '@/components/ui/video-player/VideoPlayer';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -211,14 +211,14 @@ const SwingAnalysisCard: React.FC<{
                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                    </div>
                  )}
-                 <VideoPlayer
+                 <video
                    src={analysis.videoUrl || analysis.videoSrc}
                    poster={analysis.videoThumbnail || analysis.videoPoster}
                    className="w-full h-full"
-                   autoplay={false}
-                   muted={true}
-                   loop={false}
-                   controls={true}
+                   controls
+                   muted
+                   playsInline
+                   preload="metadata"
                  />
                </div>
             ) : analysis.videoThumbnail ? (
