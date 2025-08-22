@@ -935,7 +935,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     <div 
       className="fixed inset-0 flex items-center justify-center p-4"
       style={{ 
-        zIndex: 9999
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.35)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)'
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
