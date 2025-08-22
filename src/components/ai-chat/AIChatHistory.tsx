@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -210,21 +211,15 @@ const SwingAnalysisCard: React.FC<{
                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                    </div>
                  )}
-                 <div className="relative w-full h-full bg-black rounded-lg overflow-hidden">
-                   <img 
-                     src={analysis.videoThumbnail || analysis.videoPoster || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${analysis.videoUrl?.match(/\/([a-f0-9]+)\//)?.[1] || 'default'}/thumbnails/thumbnail.jpg`}
-                     alt="Video thumbnail"
-                     className="w-full h-full object-cover"
-                   />
-                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors cursor-pointer"
-                        onClick={() => window.open(analysis.videoUrl || analysis.videoSrc, '_blank')}>
-                     <div className="bg-white/90 rounded-full p-3">
-                       <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                         <path d="M8 5v14l11-7z"/>
-                       </svg>
-                     </div>
-                   </div>
-                 </div>
+                 <EnhancedVideoPlayer
+                   src={analysis.videoUrl || analysis.videoSrc}
+                   poster={analysis.videoThumbnail || analysis.videoPoster}
+                   className="w-full h-full"
+                   autoplay={false}
+                   muted={true}
+                   loop={false}
+                   enableHLS={true}
+                 />
                </div>
             ) : analysis.videoThumbnail ? (
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
