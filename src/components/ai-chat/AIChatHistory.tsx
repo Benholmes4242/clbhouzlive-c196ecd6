@@ -1060,21 +1060,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   if (!isOpen) return null;
 
-  return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ 
-        zIndex: 9999
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
-    >
+   return (
+     <div 
+       className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
+       style={{ 
+         zIndex: 9999
+       }}
+       onClick={(e) => {
+         if (e.target === e.currentTarget) {
+           onClose();
+         }
+       }}
+       onWheel={(e) => e.stopPropagation()}
+       onTouchMove={(e) => e.stopPropagation()}
+       onScroll={(e) => e.stopPropagation()}
+     >
       <div
         className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
       style={{
@@ -1197,7 +1197,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               >
                 <div className="px-6 py-5">
                   {filteredConversations.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4 sm:space-y-5">
                       {filteredConversations.map((conversation, index) => (
                           <div
                             key={`conversation-${conversation.id || index}`}
@@ -1351,7 +1351,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               >
                 <div className="px-6 py-5">
                    {filteredCaddieLogs.length > 0 ? (
-                     <div className="space-y-3">
+                     <div className="space-y-4 sm:space-y-5">
                        {filteredCaddieLogs.map((log) => {
                          const isExpanded = expandedCaddieLogId === log.id;
                          const contentPreview = log.content.length > 120 ? log.content.slice(0, 120) + '...' : log.content;
@@ -1481,7 +1481,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               >
                 <div className="px-6 py-5">
                   {swingAnalyses.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4 sm:space-y-5">
                       {swingAnalyses.map((analysis) => (
                         <div key={analysis.id} className="transition-transform duration-100">
                           <SwingAnalysisCard
