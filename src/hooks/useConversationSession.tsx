@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ConversationMessage {
   id: string;
@@ -50,25 +51,36 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     lastOpenStateRef.current = isModalOpen;
   }, [isModalOpen]);
 
-  // Load conversations from localStorage on mount
+  // Load conversations from Supabase on mount
   useEffect(() => {
     loadConversations();
   }, []);
 
-  const loadConversations = () => {
+  const loadConversations = async () => {
     try {
-      const stored = localStorage.getItem(`${storageKey}_conversations`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        const conversationsWithDates = parsed.map((conv: any) => ({
-          ...conv,
-          createdAt: new Date(conv.createdAt),
-          lastActivityAt: new Date(conv.lastActivityAt),
-          sessionStartTime: new Date(conv.sessionStartTime),
-          messages: conv.messages.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp)
-          }))
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading conversations from Supabase:', error);
+        return;
+      }
+
+      if (data) {
+        const conversationsWithDates = data.map((conv: any) => ({
+          id: conv.id,
+          title: conv.title || '',
+          customTitle: conv.title,
+          messages: conv.messages || [],
+          createdAt: new Date(conv.created_at),
+          lastActivityAt: new Date(conv.updated_at),
+          sessionStartTime: new Date(conv.created_at)
         }));
         setConversations(conversationsWithDates);
       }
@@ -77,10 +89,10 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     }
   };
 
-  const saveConversations = (updatedConversations: ConversationSession[]) => {
+  const saveConversations = async (updatedConversations: ConversationSession[]) => {
     try {
-      localStorage.setItem(`${storageKey}_conversations`, JSON.stringify(updatedConversations));
       setConversations(updatedConversations);
+      // Supabase saving is handled in saveCurrentSession
     } catch (error) {
       console.error('Error saving conversations:', error);
     }
@@ -122,28 +134,50 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     setCurrentSession(updatedSession);
   };
 
-  const saveCurrentSession = () => {
+  const saveCurrentSession = async () => {
     if (!currentSession || currentSession.messages.length === 0) {
       return;
     }
 
-    // Check if session already exists in conversations
-    const existingIndex = conversations.findIndex(conv => conv.id === currentSession.id);
-    
-    let updatedConversations: ConversationSession[];
-    if (existingIndex >= 0) {
-      // Update existing conversation
-      updatedConversations = [...conversations];
-      updatedConversations[existingIndex] = currentSession;
-    } else {
-      // Add new conversation
-      updatedConversations = [currentSession, ...conversations];
-    }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    // Sort by last activity (most recent first)
-    updatedConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
-    
-    saveConversations(updatedConversations);
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from('conversations')
+        .upsert({
+          user_id: user.id,
+          title: currentSession.customTitle || currentSession.title,
+          messages: currentSession.messages as any
+        }, {
+          onConflict: 'user_id,title'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving conversation to Supabase:', error);
+        return;
+      }
+
+      // Update local state
+      const existingIndex = conversations.findIndex(conv => conv.id === currentSession.id);
+      
+      let updatedConversations: ConversationSession[];
+      if (existingIndex >= 0) {
+        updatedConversations = [...conversations];
+        updatedConversations[existingIndex] = currentSession;
+      } else {
+        updatedConversations = [currentSession, ...conversations];
+      }
+
+      updatedConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
+      setConversations(updatedConversations);
+      
+    } catch (error) {
+      console.error('Error saving session:', error);
+    }
   };
 
   const renameConversation = (conversationId: string, newTitle: string) => {
@@ -161,20 +195,53 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     }
   };
 
-  const deleteConversation = (conversationId: string) => {
-    const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
-    saveConversations(updatedConversations);
-    
-    // Clear current session if it's the one being deleted
-    if (currentSession && currentSession.id === conversationId) {
-      setCurrentSession(null);
+  const deleteConversation = async (conversationId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('conversations')
+        .delete()
+        .eq('id', conversationId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error deleting conversation:', error);
+        return;
+      }
+
+      const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
+      setConversations(updatedConversations);
+      
+      if (currentSession && currentSession.id === conversationId) {
+        setCurrentSession(null);
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
     }
   };
 
-  const clearAllConversations = () => {
-    localStorage.removeItem(`${storageKey}_conversations`);
-    setConversations([]);
-    setCurrentSession(null);
+  const clearAllConversations = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('conversations')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error clearing conversations:', error);
+        return;
+      }
+
+      setConversations([]);
+      setCurrentSession(null);
+    } catch (error) {
+      console.error('Error clearing conversations:', error);
+    }
   };
 
   const startNewConversationManually = () => {

@@ -11,6 +11,7 @@ import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { SwingAnalysisLoader } from './SwingAnalysisLoader';
 
 interface SwingAnalysis {
   id: string;
@@ -808,10 +809,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             {isAnalyzing && (
               <div className="flex justify-start">
                 <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                    <span className="text-sm">Swing Coach is analyzing swing positions...</span>
-                  </div>
+                  <SwingAnalysisLoader isAnalyzing={isAnalyzing} />
                 </div>
               </div>
             )}
