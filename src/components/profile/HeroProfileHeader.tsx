@@ -547,56 +547,158 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Adaptive Glass Header - Auto-switches modes based on background */}
-      <AdaptiveGlassHeader
-        isVisible={showStickyHeader && !isImmersiveOpen}
-        profile={profile}
-        stats={{
-          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-          posts: postsCount,
-          followers: followersCount,
-          following: followingCount,
-          ratedCoursesCount,
-          averageRating
-        }}
-        onStatClick={handleStatClick}
-      />
-      {/* Responsive Immersive Header - Collapses to blurred header gradient on desktop */}
-      {/* Responsive Immersive Header - Starts from top like clubhouse */}
-      <div className="absolute top-0 left-0 right-0 w-full">
-        <ResponsiveImmersiveHeader
-          mediaItems={profile?.header_photo_url ? [{
-            id: 'header',
-            media_type: 'image',
-            media_url: profile.header_photo_url
-          }] : []}
-          isCollapsed={showStickyHeader}
-        />
-      </div>
-
-      {/* Responsive Glass Profile Card */}
-      <div ref={profileCardRef} className="relative z-50 pt-32">
-        <ResponsiveGlassCard
+      {/* Desktop-only Adaptive Glass Header */}
+      {!isMobile && (
+        <AdaptiveGlassHeader
+          isVisible={showStickyHeader && !isImmersiveOpen}
           profile={profile}
-          isOwnProfile={isOwnProfile}
-          hasImmersiveMedia={hasImmersiveMedia}
-          onPreviewImmersive={previewImmersive}
-          onEditProfile={() => setEditDialogOpen(true)}
-          onMediaManager={() => setMediaManagerOpen(true)}
-        />
-      </div>
-
-      {/* Responsive Stats Display */}
-      <div className={`px-4 md:px-8 py-6 ${isMobile ? 'py-4' : 'py-8'}`}>
-        <ResponsiveStatsDisplay
-          primaryStats={{
+          stats={{
             handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
             posts: postsCount,
             followers: followersCount,
-            following: followingCount
+            following: followingCount,
+            ratedCoursesCount,
+            averageRating
           }}
           onStatClick={handleStatClick}
         />
+      )}
+
+      {/* Mobile-Only Full Bleed Profile Layout */}
+      {isMobile ? (
+        <div className="relative">
+          {/* Full-bleed profile photo for mobile */}
+          <div className="relative w-full h-80 overflow-hidden">
+            <img
+              src={profile?.profile_photo_url || '/placeholder.svg'}
+              alt={profile?.display_name || 'Profile'}
+              className="w-full h-full object-cover"
+              style={{ objectPosition: 'center' }} // Mobile crop positioning
+            />
+            {/* Subtle overlay for better text contrast */}
+            <div className="absolute inset-0 bg-black/10" />
+          </div>
+          
+          {/* Profile content on white background below photo */}
+          <div className="bg-white p-6 space-y-6">
+            {/* Name, club, handicap section */}
+            <div className="text-center space-y-3">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {profile?.display_name || 'User'}
+                </h1>
+                {profile?.username && (
+                  <p className="text-gray-600 text-base">@{profile.username}</p>
+                )}
+              </div>
+              
+              {profile?.bio && (
+                <p className="text-gray-700 text-base leading-relaxed">
+                  {profile.bio}
+                </p>
+              )}
+              
+              {/* Home Club & Handicap */}
+              <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-1">Home Club</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {profile?.home_club || 'No Club'}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-1">Handicap</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            {isOwnProfile && (
+              <div className="grid grid-cols-1 gap-3 max-w-sm mx-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditDialogOpen(true)}
+                  className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setMediaManagerOpen(true)}
+                  className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Manage Media
+                </Button>
+                {hasImmersiveMedia && (
+                  <Button
+                    variant="outline"
+                    onClick={previewImmersive}
+                    className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    Preview Profile
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Desktop layout - unchanged */
+        <>
+          {/* Responsive Immersive Header */}
+          <div className="absolute top-0 left-0 right-0 w-full">
+            <ResponsiveImmersiveHeader
+              mediaItems={profile?.header_photo_url ? [{
+                id: 'header',
+                media_type: 'image',
+                media_url: profile.header_photo_url
+              }] : []}
+              isCollapsed={showStickyHeader}
+            />
+          </div>
+
+          {/* Responsive Glass Profile Card */}
+          <div ref={profileCardRef} className="relative z-50 pt-32">
+            <ResponsiveGlassCard
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+              hasImmersiveMedia={hasImmersiveMedia}
+              onPreviewImmersive={previewImmersive}
+              onEditProfile={() => setEditDialogOpen(true)}
+              onMediaManager={() => setMediaManagerOpen(true)}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Stats Display - centered and full width on mobile */}
+      <div className={`
+        transition-all duration-300
+        ${isMobile 
+          ? 'px-6 py-6 bg-white' // Mobile: full width with padding on white background
+          : 'px-4 md:px-8 py-6' // Desktop: existing layout
+        }
+      `}>
+        <div className={`
+          ${isMobile 
+            ? 'max-w-full' // Mobile: use full width
+            : 'transition-transform duration-300 ease-out' // Desktop: existing
+          }
+        `}>
+          <ResponsiveStatsDisplay
+            primaryStats={{
+              handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+              posts: postsCount,
+              followers: followersCount,
+              following: followingCount
+            }}
+            onStatClick={handleStatClick}
+          />
+        </div>
       </div>
 
       {/* Tab Navigation with Underline Animation - Gray styling */}

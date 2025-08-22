@@ -28,7 +28,7 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
         flex flex-col items-center gap-1 p-3 rounded-lg bg-white/80 
         hover:bg-white/90 transition-all duration-200 backdrop-blur-sm 
         border border-gray-200 hover:border-gray-300 hover:scale-105
-        ${isMobile ? 'min-w-[70px] flex-shrink-0' : 'flex-1'}
+        ${isMobile ? 'w-full' : 'flex-1'}
       `}
     >
       <div className="text-lg font-semibold text-gray-900">{value}</div>
@@ -41,8 +41,8 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
       {/* Primary Stats */}
       <div className={`
         ${isMobile 
-          ? 'flex gap-2 overflow-x-auto scrollbar-hide pb-2 px-1' // Mobile: horizontal scroll pill-strip
-          : 'grid grid-cols-4 gap-4' // Desktop: inline with generous padding
+          ? 'grid grid-cols-4 gap-3 w-full' // Mobile: centered grid using full viewport width
+          : 'grid grid-cols-4 gap-4' // Desktop: existing layout
         }
       `}>
         <PrimaryStat 
