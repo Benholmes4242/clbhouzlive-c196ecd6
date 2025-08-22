@@ -283,11 +283,13 @@ const ConversationDetailsDialog: React.FC<{
 const SwingAnalysisCard: React.FC<{
   analysis: SwingAnalysis;
   onDelete: () => void;
-}> = ({ analysis, onDelete }) => {
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+}> = ({ analysis, onDelete, isExpanded, onToggleExpand }) => {
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
-  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   const handleThumbnailError = () => {
     setThumbnailError(true);
@@ -300,103 +302,222 @@ const SwingAnalysisCard: React.FC<{
 
   return (
     <>
-      <div className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-160 hover:shadow-md">
-        <div className="flex items-start gap-3">
-          {/* Left Column - Video Thumbnail */}
-          <div className="flex-shrink-0">
-            <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
-              {analysis.videoThumbnail && !thumbnailError ? (
-                <>
-                  {thumbnailLoading && (
-                    <div className="absolute inset-0 bg-muted animate-pulse" />
+      <div className={`rounded-xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/70 transition-all duration-300 hover:shadow-md ${isExpanded ? 'shadow-lg' : ''}`}>
+        {/* Collapsed Header */}
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            {/* Left Column - Video Thumbnail */}
+            <div className="flex-shrink-0">
+              <div className="relative w-28 sm:w-36 aspect-video bg-white/40 rounded-lg overflow-hidden border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+                {analysis.videoThumbnail && !thumbnailError ? (
+                  <>
+                    {thumbnailLoading && (
+                      <div className="absolute inset-0 bg-muted animate-pulse" />
+                    )}
+                    <img 
+                      src={analysis.videoThumbnail} 
+                      alt="Swing thumbnail"
+                      className="w-full h-full object-cover cursor-pointer"
+                      onError={handleThumbnailError}
+                      onLoad={handleThumbnailLoad}
+                      onClick={() => setVideoDialogOpen(true)}
+                    />
+                    <button
+                      onClick={() => setVideoDialogOpen(true)}
+                      className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group"
+                      aria-label="Play swing video"
+                    >
+                      <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
+                        <Play className="h-4 w-4 text-black" fill="currentColor" />
+                      </div>
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <div className="text-center text-muted-foreground">
+                      <FileText className="h-6 w-6 mx-auto mb-1" />
+                      <p className="text-xs">No video</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Text Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline">{analysis.category}</Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {analysis.timestamp.toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onToggleExpand}
+                    className="h-7 px-2 text-xs"
+                    title={isExpanded ? "Minimize" : "View details"}
+                  >
+                    {isExpanded ? <MessageSquare className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onDelete}
+                    className="h-7 px-2 text-destructive hover:text-destructive"
+                    title="Delete analysis"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              
+              <h3 className="text-sm font-medium mb-2 line-clamp-2">{analysis.save_card}</h3>
+              
+              {analysis.tags && analysis.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {analysis.tags.slice(0, 3).map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {analysis.tags.length > 3 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{analysis.tags.length - 3} more
+                    </Badge>
                   )}
+                </div>
+              )}
+              
+              {analysis.voiceNote && (
+                <Badge variant="outline" className="text-xs">
+                  Voice note attached
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Expanded Content */}
+        {isExpanded && (
+          <div className="border-t border-white/30 bg-white/30 animate-accordion-down">
+            {/* Sticky Mini Header */}
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-white/20 px-4 py-2 flex items-center justify-between z-10">
+              <div className="flex items-center gap-2">
+                <h4 className="font-medium text-sm">{analysis.title || analysis.save_card}</h4>
+                <span className="text-xs text-muted-foreground">
+                  {analysis.timestamp.toLocaleDateString()} at {analysis.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggleExpand}
+                className="h-7 px-2 text-xs"
+                title="Minimize"
+              >
+                <MessageSquare className="h-3 w-3" />
+              </Button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              {/* Video Section */}
+              {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  {isVideoLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  )}
+                  <video
+                    src={analysis.videoUrl || analysis.videoSrc}
+                    poster={analysis.videoThumbnail || analysis.videoPoster}
+                    controls
+                    className="w-full h-full object-cover"
+                    onLoadStart={() => setIsVideoLoading(true)}
+                    onCanPlay={() => setIsVideoLoading(false)}
+                    onError={() => setIsVideoLoading(false)}
+                  />
+                </div>
+              ) : analysis.videoThumbnail ? (
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
                   <img 
                     src={analysis.videoThumbnail} 
-                    alt="Swing thumbnail"
-                    className="w-full h-full object-cover cursor-pointer"
-                    onError={handleThumbnailError}
-                    onLoad={handleThumbnailLoad}
-                    onClick={() => setVideoDialogOpen(true)}
+                    alt="Swing analysis"
+                    className="w-full h-full object-cover"
                   />
-                  <button
-                    onClick={() => setVideoDialogOpen(true)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group"
-                    aria-label="Play swing video"
-                  >
-                    <div className="bg-white/90 rounded-full p-2 group-hover:scale-110 transition-transform">
-                      <Play className="h-4 w-4 text-black" fill="currentColor" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                    <div className="text-white text-center p-4">
+                      <FileText className="h-8 w-8 mx-auto mb-2" />
+                      <p className="text-sm font-medium mb-1">Video Preview</p>
+                      <p className="text-xs opacity-80">New swing analyses will have permanent video links</p>
                     </div>
-                  </button>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted">
-                  <div className="text-center text-muted-foreground">
-                    <FileText className="h-6 w-6 mx-auto mb-1" />
-                    <p className="text-xs">No video</p>
                   </div>
+                </div>
+              ) : (
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <FileText className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">No video available</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Analysis Content */}
+              <div className="space-y-3">
+                <h5 className="text-sm font-semibold">Analysis Conversation</h5>
+                {analysis.conversation && analysis.conversation.length > 0 ? (
+                  <div className="space-y-2">
+                    {analysis.conversation.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg text-sm ${
+                          message.role === 'user' 
+                            ? 'bg-primary/10 border-l-4 border-primary' 
+                            : 'bg-muted border-l-4 border-muted-foreground'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <Badge variant={message.role === 'user' ? 'default' : 'secondary'} className="text-xs">
+                            {message.role === 'user' ? 'You' : 'Echo Coach'}
+                          </Badge>
+                          {message.timestamp && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </div>
+                        <div className="leading-relaxed whitespace-pre-wrap">
+                          {message.content}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted text-sm leading-relaxed whitespace-pre-wrap">
+                    {analysis.content}
+                  </div>
+                )}
+              </div>
+
+              {/* Actions Row */}
+              {analysis.tags && analysis.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-white/20">
+                  {analysis.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
               )}
             </div>
           </div>
-
-          {/* Right Column - Text Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline">{analysis.category}</Badge>
-                <span className="text-xs text-muted-foreground">
-                  {analysis.timestamp.toLocaleDateString()}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDetailsDialogOpen(true)}
-                  className="h-7 px-2 text-xs"
-                  title="View details"
-                >
-                  <Maximize2 className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onDelete}
-                  className="h-7 px-2 text-destructive hover:text-destructive"
-                  title="Delete analysis"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-            
-            <h3 className="text-sm font-medium mb-2 line-clamp-2">{analysis.save_card}</h3>
-            
-            {analysis.tags && analysis.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {analysis.tags.slice(0, 3).map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-                {analysis.tags.length > 3 && (
-                  <Badge variant="secondary" className="text-xs">
-                    +{analysis.tags.length - 3} more
-                  </Badge>
-                )}
-              </div>
-            )}
-            
-            {analysis.voiceNote && (
-              <Badge variant="outline" className="text-xs">
-                Voice note attached
-              </Badge>
-            )}
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Video Player Dialog */}
+      {/* Video Player Dialog (for thumbnail clicks) */}
       <VideoPlayerDialog
         isOpen={videoDialogOpen}
         onClose={() => setVideoDialogOpen(false)}
@@ -405,13 +526,6 @@ const SwingAnalysisCard: React.FC<{
         title={analysis.title || analysis.save_card}
         date={analysis.timestamp.toLocaleDateString()}
         tags={analysis.tags}
-      />
-
-      {/* Full Conversation Details Dialog */}
-      <ConversationDetailsDialog
-        isOpen={detailsDialogOpen}
-        onClose={() => setDetailsDialogOpen(false)}
-        analysis={analysis}
       />
     </>
   );
@@ -430,6 +544,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [activeTab, setActiveTab] = useState('chat');
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Conversation session management for new grouped conversations
@@ -1255,7 +1370,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {swingAnalyses.length > 0 ? (
                     <div className="space-y-3">
                       {swingAnalyses.map((analysis) => (
-                        <div key={analysis.id} className="hover:scale-[1.01] transition-transform duration-100">
+                        <div key={analysis.id} className="transition-transform duration-100">
                           <SwingAnalysisCard
                             analysis={{
                               ...analysis,
@@ -1263,6 +1378,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               conversation: analysis.conversation || [] // Ensure conversation is always an array
                             }}
                             onDelete={() => deleteSwingAnalysis(analysis.id)}
+                            isExpanded={expandedAnalysisId === analysis.id}
+                            onToggleExpand={() => setExpandedAnalysisId(expandedAnalysisId === analysis.id ? null : analysis.id)}
                           />
                         </div>
                       ))}
