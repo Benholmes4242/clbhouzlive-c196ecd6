@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChatMessageComponent from './ChatMessage';
-import { AIChatHistory } from './AIChatHistory';
+import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
 import SwingCoach from './SwingCoach';
 import EchoAvatar from './EchoAvatar';
@@ -423,6 +423,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           <AIChatHistory 
             isOpen={showHistory} 
             onClose={() => setShowHistory(false)}
+            onSelectMessage={(message) => {
+              setShowHistory(false);
+              sendMessage(message);
+            }}
+            onNewConversation={() => {
+              conversationSession.startNewConversationManually();
+              setMessages([]);
+              setShowHistory(false);
+            }}
           />
         </div>
       </div>
