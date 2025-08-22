@@ -571,19 +571,77 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     }
   };
 
-  const saveToSwingInsights = () => {
+  const saveToSwingInsights = async () => {
     if (!currentAnalysis) return;
     
-    const updatedAnalyses = [...analyses, currentAnalysis];
-    setAnalyses(updatedAnalyses);
-    localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
-    
-    toast({
-      title: "Saved to Swing Insights",
-      description: "You can find this anytime in History & Saved → Analyses.",
-    });
-    
-    setCurrentAnalysis(null);
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to save analysis.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Save to Supabase database
+      const { data, error } = await supabase
+        .from('pro_ai_analyses')
+        .insert({
+          user_id: user.id,
+          analysis_results: {
+            aiResponse: currentAnalysis.content,
+            metadata: {
+              category: currentAnalysis.category,
+              save_card: currentAnalysis.save_card,
+              tags: currentAnalysis.tags
+            },
+            timestamp: currentAnalysis.timestamp.toISOString(),
+            userMessage: currentAnalysis.conversation?.[0]?.content || "Swing analysis request"
+          },
+          video_url: currentAnalysis.videoUrl || null,
+          swing_context: currentAnalysis.conversation ? JSON.stringify({
+            conversation: currentAnalysis.conversation,
+            videoId: currentAnalysis.videoId,
+            videoThumbnail: currentAnalysis.videoThumbnail
+          }) : null
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving to database:', error);
+        throw error;
+      }
+
+      console.log('✅ Swing analysis saved to database:', data);
+
+      // Also save to localStorage for immediate access
+      const updatedAnalyses = [...analyses, currentAnalysis];
+      setAnalyses(updatedAnalyses);
+      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
+      
+      toast({
+        title: "Saved to Swing Insights",
+        description: "You can find this anytime in History & Saved → Analyses.",
+      });
+      
+      setCurrentAnalysis(null);
+    } catch (error) {
+      console.error('Failed to save analysis:', error);
+      toast({
+        title: "Save failed",
+        description: "Failed to save analysis to database. It's still available locally.",
+        variant: "destructive"
+      });
+      
+      // Still save locally even if database save fails
+      const updatedAnalyses = [...analyses, currentAnalysis];
+      setAnalyses(updatedAnalyses);
+      localStorage.setItem('clbhouz_swing_analyses', JSON.stringify(updatedAnalyses));
+    }
   };
 
   const requestMoreDetail = (originalMessage: string) => {

@@ -452,11 +452,11 @@ const SwingAnalysisCard: React.FC<{
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                    <div className="text-white text-center p-4">
-                      <FileText className="h-8 w-8 mx-auto mb-2" />
-                      <p className="text-sm font-medium mb-1">Video Preview</p>
-                      <p className="text-xs opacity-80">New swing analyses will have permanent video links</p>
-                    </div>
+                <div className="text-white text-center p-4">
+                  <FileText className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm font-medium mb-1">Video Preview</p>
+                  <p className="text-xs opacity-80">Video playback available - expand to view</p>
+                </div>
                   </div>
                 </div>
               ) : (
@@ -640,23 +640,58 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       index === self.findIndex(t => t.id === item.id)
     );
 
-    // Load caddie logs from database
+    // Load caddie logs from database and swing analyses from database
+    let databaseAnalyses: any[] = [];
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: logs, error } = await supabase
+        // Load caddie logs
+        const { data: logs, error: logsError } = await supabase
           .from('caddie_logs')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(50);
 
-        if (!error && logs) {
+        if (!logsError && logs) {
           setCaddieLogs(logs);
+        }
+
+        // Load swing analyses from database
+        const { data: dbAnalyses, error: analysesError } = await supabase
+          .from('pro_ai_analyses')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (!analysesError && dbAnalyses) {
+          databaseAnalyses = dbAnalyses.map((analysis: any) => {
+            const metadata = analysis.analysis_results?.metadata || {};
+            const swingContext = analysis.swing_context ? JSON.parse(analysis.swing_context) : null;
+            
+            return {
+              id: analysis.id,
+              save_card: metadata.save_card || 'Swing Analysis',
+              title: metadata.save_card || 'Swing Analysis',
+              tags: metadata.tags || [],
+              category: metadata.category || 'Swing',
+              content: analysis.analysis_results?.aiResponse || '',
+              videoThumbnail: swingContext?.videoThumbnail,
+              videoPoster: swingContext?.videoThumbnail,
+              videoSrc: analysis.video_url,
+              videoUrl: analysis.video_url,
+              videoId: swingContext?.videoId,
+              conversation: swingContext?.conversation || [],
+              timestamp: new Date(analysis.created_at),
+              source: 'database'
+            };
+          });
+          
+          console.log('📊 Loaded database analyses:', databaseAnalyses.length);
         }
       }
     } catch (error) {
-      console.error('Error loading caddie logs:', error);
+      console.error('Error loading database data:', error);
     }
 
     // Convert Swing Coach conversations to analysis format with full conversation data
@@ -733,8 +768,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         };
       });
     
-    // Combine and deduplicate everything properly
-    const allAnalyses = [...uniqueLocalAnalyses, ...swingCoachAnalyses];
+    // Combine and deduplicate everything properly - prioritize database analyses over local ones
+    const allAnalyses = [...databaseAnalyses, ...uniqueLocalAnalyses, ...swingCoachAnalyses];
     const finalUniqueAnalyses = allAnalyses.filter((item, index, self) => 
       index === self.findIndex(t => t.id === item.id)
     );
@@ -745,6 +780,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }));
     
     console.log('📊 Final swing analyses count:', {
+      databaseAnalyses: databaseAnalyses.length,
       uniqueLocalAnalyses: uniqueLocalAnalyses.length,
       swingCoachAnalyses: swingCoachAnalyses.length,
       finalUnique: finalUniqueAnalyses.length,
@@ -908,8 +944,30 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     });
   };
 
-  const deleteSwingAnalysis = (id: string) => {
+  const deleteSwingAnalysis = async (id: string) => {
     console.log('🗑️ Deleting swing analysis:', id);
+    
+    try {
+      // Try to delete from database first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error } = await supabase
+          .from('pro_ai_analyses')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id); // Safety check to ensure user can only delete their own analyses
+
+        if (error) {
+          console.error('Error deleting from database:', error);
+          // Continue with local deletion even if database deletion fails
+        } else {
+          console.log('✅ Deleted analysis from database');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete from database:', error);
+      // Continue with local deletion
+    }
     
     // Remove from current state
     const updated = swingAnalyses.filter(analysis => analysis.id !== id);
