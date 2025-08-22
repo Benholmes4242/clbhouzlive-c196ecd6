@@ -214,15 +214,18 @@ const SwingAnalysisCard: React.FC<{
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
                 )}
-                <video
-                  src={analysis.videoUrl || analysis.videoSrc}
-                  poster={analysis.videoThumbnail || analysis.videoPoster}
-                  controls
-                  className="w-full h-full object-cover"
-                  onLoadStart={() => setIsVideoLoading(true)}
-                  onCanPlay={() => setIsVideoLoading(false)}
-                  onError={() => setIsVideoLoading(false)}
-                />
+                 <video
+                   src={analysis.videoUrl || analysis.videoSrc}
+                   poster={analysis.videoThumbnail || analysis.videoPoster}
+                   controls
+                   className="w-full h-full object-cover"
+                   onLoadStart={() => setIsVideoLoading(true)}
+                   onCanPlay={() => setIsVideoLoading(false)}
+                   onError={(e) => {
+                     setIsVideoLoading(false);
+                     console.log('❌ Video load error for:', analysis.videoUrl || analysis.videoSrc);
+                   }}
+                 />
               </div>
             ) : analysis.videoThumbnail ? (
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
@@ -232,11 +235,10 @@ const SwingAnalysisCard: React.FC<{
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                  <div className="text-white text-center p-4">
-                    <FileText className="h-8 w-8 mx-auto mb-2" />
-                    <p className="text-sm font-medium mb-1">Video Preview</p>
-                    <p className="text-xs opacity-80">New swing analyses will have permanent video links</p>
-                  </div>
+                   <div className="text-white text-center p-4">
+                     <FileText className="h-8 w-8 mx-auto mb-2" />
+                     <p className="text-sm font-medium mb-1">Swing Analysis</p>
+                   </div>
                 </div>
               </div>
             ) : (
