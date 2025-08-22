@@ -32,28 +32,37 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
   // Initialize conversation session on modal open - only when isModalOpen is true
   useEffect(() => {
-    console.log('🔄 Modal state changed:', { isModalOpen, lastOpen: lastOpenStateRef.current });
-    
-    // Skip session management if isModalOpen is explicitly false
-    if (isModalOpen === false) {
-      return;
-    }
+    console.log('🔄 Modal state changed:', { 
+      isModalOpen, 
+      lastOpen: lastOpenStateRef.current,
+      hasCurrentSession: !!currentSession 
+    });
     
     if (isModalOpen && !lastOpenStateRef.current) {
       // Modal just opened - start new session
       console.log('📂 Modal opened, starting new session');
       startNewSession();
       sessionStartTimeRef.current = new Date();
-    } else if (!isModalOpen && lastOpenStateRef.current && currentSession) {
+      lastOpenStateRef.current = true;
+    } else if (!isModalOpen && lastOpenStateRef.current) {
       // Modal just closed - save current session
-      console.log('🔚 Modal closed, saving session with', currentSession.messages.length, 'messages');
-      saveCurrentSession();
+      console.log('🔚 Modal closed, checking session for save...', {
+        hasSession: !!currentSession,
+        messageCount: currentSession?.messages.length || 0
+      });
+      
+      if (currentSession && currentSession.messages.length > 0) {
+        console.log('💾 Session has messages, saving...');
+        saveCurrentSession();
+      } else {
+        console.log('⚠️ No session or messages to save');
+      }
+      
       setCurrentSession(null);
       sessionStartTimeRef.current = null;
+      lastOpenStateRef.current = false;
     }
-    
-    lastOpenStateRef.current = isModalOpen;
-  }, [isModalOpen]);
+  }, [isModalOpen, currentSession]);
 
   // Load conversations from Supabase on mount
   useEffect(() => {
