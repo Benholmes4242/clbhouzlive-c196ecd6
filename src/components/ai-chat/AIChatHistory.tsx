@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { useConversationSession } from '@/hooks/useConversationSession';
 
 
 interface SavedInsight {
@@ -356,6 +357,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   
+  // Get conversation session for chat history  
+  const conversationSession = useConversationSession({
+    storageKey: 'echo_chat',
+    isModalOpen: false // We don't want to trigger auto-save behavior
+  });
+  
   // Loading and error states
   const [loadingStates, setLoadingStates] = useState({
     conversations: false,
@@ -426,38 +433,72 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
+      // Load from conversation session hook (localStorage) first
+      conversationSession.loadConversations();
+      
+      // Convert conversation session format to our chat conversation format
+      const sessionConversations = conversationSession.conversations.map(conv => ({
+        id: conv.id,
+        title: conv.title || "New conversation",
+        customTitle: conv.title,
+        messages: conv.messages.map((msg, index) => ({
+          id: `${conv.id}-${index}`,
+          type: msg.type,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp),
+          metadata: msg.metadata
+        })),
+        timestamp: new Date(conv.lastActivityAt),
+        createdAt: new Date(conv.createdAt),
+        lastActivityAt: new Date(conv.lastActivityAt),
+        messageCount: conv.messages.length
+      }));
+
+      setConversations(sessionConversations);
+
+      // Also try to load from Supabase database if available
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
+      if (user.user) {
+        const { data, error } = await supabase
+          .from('conversations')
+          .select('*')
+          .eq('user_id', user.user.id)
+          .order('updated_at', { ascending: false });
 
-      const { data, error } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('user_id', user.user.id)
-        .order('updated_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          const dbConversations = data.map(conv => {
+            const messages = (conv.messages as any[]) || [];
+            return {
+              id: conv.id,
+              title: conv.title || "New conversation",
+              customTitle: conv.title,
+              messages: messages.map((msg, index) => ({
+                id: `${conv.id}-${index}`,
+                type: msg.role as 'user' | 'ai',
+                content: msg.content,
+                timestamp: new Date(msg.timestamp || conv.created_at),
+                metadata: msg.metadata
+              })),
+              timestamp: new Date(conv.updated_at),
+              createdAt: new Date(conv.created_at),
+              lastActivityAt: new Date(conv.updated_at),
+              messageCount: messages.length
+            };
+          });
 
-      if (error) throw error;
+          // Merge database conversations with local storage conversations
+          const allConversations = [...sessionConversations];
+          dbConversations.forEach(dbConv => {
+            if (!allConversations.find(localConv => localConv.id === dbConv.id)) {
+              allConversations.push(dbConv);
+            }
+          });
 
-      const conversationsWithMessages = data?.map(conv => {
-        const messages = (conv.messages as any[]) || [];
-        return {
-          id: conv.id,
-          title: conv.title || "New conversation",
-          customTitle: conv.title,
-          messages: messages.map((msg, index) => ({
-            id: `${conv.id}-${index}`,
-            type: msg.role as 'user' | 'ai',
-            content: msg.content,
-            timestamp: new Date(msg.timestamp || conv.created_at),
-            metadata: msg.metadata
-          })),
-          timestamp: new Date(conv.updated_at),
-          createdAt: new Date(conv.created_at),
-          lastActivityAt: new Date(conv.updated_at),
-          messageCount: messages.length
-        };
-      }) || [];
-
-      setConversations(conversationsWithMessages);
+          // Sort by last activity
+          allConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
+          setConversations(allConversations);
+        }
+      }
     } catch (error) {
       console.error('Error loading chat conversations:', error);
       setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
@@ -495,10 +536,68 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
-      // No swing analyses table exists in the database yet
-      // For now, we'll just simulate loading with empty data
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setSwingAnalyses([]);
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { data, error } = await supabase
+        .from('pro_ai_analyses')
+        .select('*')
+        .eq('user_id', user.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const analysesWithFormatted = data?.map(analysis => {
+        let conversation: Array<{role: 'user' | 'coach', content: string, timestamp?: string}> = [];
+        let videoThumbnail = '';
+        let videoUrl = analysis.video_url || '';
+        
+        // Parse analysis results for conversation and video data
+        try {
+          if (analysis.analysis_results && typeof analysis.analysis_results === 'object') {
+            const results = analysis.analysis_results as any;
+            
+            // Extract conversation from various possible formats
+            if (results.conversation && Array.isArray(results.conversation)) {
+              conversation = results.conversation.map((msg: any) => ({
+                role: msg.role === 'user' ? 'user' : 'coach',
+                content: msg.content || msg.message || '',
+                timestamp: msg.timestamp
+              }));
+            } else if (results.messages && Array.isArray(results.messages)) {
+              conversation = results.messages.map((msg: any) => ({
+                role: msg.role === 'user' ? 'user' : 'coach',
+                content: msg.content || msg.message || '',
+                timestamp: msg.timestamp
+              }));
+            }
+            
+            // Extract video thumbnail if available
+            if (results.videoThumbnail) {
+              videoThumbnail = results.videoThumbnail;
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing analysis results:', parseError);
+        }
+
+        return {
+          id: analysis.id,
+          save_card: analysis.swing_context || 'Swing Analysis',
+          tags: [],
+          category: 'swing-analysis',
+          content: conversation.length > 0 
+            ? conversation.map(msg => `${msg.role === 'user' ? 'You' : 'Coach'}: ${msg.content}`).join('\n\n')
+            : analysis.swing_context || 'Swing analysis',
+          videoThumbnail,
+          videoUrl,
+          timestamp: new Date(analysis.created_at),
+          conversation,
+          title: 'Swing Analysis'
+        };
+      }) || [];
+
+      setSwingAnalyses(analysesWithFormatted);
     } catch (error) {
       console.error('Error loading swing analyses:', error);
       setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
@@ -509,13 +608,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      const { error } = await supabase
-        .from('conversations')
-        .delete()
-        .eq('id', conversationId);
+      // Delete from local storage first
+      conversationSession.deleteConversation(conversationId);
+      
+      // Also try to delete from database if it exists there
+      const { data: user } = await supabase.auth.getUser();
+      if (user.user) {
+        const { error } = await supabase
+          .from('conversations')
+          .delete()
+          .eq('id', conversationId)
+          .eq('user_id', user.user.id);
 
-      if (error) throw error;
+        // Don't throw error if database deletion fails - local deletion succeeded
+        if (error) {
+          console.warn('Failed to delete conversation from database:', error);
+        }
+      }
 
+      // Update local state
       setConversations(prev => prev.filter(c => c.id !== conversationId));
       toast({
         title: "Conversation deleted",
@@ -556,12 +667,31 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const deleteSwingAnalysis = async (analysisId: string) => {
-    // No swing analyses table exists yet
-    setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
-    toast({
-      title: "Analysis deleted",
-      description: "The swing analysis has been removed from your history."
-    });
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { error } = await supabase
+        .from('pro_ai_analyses')
+        .delete()
+        .eq('id', analysisId)
+        .eq('user_id', user.user.id);
+
+      if (error) throw error;
+
+      setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
+      toast({
+        title: "Analysis deleted",
+        description: "The swing analysis has been removed from your history."
+      });
+    } catch (error) {
+      console.error('Error deleting swing analysis:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete swing analysis. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Filter conversations based on search
