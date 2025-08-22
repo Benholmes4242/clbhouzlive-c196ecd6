@@ -660,25 +660,30 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                 </Button>
                               </div>
                             ) : (
-                              <div className="flex-1 flex flex-col">
-                                {/* Header Row */}
-                                <div className="flex items-start justify-between mb-2">
-                                  <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages[0]?.content || conversation.title}>
-                                    {conversation.messages[0]?.content || conversation.title}
-                                  </h3>
-                                  <span className="text-xs text-gray-500 flex-shrink-0">
-                                    {conversation.timestamp.toLocaleDateString()}
-                                  </span>
-                                </div>
+                               <div className="flex-1 flex flex-col">
+                                 {/* Header Row */}
+                                 <div className="flex items-start justify-between mb-2">
+                                   <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={conversation.messages.find(msg => msg.type === 'user')?.content || conversation.title}>
+                                     {conversation.messages.find(msg => msg.type === 'user')?.content || conversation.title}
+                                   </h3>
+                                   <span className="text-xs text-gray-500 flex-shrink-0">
+                                     {conversation.timestamp.toLocaleDateString()}
+                                   </span>
+                                 </div>
 
-                                {/* Body Preview */}
-                                <div className="flex-1 mb-3">
-                                  {conversation.messages.length > 1 && conversation.messages[1]?.type === 'ai' && (
-                                    <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
-                                      {conversation.messages[1].content}
-                                    </p>
-                                  )}
-                                </div>
+                                 {/* Body Preview - First AI Response */}
+                                 <div className="flex-1 mb-3">
+                                   {(() => {
+                                     const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
+                                     return firstAIMessage ? (
+                                       <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3">
+                                         {firstAIMessage.content}
+                                       </p>
+                                     ) : (
+                                       <p className="text-sm text-gray-400 italic">No response yet</p>
+                                     );
+                                   })()}
+                                 </div>
 
                                 {/* Action Row */}
                                 <div className="flex items-center justify-between">
