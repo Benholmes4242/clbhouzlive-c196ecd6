@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2 } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -291,12 +291,82 @@ const SwingAnalysisCard: React.FC<{
   );
 };
 
+// Skeleton Loading Component
+const SkeletonCard: React.FC = () => (
+  <div className="min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 animate-pulse">
+    <div className="flex items-start justify-between mb-2">
+      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+      <div className="h-3 bg-gray-200 rounded w-16"></div>
+    </div>
+    <div className="space-y-2 mb-3">
+      <div className="h-3 bg-gray-200 rounded w-full"></div>
+      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+    </div>
+    <div className="flex items-center justify-between">
+      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+      <div className="flex gap-1">
+        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Empty State Component
+const EmptyState: React.FC<{ 
+  icon: React.ReactNode; 
+  title: string; 
+  subtitle: string;
+}> = ({ icon, title, subtitle }) => (
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="text-gray-400 mb-4">
+      {icon}
+    </div>
+    <h3 className="text-sm font-medium text-gray-900 mb-1">{title}</h3>
+    <p className="text-xs text-gray-500">{subtitle}</p>
+  </div>
+);
+
+// Error State Component
+const ErrorState: React.FC<{ 
+  message: string; 
+  onRetry: () => void;
+}> = ({ message, onRetry }) => (
+  <div className="flex flex-col items-center justify-center py-8 text-center">
+    <div className="text-red-400 mb-4">
+      <AlertCircle className="h-8 w-8" />
+    </div>
+    <p className="text-sm text-red-600 mb-4">{message}</p>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onRetry}
+      className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
+    >
+      <RotateCcw className="h-3 w-3 mr-1" />
+      Retry
+    </Button>
+  </div>
+);
+
 const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  
+  // Loading and error states
+  const [loadingStates, setLoadingStates] = useState({
+    conversations: false,
+    caddieLogs: false,
+    swingAnalyses: false
+  });
+  const [errorStates, setErrorStates] = useState({
+    conversations: null as string | null,
+    caddieLogs: null as string | null,
+    swingAnalyses: null as string | null
+  });
   
   // Unified expansion state - only one card can be expanded at a time across all tabs
   const [expandedCard, setExpandedCard] = useState<{type: 'chat' | 'caddie' | 'swing', id: string} | null>(null);
@@ -352,6 +422,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadChatConversations = async () => {
+    setLoadingStates(prev => ({ ...prev, conversations: true }));
+    setErrorStates(prev => ({ ...prev, conversations: null }));
+    
     try {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
@@ -387,10 +460,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error loading chat conversations:', error);
+      setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, conversations: false }));
     }
   };
 
   const loadCaddieLogs = async () => {
+    setLoadingStates(prev => ({ ...prev, caddieLogs: true }));
+    setErrorStates(prev => ({ ...prev, caddieLogs: null }));
+    
     try {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
@@ -405,12 +484,27 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       setCaddieLogs(data || []);
     } catch (error) {
       console.error('Error loading caddie logs:', error);
+      setErrorStates(prev => ({ ...prev, caddieLogs: 'Failed to load caddie logs. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, caddieLogs: false }));
     }
   };
 
   const loadSwingAnalyses = async () => {
-    // No swing analyses table exists in the database yet
-    setSwingAnalyses([]);
+    setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
+    setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
+    
+    try {
+      // No swing analyses table exists in the database yet
+      // For now, we'll just simulate loading with empty data
+      await new Promise(resolve => setTimeout(resolve, 100));
+      setSwingAnalyses([]);
+    } catch (error) {
+      console.error('Error loading swing analyses:', error);
+      setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
+    }
   };
 
   const deleteConversation = async (conversationId: string) => {
@@ -615,7 +709,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="px-6 py-5">
-                  {filteredConversations.length > 0 ? (
+                  {loadingStates.conversations ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.conversations ? (
+                    <ErrorState
+                      message={errorStates.conversations}
+                      onRetry={loadChatConversations}
+                    />
+                  ) : filteredConversations.length > 0 ? (
                     <div className="space-y-4 sm:space-y-5">
                       {filteredConversations.map((conversation, index) => (
                         <div
@@ -775,12 +880,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center text-gray-600 py-8">
-                      <div className="text-center">
-                        <p className="text-sm">No chat history found</p>
-                        <p className="text-xs mt-1 opacity-70">Start a conversation with Echo to see it here</p>
-                      </div>
-                    </div>
+                    <EmptyState
+                      icon={<MessageCircle className="h-12 w-12" />}
+                      title="No conversations yet"
+                      subtitle="Your chat history with Echo will appear here"
+                    />
                   )}
                 </div>
               </ScrollArea>
@@ -794,7 +898,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="px-6 py-5">
-                  {filteredCaddieLogs.length > 0 ? (
+                  {loadingStates.caddieLogs ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.caddieLogs ? (
+                    <ErrorState
+                      message={errorStates.caddieLogs}
+                      onRetry={loadCaddieLogs}
+                    />
+                  ) : filteredCaddieLogs.length > 0 ? (
                     <div className="space-y-4 sm:space-y-5">
                       {filteredCaddieLogs.map((log) => {
                         const isExpanded = expandedCard?.type === 'caddie' && expandedCard?.id === log.id;
@@ -922,12 +1037,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       })}
                     </div>
                   ) : (
-                    <div className="text-center text-gray-600 py-8">
-                      <div className="text-center">
-                        <p className="text-sm">No caddie logs found</p>
-                        <p className="text-xs mt-1 opacity-70">Record voice notes during your rounds to see them here</p>
-                      </div>
-                    </div>
+                    <EmptyState
+                      icon={<Mic className="h-12 w-12" />}
+                      title="No caddie logs yet"
+                      subtitle="Record voice notes during your rounds to see them here"
+                    />
                   )}
                 </div>
               </ScrollArea>
@@ -941,7 +1055,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="px-6 py-5">
-                  {filteredSwingAnalyses.length > 0 ? (
+                  {loadingStates.swingAnalyses ? (
+                    <div className="space-y-4 sm:space-y-5">
+                      {[1, 2, 3].map((i) => (
+                        <SkeletonCard key={i} />
+                      ))}
+                    </div>
+                  ) : errorStates.swingAnalyses ? (
+                    <ErrorState
+                      message={errorStates.swingAnalyses}
+                      onRetry={loadSwingAnalyses}
+                    />
+                  ) : filteredSwingAnalyses.length > 0 ? (
                     <div className="space-y-4 sm:space-y-5">
                       {filteredSwingAnalyses.map((analysis) => (
                         <div key={analysis.id} className="transition-transform duration-100">
@@ -959,12 +1084,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center text-gray-600 py-8">
-                      <div className="text-center">
-                        <p className="text-sm">No swing analyses found</p>
-                        <p className="text-xs mt-1 opacity-70">Upload swing videos to Swing Coach to see them here</p>
-                      </div>
-                    </div>
+                    <EmptyState
+                      icon={<BarChart3 className="h-12 w-12" />}
+                      title="No swing analyses yet"
+                      subtitle="Upload swing videos to Swing Coach to see them here"
+                    />
                   )}
                 </div>
               </ScrollArea>
