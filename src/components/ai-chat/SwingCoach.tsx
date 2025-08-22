@@ -559,6 +559,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       localStorage.setItem('clbhouz_swingcoach_history', JSON.stringify(allSwingCoachMessages));
 
       // Set current analysis for potential saving
+      console.log('🔍 Analysis response data:', { 
+        hasMetadata: !!data.metadata, 
+        metadata: data.metadata,
+        response: data.response?.substring(0, 100) + '...'
+      });
+      
       if (data.metadata) {
         const analysisToSave = {
           id: aiMessage.id,
@@ -581,6 +587,30 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         // Auto-save to Supabase after successful analysis
         console.log('🤖 Analysis complete, auto-saving to Supabase...');
         await autoSaveAnalysisToSupabase(analysisToSave);
+      } else {
+        // If no metadata, still save with basic information
+        console.log('📝 No metadata found, creating basic analysis for auto-save...');
+        const basicAnalysisToSave = {
+          id: aiMessage.id,
+          save_card: 'Swing Analysis',
+          tags: [],
+          category: 'Swing',
+          content: data.response,
+          videoThumbnail: thumbnailUrl,
+          videoId: videoId,
+          videoUrl: videoUrl,
+          timestamp: new Date(),
+          conversation: [
+            { role: 'user' as const, content: userMessage.content, timestamp: userMessage.timestamp },
+            { role: 'ai' as const, content: aiMessage.content, timestamp: aiMessage.timestamp }
+          ]
+        };
+        
+        setCurrentAnalysis(basicAnalysisToSave);
+        
+        // Auto-save to Supabase even without metadata
+        console.log('🤖 Basic analysis complete, auto-saving to Supabase...');
+        await autoSaveAnalysisToSupabase(basicAnalysisToSave);
       }
 
     } catch (error) {
