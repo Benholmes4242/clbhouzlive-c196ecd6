@@ -587,43 +587,42 @@ const HeroProfileHeader = ({
               }}
             />
             {/* Subtle overlay for better text contrast */}
-            <div className="absolute inset-0 bg-black/10" />
+            <div className="absolute inset-0 bg-black/20" />
+            
+            {/* Centered user info overlay */}
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+              <h1 className="text-3xl font-bold mb-2 drop-shadow-lg">
+                {profile?.display_name || 'User'}
+              </h1>
+              {profile?.username && (
+                <p className="text-lg mb-3 drop-shadow-md opacity-90">@{profile.username}</p>
+              )}
+              {profile?.bio && (
+                <p className="text-base leading-relaxed mb-4 max-w-xs drop-shadow-md opacity-85">
+                  {profile.bio}
+                </p>
+              )}
+              
+              {/* Meta row with Home Club (left) and Handicap (right) */}
+              <div className="flex justify-between items-center w-full max-w-xs">
+                <div className="text-left">
+                  <p className="text-xs opacity-75 mb-1">Home Club</p>
+                  <p className="text-sm font-medium drop-shadow-md">
+                    {profile?.home_club || 'No Club'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs opacity-75 mb-1">Handicap</p>
+                  <p className="text-sm font-semibold drop-shadow-md">
+                    {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Profile content on white background below media */}
           <div className="bg-white px-4 py-6 space-y-6">
-            {/* User name (immediately below header media) */}
-            <div className="text-left">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {profile?.display_name || 'User'}
-              </h1>
-              {profile?.username && (
-                <p className="text-gray-600 text-base">@{profile.username}</p>
-              )}
-            </div>
-            
-            {/* Bio section */}
-            {profile?.bio && (
-              <p className="text-gray-700 text-base leading-relaxed">
-                {profile.bio}
-              </p>
-            )}
-            
-            {/* Meta row with Home Club (left) and Handicap (right) */}
-            <div className="flex justify-between items-center">
-              <div className="text-left">
-                <p className="text-xs text-gray-500 mb-1">Home Club</p>
-                <p className="text-sm font-medium text-gray-900">
-                  {profile?.home_club || 'No Club'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-gray-500 mb-1">Handicap</p>
-                <p className="text-sm font-semibold text-gray-900">
-                  {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
-                </p>
-              </div>
-            </div>
 
             {/* Three buttons stacked vertically (only for own profile) */}
             {isOwnProfile && (
