@@ -378,7 +378,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         onTouchMove={(e) => e.stopPropagation()}
         onScroll={(e) => e.stopPropagation()}
       >
-        <div className="animate-fade-in">
+        <div 
+          className={`absolute inset-0 transition-opacity duration-300 ${
+            showHistory ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+        >
           <AIChatHistory 
             isOpen={showHistory} 
             onClose={() => setShowHistory(false)}
