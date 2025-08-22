@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { useConversationSession } from '@/hooks/useConversationSession';
 
 interface SavedInsight {
   id: string;
@@ -60,14 +61,19 @@ interface HistoryMessage {
 interface ChatConversation {
   id: string;
   title: string;
+  customTitle?: string;
   messages: HistoryMessage[];
   timestamp: Date;
+  createdAt: Date;
+  lastActivityAt: Date;
+  messageCount?: number;
 }
 
 interface AIChatHistoryProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectMessage: (message: string) => void;
+  onNewConversation?: () => void;
 }
 
 // Video Player Dialog Component
@@ -411,7 +417,7 @@ const SwingAnalysisCard: React.FC<{
   );
 };
 
-const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage }) => {
+const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -422,7 +428,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [swingAnalyses, setSwingAnalyses] = useState<SwingAnalysis[]>([]);
   const [caddieLogs, setCaddieLogs] = useState<CaddieLog[]>([]);
   const [activeTab, setActiveTab] = useState('chat');
+  const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
   const { toast } = useToast();
+
+  // Conversation session management for new grouped conversations
+  const conversationSession = useConversationSession({
+    storageKey: 'clbhouz_ai_chat',
+    isModalOpen: false // Not managing sessions here, just reading
+  });
 
   // Auto-scroll hooks for each tab
   const chatAutoScroll = useAutoScroll({
@@ -490,17 +504,41 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadData = async () => {
-    // Load history from localStorage (existing chat messages)
+    // Load new conversation sessions first
+    conversationSession.loadConversations();
+    
+    // Convert session conversations to the format expected by the UI
+    const sessionConversations = conversationSession.conversations.map(session => ({
+      id: session.id,
+      title: session.customTitle || session.title || 'New conversation',
+      customTitle: session.customTitle,
+      messages: session.messages.map(msg => ({
+        id: msg.id,
+        type: msg.type,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        metadata: msg.metadata
+      })),
+      timestamp: session.lastActivityAt,
+      createdAt: session.createdAt,
+      lastActivityAt: session.lastActivityAt,
+      messageCount: session.messages.length
+    }));
+
+    // Load legacy history from localStorage (existing chat messages)
     const history = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
     const parsedHistory = history.map((msg: any) => ({
       ...msg,
       timestamp: new Date(msg.timestamp)
     }));
-    setHistoryMessages(parsedHistory);
     
-    // Group messages into conversations
-    const groupedConversations = groupMessagesIntoConversations(parsedHistory);
-    setConversations(groupedConversations);
+    // Group legacy messages into conversations if any exist
+    const legacyConversations = parsedHistory.length > 0 ? groupMessagesIntoConversations(parsedHistory) : [];
+    
+    // Combine both sources, with session conversations taking priority
+    const allConversations = [...sessionConversations, ...legacyConversations];
+    setConversations(allConversations);
+    setHistoryMessages(parsedHistory);
 
     // Load saved insights
     const saved = JSON.parse(localStorage.getItem('clbhouz_ai_saved') || '[]');
@@ -673,7 +711,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               id: `conv-${conversations.length}`,
               title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
               messages: [...currentConversation],
-              timestamp: firstUserMessage.timestamp
+              timestamp: firstUserMessage.timestamp,
+              createdAt: firstUserMessage.timestamp, // Use first message time as created time
+              lastActivityAt: currentConversation[currentConversation.length - 1]?.timestamp || firstUserMessage.timestamp,
+              messageCount: currentConversation.length
             });
           }
         }
@@ -690,7 +731,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             id: `conv-${conversations.length}`,
             title: firstUserMessage.content.substring(0, 60) + (firstUserMessage.content.length > 60 ? '...' : ''),
             messages: [...currentConversation],
-            timestamp: firstUserMessage.timestamp
+            timestamp: firstUserMessage.timestamp,
+            createdAt: firstUserMessage.timestamp, // Use first message time as created time
+            lastActivityAt: currentConversation[currentConversation.length - 1]?.timestamp || firstUserMessage.timestamp,
+            messageCount: currentConversation.length
           });
         }
       }
@@ -710,25 +754,68 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const deleteConversation = (conversationId: string) => {
-    const conversationToDelete = conversations.find(conv => conv.id === conversationId);
-    if (!conversationToDelete) return;
-    
-    // Remove messages from this conversation from the stored history
-    const remainingMessages = historyMessages.filter(msg => 
-      !conversationToDelete.messages.some(convMsg => convMsg.id === msg.id)
-    );
-    
-    localStorage.setItem('clbhouz_ai_history', JSON.stringify(remainingMessages));
-    setHistoryMessages(remainingMessages);
-    
-    // Update conversations
-    const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
-    setConversations(updatedConversations);
+    // Check if this is a session conversation or legacy conversation
+    if (conversationId.startsWith('session_')) {
+      // Delete from session conversations
+      conversationSession.deleteConversation(conversationId);
+      // Reload conversations to refresh the UI
+      setTimeout(() => loadData(), 100);
+    } else {
+      // Handle legacy conversations
+      const conversationToDelete = conversations.find(conv => conv.id === conversationId);
+      if (!conversationToDelete) return;
+      
+      // Remove messages from this conversation from the stored history
+      const remainingMessages = historyMessages.filter(msg => 
+        !conversationToDelete.messages.some(convMsg => convMsg.id === msg.id)
+      );
+      
+      localStorage.setItem('clbhouz_ai_history', JSON.stringify(remainingMessages));
+      setHistoryMessages(remainingMessages);
+      
+      // Update conversations
+      const updatedConversations = conversations.filter(conv => conv.id !== conversationId);
+      setConversations(updatedConversations);
+    }
     
     toast({
       title: "Conversation deleted",
       description: "The conversation has been removed from your history",
     });
+  };
+
+  const renameConversation = (conversationId: string, newTitle: string) => {
+    if (conversationId.startsWith('session_')) {
+      // Rename session conversation
+      conversationSession.renameConversation(conversationId, newTitle);
+      // Reload conversations to refresh the UI
+      setTimeout(() => loadData(), 100);
+    } else {
+      // Handle legacy conversations - not supported for now
+      toast({
+        title: "Renaming not supported",
+        description: "Legacy conversations cannot be renamed",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleStartEdit = (conversationId: string, currentTitle: string) => {
+    setEditingConversationId(conversationId);
+    setEditTitle(currentTitle);
+  };
+
+  const handleSaveEdit = (conversationId: string) => {
+    if (editTitle.trim()) {
+      renameConversation(conversationId, editTitle.trim());
+    }
+    setEditingConversationId(null);
+    setEditTitle('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingConversationId(null);
+    setEditTitle('');
   };
 
   const deleteSavedInsight = (id: string) => {
@@ -941,42 +1028,65 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList 
-              className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20"
-              role="tablist"
-              aria-label="Echo History sections"
-            >
-              <TabsTrigger 
-                value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
-                aria-selected={activeTab === 'chat'}
-                aria-controls="chat-panel"
-                id="chat-tab"
+            <div className="flex items-center justify-between mb-3">
+              <TabsList 
+                className="grid grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20 flex-1 mr-3"
+                role="tablist"
+                aria-label="Echo History sections"
               >
-                Chat
-              </TabsTrigger>
-              <TabsTrigger 
-                value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
-                aria-selected={activeTab === 'logs'}
-                aria-controls="logs-panel"
-                id="logs-tab"
-              >
-                Caddie Logs
-              </TabsTrigger>
-              <TabsTrigger 
-                value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-                role="tab"
-                aria-selected={activeTab === 'swing-coach'}
-                aria-controls="swing-coach-panel"
-                id="swing-coach-tab"
-              >
-                Swing Coach
-              </TabsTrigger>
-            </TabsList>
+                <TabsTrigger 
+                  value="chat" 
+                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  role="tab"
+                  aria-selected={activeTab === 'chat'}
+                  aria-controls="chat-panel"
+                  id="chat-tab"
+                >
+                  Chat
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="logs"
+                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  role="tab"
+                  aria-selected={activeTab === 'logs'}
+                  aria-controls="logs-panel"
+                  id="logs-tab"
+                >
+                  Caddie Logs
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="swing-coach"
+                  className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  role="tab"
+                  aria-selected={activeTab === 'swing-coach'}
+                  aria-controls="swing-coach-panel"
+                  id="swing-coach-tab"
+                >
+                  Swing Coach
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* New Conversation Button - only show on chat tab */}
+              {activeTab === 'chat' && onNewConversation && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    onNewConversation();
+                    onClose();
+                  }}
+                  className="bg-white/60 border-white/30 hover:bg-white/80 px-3 py-1.5 text-sm flex items-center gap-2"
+                  title="Start a new conversation"
+                >
+                  <Plus className="h-3 w-3" />
+                  New
+                </Button>
+              )}
+            </div>
+            
+            {/* Move TabsList content here - it's already included above */}
+            <div className="hidden">
+            </div>
           </div>
 
           {/* Single scrollable content area */}
@@ -991,27 +1101,83 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {filteredConversations.length > 0 ? (
                     <div className="space-y-3">
                       {filteredConversations.map((conversation, index) => (
-                        <div
-                          key={`conversation-${conversation.id || index}`}
-                          className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-medium truncate flex-1 text-gray-900">{conversation.title}</h3>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600">
-                                {conversation.timestamp.toLocaleDateString()}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deleteConversation(conversation.id)}
-                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                aria-label={`Delete conversation: ${conversation.title}`}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
+                         <div
+                           key={`conversation-${conversation.id || index}`}
+                           className="p-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-100"
+                         >
+                           <div className="flex items-center justify-between mb-2">
+                             {editingConversationId === conversation.id ? (
+                               <div className="flex items-center gap-2 flex-1">
+                                 <Input
+                                   value={editTitle}
+                                   onChange={(e) => setEditTitle(e.target.value)}
+                                   className="flex-1"
+                                   onKeyDown={(e) => {
+                                     if (e.key === 'Enter') {
+                                       handleSaveEdit(conversation.id);
+                                     } else if (e.key === 'Escape') {
+                                       handleCancelEdit();
+                                     }
+                                   }}
+                                   autoFocus
+                                 />
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={() => handleSaveEdit(conversation.id)}
+                                   className="h-7 px-2"
+                                 >
+                                   Save
+                                 </Button>
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={handleCancelEdit}
+                                   className="h-7 px-2"
+                                 >
+                                   Cancel
+                                 </Button>
+                               </div>
+                             ) : (
+                               <>
+                                 <div className="flex items-center gap-2 flex-1">
+                                   <h3 className="font-medium truncate text-gray-900">
+                                     {conversation.customTitle || conversation.title}
+                                   </h3>
+                                   {conversation.messageCount && (
+                                     <Badge variant="secondary" className="text-xs">
+                                       {conversation.messageCount} messages
+                                     </Badge>
+                                   )}
+                                 </div>
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-sm text-gray-600">
+                                     {conversation.timestamp.toLocaleDateString()}
+                                   </span>
+                                   {conversation.id.startsWith('session_') && (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
+                                       className="h-7 px-2 text-gray-600 hover:text-gray-900"
+                                       title="Rename conversation"
+                                     >
+                                       <Edit2 className="h-3 w-3" />
+                                     </Button>
+                                   )}
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => deleteConversation(conversation.id)}
+                                     className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                     aria-label={`Delete conversation: ${conversation.title}`}
+                                   >
+                                     <Trash2 className="h-3 w-3" />
+                                   </Button>
+                                 </div>
+                               </>
+                             )}
+                           </div>
                           <div className="flex justify-between items-center">
                             <Button
                               variant="outline"

@@ -13,6 +13,7 @@ import EchoAvatar from './EchoAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
+import { useConversationSession } from '@/hooks/useConversationSession';
 
 interface ChatMessageData {
   id: string;
@@ -46,6 +47,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Conversation session management
+  const conversationSession = useConversationSession({
+    storageKey: 'clbhouz_ai_chat',
+    isModalOpen: isOpen
+  });
 
   async function handleVoiceNote(transcribedText: string) {
     try {
@@ -220,16 +227,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  // Conversation session management 
   const saveCurrentChatToHistory = () => {
-    if (messages.length > 0) {
-      // Store current conversation in localStorage for history
-      const storedMessages = JSON.parse(localStorage.getItem('clbhouz_ai_history') || '[]');
-      const conversationMessages = [...messages];
-      storedMessages.push(...conversationMessages);
-      localStorage.setItem('clbhouz_ai_history', JSON.stringify(storedMessages.slice(-100))); // Keep last 100 messages
-    }
-    
-    // SwingCoach conversations are now saved separately and don't merge with chat history
+    // Messages are automatically saved to session via useEffect
   };
 
   const handleClose = () => {
@@ -256,6 +256,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    conversationSession.addMessage(userMessage); // Add to session
     setInputValue('');
     setIsLoading(true);
 
@@ -303,6 +304,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      conversationSession.addMessage(aiMessage); // Add to session
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -366,6 +368,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
           setShowHistory(false);
           // Re-open the conversation with selected message
           sendMessage(message);
+        }}
+        onNewConversation={() => {
+          conversationSession.startNewConversationManually();
+          setMessages([]); // Clear current messages
+          setShowHistory(false);
         }}
       />
     );
