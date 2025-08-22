@@ -1071,56 +1071,58 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                </div>
                              ) : (
                                <>
-                                 <div className="flex items-center gap-2 flex-1">
-                                   <h3 className="font-medium truncate text-gray-900">
-                                     {conversation.customTitle || conversation.title}
-                                   </h3>
-                                   {conversation.messageCount && (
-                                     <Badge variant="secondary" className="text-xs">
-                                       {conversation.messageCount} messages
-                                     </Badge>
-                                   )}
-                                 </div>
-                                 <div className="flex items-center gap-2">
-                                   <span className="text-sm text-gray-600">
-                                     {conversation.timestamp.toLocaleDateString()}
-                                   </span>
-                                   {conversation.id.startsWith('session_') && (
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
-                                       className="h-7 px-2 text-gray-600 hover:text-gray-900"
-                                       title="Rename conversation"
-                                     >
-                                       <Edit2 className="h-3 w-3" />
-                                     </Button>
-                                   )}
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={() => deleteConversation(conversation.id)}
-                                     className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
-                                     aria-label={`Delete conversation: ${conversation.title}`}
-                                   >
-                                     <Trash2 className="h-3 w-3" />
-                                   </Button>
-                                 </div>
+                                  <div className="flex items-center gap-2 flex-1">
+                                    <h3 className="font-medium truncate text-gray-900" style={{ maxWidth: '50%' }}>
+                                      {conversation.customTitle || conversation.title}
+                                    </h3>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">
+                                      {conversation.timestamp.toLocaleDateString()}
+                                    </span>
+                                    {conversation.id.startsWith('session_') && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleStartEdit(conversation.id, conversation.customTitle || conversation.title)}
+                                        className="h-7 px-2 text-gray-600 hover:text-gray-900"
+                                        title="Rename conversation"
+                                      >
+                                        <Edit2 className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
                                </>
                              )}
                            </div>
-                          <div className="flex justify-between items-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setExpandedConversation(
-                                expandedConversation === conversation.id ? null : conversation.id
-                              )}
-                              className="bg-gray-100 border-gray-200 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm"
-                            >
-                              {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
-                            </Button>
-                          </div>
+                           <div className="flex justify-between items-center">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => setExpandedConversation(
+                                 expandedConversation === conversation.id ? null : conversation.id
+                               )}
+                               className="bg-gray-100 border-gray-200 hover:bg-gray-200 rounded-full px-3 py-1.5 text-sm"
+                             >
+                               {expandedConversation === conversation.id ? 'Hide' : 'Show'} Conversation
+                             </Button>
+                             <div className="flex items-center gap-2">
+                               {conversation.messageCount && (
+                                 <Badge variant="secondary" className="text-xs">
+                                   {conversation.messageCount} messages
+                                 </Badge>
+                               )}
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={() => deleteConversation(conversation.id)}
+                                 className="h-7 px-2 text-destructive hover:text-destructive hover:bg-red-50 transition-colors duration-100"
+                                 aria-label={`Delete conversation: ${conversation.title}`}
+                               >
+                                 <Trash2 className="h-3 w-3" />
+                               </Button>
+                             </div>
+                           </div>
                           
                           {expandedConversation === conversation.id && (
                             <div className="mt-4 space-y-2 border-t border-gray-200 pt-4">
