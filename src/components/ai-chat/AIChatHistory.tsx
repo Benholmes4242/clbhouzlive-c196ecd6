@@ -429,12 +429,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen]);
 
   const loadChatConversations = async () => {
+    console.log('🔍 Loading chat conversations...');
     setLoadingStates(prev => ({ ...prev, conversations: true }));
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
       // Load from conversation session hook (localStorage) first
+      console.log('📱 Loading from conversation session...');
       conversationSession.loadConversations();
+      console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
       
       // Convert conversation session format to our chat conversation format
       const sessionConversations = conversationSession.conversations.map(conv => ({
@@ -454,16 +457,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         messageCount: conv.messages.length
       }));
 
+      console.log('📱 Session conversations processed:', sessionConversations.length);
       setConversations(sessionConversations);
 
       // Also try to load from Supabase database if available
       const { data: user } = await supabase.auth.getUser();
+      console.log('👤 Current user:', user.user?.id);
       if (user.user) {
+        console.log('💾 Loading from Supabase conversations table...');
         const { data, error } = await supabase
           .from('conversations')
           .select('*')
           .eq('user_id', user.user.id)
           .order('updated_at', { ascending: false });
+
+        console.log('💾 Supabase conversations result:', { data: data?.length || 0, error });
 
         if (!error && data && data.length > 0) {
           const dbConversations = data.map(conv => {
@@ -508,11 +516,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadCaddieLogs = async () => {
+    console.log('🏌️ Loading caddie logs...');
     setLoadingStates(prev => ({ ...prev, caddieLogs: true }));
     setErrorStates(prev => ({ ...prev, caddieLogs: null }));
     
     try {
       const { data: user } = await supabase.auth.getUser();
+      console.log('👤 User for caddie logs:', user.user?.id);
       if (!user.user) return;
 
       const { data, error } = await supabase
@@ -521,6 +531,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
+      console.log('🏌️ Caddie logs result:', { data: data?.length || 0, error });
       if (error) throw error;
       setCaddieLogs(data || []);
     } catch (error) {
@@ -532,11 +543,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadSwingAnalyses = async () => {
+    console.log('🏌️‍♂️ Loading swing analyses...');
     setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
       const { data: user } = await supabase.auth.getUser();
+      console.log('👤 User for swing analyses:', user.user?.id);
       if (!user.user) return;
 
       const { data, error } = await supabase
@@ -545,6 +558,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
+      console.log('🏌️‍♂️ Swing analyses result:', { data: data?.length || 0, error });
       if (error) throw error;
 
       const analysesWithFormatted = data?.map(analysis => {
@@ -597,6 +611,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         };
       }) || [];
 
+      console.log('🏌️‍♂️ Processed swing analyses:', analysesWithFormatted.length);
       setSwingAnalyses(analysesWithFormatted);
     } catch (error) {
       console.error('Error loading swing analyses:', error);
