@@ -371,7 +371,7 @@ const HeroProfileHeader = ({
 
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const headerHeight = window.innerHeight * 0.65; // 65vh header height
+      const headerHeight = window.innerHeight * 0.60; // 60vh header height
       trackScrollDepth(scrollTop, headerHeight);
     };
 
@@ -594,7 +594,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16">
           {/* Header media area (full-bleed, 72vh, passes under main header) */}
-          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '65vh' }}>
+          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '60vh' }}>
             {/* Loading state with neutral color */}
             <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             

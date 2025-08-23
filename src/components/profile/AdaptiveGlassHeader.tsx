@@ -35,8 +35,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
 
   const primaryStats = [
     { label: 'Handicap', value: stats.handicap?.toString() || '--', key: 'handicap' },
-    { label: 'Total XP', value: stats.ratedCoursesCount?.toString() || '0', key: 'totalxp' },
-    { label: 'Followers', value: stats.followers.toString(), key: 'followers' }
+    { label: 'Total XP', value: '2,500', key: 'totalxp' } // Match the achievements system XP
   ];
 
   return (
@@ -111,14 +110,14 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
               </div>
             </div>
 
-            {/* Primary Stats Strip - 3 stats only */}
-            <div className="flex items-center gap-6">
+            {/* Primary Stats Strip - 2 stats only (mobile) */}
+            <div className="flex items-center gap-8">
               {primaryStats.map((stat) => (
                 <button
                   key={stat.key}
                   onClick={() => onStatClick?.(stat.key)}
                   className={`
-                    text-center px-3 py-1 transition-all duration-300 min-w-0 flex-shrink-0
+                    text-center px-4 py-1 transition-all duration-300 min-w-0 flex-shrink-0
                     ${glassMode === 'elevated' 
                       ? 'hover:bg-black/5' 
                       : 'hover:bg-white/10'
