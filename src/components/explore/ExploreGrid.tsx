@@ -276,63 +276,86 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       return 'square'; // 70% square
     };
 
-    // Create mobile-specific layout with 70% squares, 15% tall, 15% hero
+    // Create mobile-specific dynamic layout
     const createMobileLayout = () => {
       const layoutItems = [];
       let contentIndex = 0;
-      let cyclePosition = 0; // Position within 20-card cycle
-      let tallColumnCycle = 0; // Cycle tall cards across columns (0=left, 1=middle, 2=right)
-      let squaresSinceLastTall = 0; // Track squares between tall cards
-      
-      // 20-card cycle pattern: 14 squares, 3 tall, 3 hero
-      const cyclePattern = [
-        'square', 'square', 'tall',     // Row 1: 1×1 · 1×1 · 1×2
-        'square', 'square', 'square',   // Row 2: 1×1 · 1×1 · 1×1
-        'hero',                         // Row 3-4: HERO (4×4) spans all 3 cols
-        'square', 'square', 'square',   // Row 5: 1×1 · 1×1 · 1×1
-        'tall', 'square', 'square',     // Row 6: 1×2 · 1×1 · 1×1
-        'hero',                         // Row 7-8: HERO (4×4) spans all 3 cols
-        'square', 'tall', 'square',     // Row 9: 1×1 · 1×2 · 1×1
-        'hero'                          // Row 10-11: HERO (4×4) spans all 3 cols
-      ];
+      let specialCardCounter = 0; // Track special cards placed
       
       while (contentIndex < filteredContent.length) {
-        const patternType = cyclePattern[cyclePosition % cyclePattern.length];
+        const remainingItems = filteredContent.length - contentIndex;
+        
+        // Check if we should place a special card (every 6-8 squares)
+        const shouldPlaceSpecial = specialCardCounter === 0 || 
+          (layoutItems.filter(item => item.type === 'regular').length - 
+           layoutItems.filter(item => item.type !== 'regular').length * 4) >= (6 + Math.floor(Math.random() * 3));
+        
+        if (shouldPlaceSpecial && remainingItems >= 2) {
+          // Decide between large (4x4) or tall (1x2) based on content and distribution
+          const currentSpecialCount = layoutItems.filter(item => item.type !== 'regular').length;
+          const totalSpecialNeeded = Math.floor(filteredContent.length * 0.3); // 30% special (15% large + 15% tall)
+          const largeNeeded = Math.floor(filteredContent.length * 0.15);
+          const tallNeeded = Math.floor(filteredContent.length * 0.15);
+          
+          const largeCount = layoutItems.filter(item => item.type === 'large').length;
+          const tallCount = layoutItems.filter(item => item.type === 'tall').length;
+          
+          let cardType = 'regular';
+          
+          // Prefer placing cards based on aspect ratio detection and distribution needs
+          const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+          
+          // Large squares (4x4) should be for square content or when we need more large cards
+          if ((aspectRatio === 'square' || aspectRatio === 'landscape') && largeCount < largeNeeded) {
+            cardType = 'large';
+          } 
+          // Tall cards (1x2) should be for portrait content
+          else if (aspectRatio === 'portrait' && tallCount < tallNeeded) {
+            cardType = 'tall';
+          } 
+          // Fill remaining quotas
+          else if (largeCount < largeNeeded) {
+            cardType = 'large';
+          } else if (tallCount < tallNeeded) {
+            cardType = 'tall';
+          }
+          
+          // Avoid back-to-back special cards
+          const lastItem = layoutItems[layoutItems.length - 1];
+          if (lastItem && lastItem.type !== 'regular' && Math.random() > 0.3) {
+            cardType = 'regular';
+          }
+          
+          if (cardType !== 'regular') {
+            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+            
+            layoutItems.push({
+              type: cardType,
+              item: filteredContent[contentIndex],
+              index: contentIndex,
+              shouldAutoplay,
+              aspectRatio
+            });
+            contentIndex++;
+            specialCardCounter++;
+            continue;
+          }
+        }
+        
+        // Add regular card
         const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
         const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
         const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
         
-        let cardType = 'regular';
-        
-        // Follow the cycle pattern but adapt to content availability
-        if (patternType === 'hero' && contentIndex < filteredContent.length) {
-          cardType = 'large'; // 4×4 hero cards
-        } else if (patternType === 'tall' && contentIndex < filteredContent.length) {
-          // Only place tall if we have minimum buffer of 3 squares since last tall
-          if (squaresSinceLastTall >= 3) {
-            cardType = 'tall'; // 1×2 tall cards
-            squaresSinceLastTall = 0;
-            tallColumnCycle = (tallColumnCycle + 1) % 3; // Cycle across columns
-          } else {
-            cardType = 'regular'; // Fall back to square
-            squaresSinceLastTall++;
-          }
-        } else {
-          cardType = 'regular'; // 1×1 square cards
-          squaresSinceLastTall++;
-        }
-        
         layoutItems.push({
-          type: cardType,
+          type: 'regular',
           item: filteredContent[contentIndex],
           index: contentIndex,
           shouldAutoplay,
-          aspectRatio,
-          tallColumn: cardType === 'tall' ? tallColumnCycle : undefined
+          aspectRatio
         });
-        
         contentIndex++;
-        cyclePosition++;
       }
       
       return layoutItems;
@@ -539,7 +562,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               return (
                 <div
                   key={`discover-large-${layoutItem.item.id}-${index}`}
-                  className={`${isMobileView ? 'col-span-3 row-span-4' : 'col-span-2 row-span-2'} relative overflow-hidden cursor-pointer group aspect-square`}
+                  className={`${isMobileView ? 'col-span-2 row-span-2' : 'col-span-2 row-span-2'} relative overflow-hidden cursor-pointer group aspect-square`}
                   style={{ borderRadius: '0px' }}
                   onClick={() => onMediaClick?.(layoutItem.item)}
                   {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
