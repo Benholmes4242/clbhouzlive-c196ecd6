@@ -31,13 +31,13 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const cropBoxRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef({ x: 0, y: 0 });
   
   const [cropData, setCropData] = useState<CropData>(
     initialCrop || { x: 25, y: 25, width: 50, height: 66.67 } // 3:4 aspect ratio
   );
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [scale, setScale] = useState(1);
 
@@ -86,7 +86,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
   }, []);
 
   // Handle touch events
@@ -95,17 +95,17 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     e.stopPropagation();
     const touch = e.touches[0];
     setIsDragging(true);
-    setDragStart({ x: touch.clientX, y: touch.clientY });
+    dragStartRef.current = { x: touch.clientX, y: touch.clientY };
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
+    if (!containerRef.current) return;
     
     const container = containerRef.current;
     const containerRect = container.getBoundingClientRect();
     
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
+    const deltaX = e.clientX - dragStartRef.current.x;
+    const deltaY = e.clientY - dragStartRef.current.y;
     
     const deltaXPercent = (deltaX / containerRect.width) * 100;
     const deltaYPercent = (deltaY / containerRect.height) * 100;
@@ -116,19 +116,19 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
       return { ...prev, x: newX, y: newY };
     });
     
-    setDragStart({ x: e.clientX, y: e.clientY });
-  }, [isDragging, dragStart]);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!isDragging || !containerRef.current) return;
+    if (!containerRef.current) return;
     
     e.preventDefault();
     const touch = e.touches[0];
     const container = containerRef.current;
     const containerRect = container.getBoundingClientRect();
     
-    const deltaX = touch.clientX - dragStart.x;
-    const deltaY = touch.clientY - dragStart.y;
+    const deltaX = touch.clientX - dragStartRef.current.x;
+    const deltaY = touch.clientY - dragStartRef.current.y;
     
     const deltaXPercent = (deltaX / containerRect.width) * 100;
     const deltaYPercent = (deltaY / containerRect.height) * 100;
@@ -139,8 +139,8 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
       return { ...prev, x: newX, y: newY };
     });
     
-    setDragStart({ x: touch.clientX, y: touch.clientY });
-  }, [isDragging, dragStart]);
+    dragStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
