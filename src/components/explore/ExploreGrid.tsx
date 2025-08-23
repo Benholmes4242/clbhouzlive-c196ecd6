@@ -258,6 +258,76 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   // Check if we should use Discover page layout with large video cards
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
+    const isMobile = useIsMobile();
+    
+    // Use dynamic mobile grid for discover page on mobile
+    if (isMobile) {
+      const contentWithAspectRatio = filteredContent.map(item => ({
+        ...item,
+        aspectRatio: item.media && item.media.length > 0 
+          ? (item.media[0].media_type === 'video' ? 16/9 : 1)
+          : 1
+      }));
+      
+      const { layout: mobileLayout, gridContainerClass } = useDynamicMobileGrid(contentWithAspectRatio);
+      
+      return (
+        <>
+          <div className={gridContainerClass}>
+            {mobileLayout.map((layoutItem) => {
+              const aspectRatio = layoutItem.aspectRatio 
+                ? (layoutItem.aspectRatio > 1.3 ? 'landscape' : layoutItem.aspectRatio < 0.8 ? 'portrait' : 'square')
+                : 'square';
+                
+              return (
+                <DynamicMobileCard
+                  key={layoutItem.id}
+                  gridClass={layoutItem.gridClass}
+                  aspectRatio={aspectRatio}
+                  onClick={() => onMediaClick?.(layoutItem as ExploreContentItem)}
+                >
+                  <div className="w-full h-full">
+                    <MediaDisplay
+                      media={{
+                        id: layoutItem.id,
+                        media_type: layoutItem.type as 'video' | 'image',
+                        media_url: layoutItem.src
+                      }}
+                      itemTitle={layoutItem.title}
+                      shouldAutoplay={false}
+                      isLoading={false}
+                      onImageError={() => {}}
+                      onImageLoad={() => {}}
+                      itemId={layoutItem.id}
+                      currentIndex={layoutItem.position}
+                      loop={false}
+                    />
+                  </div>
+                  
+                  {/* Video play indicator */}
+                  {layoutItem.type === 'video' && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-12 h-12 flex items-center justify-center bg-black/30 rounded-full backdrop-blur-sm">
+                        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                      </div>
+                    </div>
+                  )}
+                </DynamicMobileCard>
+              );
+            })}
+          </div>
+          
+          {/* Infinite scroll sentinel */}
+          <div id="scroll-sentinel" className="h-4">
+            {isLoading && hasMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+        </>
+      );
+    }
     
     // Create layout with large video cards every third row - no gaps
     const createDiscoverLayout = () => {
