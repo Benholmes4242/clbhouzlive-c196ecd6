@@ -288,11 +288,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       let lastTallColumn = -1; // Track last column where tall card was placed
       let squaresSinceLastTall = 0; // Track squares placed since last tall card
       
-      // Target ratios for activity feed: 60% squares, 30% tall, 10% hero
+      // Activity Feed Ratio & Placement Rules (per 20 cards)
+      // 70% Squares (1×1) = 14 cards
+      // 15% Tall (1×2) = 3 cards  
+      // 15% Large (4×4 Hero) = 3 cards
       const totalItems = filteredContent.length;
-      const targetSquares = Math.floor(totalItems * 0.6);
-      const targetTalls = Math.floor(totalItems * 0.3);
-      const targetHeroes = Math.floor(totalItems * 0.1);
+      const cycleSize = 20;
+      const cycles = Math.ceil(totalItems / cycleSize);
+      const targetSquares = cycles * 14; // 14 per 20-card cycle
+      const targetTalls = cycles * 3;    // 3 per 20-card cycle
+      const targetHeroes = cycles * 3;   // 3 per 20-card cycle
       
       while (contentIndex < filteredContent.length) {
         const remainingItems = filteredContent.length - contentIndex;
@@ -311,8 +316,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           );
           
           if (!currentRowHasSpecial) {
-            // Rule 3: Two squares buffer between tall cards
-            if (tallCount < targetTalls && squaresSinceLastTall >= 2) {
+            // Rule 3: Minimum buffer between tall cards (3 squares since they're rarer now)
+            if (tallCount < targetTalls && squaresSinceLastTall >= 3) {
               // Rule 2: Alternating columns for talls
               const canPlaceTall = lastTallColumn === -1 || 
                 (rowPosition !== lastTallColumn && Math.abs(rowPosition - lastTallColumn) >= 1);
