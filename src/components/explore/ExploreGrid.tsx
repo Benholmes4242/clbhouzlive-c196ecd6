@@ -43,6 +43,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 }) => {
   const [isMobileState, setIsMobileState] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
+  const isMobile = useIsMobile(); // Move hook to top level to avoid conditional calls
 
   // Check if mobile for TrendingVideos-style layout
   useEffect(() => {
@@ -258,7 +259,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   // Check if we should use Discover page layout with large video cards
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
-    const isMobile = useIsMobile();
     
     // Use dynamic mobile grid for discover page on mobile
     if (isMobile) {
@@ -699,8 +699,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Use dynamic mobile grid for activity feeds
-  const isMobile = useIsMobile();
+  // Use dynamic mobile grid for activity feeds  
   const shouldUseDynamicGrid = isMobile && (hideBadges); // Only apply to profile activity feeds for now
   
   console.log('🔍 Grid Debug:', { isMobile, hideBadges, isDiscoverPage, shouldUseDynamicGrid });
