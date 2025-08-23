@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -82,18 +83,84 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
     onHandicapChange(newHandicap?.toString() || "");
   };
 
-  const handleMobileCropSave = (cropData: any) => {
+  const handleMobileCropSave = async (cropData: any) => {
     setMobileCropData(cropData);
     setShowMobileCrop(false);
     
-    // Show success message
-    toast({
-      title: "Mobile crop saved",
-      description: "Your mobile profile photo crop has been updated successfully.",
-    });
-    
-    // TODO: Save crop data to profile
-    console.log('Saving mobile crop data:', cropData);
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save crop settings.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save crop data to database - simplified approach
+      const response = await fetch('/api/update-mobile-crop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          cropData: {
+            mobile_crop_x: Number(cropData.x),
+            mobile_crop_y: Number(cropData.y),
+            mobile_crop_width: Number(cropData.width),
+            mobile_crop_height: Number(cropData.height)
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update mobile crop');
+      }
+
+      // Show success message
+      toast({
+        title: "Mobile crop saved",
+        description: "Your mobile profile photo crop has been updated successfully.",
+      });
+
+      // Trigger profile refresh to update mobile view
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+    } catch (error) {
+      console.error('Error saving mobile crop:', error);
+      
+      // Fallback to direct supabase update if API route doesn't exist
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.rpc('update_mobile_crop_data', {
+            p_user_id: user.id,
+            p_crop_x: Number(cropData.x),
+            p_crop_y: Number(cropData.y),
+            p_crop_width: Number(cropData.width),
+            p_crop_height: Number(cropData.height)
+          });
+          
+          toast({
+            title: "Mobile crop saved",
+            description: "Your mobile profile photo crop has been updated successfully.",
+          });
+          
+          if (onProfileUpdate) {
+            onProfileUpdate();
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback error:', fallbackError);
+        toast({
+          title: "Error", 
+          description: "Failed to save mobile crop settings.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const handleMobileCropClick = () => {
