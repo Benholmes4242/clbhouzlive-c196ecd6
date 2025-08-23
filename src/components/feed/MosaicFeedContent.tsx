@@ -328,11 +328,47 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     );
   };
 
+  // Mobile-specific gap-free grid layout
+  const createMobileGridLayout = () => {
+    const isMobileView = window.innerWidth < 768;
+    if (!isMobileView) return sortedContent;
+    
+    const gridItems = [];
+    const totalCards = sortedContent.length;
+    
+    // 20-card cycle: 14 squares (70%), 3 tall (15%), 3 hero (15%)
+    const cyclePattern = [
+      'square', 'square', 'tall',      // Row 1: S S T
+      'square', 'square', 'square',    // Row 2: S S S  
+      'hero',                          // Row 3-4: H (2x2)
+      'square', 'tall', 'square',      // Row 5: S T S
+      'hero',                          // Row 6-7: H (2x2)
+      'square', 'square', 'tall',      // Row 8: S S T
+      'hero',                          // Row 9-10: H (2x2)
+      'square', 'square', 'square', 'square' // Row 11: S S S S
+    ];
+    
+    for (let i = 0; i < totalCards; i++) {
+      const patternIndex = i % cyclePattern.length;
+      const cardType = cyclePattern[patternIndex];
+      
+      gridItems.push({
+        ...sortedContent[i],
+        layoutType: cardType === 'square' ? 'regular' : cardType
+      });
+    }
+    
+    return gridItems;
+  };
+
+  const mobileGridItems = createMobileGridLayout();
+  const isMobileView = window.innerWidth < 768;
+
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
     700: 2,
-    500: 2
+    500: isMobileView ? 1 : 2  // Use single column for mobile custom grid
   };
 
   return (
@@ -352,16 +388,34 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         </div>
       )}
       
-      {/* Masonry Grid */}
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="mosaic-grid"
-        columnClassName="mosaic-column"
-      >
-        {sortedContent.map((item, index) => (
-          <MediaTile key={item.id} item={item} index={index} />
-        ))}
-      </Masonry>
+      {/* Mobile Gap-Free Grid or Masonry Grid */}
+      {isMobileView ? (
+        <div className="grid grid-cols-3 gap-1" style={{ gridAutoFlow: 'dense' }}>
+          {mobileGridItems.map((item: any, index) => {
+            const layoutType = item.layoutType || 'regular';
+            const gridClass = 
+              layoutType === 'hero' ? 'col-span-2 row-span-2' :
+              layoutType === 'tall' ? 'col-span-1 row-span-2' :
+              'col-span-1 row-span-1';
+            
+            return (
+              <div key={item.id} className={`${gridClass} overflow-hidden`}>
+                <MediaTile item={item} index={index} />
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="mosaic-grid"
+          columnClassName="mosaic-column"
+        >
+          {sortedContent.map((item, index) => (
+            <MediaTile key={item.id} item={item} index={index} />
+          ))}
+        </Masonry>
+      )}
 
       {/* Fullscreen Video Modal */}
       <FullscreenVideoModal
