@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { registerModal } from '@/hooks/useModalDetector';
+import { useModalState } from '@/hooks/useModalDetector';
 import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -128,9 +128,7 @@ const FullscreenMediaModal = ({
   const isOwnPost = postId && currentUser && userIdFromProp && currentUser.id === userIdFromProp;
   
   // Register modal state for Echo detection
-  useEffect(() => {
-    registerModal(isOpen);
-  }, [isOpen]);
+  useModalState(isOpen);
 
   // Debug logging
   console.log('🔍 Fullscreen Modal Debug:', {

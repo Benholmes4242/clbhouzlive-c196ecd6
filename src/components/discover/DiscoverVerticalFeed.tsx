@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import { registerModal } from '@/hooks/useModalDetector';
+import { useModalState } from '@/hooks/useModalDetector';
 import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -180,9 +180,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const queryClient = useQueryClient();
 
   // Register modal state for Echo detection
-  useEffect(() => {
-    registerModal(isOpen);
-  }, [isOpen]);
+  useModalState(isOpen);
 
   // Hide header when modal opens, show when closed
   useEffect(() => {
