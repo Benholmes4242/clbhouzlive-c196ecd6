@@ -185,8 +185,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           isLoading={false}
           hasMore={false}
           onLoadMore={handleLoadMore}
-          isDiscoverPage={false}
-          isActivityFeed={true}
+          isDiscoverPage={true}
           hideBadges={true}
         />
       )}
