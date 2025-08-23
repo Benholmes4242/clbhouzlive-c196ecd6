@@ -185,8 +185,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           isLoading={false}
           hasMore={false}
           onLoadMore={handleLoadMore}
-          isDiscoverPage={true}
-          hideBadges={true}
+          isDiscoverPage={false} // Set to false for activity feed to distinguish from discover
+          hideBadges={true} // This indicates it's a profile activity feed
         />
       )}
 
