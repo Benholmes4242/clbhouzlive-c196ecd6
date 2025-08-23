@@ -22,6 +22,7 @@ interface ExploreGridProps {
   activeFilter?: string;
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
+  isActivityFeed?: boolean;
   hideBadges?: boolean;
 }
 
@@ -36,7 +37,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   activeFilter,
   isClubhousePage = false,
   isDiscoverPage = false,
-  hideBadges = false
+  hideBadges = false,
+  isActivityFeed = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
@@ -251,6 +253,86 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     ];
     return ratios[index % ratios.length];
   };
+
+  // Check if we should use simple activity feed layout
+  if (isActivityFeed) {
+    const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
+    
+    return (
+      <>
+        {/* Simple 3-column grid for activity feed */}
+        <div className="grid grid-cols-3 gap-0.5 -mx-0">
+          {filteredContent.map((item, index) => (
+            <div
+              key={`activity-${item.id}-${index}`}
+              className="relative overflow-hidden cursor-pointer group aspect-square"
+              style={{ borderRadius: '0px' }}
+              onClick={() => onMediaClick?.(item)}
+            >
+              {/* Shimmer loading placeholder */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+              </div>
+              
+              {/* Media Display */}
+              <MediaDisplay
+                media={item.media && item.media.length > 1 && mediaIndices[item.id] !== undefined ? {
+                  id: item.media[mediaIndices[item.id] || 0].id,
+                  media_type: item.media[mediaIndices[item.id] || 0].media_type,
+                  media_url: item.media[mediaIndices[item.id] || 0].media_url
+                } : {
+                  id: item.id,
+                  media_type: item.type as 'video' | 'image',
+                  media_url: item.src
+                }}
+                itemTitle={item.title}
+                shouldAutoplay={false}
+                isLoading={false}
+                onImageError={() => {}}
+                onImageLoad={() => {}}
+                itemId={item.id}
+                currentIndex={index}
+                loop={true}
+                hidePlayButton={true}
+              />
+              
+              {/* Film icon for videos */}
+              {item.type === 'video' && (
+                <div className="absolute bottom-2 right-2 z-20">
+                  <div 
+                    className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
+                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                  >
+                    <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                  </div>
+                </div>
+              )}
+              
+              {/* Media navigation dots for multiple media */}
+              {item.media && item.media.length > 1 && (
+                <MediaNavigationDots
+                  mediaCount={item.media.length}
+                  currentIndex={mediaIndices[item.id] || 0}
+                />
+              )}
+              
+              {/* Hover animation */}
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            </div>
+          ))}
+        </div>
+        
+        {/* Infinite scroll sentinel */}
+        <div id="scroll-sentinel" className="h-4">
+          {isLoading && hasMore && (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
 
   // Check if we should use Discover page layout with dynamic mobile grid
   if (isDiscoverPage) {
