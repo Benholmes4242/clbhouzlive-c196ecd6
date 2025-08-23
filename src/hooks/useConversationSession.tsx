@@ -45,26 +45,11 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       sessionStartTimeRef.current = new Date();
       lastOpenStateRef.current = true;
     } else if (!isModalOpen && lastOpenStateRef.current) {
-      // Modal just closed - save current session
-      console.log('🔚 Modal closed, checking session for save...', {
-        hasSession: !!currentSession,
-        messageCount: currentSession?.messages.length || 0
-      });
-      
-      if (currentSession && currentSession.messages.length > 0) {
-        console.log('💾 Session has messages, saving...');
-        // Ensure save completes before clearing session
-        saveCurrentSession().finally(() => {
-          setCurrentSession(null);
-          sessionStartTimeRef.current = null;
-          lastOpenStateRef.current = false;
-        });
-      } else {
-        console.log('⚠️ No session or messages to save');
-        setCurrentSession(null);
-        sessionStartTimeRef.current = null;
-        lastOpenStateRef.current = false;
-      }
+      // Modal just closed - no need to save here since we save after each message
+      console.log('🔚 Modal closed, session already saved after each message');
+      setCurrentSession(null);
+      sessionStartTimeRef.current = null;
+      lastOpenStateRef.current = false;
     }
   }, [isModalOpen, currentSession]);
 
