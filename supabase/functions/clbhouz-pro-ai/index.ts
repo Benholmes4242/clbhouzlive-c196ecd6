@@ -106,11 +106,11 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // Simple logic: Check if question mentions years 2022 or later, or asks about current/recent info
-    const isPost2022Query = /(?:2022|2023|2024|2025|current|today|now|recent|latest|this year)/i.test(message);
+    // New logic: Use ChatGPT only if user specifically mentions a pre-2022 year, otherwise use Perplexity
+    const hasSpecificPre2022Year = /\b(19\d{2}|20[01]\d|202[01])\b/.test(message);
     
     console.log('📅 Query classification:', { 
-      isPost2022Query, 
+      hasSpecificPre2022Year, 
       message: message.substring(0, 100) 
     });
     
@@ -180,28 +180,9 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
       
-    } else if (isPost2022Query) {
-      // Use Perplexity for post-2022 data
-      console.log('🔍 Using Perplexity for post-2022 data');
-      
-      try {
-        const searchResult = await searchWeb(message);
-        
-        // Check if search actually returned useful data
-        if (searchResult.includes('Search error:') || searchResult.includes('Search temporarily unavailable')) {
-          throw new Error('Perplexity search failed');
-        }
-        
-        finalResponse = searchResult;
-        
-      } catch (error) {
-        console.log('❌ Perplexity failed, using custom fallback');
-        finalResponse = "Sorry, I'm having a little trouble right now - I'll be back from the course soon! ⛳️";
-      }
-      
-    } else {
-      // Use ChatGPT for pre-2022 data and general golf questions
-      console.log('📚 Using ChatGPT for pre-2022 data and general golf questions');
+    } else if (hasSpecificPre2022Year) {
+      // Use ChatGPT only for specific pre-2022 years
+      console.log('📚 Using ChatGPT for specific pre-2022 historical data');
       
       const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. You have extensive knowledge of golf through 2021. Help with golf questions, technique, equipment advice, course recommendations, and historical golf information. Be helpful and friendly.";
       
@@ -232,6 +213,24 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
 
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
+    } else {
+      // Use Perplexity for all other queries (default)
+      console.log('🔍 Using Perplexity for all queries');
+      
+      try {
+        const searchResult = await searchWeb(message);
+        
+        // Check if search actually returned useful data
+        if (searchResult.includes('Search error:') || searchResult.includes('Search temporarily unavailable')) {
+          throw new Error('Perplexity search failed');
+        }
+        
+        finalResponse = searchResult;
+        
+      } catch (error) {
+        console.log('❌ Perplexity failed, using custom fallback');
+        finalResponse = "Sorry, I'm having a little trouble right now - I'll be back from the course soon! ⛳️";
+      }
     }
 
     console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
