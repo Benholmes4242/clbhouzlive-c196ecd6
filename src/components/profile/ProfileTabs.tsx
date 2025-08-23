@@ -92,7 +92,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
                   disabled={transitionState !== 'idle'}
-                  className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
+                  className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 relative ${
                     isActive 
                       ? 'text-foreground' 
                       : 'text-muted-foreground hover:text-foreground'
