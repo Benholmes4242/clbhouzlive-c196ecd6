@@ -18,7 +18,6 @@ import TaggedText from './TaggedText';
 import { UserInfoOverlay } from './user-post/overlays/UserInfoOverlay';
 import { formatDistanceToNow } from 'date-fns';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import { useModalState } from '@/hooks/useModalDetector';
 
 interface PostMedia {
   id: string;
@@ -61,8 +60,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   allUserPosts,
   onNavigate
 }) => {
-  // Register this modal with the global modal detector
-  useModalState('post-viewer', isOpen);
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
   const { deletePost } = usePostDeletion();

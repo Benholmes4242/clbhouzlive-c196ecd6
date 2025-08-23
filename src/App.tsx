@@ -13,7 +13,6 @@ import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
-import { ModalProvider } from '@/hooks/useModalDetector';
 import AIChat from "@/components/ai-chat/AIChat";
 
 
@@ -73,8 +72,7 @@ const App: React.FC = () => {
               <GlobalAudioProvider>
                 <VideoManagerProvider>
                   <VideoPlaybackManagerProvider>
-                    <ModalProvider>
-                      <AuthWrapper>
+                    <AuthWrapper>
                     <Suspense fallback={<ClubhouzLoading />}>
                       <Routes>
                         <Route path="/" element={<Clubhouse />} />
@@ -106,15 +104,14 @@ const App: React.FC = () => {
                         
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                     </Suspense>
-                      </AuthWrapper>
-                      <AIChat />
-                    </ModalProvider>
+                    </Suspense>
+                    </AuthWrapper>
                   </VideoPlaybackManagerProvider>
                 </VideoManagerProvider>
               </GlobalAudioProvider>
               <Toaster />
               <Sonner />
+              <AIChat />
             </BrowserRouter>
           </SiteAccessControl>
       </TooltipProvider>

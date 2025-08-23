@@ -58,15 +58,9 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
     // If it's a Supabase storage URL, add optimization parameters
     if (url.includes('supabase') && url.includes('storage')) {
       const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}quality=80&resize=contain&width=${width || 600}&format=webp`;
+      return `${url}${separator}quality=60&resize=contain&width=${width || 300}&format=webp`;
     }
     
-    // If it's a Cloudflare Stream thumbnail, use it as-is (already optimized)
-    if (url.includes('cloudflarestream.com') && url.includes('thumbnails')) {
-      return url;
-    }
-    
-    // For other external URLs, return as-is
     return url;
   };
 
