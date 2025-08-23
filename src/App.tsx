@@ -108,13 +108,13 @@ const App: React.FC = () => {
                       </Routes>
                      </Suspense>
                       </AuthWrapper>
+                      <AIChat />
                     </ModalProvider>
                   </VideoPlaybackManagerProvider>
                 </VideoManagerProvider>
               </GlobalAudioProvider>
               <Toaster />
               <Sonner />
-              <AIChat />
             </BrowserRouter>
           </SiteAccessControl>
       </TooltipProvider>
