@@ -371,7 +371,7 @@ const HeroProfileHeader = ({
 
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const headerHeight = window.innerHeight * 0.60; // 60vh header height
+      const headerHeight = window.innerHeight * 0.55; // 55vh header height
       trackScrollDepth(scrollTop, headerHeight);
     };
 
@@ -594,7 +594,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16">
           {/* Header media area (full-bleed, 72vh, passes under main header) */}
-          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '60vh' }}>
+          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '55vh' }}>
             {/* Loading state with neutral color */}
             <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             
@@ -632,7 +632,7 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Profile content on white background below media */}
-          <div className="bg-white px-4 py-6 space-y-6">
+          <div className="bg-white px-4 py-8 space-y-6">
             {/* User name (immediately below header media) */}
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900">
@@ -730,7 +730,7 @@ const HeroProfileHeader = ({
       <div className={`
         transition-all duration-300
         ${isMobile 
-          ? 'px-6 py-6 bg-white' // Mobile: full width with padding on white background
+          ? 'px-6 py-8 bg-white' // Mobile: increased padding to match bio spacing
           : 'px-4 md:px-8 py-6' // Desktop: existing layout
         }
       `}>

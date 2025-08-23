@@ -52,8 +52,8 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
         />
         <PrimaryStat 
           label="Total XP" 
-          value={primaryStats.handicap}
-          onClick={() => onStatClick?.('handicap')}
+          value="2,500"
+          onClick={() => onStatClick?.('totalxp')}
         />
         <PrimaryStat 
           label="Following" 

@@ -111,7 +111,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
             </div>
 
             {/* Primary Stats Strip - 2 stats only (mobile) */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
               {primaryStats.map((stat) => (
                 <button
                   key={stat.key}
