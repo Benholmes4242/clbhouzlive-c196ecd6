@@ -254,20 +254,57 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   // Function to detect aspect ratio from media URL or type
   const detectAspectRatio = (item: ExploreContentItem): 'square' | 'wide' | 'tall' => {
-    // For videos, try to infer from common patterns
+    // For videos, use more sophisticated detection
     if (item.type === 'video') {
-      // Check if it's a vertical video (common for mobile uploads)
-      if (item.src.includes('9:16') || item.src.includes('portrait')) return 'tall';
-      // Check if it's a horizontal video
-      if (item.src.includes('16:9') || item.src.includes('landscape')) return 'wide';
+      const url = item.src.toLowerCase();
+      
+      // Check for common vertical video indicators
+      if (url.includes('portrait') || url.includes('vertical') || 
+          url.includes('9-16') || url.includes('916') ||
+          url.includes('tiktok') || url.includes('stories') ||
+          url.includes('reel')) {
+        return 'tall';
+      }
+      
+      // Check for landscape indicators
+      if (url.includes('landscape') || url.includes('horizontal') || 
+          url.includes('16-9') || url.includes('169') ||
+          url.includes('youtube') || url.includes('widescreen')) {
+        return 'wide';
+      }
+      
+      // For mobile-uploaded golf videos, assume many are portrait
+      // Since most golf content from phones is vertical
+      if (Math.random() < 0.4) { // 40% chance for tall videos
+        return 'tall';
+      }
     }
     
-    // For images, we can make educated guesses based on common patterns
+    // For images, similar logic
     if (item.type === 'image') {
-      // Instagram-style aspect ratios
-      if (item.src.includes('1080x1350') || item.src.includes('4:5')) return 'tall';
-      if (item.src.includes('1080x1920') || item.src.includes('9:16')) return 'tall';
-      if (item.src.includes('1920x1080') || item.src.includes('16:9')) return 'wide';
+      const url = item.src.toLowerCase();
+      
+      // Check for portrait indicators
+      if (url.includes('portrait') || url.includes('vertical') ||
+          url.includes('1080x1350') || url.includes('4-5') ||
+          url.includes('1080x1920') || url.includes('9-16')) {
+        return 'tall';
+      }
+      
+      // Check for landscape indicators  
+      if (url.includes('landscape') || url.includes('horizontal') ||
+          url.includes('1920x1080') || url.includes('16-9') ||
+          url.includes('banner') || url.includes('cover')) {
+        return 'wide';
+      }
+      
+      // For golf images, assume course photos might be wide, selfies tall
+      if (item.golfCourse && Math.random() < 0.6) { // 60% chance for wide course photos
+        return 'wide';
+      }
+      if (Math.random() < 0.3) { // 30% chance for tall selfie/portrait shots
+        return 'tall';
+      }
     }
     
     // Default to square for most content
@@ -488,14 +525,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                           })()}
                         </span>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Golf Club Tag */}
-                  {layoutItem.item.golfCourse && (
-                    <div className={`absolute ${layoutItem.type === 'special' ? 'top-12' : 'top-2'} left-2 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full z-20`}>
-                      <MapPin className="h-4 w-4 mr-1 text-white" />
-                      <span className="text-sm font-medium truncate max-w-[120px]">{layoutItem.item.golfCourse.name}</span>
                     </div>
                   )}
                   
@@ -1039,14 +1068,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                       loop={true}
                       hidePlayButton={true}
                     />
-                    
-                    {/* Golf Club Tag */}
-                    {layoutItem.item.golfCourse && (
-                      <div className="absolute top-2 left-2 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full z-20">
-                        <MapPin className="h-4 w-4 mr-1 text-white" />
-                        <span className="text-sm font-medium truncate max-w-[120px]">{layoutItem.item.golfCourse.name}</span>
-                      </div>
-                    )}
                     
                     {/* Film icon for videos */}
                     {layoutItem.item.type === 'video' && (
