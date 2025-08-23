@@ -75,11 +75,14 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     if (imageLoaded && !initialCrop) {
       resetCrop();
     }
+  }, [imageLoaded, initialCrop]); // Removed resetCrop from dependencies to prevent re-triggering
+
+  useEffect(() => {
     // Track that mobile crop tool was opened
     if (imageLoaded) {
       trackMobileCropOpened();
     }
-  }, [imageLoaded, initialCrop, resetCrop, trackMobileCropOpened]);
+  }, [imageLoaded, trackMobileCropOpened]);
 
   // Handle mouse/touch events for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
