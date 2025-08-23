@@ -16,6 +16,7 @@ import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useModalState } from '@/hooks/useModalDetector';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
@@ -91,6 +92,9 @@ const FullscreenMediaModal = ({
   onPostDeleted,
   onPostEdit
 }: FullscreenMediaModalProps) => {
+  // Register this modal with the global modal detector
+  useModalState('fullscreen-media', isOpen);
+  
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
   const mediaTypes = Array.isArray(mediaType) ? mediaType : [mediaType];

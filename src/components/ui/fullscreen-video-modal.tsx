@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
+import { useModalState } from '@/hooks/useModalDetector';
 import EnhancedVideoPlayer from './enhanced-video-player';
 
 interface FullscreenVideoModalProps {
@@ -24,6 +25,9 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   onClose,
   videoData
 }) => {
+  // Register this modal with the global modal detector
+  useModalState('fullscreen-video', isOpen);
+  
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
