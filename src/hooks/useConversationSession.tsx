@@ -214,7 +214,7 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       metadata: message.metadata || null
     };
 
-    let sessionToSave: ConversationSession;
+    let sessionToSave: ConversationSession | null = null;
 
     // Use functional state update to prevent stale state issues
     setCurrentSession(prev => {
@@ -260,9 +260,16 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       return updatedSession;
     });
 
+    // Wait for state update to complete
+    await new Promise(resolve => setTimeout(resolve, 10));
+
     // Auto-save after EVERY message to ensure both user and AI messages are persisted
     console.log('💾 CONVERSATION DEBUG - Auto-saving session after message:', normalizedMessage.type);
-    await saveSessionToDB(sessionToSave);
+    if (sessionToSave) {
+      await saveSessionToDB(sessionToSave);
+    } else {
+      console.error('❌ CONVERSATION DEBUG - sessionToSave is null, cannot save!');
+    }
   };
 
   const saveSessionToDB = async (session: ConversationSession) => {
