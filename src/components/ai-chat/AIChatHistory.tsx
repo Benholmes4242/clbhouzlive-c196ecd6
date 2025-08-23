@@ -772,13 +772,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       onScroll={(e) => e.stopPropagation()}
     >
       <div
-        className="w-full max-w-md flex flex-col overflow-hidden animate-scale-in"
+        className="w-full flex flex-col overflow-hidden animate-scale-in"
         style={{
-          height: 'min(72vh, 576px)',
+          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
+          minWidth: '448px',
+          maxWidth: '448px',
+          height: 'min(72vh, 576px)', // Reduced by 20% from 720px
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
+          borderRadius: '24px',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           boxShadow: `
             0 0 0 1px rgba(255, 255, 255, 0.08),
