@@ -631,7 +631,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   // Use dynamic mobile grid for activity feeds
   const isMobile = useIsMobile();
-  const shouldUseDynamicGrid = isMobile && (isDiscoverPage || hideBadges); // hideBadges indicates profile activity feed
+  const shouldUseDynamicGrid = isMobile && (hideBadges); // Only apply to profile activity feeds for now
+  
+  console.log('🔍 Grid Debug:', { isMobile, hideBadges, isDiscoverPage, shouldUseDynamicGrid });
   
   // Convert content to grid items with aspect ratios for mobile, filter out 'cta' types
   const contentWithAspectRatio = content
@@ -647,6 +649,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   // For mobile dynamic grid on activity feeds
   if (shouldUseDynamicGrid) {
+    console.log('🎯 Using dynamic grid with', mobileLayout.length, 'items');
     return (
       <>
         <div className={gridContainerClass}>
