@@ -34,10 +34,10 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
   if (!profile) return null;
 
   const primaryStats = [
-    { label: 'Handicap', value: stats.handicap?.toString() || '--', key: 'handicap' },
     { label: 'Posts', value: stats.posts.toString(), key: 'posts' },
-    { label: 'Followers', value: stats.followers.toString(), key: 'followers' },
-    { label: 'Following', value: stats.following?.toString() || '0', key: 'following' }
+    { label: 'Total XP', value: stats.handicap?.toString() || '--', key: 'handicap' },
+    { label: 'Following', value: stats.following?.toString() || '0', key: 'following' },
+    { label: 'Followers', value: stats.followers.toString(), key: 'followers' }
   ];
 
   return (

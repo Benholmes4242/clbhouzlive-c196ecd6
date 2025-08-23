@@ -371,7 +371,7 @@ const HeroProfileHeader = ({
 
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const headerHeight = window.innerHeight * 0.72; // 72vh header height
+      const headerHeight = window.innerHeight * 0.65; // 65vh header height
       trackScrollDepth(scrollTop, headerHeight);
     };
 
@@ -594,7 +594,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16">
           {/* Header media area (full-bleed, 72vh, passes under main header) */}
-          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '72vh' }}>
+          <div ref={profileCardRef} className="relative w-full overflow-hidden" style={{ height: '65vh' }}>
             {/* Loading state with neutral color */}
             <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             
@@ -635,11 +635,11 @@ const HeroProfileHeader = ({
           <div className="bg-white px-4 py-6 space-y-6">
             {/* User name (immediately below header media) */}
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900">
                 {profile?.display_name || 'User'}
               </h1>
               {profile?.username && (
-                <p className="text-gray-600 text-base">@{profile.username}</p>
+                <p className="text-gray-600 text-lg">@{profile.username}</p>
               )}
             </div>
             
@@ -654,14 +654,14 @@ const HeroProfileHeader = ({
             <div className="flex justify-center">
               <div className="flex items-center gap-8">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Home Club</p>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm text-gray-500 mb-1">Home Club</p>
+                  <p className="text-base font-medium text-gray-900">
                     {profile?.home_club || 'No Club'}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Handicap</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm text-gray-500 mb-1">Handicap</p>
+                  <p className="text-base font-semibold text-gray-900">
                     {profile?.eg_handicap_index?.toFixed(1) || 'N/A'}
                   </p>
                 </div>

@@ -46,24 +46,24 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
         }
       `}>
         <PrimaryStat 
-          label="Handicap" 
-          value={primaryStats.handicap}
-          onClick={() => onStatClick?.('handicap')}
-        />
-        <PrimaryStat 
           label="Posts" 
           value={primaryStats.posts}
           onClick={() => onStatClick?.('posts')}
         />
         <PrimaryStat 
-          label="Followers" 
-          value={primaryStats.followers}
-          onClick={() => onStatClick?.('followers')}
+          label="Total XP" 
+          value={primaryStats.handicap}
+          onClick={() => onStatClick?.('handicap')}
         />
         <PrimaryStat 
           label="Following" 
           value={primaryStats.following}
           onClick={() => onStatClick?.('following')}
+        />
+        <PrimaryStat 
+          label="Followers" 
+          value={primaryStats.followers}
+          onClick={() => onStatClick?.('followers')}
         />
       </div>
     </div>
