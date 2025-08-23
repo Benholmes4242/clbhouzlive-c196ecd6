@@ -175,7 +175,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             <div
               key={`friends-${item.id}-${index}`}
               className="relative bg-muted overflow-hidden cursor-pointer group aspect-[9/16]"
-              style={{ borderRadius: '8px' }}
+              style={{ borderRadius: '0px' }}
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
@@ -449,7 +449,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
                 className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '0px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
                 {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
               >
@@ -559,7 +559,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               <div
                 key={`discover-regular-${layoutItem.item.id}-${index}`}
                 className="relative overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '0px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
                 {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
               >
