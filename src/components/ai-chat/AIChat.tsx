@@ -6,6 +6,7 @@ import AIChatOverlay from './AIChatOverlay';
 
 const AIChat: React.FC = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname);
@@ -14,21 +15,31 @@ const AIChat: React.FC = () => {
   const isAuthPage = location.pathname === '/auth' || location.pathname === '/create-profile';
 
   // Echo should never render on auth pages or when user is not authenticated
-  const shouldRenderEcho = !loading && user && !isAuthPage;
+  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning;
 
-  // Handle route changes - destroy Echo before navigation
+  // Handle route changes - destroy Echo before navigation and hide during transition
   useEffect(() => {
     const currentPath = location.pathname;
     const previousPath = previousLocationRef.current;
 
     if (currentPath !== previousPath) {
-      // Route changed - destroy Echo overlay before navigation completes
+      // Route is changing - start transition
+      setIsTransitioning(true);
+      
+      // Close overlay immediately
       if (isOverlayOpen) {
         setIsOverlayOpen(false);
       }
       
       // Update the previous location reference
       previousLocationRef.current = currentPath;
+      
+      // Wait for page to settle before showing Echo again
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 300); // Small delay to ensure page has loaded
+      
+      return () => clearTimeout(timer);
     }
   }, [location.pathname, isOverlayOpen]);
 
