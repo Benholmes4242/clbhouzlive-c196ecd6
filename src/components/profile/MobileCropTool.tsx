@@ -33,42 +33,38 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const cropBoxRef = useRef<HTMLDivElement>(null);
   
   const [cropData, setCropData] = useState<CropData>(
-    initialCrop || { x: 25, y: 25, width: 50, height: 66.67 } // 3:4 aspect ratio
+    initialCrop || { x: 20, y: 20, width: 60, height: 60 } // Square default, user can adjust
   );
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState<string>('');
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // Calculate crop box dimensions maintaining 3:4 aspect ratio
+  // Calculate crop box dimensions with minimum constraints
   const calculateCropDimensions = useCallback((containerWidth: number) => {
-    const maxWidth = Math.min(containerWidth * 0.8, 300);
-    const width = maxWidth;
-    const height = width * (4/3); // 3:4 aspect ratio
-    return { width, height };
+    const minSize = Math.min(containerWidth * 0.2, 80); // Minimum 20% or 80px
+    const maxSize = Math.min(containerWidth * 0.9, 400); // Maximum 90% or 400px
+    return { minSize, maxSize };
   }, []);
 
-  // Reset crop to center with proper aspect ratio
+  // Reset crop to center with adjustable size
   const resetCrop = useCallback(() => {
     if (!containerRef.current || !imageRef.current) return;
     
     const container = containerRef.current;
-    const image = imageRef.current;
     const containerRect = container.getBoundingClientRect();
-    const imageRect = image.getBoundingClientRect();
     
-    // Calculate the crop dimensions
-    const { width: cropWidth, height: cropHeight } = calculateCropDimensions(containerRect.width);
+    // Set a reasonable default size - 60% of container
+    const defaultSize = 60;
     
     // Center the crop box
-    const x = 50 - (cropWidth / containerRect.width * 100) / 2;
-    const y = 50 - (cropHeight / containerRect.height * 100) / 2;
-    const width = (cropWidth / containerRect.width) * 100;
-    const height = (cropHeight / containerRect.height) * 100;
+    const x = (100 - defaultSize) / 2;
+    const y = (100 - defaultSize) / 2;
     
-    setCropData({ x, y, width, height });
-  }, [calculateCropDimensions]);
+    setCropData({ x, y, width: defaultSize, height: defaultSize });
+  }, []);
 
   // Initialize crop on image load and track analytics
   useEffect(() => {
@@ -81,15 +77,22 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     }
   }, [imageLoaded, initialCrop, resetCrop, trackMobileCropOpened]);
 
-  // Handle mouse/touch events for dragging
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  // Handle mouse/touch events for dragging and resizing
+  const handleMouseDown = useCallback((e: React.MouseEvent, handle?: string) => {
     e.preventDefault();
-    setIsDragging(true);
+    e.stopPropagation();
+    
+    if (handle) {
+      setIsResizing(true);
+      setResizeHandle(handle);
+    } else {
+      setIsDragging(true);
+    }
     setDragStart({ x: e.clientX, y: e.clientY });
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
+    if ((!isDragging && !isResizing) || !containerRef.current) return;
     
     const container = containerRef.current;
     const containerRect = container.getBoundingClientRect();
@@ -100,18 +103,58 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     const deltaXPercent = (deltaX / containerRect.width) * 100;
     const deltaYPercent = (deltaY / containerRect.height) * 100;
     
-    setCropData(prev => {
-      const newX = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent));
-      const newY = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent));
-      return { ...prev, x: newX, y: newY };
-    });
+    if (isDragging) {
+      // Move the crop area
+      setCropData(prev => {
+        const newX = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent));
+        const newY = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent));
+        return { ...prev, x: newX, y: newY };
+      });
+    } else if (isResizing) {
+      // Resize the crop area
+      setCropData(prev => {
+        let newCrop = { ...prev };
+        const minSize = 10; // Minimum 10%
+        const maxSize = 90; // Maximum 90%
+        
+        switch (resizeHandle) {
+          case 'nw': // Top-left
+            newCrop.width = Math.max(minSize, Math.min(maxSize, prev.width - deltaXPercent));
+            newCrop.height = Math.max(minSize, Math.min(maxSize, prev.height - deltaYPercent));
+            newCrop.x = Math.max(0, Math.min(100 - newCrop.width, prev.x + deltaXPercent));
+            newCrop.y = Math.max(0, Math.min(100 - newCrop.height, prev.y + deltaYPercent));
+            break;
+          case 'ne': // Top-right
+            newCrop.width = Math.max(minSize, Math.min(maxSize, prev.width + deltaXPercent));
+            newCrop.height = Math.max(minSize, Math.min(maxSize, prev.height - deltaYPercent));
+            newCrop.y = Math.max(0, Math.min(100 - newCrop.height, prev.y + deltaYPercent));
+            break;
+          case 'sw': // Bottom-left
+            newCrop.width = Math.max(minSize, Math.min(maxSize, prev.width - deltaXPercent));
+            newCrop.height = Math.max(minSize, Math.min(maxSize, prev.height + deltaYPercent));
+            newCrop.x = Math.max(0, Math.min(100 - newCrop.width, prev.x + deltaXPercent));
+            break;
+          case 'se': // Bottom-right
+            newCrop.width = Math.max(minSize, Math.min(maxSize, prev.width + deltaXPercent));
+            newCrop.height = Math.max(minSize, Math.min(maxSize, prev.height + deltaYPercent));
+            break;
+        }
+        
+        // Ensure crop doesn't go outside bounds
+        if (newCrop.x + newCrop.width > 100) newCrop.width = 100 - newCrop.x;
+        if (newCrop.y + newCrop.height > 100) newCrop.height = 100 - newCrop.y;
+        
+        return newCrop;
+      });
+    }
     
     setDragStart({ x: e.clientX, y: e.clientY });
-  }, [isDragging, dragStart]);
+  }, [isDragging, isResizing, resizeHandle, dragStart]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     setIsResizing(false);
+    setResizeHandle('');
   }, []);
 
   // Handle wheel event for zoom
@@ -194,7 +237,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                       width: `${cropData.width}%`,
                       height: `${cropData.height}%`,
                     }}
-                    onMouseDown={handleMouseDown}
+                    onMouseDown={(e) => handleMouseDown(e)}
                   >
                     {/* Grid overlay */}
                     <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
@@ -203,20 +246,33 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                       ))}
                     </div>
                     
-                    {/* Crop box corners for visual feedback */}
-                    <div className="absolute -top-1 -left-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-white rounded-full" />
+                    {/* Resize handles */}
+                    <div 
+                      className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full cursor-nw-resize border border-gray-300 hover:bg-blue-500 transition-colors" 
+                      onMouseDown={(e) => handleMouseDown(e, 'nw')}
+                    />
+                    <div 
+                      className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full cursor-ne-resize border border-gray-300 hover:bg-blue-500 transition-colors" 
+                      onMouseDown={(e) => handleMouseDown(e, 'ne')}
+                    />
+                    <div 
+                      className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full cursor-sw-resize border border-gray-300 hover:bg-blue-500 transition-colors" 
+                      onMouseDown={(e) => handleMouseDown(e, 'sw')}
+                    />
+                    <div 
+                      className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full cursor-se-resize border border-gray-300 hover:bg-blue-500 transition-colors" 
+                      onMouseDown={(e) => handleMouseDown(e, 'se')}
+                    />
                   </div>
                 </>
               )}
             </div>
             
             <div className="mt-4 text-sm text-muted-foreground space-y-1">
-              <p>• Drag to reposition the crop area</p>
+              <p>• Drag the crop area to reposition</p>
+              <p>• Drag corner handles to resize</p>
               <p>• Use mouse wheel to zoom in/out</p>
-              <p>• The crop maintains a 3:4 aspect ratio for mobile</p>
+              <p>• Choose any size and position you prefer</p>
             </div>
           </div>
           
