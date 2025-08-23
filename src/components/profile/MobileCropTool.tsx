@@ -159,13 +159,18 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
           </p>
         </div>
         
-        <div className="p-4 flex gap-6">
+        <div className="p-4 flex flex-col lg:flex-row gap-4 overflow-hidden">
           {/* Main crop area */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div 
               ref={containerRef}
-              className="relative bg-gray-100 rounded-lg overflow-hidden"
-              style={{ aspectRatio: '1 / 1', minHeight: '400px' }}
+              className="relative bg-gray-100 rounded-lg overflow-hidden mx-auto"
+              style={{ 
+                aspectRatio: '1 / 1', 
+                maxWidth: '400px',
+                width: '100%',
+                height: 'auto'
+              }}
               onWheel={handleWheel}
             >
               <img
