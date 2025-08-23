@@ -84,7 +84,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
                   <Icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   {!isMobile && <span>{tab.label}</span>}
                   {isMobile && (
-                    <span className="text-xs hidden xs:inline">{tab.label}</span>
+                    <span className="text-sm hidden xs:inline">{tab.label}</span>
                   )}
                 </button>
               );
