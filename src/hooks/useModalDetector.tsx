@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface ModalState {
   isAnyModalOpen: boolean;
@@ -50,9 +50,14 @@ export const useModalState = (modalId: string, isOpen: boolean) => {
   const { registerModal, unregisterModal } = useModalDetector();
 
   // Register/unregister modal when state changes
-  if (isOpen) {
-    registerModal(modalId);
-  } else {
-    unregisterModal(modalId);
-  }
+  useEffect(() => {
+    if (isOpen) {
+      registerModal(modalId);
+    } else {
+      unregisterModal(modalId);
+    }
+
+    // Cleanup: always unregister when component unmounts
+    return () => unregisterModal(modalId);
+  }, [isOpen, modalId, registerModal, unregisterModal]);
 };
