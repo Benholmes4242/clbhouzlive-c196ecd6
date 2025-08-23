@@ -34,9 +34,8 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
   if (!profile) return null;
 
   const primaryStats = [
-    { label: 'Posts', value: stats.posts.toString(), key: 'posts' },
-    { label: 'Total XP', value: stats.handicap?.toString() || '--', key: 'handicap' },
-    { label: 'Following', value: stats.following?.toString() || '0', key: 'following' },
+    { label: 'Handicap', value: stats.handicap?.toString() || '--', key: 'handicap' },
+    { label: 'Total XP', value: stats.ratedCoursesCount?.toString() || '0', key: 'totalxp' },
     { label: 'Followers', value: stats.followers.toString(), key: 'followers' }
   ];
 
@@ -112,14 +111,14 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
               </div>
             </div>
 
-            {/* Primary Stats Strip */}
-            <div className="flex items-center gap-4">
+            {/* Primary Stats Strip - 3 stats only */}
+            <div className="flex items-center gap-6">
               {primaryStats.map((stat) => (
                 <button
                   key={stat.key}
                   onClick={() => onStatClick?.(stat.key)}
                   className={`
-                    text-center px-2 py-1 transition-all duration-300
+                    text-center px-3 py-1 transition-all duration-300 min-w-0 flex-shrink-0
                     ${glassMode === 'elevated' 
                       ? 'hover:bg-black/5' 
                       : 'hover:bg-white/10'
@@ -136,7 +135,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
                   </div>
                   <div 
                     className={`
-                      text-sm transition-colors duration-300
+                      text-sm transition-colors duration-300 whitespace-nowrap
                       ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
                     `}
                   >
