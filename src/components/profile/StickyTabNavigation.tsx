@@ -79,7 +79,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
                     isActive
                       ? 'text-primary bg-primary/10'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  } ${isMobile ? 'text-sm' : 'text-base'}`}
+                  } ${isMobile ? 'text-base' : 'text-lg'}`}
                 >
                   <Icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   {!isMobile && <span>{tab.label}</span>}
