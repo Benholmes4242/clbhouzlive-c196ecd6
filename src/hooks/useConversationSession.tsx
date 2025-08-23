@@ -70,13 +70,15 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   }, []);
 
   const loadConversations = async () => {
-    console.log('📖 Loading conversations from Supabase...');
+    console.log('🐛 LOAD DEBUG - Starting to load conversations from Supabase...');
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('❌ No user authenticated');
+        console.log('❌ LOAD DEBUG - No user authenticated');
         return;
       }
+
+      console.log('🐛 LOAD DEBUG - User authenticated, querying conversations:', user.id);
 
       const { data, error } = await supabase
         .from('conversations')
@@ -85,26 +87,57 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         .order('updated_at', { ascending: false });
 
       if (error) {
-        console.error('❌ Error loading conversations:', error);
+        console.error('❌ LOAD DEBUG - Error loading conversations:', {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        });
         return;
       }
 
-      console.log('📊 Loaded conversations from DB:', data?.length || 0);
+      console.log('🐛 LOAD DEBUG - Raw data from DB:', {
+        conversationCount: data?.length || 0,
+        conversations: data?.map(conv => {
+          const messages = Array.isArray(conv.messages) ? conv.messages : [];
+          return {
+            id: conv.id,
+            title: conv.title,
+            messageCount: messages.length,
+            created_at: conv.created_at,
+            updated_at: conv.updated_at,
+            messagesPreview: messages.slice(0, 2).map((m: any) => ({ 
+              type: m.type, 
+              content: m.content?.substring(0, 30) 
+            }))
+          };
+        }) || []
+      });
+
       if (data) {
         const conversationsWithDates = data.map((conv: any) => ({
           id: conv.id,
           title: conv.title || '',
           customTitle: conv.title,
-          messages: conv.messages || [],
+          messages: Array.isArray(conv.messages) ? conv.messages : [],
           createdAt: new Date(conv.created_at),
           lastActivityAt: new Date(conv.updated_at),
           sessionStartTime: new Date(conv.created_at)
         }));
         setConversations(conversationsWithDates);
-        console.log('✅ Conversations loaded:', conversationsWithDates.length);
+        console.log('✅ LOAD DEBUG - Conversations processed and set:', {
+          processedCount: conversationsWithDates.length,
+          conversationsPreview: conversationsWithDates.map(conv => ({
+            id: conv.id,
+            title: conv.title,
+            messageCount: conv.messages.length
+          }))
+        });
       }
     } catch (error) {
-      console.error('❌ Error loading conversations:', error);
+      console.error('❌ LOAD DEBUG - Exception loading conversations:', {
+        message: error.message,
+        stack: error.stack
+      });
     }
   };
 
@@ -136,15 +169,17 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
   };
 
   const addMessage = async (message: ConversationMessage) => {
-    console.log('➕ Adding message:', { 
+    console.log('🐛 CONVERSATION DEBUG - Adding message:', { 
       hasSession: !!currentSession, 
       messageType: message.type,
+      messageContent: message.content.substring(0, 100),
       sessionId: currentSession?.id,
-      currentMessageCount: currentSession?.messages.length || 0
+      currentMessageCount: currentSession?.messages.length || 0,
+      timestamp: message.timestamp
     });
     
     if (!currentSession) {
-      console.log('❌ No current session, starting new one');
+      console.log('❌ CONVERSATION DEBUG - No current session, starting new one');
       startNewSession();
       return;
     }
@@ -158,29 +193,50 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     // Set title to first user message if not already set
     if (!updatedSession.title && message.type === 'user') {
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
+      console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
     }
 
-    console.log('✅ Session updated, now has', updatedSession.messages.length, 'messages');
+    console.log('✅ CONVERSATION DEBUG - Session updated:', {
+      sessionId: updatedSession.id,
+      messageCount: updatedSession.messages.length,
+      title: updatedSession.title,
+      lastMessage: {
+        type: message.type,
+        content: message.content.substring(0, 50)
+      }
+    });
+    
     setCurrentSession(updatedSession);
 
     // Auto-save after EVERY message to ensure both user and AI messages are persisted
-    console.log('💾 Auto-saving session after message:', message.type);
+    console.log('💾 CONVERSATION DEBUG - Auto-saving session after message:', message.type);
     await saveSessionToDB(updatedSession);
   };
 
   const saveSessionToDB = async (session: ConversationSession) => {
-    console.log('💾 Saving specific session to DB:', {
+    console.log('🐛 SAVE DEBUG - Starting save to DB:', {
       sessionId: session.id,
       messageCount: session.messages.length,
-      title: session.title
+      title: session.title,
+      messagesPreview: session.messages.map(m => ({ type: m.type, content: m.content.substring(0, 30) }))
     });
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('❌ No authenticated user for save');
+        console.log('❌ SAVE DEBUG - No authenticated user for save');
         return;
       }
+
+      console.log('🐛 SAVE DEBUG - User authenticated, preparing upsert:', {
+        userId: user.id,
+        sessionData: {
+          id: session.id,
+          user_id: user.id,
+          title: session.customTitle || session.title,
+          messageCount: session.messages.length
+        }
+      });
 
       const { data, error } = await supabase
         .from('conversations')
@@ -194,15 +250,29 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         .single();
 
       if (error) {
-        console.error('❌ Supabase upsert error:', error);
+        console.error('❌ SAVE DEBUG - Supabase upsert error:', {
+          error: error.message,
+          code: error.code,
+          details: error.details
+        });
         return;
       }
 
-      console.log('✅ Session saved successfully to DB:', data);
+      console.log('✅ SAVE DEBUG - Session saved successfully to DB:', {
+        savedId: data.id,
+        savedTitle: data.title,
+        savedMessageCount: Array.isArray(data.messages) ? data.messages.length : 0,
+        savedMessages: Array.isArray(data.messages) ? data.messages.map((m: any) => ({ type: m.type, content: m.content?.substring(0, 30) })) : []
+      });
+      
       // Reload conversations to sync with UI
+      console.log('🔄 SAVE DEBUG - Reloading conversations after save...');
       await loadConversations();
     } catch (error) {
-      console.error('❌ Exception during session save:', error);
+      console.error('❌ SAVE DEBUG - Exception during session save:', {
+        message: error.message,
+        stack: error.stack
+      });
     }
   };
 

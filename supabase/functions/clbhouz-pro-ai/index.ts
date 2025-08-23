@@ -73,16 +73,28 @@ serve(async (req) => {
   try {
     const { message, conversation, images, detailMode, isEcho } = await req.json();
 
+    // 🐛 DEBUGGING: Log incoming request details
+    console.log('🔍 EDGE FUNCTION DEBUG - Request Details:', { 
+      messageLength: message?.length || 0,
+      conversationLength: conversation?.length || 0,
+      imagesCount: images?.length || 0,
+      detailMode,
+      isEcho,
+      hasMessage: !!message
+    });
+
     if (!message) {
+      console.log('❌ EDGE FUNCTION DEBUG - No message provided');
       throw new Error('Message is required');
     }
 
     if (!openAIApiKey) {
+      console.log('❌ EDGE FUNCTION DEBUG - No OpenAI API key configured');
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('📥 Request received:', { 
-      message: message.substring(0, 100), 
+    console.log('📥 EDGE FUNCTION DEBUG - Request received:', { 
+      message: message.substring(0, 100),
       imagesCount: images?.length || 0
     });
 
@@ -199,18 +211,28 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       finalResponse = data.choices[0].message.content.trim();
     }
 
-    console.log('✅ Response generated, length:', finalResponse.length);
+    console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
+      responseLength: finalResponse.length,
+      responsePreview: finalResponse.substring(0, 100)
+    });
 
-    return new Response(JSON.stringify({ 
+    const responseData = { 
       response: finalResponse, 
       metadata: null 
-    }), {
+    };
+
+    console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('❌ Function error:', error.message);
-    return new Response(JSON.stringify({ 
+    console.error('❌ EDGE FUNCTION DEBUG - Function error:', {
+      message: error.message,
+      stack: error.stack
+    });
+    return new Response(JSON.stringify({
       error: error.message,
       response: "I'm having trouble processing your request right now. Please try again in a moment."
     }), {

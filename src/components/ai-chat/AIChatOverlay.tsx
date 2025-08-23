@@ -284,8 +284,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    console.log('🐛 CHAT DEBUG - Creating user message:', {
+      id: userMessage.id,
+      type: userMessage.type,
+      content: userMessage.content.substring(0, 100),
+      timestamp: userMessage.timestamp
+    });
+
+    setMessages(prev => {
+      console.log('🐛 CHAT DEBUG - Adding user message to local state:', {
+        previousCount: prev.length,
+        newCount: prev.length + 1
+      });
+      return [...prev, userMessage];
+    });
+    
     // Add user message to conversation session for history tracking
+    console.log('🐛 CHAT DEBUG - Adding user message to conversation session...');
     conversationSession.addMessage(userMessage);
     setInputValue('');
     setIsLoading(true);
@@ -333,8 +348,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
         metadata: data.metadata
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      console.log('🐛 CHAT DEBUG - Creating AI message:', {
+        id: aiMessage.id,
+        type: aiMessage.type,
+        content: aiMessage.content.substring(0, 100),
+        timestamp: aiMessage.timestamp
+      });
+
+      setMessages(prev => {
+        console.log('🐛 CHAT DEBUG - Adding AI message to local state:', {
+          previousCount: prev.length,
+          newCount: prev.length + 1
+        });
+        return [...prev, aiMessage];
+      });
+      
       // Add AI response to conversation session for history tracking
+      console.log('🐛 CHAT DEBUG - Adding AI message to conversation session...');
       conversationSession.addMessage(aiMessage);
 
     } catch (error) {
