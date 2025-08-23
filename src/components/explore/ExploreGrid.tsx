@@ -669,7 +669,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 <div
                   key={`discover-tall-${layoutItem.item.id}-${index}`}
                   className={`${isMobileView ? 'col-span-1 row-span-2' : 'col-span-1 row-span-2'} relative overflow-hidden cursor-pointer group`}
-                  style={{ borderRadius: '0px', aspectRatio: '1/2' }}
+                  style={{ borderRadius: '0px', aspectRatio: '3/4' }}
                   onClick={() => onMediaClick?.(layoutItem.item)}
                   {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
                 >
