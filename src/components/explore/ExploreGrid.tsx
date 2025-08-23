@@ -276,85 +276,112 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       return 'square'; // 70% square
     };
 
-    // Create mobile-specific dynamic layout
+    // Create mobile-specific dynamic layout for activity feed
     const createMobileLayout = () => {
       const layoutItems = [];
       let contentIndex = 0;
-      let specialCardCounter = 0; // Track special cards placed
+      let squareCount = 0;
+      let tallCount = 0;
+      let heroCount = 0;
+      let rowPosition = 0; // Track position in current row (0, 1, 2 for 3-column grid)
+      let currentRow = 0;
+      let lastTallColumn = -1; // Track last column where tall card was placed
+      let squaresSinceLastTall = 0; // Track squares placed since last tall card
+      
+      // Target ratios for activity feed: 60% squares, 30% tall, 10% hero
+      const totalItems = filteredContent.length;
+      const targetSquares = Math.floor(totalItems * 0.6);
+      const targetTalls = Math.floor(totalItems * 0.3);
+      const targetHeroes = Math.floor(totalItems * 0.1);
       
       while (contentIndex < filteredContent.length) {
         const remainingItems = filteredContent.length - contentIndex;
+        let cardType = 'regular';
         
-        // Check if we should place a special card (every 6-8 squares)
-        const shouldPlaceSpecial = specialCardCounter === 0 || 
-          (layoutItems.filter(item => item.type === 'regular').length - 
-           layoutItems.filter(item => item.type !== 'regular').length * 4) >= (6 + Math.floor(Math.random() * 3));
+        // Determine card type based on position, quotas, and rules
         
-        if (shouldPlaceSpecial && remainingItems >= 2) {
-          // Decide between large (4x4) or tall (1x2) based on content and distribution
-          const currentSpecialCount = layoutItems.filter(item => item.type !== 'regular').length;
-          const totalSpecialNeeded = Math.floor(filteredContent.length * 0.3); // 30% special (15% large + 15% tall)
-          const largeNeeded = Math.floor(filteredContent.length * 0.15);
-          const tallNeeded = Math.floor(filteredContent.length * 0.15);
+        // Rule 4: Heroes only at row boundaries (start of row)
+        if (rowPosition === 0 && heroCount < targetHeroes && remainingItems >= 4) {
+          cardType = 'hero';
+        }
+        // Rule 1: One special per row - check if row already has a special card
+        else if (rowPosition < 3) {
+          const currentRowHasSpecial = layoutItems.some(item => 
+            Math.floor(item.rowIndex || 0) === currentRow && (item.type === 'tall' || item.type === 'hero')
+          );
           
-          const largeCount = layoutItems.filter(item => item.type === 'large').length;
-          const tallCount = layoutItems.filter(item => item.type === 'tall').length;
-          
-          let cardType = 'regular';
-          
-          // Prefer placing cards based on aspect ratio detection and distribution needs
-          const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
-          
-          // Large squares (4x4) should be for square content or when we need more large cards
-          if ((aspectRatio === 'square' || aspectRatio === 'landscape') && largeCount < largeNeeded) {
-            cardType = 'large';
-          } 
-          // Tall cards (1x2) should be for portrait content
-          else if (aspectRatio === 'portrait' && tallCount < tallNeeded) {
-            cardType = 'tall';
-          } 
-          // Fill remaining quotas
-          else if (largeCount < largeNeeded) {
-            cardType = 'large';
-          } else if (tallCount < tallNeeded) {
-            cardType = 'tall';
-          }
-          
-          // Avoid back-to-back special cards
-          const lastItem = layoutItems[layoutItems.length - 1];
-          if (lastItem && lastItem.type !== 'regular' && Math.random() > 0.3) {
-            cardType = 'regular';
-          }
-          
-          if (cardType !== 'regular') {
-            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-            
-            layoutItems.push({
-              type: cardType,
-              item: filteredContent[contentIndex],
-              index: contentIndex,
-              shouldAutoplay,
-              aspectRatio
-            });
-            contentIndex++;
-            specialCardCounter++;
-            continue;
+          if (!currentRowHasSpecial) {
+            // Rule 3: Two squares buffer between tall cards
+            if (tallCount < targetTalls && squaresSinceLastTall >= 2) {
+              // Rule 2: Alternating columns for talls
+              const canPlaceTall = lastTallColumn === -1 || 
+                (rowPosition !== lastTallColumn && Math.abs(rowPosition - lastTallColumn) >= 1);
+              
+              if (canPlaceTall) {
+                const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+                // Prefer tall cards for portrait content
+                if (aspectRatio === 'portrait' || tallCount < targetTalls) {
+                  cardType = 'tall';
+                }
+              }
+            }
           }
         }
         
-        // Add regular card
+        // Fallback to ensure quotas are met
+        if (cardType === 'regular') {
+          if (squareCount >= targetSquares && tallCount < targetTalls) {
+            cardType = 'tall';
+          } else if (squareCount >= targetSquares && heroCount < targetHeroes && rowPosition === 0) {
+            cardType = 'hero';
+          }
+        }
+        
+        // Rule 6: Fallback rule - if intended slot isn't available, place as square
+        if (cardType === 'tall' && rowPosition === 2) {
+          cardType = 'regular'; // Can't fit tall in last column
+        }
+        if (cardType === 'hero' && rowPosition !== 0) {
+          cardType = 'regular'; // Hero must start at row boundary
+        }
+        
         const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
         const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
         const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
         
         layoutItems.push({
-          type: 'regular',
+          type: cardType,
           item: filteredContent[contentIndex],
           index: contentIndex,
           shouldAutoplay,
-          aspectRatio
+          aspectRatio,
+          rowIndex: currentRow,
+          columnIndex: rowPosition
         });
+        
+        // Update counters and position tracking
+        if (cardType === 'regular') {
+          squareCount++;
+          squaresSinceLastTall++;
+          rowPosition++;
+        } else if (cardType === 'tall') {
+          tallCount++;
+          lastTallColumn = rowPosition;
+          squaresSinceLastTall = 0;
+          rowPosition++; // Tall card takes 1 column width
+        } else if (cardType === 'hero') {
+          heroCount++;
+          squaresSinceLastTall = 0;
+          currentRow += 4; // Hero spans 4 rows
+          rowPosition = 0; // Reset to start of new row after hero
+        }
+        
+        // Move to next row when current row is full
+        if (rowPosition >= 3) {
+          currentRow++;
+          rowPosition = 0;
+        }
+        
         contentIndex++;
       }
       
