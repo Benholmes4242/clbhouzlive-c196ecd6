@@ -106,8 +106,9 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // Check if this looks like a request for current information
-    const needsSearch = /(?:last week|recent|current|latest|today|yesterday|this week|what.*shoot|scores?|results?|standings?|news|world.*number.*1|ranking|who.*is.*number|as of|right now|currently|world.*\#1|top.*player|leader.*board)/i.test(message);
+    // Determine if question is about pre-2022 historical data or post-2022 current data
+    const isHistoricalQuery = /(?:history|all time|career|records?|majors?|championships?|classic|vintage|before|when.*did|who.*was|what.*happened|won.*in|played.*in.*19|played.*in.*20[01][0-9]|tiger.*woods|jack.*nicklaus|arnold.*palmer|ben.*hogan|sam.*snead|gary.*player|bobby.*jones)/i.test(message);
+    const isCurrentQuery = /(?:current|latest|today|yesterday|this week|last week|recent|now|2022|2023|2024|2025|world.*number.*1|ranking|who.*is.*number|as of|right now|currently|world.*\#1|top.*player|leader.*board|scores?|results?|standings?|news)/i.test(message);
     
     let finalResponse = '';
     
@@ -175,30 +176,43 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
       
-    } else if (needsSearch) {
-      // Priority 2: Use web search for current information
-      console.log('🔍 Using web search for current information');
+    } else if (isCurrentQuery && !isHistoricalQuery) {
+      // Priority 2: Use Perplexity for post-2022 current information
+      console.log('🔍 Using Perplexity for current information (post-2022)');
       
-      // Enhanced search query based on the type of question
-      let searchQuery = '';
-      if (/world.*number.*1|ranking|who.*is.*number|world.*\#1|top.*player/i.test(message)) {
-        searchQuery = `current world golf ranking number 1 player 2025 official world golf ranking`;
-      } else if (/scores?|results?|shoot/i.test(message)) {
-        searchQuery = `${message} golf tournament latest scores results 2025`;
-      } else {
-        searchQuery = `${message} golf PGA tour recent results 2025`;
+      try {
+        // Enhanced search query based on the type of question
+        let searchQuery = '';
+        if (/world.*number.*1|ranking|who.*is.*number|world.*\#1|top.*player/i.test(message)) {
+          searchQuery = `current world golf ranking number 1 player 2025 official world golf ranking`;
+        } else if (/scores?|results?|shoot/i.test(message)) {
+          searchQuery = `${message} golf tournament latest scores results 2025`;
+        } else {
+          searchQuery = `${message} golf PGA tour recent results 2025`;
+        }
+        
+        console.log('🔍 Search query:', searchQuery);
+        const searchResult = await searchWeb(searchQuery);
+        
+        // Check if search actually returned useful data
+        if (searchResult.includes('Search error:') || searchResult.includes('Search temporarily unavailable')) {
+          throw new Error('Perplexity search failed');
+        }
+        
+        finalResponse = `${searchResult}`;
+        
+      } catch (error) {
+        console.log('❌ Perplexity failed, using custom fallback');
+        finalResponse = "Sorry, I'm having a little trouble right now - I'll be back from the course soon! ⛳️";
       }
       
-      console.log('🔍 Search query:', searchQuery);
-      const searchResult = await searchWeb(searchQuery);
-      
-      finalResponse = `Based on the latest information I found:\n\n${searchResult}`;
-      
     } else {
-      // Priority 3: Use OpenAI for general questions
-      console.log('💬 Using OpenAI for general conversation');
+      // Priority 3: Use ChatGPT for historical data (pre-2022) or general golf questions
+      console.log('📚 Using ChatGPT for historical data (pre-2022) or general golf questions');
       
-      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. Be helpful and friendly.";
+      const systemPrompt = isHistoricalQuery 
+        ? "You are Echo, the AI assistant inside the Clbhouz app. You have extensive knowledge of golf history through 2021. Provide detailed historical information about golf records, past tournaments, legendary players, and golf history. Be helpful and informative about golf's rich heritage."
+        : "You are Echo, the AI assistant inside the Clbhouz app. Help with general golf questions, technique, equipment advice, and course recommendations. Be helpful and friendly.";
       
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -213,10 +227,9 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5-2025-08-07', // Use latest model for better historical knowledge
           messages: messages,
-          max_tokens: 800,
-          temperature: 0.7
+          max_completion_tokens: 800
         }),
       });
 
