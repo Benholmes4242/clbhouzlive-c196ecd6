@@ -130,6 +130,47 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     }
   };
 
+  // Load conversations without clobbering current session
+  const loadConversationsWithoutClobbering = async () => {
+    console.log('🐛 LOAD DEBUG - Loading conversations list without clobbering current session...');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('❌ LOAD DEBUG - No user authenticated');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ LOAD DEBUG - Error loading conversations:', error);
+        return;
+      }
+
+      if (data) {
+        const conversationsWithDates = data.map((conv: any) => ({
+          id: conv.id,
+          title: conv.title || '',
+          customTitle: conv.title,
+          messages: Array.isArray(conv.messages) ? conv.messages : [],
+          createdAt: new Date(conv.created_at),
+          lastActivityAt: new Date(conv.updated_at),
+          sessionStartTime: new Date(conv.created_at)
+        }));
+        
+        // Only update the conversations list, preserve currentSession
+        setConversations(conversationsWithDates);
+        console.log('✅ LOAD DEBUG - Conversations list updated without clobbering current session');
+      }
+    } catch (error) {
+      console.error('❌ LOAD DEBUG - Exception loading conversations:', error);
+    }
+  };
+
   const saveConversations = async (updatedConversations: ConversationSession[]) => {
     try {
       setConversations(updatedConversations);
@@ -159,63 +200,69 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
 
   const addMessage = async (message: ConversationMessage) => {
     console.log('🐛 CONVERSATION DEBUG - Adding message:', { 
-      hasSession: !!currentSession, 
       messageType: message.type,
       messageContent: message.content.substring(0, 100),
-      sessionId: currentSession?.id,
-      currentMessageCount: currentSession?.messages.length || 0,
-      currentTitle: currentSession?.title || 'no title',
       timestamp: message.timestamp
     });
     
-    if (!currentSession) {
-      console.log('❌ CONVERSATION DEBUG - No current session, starting new one');
-      startNewSession();
-      // Wait for the new session to be created before continuing
-      setTimeout(() => addMessage(message), 100);
-      return;
-    }
-
-    const updatedSession = {
-      ...currentSession,
-      messages: [...currentSession.messages, message],
-      lastActivityAt: new Date()
+    // Normalize message to ensure consistent format
+    const normalizedMessage = {
+      id: message.id || crypto.randomUUID(),
+      type: message.type,
+      content: message.content,
+      timestamp: message.timestamp,
+      metadata: message.metadata || null
     };
 
-    // Set title to first user message if not already set, but ALWAYS preserve existing title
-    if (!updatedSession.title && message.type === 'user') {
-      updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
-      console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
-    } else if (updatedSession.title) {
-      // Explicitly preserve the existing title - don't let it get overwritten
-      console.log('🐛 CONVERSATION DEBUG - Preserving existing title:', updatedSession.title);
-    } else if (message.type === 'ai' && currentSession.title) {
-      // If this is an AI message and we have a title from previous user message, preserve it
-      updatedSession.title = currentSession.title;
-      console.log('🐛 CONVERSATION DEBUG - Restored title for AI message:', updatedSession.title);
-    }
+    let sessionToSave: ConversationSession;
 
-    console.log('✅ CONVERSATION DEBUG - Session updated:', {
-      sessionId: updatedSession.id,
-      messageCount: updatedSession.messages.length,
-      title: updatedSession.title,
-      preservedTitle: !!updatedSession.title,
-      messageType: message.type,
-      lastMessage: {
-        type: message.type,
-        content: message.content.substring(0, 50)
+    // Use functional state update to prevent stale state issues
+    setCurrentSession(prev => {
+      // If no session, create a new one on the fly
+      const baseSession = prev || {
+        id: crypto.randomUUID(),
+        title: '',
+        messages: [],
+        createdAt: new Date(),
+        lastActivityAt: new Date(),
+        sessionStartTime: new Date()
+      };
+
+      console.log('🐛 CONVERSATION DEBUG - Functional update:', {
+        prevSessionId: baseSession.id,
+        prevMessageCount: baseSession.messages.length,
+        prevTitle: baseSession.title || 'no title'
+      });
+
+      // Create updated session with new message
+      const updatedSession = {
+        ...baseSession,
+        messages: [...baseSession.messages, normalizedMessage],
+        lastActivityAt: new Date()
+      };
+
+      // Set title from first user message only
+      if (!updatedSession.title?.trim() && normalizedMessage.type === 'user') {
+        updatedSession.title = normalizedMessage.content.slice(0, 50) + (normalizedMessage.content.length > 50 ? '...' : '');
+        console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
       }
+
+      console.log('✅ CONVERSATION DEBUG - Session updated:', {
+        sessionId: updatedSession.id,
+        messageCount: updatedSession.messages.length,
+        title: updatedSession.title,
+        preservedTitle: !!updatedSession.title,
+        messageType: normalizedMessage.type
+      });
+
+      // Capture for saving outside of setState
+      sessionToSave = updatedSession;
+      return updatedSession;
     });
-    
-    // Update session state immediately to ensure consistency
-    setCurrentSession(updatedSession);
-    
-    // Force a small delay to ensure state update is processed
-    await new Promise(resolve => setTimeout(resolve, 10));
 
     // Auto-save after EVERY message to ensure both user and AI messages are persisted
-    console.log('💾 CONVERSATION DEBUG - Auto-saving session after message:', message.type);
-    await saveSessionToDB(updatedSession);
+    console.log('💾 CONVERSATION DEBUG - Auto-saving session after message:', normalizedMessage.type);
+    await saveSessionToDB(sessionToSave);
   };
 
   const saveSessionToDB = async (session: ConversationSession) => {
@@ -270,9 +317,9 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
         savedMessages: Array.isArray(data.messages) ? data.messages.map((m: any) => ({ type: m.type, content: m.content?.substring(0, 30) })) : []
       });
       
-      // Reload conversations to sync with UI
-      console.log('🔄 SAVE DEBUG - Reloading conversations after save...');
-      await loadConversations();
+      // Reload conversations list but DON'T clobber currentSession
+      console.log('🔄 SAVE DEBUG - Reloading conversations list after save...');
+      await loadConversationsWithoutClobbering();
     } catch (error) {
       console.error('❌ SAVE DEBUG - Exception during session save:', {
         message: error.message,
