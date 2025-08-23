@@ -197,10 +197,9 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     if (!updatedSession.title && message.type === 'user') {
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
       console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
-    } else if (updatedSession.title && message.type === 'ai') {
-      // Explicitly preserve title for AI messages
-      console.log('🐛 CONVERSATION DEBUG - Preserving existing title for AI message:', updatedSession.title);
-    } else if (updatedSession.title) {
+    }
+    // Always preserve existing title for any subsequent messages (user or AI)
+    if (updatedSession.title) {
       console.log('🐛 CONVERSATION DEBUG - Preserving existing title:', updatedSession.title);
     }
 
