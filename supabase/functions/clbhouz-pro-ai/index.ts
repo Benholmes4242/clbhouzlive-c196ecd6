@@ -106,13 +106,7 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // New logic: Use ChatGPT only if user specifically mentions a pre-2022 year, otherwise use Perplexity
-    const hasSpecificPre2022Year = /\b(19\d{2}|20[01]\d|202[01])\b/.test(message);
-    
-    console.log('📅 Query classification:', { 
-      hasSpecificPre2022Year, 
-      message: message.substring(0, 100) 
-    });
+    // All text queries use Perplexity, only images use OpenAI
     
     let finalResponse = '';
     
@@ -180,42 +174,9 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
       
-    } else if (hasSpecificPre2022Year) {
-      // Use ChatGPT only for specific pre-2022 years
-      console.log('📚 Using ChatGPT for specific pre-2022 historical data');
-      
-      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. You have extensive knowledge of golf through 2021. Help with golf questions, technique, equipment advice, course recommendations, and historical golf information. Be helpful and friendly.";
-      
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        ...(conversation || []),
-        { role: 'user', content: message }
-      ];
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-5-2025-08-07', // Use latest model for better historical knowledge
-          messages: messages,
-          max_completion_tokens: 800
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI API error:', response.status, errorText);
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      finalResponse = data.choices[0].message.content.trim();
     } else {
-      // Use Perplexity for all other queries (default)
-      console.log('🔍 Using Perplexity for all queries');
+      // Use Perplexity for ALL text queries
+      console.log('🔍 Using Perplexity for all text queries');
       
       try {
         const searchResult = await searchWeb(message);
