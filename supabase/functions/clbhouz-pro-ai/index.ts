@@ -55,7 +55,10 @@ async function searchWeb(query: string): Promise<string> {
     const result = data.choices?.[0]?.message?.content || 'No current information found.';
     console.log('📊 Search result length:', result.length);
     
-    return result;
+    // Remove citation numbers like [1], [2], [3], etc. for cleaner text flow
+    const cleanResult = result.replace(/\[\d+\]/g, '');
+    
+    return cleanResult;
   } catch (error) {
     console.log('❌ Search error:', error.message);
     return `Search error: ${error.message}`;
