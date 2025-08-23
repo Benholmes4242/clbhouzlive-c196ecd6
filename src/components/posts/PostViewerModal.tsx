@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { registerModal } from '@/hooks/useModalDetector';
 import { ArrowLeft, Heart, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -71,6 +72,11 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editCourse, setEditCourse] = useState<any>(null);
+
+  // Register modal state for Echo detection
+  useEffect(() => {
+    registerModal(isOpen);
+  }, [isOpen]);
 
   // Helper function to truncate text to 9 words
   const truncateToWords = (text: string, wordLimit: number = 9) => {

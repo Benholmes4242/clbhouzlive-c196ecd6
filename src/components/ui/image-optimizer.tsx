@@ -58,7 +58,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
     // If it's a Supabase storage URL, add optimization parameters
     if (url.includes('supabase') && url.includes('storage')) {
       const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}quality=60&resize=contain&width=${width || 300}&format=webp`;
+      return `${url}${separator}quality=85&resize=contain&width=${width || 600}&format=webp`;
     }
     
     return url;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useModalDetector } from '@/hooks/useModalDetector';
 import FloatingAIButton from './FloatingAIButton';
 import AIChatOverlay from './AIChatOverlay';
 
@@ -8,14 +9,15 @@ const AIChat: React.FC = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { user, loading } = useSupabaseSession();
+  const { hasModalOpen } = useModalDetector();
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname);
 
   // Check if we're on an auth page
   const isAuthPage = location.pathname === '/auth' || location.pathname === '/create-profile';
 
-  // Echo should never render on auth pages or when user is not authenticated
-  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning;
+  // Echo should never render on auth pages, when user is not authenticated, or when modals are open
+  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen;
 
   // Handle route changes - destroy Echo before navigation and hide during transition
   useEffect(() => {
