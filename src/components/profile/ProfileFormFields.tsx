@@ -99,23 +99,31 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         return;
       }
 
-      // Save crop data to database - simplified approach
-      const response = await fetch('/api/update-mobile-crop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // Update the profile directly with the new crop data
+      const updateData = {
+        mobile_crop_x: Number(cropData.x),
+        mobile_crop_y: Number(cropData.y),
+        mobile_crop_width: Number(cropData.width),
+        mobile_crop_height: Number(cropData.height),
+        updated_at: new Date().toISOString()
+      };
+
+      // Use the edge function approach to avoid TypeScript issues
+      const { data, error } = await supabase.functions.invoke('update-mobile-crop', {
+        body: {
           userId: user.id,
-          cropData: {
-            mobile_crop_x: Number(cropData.x),
-            mobile_crop_y: Number(cropData.y),
-            mobile_crop_width: Number(cropData.width),
-            mobile_crop_height: Number(cropData.height)
-          }
-        })
+          cropData: updateData
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update mobile crop');
+      if (error) {
+        console.error('Error saving mobile crop data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save mobile crop settings. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
 
       // Show success message
@@ -130,36 +138,11 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
       }
     } catch (error) {
       console.error('Error saving mobile crop:', error);
-      
-      // Fallback to direct supabase update if API route doesn't exist
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase.rpc('update_mobile_crop_data', {
-            p_user_id: user.id,
-            p_crop_x: Number(cropData.x),
-            p_crop_y: Number(cropData.y),
-            p_crop_width: Number(cropData.width),
-            p_crop_height: Number(cropData.height)
-          });
-          
-          toast({
-            title: "Mobile crop saved",
-            description: "Your mobile profile photo crop has been updated successfully.",
-          });
-          
-          if (onProfileUpdate) {
-            onProfileUpdate();
-          }
-        }
-      } catch (fallbackError) {
-        console.error('Fallback error:', fallbackError);
-        toast({
-          title: "Error", 
-          description: "Failed to save mobile crop settings.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error", 
+        description: "Failed to save mobile crop settings.",
+        variant: "destructive",
+      });
     }
   };
 

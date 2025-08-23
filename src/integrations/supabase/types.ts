@@ -1650,6 +1650,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_mobile_crop_data: {
+        Args: {
+          p_crop_height: number
+          p_crop_width: number
+          p_crop_x: number
+          p_crop_y: number
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "limited_admin"
