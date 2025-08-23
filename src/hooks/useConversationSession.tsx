@@ -175,6 +175,7 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       messageContent: message.content.substring(0, 100),
       sessionId: currentSession?.id,
       currentMessageCount: currentSession?.messages.length || 0,
+      currentTitle: currentSession?.title || 'no title',
       timestamp: message.timestamp
     });
     
@@ -194,12 +195,15 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     if (!updatedSession.title && message.type === 'user') {
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
       console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
+    } else if (updatedSession.title) {
+      console.log('🐛 CONVERSATION DEBUG - Preserving existing title:', updatedSession.title);
     }
 
     console.log('✅ CONVERSATION DEBUG - Session updated:', {
       sessionId: updatedSession.id,
       messageCount: updatedSession.messages.length,
       title: updatedSession.title,
+      preservedTitle: !!updatedSession.title,
       lastMessage: {
         type: message.type,
         content: message.content.substring(0, 50)
