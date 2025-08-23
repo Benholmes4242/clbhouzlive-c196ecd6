@@ -84,8 +84,18 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   // Handle mouse/touch events for dragging
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  // Handle touch events
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({ x: touch.clientX, y: touch.clientY });
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -109,6 +119,29 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     setDragStart({ x: e.clientX, y: e.clientY });
   }, [isDragging, dragStart]);
 
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    
+    const deltaX = touch.clientX - dragStart.x;
+    const deltaY = touch.clientY - dragStart.y;
+    
+    const deltaXPercent = (deltaX / containerRect.width) * 100;
+    const deltaYPercent = (deltaY / containerRect.height) * 100;
+    
+    setCropData(prev => {
+      const newX = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent));
+      const newY = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent));
+      return { ...prev, x: newX, y: newY };
+    });
+    
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+  }, [isDragging, dragStart]);
+
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     setIsResizing(false);
@@ -126,12 +159,16 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     if (isDragging || isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleMouseUp);
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleMouseUp);
       };
     }
-  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp, handleTouchMove]);
 
   const handleSave = () => {
     // Track mobile crop save with crop data
@@ -159,9 +196,9 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
           </p>
         </div>
         
-        <div className="p-4 flex flex-col lg:flex-row gap-4 overflow-hidden">
+        <div className="p-4 space-y-6">
           {/* Main crop area */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1">
             <div 
               ref={containerRef}
               className="relative bg-gray-100 rounded-lg overflow-hidden mx-auto"
@@ -187,12 +224,12 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
               {imageLoaded && (
                 <>
                   {/* Dark overlay */}
-                  <div className="absolute inset-0 bg-black/50" />
+                  <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                   
                   {/* Crop box */}
                   <div
                     ref={cropBoxRef}
-                    className="absolute border-2 border-white bg-transparent cursor-move"
+                    className="absolute border-2 border-white bg-transparent cursor-move select-none touch-none"
                     style={{
                       left: `${cropData.x}%`,
                       top: `${cropData.y}%`,
@@ -200,6 +237,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                       height: `${cropData.height}%`,
                     }}
                     onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
                   >
                     {/* Grid overlay */}
                     <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
@@ -209,39 +247,37 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                     </div>
                     
                     {/* Crop box corners for visual feedback */}
-                    <div className="absolute -top-1 -left-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-white rounded-full" />
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-white rounded-full" />
+                    <div className="absolute -top-1 -left-1 w-3 h-3 bg-white rounded-full pointer-events-none" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full pointer-events-none" />
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-white rounded-full pointer-events-none" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-white rounded-full pointer-events-none" />
                   </div>
                 </>
               )}
             </div>
             
-            <div className="mt-4 text-sm text-muted-foreground space-y-1">
+            <div className="mt-4 text-sm text-muted-foreground space-y-1 text-center">
               <p>• Drag to reposition the crop area</p>
               <p>• Use mouse wheel to zoom in/out</p>
               <p>• The crop maintains a 3:4 aspect ratio for mobile</p>
             </div>
           </div>
           
-          {/* Preview panel */}
-          <div className="w-64 space-y-4">
-            <div>
-              <h4 className="font-medium mb-2">Mobile preview</h4>
-              <div className="bg-gray-100 rounded-lg p-4">
-                <div className="w-16 h-20 mx-auto rounded-lg overflow-hidden bg-white">
-                  <img
-                    src={imageUrl}
-                    alt="Mobile preview"
-                    className="w-full h-full object-cover"
-                    style={getPreviewStyle()}
-                  />
-                </div>
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  How it appears in mobile header
-                </p>
+          {/* Preview panel - now below crop area */}
+          <div className="flex items-center justify-center gap-8">
+            <div className="text-center">
+              <h4 className="font-medium mb-4">Mobile Preview</h4>
+              <div className="rounded-lg overflow-hidden mx-auto" style={{ width: '120px', height: '150px' }}>
+                <img
+                  src={imageUrl}
+                  alt="Mobile preview"
+                  className="w-full h-full object-cover"
+                  style={getPreviewStyle()}
+                />
               </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                How it appears in mobile header
+              </p>
             </div>
             
             <div className="space-y-2">
@@ -249,7 +285,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={resetCrop}
-                className="w-full gap-2"
+                className="gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset to Center

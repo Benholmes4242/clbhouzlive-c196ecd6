@@ -691,7 +691,7 @@ const HeroProfileHeader = ({
                   className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   disabled={!hasImmersiveMedia}
                 >
-                  Preview Profile
+                  Immersive Preview
                 </Button>
               </div>
             )}

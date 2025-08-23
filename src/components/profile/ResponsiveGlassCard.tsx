@@ -189,7 +189,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
             className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
           >
             <Camera className="w-4 h-4 mr-2" />
-            {isMobile ? 'Media' : 'Manage Media'}
+            {isMobile ? 'Media' : 'Immersive Media'}
           </Button>
           {hasImmersiveMedia && (
             <Button
@@ -198,7 +198,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
               onClick={onPreviewImmersive}
               className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             >
-              Preview Profile
+              Immersive Preview
             </Button>
           )}
         </div>
