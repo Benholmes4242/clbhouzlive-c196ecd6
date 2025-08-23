@@ -106,9 +106,13 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // Determine if question is about pre-2022 historical data or post-2022 current data
-    const isHistoricalQuery = /(?:history|all time|career|records?|majors?|championships?|classic|vintage|before|when.*did|who.*was|what.*happened|won.*in|played.*in.*19|played.*in.*20[01][0-9]|tiger.*woods|jack.*nicklaus|arnold.*palmer|ben.*hogan|sam.*snead|gary.*player|bobby.*jones)/i.test(message);
-    const isCurrentQuery = /(?:current|latest|today|yesterday|this week|last week|recent|now|2022|2023|2024|2025|world.*number.*1|ranking|who.*is.*number|as of|right now|currently|world.*\#1|top.*player|leader.*board|scores?|results?|standings?|news)/i.test(message);
+    // Simple logic: Check if question mentions years 2022 or later, or asks about current/recent info
+    const isPost2022Query = /(?:2022|2023|2024|2025|current|today|now|recent|latest|this year)/i.test(message);
+    
+    console.log('📅 Query classification:', { 
+      isPost2022Query, 
+      message: message.substring(0, 100) 
+    });
     
     let finalResponse = '';
     
@@ -176,30 +180,19 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
       
-    } else if (isCurrentQuery && !isHistoricalQuery) {
-      // Priority 2: Use Perplexity for post-2022 current information
-      console.log('🔍 Using Perplexity for current information (post-2022)');
+    } else if (isPost2022Query) {
+      // Use Perplexity for post-2022 data
+      console.log('🔍 Using Perplexity for post-2022 data');
       
       try {
-        // Enhanced search query based on the type of question
-        let searchQuery = '';
-        if (/world.*number.*1|ranking|who.*is.*number|world.*\#1|top.*player/i.test(message)) {
-          searchQuery = `current world golf ranking number 1 player 2025 official world golf ranking`;
-        } else if (/scores?|results?|shoot/i.test(message)) {
-          searchQuery = `${message} golf tournament latest scores results 2025`;
-        } else {
-          searchQuery = `${message} golf PGA tour recent results 2025`;
-        }
-        
-        console.log('🔍 Search query:', searchQuery);
-        const searchResult = await searchWeb(searchQuery);
+        const searchResult = await searchWeb(message);
         
         // Check if search actually returned useful data
         if (searchResult.includes('Search error:') || searchResult.includes('Search temporarily unavailable')) {
           throw new Error('Perplexity search failed');
         }
         
-        finalResponse = `${searchResult}`;
+        finalResponse = searchResult;
         
       } catch (error) {
         console.log('❌ Perplexity failed, using custom fallback');
@@ -207,12 +200,10 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       }
       
     } else {
-      // Priority 3: Use ChatGPT for historical data (pre-2022) or general golf questions
-      console.log('📚 Using ChatGPT for historical data (pre-2022) or general golf questions');
+      // Use ChatGPT for pre-2022 data and general golf questions
+      console.log('📚 Using ChatGPT for pre-2022 data and general golf questions');
       
-      const systemPrompt = isHistoricalQuery 
-        ? "You are Echo, the AI assistant inside the Clbhouz app. You have extensive knowledge of golf history through 2021. Provide detailed historical information about golf records, past tournaments, legendary players, and golf history. Be helpful and informative about golf's rich heritage."
-        : "You are Echo, the AI assistant inside the Clbhouz app. Help with general golf questions, technique, equipment advice, and course recommendations. Be helpful and friendly.";
+      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. You have extensive knowledge of golf through 2021. Help with golf questions, technique, equipment advice, course recommendations, and historical golf information. Be helpful and friendly.";
       
       const messages = [
         { role: 'system', content: systemPrompt },
