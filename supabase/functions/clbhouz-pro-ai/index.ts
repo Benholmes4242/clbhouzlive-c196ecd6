@@ -27,25 +27,17 @@ async function searchWeb(query: string): Promise<string> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
+        model: 'sonar',
         messages: [
           {
             role: 'system',
-            content: 'You are a golf expert providing current, factual information. Always include dates and specify if information is current as of today. For rankings, provide the current official world golf ranking.'
+            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances.'
           },
           {
             role: 'user',
             content: query
           }
-        ],
-        temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 1000,
-        return_images: false,
-        return_related_questions: false,
-        search_recency_filter: 'week',
-        frequency_penalty: 1,
-        presence_penalty: 0
+        ]
       }),
     });
 
@@ -106,7 +98,8 @@ serve(async (req) => {
       imagesCount: images?.length || 0
     });
 
-    // All text queries use Perplexity, only images use OpenAI
+    // Check if this looks like a request for current information
+    const needsSearch = /(?:last week|recent|current|latest|today|yesterday|this week|what.*shoot|scores?|results?|standings?|news)/i.test(message);
     
     let finalResponse = '';
     
@@ -174,24 +167,48 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
       const data = await response.json();
       finalResponse = data.choices[0].message.content.trim();
       
-    } else {
-      // Use Perplexity for ALL text queries
-      console.log('🔍 Using Perplexity for all text queries');
+    } else if (needsSearch) {
+      // Priority 2: Use web search for current information
+      console.log('🔍 Using web search for current information');
+      const searchQuery = `${message} golf PGA tour recent results`;
+      const searchResult = await searchWeb(searchQuery);
       
-      try {
-        const searchResult = await searchWeb(message);
-        
-        // Check if search actually returned useful data
-        if (searchResult.includes('Search error:') || searchResult.includes('Search temporarily unavailable')) {
-          throw new Error('Perplexity search failed');
-        }
-        
-        finalResponse = searchResult;
-        
-      } catch (error) {
-        console.log('❌ Perplexity failed, using custom fallback');
-        finalResponse = "Sorry, I'm having a little trouble right now - I'll be back from the course soon! ⛳️";
+      finalResponse = `Based on the latest information I found:\n\n${searchResult}`;
+      
+    } else {
+      // Priority 3: Use OpenAI for general questions
+      console.log('💬 Using OpenAI for general conversation');
+      
+      const systemPrompt = "You are Echo, the AI assistant inside the Clbhouz app. Be helpful and friendly.";
+      
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...(conversation || []),
+        { role: 'user', content: message }
+      ];
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: messages,
+          max_tokens: 800,
+          temperature: 0.7
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI API error:', response.status, errorText);
+        throw new Error(`OpenAI API error: ${response.status}`);
       }
+
+      const data = await response.json();
+      finalResponse = data.choices[0].message.content.trim();
     }
 
     console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
