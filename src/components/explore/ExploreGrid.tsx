@@ -252,17 +252,128 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout with large video cards
+  // Check if we should use Discover page layout with dynamic mobile grid
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
-    // Create layout with large video cards every third row - no gaps
+    // Function to detect aspect ratio of media
+    const detectAspectRatio = (item: ExploreContentItem) => {
+      // Use a deterministic hash-based approach for consistency
+      const hash = item.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+      
+      if (item.type === 'video') {
+        // For videos, distribute based on common aspect ratios
+        const videoType = hash % 10;
+        if (videoType < 3) return 'portrait'; // 30% portrait (9:16, 4:5)
+        if (videoType < 5) return 'landscape'; // 20% landscape (16:9)
+        return 'square'; // 50% square (1:1)
+      }
+      
+      // For images, more likely to be square but still have variety
+      const imageType = hash % 10;
+      if (imageType < 2) return 'portrait'; // 20% portrait
+      if (imageType < 3) return 'landscape'; // 10% landscape
+      return 'square'; // 70% square
+    };
+
+    // Create mobile-specific dynamic layout
+    const createMobileLayout = () => {
+      const layoutItems = [];
+      let contentIndex = 0;
+      let specialCardCounter = 0; // Track special cards placed
+      
+      while (contentIndex < filteredContent.length) {
+        const remainingItems = filteredContent.length - contentIndex;
+        
+        // Check if we should place a special card (every 6-8 squares)
+        const shouldPlaceSpecial = specialCardCounter === 0 || 
+          (layoutItems.filter(item => item.type === 'regular').length - 
+           layoutItems.filter(item => item.type !== 'regular').length * 4) >= (6 + Math.floor(Math.random() * 3));
+        
+        if (shouldPlaceSpecial && remainingItems >= 2) {
+          // Decide between large (4x4) or tall (1x2) based on content and distribution
+          const currentSpecialCount = layoutItems.filter(item => item.type !== 'regular').length;
+          const totalSpecialNeeded = Math.floor(filteredContent.length * 0.3); // 30% special (15% large + 15% tall)
+          const largeNeeded = Math.floor(filteredContent.length * 0.15);
+          const tallNeeded = Math.floor(filteredContent.length * 0.15);
+          
+          const largeCount = layoutItems.filter(item => item.type === 'large').length;
+          const tallCount = layoutItems.filter(item => item.type === 'tall').length;
+          
+          let cardType = 'regular';
+          
+          // Prefer placing cards based on aspect ratio detection and distribution needs
+          const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+          
+          // Large squares (4x4) should be for square content or when we need more large cards
+          if ((aspectRatio === 'square' || aspectRatio === 'landscape') && largeCount < largeNeeded) {
+            cardType = 'large';
+          } 
+          // Tall cards (1x2) should be for portrait content
+          else if (aspectRatio === 'portrait' && tallCount < tallNeeded) {
+            cardType = 'tall';
+          } 
+          // Fill remaining quotas
+          else if (largeCount < largeNeeded) {
+            cardType = 'large';
+          } else if (tallCount < tallNeeded) {
+            cardType = 'tall';
+          }
+          
+          // Avoid back-to-back special cards
+          const lastItem = layoutItems[layoutItems.length - 1];
+          if (lastItem && lastItem.type !== 'regular' && Math.random() > 0.3) {
+            cardType = 'regular';
+          }
+          
+          if (cardType !== 'regular') {
+            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+            
+            layoutItems.push({
+              type: cardType,
+              item: filteredContent[contentIndex],
+              index: contentIndex,
+              shouldAutoplay,
+              aspectRatio
+            });
+            contentIndex++;
+            specialCardCounter++;
+            continue;
+          }
+        }
+        
+        // Add regular card
+        const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+        const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+        const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+        
+        layoutItems.push({
+          type: 'regular',
+          item: filteredContent[contentIndex],
+          index: contentIndex,
+          shouldAutoplay,
+          aspectRatio
+        });
+        contentIndex++;
+      }
+      
+      return layoutItems;
+    };
+
+    // Use mobile layout when on mobile, otherwise keep existing layout
     const createDiscoverLayout = () => {
+      const isMobileView = window.innerWidth < 768;
+      
+      if (isMobileView) {
+        return createMobileLayout();
+      }
+      
+      // Desktop layout (existing logic)
       const layoutItems = [];
       let contentIndex = 0;
       let rowCount = 0;
-      const isMobileView = window.innerWidth < 768;
-      const colsPerRow = isMobileView ? 3 : 4;
+      const colsPerRow = 4;
       
       while (contentIndex < filteredContent.length) {
         rowCount++;
@@ -436,27 +547,30 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       };
     };
     
+    const isMobileView = window.innerWidth < 768;
+    
     return (
       <>
-        {/* Discover Page Layout - Grid with large video cards */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
+        {/* Discover Page Layout - Dynamic Mobile Grid */}
+        <div className={`grid ${isMobileView ? 'grid-cols-3' : 'grid-cols-4'} gap-0.5 auto-rows-fr`}>
         {layoutItems.map((layoutItem, index) => {
           const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
           const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
           const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
 
-            return layoutItem.type === 'large' ? (
-              <div
-                key={`discover-large-${layoutItem.item.id}-${index}`}
-                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '0px' }}
-                onClick={() => onMediaClick?.(layoutItem.item)}
-                {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-              >
-                {/* Shimmer loading placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                </div>
+            if (layoutItem.type === 'large') {
+              return (
+                <div
+                  key={`discover-large-${layoutItem.item.id}-${index}`}
+                  className={`${isMobileView ? 'col-span-2 row-span-2' : 'col-span-2 row-span-2'} relative overflow-hidden cursor-pointer group aspect-square`}
+                  style={{ borderRadius: '0px' }}
+                  onClick={() => onMediaClick?.(layoutItem.item)}
+                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
+                >
+                   {/* Shimmer loading placeholder */}
+                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
+                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                   </div>
                 
                 {/* Large Video Card - Always Autoplay */}
                 <MediaDisplay
@@ -503,13 +617,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   </div>
                 )}
 
-                {/* Golf Club Tag for large cards - positioned to avoid context label */}
-                {layoutItem.item.golfCourse && (
-                  <div className="absolute top-12 left-2 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full z-20">
-                    <MapPin className="h-4 w-4 mr-1 text-white" />
-                    <span className="text-sm font-medium truncate max-w-[120px]">{layoutItem.item.golfCourse.name}</span>
-                  </div>
-                )}
+                {/* Golf Club Tag for large cards - only in full screen modal, not in grid thumbnails */}
                 
                 {/* Film icon for videos */}
                 {layoutItem.item.type === 'video' && (
@@ -554,15 +662,77 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
                 {/* Hover animation */}
                 <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-              </div>
-            ) : (
-              <div
-                key={`discover-regular-${layoutItem.item.id}-${index}`}
-                className="relative overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '0px' }}
-                onClick={() => onMediaClick?.(layoutItem.item)}
-                {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-              >
+                </div>
+              );
+            } else if (layoutItem.type === 'tall') {
+              return (
+                <div
+                  key={`discover-tall-${layoutItem.item.id}-${index}`}
+                  className={`${isMobileView ? 'col-span-1 row-span-2' : 'col-span-1 row-span-2'} relative overflow-hidden cursor-pointer group`}
+                  style={{ borderRadius: '0px', aspectRatio: '1/2' }}
+                  onClick={() => onMediaClick?.(layoutItem.item)}
+                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
+                >
+                  {/* Shimmer loading placeholder */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                  </div>
+                  
+                  {/* Tall Portrait Card */}
+                  <MediaDisplay
+                    media={hasMultipleMedia && currentMedia ? {
+                      id: currentMedia.id,
+                      media_type: currentMedia.media_type,
+                      media_url: currentMedia.media_url
+                    } : {
+                      id: layoutItem.item.id,
+                      media_type: layoutItem.item.type as 'video' | 'image',
+                      media_url: layoutItem.item.src
+                    }}
+                    itemTitle={layoutItem.item.title}
+                    shouldAutoplay={layoutItem.shouldAutoplay}
+                    isLoading={false}
+                    onImageError={() => {}}
+                    onImageLoad={() => {}}
+                    itemId={layoutItem.item.id}
+                    currentIndex={layoutItem.index}
+                    loop={true}
+                    hidePlayButton={true}
+                  />
+                  
+                  {/* Film icon for videos in tall cards */}
+                  {layoutItem.item.type === 'video' && (
+                    <div className="absolute bottom-2 right-2 z-20">
+                      <div 
+                        className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
+                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                      >
+                        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Media navigation dots for multiple media */}
+                  {hasMultipleMedia && (
+                    <MediaNavigationDots
+                      mediaCount={layoutItem.item.media!.length}
+                      currentIndex={currentMediaIndex}
+                    />
+                  )}
+                  
+                  {/* Hover animation */}
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+              );
+            } else {
+              return (
+                <div
+                  key={`discover-regular-${layoutItem.item.id}-${index}`}
+                  className="relative overflow-hidden cursor-pointer group aspect-square"
+                  style={{ borderRadius: '0px' }}
+                  onClick={() => onMediaClick?.(layoutItem.item)}
+                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
+                >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
@@ -602,15 +772,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   </div>
                 )}
                 
-                {/* Media navigation dots for multiple media */}
-                {hasMultipleMedia && (
-                  <MediaNavigationDots
-                    mediaCount={layoutItem.item.media!.length}
-                    currentIndex={currentMediaIndex}
-                  />
-                )}
-              </div>
-            );
+                  {/* Media navigation dots for multiple media */}
+                  {hasMultipleMedia && (
+                    <MediaNavigationDots
+                      mediaCount={layoutItem.item.media!.length}
+                      currentIndex={currentMediaIndex}
+                    />
+                  )}
+                </div>
+              );
+            }
           })}
         </div>
         
