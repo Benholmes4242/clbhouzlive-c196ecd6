@@ -635,11 +635,11 @@ const HeroProfileHeader = ({
           <div className="bg-white px-4 py-8 space-y-6">
             {/* User name (immediately below header media) */}
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 {profile?.display_name || 'User'}
               </h1>
               {profile?.username && (
-                <p className="text-gray-600 text-lg">@{profile.username}</p>
+                <p className="text-gray-600 text-base">@{profile.username}</p>
               )}
             </div>
             

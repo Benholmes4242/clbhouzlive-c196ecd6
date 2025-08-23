@@ -70,7 +70,7 @@ const AdaptiveGlassHeader: React.FC<AdaptiveGlassHeaderProps> = ({
           <div className="flex items-center justify-between">
             {/* Profile Info */}
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 rounded-full">
+              <Avatar className="w-14 h-14 rounded-full">
                 <AvatarImage 
                   src={profile.profile_photo_url || undefined}
                   alt={profile.display_name || 'User'}
