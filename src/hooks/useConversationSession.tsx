@@ -182,14 +182,17 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       lastActivityAt: new Date()
     };
 
-    // Set title to first user message if not already set, preserve existing title for AI messages
+    // Set title to first user message if not already set, but ALWAYS preserve existing title
     if (!updatedSession.title && message.type === 'user') {
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
       console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
-    }
-    // Always preserve existing title for any subsequent messages (user or AI)
-    if (updatedSession.title) {
+    } else if (updatedSession.title) {
+      // Explicitly preserve the existing title - don't let it get overwritten
       console.log('🐛 CONVERSATION DEBUG - Preserving existing title:', updatedSession.title);
+    } else if (message.type === 'ai' && currentSession.title) {
+      // If this is an AI message and we have a title from previous user message, preserve it
+      updatedSession.title = currentSession.title;
+      console.log('🐛 CONVERSATION DEBUG - Restored title for AI message:', updatedSession.title);
     }
 
     console.log('✅ CONVERSATION DEBUG - Session updated:', {
