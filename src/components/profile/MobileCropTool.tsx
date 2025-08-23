@@ -206,8 +206,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
               ref={containerRef}
               className="relative bg-gray-100 rounded-lg overflow-hidden mx-auto"
               style={{ 
-                aspectRatio: '1 / 1', 
-                maxWidth: '400px',
+                maxWidth: '500px',
                 width: '100%',
                 height: 'auto'
               }}
@@ -217,7 +216,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
                 ref={imageRef}
                 src={imageUrl}
                 alt="Profile photo to crop"
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-contain"
                 style={{ transform: `scale(${scale})` }}
                 onLoad={() => setImageLoaded(true)}
                 draggable={false}
