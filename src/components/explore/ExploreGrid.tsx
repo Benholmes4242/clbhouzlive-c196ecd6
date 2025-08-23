@@ -254,6 +254,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   // Function to detect aspect ratio from media URL or type
   const detectAspectRatio = (item: ExploreContentItem): 'square' | 'wide' | 'tall' => {
+    // Create a deterministic seed based on item ID for consistent results
+    const seed = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const random = (seed * 9301 + 49297) % 233280 / 233280; // Pseudo-random based on ID
+    
     // For videos, use more sophisticated detection
     if (item.type === 'video') {
       const url = item.src.toLowerCase();
@@ -273,9 +277,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         return 'wide';
       }
       
-      // For mobile-uploaded golf videos, assume many are portrait
-      // Since most golf content from phones is vertical
-      if (Math.random() < 0.4) { // 40% chance for tall videos
+      // For general videos, distribute based on desired ratios
+      if (random < 0.35) { // 35% chance for wide videos (landscape gameplay, course shots)
+        return 'wide';
+      } else if (random < 0.65) { // 30% chance for tall videos (mobile uploads, swing analysis)
         return 'tall';
       }
     }
@@ -298,16 +303,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         return 'wide';
       }
       
-      // For golf images, assume course photos might be wide, selfies tall
-      if (item.golfCourse && Math.random() < 0.6) { // 60% chance for wide course photos
+      // For golf course images, favor wide format for course photography
+      if (item.golfCourse && random < 0.7) { // 70% chance for wide course photos
         return 'wide';
       }
-      if (Math.random() < 0.3) { // 30% chance for tall selfie/portrait shots
+      
+      // For general images, distribute based on desired ratios
+      if (random < 0.25) { // 25% chance for wide images (course photos, group shots)
+        return 'wide';
+      } else if (random < 0.45) { // 20% chance for tall images (selfies, portrait shots)
         return 'tall';
       }
     }
     
-    // Default to square for most content
+    // Default to square for most content (55% of content)
     return 'square';
   };
 
