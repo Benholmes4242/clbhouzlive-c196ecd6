@@ -761,7 +761,7 @@ const HeroProfileHeader = ({
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
-                  relative py-4 px-4 text-sm font-medium transition-colors duration-200
+                  relative py-4 px-4 text-base md:text-lg font-medium transition-colors duration-200
                   ${activeSection === tab.id 
                     ? 'text-gray-900' 
                     : 'text-gray-600 hover:text-gray-800'
