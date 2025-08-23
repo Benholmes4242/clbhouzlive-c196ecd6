@@ -182,6 +182,8 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
     if (!currentSession) {
       console.log('❌ CONVERSATION DEBUG - No current session, starting new one');
       startNewSession();
+      // Wait for the new session to be created before continuing
+      setTimeout(() => addMessage(message), 100);
       return;
     }
 
@@ -191,10 +193,13 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       lastActivityAt: new Date()
     };
 
-    // Set title to first user message if not already set
+    // Set title to first user message if not already set, preserve existing title for AI messages
     if (!updatedSession.title && message.type === 'user') {
       updatedSession.title = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
       console.log('🐛 CONVERSATION DEBUG - Set session title:', updatedSession.title);
+    } else if (updatedSession.title && message.type === 'ai') {
+      // Explicitly preserve title for AI messages
+      console.log('🐛 CONVERSATION DEBUG - Preserving existing title for AI message:', updatedSession.title);
     } else if (updatedSession.title) {
       console.log('🐛 CONVERSATION DEBUG - Preserving existing title:', updatedSession.title);
     }
@@ -204,13 +209,18 @@ export const useConversationSession = ({ storageKey, isModalOpen }: UseConversat
       messageCount: updatedSession.messages.length,
       title: updatedSession.title,
       preservedTitle: !!updatedSession.title,
+      messageType: message.type,
       lastMessage: {
         type: message.type,
         content: message.content.substring(0, 50)
       }
     });
     
+    // Update session state immediately to ensure consistency
     setCurrentSession(updatedSession);
+    
+    // Force a small delay to ensure state update is processed
+    await new Promise(resolve => setTimeout(resolve, 10));
 
     // Auto-save after EVERY message to ensure both user and AI messages are persisted
     console.log('💾 CONVERSATION DEBUG - Auto-saving session after message:', message.type);
