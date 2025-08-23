@@ -276,85 +276,86 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       return 'square'; // 70% square
     };
 
-    // Create mobile-specific dynamic layout with 70/15/15 ratio
+    // Create mobile-specific dynamic layout
     const createMobileLayout = () => {
       const layoutItems = [];
       let contentIndex = 0;
-      let cyclePosition = 0; // Position within 20-card cycle
-      
-      // Pattern for 20-card cycle: 14 squares, 3 talls, 3 heroes
-      const cyclePattern = [
-        ...Array(14).fill('regular'),
-        ...Array(3).fill('tall'),
-        ...Array(3).fill('hero')
-      ].sort(() => Math.random() - 0.5); // Shuffle for varied placement
-      
-      // Enhanced pattern with specific placement rules
-      const createOptimalPattern = () => {
-        const pattern = [];
-        let tallCount = 0;
-        let heroCount = 0;
-        let squaresSinceSpecial = 0;
-        
-        for (let i = 0; i < 20; i++) {
-          // Heroes only at specific positions for row boundaries
-          if (heroCount < 3 && (i === 2 || i === 8 || i === 14) && squaresSinceSpecial >= 2) {
-            pattern.push('hero');
-            heroCount++;
-            squaresSinceSpecial = 0;
-          }
-          // Talls with minimum 3-square buffer and alternating placement
-          else if (tallCount < 3 && squaresSinceSpecial >= 3 && 
-                   (i === 5 || i === 11 || i === 17)) {
-            pattern.push('tall');
-            tallCount++;
-            squaresSinceSpecial = 0;
-          }
-          // Fill with squares
-          else {
-            pattern.push('regular');
-            squaresSinceSpecial++;
-          }
-        }
-        
-        return pattern;
-      };
-      
-      const optimalPattern = createOptimalPattern();
+      let specialCardCounter = 0; // Track special cards placed
       
       while (contentIndex < filteredContent.length) {
-        const patternType = optimalPattern[cyclePosition % 20];
-        const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+        const remainingItems = filteredContent.length - contentIndex;
         
-        // Determine final card type with fallback rules
-        let cardType = patternType;
+        // Check if we should place a special card (every 6-8 squares)
+        const shouldPlaceSpecial = specialCardCounter === 0 || 
+          (layoutItems.filter(item => item.type === 'regular').length - 
+           layoutItems.filter(item => item.type !== 'regular').length * 4) >= (6 + Math.floor(Math.random() * 3));
         
-        // Apply fallback rule - if intended slot isn't optimal, use 1x1
-        if (patternType === 'hero' && aspectRatio === 'portrait') {
-          // Hero cards work better with square/landscape content
-          const nextSquareIndex = cyclePosition + 1;
-          if (nextSquareIndex < 20 && optimalPattern[nextSquareIndex] === 'regular') {
-            cardType = 'regular'; // Fallback to regular
+        if (shouldPlaceSpecial && remainingItems >= 2) {
+          // Decide between large (4x4) or tall (1x2) based on content and distribution
+          const currentSpecialCount = layoutItems.filter(item => item.type !== 'regular').length;
+          const totalSpecialNeeded = Math.floor(filteredContent.length * 0.3); // 30% special (15% large + 15% tall)
+          const largeNeeded = Math.floor(filteredContent.length * 0.15);
+          const tallNeeded = Math.floor(filteredContent.length * 0.15);
+          
+          const largeCount = layoutItems.filter(item => item.type === 'large').length;
+          const tallCount = layoutItems.filter(item => item.type === 'tall').length;
+          
+          let cardType = 'regular';
+          
+          // Prefer placing cards based on aspect ratio detection and distribution needs
+          const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
+          
+          // Large squares (4x4) should be for square content or when we need more large cards
+          if ((aspectRatio === 'square' || aspectRatio === 'landscape') && largeCount < largeNeeded) {
+            cardType = 'large';
+          } 
+          // Tall cards (1x2) should be for portrait content
+          else if (aspectRatio === 'portrait' && tallCount < tallNeeded) {
+            cardType = 'tall';
+          } 
+          // Fill remaining quotas
+          else if (largeCount < largeNeeded) {
+            cardType = 'large';
+          } else if (tallCount < tallNeeded) {
+            cardType = 'tall';
           }
-        } else if (patternType === 'tall' && aspectRatio !== 'portrait') {
-          // Tall cards work better with portrait content
-          cardType = 'regular'; // Fallback to regular
+          
+          // Avoid back-to-back special cards
+          const lastItem = layoutItems[layoutItems.length - 1];
+          if (lastItem && lastItem.type !== 'regular' && Math.random() > 0.3) {
+            cardType = 'regular';
+          }
+          
+          if (cardType !== 'regular') {
+            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+            
+            layoutItems.push({
+              type: cardType,
+              item: filteredContent[contentIndex],
+              index: contentIndex,
+              shouldAutoplay,
+              aspectRatio
+            });
+            contentIndex++;
+            specialCardCounter++;
+            continue;
+          }
         }
         
+        // Add regular card
         const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
         const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+        const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
         
         layoutItems.push({
-          type: cardType,
+          type: 'regular',
           item: filteredContent[contentIndex],
           index: contentIndex,
           shouldAutoplay,
-          aspectRatio,
-          cyclePosition: cyclePosition % 20
+          aspectRatio
         });
-        
         contentIndex++;
-        cyclePosition++;
       }
       
       return layoutItems;
@@ -551,117 +552,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Discover Page Layout - Dynamic Mobile Grid */}
-        <div className={`grid ${isMobileView ? 'grid-cols-3 auto-rows-[100px]' : 'grid-cols-4 auto-rows-fr'} gap-0.5`} style={{ gridAutoFlow: 'dense' }}>
+        <div className={`grid ${isMobileView ? 'grid-cols-3' : 'grid-cols-4'} gap-0.5 auto-rows-fr`}>
         {layoutItems.map((layoutItem, index) => {
           const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
           const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
           const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
 
-            if (layoutItem.type === 'hero') {
-              return (
-                <div
-                  key={`discover-hero-${layoutItem.item.id}-${index}`}
-                  className={`${isMobileView ? 'col-span-2 row-span-2' : 'col-span-2 row-span-2'} relative overflow-hidden cursor-pointer group`}
-                  style={{ borderRadius: '0px' }}
-                  onClick={() => onMediaClick?.(layoutItem.item)}
-                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-                >
-                   {/* Shimmer loading placeholder */}
-                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
-                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                   </div>
-                
-                {/* Hero Video Card - Always Autoplay */}
-                <MediaDisplay
-                  media={hasMultipleMedia && currentMedia ? {
-                    id: currentMedia.id,
-                    media_type: currentMedia.media_type,
-                    media_url: currentMedia.media_url
-                  } : {
-                    id: layoutItem.item.id,
-                    media_type: layoutItem.item.type as 'video' | 'image',
-                    media_url: layoutItem.item.src
-                  }}
-                  itemTitle={layoutItem.item.title}
-                  shouldAutoplay={true}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
-                  itemId={layoutItem.item.id}
-                  currentIndex={layoutItem.index}
-                  loop={true}
-                  hidePlayButton={true}
-                />
-                
-                {/* Context Label */}
-                {!hideBadges && (
-                  <div className="absolute top-2 left-2 z-30">
-                    <div className="bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-white">
-                        {(() => {
-                          const labels = [
-                            '🔥 Trending Now',
-                            '🎯 Shot of the Week', 
-                            '💡 From the Pros',
-                            '⭐ Featured',
-                            '🚀 Going Viral',
-                            '🏆 Top Pick'
-                          ];
-                          // Use item ID to consistently pick the same label for the same content
-                          const labelIndex = layoutItem.item.id.charCodeAt(0) % labels.length;
-                          return labels[labelIndex];
-                        })()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Film icon for videos */}
-                {layoutItem.item.type === 'video' && (
-                  <div className="absolute bottom-3 right-3 z-20">
-                    <div 
-                      className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
-                      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                    >
-                      <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Media navigation dots for multiple media */}
-                {hasMultipleMedia && (
-                  <MediaNavigationDots
-                    mediaCount={layoutItem.item.media!.length}
-                    currentIndex={currentMediaIndex}
-                  />
-                )}
-                
-                {/* User info for hero cards */}
-                <div className="absolute bottom-3 left-3 right-12">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
-                      alt={layoutItem.item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
-                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
-                      </p>
-                      {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm max-w-[75%] md:max-w-none line-clamp-2 md:line-clamp-none">
-                          {cleanTitleText(layoutItem.item.title)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hover animation */}
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-              );
-            } else if (layoutItem.type === 'large') {
+            if (layoutItem.type === 'large') {
               return (
                 <div
                   key={`discover-large-${layoutItem.item.id}-${index}`}
@@ -831,7 +728,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               return (
                 <div
                   key={`discover-regular-${layoutItem.item.id}-${index}`}
-                  className={`${isMobileView ? 'col-span-1 row-span-1' : 'col-span-1 row-span-1'} relative overflow-hidden cursor-pointer group aspect-square`}
+                  className="relative overflow-hidden cursor-pointer group aspect-square"
                   style={{ borderRadius: '0px' }}
                   onClick={() => onMediaClick?.(layoutItem.item)}
                   {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
