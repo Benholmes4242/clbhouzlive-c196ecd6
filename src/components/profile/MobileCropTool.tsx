@@ -202,13 +202,18 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
           </p>
         </div>
         
-        <div className="p-4 flex gap-6">
+        <div className="p-4 flex flex-col lg:flex-row gap-6 max-h-[calc(90vh-200px)] overflow-auto">
           {/* Main crop area */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div 
               ref={containerRef}
-              className="relative bg-gray-100 rounded-lg overflow-hidden"
-              style={{ aspectRatio: '1 / 1', minHeight: '400px' }}
+              className="relative bg-gray-100 rounded-lg overflow-hidden mx-auto"
+              style={{ 
+                aspectRatio: '1 / 1', 
+                width: '100%',
+                maxWidth: '400px',
+                height: 'auto'
+              }}
               onWheel={handleWheel}
             >
               <img
@@ -277,7 +282,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
           </div>
           
           {/* Preview panel */}
-          <div className="w-64 space-y-4">
+          <div className="w-full lg:w-64 space-y-4 flex-shrink-0">
             <div>
               <h4 className="font-medium mb-2">Mobile preview</h4>
               <div className="bg-gray-100 rounded-lg p-4">
