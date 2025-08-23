@@ -27,17 +27,25 @@ async function searchWeb(query: string): Promise<string> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar',
+        model: 'llama-3.1-sonar-small-128k-online',
         messages: [
           {
             role: 'system',
-            content: 'Be precise and concise. Provide factual, up-to-date information about golf tournaments and player performances.'
+            content: 'You are a golf expert providing current, factual information. Always include dates and specify if information is current as of today. For rankings, provide the current official world golf ranking.'
           },
           {
             role: 'user',
             content: query
           }
-        ]
+        ],
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 1000,
+        return_images: false,
+        return_related_questions: false,
+        search_recency_filter: 'week',
+        frequency_penalty: 1,
+        presence_penalty: 0
       }),
     });
 
@@ -99,7 +107,7 @@ serve(async (req) => {
     });
 
     // Check if this looks like a request for current information
-    const needsSearch = /(?:last week|recent|current|latest|today|yesterday|this week|what.*shoot|scores?|results?|standings?|news)/i.test(message);
+    const needsSearch = /(?:last week|recent|current|latest|today|yesterday|this week|what.*shoot|scores?|results?|standings?|news|world.*number.*1|ranking|who.*is.*number|as of|right now|currently|world.*\#1|top.*player|leader.*board)/i.test(message);
     
     let finalResponse = '';
     
@@ -170,7 +178,18 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
     } else if (needsSearch) {
       // Priority 2: Use web search for current information
       console.log('🔍 Using web search for current information');
-      const searchQuery = `${message} golf PGA tour recent results`;
+      
+      // Enhanced search query based on the type of question
+      let searchQuery = '';
+      if (/world.*number.*1|ranking|who.*is.*number|world.*\#1|top.*player/i.test(message)) {
+        searchQuery = `current world golf ranking number 1 player 2025 official world golf ranking`;
+      } else if (/scores?|results?|shoot/i.test(message)) {
+        searchQuery = `${message} golf tournament latest scores results 2025`;
+      } else {
+        searchQuery = `${message} golf PGA tour recent results 2025`;
+      }
+      
+      console.log('🔍 Search query:', searchQuery);
       const searchResult = await searchWeb(searchQuery);
       
       finalResponse = `Based on the latest information I found:\n\n${searchResult}`;
