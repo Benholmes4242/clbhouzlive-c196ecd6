@@ -19,6 +19,7 @@ import Top100Progress from './Top100Progress';
 import TrophyProgressSection from './TrophyProgressSection';
 import RegionalCompletionSection from './RegionalCompletionSection';
 import CoursesControls from '@/components/profile/CoursesControls';
+import NetflixCoursesLayout from './netflix/NetflixCoursesLayout';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -285,78 +286,12 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
   return (
     <div className="relative space-y-6">
-      <UserCoursesHeader
-        displayName={finalDisplayName} 
-        isOwnProfile={finalIsOwnProfile} 
+      {/* Use Netflix-style layout */}
+      <NetflixCoursesLayout
+        username={username}
+        isOwnProfile={finalIsOwnProfile}
+        displayName={finalDisplayName}
       />
-
-
-      {/* Trophy Progress Section and Regional Completion Section removed */}
-
-      <div className="flex flex-col gap-4">
-        {/* CoursesControls component now handles all filtering and sorting */}
-        <CoursesControls
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          viewType={viewType}
-          onViewTypeChange={setViewType}
-        />
-      </div>
-
-      <div className="space-y-4">
-        {isLoadingTop100 || !isHydrated ? (
-          <div className="text-center py-8">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-muted-foreground">
-                {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
-              </span>
-            </div>
-          </div>
-        ) : filteredCourses.length > 0 ? (
-          viewType === 'cards' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredCourses.map((userCourse) => (
-                <CourseCard 
-                  key={userCourse.id} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {filteredCourses.map((userCourse) => (
-                <CourseListItem
-                  key={userCourse.id}
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
-            </div>
-          )
-        ) : activeFilter ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No courses found in the selected region.
-            </p>
-          </div>
-        ) : (
-          <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
-        )}
-      </div>
 
       {/* Course Picker Modal */}
       <CoursePickerModal
