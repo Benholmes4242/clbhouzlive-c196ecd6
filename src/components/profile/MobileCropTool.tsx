@@ -183,18 +183,14 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const getPreviewStyle = () => {
     if (!imageLoaded) return {};
     
-    // Calculate the transform to show only the cropped area
-    // We need to translate and scale to show just the selected rectangle
-    const scaleX = 100 / cropData.width;
-    const scaleY = 100 / cropData.height;
-    
-    // Calculate the translate values to position the crop area at the origin
-    const translateX = -cropData.x * scaleX;
-    const translateY = -cropData.y * scaleY;
+    // Use object-fit cover with object-position to match the crop area
+    // This creates a more accurate preview by using CSS positioning
+    const centerX = cropData.x + (cropData.width / 2);
+    const centerY = cropData.y + (cropData.height / 2);
     
     return {
-      transform: `translate(${translateX}%, ${translateY}%) scale(${scaleX}, ${scaleY})`,
-      transformOrigin: '0 0',
+      objectPosition: `${centerX}% ${centerY}%`,
+      objectFit: 'cover' as const,
     };
   };
 
