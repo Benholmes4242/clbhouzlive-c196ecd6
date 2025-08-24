@@ -30,6 +30,15 @@ serve(async (req) => {
     }
 
     // Update the user profile with mobile crop data
+    console.log('About to update user_profiles table for user:', userId);
+    console.log('Update data:', {
+      mobile_crop_x: cropData.mobile_crop_x,
+      mobile_crop_y: cropData.mobile_crop_y,
+      mobile_crop_width: cropData.mobile_crop_width,
+      mobile_crop_height: cropData.mobile_crop_height,
+      updated_at: cropData.updated_at
+    });
+    
     const { data, error } = await supabase
       .from('user_profiles')
       .update({
@@ -45,6 +54,8 @@ serve(async (req) => {
       console.error('Database error:', error);
       throw error;
     }
+
+    console.log('Update successful, returned data:', data);
 
     console.log('Mobile crop updated successfully');
     
