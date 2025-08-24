@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import { OptimizedImage } from './optimized-image';
-import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { getDirectImageUrl, isR2Url } from '@/utils/r2ImageUtils';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
 interface OptimizedAvatarProps {
@@ -20,14 +19,32 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  // Use direct URL for R2 and video content
-  const optimizedSrc = src ? getDirectImageUrl(src) : null;
+  // Use direct URL for R2 and video content - try original first, fallback if needed
+  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!src) {
+      setImageSrc(null);
+      setHasError(false);
+      return;
+    }
+
+    const directUrl = getDirectImageUrl(src);
+    setImageSrc(directUrl);
+    setHasError(false);
+  }, [src]);
+
+  const handleImageError = () => {
+    console.warn('Avatar image failed to load:', imageSrc);
+    setHasError(true);
+  };
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
-      {optimizedSrc ? (
+      {imageSrc && !hasError ? (
         <AvatarImage 
-          src={optimizedSrc}
+          src={imageSrc}
           alt={alt}
           style={{ 
             width: size, 
@@ -37,13 +54,7 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
           loading={priority ? 'eager' : 'lazy'}
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
-          crossOrigin="anonymous"
-          onLoad={() => {
-            console.log('Avatar loaded successfully:', optimizedSrc);
-          }}
-          onError={(e) => {
-            console.error('Avatar image failed to load:', optimizedSrc, e);
-          }}
+          onError={handleImageError}
         />
       ) : null}
       <AvatarFallback className="bg-primary/10 text-primary text-xs">

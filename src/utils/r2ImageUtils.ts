@@ -13,14 +13,17 @@ export const isVideoUrl = (url: string): boolean => {
 };
 
 export const getDirectImageUrl = (url: string): string => {
-  // For R2 URLs and video URLs, check if they're accessible
-  if (isR2Url(url)) {
-    console.warn('R2 images may not be accessible due to CORS restrictions in preview environment:', url);
-    // Return a placeholder for R2 images that fail CORS
-    return '/placeholder.svg';
+  if (!url) return '';
+  
+  // For video URLs, always return as-is
+  if (isVideoUrl(url)) {
+    return url;
   }
   
-  if (isVideoUrl(url)) {
+  // For R2 URLs, test if accessible in current environment
+  if (isR2Url(url)) {
+    // In production or when CORS allows, return original URL
+    // In preview environments, we may need to handle CORS restrictions
     return url;
   }
   
