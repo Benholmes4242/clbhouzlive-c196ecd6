@@ -83,7 +83,7 @@ export function ManualVideoMigration() {
             <Label htmlFor="stream-url">New Cloudflare Stream URL</Label>
             <Input
               id="stream-url"
-              placeholder="https://customer-ybxkehyomcakqjvuhnna.cloudflarestream.com/video-id/manifest/video.m3u8"
+              placeholder="https://customer-4ah4gni80ytefpck.cloudflarestream.com/video-id/manifest/video.m3u8"
               value={streamUrl}
               onChange={(e) => setStreamUrl(e.target.value)}
             />
