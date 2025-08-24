@@ -110,7 +110,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
   }, [allCourses, isOwnProfile, displayName]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 lg:space-y-8">
       {courseRows.map((row, index) => (
         <NetflixCourseRow
           key={`${row.title}-${index}`}

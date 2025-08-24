@@ -58,7 +58,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
 
   return (
     <div 
-      className={`relative group cursor-pointer transition-all duration-300 hover:scale-[1.02] ${className}`}
+      className={`relative group cursor-pointer hover:scale-[1.02] ${className}`}
       onClick={onClick}
     >
       {/* Main card container with 2:1 aspect ratio */}
