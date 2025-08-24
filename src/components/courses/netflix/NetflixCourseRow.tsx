@@ -106,8 +106,12 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           {/* Regular course cards */}
           {courses.slice(hasHeroBanner ? 1 : 0).map((course, index) => {
             // Responsive width classes based on size and breakpoints
+            // For top rated section with hero banner, show peek of next card
+            const isTopRatedWithHero = hasHeroBanner && title.includes("Top 10 Rated");
             const widthClasses = size === 'large' 
-              ? 'flex-shrink-0 w-[82vw] sm:w-[45%] md:w-[32%] lg:w-[31%] snap-start'  // Large cards
+              ? isTopRatedWithHero 
+                ? 'flex-shrink-0 w-[85vw] sm:w-[47%] md:w-[34%] lg:w-[33%] snap-start'  // Slightly wider to show peek
+                : 'flex-shrink-0 w-[82vw] sm:w-[45%] md:w-[32%] lg:w-[31%] snap-start'  // Large cards
               : 'flex-shrink-0 w-[77vw] sm:w-[41%] md:w-[29%] lg:w-[28%] snap-start';   // Medium cards
             
             const cardTransition = isFirstRow 

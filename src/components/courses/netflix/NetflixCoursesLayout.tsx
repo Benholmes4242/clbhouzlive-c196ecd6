@@ -66,7 +66,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       rows.push({
         title: isOwnProfile ? "Top 10 Rated by You" : `Top 10 Rated by ${displayName}`,
         courses: highRatedCourses,
-        size: 'medium' as const,
+        size: 'large' as const,
         hasHeroBanner: true
       });
     }
