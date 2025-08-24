@@ -44,6 +44,15 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   // Generate optimized image URL if it's from Supabase storage
   const getOptimizedImageUrl = (url: string) => {
+    // Don't optimize video URLs or streaming URLs
+    if (url.includes('cloudflarestream.com') || 
+        url.includes('.m3u8') || 
+        url.includes('.mp4') || 
+        url.includes('.mov') ||
+        url.includes('customer-')) {
+      return url;
+    }
+    
     // If it's a Supabase storage URL, we can add optimization parameters
     if (url.includes('supabase') && url.includes('storage')) {
       const separator = url.includes('?') ? '&' : '?';
