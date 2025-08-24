@@ -42,40 +42,67 @@ serve(async (req) => {
     };
 
     console.log('🎬 Starting R2 to Stream video migration...');
+    console.log(`🔧 Account ID: ${cloudflareAccountId}`);
+    console.log(`🪣 Bucket: clbhouz-media`);
+    console.log(`🔑 R2 Token present: ${!!cloudflareR2Token}`);
+    console.log(`🎥 Stream Token present: ${!!cloudflareStreamToken}`);
 
     // List all objects in R2 bucket to find video files
-    // Use a more comprehensive approach to list objects
     let allObjects: any[] = [];
     let cursor: string | undefined;
+    let pageCount = 0;
     
     do {
-      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}&max-keys=1000` : '?max-keys=1000&include-http-metadata=true'}`;
+      pageCount++;
+      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}&max-keys=1000` : '?max-keys=1000'}`;
       
-      console.log(`📋 Listing R2 objects with URL: ${listUrl}`);
+      console.log(`📋 Page ${pageCount} - Listing R2 objects with URL: ${listUrl}`);
       
       const listResponse = await fetch(listUrl, {
         headers: {
           'Authorization': `Bearer ${cloudflareR2Token}`,
+          'Content-Type': 'application/json',
         },
       });
 
+      console.log(`📋 Response status: ${listResponse.status} ${listResponse.statusText}`);
+      console.log(`📋 Response headers:`, Object.fromEntries(listResponse.headers.entries()));
+
       if (!listResponse.ok) {
         const errorText = await listResponse.text();
-        console.error('❌ R2 list error:', errorText);
+        console.error('❌ R2 list error response:', errorText);
+        console.error(`❌ R2 list error status: ${listResponse.status}`);
         throw new Error(`Failed to list R2 objects: ${listResponse.status} ${errorText}`);
       }
 
       const listData = await listResponse.json();
-      console.log(`📋 Listed ${listData.result?.length || 0} objects, truncated: ${listData.result_info?.truncated}`);
-      console.log(`📋 Sample objects:`, listData.result?.slice(0, 5).map((obj: any) => ({ key: obj.key, size: obj.size })));
+      console.log(`📋 Raw response:`, JSON.stringify(listData, null, 2));
+      console.log(`📋 Page ${pageCount} listed ${listData.result?.length || 0} objects`);
+      console.log(`📋 Truncated: ${listData.result_info?.truncated}`);
+      console.log(`📋 Cursor: ${listData.result_info?.cursor}`);
       
       if (listData.result && listData.result.length > 0) {
+        console.log(`📋 First 3 objects:`, listData.result.slice(0, 3).map((obj: any) => ({ 
+          key: obj.key, 
+          size: obj.size,
+          etag: obj.etag,
+          lastModified: obj.last_modified 
+        })));
         allObjects.push(...listData.result);
         cursor = listData.result_info?.truncated ? listData.result_info?.cursor : undefined;
       } else {
+        console.log(`📋 No objects in this page`);
+        break;
+      }
+      
+      // Safety check to prevent infinite loops
+      if (pageCount > 100) {
+        console.log(`⚠️ Stopping after ${pageCount} pages to prevent infinite loop`);
         break;
       }
     } while (cursor);
+
+    console.log(`📊 Total objects found across all pages: ${allObjects.length}`);
 
     // Filter for video files (handle nested folders, especially post-media/)
     const videoObjects = allObjects.filter((obj: any) => {
