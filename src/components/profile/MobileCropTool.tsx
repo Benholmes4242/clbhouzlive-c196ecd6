@@ -34,18 +34,18 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const dragStartRef = useRef({ x: 0, y: 0 });
   
   const [cropData, setCropData] = useState<CropData>(
-    initialCrop || { x: 25, y: 25, width: 50, height: 67 } // 3:4 aspect ratio, clamped to max 100%
+    initialCrop || { x: 30, y: 20, width: 40, height: 55 } // Taller aspect ratio for mobile header
   );
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // Calculate crop box dimensions maintaining 3:4 aspect ratio
+  // Calculate crop box dimensions maintaining mobile header aspect ratio (more square/tall)
   const calculateCropDimensions = useCallback((containerWidth: number) => {
-    const maxWidth = Math.min(containerWidth * 0.8, 300);
+    const maxWidth = Math.min(containerWidth * 0.6, 200); // Smaller width for more accurate mobile view
     const width = maxWidth;
-    const height = width * (4/3); // 3:4 aspect ratio
+    const height = width * 1.3; // Taller aspect ratio to match mobile header display
     return { width, height };
   }, []);
 
@@ -261,7 +261,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
             <div className="mt-4 text-sm text-muted-foreground space-y-1 text-center">
               <p>• Drag to reposition the crop area</p>
               <p>• Use mouse wheel to zoom in/out</p>
-              <p>• The crop maintains a 3:4 aspect ratio for mobile</p>
+              <p>• The crop maintains a taller aspect ratio for mobile header</p>
             </div>
           </div>
           
