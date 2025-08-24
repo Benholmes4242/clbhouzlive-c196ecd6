@@ -43,7 +43,7 @@ export const useCloudflareR2 = () => {
       console.log('R2 upload successful:', data);
       return {
         success: true,
-        url: data.url,
+        url: data.publicUrl,
         fileName: data.fileName
       };
 

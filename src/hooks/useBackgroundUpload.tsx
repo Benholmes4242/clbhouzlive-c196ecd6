@@ -96,14 +96,20 @@ export const useBackgroundUpload = () => {
         // Use Cloudflare R2 for image files
         else if (mediaType === 'image') {
           console.log(`Uploading image to Cloudflare R2: ${file.name}`);
-          const r2Result = await uploadToR2(file, `post-media/${fullFileName}`);
-          
-          if (r2Result.success && r2Result.url) {
-            publicUrl = r2Result.url;
-            console.log(`Successfully uploaded ${file.name} to Cloudflare R2:`, publicUrl);
-          } else {
-            console.error(`Cloudflare R2 upload failed for ${file.name}:`, r2Result.error);
-            throw new Error(r2Result.error || 'Cloudflare R2 upload failed - no fallback for images');
+          try {
+            const r2Result = await uploadToR2(file, `post-media/${fullFileName}`);
+            
+            if (r2Result.success && r2Result.url) {
+              publicUrl = r2Result.url;
+              console.log(`Successfully uploaded ${file.name} to Cloudflare R2:`, publicUrl);
+            } else {
+              console.error(`Cloudflare R2 upload failed for ${file.name}:`, r2Result.error);
+              throw new Error(r2Result.error || 'Cloudflare R2 upload failed');
+            }
+          } catch (error) {
+            console.error(`Cloudflare R2 upload failed for ${file.name}:`, error);
+            // For now, let's fail completely rather than fallback to Supabase
+            throw error;
           }
         }
         // Use chunked upload for large files (>20MB) or as fallback
