@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
 import UniversalProfileTabs from './UniversalProfileTabs';
-import { getMobileCropPosition } from '@/utils/mobileCropUtils';
+import { getMobileCropPosition, getMobileCropTransform } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -604,8 +604,10 @@ const HeroProfileHeader = ({
                 alt={profile?.display_name || 'Profile'}
                 className="w-full h-full object-cover transition-opacity duration-300"
                 style={{ 
-                  objectPosition: getMobileCropPosition(profile), // Apply mobile crop positioning with fallbacks
-                  objectFit: 'cover' // Always cover (no letterboxing), crop as needed
+                  objectPosition: getMobileCropPosition(profile),
+                  objectFit: 'cover',
+                  transform: getMobileCropTransform(profile), // Apply mobile crop transform
+                  transformOrigin: 'center center'
                 }}
                 onLoad={(e) => {
                   // Hide loading state once image loads sharply
