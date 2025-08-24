@@ -84,6 +84,9 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
   };
 
   const phrase = getFamousPhrase(golfCourse.name, golfCourse.country);
+  
+  // Use user's review as subtext if available, otherwise use famous phrase
+  const subText = course.review && course.review.trim() ? course.review.trim() : phrase;
 
   // Debug logging for image data
   console.log('Hero Banner Course Data:', {
@@ -91,6 +94,8 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
     thumbnail_url: golfCourse.thumbnail_url,
     image_url: golfCourse.image_url,
     thumbnail_image: golfCourse.thumbnail_image,
+    review: course.review,
+    subText: subText,
     fullCourseData: golfCourse
   });
 
@@ -114,22 +119,22 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
       
-      {/* Content Container */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-12">
+      {/* Content Container - moved down more */}
+      <div className="absolute inset-0 flex flex-col justify-end pb-4 md:pb-6 lg:pb-8 px-6 md:px-8 lg:px-12">
         <div className="max-w-2xl">
           {/* Course Name */}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 md:mb-4 leading-tight tracking-tight">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 md:mb-2 leading-tight tracking-tight">
             {golfCourse.name}
           </h2>
           
-          {/* Famous Phrase */}
-          <p className="text-lg md:text-xl lg:text-2xl text-white/90 italic font-light leading-relaxed tracking-wide">
-            {phrase}
+          {/* User Review or Famous Phrase */}
+          <p className="text-base md:text-lg lg:text-xl text-white/90 italic font-light leading-relaxed tracking-wide">
+            {subText}
           </p>
           
           {/* Location */}
           {golfCourse.location && (
-            <p className="text-sm md:text-base text-white/70 mt-2 font-medium">
+            <p className="text-xs md:text-sm text-white/70 mt-1 font-medium">
               {golfCourse.location}
             </p>
           )}
