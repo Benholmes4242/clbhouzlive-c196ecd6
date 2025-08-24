@@ -147,8 +147,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                    setMediaLoaded(true);
                    onImageError();
                  }}
-                 width={600}
-                 height={800}
+                 width={1200}
+                 height={1600}
                />
             ) : (
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
@@ -194,8 +194,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                setMediaLoaded(true);
                onImageError();
              }}
-             width={600}
-             height={800}
+             width={1200}
+             height={1600}
            />
         </div>
       )}
