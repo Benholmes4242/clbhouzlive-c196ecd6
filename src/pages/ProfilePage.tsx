@@ -6,7 +6,6 @@ import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
-import TestR2Images from '@/components/debug/TestR2Images';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -91,9 +90,6 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
       <Header />
-      
-      {/* Debug component - remove after testing */}
-      <TestR2Images />
       
       <HeroProfileHeader 
         profile={profile}

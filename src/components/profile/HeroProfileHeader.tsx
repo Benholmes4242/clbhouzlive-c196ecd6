@@ -34,7 +34,7 @@ import CoursesControls from './CoursesControls';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
-import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+
 import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
