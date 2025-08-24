@@ -77,10 +77,12 @@ serve(async (req) => {
       }
     } while (cursor);
 
-    // Filter for video files
+    // Filter for video files (handle nested folders)
     const videoObjects = allObjects.filter((obj: any) => {
       const name = obj.key.toLowerCase();
-      return name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
+      const isVideo = name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
+      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}`);
+      return isVideo;
     });
 
     progress.totalVideos = videoObjects.length;
