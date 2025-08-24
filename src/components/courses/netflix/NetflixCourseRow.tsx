@@ -8,6 +8,7 @@ interface NetflixCourseRowProps {
   targetUserId?: string;
   isOwnProfile: boolean;
   showRecentlyPlayedSizing?: boolean;
+  cardSize?: 'large' | 'medium';
 }
 
 const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
@@ -15,7 +16,8 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   courses,
   targetUserId,
   isOwnProfile,
-  showRecentlyPlayedSizing = false
+  showRecentlyPlayedSizing = false,
+  cardSize = 'medium'
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -36,8 +38,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   if (courses.length === 0) return null;
 
   return (
-    <div className="relative group">
-      <h2 className="text-xl font-bold text-white mb-4 px-4">{title}</h2>
+    <div className="relative group space-y-4">
+      {/* Section Title */}
+      <h2 className="text-xl font-bold text-white px-4">{title}</h2>
       
       {/* Left scroll button */}
       <button
@@ -60,7 +63,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
       {/* Scrollable course cards */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-none px-4 pb-2"
+        className={`flex ${
+          cardSize === 'large' ? 'gap-3 sm:gap-4 md:gap-5 lg:gap-6' : 'gap-2 sm:gap-3 md:gap-4 lg:gap-5'
+        } overflow-x-auto scrollbar-none px-4 pb-2`}
         style={{ 
           scrollBehavior: 'smooth',
           scrollSnapType: 'x mandatory'
@@ -69,11 +74,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {courses.map((userCourse, index) => (
           <div 
             key={userCourse.id}
-            className={`flex-none ${
-              showRecentlyPlayedSizing 
-                ? 'w-[87%] sm:w-[55%] md:w-[45%] lg:w-[32%]' // Recently played sizing
-                : 'w-72' // Standard sizing for other rows
-            }`}
+            className="flex-none"
             style={{ scrollSnapAlign: 'start' }}
           >
             <NetflixCourseCard
@@ -81,6 +82,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
               userRating={userCourse.rating}
               targetUserId={targetUserId}
               isOwnProfile={isOwnProfile}
+              size={cardSize}
             />
           </div>
         ))}

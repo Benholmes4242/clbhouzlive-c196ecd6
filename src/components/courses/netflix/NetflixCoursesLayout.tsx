@@ -205,7 +205,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
           courses={recentlyPlayed}
           targetUserId={targetUserId}
           isOwnProfile={finalIsOwnProfile}
-          showRecentlyPlayedSizing={true}
+          cardSize="large"
         />
       )}
 
@@ -216,6 +216,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
           courses={topRatedCourses}
           targetUserId={targetUserId}
           isOwnProfile={finalIsOwnProfile}
+          cardSize="medium"
         />
       )}
 
@@ -239,6 +240,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
               courses={coursesByRegion['britain-ireland']}
               targetUserId={targetUserId}
               isOwnProfile={finalIsOwnProfile}
+              cardSize="medium"
             />
           </div>
         )}
@@ -250,6 +252,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
               courses={coursesByRegion['europe']}
               targetUserId={targetUserId}
               isOwnProfile={finalIsOwnProfile}
+              cardSize="medium"
             />
           </div>
         )}
@@ -261,6 +264,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
               courses={coursesByRegion['usa']}
               targetUserId={targetUserId}
               isOwnProfile={finalIsOwnProfile}
+              cardSize="medium"
             />
           </div>
         )}
@@ -272,6 +276,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
               courses={coursesByRegion['worldwide']}
               targetUserId={targetUserId}
               isOwnProfile={finalIsOwnProfile}
+              cardSize="medium"
             />
           </div>
         )}
