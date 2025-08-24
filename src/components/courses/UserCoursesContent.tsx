@@ -8,6 +8,7 @@ import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
 import CourseListItem from './CourseListItem';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
+import NetflixCoursesLayout from './netflix/NetflixCoursesLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import ViewToggle from '@/components/profile/ViewToggle';
@@ -290,72 +291,78 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
+      {/* Netflix-style Layout */}
+      <NetflixCoursesLayout
+        username={username}
+        isOwnProfile={finalIsOwnProfile}
+        displayName={finalDisplayName}
+      />
 
-      {/* Trophy Progress Section and Regional Completion Section removed */}
+      {/* Original Layout - Hidden but preserved for now */}
+      <div className="hidden">
+        <div className="flex flex-col gap-4">
+          <CoursesControls
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            viewType={viewType}
+            onViewTypeChange={setViewType}
+          />
+        </div>
 
-      <div className="flex flex-col gap-4">
-        {/* CoursesControls component now handles all filtering and sorting */}
-        <CoursesControls
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          viewType={viewType}
-          onViewTypeChange={setViewType}
-        />
-      </div>
-
-      <div className="space-y-4">
-        {isLoadingTop100 || !isHydrated ? (
-          <div className="text-center py-8">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-muted-foreground">
-                {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
-              </span>
+        <div className="space-y-4">
+          {isLoadingTop100 || !isHydrated ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-muted-foreground">
+                  {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
+                </span>
+              </div>
             </div>
-          </div>
-        ) : filteredCourses.length > 0 ? (
-          viewType === 'cards' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredCourses.map((userCourse) => (
-                <CourseCard 
-                  key={userCourse.id} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
+          ) : filteredCourses.length > 0 ? (
+            viewType === 'cards' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredCourses.map((userCourse) => (
+                  <CourseCard 
+                    key={userCourse.id} 
+                    course={userCourse.golf_courses}
+                    viewingUserId={targetUserId}
+                    viewContext="global"
+                    userRating={userCourse.rating}
+                    isReadOnly={!finalIsOwnProfile}
+                    showUserRating={true}
+                    isFromUserCoursesPage={true}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {filteredCourses.map((userCourse) => (
+                  <CourseListItem
+                    key={userCourse.id}
+                    course={userCourse.golf_courses}
+                    viewingUserId={targetUserId}
+                    viewContext="global"
+                    userRating={userCourse.rating}
+                    isReadOnly={!finalIsOwnProfile}
+                    showUserRating={true}
+                    isFromUserCoursesPage={true}
+                  />
+                ))}
+              </div>
+            )
+          ) : activeFilter ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No courses found in the selected region.
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {filteredCourses.map((userCourse) => (
-                <CourseListItem
-                  key={userCourse.id}
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
-            </div>
-          )
-        ) : activeFilter ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No courses found in the selected region.
-            </p>
-          </div>
-        ) : (
-          <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
-        )}
+            <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
+          )}
+        </div>
       </div>
 
       {/* Course Picker Modal */}
