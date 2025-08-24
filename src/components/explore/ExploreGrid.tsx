@@ -40,6 +40,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
+  const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
   // Check if mobile for TrendingVideos-style layout
   useEffect(() => {
@@ -187,9 +188,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 }}
                 itemTitle={item.title}
                 shouldAutoplay={false}
-                isLoading={false}
-                onImageError={() => {}}
-                onImageLoad={() => {}}
+                isLoading={itemLoadingStates[item.id] ?? true}
+                onImageError={() => {
+                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                }}
+                onImageLoad={() => {
+                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                }}
                 itemId={item.id}
                 currentIndex={index}
                 loop={true}
@@ -585,9 +590,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   }}
                   itemTitle={layoutItem.item.title}
                   shouldAutoplay={true}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
+                  isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
+                  onImageError={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                  }}
+                  onImageLoad={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                  }}
                   itemId={layoutItem.item.id}
                   currentIndex={layoutItem.index}
                   loop={true}
@@ -691,9 +700,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     }}
                     itemTitle={layoutItem.item.title}
                     shouldAutoplay={layoutItem.shouldAutoplay}
-                    isLoading={false}
-                    onImageError={() => {}}
-                    onImageLoad={() => {}}
+                    isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
+                    onImageError={() => {
+                      setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                    }}
+                    onImageLoad={() => {
+                      setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                    }}
                     itemId={layoutItem.item.id}
                     currentIndex={layoutItem.index}
                     loop={true}
@@ -751,9 +764,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   }}
                   itemTitle={layoutItem.item.title}
                   shouldAutoplay={layoutItem.shouldAutoplay}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
+                  isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
+                  onImageError={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                  }}
+                  onImageLoad={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                  }}
                   itemId={layoutItem.item.id}
                   currentIndex={layoutItem.index}
                   loop={true}
