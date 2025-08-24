@@ -157,12 +157,19 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         hls.loadSource(src);
         hls.attachMedia(video);
         
-        // Add timeout for manifest loading
+        // Add timeout for manifest loading - increased for slower connections
         const manifestTimeout = setTimeout(() => {
           console.error('HLS manifest load timeout for:', src);
-          setError('Video loading timeout - please try again');
-          setIsLoading(false);
-        }, 10000);
+          // For Cloudflare Stream, try fallback to direct video
+          if (isCloudflareStream) {
+            console.log('Trying fallback for Cloudflare Stream video');
+            video.src = src.replace('/manifest/video.m3u8', '/downloads/default.mp4');
+            video.load();
+          } else {
+            setError('Video loading timeout - please try again');
+            setIsLoading(false);
+          }
+        }, 20000); // Increased from 10s to 20s
         
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
           clearTimeout(manifestTimeout);
@@ -178,8 +185,18 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
 
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
           console.error('HLS Error:', { event, data, src });
+          clearTimeout(manifestTimeout);
+          
           if (data.fatal) {
             console.error('Fatal HLS error:', data.type, data.details);
+            
+            // For Cloudflare Stream, try direct video fallback
+            if (isCloudflareStream && data.details === window.Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
+              console.log('HLS failed for Cloudflare Stream, trying direct video fallback');
+              video.src = src.replace('/manifest/video.m3u8', '/downloads/default.mp4');
+              video.load();
+              return;
+            }
             
             // Provide more specific error messages
             let errorMessage = 'Video playback error';
@@ -226,6 +243,15 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     } else {
       // Standard video or Supabase storage video
       console.log('Using standard video playback for:', src);
+      
+      // Handle .MOV files from Supabase - they often don't work in browsers
+      if (isSupabaseStorage && src.toLowerCase().includes('.mov')) {
+        console.warn('MOV file detected from Supabase storage - may have compatibility issues');
+        setError('Video format not supported - please use MP4 format');
+        setIsLoading(false);
+        return;
+      }
+      
       video.src = src;
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
