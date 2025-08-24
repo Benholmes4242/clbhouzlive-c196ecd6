@@ -110,6 +110,24 @@ Deno.serve(async (req) => {
         // Process files in batches
         for (const file of files) {
           try {
+            // Check if this is a video file that should go to Stream instead
+            const isVideo = file.name.toLowerCase().match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
+            
+            if (isVideo) {
+              console.log(`Skipping video file ${file.name} - should be migrated to Cloudflare Stream instead`);
+              progress.processedFiles++;
+              continue;
+            }
+
+            // Only process image files
+            const isImage = file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/);
+            
+            if (!isImage) {
+              console.log(`Skipping non-image file ${file.name}`);
+              progress.processedFiles++;
+              continue;
+            }
+
             // Download file from Supabase
             const { data: fileData, error: downloadError } = await supabase.storage
               .from(bucket)
@@ -151,7 +169,7 @@ Deno.serve(async (req) => {
 
             const publicUrl = `https://media.clbhouz.co.uk/${bucket}/${file.name}`;
 
-            console.log(`Successfully migrated ${file.name} from ${bucket} to R2`);
+            console.log(`Successfully migrated IMAGE ${file.name} from ${bucket} to R2`);
             bucketResult.migratedFiles++;
             progress.migratedFiles++;
             progress.processedFiles++;
