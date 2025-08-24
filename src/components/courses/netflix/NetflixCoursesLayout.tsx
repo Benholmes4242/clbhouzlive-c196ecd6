@@ -112,29 +112,6 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       });
     }
 
-    // Top 100 Courses (global or regional rank <= 100)
-    const top100Courses = allCourses
-      .filter(course => {
-        const golfCourse = course.golf_courses || course;
-        return (golfCourse.global_rank && golfCourse.global_rank <= 100) ||
-               (golfCourse.regional_rank && golfCourse.regional_rank <= 100);
-      })
-      .sort((a, b) => {
-        const getCourseRank = (course: any) => {
-          const golfCourse = course.golf_courses || course;
-          return golfCourse.global_rank || golfCourse.regional_rank || 999;
-        };
-        return getCourseRank(a) - getCourseRank(b);
-      });
-
-    if (top100Courses.length > 0) {
-      rows.push({
-        title: isOwnProfile ? "My Top 100 Courses" : `${displayName}'s Top 100 Courses`,
-        courses: top100Courses,
-        size: 'medium' as const
-      });
-    }
-
     // All Courses (if we have more than what's shown in other rows)
     const remainingCourses = allCourses
       .filter(course => {
@@ -145,11 +122,8 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         const isInHighRated = highRatedCourses.some(hrc => 
           (hrc.course_id || hrc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
         );
-        const isInTop100 = top100Courses.some(tc => 
-          (tc.course_id || tc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
-        );
         
-        return !isInRecent && !isInHighRated && !isInTop100;
+        return !isInRecent && !isInHighRated;
       })
       .slice(0, 15);
 
