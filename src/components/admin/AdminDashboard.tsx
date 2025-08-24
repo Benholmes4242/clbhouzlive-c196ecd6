@@ -11,6 +11,7 @@ import AdminSettings from './AdminSettings';
 import GolfCoursesManagement from './GolfCoursesManagement';
 import CountryFlagsManagement from './CountryFlagsManagement';
 import LogosManagement from './LogosManagement';
+import UrlConversionTool from './UrlConversionTool';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload } from 'lucide-react';
 
@@ -87,7 +88,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
       case 'team':
         return <TeamManagement />;
       case 'settings':
-        return <AdminSettings />;
+        return (
+          <div className="space-y-6">
+            <AdminSettings />
+            <UrlConversionTool />
+          </div>
+        );
       default:
         return <AdminOverview users={users} />;
     }
