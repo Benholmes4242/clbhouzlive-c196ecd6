@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 interface ImageOptimizerProps {
   src: string;
@@ -51,26 +52,10 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
     return () => observer.disconnect();
   }, [priority]);
 
-  // Optimize image URL for faster loading
+  // Use direct URL for R2 and video content
   const getOptimizedSrc = (url: string) => {
     if (!url) return '';
-    
-    // Don't optimize video URLs or streaming URLs
-    if (url.includes('cloudflarestream.com') || 
-        url.includes('.m3u8') || 
-        url.includes('.mp4') || 
-        url.includes('.mov') ||
-        url.includes('customer-')) {
-      return url;
-    }
-    
-    // If it's a Supabase storage URL, add optimization parameters
-    if (url.includes('supabase') && url.includes('storage')) {
-      const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}quality=85&resize=contain&width=${width || 600}&format=webp`;
-    }
-    
-    return url;
+    return getDirectImageUrl(url);
   };
 
   // Load image when it intersects
@@ -89,7 +74,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
       };
       img.src = optimizedSrc;
     }
-  }, [hasIntersected, src, width]);
+  }, [hasIntersected, src]);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setHasError(true);

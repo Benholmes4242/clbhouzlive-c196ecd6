@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 interface LazyImageProps {
   src: string;
@@ -23,7 +23,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
   onClick,
   priority = false,
 }) => {
-  const optimizedSrc = getOptimizedImageUrl(src, width, height);
+  // Use direct URL for R2 and video content
+  const optimizedSrc = getDirectImageUrl(src);
   const [imageSrc, setImageSrc] = useState<string>(priority ? optimizedSrc : ''); // Show optimized image for priority
   const [isLoading, setIsLoading] = useState(false); // Start without loading state
   const [hasError, setHasError] = useState(false);

@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { OptimizedImage } from './optimized-image';
-import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
 interface OptimizedAvatarProps {
@@ -20,7 +20,8 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size, priority ? 90 : 85) : null;
+  // Use direct URL for R2 and video content
+  const optimizedSrc = src ? getDirectImageUrl(src) : null;
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
