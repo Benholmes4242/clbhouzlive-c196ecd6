@@ -43,74 +43,67 @@ serve(async (req) => {
 
     console.log('🎬 Starting R2 to Stream video migration...');
     console.log(`🔧 Account ID: ${cloudflareAccountId}`);
-    console.log(`🔑 R2 Token present: ${!!cloudflareR2Token}`);
     console.log(`🎥 Stream Token present: ${!!cloudflareStreamToken}`);
 
-    // Since R2 doesn't have a REST API for listing, let's find videos by scanning the database
-    console.log('🔍 Finding video URLs from database...');
-    
-    const allVideoUrls = new Set<string>();
-    
-    // Check post_media table for video URLs
-    const { data: postMedia, error: postMediaError } = await supabase
-      .from('post_media')
-      .select('media_url, media_type')
-      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
-      .like('media_url', '%media.clbhouz.co.uk%');
-    
-    if (postMediaError) {
-      console.error('Error fetching post_media:', postMediaError);
-    } else {
-      console.log(`📹 Found ${postMedia.length} videos in post_media`);
-      postMedia.forEach(item => allVideoUrls.add(item.media_url));
-    }
-    
-    // Check profile_media table for video URLs
-    const { data: profileMedia, error: profileMediaError } = await supabase
-      .from('profile_media')
-      .select('media_url, media_type')
-      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
-      .like('media_url', '%media.clbhouz.co.uk%');
-    
-    if (profileMediaError) {
-      console.error('Error fetching profile_media:', profileMediaError);
-    } else {
-      console.log(`📹 Found ${profileMedia.length} videos in profile_media`);
-      profileMedia.forEach(item => allVideoUrls.add(item.media_url));
-    }
-    
-    // Check course_review_media table for video URLs
-    const { data: courseReviewMedia, error: courseReviewError } = await supabase
-      .from('course_review_media')
-      .select('media_url, media_type')
-      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
-      .like('media_url', '%media.clbhouz.co.uk%');
-    
-    if (courseReviewError) {
-      console.error('Error fetching course_review_media:', courseReviewError);
-    } else {
-      console.log(`📹 Found ${courseReviewMedia.length} videos in course_review_media`);
-      courseReviewMedia.forEach(item => allVideoUrls.add(item.media_url));
-    }
-    
-    const videoUrls = Array.from(allVideoUrls);
-    console.log(`📊 Total unique video URLs found: ${videoUrls.length}`);
-    console.log(`📋 Sample URLs:`, videoUrls.slice(0, 3));
-    
-    // Convert URLs to R2 object keys
-    const allObjects = videoUrls.map(url => {
-      // Extract path from URL like https://media.clbhouz.co.uk/post-media/filename.mp4
-      const path = url.replace('https://media.clbhouz.co.uk/', '');
-      return { key: path, url: url };
-    });
+    // Known video files from your R2 bucket
+    const knownVideoFiles = [
+      'compilation-6a5bcbb9-c22c-4655-ad8e-088b2858ca3e-1754346035959.mp4',
+      'temp-compilation-1754346018561-0.mov',
+      'temp-compilation-1754346022372-1.mov',
+      'temp-compilation-1754346026582-2.mov',
+      'temp-compilation-1754427492632-0.mov',
+      'temp-compilation-1754427510403-1.mov',
+      'temp-compilation-1754427517604-2.mov',
+      'temp-compilation-1754428340070-0.mov',
+      'temp-compilation-1754428343857-1.mov',
+      'temp-compilation-1754428346822-2.mov',
+      'temp-compilation-1754428361227-0.mov',
+      'temp-compilation-1754428365049-1.mov',
+      'temp-compilation-1754428367916-2.mov',
+      'temp-compilation-1754430245175-0.mov',
+      'temp-compilation-1754430249420-1.mov',
+      'temp-compilation-1754430252186-2.mov',
+      'temp-compilation-1754430276388-0.mov',
+      'temp-compilation-1754430280241-1.mov',
+      'temp-compilation-1754430283212-2.mov',
+      'temp-compilation-1754430341461-0.mov',
+      'temp-compilation-1754430345058-1.mov',
+      'temp-compilation-1754430348024-2.mov',
+      'temp-compilation-1754430654770-0.mov',
+      'temp-compilation-1754430658240-1.mov',
+      'temp-compilation-1754430661053-2.mov',
+      'temp-compilation-1754456276151-0.MOV',
+      'temp-compilation-1754456280153-1.MOV',
+      'temp-compilation-1754456284372-2.MOV',
+      'temp-compilation-1754456477031-0.MOV',
+      'temp-compilation-1754456480419-1.MOV',
+      'temp-compilation-1754456482251-2.MOV',
+      'temp-compilation-1754456701520-0.MOV',
+      'temp-compilation-1754456705100-1.MOV',
+      'temp-compilation-1754456707342-2.MOV',
+      'temp-compilation-1754456986288-0.MOV',
+      'temp-compilation-1754456989656-1.MOV',
+      'temp-compilation-1754457240377-0.MOV',
+      'temp-compilation-1754457243551-1.MOV',
+      'temp-compilation-1754457687547-0.MOV',
+      'temp-compilation-1754457690679-1.MOV',
+      'temp-compilation-1754457830808-0.MOV',
+      'temp-compilation-1754457834127-1.MOV',
+      'temp-compilation-1754458020895-0.MOV',
+      'temp-compilation-1754458023780-1.MOV'
+    ];
 
-    // Filter for video files
-    const videoObjects = allObjects.filter((obj: any) => {
-      const name = obj.key.toLowerCase();
-      const isVideo = name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
-      console.log(`🔍 Checking: ${obj.key}, isVideo: ${!!isVideo}`);
-      return isVideo;
-    });
+    // Convert to full URLs and video objects
+    const allObjects = knownVideoFiles.map(filename => ({
+      key: `post-media/${filename}`,
+      url: `https://media.clbhouz.co.uk/post-media/${filename}`,
+      filename: filename
+    }));
+
+    console.log(`📊 Total known videos to migrate: ${allObjects.length}`);
+
+    // All objects are already videos from our known list
+    const videoObjects = allObjects;
 
     progress.totalVideos = videoObjects.length;
     console.log(`📹 Found ${progress.totalVideos} video files in R2`);
@@ -124,7 +117,7 @@ serve(async (req) => {
       });
     }
 
-    // Process each video file
+    // Process each video file  
     for (const videoObj of videoObjects) {
       try {
         console.log(`🔄 Processing video: ${videoObj.key}`);
@@ -148,7 +141,7 @@ serve(async (req) => {
         formData.append('file', videoBlob);
         
         // Extract filename for metadata
-        const fileName = videoObj.key.split('/').pop() || videoObj.key;
+        const fileName = videoObj.filename;
         const metadata = {
           name: fileName,
           source: 'migrated-from-r2',
@@ -184,14 +177,12 @@ serve(async (req) => {
           continue;
         }
 
-        console.log(`✅ Uploaded ${videoObj.key} to Stream with ID: ${streamId}`);
+        console.log(`✅ Uploaded ${videoObj.filename} to Stream with ID: ${streamId}`);
 
         // Update database references
         await updateDatabaseVideoReferences(supabase, videoObj.url, streamUrl);
 
-        // Note: We're not deleting from R2 since we don't have direct API access
-        // The videos can be manually cleaned up later from the Cloudflare dashboard
-        console.log(`⚠️ Note: ${videoObj.key} needs to be manually deleted from R2`);
+        console.log(`📝 Note: Please manually delete ${videoObj.filename} from R2 after migration completes`);
 
         progress.streamVideos.push({
           r2Path: videoObj.key,
