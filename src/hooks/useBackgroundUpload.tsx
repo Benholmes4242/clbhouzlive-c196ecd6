@@ -80,49 +80,30 @@ export const useBackgroundUpload = () => {
         let publicUrl = '';
         let mediaType = file.type.startsWith('image/') ? 'image' : 'video';
         
-        // Use Cloudflare Stream for video files, but store Supabase storage URL
+        // Use Cloudflare Stream for video files
         if (file.type.startsWith('video/')) {
           console.log(`Uploading video to Cloudflare Stream: ${file.name}`);
-          try {
-            // First upload to Supabase storage to get the storage URL
-            const result = await uploadFileInChunks(file);
-            publicUrl = result.publicUrl;
-            
-            // Then upload to Cloudflare Stream in background (don't await)
-            cloudflareStream.uploadVideo(file).then(streamResult => {
-              if (streamResult.success) {
-                console.log(`Video ${file.name} uploaded to Cloudflare Stream - no additional compression needed`);
-              } else {
-                console.warn(`Cloudflare Stream upload failed for ${file.name}:`, streamResult.error);
-              }
-            }).catch(error => {
-              console.warn(`Cloudflare Stream upload failed for ${file.name}:`, error);
-            });
-            
-            console.log(`Successfully uploaded ${file.name}:`, publicUrl);
-          } catch (error) {
-            console.error(`Upload failed for ${file.name}:`, error);
-            throw error;
+          const streamResult = await cloudflareStream.uploadVideo(file);
+          
+          if (streamResult.success && streamResult.videoUrl) {
+            publicUrl = streamResult.videoUrl;
+            console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
+          } else {
+            console.error(`Cloudflare Stream upload failed for ${file.name}:`, streamResult.error);
+            throw new Error(streamResult.error || 'Cloudflare Stream upload failed - no fallback for videos');
           }
         }
         // Use Cloudflare R2 for image files
         else if (mediaType === 'image') {
           console.log(`Uploading image to Cloudflare R2: ${file.name}`);
-          try {
-            const r2Result = await uploadToR2(file, `${userId}/${postId}/${fullFileName}`);
-            
-            if (r2Result.success && r2Result.url) {
-              publicUrl = r2Result.url;
-              console.log(`Successfully uploaded ${file.name} to Cloudflare R2:`, publicUrl);
-            } else {
-              throw new Error(r2Result.error || 'Cloudflare R2 upload failed');
-            }
-          } catch (error) {
-            console.error(`Cloudflare R2 upload failed for ${file.name}:`, error);
-            // Fallback to chunked upload
-            console.log(`Falling back to chunked upload for ${file.name}`);
-            const result = await uploadFileInChunks(file);
-            publicUrl = result.publicUrl;
+          const r2Result = await uploadToR2(file, `post-media/${fullFileName}`);
+          
+          if (r2Result.success && r2Result.url) {
+            publicUrl = r2Result.url;
+            console.log(`Successfully uploaded ${file.name} to Cloudflare R2:`, publicUrl);
+          } else {
+            console.error(`Cloudflare R2 upload failed for ${file.name}:`, r2Result.error);
+            throw new Error(r2Result.error || 'Cloudflare R2 upload failed - no fallback for images');
           }
         }
         // Use chunked upload for large files (>20MB) or as fallback
