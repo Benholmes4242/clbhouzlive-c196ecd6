@@ -39,7 +39,7 @@ serve(async (req) => {
         mobile_crop_height: cropData.mobile_crop_height,
         updated_at: cropData.updated_at
       })
-      .eq('user_id', userId);
+      .eq('id', userId);
 
     if (error) {
       console.error('Database error:', error);
