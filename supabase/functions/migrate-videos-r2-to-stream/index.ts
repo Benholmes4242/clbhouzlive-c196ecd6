@@ -44,20 +44,37 @@ serve(async (req) => {
     console.log('🎬 Starting R2 to Stream video migration...');
 
     // List all objects in R2 bucket to find video files
-    const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects`;
+    // Use a more comprehensive approach to list objects
+    let allObjects: any[] = [];
+    let cursor: string | undefined;
     
-    const listResponse = await fetch(listUrl, {
-      headers: {
-        'Authorization': `Bearer ${cloudflareR2Token}`,
-      },
-    });
+    do {
+      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}` : ''}`;
+      
+      console.log(`📋 Listing R2 objects with URL: ${listUrl}`);
+      
+      const listResponse = await fetch(listUrl, {
+        headers: {
+          'Authorization': `Bearer ${cloudflareR2Token}`,
+        },
+      });
 
-    if (!listResponse.ok) {
-      throw new Error(`Failed to list R2 objects: ${listResponse.statusText}`);
-    }
+      if (!listResponse.ok) {
+        const errorText = await listResponse.text();
+        console.error('❌ R2 list error:', errorText);
+        throw new Error(`Failed to list R2 objects: ${listResponse.status} ${errorText}`);
+      }
 
-    const listData = await listResponse.json();
-    const allObjects = listData.result || [];
+      const listData = await listResponse.json();
+      console.log(`📋 Listed ${listData.result?.length || 0} objects`);
+      
+      if (listData.result && listData.result.length > 0) {
+        allObjects.push(...listData.result);
+        cursor = listData.result_info?.cursor;
+      } else {
+        break;
+      }
+    } while (cursor);
 
     // Filter for video files
     const videoObjects = allObjects.filter((obj: any) => {
