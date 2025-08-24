@@ -43,93 +43,72 @@ serve(async (req) => {
 
     console.log('🎬 Starting R2 to Stream video migration...');
     console.log(`🔧 Account ID: ${cloudflareAccountId}`);
-    console.log(`🪣 Bucket: clbhouz-media`);
     console.log(`🔑 R2 Token present: ${!!cloudflareR2Token}`);
     console.log(`🎥 Stream Token present: ${!!cloudflareStreamToken}`);
 
-    // Use the correct Cloudflare REST API for R2
-    let allObjects: any[] = [];
-    let cursor: string | undefined;
-    let pageCount = 0;
+    // Since R2 doesn't have a REST API for listing, let's find videos by scanning the database
+    console.log('🔍 Finding video URLs from database...');
     
-    do {
-      pageCount++;
-      let listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects`;
-      
-      // Build query parameters
-      const params = new URLSearchParams();
-      params.append('per_page', '1000');
-      if (cursor) {
-        params.append('cursor', cursor);
-      }
-      
-      listUrl += '?' + params.toString();
-      
-      console.log(`📋 Page ${pageCount} - Listing R2 objects with URL: ${listUrl}`);
-      
-      const listResponse = await fetch(listUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${cloudflareR2Token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+    const allVideoUrls = new Set<string>();
+    
+    // Check post_media table for video URLs
+    const { data: postMedia, error: postMediaError } = await supabase
+      .from('post_media')
+      .select('media_url, media_type')
+      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
+      .like('media_url', '%media.clbhouz.co.uk%');
+    
+    if (postMediaError) {
+      console.error('Error fetching post_media:', postMediaError);
+    } else {
+      console.log(`📹 Found ${postMedia.length} videos in post_media`);
+      postMedia.forEach(item => allVideoUrls.add(item.media_url));
+    }
+    
+    // Check profile_media table for video URLs
+    const { data: profileMedia, error: profileMediaError } = await supabase
+      .from('profile_media')
+      .select('media_url, media_type')
+      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
+      .like('media_url', '%media.clbhouz.co.uk%');
+    
+    if (profileMediaError) {
+      console.error('Error fetching profile_media:', profileMediaError);
+    } else {
+      console.log(`📹 Found ${profileMedia.length} videos in profile_media`);
+      profileMedia.forEach(item => allVideoUrls.add(item.media_url));
+    }
+    
+    // Check course_review_media table for video URLs
+    const { data: courseReviewMedia, error: courseReviewError } = await supabase
+      .from('course_review_media')
+      .select('media_url, media_type')
+      .or('media_type.eq.video/mp4,media_type.eq.video/quicktime,media_type.eq.video/mov')
+      .like('media_url', '%media.clbhouz.co.uk%');
+    
+    if (courseReviewError) {
+      console.error('Error fetching course_review_media:', courseReviewError);
+    } else {
+      console.log(`📹 Found ${courseReviewMedia.length} videos in course_review_media`);
+      courseReviewMedia.forEach(item => allVideoUrls.add(item.media_url));
+    }
+    
+    const videoUrls = Array.from(allVideoUrls);
+    console.log(`📊 Total unique video URLs found: ${videoUrls.length}`);
+    console.log(`📋 Sample URLs:`, videoUrls.slice(0, 3));
+    
+    // Convert URLs to R2 object keys
+    const allObjects = videoUrls.map(url => {
+      // Extract path from URL like https://media.clbhouz.co.uk/post-media/filename.mp4
+      const path = url.replace('https://media.clbhouz.co.uk/', '');
+      return { key: path, url: url };
+    });
 
-      console.log(`📋 Response status: ${listResponse.status} ${listResponse.statusText}`);
-
-      if (!listResponse.ok) {
-        const errorText = await listResponse.text();
-        console.error('❌ R2 list error response:', errorText);
-        throw new Error(`Failed to list R2 objects: ${listResponse.status} ${errorText}`);
-      }
-
-      const listData = await listResponse.json();
-      console.log(`📋 Raw response structure:`, {
-        success: listData.success,
-        resultCount: listData.result?.length || 0,
-        hasErrors: !!listData.errors,
-        hasResultInfo: !!listData.result_info
-      });
-      
-      if (!listData.success) {
-        console.error('❌ API returned success=false:', listData.errors);
-        throw new Error(`R2 API error: ${JSON.stringify(listData.errors)}`);
-      }
-      
-      const objects = listData.result || [];
-      console.log(`📋 Page ${pageCount} found ${objects.length} objects`);
-      
-      if (objects.length > 0) {
-        console.log(`📋 First 3 objects:`, objects.slice(0, 3).map((obj: any) => ({ 
-          key: obj.key, 
-          size: obj.size,
-          etag: obj.etag 
-        })));
-        allObjects.push(...objects);
-        
-        // Check for pagination info
-        cursor = listData.result_info?.cursor;
-        console.log(`📋 Next cursor: ${cursor}`);
-      } else {
-        console.log(`📋 No objects in this page`);
-        break;
-      }
-      
-      // Safety check
-      if (pageCount > 20) {
-        console.log(`⚠️ Stopping after ${pageCount} pages to prevent infinite loop`);
-        break;
-      }
-    } while (cursor);
-
-    console.log(`📊 Total objects found across all pages: ${allObjects.length}`);
-
-    // Filter for video files (handle nested folders, especially post-media/)
+    // Filter for video files
     const videoObjects = allObjects.filter((obj: any) => {
       const name = obj.key.toLowerCase();
       const isVideo = name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
-      const isInPostMedia = name.startsWith('post-media/');
-      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}, inPostMedia: ${isInPostMedia}`);
+      console.log(`🔍 Checking: ${obj.key}, isVideo: ${!!isVideo}`);
       return isVideo;
     });
 
@@ -150,14 +129,10 @@ serve(async (req) => {
       try {
         console.log(`🔄 Processing video: ${videoObj.key}`);
         
-        // Download video from R2 using Cloudflare REST API
-        const downloadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${encodeURIComponent(videoObj.key)}`;
+        // Download video from R2 using public URL
+        const downloadUrl = videoObj.url;
         
-        const downloadResponse = await fetch(downloadUrl, {
-          headers: {
-            'Authorization': `Bearer ${cloudflareR2Token}`,
-          },
-        });
+        const downloadResponse = await fetch(downloadUrl);
 
         if (!downloadResponse.ok) {
           progress.errors.push(`Failed to download ${videoObj.key} from R2: ${downloadResponse.statusText}`);
@@ -212,24 +187,11 @@ serve(async (req) => {
         console.log(`✅ Uploaded ${videoObj.key} to Stream with ID: ${streamId}`);
 
         // Update database references
-        const oldR2Url = `https://media.clbhouz.co.uk/${videoObj.key}`;
-        await updateDatabaseVideoReferences(supabase, oldR2Url, streamUrl);
+        await updateDatabaseVideoReferences(supabase, videoObj.url, streamUrl);
 
-        // Delete from R2 using Cloudflare REST API
-        const deleteUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${encodeURIComponent(videoObj.key)}`;
-        
-        const deleteResponse = await fetch(deleteUrl, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${cloudflareR2Token}`,
-          },
-        });
-
-        if (!deleteResponse.ok) {
-          progress.errors.push(`Failed to delete ${videoObj.key} from R2: ${deleteResponse.statusText}`);
-        } else {
-          console.log(`🗑️ Deleted ${videoObj.key} from R2`);
-        }
+        // Note: We're not deleting from R2 since we don't have direct API access
+        // The videos can be manually cleaned up later from the Cloudflare dashboard
+        console.log(`⚠️ Note: ${videoObj.key} needs to be manually deleted from R2`);
 
         progress.streamVideos.push({
           r2Path: videoObj.key,
