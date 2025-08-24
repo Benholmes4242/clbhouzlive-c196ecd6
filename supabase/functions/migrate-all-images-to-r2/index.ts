@@ -117,22 +117,26 @@ Deno.serve(async (req) => {
               continue;
             }
 
-            // Convert to FormData for R2 upload
-            const formData = new FormData();
-            formData.append('file', fileData, file.name);
-            formData.append('fileName', file.name);
-            formData.append('bucketType', bucket);
-
-            // Upload to Cloudflare R2
-            const { data: r2Data, error: r2Error } = await supabase.functions.invoke('cloudflare-r2-upload', {
-              body: formData,
+            // Upload to Cloudflare R2 directly
+            const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${bucket}/${file.name}`;
+            
+            const uploadResponse = await fetch(uploadUrl, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${cloudflareApiToken}`,
+                'Content-Type': fileData.type || 'application/octet-stream',
+              },
+              body: fileData,
             });
 
-            if (r2Error || !r2Data?.success) {
-              bucketResult.errors.push(`R2 upload error for ${file.name}: ${r2Error?.message || r2Data?.error}`);
+            if (!uploadResponse.ok) {
+              const errorText = await uploadResponse.text();
+              bucketResult.errors.push(`R2 upload error for ${file.name}: ${uploadResponse.status} ${errorText}`);
               progress.processedFiles++;
               continue;
             }
+
+            const publicUrl = `https://media.clbhouz.co.uk/${bucket}/${file.name}`;
 
             console.log(`Successfully migrated ${file.name} from ${bucket} to R2`);
             bucketResult.migratedFiles++;
@@ -140,7 +144,7 @@ Deno.serve(async (req) => {
             progress.processedFiles++;
 
             // Update database references (for specific known tables)
-            await updateDatabaseReferences(supabase, bucket, file.name, r2Data.publicUrl);
+            await updateDatabaseReferences(supabase, bucket, file.name, publicUrl);
 
           } catch (error) {
             bucketResult.errors.push(`Error processing ${file.name}: ${error.message}`);
