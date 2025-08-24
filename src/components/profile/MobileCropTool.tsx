@@ -179,13 +179,19 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     onSave(cropData);
   };
 
-  // Generate preview style
+  // Generate preview style to match the exact crop area
   const getPreviewStyle = () => {
     if (!imageLoaded) return {};
     
+    // Calculate the exact position and scale to show only the cropped area
+    const centerX = cropData.x + cropData.width / 2;
+    const centerY = cropData.y + cropData.height / 2;
+    const scaleX = 100 / cropData.width;
+    const scaleY = 100 / cropData.height;
+    
     return {
-      objectPosition: `${cropData.x + cropData.width/2}% ${cropData.y + cropData.height/2}%`,
-      transform: `scale(${100/cropData.width * 0.6})`, // Zoom to show the cropped area
+      objectPosition: `${centerX}% ${centerY}%`,
+      transform: `scale(${scaleX}, ${scaleY})`, // Use both X and Y scaling to match crop exactly
     };
   };
 
