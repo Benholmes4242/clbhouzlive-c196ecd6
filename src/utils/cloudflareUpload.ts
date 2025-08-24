@@ -10,7 +10,7 @@ export interface CloudflareUploadResult {
 
 export const uploadToCloudflareR2 = async (
   file: File,
-  bucketType: 'avatars' | 'post-media' | 'course-media' | 'course-review-media' | 'logos',
+  bucketType: 'avatars' | 'post-media' | 'course-media' | 'course-review-media' | 'logos' | 'profile-media' | 'profile-backgrounds' | 'profile-images' | 'course-images',
   originalFileName?: string
 ): Promise<CloudflareUploadResult> => {
   try {

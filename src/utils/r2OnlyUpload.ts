@@ -14,7 +14,7 @@ export interface R2OnlyUploadResult {
  */
 export const uploadToR2Only = async (
   file: File,
-  bucketType: 'avatars' | 'post-media' | 'course-media' | 'course-review-media' | 'logos' | 'profile-media' | 'profile-backgrounds' | 'profile-images',
+  bucketType: 'avatars' | 'post-media' | 'course-media' | 'course-review-media' | 'logos' | 'profile-media' | 'profile-backgrounds' | 'profile-images' | 'course-images',
   originalFileName?: string
 ): Promise<R2OnlyUploadResult> => {
   try {
