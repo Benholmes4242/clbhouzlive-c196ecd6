@@ -12,6 +12,15 @@ export const isVideoUrl = (url: string): boolean => {
          url?.includes('customer-') || false;
 };
 
+export const isSupabaseStorageUrl = (url: string): boolean => {
+  return url?.includes('supabase.co/storage') || false;
+};
+
+export const isPreviewEnvironment = (): boolean => {
+  return window.location.hostname.includes('lovable.dev') || 
+         window.location.hostname.includes('sandbox');
+};
+
 export const getDirectImageUrl = (url: string): string => {
   if (!url) return '';
   
@@ -20,12 +29,13 @@ export const getDirectImageUrl = (url: string): string => {
     return url;
   }
   
-  // For R2 URLs, return as-is - let browsers handle CORS
-  if (isR2Url(url)) {
-    return url;
+  // In preview environments, R2 images are blocked by CORS
+  // Use placeholder for R2 images, allow Supabase storage
+  if (isPreviewEnvironment() && isR2Url(url)) {
+    return '/placeholder.svg';
   }
   
-  // For other URLs, return as-is
+  // For other URLs (including Supabase storage), return as-is
   return url;
 };
 

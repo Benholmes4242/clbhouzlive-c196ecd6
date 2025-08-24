@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { getDirectImageUrl, isR2Url } from '@/utils/r2ImageUtils';
+import { getDirectImageUrl, isR2Url, isPreviewEnvironment } from '@/utils/r2ImageUtils';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
 interface OptimizedAvatarProps {
@@ -19,32 +19,37 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  // Use direct URL for R2 and video content - try original first, fallback if needed
   const [imageSrc, setImageSrc] = React.useState<string | null>(null);
-  const [hasError, setHasError] = React.useState(false);
+  const [showFallback, setShowFallback] = React.useState(false);
 
   React.useEffect(() => {
     if (!src) {
       setImageSrc(null);
-      setHasError(false);
+      setShowFallback(true);
       return;
     }
 
     const directUrl = getDirectImageUrl(src);
+    
+    // If it's a placeholder (R2 blocked in preview), show fallback immediately
+    if (directUrl === '/placeholder.svg') {
+      setImageSrc(null);
+      setShowFallback(true);
+      return;
+    }
+    
     setImageSrc(directUrl);
-    setHasError(false);
+    setShowFallback(false);
   }, [src]);
 
   const handleImageError = () => {
-    if (isR2Url(imageSrc || '')) {
-      console.warn('R2 image CORS blocked in preview environment:', imageSrc);
-    }
-    setHasError(true);
+    console.warn('Avatar image failed to load:', imageSrc);
+    setShowFallback(true);
   };
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
-      {imageSrc && !hasError ? (
+      {imageSrc && !showFallback ? (
         <AvatarImage 
           src={imageSrc}
           alt={alt}
