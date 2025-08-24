@@ -1,286 +1,215 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { useUserCoursesData } from '../user/useUserCoursesData';
-import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useMemo, useCallback } from 'react';
 import NetflixCourseRow from './NetflixCourseRow';
-import NetflixHeroBanner from './NetflixHeroBanner';
-import NetflixProgressRings from './NetflixProgressRings';
 
 interface NetflixCoursesLayoutProps {
-  username?: string;
-  isOwnProfile?: boolean;
+  allCourses: any[];
+  isOwnProfile: boolean;
   displayName?: string;
+  onCourseClick?: (course: any) => void;
 }
 
 const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
-  username,
-  isOwnProfile = false,
-  displayName
+  allCourses,
+  isOwnProfile,
+  displayName,
+  onCourseClick
 }) => {
-  const {
-    targetUserId,
-    displayName: hookDisplayName,
-    isOwnProfile: hookIsOwnProfile,
-  } = useUserCoursesData(username);
+  // Helper function to get user rating for a course
+  const getUserRating = (courseId: string) => {
+    const userCourse = allCourses.find(uc => 
+      (uc.course_id || uc.golf_courses?.id) === courseId
+    );
+    return userCourse?.rating || null;
+  };
 
-  const finalDisplayName = displayName || hookDisplayName;
-  const finalIsOwnProfile = isOwnProfile !== undefined ? isOwnProfile : hookIsOwnProfile;
-
-  const { regionProgress } = useTop100CoursesData(
-    targetUserId || '',
-    finalIsOwnProfile
-  );
-
-  // Query to get all played courses
-  const { data: allPlayedCourses = [] } = useQuery({
-    queryKey: ['allPlayedCourses', targetUserId],
-    queryFn: async () => {
-      if (!targetUserId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', targetUserId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', targetUserId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const uniqueCoursesMap = new Map();
-      
-      combinedCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
+  // Handle region navigation with smooth scrolling
+  const handleRegionClick = useCallback((region: string) => {
+    const regionElement = document.getElementById(`region-${region.toLowerCase().replace(/\s+/g, '-').replace('&', 'and')}`);
+    if (regionElement) {
+      regionElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
       });
+    }
+  }, []);
 
-      return Array.from(uniqueCoursesMap.values());
-    },
-    enabled: !!targetUserId,
-  });
+  // Organize courses into different rows
+  const courseRows = useMemo(() => {
+    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; hasHeroBanner?: boolean; isRegionalSection?: boolean; regionData?: Record<string, any[]>; regionOrder?: string[]; }[] = [];
 
-  // Recently played courses (sorted by date)
-  const recentlyPlayed = useMemo(() => {
-    return [...allPlayedCourses]
+    // Recently Played (last 10 courses by date)
+    const recentCourses = [...allCourses]
       .sort((a, b) => {
         const aDate = new Date(a.played_date || a.created_at || 0);
         const bDate = new Date(b.played_date || b.created_at || 0);
         return bDate.getTime() - aDate.getTime();
       })
       .slice(0, 10);
-  }, [allPlayedCourses]);
 
-  // Top 10 rated courses
-  const topRatedCourses = useMemo(() => {
-    return allPlayedCourses
-      .filter(course => course.rating !== null && course.rating !== undefined)
+    if (recentCourses.length > 0) {
+      rows.push({
+        title: "Recently Played",
+        courses: recentCourses,
+        size: 'large' as const
+      });
+    }
+
+    // Highest Rated (courses with ratings 8+) - Row 2 with Hero Banner
+    const highRatedCourses = allCourses
+      .filter(course => course.rating && course.rating >= 8)
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
       .slice(0, 10);
-  }, [allPlayedCourses]);
 
-  // Courses by region
-  const coursesByRegion = useMemo(() => {
-    const regions = {
-      'britain-ireland': allPlayedCourses.filter(course => 
-        course.golf_courses?.country === 'Britain & Ireland'
-      ),
-      'europe': allPlayedCourses.filter(course => 
-        course.golf_courses?.country === 'Continental Europe'
-      ),
-      'usa': allPlayedCourses.filter(course => 
-        course.golf_courses?.country === 'USA'
-      ),
-      'worldwide': allPlayedCourses.filter(course => 
-        course.golf_courses?.global_rank && course.golf_courses.global_rank <= 100
-      )
-    };
-
-    return regions;
-  }, [allPlayedCourses]);
-
-  // Hero banner course (highest rated course)
-  const heroCourse = useMemo(() => {
-    return topRatedCourses[0] || recentlyPlayed[0];
-  }, [topRatedCourses, recentlyPlayed]);
-
-  // Refs for smooth scrolling
-  const gbIrelandRef = useRef<HTMLDivElement>(null);
-  const europeRef = useRef<HTMLDivElement>(null);
-  const usaRef = useRef<HTMLDivElement>(null);
-  const worldwideRef = useRef<HTMLDivElement>(null);
-
-  const scrollToRegion = (region: string) => {
-    const refs = {
-      'britain-ireland': gbIrelandRef,
-      'europe': europeRef,
-      'usa': usaRef,
-      'worldwide': worldwideRef
-    };
-    
-    const ref = refs[region as keyof typeof refs];
-    if (ref?.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (highRatedCourses.length > 0) {
+      rows.push({
+        title: isOwnProfile ? "Top 10 Rated by You" : `Top 10 Rated by ${displayName}`,
+        courses: highRatedCourses,
+        size: 'medium' as const,
+        hasHeroBanner: true
+      });
     }
-  };
+
+    // Courses by Region (Row 3) - Group courses by region
+    const coursesByRegion = allCourses.reduce((acc, course) => {
+      const golfCourse = course.golf_courses || course;
+      let region = 'Worldwide'; // Default
+      
+      if (golfCourse.country) {
+        // Group by regions
+        if (['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'].includes(golfCourse.country)) {
+          region = 'Great Britain & Ireland';
+        } else if (['Germany', 'France', 'Spain', 'Italy', 'Portugal', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Belgium', 'Austria', 'Switzerland'].includes(golfCourse.country)) {
+          region = 'Europe';
+        } else if (['United States', 'USA'].includes(golfCourse.country)) {
+          region = 'USA';
+        }
+      }
+      
+      if (!acc[region]) {
+        acc[region] = [];
+      }
+      acc[region].push(course);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    // Add regional rows if we have courses
+    const regionOrder = ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
+    const hasRegionalCourses = Object.keys(coursesByRegion).some(region => coursesByRegion[region].length > 0);
+    
+    if (hasRegionalCourses) {
+      rows.push({
+        title: "Courses by Region",
+        courses: [], // This will be handled specially
+        size: 'medium' as const,
+        isRegionalSection: true,
+        regionData: coursesByRegion,
+        regionOrder
+      });
+    }
+
+    // Top 100 Courses (global or regional rank <= 100)
+    const top100Courses = allCourses
+      .filter(course => {
+        const golfCourse = course.golf_courses || course;
+        return (golfCourse.global_rank && golfCourse.global_rank <= 100) ||
+               (golfCourse.regional_rank && golfCourse.regional_rank <= 100);
+      })
+      .sort((a, b) => {
+        const getCourseRank = (course: any) => {
+          const golfCourse = course.golf_courses || course;
+          return golfCourse.global_rank || golfCourse.regional_rank || 999;
+        };
+        return getCourseRank(a) - getCourseRank(b);
+      });
+
+    if (top100Courses.length > 0) {
+      rows.push({
+        title: isOwnProfile ? "My Top 100 Courses" : `${displayName}'s Top 100 Courses`,
+        courses: top100Courses,
+        size: 'medium' as const
+      });
+    }
+
+    // All Courses (if we have more than what's shown in other rows)
+    const remainingCourses = allCourses
+      .filter(course => {
+        // Don't show courses already in other rows
+        const isInRecent = recentCourses.some(rc => 
+          (rc.course_id || rc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
+        );
+        const isInHighRated = highRatedCourses.some(hrc => 
+          (hrc.course_id || hrc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
+        );
+        const isInTop100 = top100Courses.some(tc => 
+          (tc.course_id || tc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
+        );
+        
+        return !isInRecent && !isInHighRated && !isInTop100;
+      })
+      .slice(0, 15);
+
+    if (remainingCourses.length > 0) {
+      rows.push({
+        title: isOwnProfile ? "All My Courses" : `All ${displayName}'s Courses`,
+        courses: remainingCourses,
+        size: 'medium' as const
+      });
+    }
+
+    return rows;
+  }, [allCourses, isOwnProfile, displayName]);
 
   return (
-    <div className="space-y-8 bg-background">
-      {/* Progress Rings Section */}
-      <NetflixProgressRings 
-        regionProgress={Object.fromEntries(
-          Object.entries(regionProgress).map(([key, progress]) => [
-            key, 
-            { 
-              ...progress, 
-              percentage: progress.total > 0 ? (progress.played / progress.total) * 100 : 0 
-            }
-          ])
-        )}
-        onRegionClick={scrollToRegion}
-      />
-
-      {/* Recently Played Row */}
-      {recentlyPlayed.length > 0 && (
-        <NetflixCourseRow
-          title="Recently Played"
-          courses={recentlyPlayed}
-          targetUserId={targetUserId}
-          isOwnProfile={finalIsOwnProfile}
-          cardSize="large"
-        />
-      )}
-
-      {/* Top 10 Rated Row */}
-      {topRatedCourses.length > 0 && (
-        <NetflixCourseRow
-          title="Top 10 Rated by You"
-          courses={topRatedCourses}
-          targetUserId={targetUserId}
-          isOwnProfile={finalIsOwnProfile}
-          cardSize="medium"
-        />
-      )}
-
-      {/* Hero Banner */}
-      {heroCourse && (
-        <NetflixHeroBanner
-          course={heroCourse}
-          targetUserId={targetUserId}
-          isOwnProfile={finalIsOwnProfile}
-        />
-      )}
-
-      {/* Courses by Region */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white px-4">Courses by Region</h2>
+    <div className="space-y-4 md:space-y-6 lg:space-y-8">
+      {courseRows.map((row, index) => {
+        // Handle regional section specially
+        if (row.isRegionalSection && row.regionData && row.regionOrder) {
+          return (
+            <div key={`${row.title}-${index}`} className="mb-4 md:mb-6 lg:mb-8">
+              {/* Main section title */}
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3 px-4 md:px-0">
+                {row.title}
+              </h2>
+              
+              {/* Regional mini-rows */}
+              <div className="space-y-4 md:space-y-6">
+                {row.regionOrder.map((region) => {
+                  const regionCourses = row.regionData![region];
+                  if (!regionCourses || regionCourses.length === 0) return null;
+                  
+                  return (
+                    <div key={`region-${region}`} id={`region-${region.toLowerCase().replace(/\s+/g, '-').replace('&', 'and')}`}>
+                      <NetflixCourseRow
+                        title={region}
+                        courses={regionCourses}
+                        onCourseClick={onCourseClick}
+                        getUserRating={getUserRating}
+                        size="medium"
+                        onRegionClick={handleRegionClick}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
         
-        {coursesByRegion['britain-ireland'].length > 0 && (
-          <div ref={gbIrelandRef}>
-            <NetflixCourseRow
-              title="Great Britain & Ireland"
-              courses={coursesByRegion['britain-ireland']}
-              targetUserId={targetUserId}
-              isOwnProfile={finalIsOwnProfile}
-              cardSize="medium"
-            />
-          </div>
-        )}
-
-        {coursesByRegion['europe'].length > 0 && (
-          <div ref={europeRef}>
-            <NetflixCourseRow
-              title="Europe"
-              courses={coursesByRegion['europe']}
-              targetUserId={targetUserId}
-              isOwnProfile={finalIsOwnProfile}
-              cardSize="medium"
-            />
-          </div>
-        )}
-
-        {coursesByRegion['usa'].length > 0 && (
-          <div ref={usaRef}>
-            <NetflixCourseRow
-              title="USA"
-              courses={coursesByRegion['usa']}
-              targetUserId={targetUserId}
-              isOwnProfile={finalIsOwnProfile}
-              cardSize="medium"
-            />
-          </div>
-        )}
-
-        {coursesByRegion['worldwide'].length > 0 && (
-          <div ref={worldwideRef}>
-            <NetflixCourseRow
-              title="Worldwide"
-              courses={coursesByRegion['worldwide']}
-              targetUserId={targetUserId}
-              isOwnProfile={finalIsOwnProfile}
-              cardSize="medium"
-            />
-          </div>
-        )}
-      </div>
+        // Regular rows
+        return (
+          <NetflixCourseRow
+            key={`${row.title}-${index}`}
+            title={row.title}
+            courses={row.courses}
+            onCourseClick={onCourseClick}
+            getUserRating={getUserRating}
+            size={row.size}
+            hasHeroBanner={row.hasHeroBanner}
+            onRegionClick={handleRegionClick}
+          />
+        );
+      })}
     </div>
   );
 };

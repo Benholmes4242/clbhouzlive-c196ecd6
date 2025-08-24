@@ -1,142 +1,224 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Star, MapPin, Trophy, Users } from 'lucide-react';
 
 interface NetflixCourseCardProps {
   course: any;
   userRating?: number | null;
-  targetUserId?: string;
-  isOwnProfile: boolean;
+  className?: string;
+  onClick?: () => void;
   size?: 'large' | 'medium';
+  isHeroBanner?: boolean;
 }
 
 const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
   course,
   userRating,
-  targetUserId,
-  isOwnProfile,
-  size = 'medium'
+  className = "",
+  onClick,
+  size = 'medium',
+  isHeroBanner = false
 }) => {
-  const navigate = useNavigate();
-
-  if (!course) return null;
-
-  const handleClick = () => {
-    navigate(`/courses/${course.id}`);
-  };
-
-  // Get ranking information for badges
-  const getRankingInfo = () => {
+  const getRankBadges = () => {
     const badges = [];
     
-    // Worldwide ranking
-    if (course.global_rank) {
-      badges.push({ type: 'worldwide', rank: course.global_rank, label: 'WORLD' });
+    // Regional rank with abbreviation
+    if (course.regional_rank && course.regional_rank <= 100) {
+      let regionAbbrev = 'GLOBAL';
+      
+      // Map country/region to abbreviation
+      if (course.country) {
+        if (['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'].includes(course.country)) {
+          regionAbbrev = 'GB&I';
+        } else if (['Germany', 'France', 'Spain', 'Italy', 'Portugal', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Belgium', 'Austria', 'Switzerland'].includes(course.country)) {
+          regionAbbrev = 'EUR';
+        } else if (['United States', 'USA'].includes(course.country)) {
+          regionAbbrev = 'USA';
+        } else {
+          regionAbbrev = 'WORLD';
+        }
+      }
+      
+      badges.push({
+        type: 'regional',
+        rank: course.regional_rank,
+        icon: MapPin,
+        label: `${regionAbbrev} ${course.regional_rank}`
+      });
     }
     
-    // Regional ranking
-    if (course.country === 'Britain & Ireland' && course.regional_rank) {
-      badges.push({ type: 'regional', rank: course.regional_rank, label: 'GB&I' });
-    } else if (course.country === 'Continental Europe' && course.regional_rank) {
-      badges.push({ type: 'regional', rank: course.regional_rank, label: 'EUR' });
-    } else if (course.country === 'USA' && course.regional_rank) {
-      badges.push({ type: 'regional', rank: course.regional_rank, label: 'USA' });
+    // Global rank (only if no regional rank or if it's different)
+    if (course.global_rank && course.global_rank <= 100 && !course.regional_rank) {
+      badges.push({
+        type: 'global',
+        rank: course.global_rank,
+        icon: Trophy,
+        label: `GLOBAL ${course.global_rank}`
+      });
     }
-    
-    // Clbhouz community rank (placeholder for now)
-    badges.push({ type: 'community', rank: Math.floor(Math.random() * 500) + 1, label: 'CLB' });
     
     return badges;
   };
 
-  const rankingBadges = getRankingInfo();
-
-  // Calculate XP earned (placeholder logic)
-  const xpEarned = course.global_rank ? Math.max(50, 500 - (course.global_rank * 4)) : 250;
-
-  // Get responsive sizing classes based on card size
-  const getSizingClasses = () => {
-    if (size === 'large') {
-      return {
-        container: 'w-[82vw] sm:w-[44%] md:w-[31%] lg:w-[30%]',
-        height: 'h-[41vw] sm:h-[22%] md:h-[15.5%] lg:h-[15%]', // 2:1 aspect ratio
-        radius: 'rounded-2xl', // 16px
-        shadow: 'shadow-xl'
-      };
-    } else {
-      return {
-        container: 'w-[76vw] sm:w-[40%] md:w-[28%] lg:w-[27%]',
-        height: 'h-[38vw] sm:h-[20%] md:h-[14%] lg:w-[13.5%]', // 2:1 aspect ratio
-        radius: 'rounded-xl', // 14px  
-        shadow: 'shadow-lg'
-      };
-    }
+  const rankBadges = getRankBadges();
+  const cornerRadius = size === 'large' ? 'rounded-2xl' : 'rounded-xl';
+  const shadowClass = size === 'large' 
+    ? 'shadow-lg shadow-black/20' 
+    : 'shadow-md shadow-black/15';
+  
+  // Text sizing - larger for Row 1 (Recently Played)
+  const textSizing = size === 'large' ? {
+    title: 'text-base md:text-lg font-bold',
+    badge: 'text-xs',
+    rating: 'text-base md:text-lg font-bold',
+    xp: 'text-xs font-semibold'
+  } : {
+    title: 'text-sm md:text-base font-bold', 
+    badge: 'text-xs',
+    rating: 'text-sm md:text-base font-bold',
+    xp: 'text-xs font-semibold'
   };
 
-  const sizingClasses = getSizingClasses();
-
-  return (
-    <button
-      onClick={handleClick}
-      className={`relative ${sizingClasses.container} aspect-[2/1] ${sizingClasses.radius} overflow-hidden group hover:scale-105 transition-all duration-300 hover:z-10 ${sizingClasses.shadow}`}
-    >
-      {/* Course Image */}
+  // Hero banner gets special treatment
+  if (isHeroBanner) {
+    return (
       <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: course.thumbnail_image 
-            ? `url(${course.thumbnail_image})`
-            : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-        }}
-      />
-      
-      {/* Subtle gradient overlay for text legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-      
-      {/* Content overlay */}
-      <div className="absolute inset-0 flex flex-col justify-between p-3">
-        {/* Top section - empty for clean look */}
-        <div />
-        
-        {/* Bottom section - Course info */}
-        <div className="flex justify-between items-end">
-          {/* Left side - Course name and badges */}
-          <div className="flex flex-col items-start space-y-2 flex-1 mr-2">
-            {/* Course name */}
-            <h3 className="text-white font-bold text-sm leading-tight line-clamp-2 text-left max-w-full">
-              {course.name}
-            </h3>
-            
-            {/* Ranking badges row */}
-            <div className="flex flex-wrap items-center gap-1">
-              {rankingBadges.map((badge, index) => (
-                <div
-                  key={index}
-                  className="px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
-                >
-                  <span className="text-white text-xs font-medium">
-                    {badge.label} {badge.rank}
-                  </span>
-                </div>
-              ))}
-              
-              {/* XP Badge */}
-              <div className="px-2 py-1 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30">
-                <span className="text-primary text-xs font-medium">
-                  +{xpEarned} XP
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Right side - User rating */}
-          {userRating && (
-            <div className="text-white font-bold text-lg flex-shrink-0">
-              {userRating}/10
+        className={`relative group cursor-pointer hover:scale-[1.005] transition-all duration-500 ease-out ${className}`}
+        onClick={onClick}
+      >
+        <div className="relative w-full aspect-[16/9] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden bg-muted shadow-2xl shadow-black/40">
+          {/* Course image */}
+          {course.thumbnail_image ? (
+            <img
+              src={course.thumbnail_image}
+              alt={course.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+              <span className="text-muted-foreground text-lg">No image</span>
             </div>
           )}
+          
+          {/* Enhanced cinematic gradient for hero banner */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 80%, transparent 100%)'
+            }}
+          />
+          
+          {/* Hero content */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-12 text-white">
+            <div className="max-w-4xl">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight drop-shadow-2xl">
+                {course.name}
+              </h1>
+              <p className="text-lg md:text-2xl lg:text-3xl italic opacity-95 leading-relaxed drop-shadow-lg font-light">
+                "{course.description || course.tagline || course.heritage || "An exceptional golfing experience"}"
+              </p>
+              {userRating && (
+                <div className="mt-6 flex items-center gap-3">
+                  <Star className="w-7 h-7 md:w-8 md:h-8 fill-yellow-400 text-yellow-400 drop-shadow" />
+                  <span className="text-2xl md:text-3xl font-bold drop-shadow-lg">{userRating}</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </button>
+    );
+  }
+
+  return (
+    <div 
+      className={`relative group cursor-pointer hover:scale-[1.02] ${className}`}
+      onClick={onClick}
+    >
+      {/* Main card container with 2:1 aspect ratio */}
+      <div className={`relative w-full aspect-[2/1] ${cornerRadius} overflow-hidden bg-muted ${shadowClass}`}>
+        {/* Course image */}
+        {course.thumbnail_image ? (
+          <img
+            src={course.thumbnail_image}
+            alt={course.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+            <span className="text-muted-foreground text-sm">No image</span>
+          </div>
+        )}
+        
+        {/* Enhanced gradient overlay for better text readability - 55% opacity over lower 40% */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" 
+             style={{
+               background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.2) 70%, transparent 100%)'
+             }} />
+        
+        {/* Bottom content area */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 text-white">
+          <div className="flex justify-between items-end">
+            {/* Left side - Course info and badges */}
+            <div className="flex-1 min-w-0">
+              <h3 className={`${textSizing.title} mb-2 line-clamp-2 leading-tight drop-shadow-lg`}>
+                {course.name}
+              </h3>
+              
+              {/* Ranking badges */}
+              {rankBadges.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-1">
+                  {rankBadges.map((badge, index) => {
+                    const IconComponent = badge.icon;
+                    return (
+                      <div 
+                        key={`${badge.type}-${index}`}
+                        className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/20 shadow-lg"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.6)',
+                          backdropFilter: 'blur(10px)',
+                          WebkitBackdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        }}
+                      >
+                        <IconComponent className="w-3 h-3" />
+                        <span className={`${textSizing.badge} font-medium`}>{badge.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              
+              {/* XP earned */}
+              <div 
+                className="backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20 shadow-lg"
+                style={{
+                  background: 'rgba(247, 147, 30, 0.9)', // Clbhouz orange
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                }}
+              >
+                <span className={`${textSizing.xp} text-white drop-shadow font-semibold`}>+250 XP</span>
+              </div>
+            </div>
+            
+            {/* Right side - User rating */}
+            {userRating && (
+              <div className="ml-2 text-right">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 drop-shadow" />
+                  <span className={`${textSizing.rating} drop-shadow-lg`}>{userRating}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
