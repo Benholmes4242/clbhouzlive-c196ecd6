@@ -9,6 +9,7 @@ import VideoMigrationTool from './VideoMigrationTool';
 import { ManualVideoMigration } from './ManualVideoMigration';
 import { DatabaseUrlUpdater } from './DatabaseUrlUpdater';
 import { StreamAccountIdFixer } from './StreamAccountIdFixer';
+import { VideoUrlAnalyzer } from './VideoUrlAnalyzer';
 
 const AdminSettings = () => {
   return (
@@ -32,7 +33,8 @@ const AdminSettings = () => {
           <h3 className="text-lg font-semibold mb-2">Migration Tools</h3>
           <p className="text-sm text-muted-foreground">Tools for migrating and fixing media files</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <VideoUrlAnalyzer />
           <VideoMigrationTool />
           <ManualVideoMigration />
           <DatabaseUrlUpdater />
