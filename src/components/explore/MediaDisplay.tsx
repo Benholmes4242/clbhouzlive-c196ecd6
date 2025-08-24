@@ -133,18 +133,23 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
           <div className="relative w-full h-full">
             {hasCloudflareThumb ? (
-              <HighQualityImage
-                src={thumbnailUrl}
-                alt={itemTitle || 'Video thumbnail'}
-                className="w-full h-full object-cover"
-                onError={() => {
-                  setImageLoading(false);
-                  setMediaLoaded(true);
-                  onImageError();
-                }}
-                width={600}
-                height={800}
-              />
+               <HighQualityImage
+                 src={thumbnailUrl}
+                 alt={itemTitle || 'Video thumbnail'}
+                 className="w-full h-full object-cover"
+                 onLoad={() => {
+                   setImageLoading(false);
+                   setMediaLoaded(true);
+                   onImageLoad();
+                 }}
+                 onError={() => {
+                   setImageLoading(false);
+                   setMediaLoaded(true);
+                   onImageError();
+                 }}
+                 width={600}
+                 height={800}
+               />
             ) : (
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
               <video
@@ -175,18 +180,23 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         )
       ) : (
         <div className="relative w-full h-full">
-          <HighQualityImage
-            src={isInvalidSrc ? fallbackImage : media.media_url}
-            alt={itemTitle || 'Content'}
-            className="w-full h-full object-cover"
-            onError={() => {
-              setImageLoading(false);
-              setMediaLoaded(true);
-              onImageError();
-            }}
-            width={600}
-            height={800}
-          />
+           <HighQualityImage
+             src={isInvalidSrc ? fallbackImage : media.media_url}
+             alt={itemTitle || 'Content'}
+             className="w-full h-full object-cover"
+             onLoad={() => {
+               setImageLoading(false);
+               setMediaLoaded(true);
+               onImageLoad();
+             }}
+             onError={() => {
+               setImageLoading(false);
+               setMediaLoaded(true);
+               onImageError();
+             }}
+             width={600}
+             height={800}
+           />
         </div>
       )}
     </div>

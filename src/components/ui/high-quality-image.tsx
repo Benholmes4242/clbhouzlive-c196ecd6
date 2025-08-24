@@ -8,6 +8,7 @@ interface HighQualityImageProps {
   width?: number;
   height?: number;
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onLoad?: () => void;
   onClick?: () => void;
 }
 
@@ -18,6 +19,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   width,
   height,
   onError,
+  onLoad,
   onClick
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(src);
@@ -33,6 +35,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   const handleImageLoad = () => {
     setIsLoading(false);
+    onLoad?.();
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
