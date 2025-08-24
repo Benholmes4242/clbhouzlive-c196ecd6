@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 interface Profile {
   display_name?: string | null;
@@ -147,15 +146,24 @@ export const useProfileForm = (
         const fileExt = formData.profilePhoto.name.split('.').pop();
         const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
         
-        const uploadResult = await uploadToR2Only(formData.profilePhoto, 'profile-images', fileName);
-        
-        if (!uploadResult.success) {
-          console.error('Profile photo upload error:', uploadResult.error);
-          throw new Error(uploadResult.error || 'Profile photo upload failed');
+        const { error: uploadError } = await supabase.storage
+          .from('profile-images')
+          .upload(fileName, formData.profilePhoto, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('Profile photo upload error:', uploadError);
+          throw uploadError;
         }
 
-        updateData.profile_photo_url = uploadResult.publicUrl;
-        console.log('Profile photo uploaded successfully:', uploadResult.publicUrl);
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(fileName);
+
+        updateData.profile_photo_url = publicUrl;
+        console.log('Profile photo uploaded successfully:', publicUrl);
       }
 
       // Handle header photo upload
@@ -164,15 +172,24 @@ export const useProfileForm = (
         const fileExt = formData.headerPhoto.name.split('.').pop();
         const fileName = `${userId}/header-${Date.now()}.${fileExt}`;
         
-        const uploadResult = await uploadToR2Only(formData.headerPhoto, 'profile-images', fileName);
-        
-        if (!uploadResult.success) {
-          console.error('Header photo upload error:', uploadResult.error);
-          throw new Error(uploadResult.error || 'Header photo upload failed');
+        const { error: uploadError } = await supabase.storage
+          .from('profile-images')
+          .upload(fileName, formData.headerPhoto, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('Header photo upload error:', uploadError);
+          throw uploadError;
         }
 
-        updateData.header_photo_url = uploadResult.publicUrl;
-        console.log('Header photo uploaded successfully:', uploadResult.publicUrl);
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(fileName);
+
+        updateData.header_photo_url = publicUrl;
+        console.log('Header photo uploaded successfully:', publicUrl);
       }
 
       console.log('Updating profile with data:', updateData);

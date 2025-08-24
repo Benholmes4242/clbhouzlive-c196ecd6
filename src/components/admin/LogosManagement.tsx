@@ -146,8 +146,13 @@ const LogosManagement = () => {
 
   const handleDeleteLogo = async (logo: Logo) => {
     try {
-      // Note: R2 deletion can be implemented later if needed
-      // For now, just remove from database as most platforms don't delete media files
+      // Delete from storage
+      const urlParts = logo.file_url.split('/');
+      const filePath = urlParts.slice(-2).join('/');
+      
+      await supabase.storage
+        .from('logos')
+        .remove([filePath]);
 
       // Delete from database
       const { error } = await supabase

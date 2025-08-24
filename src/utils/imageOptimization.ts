@@ -8,28 +8,14 @@ export const getOptimizedImageUrl = (
   format: string = 'webp'
 ): string => {
   try {
-    // Don't optimize video URLs or streaming URLs
-    if (originalUrl.includes('cloudflarestream.com') || 
-        originalUrl.includes('.m3u8') || 
-        originalUrl.includes('.mp4') || 
-        originalUrl.includes('.mov') ||
-        originalUrl.includes('customer-')) {
-      return originalUrl;
-    }
-
-    // Only optimize R2 image URLs
-    if (!originalUrl.includes('media.clbhouz.co.uk')) {
-      return originalUrl;
-    }
-
     const url = new URL(originalUrl);
     
-    // Add optimization parameters for R2 images only
+    // Add optimization parameters
     if (width) url.searchParams.set('w', width.toString());
     if (height) url.searchParams.set('h', height.toString());
     url.searchParams.set('fit', 'cover');
     url.searchParams.set('q', quality.toString());
-    url.searchParams.set('f', format);
+    url.searchParams.set('f', format); // Use specified format
     
     return url.toString();
   } catch (error) {

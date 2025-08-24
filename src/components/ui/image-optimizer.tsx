@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 interface ImageOptimizerProps {
   src: string;
@@ -52,32 +51,36 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
     return () => observer.disconnect();
   }, [priority]);
 
-  // Use direct URL for R2 and video content
+  // Optimize image URL for faster loading
   const getOptimizedSrc = (url: string) => {
     if (!url) return '';
-    return getDirectImageUrl(url);
+    
+    // If it's a Supabase storage URL, add optimization parameters
+    if (url.includes('supabase') && url.includes('storage')) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}quality=85&resize=contain&width=${width || 600}&format=webp`;
+    }
+    
+    return url;
   };
 
   // Load image when it intersects
   useEffect(() => {
     if (hasIntersected && src) {
       const optimizedSrc = getOptimizedSrc(src);
-      console.log('🖼️ IMAGE OPTIMIZER DEBUG - Starting to load image:', optimizedSrc);
       
       const img = new Image();
       img.onload = () => {
-        console.log('🖼️ IMAGE OPTIMIZER DEBUG - Image loaded successfully:', optimizedSrc);
         setImageSrc(optimizedSrc);
         setIsLoading(false);
       };
-      img.onerror = (error) => {
-        console.error('🖼️ IMAGE OPTIMIZER DEBUG - Image failed to load:', optimizedSrc, error);
+      img.onerror = () => {
         setHasError(true);
         setIsLoading(false);
       };
       img.src = optimizedSrc;
     }
-  }, [hasIntersected, src]);
+  }, [hasIntersected, src, width]);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setHasError(true);

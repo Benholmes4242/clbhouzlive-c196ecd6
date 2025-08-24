@@ -14,9 +14,6 @@ import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
-import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
-// Trigger migration on app start
-import '@/utils/runMigration';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -45,7 +42,6 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 
-
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -65,9 +61,6 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  // Enforce R2-only policy globally
-  useImageUploadSafeguard();
-  
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
@@ -108,7 +101,6 @@ const App: React.FC = () => {
                         <Route path="/achievements" element={<AchievementsPage />} />
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
-                        
                         
                         <Route path="*" element={<NotFound />} />
                       </Routes>

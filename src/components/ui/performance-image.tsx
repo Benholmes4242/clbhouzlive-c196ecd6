@@ -54,15 +54,6 @@ const PerformanceImage: React.FC<PerformanceImageProps> = memo(({
   const getOptimizedImageUrl = (url: string) => {
     if (!url) return '';
     
-    // Don't optimize video URLs or streaming URLs
-    if (url.includes('cloudflarestream.com') || 
-        url.includes('.m3u8') || 
-        url.includes('.mp4') || 
-        url.includes('.mov') ||
-        url.includes('customer-')) {
-      return url;
-    }
-    
     // Optimize Supabase storage URLs
     if (url.includes('supabase') && url.includes('storage')) {
       const separator = url.includes('?') ? '&' : '?';

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { getOptimizedImageUrl, generateResponsiveSizes } from '@/utils/imageOptimization';
 
 interface OptimizedImageProps {
   src: string;
@@ -50,11 +50,13 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
 
   // Generate responsive image sources
   const generateImageSources = (url: string) => {
-    // Use direct URL for R2 and video content - no optimization needed
-    const directUrl = getDirectImageUrl(url);
+    const responsiveSizes = generateResponsiveSizes(width, height);
+    const sources = responsiveSizes.map(size => 
+      `${getOptimizedImageUrl(url, size.width, size.height, quality, format)} ${size.width}w`
+    );
     return {
-      srcSet: '',
-      src: directUrl
+      srcSet: sources.join(', '),
+      src: getOptimizedImageUrl(url, width, height, quality, format)
     };
   };
 

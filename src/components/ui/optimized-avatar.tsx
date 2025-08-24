@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { getDirectImageUrl, isR2Url, isPreviewEnvironment } from '@/utils/r2ImageUtils';
+import { OptimizedImage } from './optimized-image';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
 interface OptimizedAvatarProps {
@@ -19,39 +20,13 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
-  const [showFallback, setShowFallback] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!src) {
-      setImageSrc(null);
-      setShowFallback(true);
-      return;
-    }
-
-    const directUrl = getDirectImageUrl(src);
-    
-    // If it's a placeholder (R2 blocked in preview), show fallback immediately
-    if (directUrl === '/placeholder.svg') {
-      setImageSrc(null);
-      setShowFallback(true);
-      return;
-    }
-    
-    setImageSrc(directUrl);
-    setShowFallback(false);
-  }, [src]);
-
-  const handleImageError = () => {
-    console.warn('Avatar image failed to load:', imageSrc);
-    setShowFallback(true);
-  };
+  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size, priority ? 90 : 85) : null;
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
-      {imageSrc && !showFallback ? (
+      {optimizedSrc ? (
         <AvatarImage 
-          src={imageSrc}
+          src={optimizedSrc}
           alt={alt}
           style={{ 
             width: size, 
@@ -61,7 +36,13 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
           loading={priority ? 'eager' : 'lazy'}
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
-          onError={handleImageError}
+          crossOrigin="anonymous"
+          onLoad={() => {
+            console.log('Avatar loaded successfully:', optimizedSrc);
+          }}
+          onError={(e) => {
+            console.error('Avatar image failed to load:', optimizedSrc, e);
+          }}
         />
       ) : null}
       <AvatarFallback className="bg-primary/10 text-primary text-xs">
