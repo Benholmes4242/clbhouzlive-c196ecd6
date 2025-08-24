@@ -34,11 +34,12 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
   // Generate thumbnail URL for Cloudflare Stream videos
   const getVideoThumbnail = (videoUrl: string) => {
     if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
-      // Extract video ID from Cloudflare Stream URL
-      const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
+      // Extract video ID and customer domain from Cloudflare Stream URL
+      const match = videoUrl.match(/(https:\/\/customer-[a-f0-9]+\.cloudflarestream\.com)\/([a-f0-9]+)\/manifest\/video\.m3u8/);
       if (match) {
-        const videoId = match[1];
-        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+        const customerDomain = match[1];
+        const videoId = match[2];
+        return `${customerDomain}/${videoId}/thumbnails/thumbnail.jpg`;
       }
     }
     return null;
