@@ -131,43 +131,12 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
               </div>
             )
           ) : (
-            <HighQualityImage
+            <img
               src={currentMedia.media_url}
               alt="Post media"
-              className="w-full h-full"
-              width={300}
-              height={300}
+              className="w-full h-full object-cover"
               onError={(e) => {
-                // Fallback to placeholder on image error safely without innerHTML
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const container = target.parentElement;
-                if (container && !container.querySelector('.image-placeholder')) {
-                  container.classList.add('flex', 'items-center', 'justify-center');
-                  
-                  // Create safe placeholder using DOM manipulation
-                  const placeholder = document.createElement('div');
-                  placeholder.className = 'flex flex-col items-center justify-center text-gray-400 image-placeholder';
-                  
-                  // Create SVG element safely
-                  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                  svg.setAttribute('class', 'w-8 h-8 mb-2');
-                  svg.setAttribute('fill', 'currentColor');
-                  svg.setAttribute('viewBox', '0 0 24 24');
-                  
-                  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                  path.setAttribute('d', 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z');
-                  
-                  svg.appendChild(path);
-                  
-                  const span = document.createElement('span');
-                  span.className = 'text-xs';
-                  span.textContent = 'Image';
-                  
-                  placeholder.appendChild(svg);
-                  placeholder.appendChild(span);
-                  container.appendChild(placeholder);
-                }
+                console.log('Image failed to load:', currentMedia.media_url);
               }}
             />
           )}
