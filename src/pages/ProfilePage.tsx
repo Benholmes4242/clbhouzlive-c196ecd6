@@ -102,12 +102,6 @@ const ProfilePage = () => {
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
       
-      {/* CORS Configuration Tool - only show in preview environments */}
-      {window.location.hostname.includes('lovable.dev') && (
-        <div className="p-4">
-          <CorsConfigTool />
-        </div>
-      )}
       
       <BottomNavigation />
     </div>
