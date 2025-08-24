@@ -5,6 +5,7 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { Loader2 } from 'lucide-react';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
+import ImageOptimizer from '@/components/ui/image-optimizer';
 
 interface MediaItem {
   id: string;
@@ -132,21 +133,18 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
           <div className="relative w-full h-full">
             {hasCloudflareThumb ? (
-              <img
+              <ImageOptimizer
                 src={thumbnailUrl}
                 alt={itemTitle || 'Video thumbnail'}
                 className="w-full h-full object-cover"
-                onLoad={() => {
-                  setImageLoading(false);
-                  setMediaLoaded(true);
-                  onImageLoad();
-                }}
                 onError={() => {
                   setImageLoading(false);
                   setMediaLoaded(true);
                   onImageError();
                 }}
-                loading={currentIndex <= 5 ? 'eager' : 'lazy'}
+                width={600}
+                height={800}
+                priority={currentIndex <= 5}
               />
             ) : (
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
@@ -178,24 +176,18 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         )
       ) : (
         <div className="relative w-full h-full">
-          <img
+          <ImageOptimizer
             src={isInvalidSrc ? fallbackImage : media.media_url}
             alt={itemTitle || 'Content'}
             className="w-full h-full object-cover"
-            onLoad={() => {
-              setImageLoading(false);
-              setMediaLoaded(true);
-              onImageLoad();
-            }}
-            onError={(e) => {
+            onError={() => {
               setImageLoading(false);
               setMediaLoaded(true);
               onImageError();
             }}
-            onLoadStart={() => {
-              setImageLoading(true);
-            }}
-            loading={currentIndex <= 5 ? 'eager' : 'lazy'}
+            width={600}
+            height={800}
+            priority={currentIndex <= 5}
           />
         </div>
       )}
