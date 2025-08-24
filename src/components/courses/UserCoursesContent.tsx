@@ -294,18 +294,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
       {/* Trophy Progress Section and Regional Completion Section removed */}
 
-      <div className="flex flex-col gap-4">
-        {/* CoursesControls component now handles all filtering and sorting */}
-        <CoursesControls
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          viewType={viewType}
-          onViewTypeChange={setViewType}
-        />
-      </div>
-
       {/* Netflix-style layout */}
       <div className="space-y-8">
         {isLoadingTop100 || !isHydrated ? (
@@ -332,6 +320,18 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
             
             {/* Traditional view toggle (keeping existing functionality) */}
             <div className="mt-12 pt-8 border-t border-border">
+              {/* CoursesControls component now handles all filtering and sorting */}
+              <div className="flex flex-col gap-4 mb-6">
+                <CoursesControls
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                  viewType={viewType}
+                  onViewTypeChange={setViewType}
+                />
+              </div>
+              
               <h3 className="text-lg font-semibold mb-4 text-foreground">
                 {finalIsOwnProfile ? 'All My Courses' : `All ${finalDisplayName}'s Courses`}
               </h3>
