@@ -585,8 +585,11 @@
 }
 
 /* Enhanced aurora animation for 300+ courses */
+/* Enhanced aurora animation for 300+ courses */
 .aurora-theme {
   animation: aurora-glow 4s ease-in-out infinite alternate;
+}
+
 /* Netflix-style course cards responsive styling */
 .netflix-course-card {
   /* Mobile (≤ 430px wide): show ~1.15 cards at a time */
