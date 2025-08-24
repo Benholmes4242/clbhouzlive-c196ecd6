@@ -6,6 +6,7 @@ import SecuritySettingsCard from './settings/SecuritySettingsCard';
 import FeatureFlagsCard from './settings/FeatureFlagsCard';
 import MaintenanceModeCard from './settings/MaintenanceModeCard';
 import VideoMigrationTool from './VideoMigrationTool';
+import { ManualVideoMigration } from './ManualVideoMigration';
 
 const AdminSettings = () => {
   return (
@@ -29,7 +30,10 @@ const AdminSettings = () => {
           <h3 className="text-lg font-semibold mb-2">Migration Tools</h3>
           <p className="text-sm text-muted-foreground">Tools for migrating and fixing media files</p>
         </div>
-        <VideoMigrationTool />
+        <div className="grid gap-6 md:grid-cols-2">
+          <VideoMigrationTool />
+          <ManualVideoMigration />
+        </div>
       </div>
     </div>
   );
