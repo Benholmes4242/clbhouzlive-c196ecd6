@@ -79,6 +79,13 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       const golfCourse = course.golf_courses || course;
       let region = 'Worldwide'; // Default
       
+      // Debug logging
+      console.log('Course data:', {
+        courseName: golfCourse.name,
+        country: golfCourse.country,
+        fullCourse: golfCourse
+      });
+      
       if (golfCourse.country) {
         // Group by regions
         if (['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'].includes(golfCourse.country)) {
@@ -90,12 +97,16 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         }
       }
       
+      console.log(`Course ${golfCourse.name} assigned to region: ${region}`);
+      
       if (!acc[region]) {
         acc[region] = [];
       }
       acc[region].push(course);
       return acc;
     }, {} as Record<string, any[]>);
+
+    console.log('Final regional grouping:', coursesByRegion);
 
     // Add regional rows if we have courses
     const regionOrder = ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
