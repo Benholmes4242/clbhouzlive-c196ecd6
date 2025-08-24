@@ -44,6 +44,7 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const MigrationPage = lazy(() => import("./pages/MigrationPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -107,6 +108,7 @@ const App: React.FC = () => {
                         <Route path="/achievements" element={<AchievementsPage />} />
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
+                        <Route path="/migration" element={<MigrationPage />} />
                         
                         <Route path="*" element={<NotFound />} />
                       </Routes>
