@@ -78,8 +78,8 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     // If it's a Supabase storage URL, we can add optimization parameters
     if (directUrl.includes('supabase') && directUrl.includes('storage')) {
       const separator = directUrl.includes('?') ? '&' : '?';
-      // Use 4K high quality settings
-      const optimizedUrl = `${directUrl}${separator}quality=95&resize=contain&width=${width || 2160}&height=${height || 2160}&format=webp`;
+      // Use maximum quality settings to avoid graininess
+      const optimizedUrl = `${directUrl}${separator}quality=100&width=${width || 2160}&height=${height || 2160}`;
       return optimizedUrl;
     }
     
@@ -104,7 +104,6 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
           imageRendering: 'auto',
           backfaceVisibility: 'hidden',
           transform: 'translateZ(0)',
-          filter: 'contrast(1.1) saturate(1.1) brightness(1.05)',
           WebkitFontSmoothing: 'antialiased',
           MozOsxFontSmoothing: 'grayscale',
           maxWidth: '100%'
