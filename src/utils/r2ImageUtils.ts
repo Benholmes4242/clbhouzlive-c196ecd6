@@ -20,10 +20,8 @@ export const getDirectImageUrl = (url: string): string => {
     return url;
   }
   
-  // For R2 URLs, test if accessible in current environment
+  // For R2 URLs, return as-is - let browsers handle CORS
   if (isR2Url(url)) {
-    // In production or when CORS allows, return original URL
-    // In preview environments, we may need to handle CORS restrictions
     return url;
   }
   

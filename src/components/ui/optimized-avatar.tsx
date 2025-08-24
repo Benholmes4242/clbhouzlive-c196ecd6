@@ -36,7 +36,9 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   }, [src]);
 
   const handleImageError = () => {
-    console.warn('Avatar image failed to load:', imageSrc);
+    if (isR2Url(imageSrc || '')) {
+      console.warn('R2 image CORS blocked in preview environment:', imageSrc);
+    }
     setHasError(true);
   };
 
