@@ -49,7 +49,7 @@ serve(async (req) => {
     let cursor: string | undefined;
     
     do {
-      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}` : '?max-keys=1000'}`;
+      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}&max-keys=1000` : '?max-keys=1000&include-http-metadata=true'}`;
       
       console.log(`📋 Listing R2 objects with URL: ${listUrl}`);
       
@@ -67,7 +67,7 @@ serve(async (req) => {
 
       const listData = await listResponse.json();
       console.log(`📋 Listed ${listData.result?.length || 0} objects, truncated: ${listData.result_info?.truncated}`);
-      console.log(`📋 Sample objects:`, listData.result?.slice(0, 3).map((obj: any) => obj.key));
+      console.log(`📋 Sample objects:`, listData.result?.slice(0, 5).map((obj: any) => ({ key: obj.key, size: obj.size })));
       
       if (listData.result && listData.result.length > 0) {
         allObjects.push(...listData.result);
@@ -77,11 +77,12 @@ serve(async (req) => {
       }
     } while (cursor);
 
-    // Filter for video files (handle nested folders)
+    // Filter for video files (handle nested folders, especially post-media/)
     const videoObjects = allObjects.filter((obj: any) => {
       const name = obj.key.toLowerCase();
       const isVideo = name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
-      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}`);
+      const isInPostMedia = name.startsWith('post-media/');
+      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}, inPostMedia: ${isInPostMedia}, size: ${obj.size || 'unknown'}`);
       return isVideo;
     });
 
