@@ -21,31 +21,38 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
   const getRankBadges = () => {
     const badges = [];
     
-    if (course.global_rank && course.global_rank <= 100) {
-      badges.push({
-        type: 'global',
-        rank: course.global_rank,
-        icon: Trophy,
-        label: 'Global'
-      });
-    }
-    
+    // Regional rank with abbreviation
     if (course.regional_rank && course.regional_rank <= 100) {
+      let regionAbbrev = 'GLOBAL';
+      
+      // Map country/region to abbreviation
+      if (course.country) {
+        if (['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'].includes(course.country)) {
+          regionAbbrev = 'GB&I';
+        } else if (['Germany', 'France', 'Spain', 'Italy', 'Portugal', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Belgium', 'Austria', 'Switzerland'].includes(course.country)) {
+          regionAbbrev = 'EUR';
+        } else if (['United States', 'USA'].includes(course.country)) {
+          regionAbbrev = 'USA';
+        } else {
+          regionAbbrev = 'WORLD';
+        }
+      }
+      
       badges.push({
         type: 'regional',
         rank: course.regional_rank,
         icon: MapPin,
-        label: 'Regional'
+        label: `${regionAbbrev} ${course.regional_rank}`
       });
     }
     
-    // Mock community rank for demo
-    if (course.community_rank) {
+    // Global rank (only if no regional rank or if it's different)
+    if (course.global_rank && course.global_rank <= 100 && !course.regional_rank) {
       badges.push({
-        type: 'community',
-        rank: course.community_rank,
-        icon: Users,
-        label: 'Community'
+        type: 'global',
+        rank: course.global_rank,
+        icon: Trophy,
+        label: `GLOBAL ${course.global_rank}`
       });
     }
     
@@ -160,10 +167,17 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
                     return (
                       <div 
                         key={`${badge.type}-${index}`}
-                        className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/20"
+                        className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/20 shadow-lg"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.6)',
+                          backdropFilter: 'blur(10px)',
+                          WebkitBackdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        }}
                       >
                         <IconComponent className="w-3 h-3" />
-                        <span className={`${textSizing.badge} font-medium`}>#{badge.rank}</span>
+                        <span className={`${textSizing.badge} font-medium`}>{badge.label}</span>
                       </div>
                     );
                   })}
@@ -171,7 +185,16 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
               )}
               
               {/* XP earned */}
-              <div className="bg-primary/80 backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20">
+              <div 
+                className="bg-primary/80 backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20 shadow-lg"
+                style={{
+                  background: 'rgba(var(--primary), 0.8)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                }}
+              >
                 <span className={`${textSizing.xp} text-white drop-shadow`}>+250 XP</span>
               </div>
             </div>
