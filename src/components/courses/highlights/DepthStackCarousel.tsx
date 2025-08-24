@@ -179,7 +179,7 @@ const VideoCard: React.FC<{
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-square rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      className="relative aspect-[4/3] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
