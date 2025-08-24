@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import NetflixCourseRow from './NetflixCourseRow';
+import NetflixHeroBanner from './NetflixHeroBanner';
 
 interface NetflixCoursesLayoutProps {
   allCourses: any[];
@@ -35,7 +36,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
   }, []);
 
   // Organize courses into different rows
-  const courseRows = useMemo(() => {
+  const coursesData = useMemo(() => {
     const rows: { title: string; courses: any[]; size: 'large' | 'medium'; hasHeroBanner?: boolean; isRegionalSection?: boolean; regionData?: Record<string, any[]>; regionOrder?: string[]; }[] = [];
 
     // Recently Played (last 10 courses by date)
@@ -69,6 +70,9 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         hasHeroBanner: true
       });
     }
+
+    // Hero Banner Course (featured course from highest rated)
+    const heroCourse = highRatedCourses.length > 0 ? highRatedCourses[0] : null;
 
     // Courses by Region (Row 3) - Group courses by region
     const coursesByRegion = allCourses.reduce((acc, course) => {
@@ -157,12 +161,16 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       });
     }
 
-    return rows;
+    return { rows, heroCourse };
   }, [allCourses, isOwnProfile, displayName]);
+
+  const { rows: courseRows, heroCourse } = coursesData;
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-8">
       {courseRows.map((row, index) => {
+        // Add hero banner after Recently Played row
+        const showHeroBanner = index === 1 && heroCourse;
         // Handle regional section specially
         if (row.isRegionalSection && row.regionData && row.regionOrder) {
           return (
@@ -198,16 +206,27 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         
         // Regular rows
         return (
-          <NetflixCourseRow
-            key={`${row.title}-${index}`}
-            title={row.title}
-            courses={row.courses}
-            onCourseClick={onCourseClick}
-            getUserRating={getUserRating}
-            size={row.size}
-            hasHeroBanner={row.hasHeroBanner}
-            onRegionClick={handleRegionClick}
-          />
+          <React.Fragment key={`${row.title}-${index}`}>
+            <NetflixCourseRow
+              title={row.title}
+              courses={row.courses}
+              onCourseClick={onCourseClick}
+              getUserRating={getUserRating}
+              size={row.size}
+              hasHeroBanner={row.hasHeroBanner}
+              onRegionClick={handleRegionClick}
+            />
+            
+            {/* Hero Banner after first row */}
+            {showHeroBanner && (
+              <div className="my-8">
+                <NetflixHeroBanner
+                  course={heroCourse}
+                  onClick={onCourseClick}
+                />
+              </div>
+            )}
+          </React.Fragment>
         );
       })}
     </div>
