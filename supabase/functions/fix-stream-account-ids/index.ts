@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const correctAccountId = 'a1b264d44ddbe2b5127bb6ff5c274108';
+    const correctAccountId = '4ah4gni80ytefpck';
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -27,7 +27,7 @@ serve(async (req) => {
 
     // Wrong account IDs found in the database
     const wrongAccountIds = [
-      '4ah4gni80ytefpck'
+      'a1b264d44ddbe2b5127bb6ff5c274108'
     ];
 
     // Update post_media table
