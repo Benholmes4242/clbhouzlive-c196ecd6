@@ -15,6 +15,8 @@ import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
+// Trigger migration on app start
+import '@/utils/runMigration';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
