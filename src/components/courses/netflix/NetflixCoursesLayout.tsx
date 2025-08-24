@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import NetflixCourseRow from './NetflixCourseRow';
 
 interface NetflixCoursesLayoutProps {
@@ -21,6 +21,18 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     );
     return userCourse?.rating || null;
   };
+
+  // Handle region navigation with smooth scrolling
+  const handleRegionClick = useCallback((region: string) => {
+    const regionElement = document.getElementById(`region-${region.toLowerCase().replace(/\s+/g, '-').replace('&', 'and')}`);
+    if (regionElement) {
+      regionElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
+  }, []);
 
   // Organize courses into different rows
   const courseRows = useMemo(() => {
@@ -167,14 +179,16 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
                   if (!regionCourses || regionCourses.length === 0) return null;
                   
                   return (
-                    <NetflixCourseRow
-                      key={`region-${region}`}
-                      title={region}
-                      courses={regionCourses}
-                      onCourseClick={onCourseClick}
-                      getUserRating={getUserRating}
-                      size="medium"
-                    />
+                    <div key={`region-${region}`} id={`region-${region.toLowerCase().replace(/\s+/g, '-').replace('&', 'and')}`}>
+                      <NetflixCourseRow
+                        title={region}
+                        courses={regionCourses}
+                        onCourseClick={onCourseClick}
+                        getUserRating={getUserRating}
+                        size="medium"
+                        onRegionClick={handleRegionClick}
+                      />
+                    </div>
                   );
                 })}
               </div>
@@ -192,6 +206,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
             getUserRating={getUserRating}
             size={row.size}
             hasHeroBanner={row.hasHeroBanner}
+            onRegionClick={handleRegionClick}
           />
         );
       })}

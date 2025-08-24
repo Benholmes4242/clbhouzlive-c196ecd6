@@ -82,10 +82,10 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
   if (isHeroBanner) {
     return (
       <div 
-        className={`relative group cursor-pointer hover:scale-[1.01] ${className}`}
+        className={`relative group cursor-pointer hover:scale-[1.005] transition-all duration-500 ease-out ${className}`}
         onClick={onClick}
       >
-        <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden bg-muted shadow-xl shadow-black/30">
+        <div className="relative w-full aspect-[16/9] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden bg-muted shadow-2xl shadow-black/40">
           {/* Course image */}
           {course.thumbnail_image ? (
             <img
@@ -96,27 +96,34 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-              <span className="text-muted-foreground">No image</span>
+              <span className="text-muted-foreground text-lg">No image</span>
             </div>
           )}
           
-          {/* Enhanced gradient for hero banner */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          {/* Enhanced cinematic gradient for hero banner */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 80%, transparent 100%)'
+            }}
+          />
           
           {/* Hero content */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
-            <h2 className="text-2xl md:text-4xl font-bold mb-2 leading-tight">
-              {course.name}
-            </h2>
-            <p className="text-lg md:text-xl italic opacity-90 leading-relaxed">
-              "{course.description || course.tagline || "An exceptional golfing experience"}"
-            </p>
-            {userRating && (
-              <div className="mt-4 flex items-center gap-2">
-                <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                <span className="text-xl font-bold">{userRating}</span>
-              </div>
-            )}
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-12 text-white">
+            <div className="max-w-4xl">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight drop-shadow-2xl">
+                {course.name}
+              </h1>
+              <p className="text-lg md:text-2xl lg:text-3xl italic opacity-95 leading-relaxed drop-shadow-lg font-light">
+                "{course.description || course.tagline || course.heritage || "An exceptional golfing experience"}"
+              </p>
+              {userRating && (
+                <div className="mt-6 flex items-center gap-3">
+                  <Star className="w-7 h-7 md:w-8 md:h-8 fill-yellow-400 text-yellow-400 drop-shadow" />
+                  <span className="text-2xl md:text-3xl font-bold drop-shadow-lg">{userRating}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -186,16 +193,16 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
               
               {/* XP earned */}
               <div 
-                className="bg-primary/80 backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20 shadow-lg"
+                className="backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20 shadow-lg"
                 style={{
-                  background: 'rgba(var(--primary), 0.8)',
+                  background: 'rgba(247, 147, 30, 0.9)', // Clbhouz orange
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                 }}
               >
-                <span className={`${textSizing.xp} text-white drop-shadow`}>+250 XP</span>
+                <span className={`${textSizing.xp} text-white drop-shadow font-semibold`}>+250 XP</span>
               </div>
             </div>
             

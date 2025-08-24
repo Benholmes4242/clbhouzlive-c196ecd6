@@ -4,6 +4,10 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+interface RegionClickHandler {
+  (region: string): void;
+}
+
 interface NetflixCourseRowProps {
   title: string;
   courses: any[];
@@ -11,6 +15,7 @@ interface NetflixCourseRowProps {
   getUserRating?: (courseId: string) => number | null;
   size?: 'large' | 'medium';
   hasHeroBanner?: boolean;
+  onRegionClick?: RegionClickHandler;
 }
 
 const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
@@ -19,7 +24,8 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   onCourseClick,
   getUserRating,
   size = 'medium',
-  hasHeroBanner = false
+  hasHeroBanner = false,
+  onRegionClick
 }) => {
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(courses.length);
 
@@ -44,6 +50,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
               isFirstRow ? 'hover:scale-110' : 'hover:scale-105'
             }`}
+            style={{
+              background: isFirstRow ? 'rgba(247, 147, 30, 0.8)' : 'rgba(0, 0, 0, 0.5)'
+            }}
             onClick={() => scroll('left')}
           >
             <ChevronLeft className="w-5 h-5" />
@@ -58,6 +67,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
               isFirstRow ? 'hover:scale-110' : 'hover:scale-105'
             }`}
+            style={{
+              background: isFirstRow ? 'rgba(247, 147, 30, 0.8)' : 'rgba(0, 0, 0, 0.5)'
+            }}
             onClick={() => scroll('right')}
           >
             <ChevronRight className="w-5 h-5" />
@@ -75,6 +87,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
+            scrollBehavior: 'smooth'
           }}
         >
           {/* Hero Banner (if this row has one) */}
