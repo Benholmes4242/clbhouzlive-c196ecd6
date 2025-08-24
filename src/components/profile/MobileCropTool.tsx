@@ -34,18 +34,18 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const dragStartRef = useRef({ x: 0, y: 0 });
   
   const [cropData, setCropData] = useState<CropData>(
-    initialCrop || { x: 30, y: 20, width: 40, height: 55 } // Taller aspect ratio for mobile header
+    initialCrop || { x: 25, y: 25, width: 50, height: 66.67 } // 3:4 aspect ratio
   );
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // Calculate crop box dimensions maintaining mobile header aspect ratio (more square/tall)
+  // Calculate crop box dimensions maintaining 3:4 aspect ratio
   const calculateCropDimensions = useCallback((containerWidth: number) => {
-    const maxWidth = Math.min(containerWidth * 0.6, 200); // Smaller width for more accurate mobile view
+    const maxWidth = Math.min(containerWidth * 0.8, 300);
     const width = maxWidth;
-    const height = width * 1.3; // Taller aspect ratio to match mobile header display
+    const height = width * (4/3); // 3:4 aspect ratio
     return { width, height };
   }, []);
 
@@ -61,11 +61,11 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     // Calculate the crop dimensions
     const { width: cropWidth, height: cropHeight } = calculateCropDimensions(containerRect.width);
     
-    // Center the crop box and ensure values are within 0-100% range
-    const x = Math.max(0, Math.min(100, 50 - (cropWidth / containerRect.width * 100) / 2));
-    const y = Math.max(0, Math.min(100, 50 - (cropHeight / containerRect.height * 100) / 2));
-    const width = Math.max(10, Math.min(100, (cropWidth / containerRect.width) * 100));
-    const height = Math.max(10, Math.min(100, (cropHeight / containerRect.height) * 100));
+    // Center the crop box
+    const x = 50 - (cropWidth / containerRect.width * 100) / 2;
+    const y = 50 - (cropHeight / containerRect.height * 100) / 2;
+    const width = (cropWidth / containerRect.width) * 100;
+    const height = (cropHeight / containerRect.height) * 100;
     
     setCropData({ x, y, width, height });
   }, [calculateCropDimensions]);
@@ -179,18 +179,13 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     onSave(cropData);
   };
 
-  // Generate preview style to show exact crop area
+  // Generate preview style
   const getPreviewStyle = () => {
     if (!imageLoaded) return {};
     
-    // Use object-fit cover with object-position to match the crop area
-    // This creates a more accurate preview by using CSS positioning
-    const centerX = cropData.x + (cropData.width / 2);
-    const centerY = cropData.y + (cropData.height / 2);
-    
     return {
-      objectPosition: `${centerX}% ${centerY}%`,
-      objectFit: 'cover' as const,
+      objectPosition: `${cropData.x + cropData.width/2}% ${cropData.y + cropData.height/2}%`,
+      transform: `scale(${100/cropData.width * 0.6})`, // Zoom to show the cropped area
     };
   };
 
@@ -266,7 +261,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
             <div className="mt-4 text-sm text-muted-foreground space-y-1 text-center">
               <p>• Drag to reposition the crop area</p>
               <p>• Use mouse wheel to zoom in/out</p>
-              <p>• The crop maintains a taller aspect ratio for mobile header</p>
+              <p>• The crop maintains a 3:4 aspect ratio for mobile</p>
             </div>
           </div>
           
