@@ -87,7 +87,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 muted={true}
                 loop={true}
                 className="w-full h-full"
-                enableHLS={true}
+                enableHLS={currentMedia.media_url.includes('cloudflarestream.com') || currentMedia.media_url.includes('.m3u8')}
                 onClick={handleClick}
               />
             ) : (
