@@ -62,13 +62,16 @@ export const getMobileCropTransform = (profile: ProfileCropData | null): string 
     return 'scale(1)';
   }
   
-  // Calculate scale to zoom into the crop area
-  // This should match what the crop tool preview shows
+  // Calculate scale and translate to match crop area
   const scaleX = 100 / mobile_crop_width;
   const scaleY = 100 / mobile_crop_height;
-  const scale = Math.min(scaleX, scaleY); // Use minimum to ensure it fits
+  const scale = Math.max(scaleX, scaleY); // Use max to fill the container
   
-  return `scale(${scale})`;
+  // Calculate translate to position the cropped area
+  const translateX = -mobile_crop_x * scale;
+  const translateY = -mobile_crop_y * scale;
+  
+  return `translate(${translateX}%, ${translateY}%) scale(${scale})`;
 };
 
 /**

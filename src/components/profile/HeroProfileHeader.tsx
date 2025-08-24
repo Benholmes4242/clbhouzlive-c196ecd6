@@ -604,10 +604,9 @@ const HeroProfileHeader = ({
                 alt={profile?.display_name || 'Profile'}
                 className="w-full h-full object-cover transition-opacity duration-300"
                 style={{ 
-                  objectPosition: getMobileCropPosition(profile),
                   objectFit: 'cover',
-                  transform: getMobileCropTransform(profile), // Apply mobile crop transform
-                  transformOrigin: 'center center'
+                  transform: getMobileCropTransform(profile),
+                  transformOrigin: getMobileCropPosition(profile)
                 }}
                 onLoad={(e) => {
                   // Hide loading state once image loads sharply
