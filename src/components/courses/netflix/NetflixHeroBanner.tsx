@@ -85,6 +85,18 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
 
   const phrase = getFamousPhrase(golfCourse.name, golfCourse.country);
 
+  // Debug logging for image data
+  console.log('Hero Banner Course Data:', {
+    courseName: golfCourse.name,
+    thumbnail_url: golfCourse.thumbnail_url,
+    image_url: golfCourse.image_url,
+    thumbnail_image: golfCourse.thumbnail_image,
+    fullCourseData: golfCourse
+  });
+
+  const imageUrl = golfCourse.thumbnail_url || golfCourse.image_url || golfCourse.thumbnail_image || '/placeholder.svg';
+  console.log('Final image URL:', imageUrl);
+
   return (
     <div 
       className={`relative w-full h-40 md:h-48 lg:h-56 rounded-2xl overflow-hidden cursor-pointer group ${className}`}
@@ -94,7 +106,7 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
       <div 
         className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
         style={{
-          backgroundImage: `url(${golfCourse.thumbnail_url || golfCourse.image_url || '/placeholder.svg'})`
+          backgroundImage: `url(${imageUrl})`
         }}
       />
       
