@@ -39,21 +39,3 @@ verify_jwt = true
 
 [functions.generate-progress-motivation]
 verify_jwt = false
-
-[functions.migrate-supabase-videos-to-stream]
-verify_jwt = true
-
-[functions.migrate-videos-r2-to-stream]
-verify_jwt = true
-
-[functions.migrate-media-to-cloudflare]
-verify_jwt = true
-
-[functions.update-database-urls-to-stream]
-verify_jwt = true
-
-[functions.update-media-urls-to-r2]
-verify_jwt = true
-
-[functions.update-video-references]
-verify_jwt = true
