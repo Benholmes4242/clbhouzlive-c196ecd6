@@ -261,11 +261,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   
                   {/* Achievement info below ring - with text wrapping */}
                   <div className="mt-4 text-center max-w-[200px]">
-                    <div className="text-lg text-foreground mb-2">
+                    <div className="text-lg text-foreground">
                       {achievement.title}
-                    </div>
-                    <div className="text-xs text-muted-foreground leading-relaxed">
-                      {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}% complete) Adventure awaits!`}
                     </div>
                   </div>
                 </div>
@@ -434,11 +431,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     
                     {/* Achievement info */}
                     <div className="mt-3 text-center max-w-[140px]">
-                      <div className="text-base text-foreground mb-1">
+                      <div className="text-base text-foreground">
                         {achievement.title}
-                      </div>
-                      <div className="text-sm text-muted-foreground leading-relaxed">
-                        {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}%) Adventure awaits!`}
                       </div>
                     </div>
                   </div>
