@@ -81,10 +81,14 @@ Deno.serve(async (req) => {
       try {
         console.log(`Processing bucket: ${bucket}`);
         
-        // List all files in the bucket
+        // List all files in the bucket (including subdirectories)
         const { data: files, error: listError } = await supabase.storage
           .from(bucket)
-          .list('', { limit: 1000, sortBy: { column: 'name', order: 'asc' } });
+          .list('', { 
+            limit: 1000, 
+            sortBy: { column: 'name', order: 'asc' },
+            search: ''
+          });
 
         if (listError) {
           progress.errors.push(`Error listing files in ${bucket}: ${listError.message}`);
@@ -112,7 +116,16 @@ Deno.serve(async (req) => {
               .download(file.name);
 
             if (downloadError) {
-              bucketResult.errors.push(`Download error for ${file.name}: ${downloadError.message}`);
+              const errorDetails = downloadError.message || JSON.stringify(downloadError) || 'Unknown download error';
+              bucketResult.errors.push(`Download error for ${file.name}: ${errorDetails}`);
+              console.error(`Failed to download ${file.name} from ${bucket}:`, downloadError);
+              progress.processedFiles++;
+              continue;
+            }
+
+            // Check if file actually has content
+            if (!fileData || fileData.size === 0) {
+              bucketResult.errors.push(`Empty file or no data for ${file.name}`);
               progress.processedFiles++;
               continue;
             }

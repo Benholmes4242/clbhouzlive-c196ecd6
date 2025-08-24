@@ -71,7 +71,7 @@ export const ImageMigrationTool = () => {
       </div>
 
       <div className="space-y-4">
-        {!completed && (
+        <div className="space-y-2">
           <Button 
             onClick={startMigration} 
             disabled={isRunning}
@@ -86,11 +86,17 @@ export const ImageMigrationTool = () => {
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
-                Start Migration
+                {completed ? 'Run Migration Again' : 'Start Migration'}
               </>
             )}
           </Button>
-        )}
+          
+          {completed && (
+            <p className="text-sm text-muted-foreground text-center">
+              Re-run to attempt migration of remaining files
+            </p>
+          )}
+        </div>
 
         {completed && (
           <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
