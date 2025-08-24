@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -100,6 +101,13 @@ const ProfilePage = () => {
       />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
+      
+      {/* CORS Configuration Tool - only show in preview environments */}
+      {window.location.hostname.includes('lovable.dev') && (
+        <div className="p-4">
+          <CorsConfigTool />
+        </div>
+      )}
       
       <BottomNavigation />
     </div>
