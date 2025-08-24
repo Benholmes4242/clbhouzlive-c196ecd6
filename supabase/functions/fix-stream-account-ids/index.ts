@@ -55,11 +55,11 @@ serve(async (req) => {
     console.log('🔄 Finding all Stream URLs in database...');
     const allStreamUrls: {table: string, id: string, url: string}[] = [];
     
-    // Get from post_media
+    // Get from post_media (both Stream and R2 URLs)
     const { data: postMedia, error: postError } = await supabase
       .from('post_media')
       .select('id, media_url')
-      .like('media_url', '%cloudflarestream.com%');
+      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
     
     if (postError) {
       errors.push(`Error fetching post_media: ${postError.message}`);
@@ -69,11 +69,11 @@ serve(async (req) => {
       });
     }
 
-    // Get from profile_media
+    // Get from profile_media (both Stream and R2 URLs)
     const { data: profileMedia, error: profileError } = await supabase
       .from('profile_media')
       .select('id, media_url')
-      .like('media_url', '%cloudflarestream.com%');
+      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
     
     if (profileError) {
       errors.push(`Error fetching profile_media: ${profileError.message}`);
@@ -83,11 +83,11 @@ serve(async (req) => {
       });
     }
 
-    // Get from course_review_media
+    // Get from course_review_media (both Stream and R2 URLs)
     const { data: courseMedia, error: courseError } = await supabase
       .from('course_review_media')
       .select('id, media_url')
-      .like('media_url', '%cloudflarestream.com%');
+      .or('media_url.like.%cloudflarestream.com%,media_url.like.%media.clbhouz.co.uk%');
     
     if (courseError) {
       errors.push(`Error fetching course_review_media: ${courseError.message}`);
@@ -103,35 +103,59 @@ serve(async (req) => {
     for (const dbItem of allStreamUrls) {
       let correctStreamUrl = null;
       
-      // Extract video ID from current URL
-      const videoIdMatch = dbItem.url.match(/\/([a-f0-9]{32})\//);
-      if (!videoIdMatch) continue;
-      
-      const currentVideoId = videoIdMatch[1];
-      
-      // Find matching video in Stream
-      const streamVideo = streamVideos.find((video: any) => video.uid === currentVideoId);
-      
-      if (streamVideo) {
-        // Use the correct manifest URL
-        correctStreamUrl = `https://customer-${correctAccountId}.cloudflarestream.com/${streamVideo.uid}/manifest/video.m3u8`;
+      if (dbItem.url.includes('cloudflarestream.com')) {
+        // Handle existing Stream URLs - extract video ID
+        const videoIdMatch = dbItem.url.match(/\/([a-f0-9]{32})\//);
+        if (!videoIdMatch) continue;
         
-        if (dbItem.url !== correctStreamUrl) {
-          console.log(`🔄 Updating ${dbItem.table}:${dbItem.id} -> ${correctStreamUrl}`);
-          
-          const { error: updateError } = await supabase
-            .from(dbItem.table)
-            .update({ media_url: correctStreamUrl })
-            .eq('id', dbItem.id);
-          
-          if (updateError) {
-            errors.push(`Failed to update ${dbItem.table} ${dbItem.id}: ${updateError.message}`);
-          } else {
-            updateCount++;
-          }
+        const currentVideoId = videoIdMatch[1];
+        
+        // Find matching video in Stream
+        const streamVideo = streamVideos.find((video: any) => video.uid === currentVideoId);
+        
+        if (streamVideo) {
+          // Use the correct manifest URL
+          correctStreamUrl = `https://customer-${correctAccountId}.cloudflarestream.com/${streamVideo.uid}/manifest/video.m3u8`;
         }
-      } else {
-        console.log(`⚠️ Video ${currentVideoId} not found in Stream - skipping`);
+      } else if (dbItem.url.includes('media.clbhouz.co.uk')) {
+        // Handle R2 URLs - extract filename and map to Stream video
+        const filename = dbItem.url.split('/').pop();
+        if (!filename) continue;
+        
+        // Find Stream video by filename in metadata
+        const streamVideo = streamVideos.find((video: any) => {
+          // Check if filename matches the original filename stored in meta
+          if (video.meta?.name === filename) return true;
+          
+          // Also check for partial matches (some files might have been renamed)
+          const baseFilename = filename.replace(/\.[^/.]+$/, ""); // Remove extension
+          if (video.meta?.name && video.meta.name.includes(baseFilename)) return true;
+          
+          return false;
+        });
+        
+        if (streamVideo) {
+          correctStreamUrl = `https://customer-${correctAccountId}.cloudflarestream.com/${streamVideo.uid}/manifest/video.m3u8`;
+          console.log(`🔄 Mapping R2 file ${filename} to Stream video ${streamVideo.uid}`);
+        } else {
+          console.log(`⚠️ No Stream video found for R2 file: ${filename}`);
+          continue;
+        }
+      }
+      
+      if (correctStreamUrl && dbItem.url !== correctStreamUrl) {
+        console.log(`🔄 Updating ${dbItem.table}:${dbItem.id} -> ${correctStreamUrl}`);
+        
+        const { error: updateError } = await supabase
+          .from(dbItem.table)
+          .update({ media_url: correctStreamUrl })
+          .eq('id', dbItem.id);
+        
+        if (updateError) {
+          errors.push(`Failed to update ${dbItem.table} ${dbItem.id}: ${updateError.message}`);
+        } else {
+          updateCount++;
+        }
       }
     }
 
