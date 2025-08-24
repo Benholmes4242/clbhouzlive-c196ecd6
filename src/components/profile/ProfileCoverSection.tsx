@@ -4,6 +4,8 @@ import { Camera, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 interface ProfileCoverSectionProps {
   coverImageUrl?: string | null;
@@ -19,6 +21,7 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useSupabaseSession();
+  const { toast } = useToast();
 
   const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -28,24 +31,21 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `cover_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
 
-      // Upload to Supabase storage
-      const { error: uploadError } = await supabase.storage
-        .from('profile-backgrounds')
-        .upload(filePath, file);
+      // Upload to R2 only
+      const uploadResult = await uploadToR2Only(file, 'profile-backgrounds', fileName);
 
-      if (uploadError) {
-        console.error('Error uploading cover image:', uploadError);
+      if (!uploadResult.success) {
+        console.error('Error uploading cover image:', uploadResult.error);
+        toast({
+          title: "Upload failed",
+          description: uploadResult.error || "Failed to upload cover image",
+          variant: "destructive"
+        });
         return;
       }
 
-      // Get public URL
-      const { data } = supabase.storage
-        .from('profile-backgrounds')
-        .getPublicUrl(filePath);
-
-      const publicUrl = data.publicUrl;
+      const publicUrl = uploadResult.publicUrl;
 
       // Update user profile with new cover photo URL
       const { error: updateError } = await supabase

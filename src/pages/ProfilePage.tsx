@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -100,6 +101,7 @@ const ProfilePage = () => {
       />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
+      
       
       <BottomNavigation />
     </div>

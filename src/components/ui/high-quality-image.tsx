@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 interface HighQualityImageProps {
   src: string;
@@ -42,17 +43,29 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     }
   };
 
-  // Generate optimized image URL if it's from Supabase storage
+  // Generate optimized image URL using the centralized utility
   const getOptimizedImageUrl = (url: string) => {
+    // First apply R2/CORS handling
+    const directUrl = getDirectImageUrl(url);
+    
+    // Don't optimize video URLs or streaming URLs
+    if (directUrl.includes('cloudflarestream.com') || 
+        directUrl.includes('.m3u8') || 
+        directUrl.includes('.mp4') || 
+        directUrl.includes('.mov') ||
+        directUrl.includes('customer-')) {
+      return directUrl;
+    }
+    
     // If it's a Supabase storage URL, we can add optimization parameters
-    if (url.includes('supabase') && url.includes('storage')) {
-      const separator = url.includes('?') ? '&' : '?';
+    if (directUrl.includes('supabase') && directUrl.includes('storage')) {
+      const separator = directUrl.includes('?') ? '&' : '?';
       // Optimize for fast loading with reasonable quality
-      const optimizedUrl = `${url}${separator}quality=75&resize=contain&width=${width || 400}&height=${height || 400}&format=webp`;
+      const optimizedUrl = `${directUrl}${separator}quality=75&resize=contain&width=${width || 400}&height=${height || 400}&format=webp`;
       return optimizedUrl;
     }
     
-    return url;
+    return directUrl;
   };
 
   const optimizedSrc = getOptimizedImageUrl(imageSrc);

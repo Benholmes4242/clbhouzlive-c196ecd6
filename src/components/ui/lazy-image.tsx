@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 interface LazyImageProps {
   src: string;
@@ -23,7 +23,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
   onClick,
   priority = false,
 }) => {
-  const optimizedSrc = getOptimizedImageUrl(src, width, height);
+  // Use direct URL for R2 and video content
+  const optimizedSrc = getDirectImageUrl(src);
   const [imageSrc, setImageSrc] = useState<string>(priority ? optimizedSrc : ''); // Show optimized image for priority
   const [isLoading, setIsLoading] = useState(false); // Start without loading state
   const [hasError, setHasError] = useState(false);
@@ -55,13 +56,16 @@ const LazyImage: React.FC<LazyImageProps> = ({
   // Load the actual image when it intersects or is priority
   useEffect(() => {
     if ((hasIntersected || priority) && optimizedSrc && !imageSrc && !hasError) {
+      console.log('🖼️ LAZY IMAGE DEBUG - Starting to load image:', optimizedSrc);
       setIsLoading(true);
       const img = new Image();
       img.onload = () => {
+        console.log('🖼️ LAZY IMAGE DEBUG - Image loaded successfully:', optimizedSrc);
         setImageSrc(optimizedSrc);
         setIsLoading(false);
       };
-      img.onerror = () => {
+      img.onerror = (error) => {
+        console.error('🖼️ LAZY IMAGE DEBUG - Image failed to load:', optimizedSrc, error);
         setHasError(true);
         setIsLoading(false);
       };

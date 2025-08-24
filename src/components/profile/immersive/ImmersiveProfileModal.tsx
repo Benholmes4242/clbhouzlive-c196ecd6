@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import ImmersiveIdentityDock from './ImmersiveIdentityDock';
-// import { useR2Upload } from '@/hooks/useR2Upload';
+import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 
 interface MediaItem {
   id: string;
@@ -230,7 +230,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           item.id === tempId ? { ...item, uploadProgress: 75 } : item
         ));
       } else {
-        // For images, simulate progress and use a simple upload
+        // For images, simulate progress and use R2 upload
         setLocalMediaItems(prev => prev.map(item => 
           item.id === tempId ? { ...item, uploadProgress: 50 } : item
         ));
@@ -238,23 +238,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         // Create form data for image upload
         const fileName = `${userId}/${Date.now()}-${file.name}`;
         
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('profile-media')
-          .upload(fileName, file);
+        uploadResult = await uploadToR2Only(file, 'profile-media', fileName);
           
-        if (uploadError) {
-          console.error('Storage upload error:', uploadError);
-          throw uploadError;
+        if (!uploadResult.success) {
+          console.error('R2 upload error:', uploadResult.error);
+          throw new Error(uploadResult.error || 'Upload failed');
         }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('profile-media')
-          .getPublicUrl(uploadData.path);
-          
-        uploadResult = {
-          success: true,
-          url: publicUrl
-        };
         
         // Update progress to 100%
         setLocalMediaItems(prev => prev.map(item => 
