@@ -14,6 +14,7 @@ import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
+import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -61,6 +62,9 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  // Enforce R2-only policy globally
+  useImageUploadSafeguard();
+  
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
