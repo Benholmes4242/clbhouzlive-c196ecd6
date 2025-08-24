@@ -24,7 +24,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
 
   // Organize courses into different rows
   const courseRows = useMemo(() => {
-    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; hasHeroBanner?: boolean; }[] = [];
+    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; hasHeroBanner?: boolean; isRegionalSection?: boolean; regionData?: Record<string, any[]>; regionOrder?: string[]; }[] = [];
 
     // Recently Played (last 10 courses by date)
     const recentCourses = [...allCourses]
@@ -55,6 +55,44 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         courses: highRatedCourses,
         size: 'medium' as const,
         hasHeroBanner: true
+      });
+    }
+
+    // Courses by Region (Row 3) - Group courses by region
+    const coursesByRegion = allCourses.reduce((acc, course) => {
+      const golfCourse = course.golf_courses || course;
+      let region = 'Worldwide'; // Default
+      
+      if (golfCourse.country) {
+        // Group by regions
+        if (['United Kingdom', 'Ireland', 'Scotland', 'England', 'Wales', 'Northern Ireland'].includes(golfCourse.country)) {
+          region = 'Great Britain & Ireland';
+        } else if (['Germany', 'France', 'Spain', 'Italy', 'Portugal', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Belgium', 'Austria', 'Switzerland'].includes(golfCourse.country)) {
+          region = 'Europe';
+        } else if (['United States', 'USA'].includes(golfCourse.country)) {
+          region = 'USA';
+        }
+      }
+      
+      if (!acc[region]) {
+        acc[region] = [];
+      }
+      acc[region].push(course);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    // Add regional rows if we have courses
+    const regionOrder = ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
+    const hasRegionalCourses = Object.keys(coursesByRegion).some(region => coursesByRegion[region].length > 0);
+    
+    if (hasRegionalCourses) {
+      rows.push({
+        title: "Courses by Region",
+        courses: [], // This will be handled specially
+        size: 'medium' as const,
+        isRegionalSection: true,
+        regionData: coursesByRegion,
+        regionOrder
       });
     }
 
@@ -112,17 +150,51 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-8">
-      {courseRows.map((row, index) => (
-        <NetflixCourseRow
-          key={`${row.title}-${index}`}
-          title={row.title}
-          courses={row.courses}
-          onCourseClick={onCourseClick}
-          getUserRating={getUserRating}
-          size={row.size}
-          hasHeroBanner={row.hasHeroBanner}
-        />
-      ))}
+      {courseRows.map((row, index) => {
+        // Handle regional section specially
+        if (row.isRegionalSection && row.regionData && row.regionOrder) {
+          return (
+            <div key={`${row.title}-${index}`} className="mb-4 md:mb-6 lg:mb-8">
+              {/* Main section title */}
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3 px-4 md:px-0">
+                {row.title}
+              </h2>
+              
+              {/* Regional mini-rows */}
+              <div className="space-y-4 md:space-y-6">
+                {row.regionOrder.map((region) => {
+                  const regionCourses = row.regionData![region];
+                  if (!regionCourses || regionCourses.length === 0) return null;
+                  
+                  return (
+                    <NetflixCourseRow
+                      key={`region-${region}`}
+                      title={region}
+                      courses={regionCourses}
+                      onCourseClick={onCourseClick}
+                      getUserRating={getUserRating}
+                      size="medium"
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        
+        // Regular rows
+        return (
+          <NetflixCourseRow
+            key={`${row.title}-${index}`}
+            title={row.title}
+            courses={row.courses}
+            onCourseClick={onCourseClick}
+            getUserRating={getUserRating}
+            size={row.size}
+            hasHeroBanner={row.hasHeroBanner}
+          />
+        );
+      })}
     </div>
   );
 };
