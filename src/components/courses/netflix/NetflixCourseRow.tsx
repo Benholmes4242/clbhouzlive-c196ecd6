@@ -10,6 +10,7 @@ interface NetflixCourseRowProps {
   onCourseClick?: (course: any) => void;
   getUserRating?: (courseId: string) => number | null;
   size?: 'large' | 'medium';
+  hasHeroBanner?: boolean;
 }
 
 const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
@@ -17,7 +18,8 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   courses,
   onCourseClick,
   getUserRating,
-  size = 'medium'
+  size = 'medium',
+  hasHeroBanner = false
 }) => {
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(courses.length);
 
@@ -75,7 +77,21 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             msOverflowStyle: 'none',
           }}
         >
-          {courses.map((course, index) => {
+          {/* Hero Banner (if this row has one) */}
+          {hasHeroBanner && courses.length > 0 && (
+            <div className="mb-6">
+              <NetflixCourseCard
+                course={courses[0].golf_courses || courses[0]}
+                userRating={getUserRating ? getUserRating(courses[0].course_id || courses[0].id) : courses[0].rating}
+                className="w-full"
+                onClick={() => onCourseClick?.(courses[0].golf_courses || courses[0])}
+                isHeroBanner={true}
+              />
+            </div>
+          )}
+          
+          {/* Regular course cards */}
+          {courses.slice(hasHeroBanner ? 1 : 0).map((course, index) => {
             // Responsive width classes based on size and breakpoints
             const widthClasses = size === 'large' 
               ? 'flex-shrink-0 w-[82vw] sm:w-[45%] md:w-[32%] lg:w-[31%] snap-start'  // Large cards

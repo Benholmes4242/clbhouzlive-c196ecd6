@@ -24,7 +24,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
 
   // Organize courses into different rows
   const courseRows = useMemo(() => {
-    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; }[] = [];
+    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; hasHeroBanner?: boolean; }[] = [];
 
     // Recently Played (last 10 courses by date)
     const recentCourses = [...allCourses]
@@ -43,7 +43,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       });
     }
 
-    // Highest Rated (courses with ratings 8+)
+    // Highest Rated (courses with ratings 8+) - Row 2 with Hero Banner
     const highRatedCourses = allCourses
       .filter(course => course.rating && course.rating >= 8)
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
@@ -51,9 +51,10 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
 
     if (highRatedCourses.length > 0) {
       rows.push({
-        title: isOwnProfile ? "My Highest Rated" : `${displayName}'s Highest Rated`,
+        title: isOwnProfile ? "Top 10 Rated by You" : `Top 10 Rated by ${displayName}`,
         courses: highRatedCourses,
-        size: 'medium' as const
+        size: 'medium' as const,
+        hasHeroBanner: true
       });
     }
 
@@ -119,6 +120,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
           onCourseClick={onCourseClick}
           getUserRating={getUserRating}
           size={row.size}
+          hasHeroBanner={row.hasHeroBanner}
         />
       ))}
     </div>
