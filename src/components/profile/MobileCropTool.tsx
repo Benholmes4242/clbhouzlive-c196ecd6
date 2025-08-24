@@ -34,7 +34,7 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
   const dragStartRef = useRef({ x: 0, y: 0 });
   
   const [cropData, setCropData] = useState<CropData>(
-    initialCrop || { x: 25, y: 25, width: 50, height: 66.67 } // 3:4 aspect ratio
+    initialCrop || { x: 25, y: 25, width: 50, height: 67 } // 3:4 aspect ratio, clamped to max 100%
   );
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -61,11 +61,11 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     // Calculate the crop dimensions
     const { width: cropWidth, height: cropHeight } = calculateCropDimensions(containerRect.width);
     
-    // Center the crop box
-    const x = 50 - (cropWidth / containerRect.width * 100) / 2;
-    const y = 50 - (cropHeight / containerRect.height * 100) / 2;
-    const width = (cropWidth / containerRect.width) * 100;
-    const height = (cropHeight / containerRect.height) * 100;
+    // Center the crop box and ensure values are within 0-100% range
+    const x = Math.max(0, Math.min(100, 50 - (cropWidth / containerRect.width * 100) / 2));
+    const y = Math.max(0, Math.min(100, 50 - (cropHeight / containerRect.height * 100) / 2));
+    const width = Math.max(10, Math.min(100, (cropWidth / containerRect.width) * 100));
+    const height = Math.max(10, Math.min(100, (cropHeight / containerRect.height) * 100));
     
     setCropData({ x, y, width, height });
   }, [calculateCropDimensions]);
