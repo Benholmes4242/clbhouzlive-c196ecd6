@@ -47,18 +47,23 @@ serve(async (req) => {
     console.log(`🔑 R2 Token present: ${!!cloudflareR2Token}`);
     console.log(`🎥 Stream Token present: ${!!cloudflareStreamToken}`);
 
-    // R2 uses S3-compatible API, not the Cloudflare v4 API
-    const r2Endpoint = `https://${cloudflareAccountId}.r2.cloudflarestorage.com`;
-    console.log(`🌐 Using R2 endpoint: ${r2Endpoint}`);
-
-    // List all objects in R2 bucket using S3 ListObjects API
+    // Use the correct Cloudflare REST API for R2
     let allObjects: any[] = [];
-    let continuationToken: string | undefined;
+    let cursor: string | undefined;
     let pageCount = 0;
     
     do {
       pageCount++;
-      const listUrl = `${r2Endpoint}/clbhouz-media?list-type=2&max-keys=1000${continuationToken ? `&continuation-token=${continuationToken}` : ''}`;
+      let listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects`;
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('per_page', '1000');
+      if (cursor) {
+        params.append('cursor', cursor);
+      }
+      
+      listUrl += '?' + params.toString();
       
       console.log(`📋 Page ${pageCount} - Listing R2 objects with URL: ${listUrl}`);
       
@@ -66,7 +71,7 @@ serve(async (req) => {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${cloudflareR2Token}`,
-          'Content-Type': 'application/xml',
+          'Content-Type': 'application/json',
         },
       });
 
@@ -78,36 +83,44 @@ serve(async (req) => {
         throw new Error(`Failed to list R2 objects: ${listResponse.status} ${errorText}`);
       }
 
-      const responseText = await listResponse.text();
-      console.log(`📋 Raw XML response (first 500 chars):`, responseText.substring(0, 500));
+      const listData = await listResponse.json();
+      console.log(`📋 Raw response structure:`, {
+        success: listData.success,
+        resultCount: listData.result?.length || 0,
+        hasErrors: !!listData.errors,
+        hasResultInfo: !!listData.result_info
+      });
       
-      // Parse XML response (basic parsing)
-      const keyMatches = responseText.match(/<Key>(.*?)<\/Key>/g);
-      const objects = keyMatches ? keyMatches.map(match => ({
-        key: match.replace(/<\/?Key>/g, '')
-      })) : [];
+      if (!listData.success) {
+        console.error('❌ API returned success=false:', listData.errors);
+        throw new Error(`R2 API error: ${JSON.stringify(listData.errors)}`);
+      }
       
+      const objects = listData.result || [];
       console.log(`📋 Page ${pageCount} found ${objects.length} objects`);
       
       if (objects.length > 0) {
-        console.log(`📋 First 3 objects:`, objects.slice(0, 3));
+        console.log(`📋 First 3 objects:`, objects.slice(0, 3).map((obj: any) => ({ 
+          key: obj.key, 
+          size: obj.size,
+          etag: obj.etag 
+        })));
         allObjects.push(...objects);
         
-        // Check for truncation
-        const isTruncated = responseText.includes('<IsTruncated>true</IsTruncated>');
-        const nextToken = responseText.match(/<NextContinuationToken>(.*?)<\/NextContinuationToken>/);
-        continuationToken = isTruncated && nextToken ? nextToken[1] : undefined;
+        // Check for pagination info
+        cursor = listData.result_info?.cursor;
+        console.log(`📋 Next cursor: ${cursor}`);
       } else {
         console.log(`📋 No objects in this page`);
         break;
       }
       
       // Safety check
-      if (pageCount > 10) {
+      if (pageCount > 20) {
         console.log(`⚠️ Stopping after ${pageCount} pages to prevent infinite loop`);
         break;
       }
-    } while (continuationToken);
+    } while (cursor);
 
     console.log(`📊 Total objects found across all pages: ${allObjects.length}`);
 
@@ -137,8 +150,8 @@ serve(async (req) => {
       try {
         console.log(`🔄 Processing video: ${videoObj.key}`);
         
-        // Download video from R2 using S3-compatible endpoint
-        const downloadUrl = `${r2Endpoint}/clbhouz-media/${videoObj.key}`;
+        // Download video from R2 using Cloudflare REST API
+        const downloadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${encodeURIComponent(videoObj.key)}`;
         
         const downloadResponse = await fetch(downloadUrl, {
           headers: {
@@ -202,8 +215,8 @@ serve(async (req) => {
         const oldR2Url = `https://media.clbhouz.co.uk/${videoObj.key}`;
         await updateDatabaseVideoReferences(supabase, oldR2Url, streamUrl);
 
-        // Delete from R2 using S3-compatible endpoint
-        const deleteUrl = `${r2Endpoint}/clbhouz-media/${videoObj.key}`;
+        // Delete from R2 using Cloudflare REST API
+        const deleteUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${encodeURIComponent(videoObj.key)}`;
         
         const deleteResponse = await fetch(deleteUrl, {
           method: 'DELETE',
