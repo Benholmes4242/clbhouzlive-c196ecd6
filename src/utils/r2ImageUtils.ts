@@ -29,13 +29,8 @@ export const getDirectImageUrl = (url: string): string => {
     return url;
   }
   
-  // In preview environments, R2 images are blocked by CORS
-  // Use placeholder for R2 images, allow Supabase storage
-  if (isPreviewEnvironment() && isR2Url(url)) {
-    return '/placeholder.svg';
-  }
-  
-  // For other URLs (including Supabase storage), return as-is
+  // R2 CORS is now configured, so R2 images should load in preview
+  // Return all URLs as-is (including R2 and Supabase storage)
   return url;
 };
 
