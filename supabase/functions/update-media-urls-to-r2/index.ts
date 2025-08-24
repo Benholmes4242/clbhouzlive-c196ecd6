@@ -77,8 +77,8 @@ Deno.serve(async (req) => {
     console.log('Updating user_profiles table...')
     const { data: profilesData, error: profilesError } = await supabaseClient
       .from('user_profiles')
-      .select('id, profile_photo_url, cover_image_url, logo_url')
-      .or('profile_photo_url.like.%supabase%,cover_image_url.like.%supabase%,logo_url.like.%supabase%')
+      .select('id, profile_photo_url, cover_photo_url, logo_url')
+      .or('profile_photo_url.like.%supabase%,cover_photo_url.like.%supabase%,logo_url.like.%supabase%')
 
     if (profilesError) {
       throw profilesError
@@ -91,8 +91,8 @@ Deno.serve(async (req) => {
         updates.profile_photo_url = convertToR2Url(row.profile_photo_url)
       }
       
-      if (row.cover_image_url?.includes('supabase')) {
-        updates.cover_image_url = convertToR2Url(row.cover_image_url)
+      if (row.cover_photo_url?.includes('supabase')) {
+        updates.cover_photo_url = convertToR2Url(row.cover_photo_url)
       }
       
       if (row.logo_url?.includes('supabase')) {
