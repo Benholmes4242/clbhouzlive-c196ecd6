@@ -19,6 +19,7 @@ import Top100Progress from './Top100Progress';
 import TrophyProgressSection from './TrophyProgressSection';
 import RegionalCompletionSection from './RegionalCompletionSection';
 import CoursesControls from '@/components/profile/CoursesControls';
+import NetflixCoursesLayout from './netflix/NetflixCoursesLayout';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -305,7 +306,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         />
       </div>
 
-      <div className="space-y-4">
+      {/* Netflix-style layout */}
+      <div className="space-y-8">
         {isLoadingTop100 || !isHydrated ? (
           <div className="text-center py-8">
             <div className="flex flex-col items-center gap-2">
@@ -316,37 +318,57 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
             </div>
           </div>
         ) : filteredCourses.length > 0 ? (
-          viewType === 'cards' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredCourses.map((userCourse) => (
-                <CourseCard 
-                  key={userCourse.id} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
+          <>
+            {/* Netflix-style rows */}
+            <NetflixCoursesLayout
+              allCourses={filteredCourses}
+              isOwnProfile={finalIsOwnProfile}
+              displayName={finalDisplayName}
+              onCourseClick={(course) => {
+                // Handle course click if needed
+                console.log('Course clicked:', course);
+              }}
+            />
+            
+            {/* Traditional view toggle (keeping existing functionality) */}
+            <div className="mt-12 pt-8 border-t border-border">
+              <h3 className="text-lg font-semibold mb-4 text-foreground">
+                {finalIsOwnProfile ? 'All My Courses' : `All ${finalDisplayName}'s Courses`}
+              </h3>
+              
+              {viewType === 'cards' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredCourses.map((userCourse) => (
+                    <CourseCard 
+                      key={userCourse.id} 
+                      course={userCourse.golf_courses}
+                      viewingUserId={targetUserId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!finalIsOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {filteredCourses.map((userCourse) => (
+                    <CourseListItem
+                      key={userCourse.id}
+                      course={userCourse.golf_courses}
+                      viewingUserId={targetUserId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!finalIsOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {filteredCourses.map((userCourse) => (
-                <CourseListItem
-                  key={userCourse.id}
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              ))}
-            </div>
-          )
+          </>
         ) : activeFilter ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
