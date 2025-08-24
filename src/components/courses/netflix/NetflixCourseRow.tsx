@@ -9,13 +9,15 @@ interface NetflixCourseRowProps {
   courses: any[];
   onCourseClick?: (course: any) => void;
   getUserRating?: (courseId: string) => number | null;
+  size?: 'large' | 'medium';
 }
 
 const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   title,
   courses,
   onCourseClick,
-  getUserRating
+  getUserRating,
+  size = 'medium'
 }) => {
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(courses.length);
 
@@ -57,21 +59,33 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {/* Scrollable course cards */}
         <div
           ref={carouselRef}
-          className="flex gap-2 md:gap-4 overflow-x-auto scrollbar-hide px-4 md:px-0"
+          className={`flex overflow-x-auto scrollbar-hide px-4 md:px-0 ${
+            size === 'large' 
+              ? 'gap-3 sm:gap-4 md:gap-5 lg:gap-6' 
+              : 'gap-3 sm:gap-4 md:gap-5 lg:gap-6'
+          }`}
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
           }}
         >
-          {courses.map((course, index) => (
-            <NetflixCourseCard
-              key={`${course.course_id || course.id}-${index}`}
-              course={course.golf_courses || course}
-              userRating={getUserRating ? getUserRating(course.course_id || course.id) : course.rating}
-              className="flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[280px] md:w-[300px] lg:w-[320px]"
-              onClick={() => onCourseClick?.(course.golf_courses || course)}
-            />
-          ))}
+          {courses.map((course, index) => {
+            // Responsive width classes based on size and breakpoints
+            const widthClasses = size === 'large' 
+              ? 'flex-shrink-0 w-[82vw] sm:w-[45%] md:w-[32%] lg:w-[31%]'  // Large cards
+              : 'flex-shrink-0 w-[77vw] sm:w-[41%] md:w-[29%] lg:w-[28%]';   // Medium cards
+            
+            return (
+              <NetflixCourseCard
+                key={`${course.course_id || course.id}-${index}`}
+                course={course.golf_courses || course}
+                userRating={getUserRating ? getUserRating(course.course_id || course.id) : course.rating}
+                className={widthClasses}
+                onClick={() => onCourseClick?.(course.golf_courses || course)}
+                size={size}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
 
   // Organize courses into different rows
   const courseRows = useMemo(() => {
-    const rows: { title: string; courses: any[]; }[] = [];
+    const rows: { title: string; courses: any[]; size: 'large' | 'medium'; }[] = [];
 
     // Recently Played (last 10 courses by date)
     const recentCourses = [...allCourses]
@@ -38,7 +38,8 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     if (recentCourses.length > 0) {
       rows.push({
         title: "Recently Played",
-        courses: recentCourses
+        courses: recentCourses,
+        size: 'large' as const
       });
     }
 
@@ -51,7 +52,8 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     if (highRatedCourses.length > 0) {
       rows.push({
         title: isOwnProfile ? "My Highest Rated" : `${displayName}'s Highest Rated`,
-        courses: highRatedCourses
+        courses: highRatedCourses,
+        size: 'medium' as const
       });
     }
 
@@ -73,7 +75,8 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     if (top100Courses.length > 0) {
       rows.push({
         title: isOwnProfile ? "My Top 100 Courses" : `${displayName}'s Top 100 Courses`,
-        courses: top100Courses
+        courses: top100Courses,
+        size: 'medium' as const
       });
     }
 
@@ -98,7 +101,8 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
     if (remainingCourses.length > 0) {
       rows.push({
         title: isOwnProfile ? "All My Courses" : `All ${displayName}'s Courses`,
-        courses: remainingCourses
+        courses: remainingCourses,
+        size: 'medium' as const
       });
     }
 
@@ -114,6 +118,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
           courses={row.courses}
           onCourseClick={onCourseClick}
           getUserRating={getUserRating}
+          size={row.size}
         />
       ))}
     </div>
