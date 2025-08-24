@@ -36,6 +36,21 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.log('🔴 IMAGE ERROR - Failed to load:', {
+      src: imageSrc,
+      optimizedSrc: getOptimizedImageUrl(imageSrc),
+      width,
+      height,
+      error: e
+    });
+    
+    // Try fallback to original URL if optimization failed
+    if (imageSrc !== src && !hasError) {
+      console.log('🔄 IMAGE ERROR - Trying fallback to original URL:', src);
+      setImageSrc(src);
+      return;
+    }
+    
     setHasError(true);
     setIsLoading(false);
     if (onError) {
