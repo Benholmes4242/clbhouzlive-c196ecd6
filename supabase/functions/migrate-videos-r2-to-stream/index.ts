@@ -47,60 +47,67 @@ serve(async (req) => {
     console.log(`🔑 R2 Token present: ${!!cloudflareR2Token}`);
     console.log(`🎥 Stream Token present: ${!!cloudflareStreamToken}`);
 
-    // List all objects in R2 bucket to find video files
+    // R2 uses S3-compatible API, not the Cloudflare v4 API
+    const r2Endpoint = `https://${cloudflareAccountId}.r2.cloudflarestorage.com`;
+    console.log(`🌐 Using R2 endpoint: ${r2Endpoint}`);
+
+    // List all objects in R2 bucket using S3 ListObjects API
     let allObjects: any[] = [];
-    let cursor: string | undefined;
+    let continuationToken: string | undefined;
     let pageCount = 0;
     
     do {
       pageCount++;
-      const listUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects${cursor ? `?cursor=${cursor}&max-keys=1000` : '?max-keys=1000'}`;
+      const listUrl = `${r2Endpoint}/clbhouz-media?list-type=2&max-keys=1000${continuationToken ? `&continuation-token=${continuationToken}` : ''}`;
       
       console.log(`📋 Page ${pageCount} - Listing R2 objects with URL: ${listUrl}`);
       
       const listResponse = await fetch(listUrl, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${cloudflareR2Token}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/xml',
         },
       });
 
       console.log(`📋 Response status: ${listResponse.status} ${listResponse.statusText}`);
-      console.log(`📋 Response headers:`, Object.fromEntries(listResponse.headers.entries()));
 
       if (!listResponse.ok) {
         const errorText = await listResponse.text();
         console.error('❌ R2 list error response:', errorText);
-        console.error(`❌ R2 list error status: ${listResponse.status}`);
         throw new Error(`Failed to list R2 objects: ${listResponse.status} ${errorText}`);
       }
 
-      const listData = await listResponse.json();
-      console.log(`📋 Raw response:`, JSON.stringify(listData, null, 2));
-      console.log(`📋 Page ${pageCount} listed ${listData.result?.length || 0} objects`);
-      console.log(`📋 Truncated: ${listData.result_info?.truncated}`);
-      console.log(`📋 Cursor: ${listData.result_info?.cursor}`);
+      const responseText = await listResponse.text();
+      console.log(`📋 Raw XML response (first 500 chars):`, responseText.substring(0, 500));
       
-      if (listData.result && listData.result.length > 0) {
-        console.log(`📋 First 3 objects:`, listData.result.slice(0, 3).map((obj: any) => ({ 
-          key: obj.key, 
-          size: obj.size,
-          etag: obj.etag,
-          lastModified: obj.last_modified 
-        })));
-        allObjects.push(...listData.result);
-        cursor = listData.result_info?.truncated ? listData.result_info?.cursor : undefined;
+      // Parse XML response (basic parsing)
+      const keyMatches = responseText.match(/<Key>(.*?)<\/Key>/g);
+      const objects = keyMatches ? keyMatches.map(match => ({
+        key: match.replace(/<\/?Key>/g, '')
+      })) : [];
+      
+      console.log(`📋 Page ${pageCount} found ${objects.length} objects`);
+      
+      if (objects.length > 0) {
+        console.log(`📋 First 3 objects:`, objects.slice(0, 3));
+        allObjects.push(...objects);
+        
+        // Check for truncation
+        const isTruncated = responseText.includes('<IsTruncated>true</IsTruncated>');
+        const nextToken = responseText.match(/<NextContinuationToken>(.*?)<\/NextContinuationToken>/);
+        continuationToken = isTruncated && nextToken ? nextToken[1] : undefined;
       } else {
         console.log(`📋 No objects in this page`);
         break;
       }
       
-      // Safety check to prevent infinite loops
-      if (pageCount > 100) {
+      // Safety check
+      if (pageCount > 10) {
         console.log(`⚠️ Stopping after ${pageCount} pages to prevent infinite loop`);
         break;
       }
-    } while (cursor);
+    } while (continuationToken);
 
     console.log(`📊 Total objects found across all pages: ${allObjects.length}`);
 
@@ -109,7 +116,7 @@ serve(async (req) => {
       const name = obj.key.toLowerCase();
       const isVideo = name.match(/\.(mov|mp4|avi|mkv|webm|m4v)$/);
       const isInPostMedia = name.startsWith('post-media/');
-      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}, inPostMedia: ${isInPostMedia}, size: ${obj.size || 'unknown'}`);
+      console.log(`🔍 Checking object: ${obj.key}, isVideo: ${!!isVideo}, inPostMedia: ${isInPostMedia}`);
       return isVideo;
     });
 
@@ -130,8 +137,8 @@ serve(async (req) => {
       try {
         console.log(`🔄 Processing video: ${videoObj.key}`);
         
-        // Download video from R2
-        const downloadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${videoObj.key}`;
+        // Download video from R2 using S3-compatible endpoint
+        const downloadUrl = `${r2Endpoint}/clbhouz-media/${videoObj.key}`;
         
         const downloadResponse = await fetch(downloadUrl, {
           headers: {
@@ -195,8 +202,8 @@ serve(async (req) => {
         const oldR2Url = `https://media.clbhouz.co.uk/${videoObj.key}`;
         await updateDatabaseVideoReferences(supabase, oldR2Url, streamUrl);
 
-        // Delete from R2
-        const deleteUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${videoObj.key}`;
+        // Delete from R2 using S3-compatible endpoint
+        const deleteUrl = `${r2Endpoint}/clbhouz-media/${videoObj.key}`;
         
         const deleteResponse = await fetch(deleteUrl, {
           method: 'DELETE',
