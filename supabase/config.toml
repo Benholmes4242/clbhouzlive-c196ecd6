@@ -22,6 +22,9 @@ verify_jwt = true
 [functions.migrate-media-to-cloudflare]
 verify_jwt = true
 
+[functions.migrate-all-images-to-r2]
+verify_jwt = true
+
 [functions.validate-site-access]
 verify_jwt = false
 
