@@ -18,7 +18,7 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
   const sizeClasses = {
     sm: 'w-4 h-3',
     md: 'w-6 h-4',
-    lg: 'w-8 h-6'
+    lg: 'w-9 h-6'
   };
 
   // Use flag-icons CSS library approach with inline SVG data
