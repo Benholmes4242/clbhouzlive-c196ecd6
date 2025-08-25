@@ -210,7 +210,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black font-semibold leading-none">
+                            <div className="text-2xl text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
@@ -229,7 +229,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black font-semibold leading-none">
+                            <div className="text-2xl text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
@@ -248,7 +248,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black font-semibold leading-none">
+                            <div className="text-2xl text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
@@ -267,7 +267,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black font-semibold leading-none">
+                            <div className="text-2xl text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
@@ -278,7 +278,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         </div>
                       ) : (
                         <>
-                          <div className="text-2xl text-black font-semibold leading-none">
+                          <div className="text-2xl text-black leading-none">
                             <span>{progress.played}</span>
                             <span className="text-black/60"> / {progress.total}</span>
                           </div>
@@ -892,7 +892,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-foreground">
+          <h3 className="text-3xl text-foreground">
             Top 10 Rated by You
           </h3>
           <div className="flex gap-2">
@@ -901,7 +901,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 focus:outline-none focus:ring-0 focus:border-0"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -910,7 +910,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 focus:outline-none focus:ring-0 focus:border-0"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
