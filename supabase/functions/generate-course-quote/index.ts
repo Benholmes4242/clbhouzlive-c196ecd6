@@ -34,11 +34,11 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a golf course expert who creates inspiring, poetic, and memorable quotes about famous golf courses. Create short, elegant quotes (8-12 words max) that capture the essence, beauty, or character of each specific golf course. Each quote should be unique and reflect the course\'s distinctive features, history, or setting. Examples: "Where golf dreams come to life", "The greatest meeting of land and sea", "A masterpiece carved by nature", "Golf perfection on hallowed ground".' 
+            content: 'You are a golf course expert with deep knowledge of famous golf courses worldwide. For each course, create a unique, poetic quote (8-12 words) that captures what makes that SPECIFIC course legendary. Consider the course\'s: signature holes, dramatic landscapes, historical moments, architectural features, and unique challenges. Examples: "Where the ocean meets golfing perfection" (Pebble Beach), "Links golf at its most sublime" (St. Andrews), "Drama carved into coastal cliffs" (for clifftop courses). Be specific to each course\'s identity.' 
           },
           { 
             role: 'user', 
-            content: `Create a unique, inspiring quote specifically for ${courseName} golf course${country ? ` in ${country}` : ''}. Research what makes this specific course special (its location, design, history, or unique features) and create a memorable, poetic quote that captures its distinctive character. Avoid generic golf quotes and make it specific to this course.` 
+            content: `Create a distinctive quote for "${courseName}"${country ? ` in ${country}` : ''}. Think about what golfers and experts say about this specific course - its signature features, famous holes, setting, or what makes it stand out from other courses. Create a poetic quote that only applies to THIS course, not generic golf language.` 
           }
         ],
         max_tokens: 60,
