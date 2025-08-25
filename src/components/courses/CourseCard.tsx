@@ -77,6 +77,29 @@ const formatLocation = (course: Course) => {
   return parts.join(', ');
 };
 
+// Helper function to get the actual country name from course data
+const getActualCountry = (course: Course) => {
+  // If sub_country exists, use it as it's likely the actual country
+  if (course.sub_country) {
+    return course.sub_country;
+  }
+  
+  // If country is a region, try to derive actual country
+  if (course.country === 'Britain & Ireland') {
+    // For Britain & Ireland, we'd need more specific logic
+    // For now, return the region as fallback
+    return course.region || course.country;
+  }
+  
+  if (course.country === 'Continental Europe') {
+    // For Continental Europe, prefer region or fallback to country
+    return course.region || course.country;
+  }
+  
+  // For other cases (like USA), return the country as is
+  return course.country;
+};
+
 const CourseCard: React.FC<CourseCardProps> = ({ 
   course, 
   viewContext = 'global', 
@@ -152,10 +175,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {showCountryWithFlag ? (
               <>
                 <CountryFlag 
-                  country={course.country} 
+                  country={getActualCountry(course)} 
                   className="h-5 w-5 mr-2 flex-shrink-0" 
                 />
-                <span>{course.country}</span>
+                <span className="flex items-center">{getActualCountry(course)}</span>
               </>
             ) : (
               <>
