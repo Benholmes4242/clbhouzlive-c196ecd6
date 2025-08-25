@@ -20,7 +20,6 @@ import TrophyProgressSection from './TrophyProgressSection';
 import RegionalCompletionSection from './RegionalCompletionSection';
 import CoursesControls from '@/components/profile/CoursesControls';
 import NetflixCoursesLayout from './netflix/NetflixCoursesLayout';
-import TopRatedCarousel from './TopRatedCarousel';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -273,20 +272,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
-  // Get top 10 highest rated courses for carousel
-  const topRatedCourses = useMemo(() => {
-    return allPlayedCourses
-      .filter(course => course.rating !== null && course.rating !== undefined)
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 10);
-  }, [allPlayedCourses]);
-
-  // Helper function to get user rating
-  const getUserRating = (courseId: string) => {
-    const course = allPlayedCourses.find(c => c.course_id === courseId || c.golf_courses?.id === courseId);
-    return course?.rating || null;
-  };
-
   // Calculate total completed Top 100 courses (with global or regional rankings)
   const top100CompletedCount = useMemo(() => {
     return allPlayedCourses.filter((userCourse) => {
@@ -322,18 +307,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           </div>
         ) : filteredCourses.length > 0 ? (
           <>
-            {/* Top 10 Rated by You Carousel */}
-            {topRatedCourses.length > 0 && (
-              <div className="mb-8">
-                <TopRatedCarousel
-                  courses={topRatedCourses}
-                  isOwnProfile={finalIsOwnProfile}
-                  displayName={finalDisplayName}
-                  getUserRating={getUserRating}
-                />
-              </div>
-            )}
-
             {/* Netflix-style rows */}
             <NetflixCoursesLayout
               allCourses={filteredCourses}
