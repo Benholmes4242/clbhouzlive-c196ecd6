@@ -31,7 +31,7 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
     <img
       src={getFlagImageUrl(flagCode)}
       alt={`${country} flag`}
-      className={`inline-block ${sizeClasses[size]} ${className} rounded-sm object-cover border border-gray-200`}
+      className={`inline-block ${sizeClasses[size]} ${className} rounded-sm object-cover`}
       title={country}
       onError={(e) => {
         // Fallback to a default flag if the image fails to load
