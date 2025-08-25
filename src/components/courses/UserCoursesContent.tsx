@@ -281,7 +281,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   }, [allPlayedCourses]);
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative">
       <UserCoursesHeader
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
@@ -300,7 +300,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       ) : filteredCourses.length > 0 ? (
         <>
           {/* CoursesControls component now handles all filtering and sorting */}
-          <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col">
             <CoursesControls
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
