@@ -79,24 +79,12 @@ const formatLocation = (course: Course) => {
 
 // Helper function to get the actual country name from course data
 const getActualCountry = (course: Course) => {
-  // If sub_country exists, use it as it's likely the actual country
-  if (course.sub_country) {
-    return course.sub_country;
+  // For GB&I and Continental Europe, use sub_country if available
+  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
+    return course.sub_country || course.region || course.country;
   }
   
-  // If country is a region, try to derive actual country
-  if (course.country === 'Britain & Ireland') {
-    // For Britain & Ireland, we'd need more specific logic
-    // For now, return the region as fallback
-    return course.region || course.country;
-  }
-  
-  if (course.country === 'Continental Europe') {
-    // For Continental Europe, prefer region or fallback to country
-    return course.region || course.country;
-  }
-  
-  // For other cases (like USA), return the country as is
+  // For USA and other countries, use the country field
   return course.country;
 };
 
