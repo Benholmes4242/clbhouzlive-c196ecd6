@@ -898,18 +898,18 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
+              className="h-12 w-12 p-0"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-8 w-8" strokeWidth={2} />
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0"
+              className="h-12 w-12 p-0"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-8 w-8" strokeWidth={2} />
             </Button>
           </div>
         </div>
@@ -1136,18 +1136,18 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
+              className="h-12 w-12 p-0"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-8 w-8" strokeWidth={2} />
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0"
+              className="h-12 w-12 p-0"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-8 w-8" strokeWidth={2} />
             </Button>
           </div>
         </div>
