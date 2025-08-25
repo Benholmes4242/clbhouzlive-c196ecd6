@@ -744,7 +744,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)] h-[520px]" // Half width minus gap with fixed height 30% taller
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
@@ -754,6 +754,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       isReadOnly={!isOwnProfile}
                       showUserRating={true}
                       isFromUserCoursesPage={true}
+                      customHeight="h-[333px]"
                     />
                   </div>
                 ))}

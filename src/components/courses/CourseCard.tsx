@@ -32,6 +32,7 @@ interface CourseCardProps {
   isFromUserCoursesPage?: boolean;
   xp?: number;
   showXP?: boolean;
+  customHeight?: string;
 }
 
 // Helper function to format description text with line breaks
@@ -82,7 +83,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showUserRating = false,
   isFromUserCoursesPage = false,
   xp,
-  showXP = false
+  showXP = false,
+  customHeight = "h-64"
 }) => {
   const navigate = useNavigate();
 
@@ -93,7 +95,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative h-64"
+        className={`group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative ${customHeight}`}
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
