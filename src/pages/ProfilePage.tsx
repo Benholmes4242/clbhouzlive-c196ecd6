@@ -13,16 +13,16 @@ const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState('activity');
   const queryClient = useQueryClient();
   
-  // Force invalidate profile cache on page load to ensure fresh data
+  // Only invalidate profile cache on initial page load, not on remounts
   useEffect(() => {
-    console.log('ProfilePage mounted - invalidating profile cache');
-    queryClient.invalidateQueries({ queryKey: ['profile'] });
-  }, [queryClient]);
-  
-  // Debug log for activeSection changes
-  useEffect(() => {
-    console.log('Active section changed to:', activeSection);
-  }, [activeSection]);
+    // Only invalidate if we're coming from a different route or initial load
+    const hasInitialized = sessionStorage.getItem('profile-initialized');
+    if (!hasInitialized) {
+      console.log('ProfilePage initial load - invalidating profile cache');
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      sessionStorage.setItem('profile-initialized', 'true');
+    }
+  }, []); // Remove queryClient dependency to prevent retriggering
   
   const {
     user,
