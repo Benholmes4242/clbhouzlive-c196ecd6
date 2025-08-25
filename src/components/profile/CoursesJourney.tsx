@@ -21,6 +21,29 @@ interface CoursesJourneyProps {
   isOwnProfile?: boolean;
 }
 
+// My Highlights Section Component
+interface MyHighlightsSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+  userFirstName?: string;
+}
+
+const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({ 
+  userId,
+  isOwnProfile = false,
+  userFirstName = 'User'
+}) => {
+  return (
+    <div className="w-full mb-8">
+      <LatestHighlights 
+        userId={userId || ''} 
+        isOwnProfile={isOwnProfile}
+        userFirstName={userFirstName}
+      />
+    </div>
+  );
+};
+
 const CoursesJourney: React.FC<CoursesJourneyProps> = ({ 
   className = '', 
   userId = '', 
@@ -936,28 +959,6 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   );
 };
 
-// My Highlights Section Component
-interface MyHighlightsSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-  userFirstName?: string;
-}
-
-const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({ 
-  userId,
-  isOwnProfile = false,
-  userFirstName = 'User'
-}) => {
-  return (
-    <div className="w-full mb-8">
-      <LatestHighlights 
-        userId={userId || ''} 
-        isOwnProfile={isOwnProfile}
-        userFirstName={userFirstName}
-      />
-    </div>
-  );
-};
 
 // Courses by Region Section Component
 interface CoursesbyRegionSectionProps {
