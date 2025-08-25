@@ -115,7 +115,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     <>
       <div className="px-4 md:px-0">
           {/* Filter Dropdown */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-end my-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="p-2 hover:bg-muted/50 transition-colors">
