@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
-import RegionalCoursesList from './RegionalCoursesList';
-import usaMap from '@/assets/usa-map.png';
-import ukIrelandMap from '@/assets/uk-ireland-map.png';
-import continentalEuropeMap from '@/assets/continental-europe-map.png';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -184,7 +180,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-2xl text-black font-semibold mt-1">
+                             <div className="text-sm text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -203,7 +199,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-2xl text-black font-semibold mt-1">
+                             <div className="text-sm text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -222,7 +218,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-2xl text-black font-semibold mt-1">
+                             <div className="text-sm text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -241,7 +237,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-2xl text-black font-semibold mt-1">
+                             <div className="text-sm text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -252,7 +248,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <span>{progress.played}</span>
                             <span className="text-black/60"> / {progress.total}</span>
                           </div>
-                           <div className="text-2xl text-black font-semibold mt-1">
+                           <div className="text-sm text-black font-semibold mt-1">
                              {progress.played * 120} XP
                            </div>
                         </>
@@ -354,7 +350,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                               <div className="text-sm text-muted-foreground mt-1">
+                               <div className="text-xs text-muted-foreground mt-1">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -373,7 +369,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                               <div className="text-sm text-muted-foreground mt-1">
+                               <div className="text-xs text-muted-foreground mt-1">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -392,7 +388,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                               <div className="text-sm text-muted-foreground mt-1">
+                               <div className="text-xs text-muted-foreground mt-1">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -411,7 +407,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                               <div className="text-sm text-muted-foreground mt-1">
+                               <div className="text-xs text-muted-foreground mt-1">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -422,7 +418,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                             <div className="text-sm text-muted-foreground mt-1">
+                             <div className="text-xs text-muted-foreground mt-1">
                                {progress.played * 120} XP
                              </div>
                           </>
@@ -445,30 +441,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Regional Course Lists */}
-      <div className="space-y-12 mt-16">
-        <RegionalCoursesList
-          userId={userId}
-          region="britain-ireland"
-          title="Great Britain & Ireland Courses"
-          isOwnProfile={isOwnProfile}
-        />
-        
-        <RegionalCoursesList
-          userId={userId}
-          region="europe"
-          title="Continental Europe Courses"
-          isOwnProfile={isOwnProfile}
-        />
-        
-        <RegionalCoursesList
-          userId={userId}
-          region="usa"
-          title="USA Courses"
-          isOwnProfile={isOwnProfile}
-        />
       </div>
     </div>
   );
