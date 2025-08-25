@@ -171,7 +171,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   country={getCountryForFlag(course)} 
                   className="h-5 w-5 mr-2 flex-shrink-0" 
                 />
-                <span style={{ transform: 'translateY(-2px)' }}>{getLocationText(course)}</span>
+                <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
               </>
             ) : (
               <>
