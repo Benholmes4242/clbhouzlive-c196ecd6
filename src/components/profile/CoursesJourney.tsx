@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
+import RegionalCoursesList from './RegionalCoursesList';
 import usaMap from '@/assets/usa-map.png';
 import ukIrelandMap from '@/assets/uk-ireland-map.png';
 import continentalEuropeMap from '@/assets/continental-europe-map.png';
@@ -144,7 +145,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         r="45"
                         fill="none"
                         stroke={achievement.colorLight}
-                        strokeWidth="3"
+                        strokeWidth="6"
                         strokeLinecap="round"
                       />
                       
@@ -155,7 +156,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         r="45"
                         fill="none"
                         stroke={achievement.color}
-                        strokeWidth="3"
+                        strokeWidth="6"
                         strokeLinecap="round"
                         strokeDasharray="283"
                         strokeDashoffset={283 - completedAngle}
@@ -183,9 +184,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Courses
-                            </div>
+                             <div className="text-xs text-muted-foreground mt-1">
+                               {progress.played * 120} XP
+                             </div>
                           </div>
                         </div>
                       ) : achievement.region === 'europe' ? (
@@ -202,9 +203,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Courses
-                            </div>
+                             <div className="text-xs text-muted-foreground mt-1">
+                               {progress.played * 120} XP
+                             </div>
                           </div>
                         </div>
                       ) : achievement.region === 'britain-ireland' ? (
@@ -221,9 +222,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Courses
-                            </div>
+                             <div className="text-xs text-muted-foreground mt-1">
+                               {progress.played * 120} XP
+                             </div>
                           </div>
                         </div>
                       ) : achievement.region === 'global' ? (
@@ -240,9 +241,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Courses
-                            </div>
+                             <div className="text-xs text-muted-foreground mt-1">
+                               {progress.played * 120} XP
+                             </div>
                           </div>
                         </div>
                       ) : (
@@ -251,20 +252,20 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <span>{progress.played}</span>
                             <span className="text-muted-foreground"> / {progress.total}</span>
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Courses
-                          </div>
+                           <div className="text-xs text-muted-foreground mt-1">
+                             {progress.played * 120} XP
+                           </div>
                         </>
                       )}
                     </div>
                   </div>
                   
-                  {/* Achievement info below ring - with text wrapping */}
-                  <div className="mt-4 text-center max-w-[200px]">
-                    <div className="text-lg text-foreground">
-                      {achievement.title}
-                    </div>
-                  </div>
+                   {/* Achievement info below ring - with text wrapping */}
+                   <div className="mt-2 text-center max-w-[200px]">
+                     <div className="text-lg text-foreground">
+                       {achievement.title}
+                     </div>
+                   </div>
                 </div>
               );
             })}
@@ -314,7 +315,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           r="45"
                           fill="none"
                           stroke={achievement.colorLight}
-                          strokeWidth="3"
+                          strokeWidth="6"
                           strokeLinecap="round"
                         />
                         
@@ -325,7 +326,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           r="45"
                           fill="none"
                           stroke={achievement.color}
-                          strokeWidth="3"
+                          strokeWidth="6"
                           strokeLinecap="round"
                           strokeDasharray="283"
                           strokeDashoffset={283 - completedAngle}
@@ -353,9 +354,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                Courses
-                              </div>
+                               <div className="text-sm text-muted-foreground mt-1">
+                                 {progress.played * 120} XP
+                               </div>
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
@@ -372,9 +373,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                Courses
-                              </div>
+                               <div className="text-sm text-muted-foreground mt-1">
+                                 {progress.played * 120} XP
+                               </div>
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
@@ -391,9 +392,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                Courses
-                              </div>
+                               <div className="text-sm text-muted-foreground mt-1">
+                                 {progress.played * 120} XP
+                               </div>
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
@@ -410,9 +411,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                                 <span>{progress.played}</span>
                                 <span className="text-muted-foreground"> / {progress.total}</span>
                               </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                Courses
-                              </div>
+                               <div className="text-sm text-muted-foreground mt-1">
+                                 {progress.played * 120} XP
+                               </div>
                             </div>
                           </div>
                         ) : (
@@ -421,20 +422,20 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-muted-foreground"> / {progress.total}</span>
                             </div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              Courses
-                            </div>
+                             <div className="text-sm text-muted-foreground mt-1">
+                               {progress.played * 120} XP
+                             </div>
                           </>
                         )}
                       </div>
                     </div>
                     
-                    {/* Achievement info */}
-                    <div className="mt-3 text-center max-w-[140px]">
-                      <div className="text-base text-foreground">
-                        {achievement.title}
-                      </div>
-                    </div>
+                     {/* Achievement info */}
+                     <div className="mt-1 text-center max-w-[140px]">
+                       <div className="text-base text-foreground">
+                         {achievement.title}
+                       </div>
+                     </div>
                   </div>
                 );
               })}
@@ -444,6 +445,30 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Regional Course Lists */}
+      <div className="space-y-12 mt-16">
+        <RegionalCoursesList
+          userId={userId || ''}
+          region="britain-ireland"
+          title="Great Britain & Ireland Courses"
+          isOwnProfile={isOwnProfile}
+        />
+        
+        <RegionalCoursesList
+          userId={userId || ''}
+          region="europe"
+          title="Continental Europe Courses"
+          isOwnProfile={isOwnProfile}
+        />
+        
+        <RegionalCoursesList
+          userId={userId || ''}
+          region="usa"
+          title="USA Courses"
+          isOwnProfile={isOwnProfile}
+        />
       </div>
     </div>
   );

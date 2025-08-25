@@ -69,22 +69,13 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       
       case 'courses':
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Courses Played ({profileData.coursesPlayed})</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {profileData.topRankedCourses.map((course: any, index: number) => (
-                <div key={index} className="bg-card rounded-lg border p-4">
-                  <h3 className="font-semibold">{course.golf_courses?.country}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Global Rank: {course.golf_courses?.global_rank || 'N/A'}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Regional Rank: {course.golf_courses?.regional_rank || 'N/A'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Suspense fallback={<ProfileTabsSkeleton />}>
+            <CoursesJourney 
+              userId={userId}
+              userDisplayName={profileData.profile?.display_name || 'User'}
+              isOwnProfile={isOwnProfile}
+            />
+          </Suspense>
         );
       
       case 'progress':

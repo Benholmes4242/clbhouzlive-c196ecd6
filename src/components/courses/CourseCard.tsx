@@ -30,6 +30,8 @@ interface CourseCardProps {
   isReadOnly?: boolean;
   showUserRating?: boolean;
   isFromUserCoursesPage?: boolean;
+  xp?: number;
+  showXP?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -78,7 +80,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   userRating,
   isReadOnly = false,
   showUserRating = false,
-  isFromUserCoursesPage = false
+  isFromUserCoursesPage = false,
+  xp,
+  showXP = false
 }) => {
   const navigate = useNavigate();
 
@@ -116,6 +120,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
           userRating={userRating}
           showUserRating={showUserRating}
           positioning="top-left"
+          xp={xp}
+          showXP={showXP}
         />
 
         {/* Course Information Overlay - positioned at bottom */}

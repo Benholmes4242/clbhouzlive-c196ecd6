@@ -5,6 +5,7 @@ import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import XPBadge from '@/components/ui/xp-badge';
 
 interface CourseRankBadgesProps {
   globalRank: number | null;
@@ -15,6 +16,8 @@ interface CourseRankBadgesProps {
   userRating?: number | null;
   showUserRating?: boolean;
   positioning?: 'top-left' | 'bottom-left';
+  xp?: number;
+  showXP?: boolean;
 }
 
 const CourseRankBadges = ({ 
@@ -25,7 +28,9 @@ const CourseRankBadges = ({
   viewContext = 'global',
   userRating,
   showUserRating = false,
-  positioning = 'top-left'
+  positioning = 'top-left',
+  xp,
+  showXP = false
 }: CourseRankBadgesProps) => {
   // Check for GB&I countries - including all possible variations
   const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
@@ -65,7 +70,7 @@ const CourseRankBadges = ({
     });
   }
 
-  // Player rating badge (separate from rankings)
+  // Player rating badge (separate from rankings) - remove star emoji, just use numbers
   const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
     content: `${userRating}/10`,
     tooltip: "Your Rating"
@@ -105,24 +110,38 @@ const CourseRankBadges = ({
             </Tooltip>
           ))}
           
-          {/* Add Clubhouse rating badge as the rightmost badge */}
-          {playerRatingBadge && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                 <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
-                   <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
-                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-                   <div className="relative z-10 flex items-center gap-2">
-                     <ClubhouseLogo size="sm" />
-                     <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
-                   </div>
+           {/* Add Clubhouse rating badge */}
+           {playerRatingBadge && (
+             <Tooltip>
+               <TooltipTrigger asChild>
+                  <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                    <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+                    <div className="relative z-10 flex items-center gap-2">
+                      <ClubhouseLogo size="sm" />
+                      <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
+                    </div>
+                  </div>
+               </TooltipTrigger>
+               <TooltipContent>
+                 <p>{playerRatingBadge.tooltip}</p>
+               </TooltipContent>
+             </Tooltip>
+           )}
+
+           {/* Add XP badge to the right */}
+           {showXP && xp && (
+             <Tooltip>
+               <TooltipTrigger asChild>
+                 <div>
+                   <XPBadge xp={xp} size="sm" />
                  </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{playerRatingBadge.tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+               </TooltipTrigger>
+               <TooltipContent>
+                 <p>Experience Points Earned</p>
+               </TooltipContent>
+             </Tooltip>
+           )}
         </div>
       )}
 
