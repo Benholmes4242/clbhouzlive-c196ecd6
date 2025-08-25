@@ -676,6 +676,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   return (
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
+        <h3 className="text-2xl font-bold text-foreground mb-6">
+          Recently Played
+        </h3>
+        
         <div className="relative space-y-6">
           {!isHydrated ? (
             <div className="text-center py-8">
