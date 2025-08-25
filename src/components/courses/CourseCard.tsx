@@ -164,14 +164,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </h3>
           
           {/* Location with map pin OR country with flag */}
-          <div className="flex items-center text-white/90 text-2xl leading-relaxed drop-shadow-lg">
+          <div className="flex items-center text-white/90 text-2xl drop-shadow-lg">
             {showCountryWithFlag ? (
               <>
                 <CountryFlag 
                   country={getCountryForFlag(course)} 
                   className="h-5 w-5 mr-2 flex-shrink-0" 
                 />
-                <span className="leading-5 align-middle">{getLocationText(course)}</span>
+                <span className="leading-5">{getLocationText(course)}</span>
               </>
             ) : (
               <>
