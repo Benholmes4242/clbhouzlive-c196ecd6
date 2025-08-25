@@ -740,9 +740,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={prevSlide}
-                className="h-16 w-16 p-0 hover:bg-transparent"
+                className="h-20 w-20 p-0 hover:bg-transparent"
               >
-                <ChevronLeft className="h-12 w-12" />
+                <ChevronLeft className="h-16 w-16 text-foreground" strokeWidth={2} />
               </Button>
             )}
             <Button
@@ -750,9 +750,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-16 w-16 p-0 hover:bg-transparent"
+              className="h-20 w-20 p-0 hover:bg-transparent"
             >
-              <ChevronRight className="h-12 w-12" />
+              <ChevronRight className="h-16 w-16 text-foreground" strokeWidth={2} />
             </Button>
           </div>
         </div>
