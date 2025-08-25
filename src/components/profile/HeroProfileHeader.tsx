@@ -910,10 +910,10 @@ const HeroProfileHeader = ({
       {/* Content sections for the selected tab with responsive animations */}
       <div className={`
         transition-all duration-300 ease-out
-        ${activeSection === 'activity' ? 'px-0 md:px-0 py-8' : 'px-4 md:px-0'}
+        ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0'}
         ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
         ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
-        ${isMobile && activeSection === 'activity' ? 'py-4' : ''}
+        ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
         ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
       `}>
         <div className={`
