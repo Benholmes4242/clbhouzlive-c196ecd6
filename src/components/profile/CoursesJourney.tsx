@@ -9,6 +9,9 @@ import CourseListItem from '@/components/courses/CourseListItem';
 import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStates';
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -187,7 +190,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black font-semibold mt-1">
+                             <div className="text-xl text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -206,7 +209,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black font-semibold mt-1">
+                             <div className="text-xl text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -225,7 +228,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black font-semibold mt-1">
+                             <div className="text-xl text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -244,7 +247,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black font-semibold mt-1">
+                             <div className="text-xl text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -255,7 +258,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <span>{progress.played}</span>
                             <span className="text-black/60"> / {progress.total}</span>
                           </div>
-                           <div className="text-xl text-black font-semibold mt-1">
+                           <div className="text-xl text-black mt-1">
                              {progress.played * 120} XP
                            </div>
                         </>
@@ -537,6 +540,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
   const { viewType, setViewType, isHydrated } = useViewPreference();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
 
   // Query to get all played courses (from both tables) for filtering
   const { data: allPlayedCourses = [] } = useQuery({
@@ -673,12 +678,50 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
+  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-2xl font-bold text-foreground mb-6">
-          Recently Played
-        </h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-foreground">
+            Recently Played
+          </h3>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevSlide}
+              disabled={currentIndex === 0}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
         
         <div className="relative space-y-6">
           {!isHydrated ? (
@@ -691,12 +734,21 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <>
-              {viewType === 'cards' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredCourses.map((userCourse) => (
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+                  width: `${Math.ceil(filteredCourses.length / cardsPerView) * 100}%`
+                }}
+              >
+                {filteredCourses.map((userCourse) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0"
+                    style={{ width: `${100 / Math.ceil(filteredCourses.length / cardsPerView)}%` }}
+                  >
                     <CourseCard 
-                      key={userCourse.id} 
                       course={userCourse.golf_courses}
                       viewingUserId={userId}
                       viewContext="global"
@@ -705,25 +757,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       showUserRating={true}
                       isFromUserCoursesPage={true}
                     />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {filteredCourses.map((userCourse) => (
-                    <CourseListItem
-                      key={userCourse.id}
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : activeFilter ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
