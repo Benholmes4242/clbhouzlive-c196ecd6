@@ -16,7 +16,7 @@ interface CoursesJourneyProps {
 
 const CoursesJourney: React.FC<CoursesJourneyProps> = ({ 
   className = '', 
-  userId, 
+  userId = '', 
   userDisplayName = 'User',
   isOwnProfile = false 
 }) => {
@@ -199,11 +199,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-foreground leading-none">
+                            <div className="text-2xl text-black font-semibold leading-none">
                               <span>{progress.played}</span>
-                              <span className="text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-muted-foreground mt-1">
+                             <div className="text-2xl text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -218,11 +218,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-foreground leading-none">
+                            <div className="text-2xl text-black font-semibold leading-none">
                               <span>{progress.played}</span>
-                              <span className="text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-muted-foreground mt-1">
+                             <div className="text-2xl text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -237,22 +237,22 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-foreground leading-none">
+                            <div className="text-2xl text-black font-semibold leading-none">
                               <span>{progress.played}</span>
-                              <span className="text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-muted-foreground mt-1">
+                             <div className="text-2xl text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
                         </div>
                       ) : (
                         <>
-                          <div className="text-2xl text-foreground leading-none">
+                          <div className="text-2xl text-black font-semibold leading-none">
                             <span>{progress.played}</span>
-                            <span className="text-muted-foreground"> / {progress.total}</span>
+                            <span className="text-black/60"> / {progress.total}</span>
                           </div>
-                           <div className="text-xs text-muted-foreground mt-1">
+                           <div className="text-2xl text-black font-semibold mt-1">
                              {progress.played * 120} XP
                            </div>
                         </>
@@ -314,7 +314,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           cy="60"
                           r="45"
                           fill="none"
-                          stroke={achievement.colorLight}
+                          stroke="#e5e7eb"
                           strokeWidth="6"
                           strokeLinecap="round"
                         />
@@ -450,21 +450,21 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       {/* Regional Course Lists */}
       <div className="space-y-12 mt-16">
         <RegionalCoursesList
-          userId={userId || ''}
+          userId={userId}
           region="britain-ireland"
           title="Great Britain & Ireland Courses"
           isOwnProfile={isOwnProfile}
         />
         
         <RegionalCoursesList
-          userId={userId || ''}
+          userId={userId}
           region="europe"
           title="Continental Europe Courses"
           isOwnProfile={isOwnProfile}
         />
         
         <RegionalCoursesList
-          userId={userId || ''}
+          userId={userId}
           region="usa"
           title="USA Courses"
           isOwnProfile={isOwnProfile}
