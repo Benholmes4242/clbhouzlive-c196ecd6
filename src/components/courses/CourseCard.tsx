@@ -171,7 +171,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   country={getCountryForFlag(course)} 
                   className="h-5 w-5 mr-2 flex-shrink-0" 
                 />
-                <span className="leading-5">{getLocationText(course)}</span>
+                <div className="flex items-center h-5">
+                  <span>{getLocationText(course)}</span>
+                </div>
               </>
             ) : (
               <>
