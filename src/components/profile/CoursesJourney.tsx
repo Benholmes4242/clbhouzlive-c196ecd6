@@ -460,22 +460,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
       {/* Courses by Region Section */}
-      <div className="w-full px-4 py-8 mb-24">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Titles */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Courses by Region
-            </h2>
-            <h3 className="text-xl text-muted-foreground">
-              Great Britain & Ireland
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      {/* Great Britain & Ireland Courses Section */}
-      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
+      <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -943,6 +928,36 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+// Courses by Region Section Component
+interface CoursesbyRegionSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  return (
+    <div className="w-full px-4 py-8 mb-0">
+      <div className="max-w-6xl mx-auto">
+        {/* Section Titles */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Courses by Region
+          </h2>
+          <h3 className="text-xl text-muted-foreground">
+            Great Britain & Ireland
+          </h3>
+        </div>
+      </div>
+      
+      {/* Great Britain & Ireland Courses Section */}
+      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
