@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface Course {
   id: string;
@@ -33,6 +34,8 @@ interface CourseCardProps {
   xp?: number;
   showXP?: boolean;
   customHeight?: string;
+  hideRankingBadges?: boolean;
+  showCountryWithFlag?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -84,7 +87,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   isFromUserCoursesPage = false,
   xp,
   showXP = false,
-  customHeight = "h-64"
+  customHeight = "h-64",
+  hideRankingBadges = false,
+  showCountryWithFlag = false
 }) => {
   const navigate = useNavigate();
 
@@ -112,31 +117,52 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        {/* Course ranking badges - positioned at top-left */}
-        <CourseRankBadges
-          globalRank={course.global_rank}
-          regionalRank={course.regional_rank}
-          usaRank={course.usa_rank}
-          country={course.country}
-          viewContext={viewContext}
-          userRating={userRating}
-          showUserRating={showUserRating}
-          positioning="top-left"
-          xp={xp}
-          showXP={showXP}
-        />
+        {/* Course ranking badges - positioned at top-left - conditionally hide */}
+        {!hideRankingBadges && (
+          <CourseRankBadges
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
+            viewContext={viewContext}
+            userRating={userRating}
+            showUserRating={showUserRating}
+            positioning="top-left"
+            xp={xp}
+            showXP={showXP}
+          />
+        )}
 
         {/* Course Information Overlay - positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
+          {/* XP earned - show above course name */}
+          {showXP && xp && (
+            <div className="text-2xl text-white/90 leading-tight mb-1 drop-shadow-lg">
+              + {xp} XP
+            </div>
+          )}
+          
           {/* Course Name */}
-          <h3 className="text-3xl font-bold text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors">
+          <h3 className={`text-3xl text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : 'font-bold'}`}>
             {course.name}
           </h3>
           
-          {/* Location with map pin */}
-          <div className="flex items-center text-white/90 text-lg leading-relaxed drop-shadow-lg">
-            <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
-            <span>{formatLocation(course)}</span>
+          {/* Location with map pin OR country with flag */}
+          <div className="flex items-center text-white/90 text-2xl leading-relaxed drop-shadow-lg">
+            {showCountryWithFlag ? (
+              <>
+                <CountryFlag 
+                  country={course.country} 
+                  className="h-5 w-5 mr-2 flex-shrink-0" 
+                />
+                <span>{course.country}</span>
+              </>
+            ) : (
+              <>
+                <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
+                <span>{formatLocation(course)}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
