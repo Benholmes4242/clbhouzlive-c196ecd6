@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import CreatePostDialog from '@/components/posts/CreatePostDialog';
@@ -9,17 +8,21 @@ interface ActivityHeaderProps {
   postsCount: number;
   isOwnProfile: boolean;
   onPostCreated: () => void;
+  onAchievementsClick?: () => void; // New prop for tab switching
 }
 
-const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfile, onPostCreated }) => {
-  const navigate = useNavigate();
-
+const ActivityHeader: React.FC<ActivityHeaderProps> = ({ 
+  postsCount, 
+  isOwnProfile, 
+  onPostCreated,
+  onAchievementsClick 
+}) => {
   return (
     <div className="mb-4">
-      {isOwnProfile && (
+      {isOwnProfile && onAchievementsClick && (
         <div className="mb-4">
           <Button
-            onClick={() => navigate('/achievements')}
+            onClick={onAchievementsClick}
             variant="outline"
             size="sm"
             className="text-white border-white/20 hover:bg-white/10"

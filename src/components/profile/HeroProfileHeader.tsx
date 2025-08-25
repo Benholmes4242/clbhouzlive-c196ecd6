@@ -927,6 +927,7 @@ const HeroProfileHeader = ({
               profileDisplayName={profile?.display_name}
               userHandicap={profile?.eg_handicap_index}
               userProfilePhotoUrl={profile?.profile_photo_url}
+              onAchievementsClick={() => onSectionChange?.('achievements')}
             />
           )}
           {activeSection === 'courses' && (

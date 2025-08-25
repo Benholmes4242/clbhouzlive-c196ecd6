@@ -108,6 +108,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           postsCount={0}
           isOwnProfile={isOwnProfile}
           onPostCreated={fetchUserPosts}
+          onAchievementsClick={() => {}} // Empty function for loading state
         />
         <div className="text-center py-8">
           <p className="text-muted-foreground">Loading posts...</p>
@@ -122,6 +123,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         postsCount={posts.length}
         isOwnProfile={isOwnProfile}
         onPostCreated={fetchUserPosts}
+        onAchievementsClick={() => {}} // Empty function as SocialActivity doesn't handle tab switching
       />
 
 

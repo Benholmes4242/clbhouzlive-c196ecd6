@@ -25,6 +25,7 @@ interface ActivityFeedProps {
   profileDisplayName?: string;
   userHandicap?: number;
   userProfilePhotoUrl?: string;
+  onAchievementsClick?: () => void; // New prop for tab switching
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
@@ -32,7 +33,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   isOwnProfile,
   profileDisplayName,
   userHandicap,
-  userProfilePhotoUrl
+  userProfilePhotoUrl,
+  onAchievementsClick
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
