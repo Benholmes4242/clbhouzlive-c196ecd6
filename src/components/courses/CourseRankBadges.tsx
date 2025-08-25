@@ -95,10 +95,12 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="relative flex items-center px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden bg-black/60 border border-white/20">
-                  <div className="relative z-10 flex items-center gap-1.5">
+                <div className="relative flex items-center px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                  <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+                  <div className="relative z-10 flex items-center">
                     {badge.icon}
-                    <span className="text-sm font-bold text-white">{badge.rank}</span>
+                    <span className={`text-sm font-bold text-white ${index === 0 ? 'ml-4' : 'ml-2'}`}>{badge.rank}</span>
                   </div>
                 </div>
               </TooltipTrigger>
@@ -112,12 +114,14 @@ const CourseRankBadges = ({
            {playerRatingBadge && (
              <Tooltip>
                <TooltipTrigger asChild>
-                   <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden bg-black/60 border border-white/20">
-                     <div className="relative z-10 flex items-center gap-1.5">
-                       <ClubhouseLogo size="sm" />
-                       <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
-                     </div>
-                   </div>
+                  <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                    <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+                    <div className="relative z-10 flex items-center gap-2">
+                      <ClubhouseLogo size="sm" />
+                      <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
+                    </div>
+                  </div>
                </TooltipTrigger>
                <TooltipContent>
                  <p>{playerRatingBadge.tooltip}</p>
@@ -146,8 +150,10 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-               <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden bg-black/60 border border-white/20">
-                 <div className="relative z-10 flex items-center gap-1.5">
+               <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                 <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+                 <div className="relative z-10 flex items-center gap-2">
                    <ClubhouseLogo size="sm" />
                    <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
                  </div>

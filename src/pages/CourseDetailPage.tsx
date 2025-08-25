@@ -16,28 +16,12 @@ import CoursePlayedButton from '@/components/courses/CoursePlayedButton';
 import AddToPlayedModal from '@/components/courses/AddToPlayedModal';
 
 const CourseDetailPage = () => {
-  const params = useParams();
-  const courseId = params?.courseId;
+  const { courseId } = useParams();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
   const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
   const [isPlayed, setIsPlayed] = useState(false);
-
-  // Add defensive check for courseId
-  if (!courseId) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Course not found</h1>
-          <p className="text-muted-foreground mb-4">The course you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate('/courses')}>
-            Back to Courses
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
