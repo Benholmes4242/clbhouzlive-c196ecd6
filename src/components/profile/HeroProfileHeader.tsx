@@ -928,11 +928,6 @@ const HeroProfileHeader = ({
           )}
           {activeSection === 'courses' && (
             <>
-              <LatestHighlights 
-                userId={profile?.id || ''} 
-                isOwnProfile={isOwnProfile}
-                userFirstName={profile?.display_name?.split(' ')[0] || profile?.username || 'User'}
-              />
               <UserCoursesContent 
                 username={profile?.username || ''}
                 isOwnProfile={isOwnProfile}

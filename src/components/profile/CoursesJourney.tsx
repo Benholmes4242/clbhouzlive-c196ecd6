@@ -12,6 +12,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -458,6 +459,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
       {/* Top 10 Rated by You Section */}
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* My Highlights Section */}
+      <MyHighlightsSection userId={userId} isOwnProfile={isOwnProfile} userFirstName={userDisplayName?.split(' ')[0] || 'User'} />
 
       {/* Courses by Region Section */}
       <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
@@ -928,6 +932,29 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+// My Highlights Section Component
+interface MyHighlightsSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+  userFirstName?: string;
+}
+
+const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({ 
+  userId,
+  isOwnProfile = false,
+  userFirstName = 'User'
+}) => {
+  return (
+    <div className="w-full mb-8">
+      <LatestHighlights 
+        userId={userId || ''} 
+        isOwnProfile={isOwnProfile}
+        userFirstName={userFirstName}
+      />
     </div>
   );
 };
