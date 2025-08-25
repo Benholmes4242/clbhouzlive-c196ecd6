@@ -107,7 +107,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         {/* Controls Section moved - now appears above depth stack carousel */}
 
         {/* Progress Rings Section */}
-        <div className="relative py-8">
+        <div className="relative py-16">
           {/* Desktop: Single row */}
           <div className="hidden md:flex gap-8 justify-center px-4">{/* Reduced gap and added padding */}
             {achievementRings.map((achievement, index) => {
