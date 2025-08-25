@@ -118,7 +118,6 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
           active:scale-95
           flex items-center justify-center
           relative overflow-hidden
-          border border-white/10
           before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-[#2A9D8F] before:to-[#1D3557] before:opacity-20 before:blur-xl before:-z-10 before:scale-110
         `}
       >
