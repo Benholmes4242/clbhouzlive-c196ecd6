@@ -734,7 +734,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden mb-8"> {/* Added bottom margin for scaled cards */}
+            <div ref={swipeRef} className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ 
@@ -744,20 +744,17 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0"
-                    style={{ width: '30%' }} // 60% of original 50% = 30% of container
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
                   >
-                    <div className="transform scale-y-[1.3] origin-top"> {/* 30% taller */}
-                      <CourseCard 
-                        course={userCourse.golf_courses}
-                        viewingUserId={userId}
-                        viewContext="global"
-                        userRating={userCourse.rating}
-                        isReadOnly={!isOwnProfile}
-                        showUserRating={true}
-                        isFromUserCoursesPage={true}
-                      />
-                    </div>
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                    />
                   </div>
                 ))}
               </div>
