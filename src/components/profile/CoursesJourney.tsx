@@ -735,23 +735,24 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             Recently Played
           </h3>
           <div className="flex gap-2">
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-8 w-8 p-0 hover:bg-transparent"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+            )}
             <Button
-              variant="outline"
-              size="sm"
-              onClick={prevSlide}
-              disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 hover:bg-transparent"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-6 w-6" />
             </Button>
           </div>
         </div>
@@ -777,7 +778,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
+                    className="flex-shrink-0 w-[calc(30%-12px)]" // Reduced width by 40% (from 50% to 30%)
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
