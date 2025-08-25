@@ -134,16 +134,16 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   }, [regionProgress, generateMotivation]);
 
   return (
-    <div className={`w-full pt-0 ${className}`}>
-      <div className="md:max-w-[1150px] md:mx-auto">
+    <div className={`w-full pt-6 ${className}`}>
+      <div className="md:max-w-[1150px] md:mx-auto px-0 md:px-4">{/* Add 16px left/right padding on desktop */}
         {/* Course highlights section removed */}
 
         {/* Controls Section moved - now appears above depth stack carousel */}
 
         {/* Progress Rings Section */}
-        <div className="relative">
+        <div className="relative pt-2">{/* Add 32px top padding for rings */}
           {/* Desktop: Single row */}
-          <div className="hidden md:flex gap-8 justify-center px-4">{/* Reduced gap and added padding */}
+          <div className="hidden md:flex gap-8 justify-center">{/* Removed px-4 since parent now has padding */}
             {achievementRings.map((achievement, index) => {
               const progress = getProgressData(achievement.region);
               const animationDelay = index * 0.2;
@@ -301,15 +301,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
             })}
           </div>
 
-          {/* Mobile: Swipeable carousel */}
+          {/* Mobile: Swipeable carousel - Optimized for all 4 rings to fit */}
           <div className="md:hidden">
-            <div className="flex gap-8 overflow-x-auto scrollbar-hide pb-4 px-4"
-                 style={{
-                   scrollbarWidth: 'none',
-                   msOverflowStyle: 'none',
-                   WebkitOverflowScrolling: 'touch',
-                   scrollSnapType: 'x mandatory'
-                 }}>
+            <div 
+              className="flex gap-2 overflow-x-auto scrollbar-hide pb-4 pl-0 pr-4"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+                scrollSnapType: 'x mandatory'
+              }}
+            >
               {achievementRings.map((achievement, index) => {
                 const progress = getProgressData(achievement.region);
                 const isLast = index === achievementRings.length - 1;
@@ -319,10 +321,10 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                 return (
                   <div 
                     key={achievement.id} 
-                    className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-4' : ''}`}
-                    style={{ scrollSnapAlign: 'start' }}
+                    className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-2' : ''}`}
+                    style={{ scrollSnapAlign: 'start', minWidth: 'calc(25% - 6px)' }}
                   >
-                    <div className="w-32 h-32 relative transition-all duration-300">
+                    <div className="w-20 h-20 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
