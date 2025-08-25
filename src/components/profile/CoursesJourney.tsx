@@ -897,22 +897,22 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           </h3>
           <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-8 w-8 p-0 focus:outline-none focus:ring-0 focus:border-0"
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-10 w-10" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0 focus:outline-none focus:ring-0 focus:border-0"
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-10 w-10" />
             </Button>
           </div>
         </div>
