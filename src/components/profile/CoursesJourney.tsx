@@ -676,10 +676,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   return (
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-2xl font-bold text-foreground mb-6">
-          Recently Played
-        </h3>
-        
         <div className="relative space-y-6">
           {!isHydrated ? (
             <div className="text-center py-8">
@@ -692,18 +688,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <>
-              {/* CoursesControls component now handles all filtering and sorting */}
-              <div className="flex flex-col gap-4 mb-6">
-                <CoursesControls
-                  activeFilter={activeFilter}
-                  onFilterChange={setActiveFilter}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                  viewType={viewType}
-                  onViewTypeChange={setViewType}
-                />
-              </div>
-              
               {viewType === 'cards' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredCourses.map((userCourse) => (
