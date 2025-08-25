@@ -331,7 +331,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollLeft}
             variant="ghost"
             size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
             style={{ 
               backdropFilter: 'blur(40px) saturate(180%)'
             }}
@@ -339,7 +339,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             <div className="absolute inset-0 bg-white/10 border border-white/20 rounded-full" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-full" />
             <div className="relative z-10 text-white">
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft size={24} strokeWidth={2} />
             </div>
           </Button>
           
@@ -348,7 +348,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollRight}
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
             style={{ 
               backdropFilter: 'blur(40px) saturate(180%)'
             }}
@@ -356,7 +356,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             <div className="absolute inset-0 bg-white/10 border border-white/20 rounded-full" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-full" />
             <div className="relative z-10 text-white">
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight size={24} strokeWidth={2} />
             </div>
           </Button>
         </>
