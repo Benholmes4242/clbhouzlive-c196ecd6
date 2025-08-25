@@ -117,6 +117,7 @@ const HeroProfileHeader = ({
   activeSection = 'activity',
   onSectionChange
 }: HeroProfileHeaderProps) => {
+  console.log('🎭 HeroProfileHeader render:', { activeSection, profileId: profile?.id, timestamp: Date.now() });
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
@@ -163,15 +164,23 @@ const HeroProfileHeader = ({
   ];
 
   const handleTabChange = (newTab: string) => {
-    if (newTab === activeSection || transitionState !== 'idle') return;
+    console.log('🔄 Tab change requested:', { from: activeSection, to: newTab, transitionState });
+    
+    if (newTab === activeSection || transitionState !== 'idle') {
+      console.log('❌ Tab change blocked:', newTab === activeSection ? 'same tab' : 'transition in progress');
+      return;
+    }
     
     // Determine transition direction based on tab order
     const currentIndex = tabs.findIndex(tab => tab.id === activeSection);
     const newIndex = tabs.findIndex(tab => tab.id === newTab);
     const direction: TransitionDirection = newIndex > currentIndex ? 'right' : 'left';
     
+    console.log('✅ Starting tab transition:', { currentIndex, newIndex, direction });
+    
     // Start transition and immediately change the tab
     startTransition(direction, () => {
+      console.log('🎯 Tab change callback executed:', newTab);
       onSectionChange?.(newTab);
     });
   };

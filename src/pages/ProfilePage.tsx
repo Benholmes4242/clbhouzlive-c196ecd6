@@ -13,6 +13,8 @@ const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState('activity');
   const queryClient = useQueryClient();
   
+  console.log('🏠 ProfilePage render:', { activeSection, timestamp: Date.now() });
+  
   // Only invalidate profile cache on initial page load, not on remounts
   useEffect(() => {
     // Only invalidate if we're coming from a different route or initial load
