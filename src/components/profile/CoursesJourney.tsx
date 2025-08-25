@@ -320,7 +320,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   <div 
                     key={achievement.id} 
                     className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-0' : ''}`}
-                    style={{ scrollSnapAlign: 'start', minWidth: '20vw' }}
+                    style={{ scrollSnapAlign: 'start', minWidth: '16vw' }}
                   >
                     <div className="w-28 h-28 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
