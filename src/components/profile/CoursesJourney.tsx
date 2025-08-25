@@ -458,6 +458,24 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
       {/* Top 10 Rated by You Section */}
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* Courses by Region Section */}
+      <div className="w-full px-4 py-8 mb-24">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Titles */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              Courses by Region
+            </h2>
+            <h3 className="text-xl text-muted-foreground">
+              Great Britain & Ireland
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Great Britain & Ireland Courses Section */}
+      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -920,6 +938,213 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 {isOwnProfile ? "You haven't rated any courses yet." : "No rated courses found."}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Great Britain & Ireland Section Component
+interface GreatBritainIrelandSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
+
+  // Query to get Great Britain & Ireland courses
+  const { data: gbIrelandCourses = [] } = useQuery({
+    queryKey: ['gbIrelandCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      // Get courses from user_top100_courses table for GB&I
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table for GB&I
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine and filter for Great Britain & Ireland only
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null, // Add rating field for consistency
+          id: `top100-${course.course_id}` // Unique ID for deduplication
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at, // Use rating date as played date
+          id: `rating-${course.course_id}` // Unique ID for deduplication
+        }))
+      ];
+
+      // Filter for Great Britain & Ireland courses only
+      const gbIrelandCourses = combinedCourses.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        return course && course.country === 'Britain & Ireland';
+      });
+
+      // Remove duplicates based on course_id, preferring rated courses over top100 courses
+      const uniqueCoursesMap = new Map();
+      
+      gbIrelandCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else {
+          // Prefer courses with ratings over those without
+          if (course.rating !== null && course.rating !== undefined && 
+              (existing.rating === null || existing.rating === undefined)) {
+            uniqueCoursesMap.set(courseId, course);
+          }
+        }
+      });
+
+      const rawCourses = Array.from(uniqueCoursesMap.values());
+      
+      // Apply sorting by recent play date
+      return getSortedUserCourses(rawCourses, 'recent');
+    },
+    enabled: !!userId,
+  });
+
+  const { isHydrated } = useViewPreference();
+
+  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  return (
+    <div className="w-full px-4 py-8 mb-24">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevSlide}
+              disabled={currentIndex === 0}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="relative space-y-6 mb-16">
+          {!isHydrated ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-muted-foreground">
+                  Loading preferences...
+                </span>
+              </div>
+            </div>
+          ) : gbIrelandCourses.length > 0 ? (
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
+                {gbIrelandCourses.map((userCourse) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
+                  >
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[333px]"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
               </p>
             </div>
           )}
