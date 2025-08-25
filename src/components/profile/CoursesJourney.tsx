@@ -303,7 +303,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
           {/* Mobile: Swipeable carousel */}
           <div className="md:hidden">
-            <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-4 px-0"
+            <div className="flex gap-0 overflow-x-auto scrollbar-hide pb-4 px-0"
                  style={{
                    scrollbarWidth: 'none',
                    msOverflowStyle: 'none',
