@@ -228,7 +228,7 @@ const HeroProfileHeader = ({
         case 'activity':
           return (
             <SocialActivity
-              userId={profile?.id}
+              userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
               profileDisplayName={profile?.display_name}
               userType={profile?.user_type || 'individual'}
