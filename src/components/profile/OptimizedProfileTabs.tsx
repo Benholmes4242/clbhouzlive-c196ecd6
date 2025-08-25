@@ -69,13 +69,11 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       
       case 'courses':
         return (
-          <Suspense fallback={<ProfileTabsSkeleton />}>
-            <CoursesJourney 
-              userId={userId}
-              userDisplayName={profileData.profile?.display_name || 'User'}
-              isOwnProfile={isOwnProfile}
-            />
-          </Suspense>
+          <CoursesJourney 
+            userId={userId}
+            userDisplayName={profileData.profile?.display_name || 'User'}
+            isOwnProfile={isOwnProfile}
+          />
         );
       
       case 'progress':

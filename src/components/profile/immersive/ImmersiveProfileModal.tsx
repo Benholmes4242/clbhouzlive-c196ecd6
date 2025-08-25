@@ -344,7 +344,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [activeIndex, currentItem, isOpen, isTransitioning, handleNext, isVideoPaused]);
+  }, [isOpen, currentItem, isTransitioning, handleNext, isVideoPaused]);
 
   // Reset video pause state when changing media
   useEffect(() => {
@@ -387,6 +387,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     <div
       id="immersive-modal"
       className="fixed inset-0 z-[100] bg-black"
+      data-immersive-modal="true"
       {...swipeHandlers}
     >
       {/* Segmented Progress Bar */}
@@ -422,9 +423,9 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         style={liquidGlassStyle}
       >
         {isGloballyMuted ? (
-          <VolumeX className="w-5 h-5 text-white" />
-        ) : (
           <Volume2 className="w-5 h-5 text-white" />
+        ) : (
+          <VolumeX className="w-5 h-5 text-white" />
         )}
       </button>
 
@@ -436,7 +437,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
             autoplay={true}
-            muted={!isGloballyMuted}
+            muted={isGloballyMuted}
             loop={true}
             enableHLS={true}
             className="w-full h-full"

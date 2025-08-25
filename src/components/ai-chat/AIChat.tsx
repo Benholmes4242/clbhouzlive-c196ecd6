@@ -16,8 +16,11 @@ const AIChat: React.FC = () => {
   // Check if we're on an auth page
   const isAuthPage = location.pathname === '/auth' || location.pathname === '/create-profile';
 
-  // Echo should never render on auth pages, when user is not authenticated, or when modals are open
-  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen;
+  // Check if we're on an immersive profile modal by looking for it in the DOM
+  const isImmersiveModalOpen = document.querySelector('[data-immersive-modal="true"]') !== null;
+
+  // Echo should never render on auth pages, when user is not authenticated, when modals are open, or in immersive modal
+  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen && !isImmersiveModalOpen;
 
   // Handle route changes - destroy Echo before navigation and hide during transition
   useEffect(() => {

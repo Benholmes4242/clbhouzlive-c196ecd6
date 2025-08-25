@@ -122,20 +122,20 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
       >
         <div className="px-8 py-5">
           <div className="flex items-center gap-4">
-            {/* Avatar */}
+            {/* Avatar - made bigger */}
             <Avatar className="w-16 h-16 rounded-full">
               <AvatarImage 
                 src={profile.profile_photo_url || undefined}
                 alt={profile.display_name || 'User'}
               />
-              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold">
+              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold text-xl">
                 {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            {/* Profile Info */}
+            {/* Profile Info - made text bigger */}
             <div className="flex-1 min-w-0">
-              <div className="text-white font-bold text-lg truncate">
+              <div className="text-white font-bold text-xl truncate">
                 {profile.display_name || profile.username || 'Unknown User'}
               </div>
               {profile.username && (
