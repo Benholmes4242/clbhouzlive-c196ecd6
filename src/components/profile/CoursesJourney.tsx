@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import CourseCard from '@/components/courses/CourseCard';
+import CourseListItem from '@/components/courses/CourseListItem';
+import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStates';
+import CoursesControls from '@/components/profile/CoursesControls';
+import { useViewPreference } from '@/hooks/useViewPreference';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -443,6 +450,303 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         </div>
       </div>
 
+      {/* Recently Played Section - Copy of Courses Played */}
+      <RecentlyPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
+    </div>
+  );
+};
+
+// Recently Played Section Component - Exact copy of UserCoursesContent logic
+interface RecentlyPlayedSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+// Helper function to get the best ranking for sorting
+const getCourseRanking = (course: any) => {
+  if (course.regional_rank) return course.regional_rank;
+  if (course.global_rank) return course.global_rank;
+  return 9999;
+};
+
+// Custom sorting function for user courses with different sort options
+const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
+  console.log('Sorting user courses in RecentlyPlayed:', userCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
+  const sortedCourses = userCourses.sort((a, b) => {
+    switch (sortBy) {
+      case 'rank-desc':
+      case 'rating-high-low':
+        // Sort by rating descending (10, 9, 8, ...)
+        const aRating = a.rating;
+        const bRating = b.rating;
+        
+        if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
+          return bRating - aRating;
+        }
+        if (aRating !== null && aRating !== undefined) return -1;
+        if (bRating !== null && bRating !== undefined) return 1;
+        
+        // If neither has a rating, sort by official ranking
+        const aRank = getCourseRanking(a.golf_courses);
+        const bRank = getCourseRanking(b.golf_courses);
+        return aRank - bRank;
+        
+      case 'rank-asc':
+      case 'rating-low-high':
+        // Sort by rating ascending (0.5, 1, 2, ...)
+        const aRatingLow = a.rating;
+        const bRatingLow = b.rating;
+        
+        if (aRatingLow !== null && aRatingLow !== undefined && bRatingLow !== null && bRatingLow !== undefined) {
+          return aRatingLow - bRatingLow;
+        }
+        if (aRatingLow !== null && aRatingLow !== undefined) return -1;
+        if (bRatingLow !== null && bRatingLow !== undefined) return 1;
+        
+        // If neither has a rating, sort by official ranking
+        const aRankLow = getCourseRanking(a.golf_courses);
+        const bRankLow = getCourseRanking(b.golf_courses);
+        return aRankLow - bRankLow;
+        
+      case 'recent':
+      case 'recently-played':
+      default:
+        // Sort by most recent date (played_date or created_at for ratings)
+        const aDate = new Date(a.played_date || a.created_at || 0);
+        const bDate = new Date(b.played_date || b.created_at || 0);
+        return bDate.getTime() - aDate.getTime();
+    }
+  });
+  
+  console.log('Final sorted order in RecentlyPlayed:', sortedCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
+  return sortedCourses;
+};
+
+const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
+  const { viewType, setViewType, isHydrated } = useViewPreference();
+
+  // Query to get all played courses (from both tables) for filtering
+  const { data: allPlayedCourses = [] } = useQuery({
+    queryKey: ['recentlyPlayedCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine and deduplicate, ensuring consistent structure
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null, // Add rating field for consistency
+          id: `top100-${course.course_id}` // Unique ID for deduplication
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at, // Use rating date as played date
+          id: `rating-${course.course_id}` // Unique ID for deduplication
+        }))
+      ];
+
+      // Remove duplicates based on course_id, preferring rated courses over top100 courses
+      const uniqueCoursesMap = new Map();
+      
+      combinedCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else {
+          // Prefer courses with ratings over those without
+          if (course.rating !== null && course.rating !== undefined && 
+              (existing.rating === null || existing.rating === undefined)) {
+            uniqueCoursesMap.set(courseId, course);
+          }
+        }
+      });
+
+      const rawCourses = Array.from(uniqueCoursesMap.values());
+      console.log('Raw combined courses before sorting in RecentlyPlayed:', rawCourses.map(c => ({ 
+        name: c.golf_courses?.name, 
+        rating: c.rating 
+      })));
+      
+      // Apply sorting here to ensure proper order
+      return getSortedUserCourses(rawCourses, 'recent');
+    },
+    enabled: !!userId,
+  });
+
+  // Filter and sort courses based on active filter and sort option
+  const filteredCourses = useMemo(() => {
+    let coursesToFilter = allPlayedCourses;
+    
+    // First apply regional filtering if active
+    if (activeFilter) {
+      coursesToFilter = coursesToFilter.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        if (!course) return false;
+
+        switch (activeFilter) {
+          case 'britain-ireland':
+            return course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100;
+          case 'europe':
+            return course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100;
+          case 'usa':
+            return course.country === 'USA' && course.regional_rank && course.regional_rank <= 100;
+          case 'global':
+            return course.global_rank && course.global_rank <= 100;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Then apply sorting
+    const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
+    
+    console.log('Final filtered and sorted courses in RecentlyPlayed:', sortedCourses.map(c => ({ 
+      name: c.golf_courses?.name, 
+      rating: c.rating,
+      sortBy 
+    })));
+    
+    return sortedCourses;
+  }, [allPlayedCourses, activeFilter, sortBy]);
+
+  return (
+    <div className="w-full px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <h3 className="text-2xl font-bold text-foreground mb-6">
+          Recently Played
+        </h3>
+        
+        <div className="relative space-y-6">
+          {!isHydrated ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-muted-foreground">
+                  Loading preferences...
+                </span>
+              </div>
+            </div>
+          ) : filteredCourses.length > 0 ? (
+            <>
+              {/* CoursesControls component now handles all filtering and sorting */}
+              <div className="flex flex-col gap-4 mb-6">
+                <CoursesControls
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                  viewType={viewType}
+                  onViewTypeChange={setViewType}
+                />
+              </div>
+              
+              {viewType === 'cards' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredCourses.map((userCourse) => (
+                    <CourseCard 
+                      key={userCourse.id} 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {filteredCourses.map((userCourse) => (
+                    <CourseListItem
+                      key={userCourse.id}
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : activeFilter ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No courses found in the selected region.
+              </p>
+            </div>
+          ) : (
+            <EmptyTop100State isOwnProfile={isOwnProfile} displayName="" />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
