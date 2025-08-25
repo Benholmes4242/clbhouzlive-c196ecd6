@@ -742,7 +742,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 onClick={prevSlide}
                 className="h-8 w-8 p-0 hover:bg-transparent"
               >
-                <ChevronLeft className="h-8 w-8" />
+                <ChevronLeft className="h-10 w-10" />
               </Button>
             )}
             <Button
@@ -752,7 +752,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               disabled={currentIndex >= maxIndex}
               className="h-8 w-8 p-0 hover:bg-transparent"
             >
-              <ChevronRight className="h-8 w-8" />
+              <ChevronRight className="h-10 w-10" />
             </Button>
           </div>
         </div>
@@ -778,7 +778,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(30%-12px)]" // Reduced width by 40% (from 50% to 30%)
+                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
