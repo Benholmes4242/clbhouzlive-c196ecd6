@@ -34,15 +34,15 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a golf course expert who creates inspiring, poetic, and memorable quotes about famous golf courses. Create short, elegant quotes (8-12 words max) that capture the essence, beauty, or character of each golf course. Examples: "Where golf dreams come to life", "The greatest meeting of land and sea", "A masterpiece carved by nature", "Golf perfection on hallowed ground".' 
+            content: 'You are a golf course expert who creates inspiring, poetic, and memorable quotes about famous golf courses. Create short, elegant quotes (8-12 words max) that capture the essence, beauty, or character of each specific golf course. Each quote should be unique and reflect the course\'s distinctive features, history, or setting. Examples: "Where golf dreams come to life", "The greatest meeting of land and sea", "A masterpiece carved by nature", "Golf perfection on hallowed ground".' 
           },
           { 
             role: 'user', 
-            content: `Create an inspiring quote for ${courseName} golf course${country ? ` in ${country}` : ''}. Make it memorable and poetic, capturing what makes this course special.` 
+            content: `Create a unique, inspiring quote specifically for ${courseName} golf course${country ? ` in ${country}` : ''}. Research what makes this specific course special (its location, design, history, or unique features) and create a memorable, poetic quote that captures its distinctive character. Avoid generic golf quotes and make it specific to this course.` 
           }
         ],
-        max_tokens: 50,
-        temperature: 0.8,
+        max_tokens: 60,
+        temperature: 0.9,
       }),
     });
 
