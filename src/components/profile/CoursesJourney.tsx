@@ -292,7 +292,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   
                    {/* Achievement info below ring - reduced gap and larger text size */}
                    <div className="mt-0.5 text-center max-w-[200px]">
-                     <div className="text-xl text-foreground font-semibold">
+                     <div className="text-xl text-foreground">
                        {achievement.title}
                      </div>
                    </div>
@@ -896,15 +896,16 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             Top 10 Rated by You
           </h3>
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={prevSlide}
-              disabled={currentIndex === 0}
-              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-            >
-              <ChevronLeft className="h-10 w-10" />
-            </Button>
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -938,19 +939,19 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="h-[333px]"
-                    />
-                  </div>
+                     className="flex-shrink-0 w-[calc(70%-12px)]" // Increased width by 40%
+                   >
+                     <CourseCard 
+                       course={userCourse.golf_courses}
+                       viewingUserId={userId}
+                       viewContext="global"
+                       userRating={userCourse.rating}
+                       isReadOnly={!isOwnProfile}
+                       showUserRating={true}
+                       isFromUserCoursesPage={true}
+                       customHeight="h-[266px]" // Reduced height by 20% (from 333px to 266px)
+                     />
+                   </div>
                 ))}
               </div>
             </div>
