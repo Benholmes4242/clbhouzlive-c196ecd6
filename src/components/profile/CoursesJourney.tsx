@@ -939,7 +939,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                     className="flex-shrink-0 w-[calc(70%-12px)]" // Increased width by 40%
+                     className="flex-shrink-0 w-[calc(84%-12px)]" // Increased width by another 20% (from 70% to 84%)
                    >
                      <CourseCard 
                        course={userCourse.golf_courses}
@@ -950,6 +950,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        showUserRating={true}
                        isFromUserCoursesPage={true}
                        customHeight="h-[266px]" // Reduced height by 20% (from 333px to 266px)
+                       hideRankingBadges={true}
+                       showAIQuote={true}
                      />
                    </div>
                 ))}

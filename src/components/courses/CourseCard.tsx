@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
 import CountryFlag from '@/components/ui/country-flag';
+import { createClient } from '@supabase/supabase-js';
 
 interface Course {
   id: string;
@@ -36,6 +37,7 @@ interface CourseCardProps {
   customHeight?: string;
   hideRankingBadges?: boolean;
   showCountryWithFlag?: boolean;
+  showAIQuote?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -105,9 +107,44 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showXP = false,
   customHeight = "h-64",
   hideRankingBadges = false,
-  showCountryWithFlag = false
+  showCountryWithFlag = false,
+  showAIQuote = false
 }) => {
   const navigate = useNavigate();
+  const [courseQuote, setCourseQuote] = useState<string>('');
+
+  // Generate AI quote for course
+  useEffect(() => {
+    if (showAIQuote && course.name) {
+      const generateQuote = async () => {
+        try {
+          const supabase = createClient(
+            import.meta.env.VITE_SUPABASE_URL,
+            import.meta.env.VITE_SUPABASE_ANON_KEY
+          );
+          
+          const { data, error } = await supabase.functions.invoke('generate-course-quote', {
+            body: { 
+              courseName: course.name,
+              country: course.country 
+            }
+          });
+
+          if (error) {
+            console.error('Error generating quote:', error);
+            setCourseQuote('A golf experience like no other');
+          } else {
+            setCourseQuote(data.quote || 'A golf experience like no other');
+          }
+        } catch (error) {
+          console.error('Error calling quote function:', error);
+          setCourseQuote('A golf experience like no other');
+        }
+      };
+
+      generateQuote();
+    }
+  }, [showAIQuote, course.name, course.country]);
 
   const handleCardClick = () => {
     navigate(`/courses/${course.id}`);
@@ -159,28 +196,34 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
           
           {/* Course Name */}
-          <h3 className={`text-3xl text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : 'font-bold'}`}>
+          <h3 className={`text-3xl text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : ''}`}>
             {course.name}
           </h3>
           
-          {/* Location with map pin OR country with flag */}
-          <div className="flex items-center text-white/90 text-2xl drop-shadow-lg">
-            {showCountryWithFlag ? (
-              <>
-                <CountryFlag 
-                  country={getCountryForFlag(course)} 
-                  size="lg"
-                  className="mr-2 flex-shrink-0" 
-                />
-                <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
-              </>
-            ) : (
-              <>
-                <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
-                <span>{formatLocation(course)}</span>
-              </>
-            )}
-          </div>
+          {/* AI Quote or Location */}
+          {showAIQuote ? (
+            <div className="text-white/90 text-2xl leading-relaxed drop-shadow-lg italic">
+              {courseQuote || 'A golf experience like no other'}
+            </div>
+          ) : (
+            <div className="flex items-center text-white/90 text-2xl drop-shadow-lg">
+              {showCountryWithFlag ? (
+                <>
+                  <CountryFlag 
+                    country={getCountryForFlag(course)} 
+                    size="lg"
+                    className="mr-2 flex-shrink-0" 
+                  />
+                  <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
+                </>
+              ) : (
+                <>
+                  <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span>{formatLocation(course)}</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
