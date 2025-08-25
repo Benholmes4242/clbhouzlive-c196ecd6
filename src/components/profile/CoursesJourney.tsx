@@ -260,9 +260,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     </div>
                   </div>
                   
-                   {/* Achievement info below ring - reduced gap and consistent text size */}
-                   <div className="mt-1 text-center max-w-[200px]">
-                     <div className="text-base text-foreground font-medium">
+                   {/* Achievement info below ring - reduced gap and larger text size */}
+                   <div className="mt-0.5 text-center max-w-[200px]">
+                     <div className="text-xl text-foreground font-semibold">
                        {achievement.title}
                      </div>
                    </div>
