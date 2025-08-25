@@ -13,7 +13,7 @@ export const useActivityPosts = (userId?: string) => {
       return;
     }
 
-    console.log('ActivityPosts - Fetching posts for userId:', userId);
+    // Fetching posts for userId
     setLoading(true);
 
     try {
@@ -41,11 +41,9 @@ export const useActivityPosts = (userId?: string) => {
         return;
       }
 
-      console.log('ActivityPosts - Raw posts data:', postsData);
-      console.log('ActivityPosts - Detailed posts data:', JSON.stringify(postsData, null, 2));
+      // Debug logging removed for performance
 
       if (!postsData || postsData.length === 0) {
-        console.log('ActivityPosts - No posts found for user');
         setPosts([]);
         setLoading(false);
         return;
@@ -54,7 +52,7 @@ export const useActivityPosts = (userId?: string) => {
       // Post tags temporarily disabled due to missing database tables
       let postTags = [];
 
-      console.log('ActivityPosts - Mapped post tags:', postTags);
+      // Post tags logging removed for performance
 
       // Get user profile for the posts
       const { data: userProfile, error: profileError } = await supabase
@@ -77,11 +75,7 @@ export const useActivityPosts = (userId?: string) => {
         .map(post => {
         const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
         
-        console.log('ActivityPosts - Processing post:', {
-          id: post.id,
-          mediaCount: post.post_media?.length || 0,
-          mediaData: post.post_media
-        });
+        // Post processing logging removed for performance
         
         return {
           id: post.id,
@@ -108,7 +102,7 @@ export const useActivityPosts = (userId?: string) => {
         };
       });
 
-      console.log('ActivityPosts - Final formatted posts:', formattedPosts.length);
+      // Final posts count logging removed for performance
       setPosts(formattedPosts);
     } catch (error) {
       console.error('ActivityPosts - Error fetching posts:', error);
@@ -125,7 +119,6 @@ export const useActivityPosts = (userId?: string) => {
   // Listen for post updates
   useEffect(() => {
     const handlePostCompleted = () => {
-      console.log('ActivityPosts - Post completed event received, refetching');
       setTimeout(() => {
         fetchUserPosts();
       }, 1000);

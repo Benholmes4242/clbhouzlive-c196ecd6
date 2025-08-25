@@ -56,14 +56,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
   const currentMedia = hasMedia ? post.post_media[currentMediaIndex] : null;
   const isVideo = currentMedia?.media_type === 'video';
   
-  // Debug logging
-  console.log('ActivityPostCard - Rendering post:', {
-    postId: post.id,
-    hasMedia,
-    mediaCount: post.post_media?.length || 0,
-    mediaData: post.post_media,
-    currentMedia: currentMedia
-  });
+  // Debug logging removed for performance
   
   // Only autoplay if this is the first video and shouldAutoplay is true
   const allowAutoplay = isVideo && isFirstVideo && shouldAutoplay;
