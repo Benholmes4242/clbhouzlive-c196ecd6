@@ -81,9 +81,12 @@ const getCountryForFlag = (course: Course) => {
 
 // Helper function to get the location text to display
 const getLocationText = (course: Course) => {
-  // For GB&I and Continental Europe, use sub_country (like "Portugal") 
+  // For GB&I and Continental Europe, ALWAYS use sub_country if it exists
   if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    return course.sub_country || course.region || course.country;
+    if (course.sub_country) {
+      return course.sub_country; // This will be "Portugal", "Spain", "England", etc.
+    }
+    return course.region || course.country;
   }
   
   // For USA and other countries, use the country field
