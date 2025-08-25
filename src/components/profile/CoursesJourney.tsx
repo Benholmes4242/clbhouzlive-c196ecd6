@@ -303,7 +303,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
           {/* Mobile: Swipeable carousel */}
           <div className="md:hidden">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-4 px-0"
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 px-0"
                  style={{
                    scrollbarWidth: 'none',
                    msOverflowStyle: 'none',
@@ -320,9 +320,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   <div 
                     key={achievement.id} 
                     className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-0' : ''}`}
-                    style={{ scrollSnapAlign: 'start', minWidth: '24vw' }}
+                    style={{ scrollSnapAlign: 'start', minWidth: '22vw' }}
                   >
-                    <div className="w-24 h-24 relative transition-all duration-300">
+                    <div className="w-20 h-20 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
@@ -371,7 +371,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                  <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Map Background */}
                             <img
                               src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
@@ -437,26 +437,26 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                               <div className="text-base text-black leading-none">
-                                 <span>{progress.played}</span>
-                                 <span className="text-black/60"> / {progress.total}</span>
-                               </div>
-                                <div className="text-sm text-black mt-1">
-                                  {progress.played * 120} XP
-                                </div>
-                             </div>
-                           </div>
-                         ) : (
-                           <>
-                             <div className="text-base text-black leading-none">
-                               <span>{progress.played}</span>
-                               <span className="text-black/60"> / {progress.total}</span>
-                             </div>
-                              <div className="text-sm text-black mt-1">
-                                {progress.played * 120} XP
+                              <div className="text-sm text-black leading-none">
+                                <span>{progress.played}</span>
+                                <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                           </>
-                         )}
+                               <div className="text-xs text-black mt-0.5">
+                                 {progress.played * 120} XP
+                               </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-sm text-black leading-none">
+                              <span>{progress.played}</span>
+                              <span className="text-black/60"> / {progress.total}</span>
+                            </div>
+                             <div className="text-xs text-black mt-0.5">
+                               {progress.played * 120} XP
+                             </div>
+                          </>
+                        )}
                       </div>
                     </div>
                     
@@ -939,7 +939,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                     className="flex-shrink-0 w-[calc(90%-12px)] md:w-[calc(84%-12px)]" // Mobile: 90% width, Desktop: 84% width
+                     className="flex-shrink-0 w-[calc(84%-12px)]" // Increased width by another 20% (from 70% to 84%)
                    >
                      <CourseCard 
                        course={userCourse.golf_courses}
@@ -949,7 +949,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        isReadOnly={!isOwnProfile}
                        showUserRating={true}
                        isFromUserCoursesPage={true}
-                       customHeight="h-[266px]" // Keep same height as requested
+                       customHeight="h-[266px]" // Reduced height by 20% (from 333px to 266px)
                        hideRankingBadges={true}
                        showAIQuote={true}
                      />
