@@ -92,7 +92,7 @@ const TopRatedCarousel: React.FC<TopRatedCarouselProps> = ({
       <div className="relative -mx-4 md:mx-0 overflow-hidden">
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 px-4 md:px-0"
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-4 md:px-0"
           style={{
             scrollSnapType: 'x mandatory',
             WebkitOverflowScrolling: 'touch'
@@ -101,14 +101,14 @@ const TopRatedCarousel: React.FC<TopRatedCarouselProps> = ({
           {courses.map((course, index) => (
             <div
               key={course.id || `${course.course_id}-${index}`}
-              className="flex-none md:w-full"
+              className="flex-none"
               style={{
-                width: 'calc(100vw - 4rem)', // Full width minus padding and gap for peek on mobile
-                minWidth: 'calc(100vw - 4rem)',
+                width: 'calc(100vw - 6rem)', // Full width minus padding and space for peek
+                minWidth: 'calc(100vw - 6rem)',
                 scrollSnapAlign: 'start'
               }}
             >
-              <div className="h-32 relative rounded-lg overflow-hidden">
+              <div className="w-full">
                 <Top100CourseCard
                   course={course.golf_courses || course}
                   isPlayed={true}
@@ -116,7 +116,7 @@ const TopRatedCarousel: React.FC<TopRatedCarouselProps> = ({
                   isOwnProfile={isOwnProfile}
                   onToggle={onToggle ? () => onToggle(course.course_id || course.id) : undefined}
                   userRating={getUserRating(course.course_id || course.id)}
-                  viewType="list"
+                  viewType="cards"
                   userFirstName={displayName?.split(' ')[0]}
                 />
               </div>
