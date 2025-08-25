@@ -5,7 +5,7 @@ import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
 import CountryFlag from '@/components/ui/country-flag';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Course {
   id: string;
@@ -118,11 +118,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
     if (showAIQuote && course.name) {
       const generateQuote = async () => {
         try {
-          const supabase = createClient(
-            import.meta.env.VITE_SUPABASE_URL,
-            import.meta.env.VITE_SUPABASE_ANON_KEY
-          );
-          
           const { data, error } = await supabase.functions.invoke('generate-course-quote', {
             body: { 
               courseName: course.name,
