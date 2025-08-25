@@ -7,6 +7,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
+import SocialActivity from './SocialActivity';
 import UniversalProfileTabs from './UniversalProfileTabs';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
@@ -226,13 +227,11 @@ const HeroProfileHeader = ({
       switch (activeSection) {
         case 'activity':
           return (
-            <ActivityFeed
-              userId={profile?.id || ''}
+            <SocialActivity
+              userId={profile?.id}
               isOwnProfile={isOwnProfile}
               profileDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              onAchievementsClick={() => onSectionChange?.('achievements')}
+              userType={profile?.user_type || 'individual'}
             />
           );
         case 'courses':
