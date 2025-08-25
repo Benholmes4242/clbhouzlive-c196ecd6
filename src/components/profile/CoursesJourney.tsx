@@ -141,7 +141,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         {/* Controls Section moved - now appears above depth stack carousel */}
 
         {/* Progress Rings Section */}
-        <div className="relative py-16">
+        <div className="relative">
           {/* Desktop: Single row */}
           <div className="hidden md:flex gap-8 justify-center px-4">{/* Reduced gap and added padding */}
             {achievementRings.map((achievement, index) => {
@@ -757,7 +757,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           </div>
         </div>
         
-        <div className="relative space-y-6 mb-16">
+        <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
@@ -914,7 +914,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           </div>
         </div>
         
-        <div className="relative space-y-6 mb-16">
+        <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
@@ -1152,7 +1152,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
           </div>
         </div>
         
-        <div className="relative space-y-6 mb-16">
+        <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
