@@ -230,6 +230,33 @@ export type Database = {
         }
         Relationships: []
       }
+      country_flags: {
+        Row: {
+          country_code: string
+          created_at: string
+          file_name: string
+          flag_url: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          file_name: string
+          flag_url: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          file_name?: string
+          flag_url?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       course_media: {
         Row: {
           course_id: string
