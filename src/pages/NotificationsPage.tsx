@@ -27,7 +27,7 @@ const NotificationsPage = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view notifications.</p>
         </div>
         <BottomNavigation />

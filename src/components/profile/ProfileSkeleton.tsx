@@ -59,7 +59,7 @@ export const ProfileTabsSkeleton = () => {
     <div className="bg-background min-h-screen">
       {/* Tabs Skeleton */}
       <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-0">
           <div className="flex gap-8 py-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -69,7 +69,7 @@ export const ProfileTabsSkeleton = () => {
       </div>
 
       {/* Content Skeleton */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 md:px-0 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-card rounded-lg p-6 border">

@@ -117,7 +117,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   }
 
   return (
-    <div className="container mx-auto px-4 pt-6 pb-2">
+    <div className="container mx-auto px-4 md:px-0 pt-6 pb-2">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-foreground">Trending Videos</h2>
       </div>

@@ -4,7 +4,7 @@ import React from 'react';
 const StoryBarSkeleton = () => {
   return (
     <div className="bg-background border-b border-border">
-      <div className="container mx-auto px-4 py-2">
+      <div className="container mx-auto px-4 md:px-0 py-2">
         <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
           {/* Loading skeleton */}
           {[1, 2, 3, 4].map((i) => (

@@ -145,7 +145,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
     <div className="bg-background min-h-screen">
       {/* Tabs Navigation */}
       <div className="bg-background border-b border-border sticky top-0 z-40">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-0">
           <div className="flex gap-8 overflow-x-auto scrollbar-hide py-4">
             {tabs.map((tab) => (
               <TabButton
@@ -162,7 +162,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 md:px-0 py-8">
         {renderTabContent()}
       </div>
     </div>
