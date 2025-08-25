@@ -740,9 +740,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={prevSlide}
-                className="h-20 w-20 p-0 hover:bg-transparent"
+                className="h-12 w-12 p-0 hover:bg-transparent"
               >
-                <ChevronLeft size={32} className="text-foreground" strokeWidth={2} />
+                <ChevronLeft className="h-10 w-10" />
               </Button>
             )}
             <Button
@@ -750,9 +750,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-20 w-20 p-0 hover:bg-transparent"
+              className="h-12 w-12 p-0 hover:bg-transparent"
             >
-              <ChevronRight size={32} className="text-foreground" strokeWidth={2} />
+              <ChevronRight className="h-10 w-10" />
             </Button>
           </div>
         </div>
@@ -898,18 +898,18 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-12 w-12 p-0"
+              className="h-8 w-8 p-0"
             >
-              <ChevronLeft size={20} strokeWidth={2} />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0"
+              className="h-8 w-8 p-0"
             >
-              <ChevronRight size={20} strokeWidth={2} />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -1136,18 +1136,18 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               size="sm"
               onClick={prevSlide}
               disabled={currentIndex === 0}
-              className="h-12 w-12 p-0"
+              className="h-8 w-8 p-0"
             >
-              <ChevronLeft size={20} strokeWidth={2} />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0"
+              className="h-8 w-8 p-0"
             >
-              <ChevronRight size={20} strokeWidth={2} />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
