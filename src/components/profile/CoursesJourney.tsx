@@ -733,7 +733,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     <div className="w-full px-4 pt-4 pb-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-bold text-foreground">
+          <h3 className="text-3xl text-foreground">
             Recently Played
           </h3>
           <div className="flex gap-2">
