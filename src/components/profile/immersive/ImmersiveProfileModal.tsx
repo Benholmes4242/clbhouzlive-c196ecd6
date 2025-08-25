@@ -423,9 +423,9 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         style={liquidGlassStyle}
       >
         {isGloballyMuted ? (
-          <Volume2 className="w-5 h-5 text-white" />
-        ) : (
           <VolumeX className="w-5 h-5 text-white" />
+        ) : (
+          <Volume2 className="w-5 h-5 text-white" />
         )}
       </button>
 

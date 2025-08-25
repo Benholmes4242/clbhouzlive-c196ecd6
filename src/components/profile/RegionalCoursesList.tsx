@@ -58,21 +58,46 @@ const RegionalCoursesList: React.FC<RegionalCoursesListProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {playedCoursesData.map((course) => (
-          <CourseCard 
-            key={course.id} 
-            course={course}
-            viewingUserId={userId}
-            viewContext="global"
-            userRating={getUserRating(course.id)}
-            isReadOnly={!isOwnProfile}
-            showUserRating={true}
-            isFromUserCoursesPage={true}
-            xp={120}
-            showXP={true}
-          />
-        ))}
+      
+      {/* Carousel for mobile and desktop */}
+      <div className="relative">
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+             style={{
+               scrollbarWidth: 'none',
+               msOverflowStyle: 'none',
+               WebkitOverflowScrolling: 'touch',
+               scrollSnapType: 'x mandatory'
+             }}>
+          {playedCoursesData.map((course, index) => {
+            const isLast = index === playedCoursesData.length - 1;
+            return (
+              <div 
+                key={course.id}
+                className={`flex-shrink-0 w-80 ${isLast ? 'pr-4' : ''}`}
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <CourseCard 
+                  course={course}
+                  viewingUserId={userId}
+                  viewContext="global"
+                  userRating={getUserRating(course.id)}
+                  isReadOnly={!isOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                  xp={120}
+                  showXP={true}
+                />
+              </div>
+            );
+          })}
+          
+          {/* Peek indicator for more content */}
+          {playedCoursesData.length > 1 && (
+            <div className="flex-shrink-0 w-8 flex items-center justify-center opacity-50">
+              <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

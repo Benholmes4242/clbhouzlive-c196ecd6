@@ -144,7 +144,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         cy="60"
                         r="45"
                         fill="none"
-                        stroke={achievement.colorLight}
+                        stroke="#e5e7eb"
                         strokeWidth="6"
                         strokeLinecap="round"
                       />
@@ -180,11 +180,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-foreground leading-none">
+                            <div className="text-2xl text-black font-semibold leading-none">
                               <span>{progress.played}</span>
-                              <span className="text-muted-foreground"> / {progress.total}</span>
+                              <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-muted-foreground mt-1">
+                             <div className="text-2xl text-black font-semibold mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -260,9 +260,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     </div>
                   </div>
                   
-                   {/* Achievement info below ring - with text wrapping */}
-                   <div className="mt-2 text-center max-w-[200px]">
-                     <div className="text-lg text-foreground">
+                   {/* Achievement info below ring - reduced gap and consistent text size */}
+                   <div className="mt-1 text-center max-w-[200px]">
+                     <div className="text-base text-foreground font-medium">
                        {achievement.title}
                      </div>
                    </div>

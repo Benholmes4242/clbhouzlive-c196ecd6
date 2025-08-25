@@ -17,7 +17,20 @@ const AIChat: React.FC = () => {
   const isAuthPage = location.pathname === '/auth' || location.pathname === '/create-profile';
 
   // Check if we're on an immersive profile modal by looking for it in the DOM
-  const isImmersiveModalOpen = document.querySelector('[data-immersive-modal="true"]') !== null;
+  const [isImmersiveModalOpen, setIsImmersiveModalOpen] = useState(false);
+
+  // Poll for immersive modal presence
+  useEffect(() => {
+    const checkImmersiveModal = () => {
+      const modalExists = document.querySelector('[data-immersive-modal="true"]') !== null;
+      setIsImmersiveModalOpen(modalExists);
+    };
+
+    checkImmersiveModal();
+    const interval = setInterval(checkImmersiveModal, 100);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Echo should never render on auth pages, when user is not authenticated, when modals are open, or in immersive modal
   const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen && !isImmersiveModalOpen;
