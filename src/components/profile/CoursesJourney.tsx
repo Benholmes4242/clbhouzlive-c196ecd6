@@ -742,7 +742,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={prevSlide}
-                className="h-12 w-12 p-0 hover:bg-transparent"
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronLeft className="h-10 w-10" />
               </Button>
@@ -752,7 +752,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               size="sm"
               onClick={nextSlide}
               disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0 hover:bg-transparent"
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
             >
               <ChevronRight className="h-10 w-10" />
             </Button>
@@ -846,6 +846,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             name,
             country,
             region,
+            sub_country,
             continent,
             global_rank,
             regional_rank,
@@ -1027,6 +1028,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             name,
             country,
             region,
+            sub_country,
             continent,
             global_rank,
             regional_rank,
@@ -1052,6 +1054,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             name,
             country,
             region,
+            sub_country,
             continent,
             global_rank,
             regional_rank,
