@@ -1007,8 +1007,8 @@ const HeroProfileHeader = ({
         ) : (
           /* Normal state - only show active section */
           <div className={`
-            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
-            ${activeSection === 'courses' ? 'pt-8 pb-8' : ''}
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0'}
+            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
             ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
             ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
             ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
