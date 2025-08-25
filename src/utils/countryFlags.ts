@@ -5,10 +5,10 @@ export const countryToFlagCode: Record<string, string> = {
   'Britain & Ireland': 'GB', // Using GB for Great Britain
   'Continental Europe': 'EU', // Using EU flag for Continental Europe
   'England': 'GB-ENG', // England flag (St. George's Cross)
-  'Scotland': 'GB',
-  'Wales': 'GB',
+  'Scotland': 'GB-SCT', // Scotland flag (St. Andrew's Cross)
+  'Wales': 'GB-WLS', // Wales flag (Red Dragon)
   'Ireland': 'IE',
-  'Northern Ireland': 'GB',
+  'Northern Ireland': 'GB-NIR', // Northern Ireland flag
   'France': 'FR',
   'Germany': 'DE',
   'Spain': 'ES',
