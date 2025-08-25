@@ -34,7 +34,7 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full mb-8">
+    <div className="w-full">
       <LatestHighlights 
         userId={userId || ''} 
         isOwnProfile={isOwnProfile}
@@ -134,7 +134,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   }, [regionProgress, generateMotivation]);
 
   return (
-    <div className={`w-full mb-6 md:mb-8 pt-0 ${className}`}>
+    <div className={`w-full pt-0 ${className}`}>
       <div className="md:max-w-[1150px] md:mx-auto">
         {/* Course highlights section removed */}
 
@@ -728,7 +728,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   };
 
   return (
-    <div className="w-full px-4 pt-4 pb-8 mb-24">
+    <div className="w-full px-4 pt-4 pb-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-foreground">
@@ -886,7 +886,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   };
 
   return (
-    <div className="w-full px-4 py-8 mb-24">
+    <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-foreground">
@@ -1127,7 +1127,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   };
 
   return (
-    <div className="w-full px-4 py-8 mb-24">
+    <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-2">
