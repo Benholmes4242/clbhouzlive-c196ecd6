@@ -734,7 +734,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div ref={swipeRef} className="overflow-hidden mb-8"> {/* Added bottom margin for scaled cards */}
               <div 
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ 
