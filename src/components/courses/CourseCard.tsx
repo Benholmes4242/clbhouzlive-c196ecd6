@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
 import CountryFlag from '@/components/ui/country-flag';
 import { supabase } from '@/integrations/supabase/client';
+import { callEdgeFunctionDebounced } from '@/utils/edgeFunctionHelper';
 
 interface Course {
   id: string;
@@ -118,19 +119,20 @@ const CourseCard: React.FC<CourseCardProps> = ({
     if (showAIQuote && course.name) {
       const generateQuote = async () => {
         try {
-          const { data, error } = await supabase.functions.invoke('generate-course-quote', {
-            body: { 
+          const debounceKey = `quote-${course.name}-${course.country}`;
+          
+          const data = await callEdgeFunctionDebounced(
+            'generate-course-quote',
+            { 
               courseName: course.name,
               country: course.country 
-            }
-          });
+            },
+            debounceKey,
+            2000, // 2 second debounce for quotes
+            { timeout: 8000, retries: 1 }
+          );
 
-          if (error) {
-            console.error('Error generating quote:', error);
-            setCourseQuote('A golf experience like no other');
-          } else {
-            setCourseQuote(data.quote || 'A golf experience like no other');
-          }
+          setCourseQuote(data?.quote || 'A golf experience like no other');
         } catch (error) {
           console.error('Error calling quote function:', error);
           setCourseQuote('A golf experience like no other');

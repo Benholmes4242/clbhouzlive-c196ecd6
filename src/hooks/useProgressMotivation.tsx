@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { callEdgeFunctionDebounced } from '@/utils/edgeFunctionHelper';
 
 interface MotivationCache {
   [key: string]: string;
@@ -28,20 +29,21 @@ export const useProgressMotivation = (
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-progress-motivation', {
-        body: {
+      const debounceKey = `motivation-${region}-${played}-${total}`;
+      
+      const data = await callEdgeFunctionDebounced(
+        'generate-progress-motivation',
+        {
           region,
           played,
           total,
           userDisplayName,
           isOwnProfile
-        }
-      });
-
-      if (error) {
-        console.error('Error generating motivation:', error);
-        return getDefaultMotivation(region, played, total);
-      }
+        },
+        debounceKey,
+        1000, // 1 second debounce
+        { timeout: 8000, retries: 1 }
+      );
 
       const message = data?.motivationalMessage || getDefaultMotivation(region, played, total);
       
