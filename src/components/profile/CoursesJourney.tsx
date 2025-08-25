@@ -303,7 +303,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
           {/* Mobile: Swipeable carousel */}
           <div className="md:hidden">
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 px-0"
+            <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-4 px-0"
                  style={{
                    scrollbarWidth: 'none',
                    msOverflowStyle: 'none',
@@ -320,9 +320,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   <div 
                     key={achievement.id} 
                     className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-0' : ''}`}
-                    style={{ scrollSnapAlign: 'start', minWidth: '22vw' }}
+                    style={{ scrollSnapAlign: 'start', minWidth: '24vw' }}
                   >
-                    <div className="w-20 h-20 relative transition-all duration-300">
+                    <div className="w-28 h-28 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
