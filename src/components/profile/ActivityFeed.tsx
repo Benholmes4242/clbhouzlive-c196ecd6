@@ -8,7 +8,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Sliders, Video, Image, MapPin, Trophy } from 'lucide-react';
+import { MoreHorizontal, Video, Image, MapPin, Trophy } from 'lucide-react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -118,13 +118,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           <div className="flex justify-end mb-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="bg-muted border border-border hover:bg-muted/80 text-foreground transition-all duration-200"
-                >
-                  <Sliders className="h-4 w-4 text-black" />
-                </Button>
+                <button className="p-2 hover:bg-muted/50 transition-colors">
+                  <MoreHorizontal className="w-5 h-5 text-foreground" />
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
                 align="end" 
