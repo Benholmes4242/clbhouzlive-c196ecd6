@@ -738,15 +738,13 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               <div 
                 className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  width: `${Math.ceil(filteredCourses.length / cardsPerView) * 100}%`
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
                 }}
               >
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0"
-                    style={{ width: `${100 / Math.ceil(filteredCourses.length / cardsPerView)}%` }}
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
