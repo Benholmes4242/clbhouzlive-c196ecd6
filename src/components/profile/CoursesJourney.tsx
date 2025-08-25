@@ -466,7 +466,7 @@ const CoursesPlayedCarousel: React.FC<CoursesPlayedCarouselProps> = ({
   isOwnProfile = false 
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 3; // Show 3 cards at a time
+  const cardsPerView = 2; // Show 2 cards at a time to match the reference image
 
   // Query to get all played courses
   const { data: allPlayedCourses = [] } = useQuery({
@@ -550,7 +550,7 @@ const CoursesPlayedCarousel: React.FC<CoursesPlayedCarouselProps> = ({
         }
       });
 
-      return Array.from(uniqueCoursesMap.values()).slice(0, 12); // Limit to 12 courses
+      return Array.from(uniqueCoursesMap.values()).slice(0, 8); // Limit to 8 courses
     },
     enabled: !!userId,
   });
@@ -575,12 +575,54 @@ const CoursesPlayedCarousel: React.FC<CoursesPlayedCarouselProps> = ({
     return null;
   }
 
+  // Helper function to get country flag emoji
+  const getCountryFlag = (country: string) => {
+    switch (country) {
+      case 'USA':
+      case 'United States':
+        return '🇺🇸';
+      case 'Britain & Ireland':
+      case 'England':
+      case 'Scotland':
+      case 'Wales':
+      case 'Ireland':
+        return '🇬🇧';
+      case 'Continental Europe':
+      case 'Spain':
+        return '🇪🇸';
+      case 'France':
+        return '🇫🇷';
+      case 'Germany':
+        return '🇩🇪';
+      case 'Portugal':
+        return '🇵🇹';
+      case 'Netherlands':
+        return '🇳🇱';
+      default:
+        return '🌍';
+    }
+  };
+
+  // Helper function to get ranking badge
+  const getRankingBadge = (course: any) => {
+    if (course.global_rank && course.global_rank <= 100) {
+      return { rank: course.global_rank, type: 'global' };
+    }
+    if (course.regional_rank && course.regional_rank <= 100) {
+      return { rank: course.regional_rank, type: 'regional' };
+    }
+    if (course.usa_rank && course.usa_rank <= 100) {
+      return { rank: course.usa_rank, type: 'usa' };
+    }
+    return null;
+  };
+
   return (
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-foreground">
-            {isOwnProfile ? 'Courses Played' : 'Courses Played'}
+            Courses Played
           </h3>
           <div className="flex gap-2">
             <Button
@@ -609,26 +651,69 @@ const CoursesPlayedCarousel: React.FC<CoursesPlayedCarouselProps> = ({
             className="flex transition-transform duration-300 ease-in-out gap-6"
             style={{ 
               transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-              width: `${(allPlayedCourses.length / cardsPerView) * 100}%`
+              width: `${Math.ceil(allPlayedCourses.length / cardsPerView) * 100}%`
             }}
           >
-            {allPlayedCourses.map((userCourse) => (
-              <div 
-                key={userCourse.id} 
-                className="flex-shrink-0"
-                style={{ width: `${100 / allPlayedCourses.length}%` }}
-              >
-                <CourseCard 
-                  course={userCourse.golf_courses}
-                  viewingUserId={userId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!isOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
-              </div>
-            ))}
+            {allPlayedCourses.map((userCourse) => {
+              const course = userCourse.golf_courses;
+              const rankingBadge = getRankingBadge(course);
+              
+              return (
+                <div 
+                  key={userCourse.id} 
+                  className="flex-shrink-0"
+                  style={{ width: `${100 / Math.ceil(allPlayedCourses.length / cardsPerView)}%` }}
+                >
+                  <div 
+                    className="relative h-64 rounded-xl overflow-hidden bg-cover bg-center group cursor-pointer"
+                    style={{ 
+                      backgroundImage: `url(${course?.thumbnail_image || '/placeholder.svg'})`,
+                    }}
+                  >
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    
+                    {/* Top badges */}
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      {/* World ranking badge */}
+                      {rankingBadge && (
+                        <div className="bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                          <span>🌍</span>
+                          <span>{rankingBadge.rank}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="absolute top-3 right-3 flex gap-2">
+                      {/* Country flag badge */}
+                      <div className="bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                        <span>{getCountryFlag(course?.country || '')}</span>
+                        <span>{course?.regional_rank || course?.usa_rank || course?.global_rank || ''}</span>
+                      </div>
+                      
+                      {/* User rating badge */}
+                      {userCourse.rating && (
+                        <div className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                          <span>⭐</span>
+                          <span>{userCourse.rating}/10</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Course info at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h4 className="text-white text-xl font-bold mb-1 leading-tight">
+                        {course?.name}
+                      </h4>
+                      <p className="text-white/80 text-sm flex items-center gap-1">
+                        <span>📍</span>
+                        <span>{course?.country}{course?.region ? `, ${course.region}` : ''}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
