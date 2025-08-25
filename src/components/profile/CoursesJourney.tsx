@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import CourseCard from '@/components/courses/CourseCard';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -439,6 +445,190 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
               {/* Peek indicator for mobile */}
               <div className="flex-shrink-0 w-4"></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Courses Played Carousel */}
+      <CoursesPlayedCarousel userId={userId} isOwnProfile={isOwnProfile} />
+    </div>
+  );
+};
+
+// Courses Played Carousel Component
+interface CoursesPlayedCarouselProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const CoursesPlayedCarousel: React.FC<CoursesPlayedCarouselProps> = ({ 
+  userId, 
+  isOwnProfile = false 
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 3; // Show 3 cards at a time
+
+  // Query to get all played courses
+  const { data: allPlayedCourses = [] } = useQuery({
+    queryKey: ['coursesPlayedCarousel', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine and deduplicate
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null,
+          id: `top100-${course.course_id}`
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at,
+          id: `rating-${course.course_id}`
+        }))
+      ];
+
+      // Remove duplicates, preferring rated courses
+      const uniqueCoursesMap = new Map();
+      combinedCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else if (course.rating !== null && course.rating !== undefined && 
+                   (existing.rating === null || existing.rating === undefined)) {
+          uniqueCoursesMap.set(courseId, course);
+        }
+      });
+
+      return Array.from(uniqueCoursesMap.values()).slice(0, 12); // Limit to 12 courses
+    },
+    enabled: !!userId,
+  });
+
+  const maxIndex = Math.max(0, allPlayedCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  if (allPlayedCourses.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="w-full px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-foreground">
+            {isOwnProfile ? 'Courses Played' : 'Courses Played'}
+          </h3>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevSlide}
+              disabled={currentIndex === 0}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div ref={swipeRef} className="overflow-hidden">
+          <div 
+            className="flex transition-transform duration-300 ease-in-out gap-6"
+            style={{ 
+              transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+              width: `${(allPlayedCourses.length / cardsPerView) * 100}%`
+            }}
+          >
+            {allPlayedCourses.map((userCourse) => (
+              <div 
+                key={userCourse.id} 
+                className="flex-shrink-0"
+                style={{ width: `${100 / allPlayedCourses.length}%` }}
+              >
+                <CourseCard 
+                  course={userCourse.golf_courses}
+                  viewingUserId={userId}
+                  viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!isOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
