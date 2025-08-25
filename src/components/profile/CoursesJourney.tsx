@@ -742,7 +742,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 onClick={prevSlide}
                 className="h-20 w-20 p-0 hover:bg-transparent"
               >
-                <ChevronLeft className="h-16 w-16 text-foreground" strokeWidth={2} />
+                <ChevronLeft size={32} className="text-foreground" strokeWidth={2} />
               </Button>
             )}
             <Button
@@ -752,7 +752,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               disabled={currentIndex >= maxIndex}
               className="h-20 w-20 p-0 hover:bg-transparent"
             >
-              <ChevronRight className="h-16 w-16 text-foreground" strokeWidth={2} />
+              <ChevronRight size={32} className="text-foreground" strokeWidth={2} />
             </Button>
           </div>
         </div>
@@ -900,7 +900,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               disabled={currentIndex === 0}
               className="h-12 w-12 p-0"
             >
-              <ChevronLeft className="h-8 w-8" strokeWidth={2} />
+              <ChevronLeft size={20} strokeWidth={2} />
             </Button>
             <Button
               variant="outline"
@@ -909,7 +909,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               disabled={currentIndex >= maxIndex}
               className="h-12 w-12 p-0"
             >
-              <ChevronRight className="h-8 w-8" strokeWidth={2} />
+              <ChevronRight size={20} strokeWidth={2} />
             </Button>
           </div>
         </div>
@@ -1138,7 +1138,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               disabled={currentIndex === 0}
               className="h-12 w-12 p-0"
             >
-              <ChevronLeft className="h-8 w-8" strokeWidth={2} />
+              <ChevronLeft size={20} strokeWidth={2} />
             </Button>
             <Button
               variant="outline"
@@ -1147,7 +1147,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               disabled={currentIndex >= maxIndex}
               className="h-12 w-12 p-0"
             >
-              <ChevronRight className="h-8 w-8" strokeWidth={2} />
+              <ChevronRight size={20} strokeWidth={2} />
             </Button>
           </div>
         </div>
