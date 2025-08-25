@@ -77,11 +77,22 @@ const formatLocation = (course: Course) => {
   return parts.join(', ');
 };
 
-// Helper function to get the actual country name from course data
-const getActualCountry = (course: Course) => {
+// Helper function to get the country for flag display
+const getCountryForFlag = (course: Course) => {
   // For GB&I and Continental Europe, use sub_country if available
   if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
     return course.sub_country || course.region || course.country;
+  }
+  
+  // For USA and other countries, use the country field
+  return course.country;
+};
+
+// Helper function to get the location text to display
+const getLocationText = (course: Course) => {
+  // For GB&I and Continental Europe, prefer region (like "Algarve") over sub_country
+  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
+    return course.region || course.sub_country || course.country;
   }
   
   // For USA and other countries, use the country field
@@ -163,10 +174,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {showCountryWithFlag ? (
               <>
                 <CountryFlag 
-                  country={getActualCountry(course)} 
+                  country={getCountryForFlag(course)} 
                   className="h-5 w-5 mr-2 flex-shrink-0" 
                 />
-                <span className="flex items-center">{getActualCountry(course)}</span>
+                <span className="flex items-center">{getLocationText(course)}</span>
               </>
             ) : (
               <>
