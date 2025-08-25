@@ -15,11 +15,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
-import Top100Progress from './Top100Progress';
-import TrophyProgressSection from './TrophyProgressSection';
-import RegionalCompletionSection from './RegionalCompletionSection';
 import CoursesControls from '@/components/profile/CoursesControls';
-import NetflixCoursesLayout from './netflix/NetflixCoursesLayout';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
