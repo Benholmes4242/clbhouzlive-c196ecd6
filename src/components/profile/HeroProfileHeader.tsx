@@ -192,6 +192,88 @@ const HeroProfileHeader = ({
         : (isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left');
     }
   };
+
+  // Get transition classes for content sections
+  const getContentTransitionClass = (isOutgoing: boolean = false) => {
+    if (transitionState === 'idle') return '';
+    
+    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0';
+    const sectionClasses = `
+      ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+      ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
+      ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
+      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+    `;
+    
+    if (isOutgoing) {
+      // Element sliding out
+      return `${baseClasses} ${sectionClasses} ${transitionDirection === 'right' 
+        ? 'animate-slide-out-left' 
+        : 'animate-slide-out-right'}`;
+    } else {
+      // Element sliding in
+      return `${baseClasses} ${sectionClasses} ${transitionDirection === 'right'
+        ? (isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right')
+        : (isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left')}`;
+    }
+  };
+
+  // Get current content based on active section
+  const getCurrentContent = () => {
+    const containerClasses = activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto';
+    
+    const content = (() => {
+      switch (activeSection) {
+        case 'activity':
+          return (
+            <ActivityFeed
+              userId={profile?.id || ''}
+              isOwnProfile={isOwnProfile}
+              profileDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              onAchievementsClick={() => onSectionChange?.('achievements')}
+            />
+          );
+        case 'courses':
+          return (
+            <UserCoursesContent 
+              username={profile?.username || ''}
+              isOwnProfile={isOwnProfile}
+              displayName={profile?.display_name || 'User'}
+            />
+          );
+        case 'achievements':
+          return (
+            <AchievementsPane 
+              userId={profile?.id}
+              userDisplayName={profile?.display_name || 'User'}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
+          );
+        case 'stats':
+          return (
+            <HandicapSection 
+              userId={profile?.id || ''}
+              profile={profile}
+            />
+          );
+        default:
+          return null;
+      }
+    })();
+
+    return <div className={containerClasses}>{content}</div>;
+  };
+
+  // Get previous content for transitions (used during slide animations)
+  const getPreviousContent = () => {
+    // During transition, we need to show the content that was active before the transition started
+    // This function will return the content that should slide out
+    return getCurrentContent(); // For now, use current content logic - this could be enhanced
+  };
   
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
@@ -907,54 +989,37 @@ const HeroProfileHeader = ({
         )}
       </div>
 
-      {/* Content sections for the selected tab with responsive animations */}
-      <div className={`
-        transition-all duration-300 ease-out
-        ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0'}
-        ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
-        ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
-        ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
-        ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
-      `}>
-        <div className={`
-          transition-transform duration-300 ease-out
-          ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
-        `}>
-          {activeSection === 'activity' && (
-            <ActivityFeed
-              userId={profile?.id || ''}
-              isOwnProfile={isOwnProfile}
-              profileDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              onAchievementsClick={() => onSectionChange?.('achievements')}
-            />
-          )}
-          {activeSection === 'courses' && (
-            <>
-              <UserCoursesContent 
-                username={profile?.username || ''}
-                isOwnProfile={isOwnProfile}
-                displayName={profile?.display_name || 'User'}
-              />
-            </>
-          )}
-          {activeSection === 'achievements' && (
-            <AchievementsPane 
-              userId={profile?.id}
-              userDisplayName={profile?.display_name || 'User'}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
-          )}
-          {activeSection === 'stats' && (
-            <HandicapSection 
-              userId={profile?.id || ''}
-              profile={profile}
-            />
-          )}
-        </div>
+      {/* Content sections with slide transitions */}
+      <div className="relative overflow-hidden">
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing content */}
+            <div className={`absolute inset-0 w-full ${getContentTransitionClass(true)}`}>
+              {getPreviousContent()}
+            </div>
+            
+            {/* Incoming content */}
+            <div className={`relative w-full ${getContentTransitionClass(false)}`}>
+              {getCurrentContent()}
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <div className={`
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0'}
+            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
+            ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
+            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+          `}>
+            <div className={`
+              ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
+            `}>
+              {getCurrentContent()}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Post Viewer Modal */}
