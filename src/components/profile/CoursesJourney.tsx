@@ -455,6 +455,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
       {/* Recently Played Section - Copy of Courses Played */}
       <RecentlyPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* Top 10 Rated by You Section */}
+      <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -768,6 +771,157 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             </div>
           ) : (
             <EmptyTop100State isOwnProfile={isOwnProfile} displayName="" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Top 10 Rated by You Section Component
+interface TopRatedSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const TopRatedSection: React.FC<TopRatedSectionProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
+
+  // Query to get top rated courses by the user
+  const { data: topRatedCourses = [] } = useQuery({
+    queryKey: ['topRatedCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      // Get courses from course_ratings table ordered by rating desc
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .order('rating', { ascending: false })
+        .limit(10);
+
+      if (ratedError) throw ratedError;
+
+      return (ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at, // Use rating date as played date
+        id: `rating-${course.course_id}` // Unique ID
+      }));
+    },
+    enabled: !!userId,
+  });
+
+  const { isHydrated } = useViewPreference();
+
+  const maxIndex = Math.max(0, topRatedCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  return (
+    <div className="w-full px-4 py-8 mb-24">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-foreground">
+            Top 10 Rated by You
+          </h3>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevSlide}
+              disabled={currentIndex === 0}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="relative space-y-6 mb-16">
+          {!isHydrated ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-muted-foreground">
+                  Loading preferences...
+                </span>
+              </div>
+            </div>
+          ) : topRatedCourses.length > 0 ? (
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
+                {topRatedCourses.map((userCourse) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
+                  >
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[333px]"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {isOwnProfile ? "You haven't rated any courses yet." : "No rated courses found."}
+              </p>
+            </div>
           )}
         </div>
       </div>
