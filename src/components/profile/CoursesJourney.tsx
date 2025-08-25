@@ -744,17 +744,20 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
+                    className="flex-shrink-0"
+                    style={{ width: '30%' }} // 60% of original 50% = 30% of container
                   >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                    />
+                    <div className="transform scale-y-[1.3] origin-top"> {/* 30% taller */}
+                      <CourseCard 
+                        course={userCourse.golf_courses}
+                        viewingUserId={userId}
+                        viewContext="global"
+                        userRating={userCourse.rating}
+                        isReadOnly={!isOwnProfile}
+                        showUserRating={true}
+                        isFromUserCoursesPage={true}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
