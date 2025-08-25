@@ -1,6 +1,9 @@
 
 project_id = "ybxkehyomcakqjvuhnna"
 
+[functions.upload-country-flags]
+verify_jwt = true
+
 [functions.fetch-news]
 verify_jwt = false
 
