@@ -120,8 +120,8 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         onClick={onMorphToHeader}
         className="flex-shrink-0"
       >
-        <div className="px-8 py-5">
-          <div className="flex items-center gap-4">
+        <div className="px-6 py-3">
+          <div className="flex items-center gap-3">
             {/* Avatar - made even bigger */}
             <Avatar className="w-20 h-20 rounded-full">
               <AvatarImage 
