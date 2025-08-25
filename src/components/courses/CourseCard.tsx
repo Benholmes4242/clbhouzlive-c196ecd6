@@ -59,22 +59,13 @@ const formatDescription = (description: string) => {
 };
 
 const formatLocation = (course: Course) => {
-  const parts = [];
-  
-  // Always start with country
-  parts.push(course.country);
-  
-  // Add sub_country if it exists
-  if (course.sub_country) {
-    parts.push(course.sub_country);
+  // For GB&I and Continental Europe, use sub_country (like "Portugal") 
+  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
+    return course.sub_country || course.region || course.country;
   }
   
-  // Add region if it exists and is different from country
-  if (course.region && course.region !== course.country) {
-    parts.push(course.region);
-  }
-  
-  return parts.join(', ');
+  // For USA and other countries, use the country field
+  return course.country;
 };
 
 // Helper function to get the country for flag display
