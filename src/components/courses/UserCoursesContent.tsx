@@ -292,93 +292,70 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      {/* Trophy Progress Section and Regional Completion Section removed */}
-
-      {/* Netflix-style layout */}
-      <div className="space-y-8">
-        {isLoadingTop100 || !isHydrated ? (
-          <div className="text-center py-8">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-muted-foreground">
-                {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
-              </span>
-            </div>
+      {isLoadingTop100 || !isHydrated ? (
+        <div className="text-center py-8">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-muted-foreground">
+              {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
+            </span>
           </div>
-        ) : filteredCourses.length > 0 ? (
-          <>
-            {/* Netflix-style rows */}
-            <NetflixCoursesLayout
-              allCourses={filteredCourses}
-              isOwnProfile={finalIsOwnProfile}
-              displayName={finalDisplayName}
-              onCourseClick={(course) => {
-                // Handle course click if needed
-                console.log('Course clicked:', course);
-              }}
+        </div>
+      ) : filteredCourses.length > 0 ? (
+        <>
+          {/* CoursesControls component now handles all filtering and sorting */}
+          <div className="flex flex-col gap-4 mb-6">
+            <CoursesControls
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              viewType={viewType}
+              onViewTypeChange={setViewType}
             />
-            
-            {/* Traditional view toggle (keeping existing functionality) */}
-            <div className="mt-12 pt-8 border-t border-border">
-              {/* CoursesControls component now handles all filtering and sorting */}
-              <div className="flex flex-col gap-4 mb-6">
-                <CoursesControls
-                  activeFilter={activeFilter}
-                  onFilterChange={setActiveFilter}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                  viewType={viewType}
-                  onViewTypeChange={setViewType}
-                />
-              </div>
-              
-              <h3 className="text-lg font-semibold mb-4 text-foreground">
-                {finalIsOwnProfile ? 'All My Courses' : `All ${finalDisplayName}'s Courses`}
-              </h3>
-              
-              {viewType === 'cards' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredCourses.map((userCourse) => (
-                    <CourseCard 
-                      key={userCourse.id} 
-                      course={userCourse.golf_courses}
-                      viewingUserId={targetUserId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!finalIsOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {filteredCourses.map((userCourse) => (
-                    <CourseListItem
-                      key={userCourse.id}
-                      course={userCourse.golf_courses}
-                      viewingUserId={targetUserId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!finalIsOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
-        ) : activeFilter ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No courses found in the selected region.
-            </p>
           </div>
-        ) : (
-          <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
-        )}
-      </div>
+          
+          {viewType === 'cards' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredCourses.map((userCourse) => (
+                <CourseCard 
+                  key={userCourse.id} 
+                  course={userCourse.golf_courses}
+                  viewingUserId={targetUserId}
+                  viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!finalIsOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {filteredCourses.map((userCourse) => (
+                <CourseListItem
+                  key={userCourse.id}
+                  course={userCourse.golf_courses}
+                  viewingUserId={targetUserId}
+                  viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!finalIsOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      ) : activeFilter ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            No courses found in the selected region.
+          </p>
+        </div>
+      ) : (
+        <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
+      )}
 
       {/* Course Picker Modal */}
       <CoursePickerModal
