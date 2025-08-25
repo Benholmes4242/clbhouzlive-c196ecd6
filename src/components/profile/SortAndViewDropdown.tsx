@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, Grid3X3, List } from 'lucide-react';
+import { MoreHorizontal, Grid3X3, List } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,11 +43,8 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-muted/50 hover:bg-muted text-foreground rounded-full transition-all duration-200 border border-border/20">
-          <ChevronDown className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            Sort & View
-          </span>
+        <button className="p-2 hover:bg-muted/50 transition-colors">
+          <MoreHorizontal className="w-5 h-5 text-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
