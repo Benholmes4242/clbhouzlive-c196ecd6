@@ -95,7 +95,7 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="relative flex items-center px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-sm border border-white/20" style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                <div className="relative flex items-center px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                   <div className="relative z-10 flex items-center gap-1.5">
                     {badge.icon}
                     <span className="text-sm font-bold text-white">{badge.rank}</span>
@@ -112,7 +112,7 @@ const CourseRankBadges = ({
            {playerRatingBadge && (
              <Tooltip>
                <TooltipTrigger asChild>
-                    <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-sm border border-white/20" style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+                    <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                      <div className="relative z-10 flex items-center gap-1.5">
                        <ClubhouseLogo size="sm" />
                        <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
@@ -146,7 +146,7 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-               <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-sm border border-white/20" style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+               <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-full shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                  <div className="relative z-10 flex items-center gap-1.5">
                    <ClubhouseLogo size="sm" />
                    <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
