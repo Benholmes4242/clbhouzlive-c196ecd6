@@ -695,7 +695,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   };
 
   return (
-    <div className="w-full px-4 py-8">
+    <div className="w-full px-4 py-8 mb-16">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-foreground">
@@ -723,7 +723,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           </div>
         </div>
         
-        <div className="relative space-y-6">
+        <div className="relative space-y-6 mb-12">
           {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
@@ -744,7 +744,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
+                    className="flex-shrink-0 w-[calc(50%-12px)] transform scale-y-[1.3] origin-top" // Half width minus gap with 30% height increase
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
