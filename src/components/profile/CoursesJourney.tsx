@@ -742,7 +742,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 onClick={prevSlide}
                 className="h-8 w-8 p-0 hover:bg-transparent"
               >
-                <ChevronLeft className="h-6 w-6" />
+                <ChevronLeft className="h-8 w-8" />
               </Button>
             )}
             <Button
@@ -752,7 +752,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               disabled={currentIndex >= maxIndex}
               className="h-8 w-8 p-0 hover:bg-transparent"
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-8 w-8" />
             </Button>
           </div>
         </div>
@@ -770,7 +770,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           ) : filteredCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-6"
+                className="flex transition-transform duration-300 ease-in-out gap-3"
                 style={{ 
                   transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
                 }}
