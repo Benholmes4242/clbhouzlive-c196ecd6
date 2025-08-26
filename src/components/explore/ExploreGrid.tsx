@@ -388,7 +388,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   sections.push(
                     <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -410,6 +410,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                           currentIndex={0}
                           loop={true}
                         />
+                        
+                        {/* Multiple media indicator */}
+                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <MediaNavigationDots
+                              mediaCount={portraitItem.item.media.length}
+                              currentIndex={0}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -420,7 +430,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   sections.push(
                     <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -442,6 +452,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                           currentIndex={0}
                           loop={true}
                         />
+                        
+                        {/* Multiple media indicator */}
+                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <MediaNavigationDots
+                              mediaCount={portraitItem.item.media.length}
+                              currentIndex={0}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
