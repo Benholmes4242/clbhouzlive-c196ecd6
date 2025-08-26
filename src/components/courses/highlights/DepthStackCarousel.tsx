@@ -179,7 +179,7 @@ const VideoCard: React.FC<{
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-[4/3] rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      className="relative aspect-video rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -274,7 +274,28 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     isMobile
   } = useCarouselNavigation(carouselItems.length);
 
-  const visibleCards = isMobile ? 1 : 3;
+  // Responsive card visibility based on screen size
+  const getVisibleCards = () => {
+    if (typeof window === 'undefined') return 3; // SSR fallback
+    
+    const width = window.innerWidth;
+    if (width <= 430) return 1.15; // Mobile: 1 full + peek
+    if (width <= 768) return 1.7; // Small tablet: ~1.6-1.8
+    if (width <= 1024) return 2.2; // Large tablet: ~2.2
+    return 3; // Desktop: 3
+  };
+
+  const [visibleCards, setVisibleCards] = useState(getVisibleCards);
+
+  // Update visible cards on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setVisibleCards(getVisibleCards());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Create a local ref to access the container element
   const containerRef = useRef<HTMLDivElement>(null);
@@ -377,37 +398,48 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           msOverflowStyle: 'none'
         }}
       >
-        {carouselItems.map((item, index) => (
-          <div
-            key={item.id}
-            className={`flex-shrink-0 transition-all duration-300 ${
-              isMobile 
-                ? 'w-[calc(100vw-8rem)]' // Smaller width on mobile to show peek of next card
-                : 'w-80'
-            }`}
-            style={{ scrollSnapAlign: 'start' }}
-            onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
-            onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
-          >
-            <VideoCard
-              video={item}
-              isActive={index === activeVideoIndex}
-              onVideoPlay={onVideoPlay}
-              isMobile={isMobile}
-              isHovered={hoveredCardIndex === index}
-              isFirstCard={index === 0}
-              shouldAutoPlay={hoveredCardIndex === null || hoveredCardIndex === 0}
-              userFirstName={userFirstName}
-              isOwnProfile={isOwnProfile}
-            />
-          </div>
-        ))}
+        {carouselItems
+          .filter(item => item.videoUrl) // Hide cards without videos
+          .map((item, index) => {
+            // Calculate responsive width based on visible cards
+            const getCardWidth = () => {
+              if (typeof window === 'undefined') return 'w-80'; // SSR fallback
+              
+              const width = window.innerWidth;
+              if (width <= 430) return 'w-[calc(87vw)]'; // Mobile: ~1.15 cards visible
+              if (width <= 768) return 'w-[calc(59vw)]'; // Small tablet: ~1.7 cards visible
+              if (width <= 1024) return 'w-[calc(45vw)]'; // Large tablet: ~2.2 cards visible
+              return 'w-80'; // Desktop: 3 cards visible (320px each)
+            };
+
+            return (
+              <div
+                key={item.id}
+                className={`flex-shrink-0 transition-all duration-300 ${getCardWidth()}`}
+                style={{ scrollSnapAlign: 'start' }}
+                onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
+                onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
+              >
+                <VideoCard
+                  video={item}
+                  isActive={index === activeVideoIndex}
+                  onVideoPlay={onVideoPlay}
+                  isMobile={isMobile}
+                  isHovered={hoveredCardIndex === index}
+                  isFirstCard={index === 0}
+                  shouldAutoPlay={hoveredCardIndex === null || hoveredCardIndex === 0}
+                  userFirstName={userFirstName}
+                  isOwnProfile={isOwnProfile}
+                />
+              </div>
+            );
+          })}
       </div>
 
       {/* Carousel dots */}
-      {carouselItems.length > 1 && (
+      {carouselItems.filter(item => item.videoUrl).length > 1 && (
         <div className="flex justify-center gap-2 mt-4">
-          {carouselItems.map((_, index) => (
+          {carouselItems.filter(item => item.videoUrl).map((_, index) => (
             <button
               key={index}
               onClick={() => {

@@ -34,8 +34,13 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full px-4 py-8">
+    <div className="w-full px-4 pt-4 pb-8">
       <div className="max-w-6xl mx-auto">
+        {/* Highlights from my journey title - matches Top 10 Rated by You style */}
+        <h3 className="text-3xl text-foreground mb-0">
+          Highlights from my journey
+        </h3>
+        
         <LatestHighlights 
           userId={userId || ''} 
           isOwnProfile={isOwnProfile}
@@ -984,22 +989,175 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   isOwnProfile = false
 }) => {
   return (
-    <div className="w-full px-4 py-8 mb-0">
+    <div className="w-full px-4 pt-4 pb-8 mb-0">
       <div className="max-w-6xl mx-auto">
-        {/* Section Titles */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+        {/* Courses by Region title - matches Top 10 Rated by You style */}
+        <div className="flex items-center justify-between mb-0">
+          <h3 className="text-3xl text-foreground">
             Courses by Region
-          </h2>
-          <h3 className="text-xl text-muted-foreground">
-            Great Britain & Ireland
           </h3>
+          <div className="flex gap-2">
+            {/* Navigation buttons moved here from Great Britain section */}
+            <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
+          </div>
         </div>
+        
+        {/* Great Britain & Ireland subtitle */}
+        <h4 className="text-xl text-muted-foreground mb-0">
+          Great Britain & Ireland
+        </h4>
       </div>
       
-      {/* Great Britain & Ireland Courses Section */}
+      {/* Great Britain & Ireland Courses Section - no gap */}
       <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
+  );
+};
+
+// Navigation component for Great Britain & Ireland section
+interface GreatBritainIrelandNavigationProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  // Use the same state management pattern as the main section
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2;
+
+  // Same query as the main section to get the data for navigation
+  const { data: gbIrelandCourses = [] } = useQuery({
+    queryKey: ['gbIrelandCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null,
+          id: `top100-${course.course_id}`
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at,
+          id: `rating-${course.course_id}`
+        }))
+      ];
+
+      const gbIrelandCourses = combinedCourses.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        return course && course.country === 'Britain & Ireland';
+      });
+
+      const uniqueCoursesMap = new Map();
+      
+      gbIrelandCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else {
+          if (course.rating !== null && course.rating !== undefined && 
+              (existing.rating === null || existing.rating === undefined)) {
+            uniqueCoursesMap.set(courseId, course);
+          }
+        }
+      });
+
+      const rawCourses = Array.from(uniqueCoursesMap.values());
+      return getSortedUserCourses(rawCourses, 'recent');
+    },
+    enabled: !!userId,
+  });
+
+  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+    // Trigger the same navigation in the main section
+    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'next' } }));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    // Trigger the same navigation in the main section
+    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'prev' } }));
+  };
+
+  return (
+    <>
+      {currentIndex > 0 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={prevSlide}
+          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+        >
+          <ChevronLeft className="h-10 w-10" />
+        </Button>
+      )}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={nextSlide}
+        disabled={currentIndex >= maxIndex}
+        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+      >
+        <ChevronRight className="h-10 w-10" />
+      </Button>
+    </>
   );
 };
 
@@ -1136,31 +1294,23 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     setCurrentIndex(prev => Math.max(prev - 1, 0));
   };
 
+  // Listen for navigation events from the navigation component
+  useEffect(() => {
+    const handleNavigation = (event: any) => {
+      if (event.detail.action === 'next') {
+        nextSlide();
+      } else if (event.detail.action === 'prev') {
+        prevSlide();
+      }
+    };
+
+    window.addEventListener('gbireland-nav', handleNavigation);
+    return () => window.removeEventListener('gbireland-nav', handleNavigation);
+  }, []);
+
   return (
-    <div className="w-full px-4 py-8">
+    <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={prevSlide}
-              disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
         
         <div className="relative">
           {!isHydrated ? (
