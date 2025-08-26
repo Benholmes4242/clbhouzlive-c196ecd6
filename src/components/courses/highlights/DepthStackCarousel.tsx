@@ -391,7 +391,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           carouselRef(node);
           containerRef.current = node;
         }}
-        className={`flex gap-3 overflow-x-auto scrollbar-hide ${
+        className={`flex gap-6 overflow-x-auto scrollbar-hide ${
           isMobile ? 'px-0' : 'px-0'
         }`}
         style={{
@@ -403,15 +403,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems
           .filter(item => item.videoUrl) // Hide cards without videos
           .map((item, index) => {
-            // Calculate responsive width based on visible cards - accounting for gaps
+            // Calculate responsive width based on visible cards - accounting for larger gaps
             const getCardWidth = () => {
               if (typeof window === 'undefined') return 'w-96'; // SSR fallback
               
               const width = window.innerWidth;
-              if (width <= 430) return 'w-[calc(87vw-12px)]'; // Mobile: account for gaps
-              if (width <= 768) return 'w-[calc(59vw-12px)]'; // Small tablet: account for gaps  
-              if (width <= 1024) return 'w-[calc(45vw-12px)]'; // Large tablet: account for gaps
-              return 'w-80'; // Desktop: fixed width with proper gaps
+              if (width <= 430) return 'w-[calc(85vw-24px)]'; // Mobile: account for larger gaps
+              if (width <= 768) return 'w-[calc(55vw-24px)]'; // Small tablet: account for larger gaps  
+              if (width <= 1024) return 'w-[calc(42vw-24px)]'; // Large tablet: account for larger gaps
+              return 'w-72'; // Desktop: smaller fixed width for better gaps
             };
 
             return (
@@ -447,8 +447,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => {
                 const container = containerRef.current;
                 if (container) {
-                  const cardWidth = isMobile ? container.offsetWidth : 320; // w-80 = 320px
-                  const gap = 12; // gap-3 = 12px
+                  const cardWidth = isMobile ? container.offsetWidth : 288; // w-72 = 288px
+                  const gap = 24; // gap-6 = 24px
                   const scrollPosition = index * (cardWidth + gap);
                   container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                 }
