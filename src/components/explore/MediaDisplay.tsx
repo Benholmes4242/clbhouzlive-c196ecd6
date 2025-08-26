@@ -49,6 +49,37 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   useSmartMedia = false,
   onMediaClick
 }) => {
+  // Generate thumbnail URL for Cloudflare Stream videos
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
+      // Extract video ID from Cloudflare Stream URL
+      const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
+      if (match) {
+        const videoId = match[1];
+        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      }
+    }
+    return null;
+  };
+
+  // Use smart media logic if enabled (early return to avoid hook order issues)
+  if (useSmartMedia && cardType) {
+    const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
+    return (
+      <SmartCardMedia
+        media={{
+          ...media,
+          thumbnail_url: thumbnailUrl || undefined,
+          poster_url: thumbnailUrl || undefined
+        }}
+        cardType={cardType}
+        shouldAutoplay={shouldAutoplay}
+        onMediaClick={onMediaClick}
+        className="w-full h-full"
+      />
+    );
+  }
+
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
   
@@ -69,40 +100,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Video autoplay transition state
   const [videoTransitioning, setVideoTransitioning] = useState(false);
 
-  // Generate thumbnail URL for Cloudflare Stream videos
-  const getVideoThumbnail = (videoUrl: string) => {
-    if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
-      // Extract video ID from Cloudflare Stream URL
-      const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
-      if (match) {
-        const videoId = match[1];
-        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
-      }
-    }
-    // For non-Cloudflare videos, we'll show the video element with preload="metadata" 
-    // which will display the first frame as thumbnail
-    return null;
-  };
-
   const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
   const hasCloudflareThumb = thumbnailUrl !== null;
-
-  // Use smart media logic if enabled
-  if (useSmartMedia && cardType) {
-    return (
-      <SmartCardMedia
-        media={{
-          ...media,
-          thumbnail_url: thumbnailUrl || undefined,
-          poster_url: thumbnailUrl || undefined
-        }}
-        cardType={cardType}
-        shouldAutoplay={shouldAutoplay}
-        onMediaClick={onMediaClick}
-        className="w-full h-full"
-      />
-    );
-  }
 
   // Handle smooth transition for autoplay videos
   React.useEffect(() => {
