@@ -858,7 +858,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   return (
     <>
       {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px -mx-0 md:mx-0" style={{ gridAutoRows: '1fr' }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
