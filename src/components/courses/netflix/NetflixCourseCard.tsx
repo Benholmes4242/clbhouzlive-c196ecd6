@@ -8,6 +8,8 @@ interface NetflixCourseCardProps {
   onClick?: () => void;
   size?: 'large' | 'medium';
   isHeroBanner?: boolean;
+  isHighlightReel?: boolean;
+  isTopRated?: boolean;
 }
 
 const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
@@ -16,7 +18,9 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
   className = "",
   onClick,
   size = 'medium',
-  isHeroBanner = false
+  isHeroBanner = false,
+  isHighlightReel = false,
+  isTopRated = false
 }) => {
   const getRankBadges = () => {
     const badges = [];
@@ -132,11 +136,17 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
 
   // Determine aspect ratio based on card size and context
   const getAspectRatio = () => {
-    if (size === 'large') {
-      // Recently Played and Highlight Reel: 3:4 portrait
+    if (isTopRated) {
+      // Top 10 Rated: Wide landscape (shorter than portrait)
+      return 'aspect-[2.5/1]';
+    } else if (isHighlightReel) {
+      // Highlight Reel: Slightly shorter than Recently Played (portrait-ish)
+      return 'aspect-[4/5]';
+    } else if (size === 'large') {
+      // Recently Played and regional: 3:4 portrait
       return 'aspect-[3/4]';
     } else {
-      // Top 10 Rated and other medium cards: wide landscape
+      // Default medium cards: landscape
       return 'aspect-[2/1]';
     }
   };

@@ -113,11 +113,11 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             if (isRecentlyPlayed) {
               widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
             }
-            // Top 10 Rated: Wide landscape cards with peek at all breakpoints  
+            // Top 10 Rated: Feature-wide cards with specific peek percentages
             else if (isTopRated) {
-              widthClasses = 'flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(100vw-4rem)] md:w-[calc(100vw-5rem)] lg:w-[calc(100vw-6rem)] xl:w-[calc(100vw-8rem)] snap-start';
+              widthClasses = 'flex-shrink-0 w-[calc(92vw-2rem)] sm:w-[calc(94vw-3rem)] md:w-[calc(92vw-4rem)] lg:w-[calc(90vw-5rem)] xl:w-[calc(80vw-6rem)] snap-start';
             }
-            // Highlight Reel: Same height as Recently Played but wider cards
+            // Highlight Reel: Slightly shorter than Recently Played but wider cards
             else if (isHighlightReel) {
               widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
             }
@@ -142,6 +142,8 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
                 className={`${widthClasses} ${cardTransition}`}
                 onClick={() => onCourseClick?.(course.golf_courses || course)}
                 size={size}
+                isTopRated={isTopRated}
+                isHighlightReel={isHighlightReel}
               />
             );
           })}
