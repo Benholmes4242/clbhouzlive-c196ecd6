@@ -71,7 +71,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
                   width={80}
                   height={80}
                   onError={(e) => {
-                    console.log('Image failed to load:', story.avatar);
+                    // Image load error handled silently
                     e.currentTarget.style.display = 'none';
                     e.currentTarget.nextElementSibling?.classList.remove('hidden');
                   }}

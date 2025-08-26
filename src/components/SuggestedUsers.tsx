@@ -127,7 +127,7 @@ const SuggestedUsers = () => {
     );
     
     // Here you would typically send a friend request to the backend
-    console.log('Following user:', userId);
+    // Following user action
   };
 
   if (loading) {

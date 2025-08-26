@@ -56,7 +56,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userProfilePhotoUrl,
   isCurrentUser = true
 }) => {
-  console.log('ClbhouzAchievementsModal rendering - v2.0');
+  // Component render optimized
   
   const isMobile = useIsMobile();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
