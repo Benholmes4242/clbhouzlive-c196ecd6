@@ -130,7 +130,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
               
               return (
                 <div key={achievement.id} className="flex flex-col items-center cursor-pointer group">
-                  <div className="w-44 h-44 relative transition-all duration-300 group-hover:scale-105">
+                  <div className="w-44 h-44 relative transition-all duration-300">
                     {/* Progress Ring with Full Circle */}
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                       {/* Gradient Definitions */}

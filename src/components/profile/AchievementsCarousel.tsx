@@ -154,7 +154,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
               {displayAchievements.slice(0, isMobile ? 6 : 8).map((achievement, index) => (
                 <div key={achievement.id} className="flex flex-col items-center cursor-pointer">
                   <div 
-                    className={`w-20 h-20 md:w-24 md:h-24 transition-all duration-300 hover:scale-105 overflow-hidden ${
+                    className={`w-20 h-20 md:w-24 md:h-24 transition-all duration-300 overflow-hidden ${
                       !achievement.unlocked ? 'grayscale opacity-60' : ''
                     }`}
                     onClick={() => {

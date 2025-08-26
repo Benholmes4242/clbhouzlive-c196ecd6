@@ -431,7 +431,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -473,7 +473,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: 'span 2' }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -515,7 +515,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: 'span 2' }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -556,7 +556,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -590,7 +590,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -621,7 +621,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 2 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -699,7 +699,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={heroItem.key} className="col-span-2 row-span-2 aspect-square" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(heroItem.item)}
                       >
                         <MediaDisplay
@@ -732,7 +732,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -770,7 +770,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -807,7 +807,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: col, gridRow: sectionStart + row }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
+                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay

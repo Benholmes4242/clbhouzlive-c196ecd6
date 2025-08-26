@@ -55,7 +55,7 @@ const OptimizedActivityFeed: React.FC<OptimizedActivityFeedProps> = ({
                     <img
                       src={media.media_url}
                       alt="Post media"
-                      className="w-full h-64 object-cover transition-transform hover:scale-105"
+                      className="w-full h-64 object-cover transition-transform"
                       loading="lazy"
                       decoding="async"
                     />
