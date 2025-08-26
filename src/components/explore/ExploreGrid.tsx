@@ -374,8 +374,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout - use new grid structure
-  if (isDiscoverPage) {
+  // Check if we should use Discover page layout - use new grid structure (desktop only)
+  if (isDiscoverPage && !isMobile) {
     const gridItems = createGridLayout();
     
     return (
@@ -671,8 +671,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 // Hero section
                 const heroItem = sectionItems.find(item => item.type === 'hero');
                 const squareItems = sectionItems.filter(item => item.type === 'square');
-                const heroIndex = Math.floor(currentSection / 3);
-                const isHeroOnRight = heroIndex % 2 === 0;
+                const isHeroOnRight = heroItem?.isOnRight ?? true; // Use the isOnRight property from the grid item
                 
                 if (heroItem) {
                   const heroCol = isHeroOnRight ? 2 : 1;
