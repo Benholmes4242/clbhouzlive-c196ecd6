@@ -1,9 +1,15 @@
+
 import React, { memo, useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
+import { MdOutlinePlayCircle } from 'react-icons/md';
+import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
+
+// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -33,9 +39,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
-  // Check if mobile
+  // Check if mobile for TrendingVideos-style layout
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -46,10 +53,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Function to clean title text
+  // Function to clean title text and remove golf course information
   const cleanTitleText = (title: string) => {
     if (!title) return '';
     
+    // Remove golf course patterns from title
     return title
       .replace(/\s*Played at\s+[^.!?]*[.!?]?\s*/gi, '')
       .replace(/\s*#golf\s*/gi, '')
@@ -74,6 +82,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return words.slice(0, 5).join(' ') + '...';
   };
 
+  // Temporarily disable autoplay manager to fix loading issues
+  // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -97,12 +107,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Loading state
+  // Don't show skeleton loading on initial load for any filter
   if (isLoading && content.length === 0) {
-    return null;
+    return null; // No loading state shown
   }
 
-  // Empty state
   if (content.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -117,15 +126,51 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Helper function to determine if media is portrait
-  const isPortraitMedia = (index: number): boolean => {
-    return index % 5 === 0; // Every 5th item is portrait for demo
+  // Create layout with featured big cards every 9-12 items
+  const createGridLayout = () => {
+    const gridItems = [];
+    let index = 0;
+    // Disable video tracking for now
+    // let videoIndex = 0; // Track video position for autoplay
+    
+    while (index < content.length) {
+      // Add 8-10 regular items
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
+      
+      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
+        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+        gridItems.push({
+          type: 'regular',
+          item: content[index],
+          key: `regular-${content[index].id}`,
+          // videoIndex: currentVideoIndex
+        });
+        index++;
+      }
+      
+      // Add one big featured card if we have more content
+      if (index < content.length) {
+        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+        gridItems.push({
+          type: 'featured',
+          item: content[index],
+          key: `featured-${content[index].id}`,
+          // videoIndex: currentVideoIndex
+        });
+        index++;
+      }
+    }
+    
+    return gridItems;
   };
 
-  // TrendingVideos-style layout for Friends tab on Clubhouse
+  const gridItems = createGridLayout();
+
+  // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
     return (
       <>
+        {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
         <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
@@ -134,6 +179,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               style={{ borderRadius: '0px' }}
               onClick={() => onMediaClick?.(item)}
             >
+              {/* Media Display */}
               <MediaDisplay
                 media={{
                   id: item.id,
@@ -154,8 +200,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 loop={true}
               />
               
+              {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               
+              {/* Golf Club Tag */}
               {item.golfCourse && (
                 <div className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full flex items-center gap-2 max-w-[70%]">
                   <MapPin className="w-4 h-4 text-white flex-shrink-0" />
@@ -165,6 +213,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 </div>
               )}
               
+              {/* User info */}
               <div className="absolute bottom-3 left-3 right-3">
                 <div className="flex items-center gap-2">
                   <img
@@ -186,6 +235,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           ))}
         </div>
         
+        {/* Infinite scroll sentinel */}
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -197,36 +247,74 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Simple grid layout for Discover page
+  // Function to get aspect ratio for masonry layout
+  const getAspectRatio = (index: number) => {
+    const ratios = [
+      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
+      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
+      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
+    ];
+    return ratios[index % ratios.length];
+  };
+
+  // Check if we should use Discover page layout - use simple Instagram-style grid like profile
   if (isDiscoverPage) {
     return (
       <>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px">
+        {/* Simple Instagram-style grid that works on profile pages */}
+        <div className="grid grid-cols-3 gap-px">
           {content.map((item, index) => {
-            const isPortrait = isPortraitMedia(index);
+            // Create larger featured cards every 9-12 items
+            const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
             
             return (
-              <div 
-                key={`${item.id}-${index}`} 
-                className={`${
-                  isMobile && isPortrait 
-                    ? 'col-span-2 aspect-[1/2]' 
-                    : isPortrait 
-                    ? 'aspect-[1/2] row-span-2' 
+              <div
+                key={`discover-${item.id}-${index}`}
+                className={`
+                  relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02]
+                  ${isLargeCard 
+                    ? 'col-span-2 row-span-2 aspect-square' 
                     : 'aspect-square'
-                }`}
+                  }
+                `}
+                onClick={() => onMediaClick?.(item)}
               >
-                <ExploreContentCard 
-                  item={item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
+                <MediaDisplay
+                  media={{
+                    id: item.id,
+                    media_type: item.type as 'video' | 'image',
+                    media_url: item.src
+                  }}
+                  itemTitle={item.title}
+                  shouldAutoplay={false}
+                  isLoading={itemLoadingStates[item.id] ?? true}
+                  onImageError={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                  }}
+                  onImageLoad={() => {
+                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                  }}
+                  itemId={item.id}
+                  currentIndex={index}
+                  loop={true}
                 />
+                
+                
+                {/* Multiple media indicator */}
+                {item.media && item.media.length > 1 && (
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                    <MediaNavigationDots
+                      mediaCount={item.media.length}
+                      currentIndex={0}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
         
+        {/* Infinite scroll sentinel */}
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -238,24 +326,37 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Default grid layout
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
-        {content.map((item, index) => (
-          <div key={`${item.id}-${index}`} className="aspect-square">
-            <ExploreContentCard 
-              item={item} 
-              onLike={onLike} 
-              onFollow={onFollow} 
-              onMediaClick={onMediaClick}
-            />
-          </div>
+      {/* Instagram-style Grid Layout with Featured Cards */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
+        {gridItems.map((gridItem) => (
+          gridItem.type === 'featured' ? (
+            <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+              <ExploreContentCard 
+                item={gridItem.item} 
+                onLike={onLike} 
+                onFollow={onFollow} 
+                onMediaClick={onMediaClick}
+                isFeatured={true}
+              />
+            </div>
+          ) : (
+            <div key={gridItem.key} className="aspect-square">
+              <ExploreContentCard 
+                item={gridItem.item} 
+                onLike={onLike} 
+                onFollow={onFollow} 
+                onMediaClick={onMediaClick}
+              />
+            </div>
+          )
         ))}
       </div>
       
+      {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && (
+        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
           </div>
