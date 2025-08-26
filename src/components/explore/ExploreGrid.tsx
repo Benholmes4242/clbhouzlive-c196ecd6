@@ -303,60 +303,134 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout - use simple Instagram-style grid like profile
+  // Check if we should use Discover page layout - use new grid structure
   if (isDiscoverPage) {
+    const gridItems = createGridLayout();
+    
     return (
       <>
-        {/* Simple Instagram-style grid that works on profile pages */}
-        <div className="grid grid-cols-3 gap-px">
-          {content.map((item, index) => {
-            // Create larger featured cards every 9-12 items
-            const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
-            
-            return (
-              <div
-                key={`discover-${item.id}-${index}`}
-                className={`
-                  relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02]
-                  ${isLargeCard 
-                    ? 'col-span-2 row-span-2 aspect-square' 
-                    : 'aspect-square'
-                  }
-                `}
-                onClick={() => onMediaClick?.(item)}
-              >
-                <MediaDisplay
-                  media={{
-                    id: item.id,
-                    media_type: item.type as 'video' | 'image',
-                    media_url: item.src
-                  }}
-                  itemTitle={item.title}
-                  shouldAutoplay={false}
-                  isLoading={itemLoadingStates[item.id] ?? true}
-                  onImageError={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                  }}
-                  onImageLoad={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                  }}
-                  itemId={item.id}
-                  currentIndex={index}
-                  loop={true}
-                />
-                
-                
-                {/* Multiple media indicator */}
-                {item.media && item.media.length > 1 && (
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                    <MediaNavigationDots
-                      mediaCount={item.media.length}
+        {/* New Grid Layout for Discover Page */}
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
+          {gridItems.map((gridItem) => {
+            if (gridItem.type === 'portrait') {
+              return (
+                <div key={gridItem.key} className="aspect-[1/2] row-span-2">
+                  <div
+                    className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                    onClick={() => onMediaClick?.(gridItem.item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: gridItem.item.id,
+                        media_type: gridItem.item.type as 'video' | 'image',
+                        media_url: gridItem.item.src
+                      }}
+                      itemTitle={gridItem.item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[gridItem.item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      itemId={gridItem.item.id}
                       currentIndex={0}
+                      loop={true}
                     />
+                    
+                    {/* Multiple media indicator */}
+                    {gridItem.item.media && gridItem.item.media.length > 1 && (
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                        <MediaNavigationDots
+                          mediaCount={gridItem.item.media.length}
+                          currentIndex={0}
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
+                </div>
+              );
+            } else if (gridItem.type === 'hero') {
+              return (
+                <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+                  <div
+                    className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                    onClick={() => onMediaClick?.(gridItem.item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: gridItem.item.id,
+                        media_type: gridItem.item.type as 'video' | 'image',
+                        media_url: gridItem.item.src
+                      }}
+                      itemTitle={gridItem.item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[gridItem.item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      itemId={gridItem.item.id}
+                      currentIndex={0}
+                      loop={true}
+                    />
+                    
+                    {/* Multiple media indicator */}
+                    {gridItem.item.media && gridItem.item.media.length > 1 && (
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                        <MediaNavigationDots
+                          mediaCount={gridItem.item.media.length}
+                          currentIndex={0}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            } else {
+              // Square card
+              return (
+                <div key={gridItem.key} className="aspect-square">
+                  <div
+                    className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
+                    onClick={() => onMediaClick?.(gridItem.item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: gridItem.item.id,
+                        media_type: gridItem.item.type as 'video' | 'image',
+                        media_url: gridItem.item.src
+                      }}
+                      itemTitle={gridItem.item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[gridItem.item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [gridItem.item.id]: false }));
+                      }}
+                      itemId={gridItem.item.id}
+                      currentIndex={0}
+                      loop={true}
+                    />
+                    
+                    {/* Multiple media indicator */}
+                    {gridItem.item.media && gridItem.item.media.length > 1 && (
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                        <MediaNavigationDots
+                          mediaCount={gridItem.item.media.length}
+                          currentIndex={0}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            }
           })}
         </div>
         
