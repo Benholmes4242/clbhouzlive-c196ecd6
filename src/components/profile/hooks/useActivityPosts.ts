@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ActivityPost } from '../types/ActivityTypes';
 
@@ -7,7 +7,7 @@ export const useActivityPosts = (userId?: string) => {
   const [posts, setPosts] = useState<ActivityPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserPosts = async () => {
+  const fetchUserPosts = useCallback(async () => {
     if (!userId) {
       setLoading(false);
       return;
@@ -110,11 +110,11 @@ export const useActivityPosts = (userId?: string) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchUserPosts();
-  }, [userId]);
+  }, [fetchUserPosts]);
 
   // Listen for post updates
   useEffect(() => {
@@ -129,7 +129,7 @@ export const useActivityPosts = (userId?: string) => {
     return () => {
       window.removeEventListener('postCompleted', handlePostCompleted);
     };
-  }, []);
+  }, [fetchUserPosts]);
 
   return { posts, loading, fetchUserPosts };
 };
