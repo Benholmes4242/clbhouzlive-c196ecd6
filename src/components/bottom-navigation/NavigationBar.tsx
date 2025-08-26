@@ -11,12 +11,6 @@ interface NavigationBarProps {
 const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default' }) => {
   const isClubhouse = variant === 'clubhouse';
   
-  // Debug logging
-  console.log('🔍 NavigationBar Debug:', {
-    variant,
-    isClubhouse,
-    activeTab
-  });
   
   return (
     <nav 
@@ -32,16 +26,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             
-            // Debug for home icon specifically
-            if (tab.id === 'clubhouse') {
-              console.log('🏠 Home Icon Debug:', {
-                tabId: tab.id,
-                activeTab,
-                isActive,
-                isClubhouse,
-                willBeWhite: isClubhouse && isActive
-              });
-            }
             
             return (
               <button

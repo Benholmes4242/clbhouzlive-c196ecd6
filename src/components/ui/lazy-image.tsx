@@ -56,11 +56,9 @@ const LazyImage: React.FC<LazyImageProps> = ({
   // Load the actual image when it intersects or is priority
   useEffect(() => {
     if ((hasIntersected || priority) && optimizedSrc && !imageSrc && !hasError) {
-      console.log('🖼️ LAZY IMAGE DEBUG - Starting to load image:', optimizedSrc);
       setIsLoading(true);
       const img = new Image();
       img.onload = () => {
-        console.log('🖼️ LAZY IMAGE DEBUG - Image loaded successfully:', optimizedSrc);
         setImageSrc(optimizedSrc);
         setIsLoading(false);
       };

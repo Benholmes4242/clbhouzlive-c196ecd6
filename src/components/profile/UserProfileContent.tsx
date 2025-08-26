@@ -21,13 +21,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   const isOwnProfile = user?.id === profile?.id;
   const [activeSection, setActiveSection] = useState('activity');
 
-  console.log('UserProfileContent - Debug isOwnProfile:', {
-    userId: user?.id,
-    profileId: profile?.id,
-    isOwnProfile,
-    user,
-    profile
-  });
 
   if (!profile) {
     return null;

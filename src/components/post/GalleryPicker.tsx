@@ -6,7 +6,7 @@ import { createFileInput, handleFileSelection } from './gallery-picker/fileHandl
 import { GalleryPickerProps } from './gallery-picker/types';
 
 const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelected }: GalleryPickerProps) => {
-  console.log('GalleryPicker: New slide-down version loaded', { isOpen });
+  
   const isMobile = useIsMobile();
   const pickerRef = useRef<HTMLDivElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);

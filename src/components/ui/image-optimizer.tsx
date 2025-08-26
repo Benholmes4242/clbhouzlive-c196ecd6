@@ -62,11 +62,8 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({
   useEffect(() => {
     if (hasIntersected && src) {
       const optimizedSrc = getOptimizedSrc(src);
-      console.log('🖼️ IMAGE OPTIMIZER DEBUG - Starting to load image:', optimizedSrc);
-      
       const img = new Image();
       img.onload = () => {
-        console.log('🖼️ IMAGE OPTIMIZER DEBUG - Image loaded successfully:', optimizedSrc);
         setImageSrc(optimizedSrc);
         setIsLoading(false);
       };

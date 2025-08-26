@@ -210,15 +210,6 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const hasMedia = videoUrl || profilePhotoUrl;
 
-  // Debug logging
-  console.log('CinematicProfileHeader Debug:', {
-    videoUrl,
-    profilePhotoUrl,
-    hasMedia,
-    displayName,
-    showVideo,
-    thumbnailUrl
-  });
 
   // Test with a fallback image if no media is available
   const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';

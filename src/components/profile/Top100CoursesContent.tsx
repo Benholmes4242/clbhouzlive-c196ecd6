@@ -67,13 +67,6 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
     return sorted;
   }, [courses, searchTerm, sortType, region]);
 
-  // Debug logging for viewType
-  console.log('🔍 Top100CoursesContent DEBUG:', {
-    viewType,
-    sortType,
-    coursesCount: filteredAndSortedCourses.length,
-    isListView: viewType === 'list'
-  });
 
   if (isLoading) {
     return (
@@ -91,16 +84,6 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
           const isPlayed = playedCourses.has(course.id);
           const userRating = getUserRating(course.id);
           
-          // Debug logging
-          if (course.name === "Trump Turnberry Resort - Ailsa") {
-            console.log('Top100CourseCard debug:', {
-              courseName: course.name,
-              courseId: course.id,
-              userRating,
-              isPlayed,
-              showUserRating: !!userRating
-            });
-          }
           
           return (
             <Top100CourseCard

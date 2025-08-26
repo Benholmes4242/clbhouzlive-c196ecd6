@@ -65,18 +65,6 @@ const CreateMomentModal = ({
   // Determine which files to use - multiple files take precedence
   const mediaFiles = selectedFiles && selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
   const hasMultipleMedia = mediaFiles.length > 1;
-  
-  // Debug logging for media files
-  console.log('CreateMomentModal render - Media files debug:', {
-    isOpen,
-    hasSelectedFile: !!selectedFile,
-    selectedFileName: selectedFile?.name,
-    selectedFilesCount: selectedFiles?.length || 0,
-    selectedFilesNames: selectedFiles?.map(f => f.name) || [],
-    mediaFilesCount: mediaFiles.length,
-    hasMultipleMedia,
-    previewUrl
-  });
 
   // Reset state when modal opens/closes
   useEffect(() => {

@@ -130,17 +130,6 @@ const FullscreenMediaModal = ({
   // Register modal state for Echo detection
   useModalState(isOpen);
 
-  // Debug logging
-  console.log('🔍 Fullscreen Modal Debug:', {
-    postId,
-    currentUserId: currentUser?.id,
-    postUserId: userIdFromProp,
-    userObject: user,
-    isOwnPost,
-    hasPostId: !!postId,
-    hasCurrentUser: !!currentUser,
-    hasUser: !!user
-  });
 
   // Handle post deletion
   const handleDeletePost = async () => {

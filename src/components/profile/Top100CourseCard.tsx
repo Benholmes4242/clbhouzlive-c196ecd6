@@ -97,12 +97,6 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     }
   };
 
-  // Debug logging for viewType
-  console.log('🔍 Top100CourseCard DEBUG:', {
-    viewType,
-    courseName: course.name,
-    isListView: viewType === 'list'
-  });
 
   // Check if this should render as list view
   if (viewType === 'list') {
