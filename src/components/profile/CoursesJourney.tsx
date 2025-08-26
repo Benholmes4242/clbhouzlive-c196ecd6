@@ -585,6 +585,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
   const { viewType, setViewType, isHydrated } = useViewPreference();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
 
   // Query to get all played courses (from both tables) for filtering
   const { data: allPlayedCourses = [] } = useQuery({
@@ -723,6 +725,22 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
+  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
@@ -730,6 +748,27 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           <h3 className="text-3xl text-foreground">
             Recently Played
           </h3>
+          <div className="flex gap-2">
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+            >
+              <ChevronRight className="h-10 w-10" />
+            </Button>
+          </div>
         </div>
         
         <div className="relative">
@@ -743,19 +782,17 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" 
-                 style={{
-                   scrollSnapType: 'x mandatory',
-                   scrollbarWidth: 'none',
-                   msOverflowStyle: 'none',
-                   WebkitOverflowScrolling: 'touch'
-                 }}>
-              <div className="flex gap-3 px-0">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[42vw] md:w-80"
-                    style={{ scrollSnapAlign: 'start' }}
+                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
@@ -800,6 +837,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
 
   // Query to get top rated courses by the user
   const { data: topRatedCourses = [] } = useQuery({
@@ -845,6 +884,22 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
+  const maxIndex = Math.max(0, topRatedCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div className="w-full px-4 pt-0 pb-8">
       <div className="max-w-6xl mx-auto">
@@ -852,6 +907,27 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           <h3 className="text-3xl text-foreground">
             Top 10 Rated by You
           </h3>
+          <div className="flex gap-2">
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+            >
+              <ChevronRight className="h-10 w-10" />
+            </Button>
+          </div>
         </div>
         
         <div className="relative">
@@ -865,33 +941,31 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               </div>
             </div>
           ) : topRatedCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" 
-                 style={{
-                   scrollSnapType: 'x mandatory',
-                   scrollbarWidth: 'none',
-                   msOverflowStyle: 'none',
-                   WebkitOverflowScrolling: 'touch'
-                 }}>
-              <div className="flex gap-3 px-0">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[84vw] md:w-[calc(50%-6px)]"
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="h-[266px]"
-                      hideRankingBadges={true}
-                      showAIQuote={true}
-                    />
-                  </div>
+                     className="flex-shrink-0 w-[calc(84%-12px)]" // Increased width by another 20% (from 70% to 84%)
+                   >
+                     <CourseCard 
+                       course={userCourse.golf_courses}
+                       viewingUserId={userId}
+                       viewContext="global"
+                       userRating={userCourse.rating}
+                       isReadOnly={!isOwnProfile}
+                       showUserRating={true}
+                       isFromUserCoursesPage={true}
+                       customHeight="h-[266px]" // Reduced height by 20% (from 333px to 266px)
+                       hideRankingBadges={true}
+                       showAIQuote={true}
+                     />
+                   </div>
                 ))}
               </div>
             </div>
@@ -1102,6 +1176,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
 
   // Query to get Great Britain & Ireland courses
   const { data: gbIrelandCourses = [] } = useQuery({
@@ -1207,16 +1283,29 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
+  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
   // Listen for navigation events from the navigation component
   useEffect(() => {
     const handleNavigation = (event: any) => {
-      const container = document.querySelector('.overflow-x-auto[data-gb-ireland="true"]');
-      if (container) {
-        if (event.detail.action === 'next') {
-          container.scrollBy({ left: 300, behavior: 'smooth' });
-        } else if (event.detail.action === 'prev') {
-          container.scrollBy({ left: -300, behavior: 'smooth' });
-        }
+      if (event.detail.action === 'next') {
+        nextSlide();
+      } else if (event.detail.action === 'prev') {
+        prevSlide();
       }
     };
 
@@ -1239,19 +1328,17 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               </div>
             </div>
           ) : gbIrelandCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" data-gb-ireland="true"
-                 style={{
-                   scrollSnapType: 'x mandatory',
-                   scrollbarWidth: 'none',
-                   msOverflowStyle: 'none',
-                   WebkitOverflowScrolling: 'touch'
-                 }}>
-              <div className="flex gap-3 px-0">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {gbIrelandCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[84vw] md:w-[calc(50%-6px)]"
-                    style={{ scrollSnapAlign: 'start' }}
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
