@@ -227,7 +227,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return gridItems;
   };
 
-  // Create layout with fixed grid structure - 3 rows per section (Desktop)
+  // Create layout with fixed grid structure - 2 rows per section (Desktop)
   const createGridLayout = () => {
     const { portraitQueue, generalQueue } = createMediaQueues();
     const gridItems = [];
@@ -269,18 +269,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           key: `square-${sectionIndex}-2-${i}-${generalQueue[generalIndex - 1]?.id}`,
           sectionIndex,
           row: 2,
-          position: i
-        });
-      }
-      
-      // Row 3: 4 squares (full width)
-      for (let i = 0; i < 4 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-3-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 3,
           position: i
         });
       }
@@ -407,13 +395,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               const portraitItem = sectionItems.find(item => item.type === 'portrait');
               const squareItems = sectionItems.filter(item => item.type === 'square');
               
-              // Section starts here - 3 rows
-              const sectionStart = currentSection * 3;
+              // Section starts here - 2 rows
+              const sectionStart = currentSection * 2;
               
               // Row 1: 3 squares + portrait top half
               const row1Squares = squareItems.filter(item => item.row === 1).slice(0, 3);
               const row2Squares = squareItems.filter(item => item.row === 2).slice(0, 3);
-              const row3Squares = squareItems.filter(item => item.row === 3).slice(0, 4);
               
               // Add row 1 items
               if (isPortraitOnRight) {
@@ -639,38 +626,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   );
                 });
               }
-              
-              // Row 3: 4 squares (full width)
-              row3Squares.forEach((item, idx) => {
-                sections.push(
-                  <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 3 }}>
-                    <div
-                      className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                      onClick={() => onMediaClick?.(item.item)}
-                    >
-                      <MediaDisplay
-                        media={{
-                          id: item.item.id,
-                          media_type: item.item.type as 'video' | 'image',
-                          media_url: item.item.src
-                        }}
-                        itemTitle={item.item.title}
-                        shouldAutoplay={false}
-                        isLoading={itemLoadingStates[item.item.id] ?? true}
-                        onImageError={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                        }}
-                        onImageLoad={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                        }}
-                        itemId={item.item.id}
-                        currentIndex={0}
-                        loop={true}
-                      />
-                    </div>
-                  </div>
-                );
-              });
               
               currentSection++;
             }
