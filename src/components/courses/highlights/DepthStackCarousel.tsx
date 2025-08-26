@@ -391,7 +391,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           carouselRef(node);
           containerRef.current = node;
         }}
-        className={`flex gap-4 overflow-x-auto scrollbar-hide ${
+        className={`flex gap-3 overflow-x-auto scrollbar-hide ${
           isMobile ? 'px-0' : 'px-0'
         }`}
         style={{
@@ -403,15 +403,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems
           .filter(item => item.videoUrl) // Hide cards without videos
           .map((item, index) => {
-            // Calculate responsive width based on visible cards - ensuring no overlapping
+            // Use percentage-based widths like Recently Played section
             const getCardWidth = () => {
-              if (typeof window === 'undefined') return 'w-80'; // SSR fallback
+              if (typeof window === 'undefined') return 'w-[calc(27%-12px)]'; // SSR fallback
               
               const width = window.innerWidth;
-              if (width <= 430) return 'w-[85vw]'; // Mobile: single card
-              if (width <= 768) return 'w-[320px]'; // Small tablet: smaller fixed width
-              if (width <= 1024) return 'w-[360px]'; // Large tablet: smaller fixed width
-              return 'w-[400px]'; // Desktop: smaller fixed width for better gaps
+              if (width <= 430) return 'w-[calc(90vw-12px)]'; // Mobile: single card
+              if (width <= 768) return 'w-[calc(45%-12px)]'; // Small tablet: 2 cards
+              if (width <= 1024) return 'w-[calc(32%-12px)]'; // Large tablet: 3 cards
+              return 'w-[calc(27%-12px)]'; // Desktop: matches Recently Played
             };
 
             return (
@@ -447,8 +447,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => {
                 const container = containerRef.current;
                 if (container) {
-                  const cardWidth = isMobile ? container.offsetWidth * 0.85 : 400; // Match smaller fixed widths
-                  const gap = 16; // gap-4 = 16px
+                  const cardWidth = isMobile ? container.offsetWidth * 0.9 : container.offsetWidth * 0.27; // Match percentage-based approach
+                  const gap = 12; // gap-3 = 12px
                   const scrollPosition = index * (cardWidth + gap);
                   container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                 }
