@@ -918,7 +918,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
       if (coursesError) throw coursesError;
 
-      // Transform posts into course format for existing card structure
+    // Transform posts into course format for existing card structure
       const courseData = posts
         .map(post => {
           // Find the tag for this post
@@ -929,13 +929,21 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           const course = courses?.find(c => c.id === postTag.taggable_entities.entity_id);
           if (!course) return null;
 
+          // Get video thumbnail from post media
+          const videoMedia = post.post_media?.[0];
+          const videoThumbnail = videoMedia?.media_url;
+
           return {
             id: `video-${post.id}`,
             course_id: course.id,
             played_date: post.created_at,
             created_at: post.created_at,
             rating: null,
-            golf_courses: course
+            videoThumbnail: videoThumbnail,
+            golf_courses: {
+              ...course,
+              thumbnail_image: videoThumbnail || course.thumbnail_image // Use video thumbnail as course image
+            }
           };
         })
         .filter(Boolean);
@@ -1001,7 +1009,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   return (
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4" style={{ marginTop: '16px' }}>
           <h3 className="text-3xl text-foreground">
             Highlight Reel
           </h3>
@@ -1158,12 +1166,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   };
 
   return (
-    <div className="w-full px-4 pt-0 pb-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-0">
-          <h3 className="text-3xl text-foreground">
-            Top 10 Rated by You
-          </h3>
+      <div className="w-full px-4 pt-0 pb-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-3xl text-foreground">
+              Top 10 Rated by You
+            </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
               <Button
