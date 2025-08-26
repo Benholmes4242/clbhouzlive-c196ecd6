@@ -5,7 +5,7 @@ import { OptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import AchievementsPane from './AchievementsPane';
 
 // Lazy load heavy components for better initial load
-const CourseHighlightsCarousel = lazy(() => import('./CourseHighlightsCarousel'));
+
 const CoursesJourney = lazy(() => import('./CoursesJourney'));
 const PinnedAchievements = lazy(() => import('./PinnedAchievements'));
 const ProfileProgressSection = lazy(() => import('./ProfileProgressSection'));
@@ -54,7 +54,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
     { id: 'courses', label: 'Courses', count: profileData.coursesPlayed },
     { id: 'progress', label: 'Progress' },
     { id: 'achievements', label: 'Achievements', count: profileData.recentAchievements.length },
-    { id: 'highlights', label: 'Highlights' }
+    
   ];
 
   const renderTabContent = () => {
@@ -110,15 +110,6 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
           />
         );
       
-      case 'highlights':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">
-              {isOwnProfile ? "My Highlights" : `${profileData.profile?.display_name?.split(' ')[0] || 'User'}'s Highlights`}
-            </h2>
-            <p className="text-muted-foreground">Course highlights coming soon...</p>
-          </div>
-        );
       
       default:
         return (
