@@ -484,7 +484,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   }
 
   return (
-    <div className="w-full px-4 pt-8 pb-0">
+    <div className="w-full px-4 pt-8 pb-4">
       <div className="max-w-6xl mx-auto">
         {/* Recently Played title */}
         <div className="flex items-center justify-between mb-6">
@@ -517,15 +517,15 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
         <div className="relative">
           <div className="overflow-hidden">
             <div 
-              className="flex transition-transform duration-300 ease-in-out gap-3"
+              className="flex transition-transform duration-300 ease-in-out gap-6"
               style={{ 
-                transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)` 
               }}
             >
               {recentlyPlayedCourses.map((userCourse) => (
                 <div 
                   key={userCourse.id} 
-                  className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width
+                  className="flex-shrink-0 w-[calc(50%-12px)]"
                 >
                   <CourseCard 
                     course={userCourse.golf_courses}
@@ -625,7 +625,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   }
 
   return (
-    <div className="w-full px-4 pt-8 pb-0">
+    <div className="w-full px-4 pt-8 pb-4">
       <div className="max-w-6xl mx-auto">
         {/* Top 10 Rated by You title */}
         <div className="flex items-center justify-between mb-6">
@@ -658,21 +658,21 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         <div className="relative">
           <div className="overflow-hidden">
             <div 
-              className="flex transition-transform duration-300 ease-in-out gap-3"
+              className="flex transition-transform duration-300 ease-in-out gap-6"
               style={{ 
-                transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)` 
               }}
             >
-              {topRatedCourses.map((userCourse) => (
+              {topRatedCourses.map((courseRating) => (
                 <div 
-                  key={userCourse.id} 
-                  className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width
+                  key={courseRating.id} 
+                  className="flex-shrink-0 w-[calc(50%-12px)]"
                 >
                   <CourseCard 
-                    course={userCourse.golf_courses}
+                    course={courseRating.golf_courses}
                     viewingUserId={userId}
                     viewContext="global"
-                    userRating={userCourse.rating}
+                    userRating={courseRating.rating}
                     isReadOnly={!isOwnProfile}
                     showUserRating={true}
                     isFromUserCoursesPage={true}
@@ -843,7 +843,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   }
 
   return (
-    <div className="w-full px-4 pt-8 pb-8">
+    <div className="w-full px-4 pt-8 pb-4">
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title */}
         <div className="flex items-center justify-between mb-6">
@@ -886,15 +886,15 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
           ) : filteredCourses.length > 0 ? (
             <div className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-3"
+                className="flex transition-transform duration-300 ease-in-out gap-6"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)` 
                 }}
               >
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
+                    className="flex-shrink-0 w-[calc(50%-12px)]"
                   >
                     <CourseCard 
                       course={userCourse.golf_courses}
