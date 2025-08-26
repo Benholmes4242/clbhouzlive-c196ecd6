@@ -712,9 +712,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-4xl xl:text-4xl lg:text-3xl md:text-2xl sm:text-xl text-foreground font-bold">
-            Recently Played
-          </h3>
+            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
+              Recently Played
+            </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
               <Button
@@ -750,11 +750,11 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex xl:grid xl:grid-cols-4 lg:grid lg:grid-cols-4 md:grid md:grid-cols-2 gap-5 xl:gap-5 lg:gap-4 md:gap-3 sm:gap-2 min-w-max xl:min-w-0 lg:min-w-0 md:min-w-0">
+              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[280px] xl:w-auto lg:w-auto md:w-auto sm:w-full"
+                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)] xl:w-[calc(25vw-1.5rem)]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="aspect-[3/4] w-full">
@@ -992,9 +992,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-4xl xl:text-4xl lg:text-3xl md:text-2xl sm:text-xl text-foreground font-bold">
-            Highlight Reel
-          </h3>
+            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
+              Highlight Reel
+            </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
               <Button
@@ -1030,11 +1030,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex xl:grid xl:grid-cols-4 lg:grid lg:grid-cols-4 md:grid md:grid-cols-2 gap-5 xl:gap-5 lg:gap-4 md:gap-3 sm:gap-2 min-w-max xl:min-w-0 lg:min-w-0 md:min-w-0">
+              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[280px] xl:w-auto lg:w-auto md:w-auto sm:w-full"
+                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="aspect-[3/4] w-full">
@@ -1150,7 +1150,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0">
-            <h3 className="text-4xl xl:text-4xl lg:text-3xl md:text-2xl sm:text-xl text-foreground font-bold">
+            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
               Top 10 Rated by You
             </h3>
           <div className="flex gap-2">
@@ -1188,14 +1188,14 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             </div>
           ) : topRatedCourses.length > 0 ? (
             <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex xl:grid xl:grid-cols-4 lg:grid lg:grid-cols-4 md:grid md:grid-cols-2 gap-5 xl:gap-5 lg:gap-4 md:gap-3 sm:gap-2 min-w-max xl:min-w-0 lg:min-w-0 md:min-w-0">
+              <div className="flex gap-2 lg:gap-3 xl:gap-4 overflow-x-auto scrollbar-hide">
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[280px] xl:w-auto lg:w-auto md:w-auto sm:w-full"
+                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-6rem)] xl:w-[calc(100vw-8rem)]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    <div className="aspect-[3/4] w-full">
+                    <div className="aspect-[16/9] w-full">
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -1573,11 +1573,11 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             </div>
           ) : gbIrelandCourses.length > 0 ? (
             <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex xl:grid xl:grid-cols-4 lg:grid lg:grid-cols-4 md:grid md:grid-cols-2 gap-5 xl:gap-5 lg:gap-4 md:gap-3 sm:gap-2 min-w-max xl:min-w-0 lg:min-w-0 md:min-w-0">
+              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
                 {gbIrelandCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[280px] xl:w-auto lg:w-auto md:w-auto sm:w-full"
+                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="aspect-[3/4] w-full">
