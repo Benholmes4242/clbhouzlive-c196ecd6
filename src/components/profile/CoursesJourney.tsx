@@ -711,10 +711,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   return (
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-0">
-            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
-              Recently Played
-            </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-3xl text-foreground">
+            Recently Played
+          </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
               <Button
@@ -749,30 +749,32 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)] xl:w-[calc(25vw-1.5rem)]"
-                    style={{ scrollSnapAlign: 'start' }}
+                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
                   >
-                    <div className="aspect-[3/4] w-full">
-                      <CourseCard 
-                        course={userCourse.golf_courses}
-                        viewingUserId={userId}
-                        viewContext="global"
-                        userRating={userCourse.rating}
-                        isReadOnly={!isOwnProfile}
-                        showUserRating={true}
-                        isFromUserCoursesPage={true}
-                        customHeight="h-full"
-                        hideRankingBadges={true}
-                        showCountryWithFlag={true}
-                        showXP={true}
-                        xp={100}
-                      />
-                    </div>
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[400px]"
+                      hideRankingBadges={true}
+                      showCountryWithFlag={true}
+                      showXP={true}
+                      xp={100}
+                    />
                   </div>
                 ))}
               </div>
@@ -992,9 +994,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
-            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
-              Highlight Reel
-            </h3>
+          <h3 className="text-3xl text-foreground">
+            Highlight Reel
+          </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
               <Button
@@ -1029,31 +1031,33 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)]"
-                    style={{ scrollSnapAlign: 'start' }}
+                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
                   >
-                    <div className="aspect-[3/4] w-full">
-                      <CourseCard 
-                        course={userCourse.golf_courses}
-                        viewingUserId={userId}
-                        viewContext="global"
-                        userRating={userCourse.rating}
-                        isReadOnly={!isOwnProfile}
-                        showUserRating={true}
-                        isFromUserCoursesPage={true}
-                        customHeight="h-full"
-                        hideRankingBadges={true}
-                        showCountryWithFlag={true}
-                        showXP={true}
-                        xp={100}
-                        disableClick={true}
-                      />
-                    </div>
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[400px]"
+                      hideRankingBadges={true}
+                      showCountryWithFlag={true}
+                      showXP={true}
+                      xp={100}
+                      disableClick={true}
+                    />
                   </div>
                 ))}
               </div>
@@ -1150,7 +1154,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0">
-            <h3 className="text-2xl lg:text-3xl xl:text-4xl text-foreground font-bold">
+            <h3 className="text-3xl text-foreground">
               Top 10 Rated by You
             </h3>
           <div className="flex gap-2">
@@ -1187,29 +1191,31 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               </div>
             </div>
           ) : topRatedCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex gap-2 lg:gap-3 xl:gap-4 overflow-x-auto scrollbar-hide">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {topRatedCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-6rem)] xl:w-[calc(100vw-8rem)]"
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <div className="aspect-[16/9] w-full">
-                      <CourseCard 
-                        course={userCourse.golf_courses}
-                        viewingUserId={userId}
-                        viewContext="global"
-                        userRating={userCourse.rating}
-                        isReadOnly={!isOwnProfile}
-                        showUserRating={true}
-                        isFromUserCoursesPage={true}
-                        customHeight="h-full"
-                        hideRankingBadges={true}
-                        showAIQuote={true}
-                      />
-                    </div>
-                  </div>
+                     className="flex-shrink-0 w-[calc(84%-12px)]" // Increased width by another 20% (from 70% to 84%)
+                   >
+                     <CourseCard 
+                       course={userCourse.golf_courses}
+                       viewingUserId={userId}
+                       viewContext="global"
+                       userRating={userCourse.rating}
+                       isReadOnly={!isOwnProfile}
+                       showUserRating={true}
+                       isFromUserCoursesPage={true}
+                       customHeight="h-[266px]" // Reduced height by 20% (from 333px to 266px)
+                       hideRankingBadges={true}
+                       showAIQuote={true}
+                     />
+                   </div>
                 ))}
               </div>
             </div>
@@ -1242,7 +1248,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-4xl xl:text-4xl lg:text-3xl md:text-2xl sm:text-xl text-foreground font-bold">
+          <h3 className="text-3xl text-foreground">
             Courses by Region
           </h3>
           <div className="flex gap-2">
@@ -1252,7 +1258,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
         </div>
         
         {/* Great Britain & Ireland subtitle */}
-        <h4 className="text-xl xl:text-xl lg:text-lg md:text-base sm:text-sm text-muted-foreground mb-0">
+        <h4 className="text-xl text-muted-foreground mb-0">
           Great Britain & Ireland
         </h4>
       </div>
@@ -1572,26 +1578,28 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               </div>
             </div>
           ) : gbIrelandCourses.length > 0 ? (
-            <div className="overflow-x-auto scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
-              <div className="flex gap-3 lg:gap-4 xl:gap-5 overflow-x-auto scrollbar-hide">
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-6"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
                 {gbIrelandCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-1.5rem)] lg:w-[calc(33.333vw-1.5rem)]"
-                    style={{ scrollSnapAlign: 'start' }}
+                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
                   >
-                    <div className="aspect-[3/4] w-full">
-                      <CourseCard 
-                        course={userCourse.golf_courses}
-                        viewingUserId={userId}
-                        viewContext="global"
-                        userRating={userCourse.rating}
-                        isReadOnly={!isOwnProfile}
-                        showUserRating={true}
-                        isFromUserCoursesPage={true}
-                        customHeight="h-full"
-                      />
-                    </div>
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[333px]"
+                    />
                   </div>
                 ))}
               </div>
@@ -1599,10 +1607,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {isOwnProfile 
-                  ? "You haven't played any courses in Great Britain & Ireland yet."
-                  : "No courses found in Great Britain & Ireland."
-                }
+                {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
               </p>
             </div>
           )}
