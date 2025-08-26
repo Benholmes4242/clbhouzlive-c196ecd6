@@ -35,21 +35,23 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
 }) => {
   return (
     <div className="w-full px-4 pt-0 pb-8">
-      {/* Highlights From My Journey title - matches Top 10 Rated by You exact structure */}
-      <div className="flex items-center justify-between mb-0 max-w-6xl mx-auto">
-        <h3 className="text-3xl text-foreground">
-          Highlights From My Journey
-        </h3>
-        <div className="flex gap-2">
-          {/* Empty div to maintain same height as Top 10 section with buttons */}
+      <div className="max-w-6xl mx-auto">
+        {/* Highlights From My Journey title - matches Top 10 Rated by You exact structure */}
+        <div className="flex items-center justify-between mb-0">
+          <h3 className="text-3xl text-foreground">
+            Highlights From My Journey
+          </h3>
+          <div className="flex gap-2">
+            {/* Empty div to maintain same height as Top 10 section with buttons */}
+          </div>
         </div>
+        
+        <LatestHighlights 
+          userId={userId || ''} 
+          isOwnProfile={isOwnProfile}
+          userFirstName={userFirstName}
+        />
       </div>
-      
-      <LatestHighlights 
-        userId={userId || ''} 
-        isOwnProfile={isOwnProfile}
-        userFirstName={userFirstName}
-      />
     </div>
   );
 };
