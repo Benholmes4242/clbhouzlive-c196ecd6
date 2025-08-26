@@ -203,7 +203,7 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
             return (
               <Card 
                 key={media.id} 
-                className={`relative group overflow-hidden transition-all duration-200 hover-scale cursor-pointer
+                className={`relative group overflow-hidden transition-all duration-200 cursor-pointer
                   ${isDraggedOver ? 'ring-2 ring-primary scale-105' : ''}
                   ${draggedItem?.id === media.id ? 'opacity-50 scale-95' : ''}
                 `}

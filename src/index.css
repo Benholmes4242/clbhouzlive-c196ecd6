@@ -523,7 +523,7 @@
 
 /* Hover scale animation utility */
 .hover-scale {
-  @apply transition-transform duration-200 hover:scale-105;
+  @apply transition-transform duration-200;
 }
 
 /* Shake animation for validation errors */
