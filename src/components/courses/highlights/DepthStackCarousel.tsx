@@ -403,15 +403,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems
           .filter(item => item.videoUrl) // Hide cards without videos
           .map((item, index) => {
-            // Use percentage-based widths like Recently Played section
+            // Use fixed widths for scrollable carousel - much smaller to prevent overlap
             const getCardWidth = () => {
-              if (typeof window === 'undefined') return 'w-[calc(27%-12px)]'; // SSR fallback
+              if (typeof window === 'undefined') return 'w-72'; // SSR fallback
               
               const width = window.innerWidth;
-              if (width <= 430) return 'w-[calc(90vw-12px)]'; // Mobile: single card
-              if (width <= 768) return 'w-[calc(45%-12px)]'; // Small tablet: 2 cards
-              if (width <= 1024) return 'w-[calc(32%-12px)]'; // Large tablet: 3 cards
-              return 'w-[calc(27%-12px)]'; // Desktop: matches Recently Played
+              if (width <= 430) return 'w-[85vw]'; // Mobile: single card
+              if (width <= 768) return 'w-64'; // Small tablet: 256px
+              if (width <= 1024) return 'w-72'; // Large tablet: 288px
+              return 'w-80'; // Desktop: 320px - much smaller than before
             };
 
             return (
@@ -447,7 +447,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => {
                 const container = containerRef.current;
                 if (container) {
-                  const cardWidth = isMobile ? container.offsetWidth * 0.9 : container.offsetWidth * 0.27; // Match percentage-based approach
+                  const cardWidth = isMobile ? container.offsetWidth * 0.85 : 320; // Match fixed 320px (w-80)
                   const gap = 12; // gap-3 = 12px
                   const scrollPosition = index * (cardWidth + gap);
                   container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
