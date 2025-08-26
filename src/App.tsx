@@ -53,9 +53,9 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (v5 uses gcTime instead of cacheTime)
-      refetchOnMount: false,
+      staleTime: 30 * 1000, // 30 seconds for faster updates
+      gcTime: 2 * 60 * 1000, // 2 minutes for faster cleanup
+      refetchOnMount: 'always', // Always refetch on mount for fresh data
       refetchOnReconnect: 'always',
     },
     mutations: {

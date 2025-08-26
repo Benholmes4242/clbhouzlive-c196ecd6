@@ -89,13 +89,13 @@ export const optimizeImageUrl = (url: string, options: {
   return `${url}${separator}${params}`;
 };
 
-// Request deduplication for identical API calls with improved cleanup
+// Request deduplication for identical API calls - simplified for better performance
 const requestCache = new Map<string, { promise: Promise<any>; timestamp: number }>();
 
 export const dedupeRequest = <T>(
   key: string,
   requestFn: () => Promise<T>,
-  ttl: number = 5000
+  ttl: number = 3000 // Reduced TTL for faster cache eviction
 ): Promise<T> => {
   const now = Date.now();
   const cached = requestCache.get(key);
@@ -105,35 +105,32 @@ export const dedupeRequest = <T>(
     return cached.promise;
   }
   
+  // Clear expired entry immediately
+  if (cached && (now - cached.timestamp) >= ttl) {
+    requestCache.delete(key);
+  }
+  
   const request = requestFn().finally(() => {
-    // Clean up on completion
+    // Clean up on completion with shorter delay
     setTimeout(() => {
       requestCache.delete(key);
-    }, 1000);
+    }, 500);
   });
   
   requestCache.set(key, { promise: request, timestamp: now });
   
-  // Clean up cache after TTL
-  setTimeout(() => {
-    const entry = requestCache.get(key);
-    if (entry && (Date.now() - entry.timestamp) >= ttl) {
-      requestCache.delete(key);
-    }
-  }, ttl);
-  
   return request;
 };
 
-// Cleanup expired cache entries periodically
+// Simplified cleanup - more frequent but lighter
 setInterval(() => {
   const now = Date.now();
   for (const [key, { timestamp }] of requestCache.entries()) {
-    if (now - timestamp > 30000) { // 30 seconds
+    if (now - timestamp > 10000) { // 10 seconds instead of 30
       requestCache.delete(key);
     }
   }
-}, 60000); // Run every minute
+}, 30000); // Run every 30 seconds instead of 60
 
 // Batch DOM updates to prevent layout thrashing
 export const batchDOMUpdates = (updates: (() => void)[]): void => {

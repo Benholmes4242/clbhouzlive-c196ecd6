@@ -5,19 +5,19 @@ import { initPerformanceObserver, analyzeBundleSize, monitorMemoryUsage } from '
 export const initializePerformanceMonitoring = () => {
   if (typeof window === 'undefined') return;
 
-  // Start performance observers
+  // Start performance observers with reduced frequency
   initPerformanceObserver();
 
-  // Log initial bundle analysis after a short delay
+  // Log initial bundle analysis after app loads
   setTimeout(() => {
     analyzeBundleSize();
     monitorMemoryUsage();
-  }, 2000);
+  }, 1000);
 
-  // Monitor memory usage periodically
+  // Monitor memory usage less frequently to reduce overhead
   setInterval(() => {
     monitorMemoryUsage();
-  }, 60000); // Every minute
+  }, 300000); // Every 5 minutes instead of 1 minute
 
   // Set up performance budget warnings
   const performanceBudget = {
@@ -45,9 +45,8 @@ export const initializePerformanceMonitoring = () => {
     }
   };
 
-  // Check budget on page load and periodically
+  // Check budget on page load only to reduce overhead
   window.addEventListener('load', checkPerformanceBudget);
-  setInterval(checkPerformanceBudget, 5 * 60 * 1000); // Every 5 minutes
 };
 
 // Cleanup function for when app unmounts
