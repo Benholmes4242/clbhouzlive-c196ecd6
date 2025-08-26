@@ -34,7 +34,7 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full px-4 pt-0 pb-8">
+    <div className="w-full px-4 pt-0 pb-0">
       <div className="max-w-6xl mx-auto">
         {/* Highlights From My Journey title - matches Top 10 Rated by You exact structure */}
         <div className="flex items-center justify-between mb-0">
@@ -1167,7 +1167,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   };
 
   return (
-      <div className="w-full px-4 pt-0 pb-8">
+      <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-3xl text-foreground">
