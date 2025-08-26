@@ -39,6 +39,7 @@ interface CourseCardProps {
   hideRankingBadges?: boolean;
   showCountryWithFlag?: boolean;
   showAIQuote?: boolean;
+  disableClick?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -109,7 +110,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   customHeight = "h-64",
   hideRankingBadges = false,
   showCountryWithFlag = false,
-  showAIQuote = false
+  showAIQuote = false,
+  disableClick = false
 }) => {
   const navigate = useNavigate();
   const [courseQuote, setCourseQuote] = useState<string>('');
@@ -144,13 +146,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
   }, [showAIQuote, course.name, course.country]);
 
   const handleCardClick = () => {
-    navigate(`/courses/${course.id}`);
+    if (!disableClick) {
+      navigate(`/courses/${course.id}`);
+    }
   };
 
   return (
     <>
       <div 
-        className={`group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative ${customHeight}`}
+        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight}`}
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
