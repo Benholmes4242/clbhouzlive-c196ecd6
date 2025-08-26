@@ -5,7 +5,6 @@ import App from './App.tsx'
 import './index.css'
 import './styles/superellipse.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
-import './utils/globalPerformanceOptimizations'
 
 const container = document.getElementById("root");
 if (!container) {
@@ -17,5 +16,5 @@ initializePerformanceMonitoring();
 
 const root = createRoot(container);
 
-// Ultra-fast rendering with minimal overhead
+// Render without StrictMode for better performance
 root.render(<App />);

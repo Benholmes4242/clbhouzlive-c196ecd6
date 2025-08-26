@@ -8,9 +8,6 @@ import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
-import UltraFastImage from '@/components/ui/ultra-fast-image';
-import UltraFastVideo from '@/components/ui/ultra-fast-video';
-import { ultraThrottle, microCacheGet, microCacheSet } from '@/utils/ultraPerformance';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -43,10 +40,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
-  // Ultra-fast mobile detection with throttling
-  const checkMobile = useCallback(ultraThrottle(() => {
+  // Optimized mobile detection
+  const checkMobile = useCallback(() => {
     setIsMobile(window.innerWidth < 768);
-  }, 100), []);
+  }, []);
 
   useEffect(() => {
     checkMobile();

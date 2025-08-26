@@ -3,20 +3,19 @@ import { useState, useCallback, useEffect } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
-import { microCacheGet, microCacheSet, ultraThrottle } from '@/utils/ultraPerformance';
 
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 
 export const useInfiniteExploreContent = (activeFilter?: string) => {
-  // Ultra-fast content caching by filter type
+  // Fast content caching by filter type
   const [contentCache, setContentCache] = useState<Record<string, ExploreContentItem[]>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [hasMoreStates, setHasMoreStates] = useState<Record<string, boolean>>({});
   const [offsetStates, setOffsetStates] = useState<Record<string, number>>({});
   const [mockOffsetStates, setMockOffsetStates] = useState<Record<string, number>>({});
   
-  // Ultra-aggressive preloading cache
+  // Aggressive preloading cache
   const [preloadedContent, setPreloadedContent] = useState<Record<string, ExploreContentItem[]>>({});
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
@@ -24,17 +23,16 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
   
   const currentFilter = activeFilter || 'Friends';
   
-  // Use micro-cache for current state
-  const cacheKey = `explore-content-${currentFilter}`;
-  const content = microCacheGet<ExploreContentItem[]>(cacheKey) || contentCache[currentFilter] || [];
+  // Current state
+  const content = contentCache[currentFilter] || [];
   const loading = loadingStates[currentFilter] || false;
   const hasMore = hasMoreStates[currentFilter] ?? true;
   const currentOffset = offsetStates[currentFilter] || 0;
   const currentMockOffset = mockOffsetStates[currentFilter] || 0;
 
-  // Ultra-fast preload with aggressive caching
+  // Fast preload
 
-  const preloadMore = useCallback(ultraThrottle(async () => {
+  const preloadMore = useCallback(async () => {
     if (loading || !hasMore || preloadedContent[currentFilter]?.length > 0) {
       return;
     }
@@ -58,24 +56,23 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     } catch (error) {
       console.error('Error preloading content:', error);
     }
-  }, 300), [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
       return;
     }
     
-    // Ultra-fast: Check preloaded content first
+    // Fast: Check preloaded content first
     const preloaded = preloadedContent[currentFilter];
     if (preloaded && preloaded.length > 0) {
       const newContent = [...content, ...preloaded];
       
-      // Update cache and micro-cache instantly
+      // Update cache instantly
       setContentCache(prev => ({
         ...prev,
         [currentFilter]: newContent
       }));
-      microCacheSet(cacheKey, newContent, 5000);
       
       setOffsetStates(prev => ({
         ...prev,
@@ -88,7 +85,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
         [currentFilter]: []
       }));
       
-      setTimeout(() => preloadMore(), 50); // Ultra-fast preload trigger
+      setTimeout(() => preloadMore(), 50); // Fast preload trigger
       
       if (preloaded.length < POSTS_PER_PAGE) {
         setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));

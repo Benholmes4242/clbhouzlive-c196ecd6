@@ -1,5 +1,4 @@
 // Minimal performance monitoring for ultra-fast performance
-import { cleanupPerformanceOverhead } from './ultraPerformance';
 
 let performanceCleanupInterval: number;
 
@@ -19,7 +18,10 @@ export const initializePerformanceMonitoring = () => {
 
   // Minimal memory monitoring
   performanceCleanupInterval = window.setInterval(() => {
-    cleanupPerformanceOverhead();
+    // Basic cleanup
+    if (window.gc) {
+      window.gc();
+    }
     
     // Check memory only if available
     if ('memory' in performance) {
