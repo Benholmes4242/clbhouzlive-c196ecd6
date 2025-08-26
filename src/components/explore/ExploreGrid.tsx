@@ -474,6 +474,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                     <div key={portraitItem.key} className="aspect-[1/2] mb-px" style={{ gridColumn: 4, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -516,6 +517,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                     <div key={portraitItem.key} className="aspect-[1/2] mb-px" style={{ gridColumn: 1, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -771,6 +773,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                     <div key={portraitItem.key} className="aspect-[1/2] row-span-2 mb-px" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
