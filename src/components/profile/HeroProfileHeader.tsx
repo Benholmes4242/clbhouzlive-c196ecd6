@@ -29,7 +29,7 @@ import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
-
+import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import CoursesControls from './CoursesControls';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
