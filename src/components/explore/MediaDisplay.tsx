@@ -49,7 +49,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   useSmartMedia = false,
   onMediaClick
 }) => {
-  // Generate thumbnail URL for Cloudflare Stream videos
+  // Generate thumbnail URL for Cloudflare Stream videos - keep this function always available
   const getVideoThumbnail = (videoUrl: string) => {
     if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
       // Extract video ID from Cloudflare Stream URL
@@ -59,12 +59,15 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
       }
     }
+    // For non-Cloudflare videos, we'll show the video element with preload="metadata" 
+    // which will display the first frame as thumbnail
     return null;
   };
 
+  const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
+
   // Use smart media logic if enabled (early return to avoid hook order issues)
   if (useSmartMedia && cardType) {
-    const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
     return (
       <SmartCardMedia
         media={{
@@ -100,7 +103,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Video autoplay transition state
   const [videoTransitioning, setVideoTransitioning] = useState(false);
 
-  const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
   const hasCloudflareThumb = thumbnailUrl !== null;
 
   // Handle smooth transition for autoplay videos
