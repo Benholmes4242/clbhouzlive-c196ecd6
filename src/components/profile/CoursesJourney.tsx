@@ -495,6 +495,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       {/* Top 10 Rated by You Section */}
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
+      {/* Highlight Reel Section */}
+      <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
+
       {/* My Highlights Section */}
       <MyHighlightsSection userId={userId} isOwnProfile={isOwnProfile} userFirstName={userDisplayName?.split(' ')[0] || 'User'} />
 
@@ -826,6 +829,251 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     </div>
   );
 };
+
+// Highlight Reel Section Component - Copy of Recently Played Section
+interface HighlightReelSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({ 
+  userId,
+  isOwnProfile = false
+}) => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Highlight Reel"
+  const { viewType, setViewType, isHydrated } = useViewPreference();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2; // Show 2 cards at a time
+
+  // Query to get all played courses (from both tables) for filtering
+  const { data: allPlayedCourses = [] } = useQuery({
+    queryKey: ['highlightReelCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine and deduplicate, ensuring consistent structure
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null, // Add rating field for consistency
+          id: `top100-${course.course_id}` // Unique ID for deduplication
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at, // Use rating date as played date
+          id: `rating-${course.course_id}` // Unique ID for deduplication
+        }))
+      ];
+
+      // Remove duplicates based on course_id, preferring rated courses over top100 courses
+      const uniqueCoursesMap = new Map();
+      
+      combinedCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else {
+          // Prefer courses with ratings over those without
+          if (course.rating !== null && course.rating !== undefined && 
+              (existing.rating === null || existing.rating === undefined)) {
+            uniqueCoursesMap.set(courseId, course);
+          }
+        }
+      });
+
+      const rawCourses = Array.from(uniqueCoursesMap.values());
+      
+      // Apply sorting here to ensure proper order
+      return getSortedUserCourses(rawCourses, 'recent');
+    },
+    enabled: !!userId,
+  });
+
+  // Filter and sort courses based on active filter and sort option
+  const filteredCourses = useMemo(() => {
+    let coursesToFilter = allPlayedCourses;
+    
+    // First apply regional filtering if active
+    if (activeFilter) {
+      coursesToFilter = coursesToFilter.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        if (!course) return false;
+
+        switch (activeFilter) {
+          case 'britain-ireland':
+            return course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100;
+          case 'europe':
+            return course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100;
+          case 'usa':
+            return course.country === 'USA' && course.regional_rank && course.regional_rank <= 100;
+          case 'global':
+            return course.global_rank && course.global_rank <= 100;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Then apply sorting
+    const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
+    
+    return sortedCourses;
+  }, [allPlayedCourses, activeFilter, sortBy]);
+
+  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
+    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    threshold: 50
+  });
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  return (
+    <div className="w-full px-4 pt-4 pb-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between">
+          <h3 className="text-3xl text-foreground">
+            Highlight Reel
+          </h3>
+          <div className="flex gap-2">
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+            >
+              <ChevronRight className="h-10 w-10" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="relative">
+          {!isHydrated ? (
+            <div className="text-center py-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-muted-foreground">
+                  Loading preferences...
+                </span>
+              </div>
+            </div>
+          ) : filteredCourses.length > 0 ? (
+            <div ref={swipeRef} className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out gap-3"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                }}
+              >
+                {filteredCourses.map((userCourse) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
+                  >
+                    <CourseCard 
+                      course={userCourse.golf_courses}
+                      viewingUserId={userId}
+                      viewContext="global"
+                      userRating={userCourse.rating}
+                      isReadOnly={!isOwnProfile}
+                      showUserRating={true}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-[400px]"
+                      hideRankingBadges={true}
+                      showCountryWithFlag={true}
+                      showXP={true}
+                      xp={100}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activeFilter ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No courses found in the selected region.
+              </p>
+            </div>
+          ) : (
+            <EmptyTop100State isOwnProfile={isOwnProfile} displayName="" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Top 10 Rated by You Section Component
 interface TopRatedSectionProps {
