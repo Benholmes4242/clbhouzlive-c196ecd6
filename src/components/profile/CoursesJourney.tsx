@@ -1153,7 +1153,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   return (
       <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-0">
             <h3 className="text-3xl text-foreground">
               Top 10 Rated by You
             </h3>
