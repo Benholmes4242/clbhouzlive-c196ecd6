@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, Play, Pause } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
 import CountryFlag from '@/components/ui/country-flag';
@@ -40,6 +40,10 @@ interface CourseCardProps {
   showCountryWithFlag?: boolean;
   showAIQuote?: boolean;
   disableClick?: boolean;
+  videoThumbnail?: string;
+  isVideoCard?: boolean;
+  autoPlay?: boolean;
+  onVideoClick?: () => void;
 }
 
 // Helper function to format description text with line breaks
@@ -111,10 +115,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
   hideRankingBadges = false,
   showCountryWithFlag = false,
   showAIQuote = false,
-  disableClick = false
+  disableClick = false,
+  videoThumbnail,
+  isVideoCard = false,
+  autoPlay = false,
+  onVideoClick
 }) => {
   const navigate = useNavigate();
   const [courseQuote, setCourseQuote] = useState<string>('');
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Generate AI quote for course
   useEffect(() => {
@@ -145,31 +155,101 @@ const CourseCard: React.FC<CourseCardProps> = ({
     }
   }, [showAIQuote, course.name, course.country]);
 
+  // Handle video autoplay when autoPlay prop changes
+  useEffect(() => {
+    if (isVideoCard && videoRef.current) {
+      if (autoPlay) {
+        videoRef.current.play().catch(console.error);
+        setIsPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  }, [autoPlay, isVideoCard]);
+
   const handleCardClick = () => {
     if (!disableClick) {
       navigate(`/courses/${course.id}`);
     }
   };
 
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play().catch(console.error);
+        setIsPlaying(true);
+      }
+    }
+    onVideoClick?.();
+  };
+
+  const getVideoSrc = () => {
+    if (!videoThumbnail) return '';
+    // Convert thumbnail URL back to video URL
+    if (videoThumbnail.includes('customer-') && videoThumbnail.includes('cloudflarestream.com')) {
+      const matches = videoThumbnail.match(/customer-[^\/]+\.cloudflarestream\.com\/([^\/]+)/);
+      if (matches && matches[1]) {
+        const videoId = matches[1];
+        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+      }
+    }
+    return videoThumbnail;
+  };
+
   return (
     <>
       <div 
-        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight}`}
+        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight} ${isVideoCard ? 'aspect-video' : ''}`}
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: course.thumbnail_image 
-              ? `url(${course.thumbnail_image})`
-              : `url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop')`
-          }}
-        >
-          {/* Gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        </div>
+        {/* Background Image or Video */}
+        {isVideoCard && videoThumbnail ? (
+          <div className="absolute inset-0">
+            <video
+              ref={videoRef}
+              src={getVideoSrc()}
+              poster={videoThumbnail}
+              className="w-full h-full object-cover"
+              muted
+              loop
+              playsInline
+              onLoadedData={() => {
+                if (autoPlay && videoRef.current) {
+                  videoRef.current.play().catch(console.error);
+                }
+              }}
+            />
+            
+            {/* Video Play/Pause Button */}
+            <button
+              onClick={handleVideoClick}
+              className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200 z-10"
+            >
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </button>
+            
+            {/* Gradient overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+          </div>
+        ) : (
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: course.thumbnail_image 
+                ? `url(${course.thumbnail_image})`
+                : `url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop')`
+            }}
+          >
+            {/* Gradient overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          </div>
+        )}
 
         {/* Course ranking badges - positioned at top-left - conditionally hide */}
         {!hideRankingBadges && (
