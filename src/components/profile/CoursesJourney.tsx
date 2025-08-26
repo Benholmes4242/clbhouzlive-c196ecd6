@@ -34,12 +34,14 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full">
-      <LatestHighlights 
-        userId={userId || ''} 
-        isOwnProfile={isOwnProfile}
-        userFirstName={userFirstName}
-      />
+    <div className="w-full px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <LatestHighlights 
+          userId={userId || ''} 
+          isOwnProfile={isOwnProfile}
+          userFirstName={userFirstName}
+        />
+      </div>
     </div>
   );
 };
