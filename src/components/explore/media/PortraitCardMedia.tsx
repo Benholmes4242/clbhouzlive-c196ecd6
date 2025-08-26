@@ -61,15 +61,22 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
       onClick={onMediaClick}
     >
-      <FeedVideoPlayer
-        ref={videoRef}
-        src={media.media_url}
-        className="w-full h-full object-cover"
-        muted={true}
-        loop={true}
-        playsInline={true}
-        preload="metadata"
-      />
+      {/* Only render video if we have a valid URL */}
+      {media.media_url && (media.media_url.startsWith('http') || media.media_url.startsWith('/')) ? (
+        <FeedVideoPlayer
+          ref={videoRef}
+          src={media.media_url}
+          className="w-full h-full object-cover"
+          muted={true}
+          loop={true}
+          playsInline={true}
+          preload="metadata"
+        />
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Invalid video source</span>
+        </div>
+      )}
       
       
       {/* Video play icon for autoplaying videos */}

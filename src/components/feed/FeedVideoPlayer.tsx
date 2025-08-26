@@ -35,17 +35,30 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
     const video = videoRef.current;
     if (!video) return;
 
+    // Validate video source
+    if (!src || typeof src !== 'string' || src.trim() === '') {
+      console.error('FeedVideoPlayer - Invalid video source:', src);
+      return;
+    }
+
     // Clear any existing HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
 
-    // Check if HLS is needed
+    // Check if HLS is needed and if source is a proper URL
+    const isValidUrl = src.startsWith('http') || src.startsWith('/');
     const isHLS = src.includes('.m3u8') || src.includes('cloudflarestream.com');
     
     console.log('FeedVideoPlayer - Video src:', src);
+    console.log('FeedVideoPlayer - Is valid URL:', isValidUrl);
     console.log('FeedVideoPlayer - Is HLS:', isHLS);
+
+    if (!isValidUrl) {
+      console.error('FeedVideoPlayer - Invalid video URL format:', src);
+      return;
+    }
     
     if (isHLS) {
       // Load HLS.js if not already loaded
@@ -137,6 +150,12 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
       preload="metadata"
       crossOrigin="anonymous"
       onClick={onClick}
+      onError={(e) => {
+        console.error('FeedVideoPlayer - Video error:', e, 'Source:', src);
+      }}
+      onLoadStart={() => {
+        console.log('FeedVideoPlayer - Video load started:', src);
+      }}
     />
   );
 });
