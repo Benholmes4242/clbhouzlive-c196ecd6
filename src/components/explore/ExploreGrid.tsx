@@ -1,15 +1,9 @@
-
 import React, { memo, useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { MdOutlinePlayCircle } from 'react-icons/md';
-import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
-import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
-
-// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -42,7 +36,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
-  // Check if mobile for TrendingVideos-style layout
+  // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -53,11 +47,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Function to clean title text and remove golf course information
+  // Function to clean title text
   const cleanTitleText = (title: string) => {
     if (!title) return '';
     
-    // Remove golf course patterns from title
     return title
       .replace(/\s*Played at\s+[^.!?]*[.!?]?\s*/gi, '')
       .replace(/\s*#golf\s*/gi, '')
@@ -71,7 +64,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       .trim();
   };
   
-  // Function to truncate title to 5 words for preview
+  // Function to truncate title to 5 words
   const truncateTitle = (title: string) => {
     const cleanedTitle = cleanTitleText(title);
     if (!cleanedTitle) return '';
@@ -82,8 +75,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return words.slice(0, 5).join(' ') + '...';
   };
 
-  // Temporarily disable autoplay manager to fix loading issues
-  // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -107,9 +98,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Don't show skeleton loading on initial load for any filter
+  // Don't show skeleton loading on initial load
   if (isLoading && content.length === 0) {
-    return null; // No loading state shown
+    return null;
   }
 
   if (content.length === 0 && !isLoading) {
@@ -126,178 +117,75 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Helper function to determine if media is portrait (H/W >= 1.1)
-  const isPortraitMedia = (item: ExploreContentItem): boolean => {
-    // For demo purposes, let's treat every 3rd item as portrait to ensure we have portrait cards
-    // In real implementation, you'd check actual image dimensions
-    const index = content.indexOf(item);
-    return index % 3 === 0; // Every 3rd item is considered portrait
+  // Helper functions for mobile layout
+  const isPortraitMedia = (item: ExploreContentItem, index: number): boolean => {
+    return index % 3 === 0; // Every 3rd item is portrait for demo
   };
 
-  // Create media queues
-  const createMediaQueues = () => {
-    const portraitQueue: ExploreContentItem[] = [];
-    const generalQueue: ExploreContentItem[] = [];
+  const createMobileLayout = () => {
+    const items = [];
+    let contentIndex = 0;
     
-    content.forEach(item => {
-      if (isPortraitMedia(item)) {
-        portraitQueue.push(item);
-        generalQueue.push(item); // Portrait items can also be used in square/hero cards
-      } else {
-        generalQueue.push(item);
-      }
-    });
-    
-    return { portraitQueue, generalQueue };
-  };
-
-  // Create mobile layout (3 columns, section-based)
-  const createMobileGridLayout = () => {
-    const { portraitQueue, generalQueue } = createMediaQueues();
-    const gridItems = [];
-    let portraitIndex = 0;
-    let generalIndex = 0;
-    let sectionIndex = 0;
-    
-    while (generalIndex < generalQueue.length && sectionIndex < 20) { // Limit sections
-      const isHeroSection = (sectionIndex + 1) % 3 === 0; // Every 3rd section (3,6,9...)
+    for (let section = 0; section < Math.ceil(content.length / 6) && section < 20; section++) {
+      const isHeroSection = (section + 1) % 3 === 0;
       
       if (isHeroSection) {
-        // Hero section
-        const heroIndex = Math.floor(sectionIndex / 3); // Which hero section this is (0,1,2...)
-        const isHeroOnRight = heroIndex % 2 === 0; // Alternate hero position
+        // Hero section: 1 hero (2x2) + 2 squares
+        const heroIndex = Math.floor(section / 3);
+        const heroOnRight = heroIndex % 2 === 0;
         
-        // Add hero card
-        if (generalIndex < generalQueue.length) {
-          gridItems.push({
+        if (contentIndex < content.length) {
+          items.push({
             type: 'hero',
-            item: generalQueue[generalIndex++],
-            key: `hero-${sectionIndex}-${generalQueue[generalIndex - 1]?.id}`,
-            sectionIndex,
-            isOnRight: isHeroOnRight
+            item: content[contentIndex++],
+            heroOnRight,
+            section
           });
         }
         
-        // Add 2 stacked squares on opposite side
-        for (let i = 0; i < 2 && generalIndex < generalQueue.length; i++) {
-          gridItems.push({
+        for (let i = 0; i < 2 && contentIndex < content.length; i++) {
+          items.push({
             type: 'square',
-            item: generalQueue[generalIndex++],
-            key: `square-hero-${sectionIndex}-${i}-${generalQueue[generalIndex - 1]?.id}`,
-            sectionIndex,
-            row: i + 1,
-            isHeroSection: true,
-            heroOnRight: isHeroOnRight
+            item: content[contentIndex++],
+            heroOnRight,
+            stackIndex: i,
+            section
           });
         }
       } else {
-        // Standard section
-        const isPortraitOnRight = sectionIndex % 2 === 0; // Alternate portrait position
+        // Standard section: 4 squares + 1 portrait
+        const portraitOnRight = section % 2 === 0;
         
-        // Add portrait card (spans 2 rows)
-        if (portraitIndex < portraitQueue.length) {
-          gridItems.push({
+        // Add portrait
+        if (contentIndex < content.length) {
+          items.push({
             type: 'portrait',
-            item: portraitQueue[portraitIndex++],
-            key: `portrait-${sectionIndex}-${portraitQueue[portraitIndex - 1]?.id}`,
-            sectionIndex,
-            isOnRight: isPortraitOnRight
+            item: content[contentIndex++],
+            portraitOnRight,
+            section
           });
         }
         
-        // Add 4 squares (2 top row, 2 bottom row)
-        for (let row = 1; row <= 2; row++) {
-          for (let col = 0; col < 2 && generalIndex < generalQueue.length; col++) {
-            gridItems.push({
-              type: 'square',
-              item: generalQueue[generalIndex++],
-              key: `square-${sectionIndex}-${row}-${col}-${generalQueue[generalIndex - 1]?.id}`,
-              sectionIndex,
-              row,
-              col,
-              portraitOnRight: isPortraitOnRight
-            });
-          }
+        // Add 4 squares
+        for (let i = 0; i < 4 && contentIndex < content.length; i++) {
+          items.push({
+            type: 'square',
+            item: content[contentIndex++],
+            portraitOnRight,
+            squareIndex: i,
+            section
+          });
         }
       }
-      
-      sectionIndex++;
     }
     
-    return gridItems;
+    return items;
   };
-
-  // Create layout with fixed grid structure - 3 rows per section (Desktop)
-  const createGridLayout = () => {
-    const { portraitQueue, generalQueue } = createMediaQueues();
-    const gridItems = [];
-    let portraitIndex = 0;
-    let generalIndex = 0;
-    let sectionIndex = 0;
-    
-    while (generalIndex < generalQueue.length && sectionIndex < 10) { // Limit sections to prevent infinite loop
-      const isPortraitOnRight = sectionIndex % 2 === 0; // Section 0,2,4... = right, Section 1,3,5... = left
-      
-      // Add portrait card first (spans rows 1 and 2 of this section)
-      if (portraitIndex < portraitQueue.length) {
-        gridItems.push({
-          type: 'portrait',
-          item: portraitQueue[portraitIndex++],
-          key: `portrait-${sectionIndex}-${portraitQueue[portraitIndex - 1]?.id}`,
-          sectionIndex,
-          isOnRight: isPortraitOnRight
-        });
-      }
-      
-      // Row 1: 3 squares (portrait takes up column 1 or 4)
-      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-1-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 1,
-          position: i
-        });
-      }
-      
-      // Row 2: 3 squares (portrait continues in column 1 or 4)
-      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-2-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 2,
-          position: i
-        });
-      }
-      
-      // Row 3: 4 squares (full width)
-      for (let i = 0; i < 4 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-3-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 3,
-          position: i
-        });
-      }
-      
-      sectionIndex++;
-    }
-    
-    return gridItems;
-  };
-
-  const gridItems = createGridLayout();
 
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
     return (
       <>
-        {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
         <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
@@ -306,7 +194,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               style={{ borderRadius: '0px' }}
               onClick={() => onMediaClick?.(item)}
             >
-              {/* Media Display */}
               <MediaDisplay
                 media={{
                   id: item.id,
@@ -327,10 +214,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 loop={true}
               />
               
-              {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               
-              {/* Golf Club Tag */}
               {item.golfCourse && (
                 <div className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full flex items-center gap-2 max-w-[70%]">
                   <MapPin className="w-4 h-4 text-white flex-shrink-0" />
@@ -340,7 +225,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 </div>
               )}
               
-              {/* User info */}
               <div className="absolute bottom-3 left-3 right-3">
                 <div className="flex items-center gap-2">
                   <img
@@ -362,7 +246,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           ))}
         </div>
         
-        {/* Infinite scroll sentinel */}
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -374,193 +257,143 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Function to get aspect ratio for masonry layout
-  const getAspectRatio = (index: number) => {
-    const ratios = [
-      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
-      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
-      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
-    ];
-    return ratios[index % ratios.length];
-  };
-
-  // Check if we should use Discover page layout - use new grid structure
+  // Discover page layout
   if (isDiscoverPage) {
     if (isMobile) {
-      // Mobile layout for discover page
-      const mobileGridItems = createMobileGridLayout();
+      const mobileItems = createMobileLayout();
       
       return (
         <>
-          {/* Mobile 3-column section-based layout for Discover */}
-          <div className="grid grid-cols-3 gap-px">
-            {(() => {
-              const sections = [];
-              let currentSection = 0;
+          <div className="grid grid-cols-3 gap-px auto-rows-fr">
+            {mobileItems.map((layoutItem, index) => {
+              const { type, item, section } = layoutItem;
               
-              while (currentSection < 20) {
-                const sectionItems = mobileGridItems.filter(item => item.sectionIndex === currentSection);
-                if (sectionItems.length === 0) break;
+              if (type === 'hero') {
+                const { heroOnRight } = layoutItem;
+                const gridColumn = heroOnRight ? '2 / 4' : '1 / 3';
+                const gridRow = `${section * 2 + 1} / ${section * 2 + 3}`;
                 
-                const isHeroSection = (currentSection + 1) % 3 === 0;
-                const sectionStart = currentSection * 2; // Each section is 2 rows tall
-                
-                if (isHeroSection) {
-                  // Hero section
-                  const heroItem = sectionItems.find(item => item.type === 'hero');
-                  const squareItems = sectionItems.filter(item => item.type === 'square');
-                  const heroIndex = Math.floor(currentSection / 3);
-                  const isHeroOnRight = heroIndex % 2 === 0;
-                  
-                  if (heroItem) {
-                    const heroCol = isHeroOnRight ? 2 : 1;
-                    sections.push(
-                      <div key={heroItem.key} className="col-span-2 row-span-2 aspect-square" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                        <div
-                          className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                          onClick={() => onMediaClick?.(heroItem.item)}
-                        >
-                          <MediaDisplay
-                            media={{
-                              id: heroItem.item.id,
-                              media_type: heroItem.item.type as 'video' | 'image',
-                              media_url: heroItem.item.src
-                            }}
-                            itemTitle={heroItem.item.title}
-                            shouldAutoplay={false}
-                            isLoading={itemLoadingStates[heroItem.item.id] ?? true}
-                            onImageError={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
-                            }}
-                            onImageLoad={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
-                            }}
-                            itemId={heroItem.item.id}
-                            currentIndex={0}
-                            loop={true}
-                          />
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // Add 2 stacked squares on opposite side
-                  squareItems.forEach((item, idx) => {
-                    const squareCol = isHeroOnRight ? 1 : 3;
-                    sections.push(
-                      <div key={item.key} className="aspect-square" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
-                        <div
-                          className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                          onClick={() => onMediaClick?.(item.item)}
-                        >
-                          <MediaDisplay
-                            media={{
-                              id: item.item.id,
-                              media_type: item.item.type as 'video' | 'image',
-                              media_url: item.item.src
-                            }}
-                            itemTitle={item.item.title}
-                            shouldAutoplay={false}
-                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                            onImageError={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                            }}
-                            onImageLoad={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                            }}
-                            itemId={item.item.id}
-                            currentIndex={0}
-                            loop={true}
-                          />
-                        </div>
-                      </div>
-                    );
-                  });
-                } else {
-                  // Standard section
-                  const portraitItem = sectionItems.find(item => item.type === 'portrait');
-                  const squareItems = sectionItems.filter(item => item.type === 'square');
-                  const isPortraitOnRight = currentSection % 2 === 0;
-                  
-                  // Add portrait card (spans 2 rows)
-                  if (portraitItem) {
-                    const portraitCol = isPortraitOnRight ? 3 : 1;
-                    sections.push(
-                      <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                        <div
-                          className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                          onClick={() => onMediaClick?.(portraitItem.item)}
-                        >
-                          <MediaDisplay
-                            media={{
-                              id: portraitItem.item.id,
-                              media_type: portraitItem.item.type as 'video' | 'image',
-                              media_url: portraitItem.item.src
-                            }}
-                            itemTitle={portraitItem.item.title}
-                            shouldAutoplay={false}
-                            isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                            onImageError={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                            }}
-                            onImageLoad={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                            }}
-                            itemId={portraitItem.item.id}
-                            currentIndex={0}
-                            loop={true}
-                          />
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // Add 4 squares in 2x2 grid
-                  squareItems.forEach((item, idx) => {
-                    const row = Math.floor(idx / 2) + 1; // Row 1 or 2
-                    const colOffset = idx % 2; // 0 or 1
-                    const baseCol = isPortraitOnRight ? 1 : 2; // Start at col 1 or 2
-                    const col = baseCol + colOffset;
-                    
-                    sections.push(
-                      <div key={item.key} className="aspect-square" style={{ gridColumn: col, gridRow: sectionStart + row }}>
-                        <div
-                          className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                          onClick={() => onMediaClick?.(item.item)}
-                        >
-                          <MediaDisplay
-                            media={{
-                              id: item.item.id,
-                              media_type: item.item.type as 'video' | 'image',
-                              media_url: item.item.src
-                            }}
-                            itemTitle={item.item.title}
-                            shouldAutoplay={false}
-                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                            onImageError={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                            }}
-                            onImageLoad={() => {
-                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                            }}
-                            itemId={item.item.id}
-                            currentIndex={0}
-                            loop={true}
-                          />
-                        </div>
-                      </div>
-                    );
-                  });
-                }
-                
-                currentSection++;
+                return (
+                  <div
+                    key={`hero-${item.id}-${index}`}
+                    className="aspect-square relative bg-muted overflow-hidden cursor-pointer"
+                    style={{ gridColumn, gridRow }}
+                    onClick={() => onMediaClick?.(item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: item.id,
+                        media_type: item.type as 'video' | 'image',
+                        media_url: item.src
+                      }}
+                      itemTitle={item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      itemId={item.id}
+                      currentIndex={index}
+                      loop={true}
+                    />
+                  </div>
+                );
               }
               
-              return sections;
-            })()}
+              if (type === 'portrait') {
+                const { portraitOnRight } = layoutItem;
+                const gridColumn = portraitOnRight ? '2 / 4' : '1 / 3';
+                const gridRow = `${section * 2 + 1} / ${section * 2 + 3}`;
+                
+                return (
+                  <div
+                    key={`portrait-${item.id}-${index}`}
+                    className="aspect-[2/3] relative bg-muted overflow-hidden cursor-pointer"
+                    style={{ gridColumn, gridRow }}
+                    onClick={() => onMediaClick?.(item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: item.id,
+                        media_type: item.type as 'video' | 'image',
+                        media_url: item.src
+                      }}
+                      itemTitle={item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      itemId={item.id}
+                      currentIndex={index}
+                      loop={true}
+                    />
+                  </div>
+                );
+              }
+              
+              if (type === 'square') {
+                let gridColumn, gridRow;
+                
+                if ('heroOnRight' in layoutItem) {
+                  // Hero section squares
+                  const { heroOnRight, stackIndex } = layoutItem;
+                  gridColumn = heroOnRight ? '1' : '3';
+                  gridRow = `${section * 2 + 1 + stackIndex}`;
+                } else {
+                  // Standard section squares
+                  const { portraitOnRight, squareIndex } = layoutItem;
+                  const row = Math.floor(squareIndex / 2);
+                  const col = squareIndex % 2;
+                  
+                  if (portraitOnRight) {
+                    gridColumn = `${col + 1}`;
+                  } else {
+                    gridColumn = `${col + 2}`;
+                  }
+                  gridRow = `${section * 2 + 1 + row}`;
+                }
+                
+                return (
+                  <div
+                    key={`square-${item.id}-${index}`}
+                    className="aspect-square relative bg-muted overflow-hidden cursor-pointer"
+                    style={{ gridColumn, gridRow }}
+                    onClick={() => onMediaClick?.(item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: item.id,
+                        media_type: item.type as 'video' | 'image',
+                        media_url: item.src
+                      }}
+                      itemTitle={item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      itemId={item.id}
+                      currentIndex={index}
+                      loop={true}
+                    />
+                  </div>
+                );
+              }
+              
+              return null;
+            })}
           </div>
           
-          {/* Infinite scroll sentinel */}
           <div id="scroll-sentinel" className="h-4">
             {isLoading && hasMore && (
               <div className="flex justify-center py-4">
@@ -571,546 +404,58 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         </>
       );
     } else {
-      // Desktop layout for discover page
-      const gridItems = createGridLayout();
-    
-    return (
-      <>
-        {/* New Grid Layout for Discover Page - Section-based with alternating portraits */}
-        <div className="grid grid-cols-4 gap-px">
-          {(() => {
-            const sections = [];
-            let currentSection = 0;
-            let itemIndex = 0;
-            
-            while (itemIndex < gridItems.length && currentSection < 10) {
-              const sectionItems = gridItems.filter(item => item.sectionIndex === currentSection);
-              const isPortraitOnRight = currentSection % 2 === 0;
-              
-              if (sectionItems.length === 0) break;
-              
-              // Find portrait and square items for this section
-              const portraitItem = sectionItems.find(item => item.type === 'portrait');
-              const squareItems = sectionItems.filter(item => item.type === 'square');
-              
-              // Section starts here - 3 rows
-              const sectionStart = currentSection * 3;
-              
-              // Row 1: 3 squares + portrait top half
-              const row1Squares = squareItems.filter(item => item.row === 1).slice(0, 3);
-              const row2Squares = squareItems.filter(item => item.row === 2).slice(0, 3);
-              const row3Squares = squareItems.filter(item => item.row === 3).slice(0, 4);
-              
-              // Add row 1 items
-              if (isPortraitOnRight) {
-                // Portrait on right: squares in cols 1,2,3, portrait in col 4
-                row1Squares.forEach((item, idx) => {
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                        
-                        {/* Multiple media indicator */}
-                        {item.item.media && item.item.media.length > 1 && (
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                            <MediaNavigationDots
-                              mediaCount={item.item.media.length}
-                              currentIndex={0}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                });
-                
-                // Portrait card (spans 2 rows)
-                if (portraitItem) {
-                  sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(portraitItem.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: portraitItem.item.id,
-                            media_type: portraitItem.item.type as 'video' | 'image',
-                            media_url: portraitItem.item.src
-                          }}
-                          itemTitle={portraitItem.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          itemId={portraitItem.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                        
-                        {/* Multiple media indicator */}
-                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                            <MediaNavigationDots
-                              mediaCount={portraitItem.item.media.length}
-                              currentIndex={0}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-              } else {
-                // Portrait on left: portrait in col 1, squares in cols 2,3,4
-                if (portraitItem) {
-                  sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(portraitItem.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: portraitItem.item.id,
-                            media_type: portraitItem.item.type as 'video' | 'image',
-                            media_url: portraitItem.item.src
-                          }}
-                          itemTitle={portraitItem.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          itemId={portraitItem.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                        
-                        {/* Multiple media indicator */}
-                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
-                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                            <MediaNavigationDots
-                              mediaCount={portraitItem.item.media.length}
-                              currentIndex={0}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-                
-                row1Squares.forEach((item, idx) => {
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                });
-              }
-              
-              // Row 2 squares
-              if (isPortraitOnRight) {
-                row2Squares.forEach((item, idx) => {
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                });
-              } else {
-                row2Squares.forEach((item, idx) => {
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 2 }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                });
-              }
-              
-              // Row 3: 4 squares (full width)
-              row3Squares.forEach((item, idx) => {
-                sections.push(
-                  <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 3 }}>
-                    <div
-                      className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full"
-                      onClick={() => onMediaClick?.(item.item)}
-                    >
-                      <MediaDisplay
-                        media={{
-                          id: item.item.id,
-                          media_type: item.item.type as 'video' | 'image',
-                          media_url: item.item.src
-                        }}
-                        itemTitle={item.item.title}
-                        shouldAutoplay={false}
-                        isLoading={itemLoadingStates[item.item.id] ?? true}
-                        onImageError={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                        }}
-                        onImageLoad={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                        }}
-                        itemId={item.item.id}
-                        currentIndex={0}
-                        loop={true}
-                      />
-                    </div>
-                  </div>
-                );
-              });
-              
-              currentSection++;
-            }
-            
-            return sections;
-          })()}
-        </div>
-        
-        {/* Infinite scroll sentinel */}
-        <div id="scroll-sentinel" className="h-4">
-          {isLoading && hasMore && (
-            <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-        </div>
-      </>
-    );
+      // Desktop layout - simple masonry
+      return (
+        <>
+          <div className="columns-4 gap-2 space-y-2">
+            {content.map((item, index) => {
+              const { aspect } = getAspectRatio(index);
+              return (
+                <div key={`desktop-${item.id}-${index}`} className={`break-inside-avoid ${aspect} relative bg-muted overflow-hidden cursor-pointer group`}>
+                  <ExploreContentCard 
+                    item={item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          
+          <div id="scroll-sentinel" className="h-4">
+            {isLoading && hasMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+        </>
+      );
     }
   }
 
-  // Check if mobile for new 3-column layout
-  if (isMobile) {
-    const mobileGridItems = createMobileGridLayout();
-    
-    return (
-      <>
-        {/* Mobile 3-column section-based layout */}
-        <div className="grid grid-cols-3 gap-px">
-          {(() => {
-            const sections = [];
-            let currentSection = 0;
-            
-            while (currentSection < 20) {
-              const sectionItems = mobileGridItems.filter(item => item.sectionIndex === currentSection);
-              if (sectionItems.length === 0) break;
-              
-              const isHeroSection = (currentSection + 1) % 3 === 0;
-              const sectionStart = currentSection * 2; // Each section is 2 rows tall
-              
-              if (isHeroSection) {
-                // Hero section
-                const heroItem = sectionItems.find(item => item.type === 'hero');
-                const squareItems = sectionItems.filter(item => item.type === 'square');
-                const heroIndex = Math.floor(currentSection / 3);
-                const isHeroOnRight = heroIndex % 2 === 0;
-                
-                if (heroItem) {
-                  const heroCol = isHeroOnRight ? 2 : 1;
-                  sections.push(
-                    <div key={heroItem.key} className="col-span-2 row-span-2 aspect-square" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(heroItem.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: heroItem.item.id,
-                            media_type: heroItem.item.type as 'video' | 'image',
-                            media_url: heroItem.item.src
-                          }}
-                          itemTitle={heroItem.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[heroItem.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
-                          }}
-                          itemId={heroItem.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                }
-                
-                // Add 2 stacked squares on opposite side
-                squareItems.forEach((item, idx) => {
-                  const squareCol = isHeroOnRight ? 1 : 3;
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                });
-              } else {
-                // Standard section
-                const portraitItem = sectionItems.find(item => item.type === 'portrait');
-                const squareItems = sectionItems.filter(item => item.type === 'square');
-                const isPortraitOnRight = currentSection % 2 === 0;
-                
-                // Add portrait card (spans 2 rows)
-                if (portraitItem) {
-                  const portraitCol = isPortraitOnRight ? 3 : 1;
-                  sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(portraitItem.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: portraitItem.item.id,
-                            media_type: portraitItem.item.type as 'video' | 'image',
-                            media_url: portraitItem.item.src
-                          }}
-                          itemTitle={portraitItem.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          itemId={portraitItem.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                }
-                
-                // Add 4 squares in 2x2 grid
-                squareItems.forEach((item, idx) => {
-                  const row = Math.floor(idx / 2) + 1; // Row 1 or 2
-                  const colOffset = idx % 2; // 0 or 1
-                  const baseCol = isPortraitOnRight ? 1 : 2; // Start at col 1 or 2
-                  const col = baseCol + colOffset;
-                  
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: col, gridRow: sectionStart + row }}>
-                      <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
-                        onClick={() => onMediaClick?.(item.item)}
-                      >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={false}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                });
-              }
-              
-              currentSection++;
-            }
-            
-            return sections;
-          })()}
-        </div>
-        
-        {/* Infinite scroll sentinel */}
-        <div id="scroll-sentinel" className="h-4">
-          {isLoading && hasMore && (
-            <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-        </div>
-      </>
-    );
-  }
-
+  // Default masonry layout for other pages
   return (
     <>
-      {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
-        {gridItems.map((gridItem) => {
-          if (gridItem.type === 'portrait') {
-            return (
-              <div key={gridItem.key} className="aspect-[1/2] row-span-2">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'hero') {
-            return (
-              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isFeatured={true}
-                />
-              </div>
-            );
-          } else {
-            // Square card
-            return (
-              <div key={gridItem.key} className="aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          }
+      <div className="columns-1 md:columns-3 gap-2 space-y-2">
+        {content.map((item, index) => {
+          const { aspect } = getAspectRatio(index);
+          return (
+            <div key={`default-${item.id}-${index}`} className={`break-inside-avoid ${aspect} relative bg-muted overflow-hidden cursor-pointer group`}>
+              <ExploreContentCard 
+                item={item} 
+                onLike={onLike} 
+                onFollow={onFollow} 
+                onMediaClick={onMediaClick}
+              />
+            </div>
+          );
         })}
       </div>
       
-      {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
+        {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
           </div>
@@ -1118,6 +463,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       </div>
     </>
   );
+
+  // Helper function for aspect ratios
+  function getAspectRatio(index: number) {
+    const ratios = [
+      { aspect: 'aspect-square' },
+      { aspect: 'aspect-[4/5]' },
+      { aspect: 'aspect-[9/16]' }
+    ];
+    return ratios[index % ratios.length];
+  }
 };
 
 export default memo(ExploreGrid);
