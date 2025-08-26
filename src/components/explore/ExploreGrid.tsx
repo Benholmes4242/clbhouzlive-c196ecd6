@@ -126,39 +126,85 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with featured big cards every 9-12 items
-  const createGridLayout = () => {
-    const gridItems = [];
-    let index = 0;
-    // Disable video tracking for now
-    // let videoIndex = 0; // Track video position for autoplay
+  // Helper function to determine if media is portrait (H/W >= 1.1)
+  const isPortraitMedia = (item: ExploreContentItem): boolean => {
+    // For now, we'll use a simple heuristic based on type
+    // In a real implementation, you'd check actual image dimensions
+    return item.type === 'image'; // Simplified: assume images are more likely to be portrait
+  };
+
+  // Create media queues
+  const createMediaQueues = () => {
+    const portraitQueue: ExploreContentItem[] = [];
+    const generalQueue: ExploreContentItem[] = [];
     
-    while (index < content.length) {
-      // Add 8-10 regular items
-      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
+    content.forEach(item => {
+      if (isPortraitMedia(item)) {
+        portraitQueue.push(item);
+        generalQueue.push(item); // Portrait items can also be used in square/hero cards
+      } else {
+        generalQueue.push(item);
+      }
+    });
+    
+    return { portraitQueue, generalQueue };
+  };
+
+  // Create layout with fixed grid structure
+  const createGridLayout = () => {
+    const { portraitQueue, generalQueue } = createMediaQueues();
+    const gridItems = [];
+    let portraitIndex = 0;
+    let generalIndex = 0;
+    let sectionIndex = 0;
+    
+    while (generalIndex < generalQueue.length || portraitIndex < portraitQueue.length) {
+      const isPortraitOnRight = sectionIndex % 2 === 0; // Alternating: right, left, right, left...
       
-      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
-        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+      // Row 1: 3 squares + portrait (top half)
+      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
+        const colPosition = isPortraitOnRight ? i : i + 1;
         gridItems.push({
-          type: 'regular',
-          item: content[index],
-          key: `regular-${content[index].id}`,
-          // videoIndex: currentVideoIndex
+          type: 'square',
+          item: generalQueue[generalIndex++],
+          key: `square-${generalQueue[generalIndex - 1]?.id}`,
+          gridPosition: { row: sectionIndex * 3, col: colPosition }
         });
-        index++;
       }
       
-      // Add one big featured card if we have more content
-      if (index < content.length) {
-        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+      // Portrait card (spans 2 rows)
+      if (portraitIndex < portraitQueue.length) {
+        const colPosition = isPortraitOnRight ? 3 : 0;
         gridItems.push({
-          type: 'featured',
-          item: content[index],
-          key: `featured-${content[index].id}`,
-          // videoIndex: currentVideoIndex
+          type: 'portrait',
+          item: portraitQueue[portraitIndex++],
+          key: `portrait-${portraitQueue[portraitIndex - 1]?.id}`,
+          gridPosition: { row: sectionIndex * 3, col: colPosition, rowSpan: 2 }
         });
-        index++;
       }
+      
+      // Row 2: 3 squares (portrait continues)
+      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
+        const colPosition = isPortraitOnRight ? i : i + 1;
+        gridItems.push({
+          type: 'square',
+          item: generalQueue[generalIndex++],
+          key: `square-${generalQueue[generalIndex - 1]?.id}`,
+          gridPosition: { row: sectionIndex * 3 + 1, col: colPosition }
+        });
+      }
+      
+      // Row 3: 4 squares
+      for (let i = 0; i < 4 && generalIndex < generalQueue.length; i++) {
+        gridItems.push({
+          type: 'square',
+          item: generalQueue[generalIndex++],
+          key: `square-${generalQueue[generalIndex - 1]?.id}`,
+          gridPosition: { row: sectionIndex * 3 + 2, col: i }
+        });
+      }
+      
+      sectionIndex++;
     }
     
     return gridItems;
@@ -328,30 +374,46 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Instagram-style Grid Layout with Featured Cards */}
+      {/* Fixed Grid Layout with Square and Portrait Cards */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
-        {gridItems.map((gridItem) => (
-          gridItem.type === 'featured' ? (
-            <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-              <ExploreContentCard 
-                item={gridItem.item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
-                isFeatured={true}
-              />
-            </div>
-          ) : (
-            <div key={gridItem.key} className="aspect-square">
-              <ExploreContentCard 
-                item={gridItem.item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
-              />
-            </div>
-          )
-        ))}
+        {gridItems.map((gridItem) => {
+          if (gridItem.type === 'portrait') {
+            return (
+              <div key={gridItem.key} className="aspect-[1/2] row-span-2">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                />
+              </div>
+            );
+          } else if (gridItem.type === 'hero') {
+            return (
+              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                  isFeatured={true}
+                />
+              </div>
+            );
+          } else {
+            // Square card
+            return (
+              <div key={gridItem.key} className="aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                />
+              </div>
+            );
+          }
+        })}
       </div>
       
       {/* Infinite scroll sentinel */}
