@@ -939,16 +939,17 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           // For videos, try to get thumbnail by modifying the URL or use the video URL as fallback
           if (videoMedia?.media_type === 'video' && videoThumbnail) {
             // If it's a Cloudflare Stream video, we can generate thumbnail URL
-            if (videoThumbnail.includes('cloudflarestream.com') || videoThumbnail.includes('videodelivery.net')) {
-              // Extract video ID and create thumbnail URL
-              const videoId = videoThumbnail.split('/').pop()?.split('.')[0];
-              if (videoId) {
-                videoThumbnail = `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg`;
+            if (videoThumbnail.includes('customer-') && videoThumbnail.includes('cloudflarestream.com')) {
+              // Extract video ID from URLs like: https://customer-4ah4gni80ytefpck.cloudflarestream.com/bfaa2b729eed40d2b3292f40035e8231/manifest/video.m3u8
+              const matches = videoThumbnail.match(/customer-[^\/]+\.cloudflarestream\.com\/([^\/]+)/);
+              if (matches && matches[1]) {
+                const videoId = matches[1];
+                videoThumbnail = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
               }
             }
           }
           
-          console.log('Processing post:', post.id, 'Video thumbnail:', videoThumbnail);
+          console.log('Processing post:', post.id, 'Original URL:', videoMedia?.media_url, 'Thumbnail URL:', videoThumbnail);
 
           return {
             id: `video-${post.id}`,
