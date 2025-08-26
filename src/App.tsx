@@ -19,12 +19,10 @@ import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import '@/utils/runMigration';
 
 
-// Import core pages directly to avoid loading delays
-import Auth from "./pages/Auth";
-import Clubhouse from "./pages/Clubhouse";
-import Discover from "./pages/Discover";
-
-// Keep less frequently used pages lazy-loaded
+// Lazy load all pages for better code splitting and loading screen experience
+const Auth = lazy(() => import("./pages/Auth"));
+const Clubhouse = lazy(() => import("./pages/Clubhouse"));
+const Discover = lazy(() => import("./pages/Discover"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
