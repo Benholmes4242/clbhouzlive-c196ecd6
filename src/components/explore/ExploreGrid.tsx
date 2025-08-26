@@ -471,7 +471,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait card (spans 2 rows)
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: 'span 2', height: 'calc(200% + 1px)' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -513,7 +513,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait on left: portrait in col 1, squares in cols 2,3,4
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: 'span 2', height: 'calc(200% + 1px)' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -768,7 +768,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 if (portraitItem) {
                   const portraitCol = isPortraitOnRight ? 3 : 1;
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: 'span 2', height: 'calc(200% + 1px)' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -862,7 +862,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[1/2]" style={{ gridRow: 'span 2', height: 'calc(200% + 1px)' }}>
+              <div key={gridItem.key} className="aspect-[1/2]" style={{ gridRow: 'span 2' }}>
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
