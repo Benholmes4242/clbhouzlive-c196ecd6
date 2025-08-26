@@ -486,7 +486,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   if (portraitItem) {
                     const portraitCol = isPortraitOnRight ? 3 : 1;
                     sections.push(
-                      <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
+                      <div key={portraitItem.key} className="col-span-2 row-span-2 aspect-[1/2]" style={{ gridColumn: `${portraitCol} / ${portraitCol + 2}`, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                         <div
                           className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                           onClick={() => onMediaClick?.(portraitItem.item)}
@@ -978,7 +978,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 if (portraitItem) {
                   const portraitCol = isPortraitOnRight ? 3 : 1;
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
+                    <div key={portraitItem.key} className="col-span-2 row-span-2 aspect-[1/2]" style={{ gridColumn: `${portraitCol} / ${portraitCol + 2}`, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
