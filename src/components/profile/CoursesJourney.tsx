@@ -943,7 +943,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           ) : topRatedCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-6"
+                className="flex transition-transform duration-300 ease-in-out gap-3"
                 style={{ 
                   transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
                 }}

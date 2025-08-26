@@ -391,7 +391,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           carouselRef(node);
           containerRef.current = node;
         }}
-        className={`flex gap-4 overflow-x-auto scrollbar-hide ${
+        className={`flex gap-3 overflow-x-auto scrollbar-hide ${
           isMobile ? 'px-0' : 'px-0'
         }`}
         style={{
@@ -448,7 +448,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 const container = containerRef.current;
                 if (container) {
                   const cardWidth = isMobile ? container.offsetWidth : 320; // w-80 = 320px
-                  const gap = 16; // gap-4 = 16px
+                  const gap = 12; // gap-3 = 12px
                   const scrollPosition = index * (cardWidth + gap);
                   container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                 }
