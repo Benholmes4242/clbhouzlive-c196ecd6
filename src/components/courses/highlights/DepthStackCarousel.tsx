@@ -179,7 +179,7 @@ const VideoCard: React.FC<{
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-[16/9] rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      className="relative aspect-[4/3] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -382,8 +382,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             key={item.id}
             className={`flex-shrink-0 transition-all duration-300 ${
               isMobile 
-                ? 'w-[87vw]' // ~1.15 cards visible on mobile (≤430px)
-                : 'w-[60vw] sm:w-[55vw] md:w-[45vw] lg:w-[32vw]' // Responsive breakpoints: 1.6 cards (SM), 1.8 (MD), 2.2 (LG), 3 (XL)
+                ? 'w-[calc(100vw-8rem)]' // Smaller width on mobile to show peek of next card
+                : 'w-80'
             }`}
             style={{ scrollSnapAlign: 'start' }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
