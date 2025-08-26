@@ -19,16 +19,4 @@ export const triggerMigration = async () => {
   }
 };
 
-// Auto-trigger migration
-triggerMigration()
-  .then((result) => {
-    console.log('Migration result:', result);
-    console.log(`Successfully migrated ${result.migratedFiles} out of ${result.totalFiles} files`);
-    
-    if (result.errors?.length > 0) {
-      console.warn('Migration completed with errors:', result.errors);
-    }
-  })
-  .catch((error) => {
-    console.error('Migration failed:', error);
-  });
+// Migration auto-trigger removed - migration already completed
