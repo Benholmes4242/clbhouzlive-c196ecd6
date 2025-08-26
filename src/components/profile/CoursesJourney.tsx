@@ -839,7 +839,24 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Highlight Reel"
   const { viewType, setViewType, isHydrated } = useViewPreference();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2; // Show 2 cards at a time
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Track window width for responsive breakpoints
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Calculate cards per view for Highlight Reel
+  const getCardsPerView = () => {
+    if (windowWidth >= 1200) return 3; // Desktop: 3 cards
+    if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
+    if (windowWidth >= 768) return 2;  // Tablet: 2 cards
+    return 1; // Mobile: 1 with peek
+  };
+  
+  const cardsPerView = getCardsPerView();
 
   // Query to get courses from videos tagged at top 100 courses
   const { data: allPlayedCourses = [] } = useQuery({
@@ -1064,33 +1081,47 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           ) : filteredCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
+                className="flex transition-transform duration-300 ease-in-out"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
-                {filteredCourses.map((userCourse) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start"
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="aspect-[4/5]"
-                      hideRankingBadges={true}
-                      showCountryWithFlag={true}
-                      showXP={true}
-                      xp={100}
-                      disableClick={true}
-                    />
-                  </div>
-                ))}
+                {filteredCourses.map((userCourse, index) => {
+                  // Calculate responsive width for Highlight Reel (slightly shorter than Recently Played, but wider cards)
+                  const getCardWidth = () => {
+                    if (windowWidth >= 1200) return 'calc(33.333% - 16px)'; // Desktop: 3 cards
+                    if (windowWidth >= 1024) return 'calc(33.333% - 14px)'; // Laptop: 3 cards
+                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
+                  };
+
+                  return (
+                    <div 
+                      key={userCourse.id} 
+                      className="flex-shrink-0 snap-start"
+                      style={{ width: getCardWidth() }}
+                    >
+                      <div className="aspect-[4/5] w-full">
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          hideRankingBadges={true}
+                          showCountryWithFlag={true}
+                          showXP={true}
+                          xp={100}
+                          disableClick={true}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : activeFilter ? (
@@ -1119,7 +1150,17 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   isOwnProfile = false
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2; // Show 2 cards at a time
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Track window width for responsive breakpoints
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Top 10 Rated always shows 1 card with peek at all breakpoints
+  const cardsPerView = 1;
 
   // Query to get top rated courses by the user
   const { data: topRatedCourses = [] } = useQuery({
@@ -1224,30 +1265,44 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           ) : topRatedCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
+                className="flex transition-transform duration-300 ease-in-out"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100)}%)` // Move by full container width for feature cards
+                  transform: `translateX(-${currentIndex * (100)}%)`, // Move by full container width for feature cards
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
-                {topRatedCourses.map((userCourse) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(92vw-2rem)] sm:w-[calc(94vw-3rem)] md:w-[calc(92vw-4rem)] lg:w-[calc(90vw-5rem)] xl:w-[calc(80vw-6rem)] snap-start"
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="aspect-[2.5/1]"
-                      hideRankingBadges={true}
-                      showAIQuote={true}
-                    />
-                  </div>
-                ))}
+                {topRatedCourses.map((userCourse, index) => {
+                  // Calculate responsive width for Top 10 Rated (wide feature cards with specific peek percentages)
+                  const getCardWidth = () => {
+                    if (windowWidth >= 1200) return 'calc(80vw - 6rem)'; // Desktop: 80% width (20% peek)
+                    if (windowWidth >= 1024) return 'calc(90vw - 5rem)'; // Laptop: 90% width (10% peek)
+                    if (windowWidth >= 768) return 'calc(92vw - 4rem)'; // Tablet: 92% width (8% peek)
+                    return 'calc(92vw - 2rem)'; // Mobile: 92% width (8% peek)
+                  };
+
+                  return (
+                    <div 
+                      key={userCourse.id} 
+                      className="flex-shrink-0 snap-start"
+                      style={{ width: getCardWidth() }}
+                    >
+                      <div className="aspect-[2.5/1] w-full">
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          hideRankingBadges={true}
+                          showAIQuote={true}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -1279,7 +1334,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-3xl text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
             Courses by Region
           </h3>
           <div className="flex gap-2">
@@ -1458,7 +1513,24 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   isOwnProfile = false
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2; // Show 2 cards at a time
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Track window width for responsive breakpoints
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Calculate cards per view based on exact breakpoints - different from Recently Played
+  const getCardsPerView = () => {
+    if (windowWidth >= 1200) return 3; // Desktop: 3 cards
+    if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
+    if (windowWidth >= 768) return 2;  // Tablet: 2 cards
+    return 1; // Mobile: 1 with peek
+  };
+  
+  const cardsPerView = getCardsPerView();
 
   // Query to get Great Britain & Ireland courses
   const { data: gbIrelandCourses = [] } = useQuery({
@@ -1611,28 +1683,42 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
           ) : gbIrelandCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-6"
+                className="flex transition-transform duration-300 ease-in-out"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
-                {gbIrelandCourses.map((userCourse) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(50%-12px)]" // Half width minus gap
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="h-[333px]"
-                    />
-                  </div>
-                ))}
+                {gbIrelandCourses.map((userCourse, index) => {
+                  // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
+                  const getCardWidth = () => {
+                    if (windowWidth >= 1200) return 'calc(33.333% - 16px)'; // Desktop: 3 cards
+                    if (windowWidth >= 1024) return 'calc(33.333% - 14px)'; // Laptop: 3 cards
+                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
+                  };
+
+                  return (
+                    <div 
+                      key={userCourse.id} 
+                      className="flex-shrink-0 snap-start"
+                      style={{ width: getCardWidth() }}
+                    >
+                      <div className="aspect-[3/4] w-full">
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : (
