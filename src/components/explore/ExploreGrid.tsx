@@ -478,7 +478,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait card (spans 2 rows)
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} style={{ gridColumn: 4, gridRow: `${sectionStart + 1} / ${sectionStart + 3}`, height: 'calc(200% + 1px)' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -523,7 +523,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait on left: portrait in col 1, squares in cols 2,3,4
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} style={{ gridColumn: 1, gridRow: `${sectionStart + 1} / ${sectionStart + 3}`, height: 'calc(200% + 1px)' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
