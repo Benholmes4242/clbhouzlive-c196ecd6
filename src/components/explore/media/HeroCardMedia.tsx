@@ -79,7 +79,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Cinematic loading indicator */}
       {!isVisible && (
-        <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-muted/15 via-muted/10 to-muted/5 animate-[pulse_3s_ease-in-out_infinite]" />
       )}
       
       {/* Video play icon for autoplaying videos */}
