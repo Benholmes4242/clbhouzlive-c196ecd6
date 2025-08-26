@@ -62,14 +62,17 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   
   // Intersection observer for mobile lazy loading
   const { ref: videoContainerRef, isInView } = useIntersectionObserver({
-    threshold: isMobile ? 0.8 : 0.3, // Higher threshold for mobile
-    rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
+    threshold: autoplay ? 0.3 : (isMobile ? 0.8 : 0.3), // Lower threshold for autoplay videos
+    rootMargin: autoplay ? '200px' : (isMobile ? '0px' : '100px') // Larger margin for autoplay videos
   });
 
-  // Mobile lazy loading logic
+  // Mobile lazy loading logic - more aggressive for autoplay videos
   useEffect(() => {
-    if (isMobile) {
-      // On mobile, only load when actually in view
+    if (autoplay) {
+      // For autoplay videos, load immediately regardless of mobile
+      setShouldLoadVideo(true);
+    } else if (isMobile) {
+      // On mobile, only load when actually in view for non-autoplay videos
       if (isInView && !shouldLoadVideo) {
         setShouldLoadVideo(true);
       }
@@ -77,7 +80,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       // On desktop, load immediately
       setShouldLoadVideo(true);
     }
-  }, [isInView, isMobile, shouldLoadVideo, src]);
+  }, [isInView, isMobile, shouldLoadVideo, src, autoplay]);
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
