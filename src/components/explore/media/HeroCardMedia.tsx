@@ -1,4 +1,5 @@
 import React, { memo, useRef } from 'react';
+import { MdOutlinePlayCircle } from 'react-icons/md';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
@@ -48,9 +49,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <svg className="w-6 h-6 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M8 5v10l8-5-8-5z" />
-          </svg>
+          <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
         </div>
         
         {/* Hero overlay gradient for visual appeal */}
@@ -82,6 +81,11 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       {!isVisible && (
         <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted animate-pulse" />
       )}
+      
+      {/* Video play icon for autoplaying videos */}
+      <div className="absolute bottom-3 right-3 z-20">
+        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+      </div>
       
       {/* Hero badge indicator */}
       <div className="absolute top-3 right-3 bg-primary/20 backdrop-blur-sm px-2 py-1 rounded-full">
