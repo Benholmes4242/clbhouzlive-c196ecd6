@@ -401,7 +401,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return (
       <>
         {/* New Grid Layout for Discover Page - Section-based with alternating portraits */}
-        <div className="grid grid-cols-4 gap-px" style={{ gridAutoRows: '1fr' }}>
+        <div className="grid grid-cols-4 gap-px">
           {(() => {
             const sections = [];
             let currentSection = 0;
@@ -471,10 +471,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait card (spans 2 rows)
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] mb-px" style={{ gridColumn: 4, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
-                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -514,10 +513,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait on left: portrait in col 1, squares in cols 2,3,4
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] mb-px" style={{ gridColumn: 1, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 1, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
-                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -678,7 +676,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return (
       <>
         {/* Mobile 3-column section-based layout */}
-        <div className="grid grid-cols-3 gap-px" style={{ gridAutoRows: '1fr' }}>
+        <div className="grid grid-cols-3 gap-px">
           {(() => {
             const sections = [];
             let currentSection = 0;
@@ -770,10 +768,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 if (portraitItem) {
                   const portraitCol = isPortraitOnRight ? 3 : 1;
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2 mb-px" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
-                        style={{ height: '100%' }}
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                         <MediaDisplay
@@ -861,11 +858,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   return (
     <>
       {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px -mx-0 md:mx-0" style={{ gridAutoRows: '1fr' }}>
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[1/2] mb-px" style={{ gridRow: 'span 2' }}>
+              <div key={gridItem.key} className="aspect-[1/2]" style={{ gridRow: 'span 2' }}>
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
