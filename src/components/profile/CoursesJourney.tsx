@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
+import { useTop100CoursesData } from '@/hooks/useTop100CoursesData.tsx';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
 import { useQuery } from '@tanstack/react-query';
