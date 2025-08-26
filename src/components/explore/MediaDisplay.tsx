@@ -67,7 +67,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   const [imageLoading, setImageLoading] = useState(true);
   const [mediaLoaded, setMediaLoaded] = useState(false);
   // Video autoplay transition state
-  const [videoTransitioning, setVideoTransitioning] = useState(shouldAutoplay);
+  const [videoTransitioning, setVideoTransitioning] = useState(false);
 
   // Generate thumbnail URL for Cloudflare Stream videos
   const getVideoThumbnail = (videoUrl: string) => {
