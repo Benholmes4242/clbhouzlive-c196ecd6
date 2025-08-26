@@ -12,7 +12,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
+
 
 interface CoursesJourneyProps {
   className?: string;
@@ -21,40 +21,6 @@ interface CoursesJourneyProps {
   isOwnProfile?: boolean;
 }
 
-// My Highlights Section Component
-interface MyHighlightsSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-  userFirstName?: string;
-}
-
-const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({ 
-  userId,
-  isOwnProfile = false,
-  userFirstName = 'User'
-}) => {
-  return (
-    <div className="w-full px-4 pt-0 pb-0">
-      <div className="max-w-6xl mx-auto">
-        {/* Highlights From My Journey title - matches Top 10 Rated by You exact structure */}
-        <div className="flex items-center justify-between mb-0">
-          <h3 className="text-3xl text-foreground">
-            Highlights From My Journey
-          </h3>
-          <div className="flex gap-2">
-            {/* Empty div to maintain same height as Top 10 section with buttons */}
-          </div>
-        </div>
-        
-        <LatestHighlights 
-          userId={userId || ''} 
-          isOwnProfile={isOwnProfile}
-          userFirstName={userFirstName}
-        />
-      </div>
-    </div>
-  );
-};
 
 const CoursesJourney: React.FC<CoursesJourneyProps> = ({ 
   className = '', 
@@ -498,8 +464,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       {/* Highlight Reel Section */}
       <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* My Highlights Section */}
-      <MyHighlightsSection userId={userId} isOwnProfile={isOwnProfile} userFirstName={userDisplayName?.split(' ')[0] || 'User'} />
 
       {/* Courses by Region Section */}
       <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
