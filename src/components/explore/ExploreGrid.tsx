@@ -257,548 +257,66 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout with dynamic mobile grid
+  // Check if we should use Discover page layout - use simple Instagram-style grid like profile
   if (isDiscoverPage) {
-    const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
-    
-    // Function to detect aspect ratio of media
-    const detectAspectRatio = (item: ExploreContentItem) => {
-      // Use a deterministic hash-based approach for consistency
-      const hash = item.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-      
-      if (item.type === 'video') {
-        // For videos, distribute based on common aspect ratios
-        const videoType = hash % 10;
-        if (videoType < 3) return 'portrait'; // 30% portrait (9:16, 4:5)
-        if (videoType < 5) return 'landscape'; // 20% landscape (16:9)
-        return 'square'; // 50% square (1:1)
-      }
-      
-      // For images, more likely to be square but still have variety
-      const imageType = hash % 10;
-      if (imageType < 2) return 'portrait'; // 20% portrait
-      if (imageType < 3) return 'landscape'; // 10% landscape
-      return 'square'; // 70% square
-    };
-
-    // Create mobile-specific dynamic layout
-    const createMobileLayout = () => {
-      const layoutItems = [];
-      let contentIndex = 0;
-      let specialCardCounter = 0; // Track special cards placed
-      
-      while (contentIndex < filteredContent.length) {
-        const remainingItems = filteredContent.length - contentIndex;
-        
-        // Check if we should place a special card (every 6-8 squares)
-        const shouldPlaceSpecial = specialCardCounter === 0 || 
-          (layoutItems.filter(item => item.type === 'regular').length - 
-           layoutItems.filter(item => item.type !== 'regular').length * 4) >= (6 + Math.floor(Math.random() * 3));
-        
-        if (shouldPlaceSpecial && remainingItems >= 2) {
-          // Decide between large (4x4) or tall (1x2) based on content and distribution
-          const currentSpecialCount = layoutItems.filter(item => item.type !== 'regular').length;
-          const totalSpecialNeeded = Math.floor(filteredContent.length * 0.3); // 30% special (15% large + 15% tall)
-          const largeNeeded = Math.floor(filteredContent.length * 0.15);
-          const tallNeeded = Math.floor(filteredContent.length * 0.15);
-          
-          const largeCount = layoutItems.filter(item => item.type === 'large').length;
-          const tallCount = layoutItems.filter(item => item.type === 'tall').length;
-          
-          let cardType = 'regular';
-          
-          // Prefer placing cards based on aspect ratio detection and distribution needs
-          const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
-          
-          // Large squares (4x4) should be for square content or when we need more large cards
-          if ((aspectRatio === 'square' || aspectRatio === 'landscape') && largeCount < largeNeeded) {
-            cardType = 'large';
-          } 
-          // Tall cards (1x2) should be for portrait content
-          else if (aspectRatio === 'portrait' && tallCount < tallNeeded) {
-            cardType = 'tall';
-          } 
-          // Fill remaining quotas
-          else if (largeCount < largeNeeded) {
-            cardType = 'large';
-          } else if (tallCount < tallNeeded) {
-            cardType = 'tall';
-          }
-          
-          // Avoid back-to-back special cards
-          const lastItem = layoutItems[layoutItems.length - 1];
-          if (lastItem && lastItem.type !== 'regular' && Math.random() > 0.3) {
-            cardType = 'regular';
-          }
-          
-          if (cardType !== 'regular') {
-            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-            
-            layoutItems.push({
-              type: cardType,
-              item: filteredContent[contentIndex],
-              index: contentIndex,
-              shouldAutoplay,
-              aspectRatio
-            });
-            contentIndex++;
-            specialCardCounter++;
-            continue;
-          }
-        }
-        
-        // Add regular card
-        const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-        const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-        const aspectRatio = detectAspectRatio(filteredContent[contentIndex]);
-        
-        layoutItems.push({
-          type: 'regular',
-          item: filteredContent[contentIndex],
-          index: contentIndex,
-          shouldAutoplay,
-          aspectRatio
-        });
-        contentIndex++;
-      }
-      
-      return layoutItems;
-    };
-
-    // Use mobile layout when on mobile, otherwise keep existing layout
-    const createDiscoverLayout = () => {
-      const isMobileView = window.innerWidth < 768;
-      
-      if (isMobileView) {
-        return createMobileLayout();
-      }
-      
-      // Desktop layout (existing logic)
-      const layoutItems = [];
-      let contentIndex = 0;
-      let rowCount = 0;
-      const colsPerRow = 4;
-      
-      while (contentIndex < filteredContent.length) {
-        rowCount++;
-        const remainingItems = filteredContent.length - contentIndex;
-        
-        // Every third row, try to place a large video card
-        if (rowCount % 3 === 0) {
-          // Look for a video in the upcoming content for large card
-          let largeCardVideo = null;
-          let largeCardIndex = -1;
-          
-          // First try to find a video for the large card
-          for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 3, filteredContent.length); i++) {
-            if (filteredContent[i].type === 'video') {
-              largeCardVideo = filteredContent[i];
-              largeCardIndex = i;
-              break;
-            }
-          }
-          
-          // If no video found, use any content item for large card (image can work too)
-          if (!largeCardVideo && contentIndex < filteredContent.length) {
-            largeCardVideo = filteredContent[contentIndex + Math.min(2, filteredContent.length - contentIndex - 1)];
-            largeCardIndex = contentIndex + Math.min(2, filteredContent.length - contentIndex - 1);
-          }
-          
-          if (largeCardVideo && remainingItems >= 3) {
-            // Calculate how many regular cards we can fit alongside the large card
-            const regularCardsInRow = colsPerRow - 2; // Large card takes 2 columns
-            let regularCardsAdded = 0;
-            
-            // Add regular cards first, skipping the item we'll use for large card
-            while (regularCardsAdded < regularCardsInRow && contentIndex < filteredContent.length) {
-              if (contentIndex === largeCardIndex) {
-                contentIndex++; // Skip the item we'll use for large card
-                if (contentIndex >= filteredContent.length) break;
-              }
-              
-              const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-              const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-              
-              layoutItems.push({
-                type: 'regular',
-                item: filteredContent[contentIndex],
-                index: contentIndex,
-                shouldAutoplay
-              });
-              contentIndex++;
-              regularCardsAdded++;
-            }
-            
-            // Add the large card
-            layoutItems.push({
-              type: 'large',
-              item: largeCardVideo,
-              index: largeCardIndex,
-              shouldAutoplay: largeCardVideo.type === 'video' // Only autoplay if it's a video
-            });
-            
-            // Skip the item we used for large card if we haven't passed it yet
-            if (largeCardIndex >= contentIndex) {
-              contentIndex = largeCardIndex + 1;
-            }
-            
-            // The large card spans 2 rows, so increment row count by 1
-            rowCount++;
-            
-            // Add one more row to completely fill the space around the large card
-            const nextRowItems = Math.min(colsPerRow, filteredContent.length - contentIndex);
-            for (let i = 0; i < nextRowItems; i++) {
-              if (contentIndex < filteredContent.length) {
-                const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-                const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-                
-                layoutItems.push({
-                  type: 'regular',
-                  item: filteredContent[contentIndex],
-                  index: contentIndex,
-                  shouldAutoplay
-                });
-                contentIndex++;
-              }
-            }
-          } else {
-            // No video available or not enough content, fill row with regular cards
-            const itemsInThisRow = Math.min(colsPerRow, remainingItems);
-            for (let i = 0; i < itemsInThisRow; i++) {
-              const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-              const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-              
-              layoutItems.push({
-                type: 'regular',
-                item: filteredContent[contentIndex],
-                index: contentIndex,
-                shouldAutoplay
-              });
-              contentIndex++;
-            }
-          }
-        } else {
-          // Regular row - fill with normal cards
-          const itemsInThisRow = Math.min(colsPerRow, remainingItems);
-          for (let i = 0; i < itemsInThisRow; i++) {
-            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-            
-            layoutItems.push({
-              type: 'regular',
-              item: filteredContent[contentIndex],
-              index: contentIndex,
-              shouldAutoplay
-            });
-            contentIndex++;
-          }
-        }
-      }
-      
-      return layoutItems;
-    };
-    
-    const layoutItems = createDiscoverLayout();
-    
-    // Helper functions for media navigation
-    const handlePrevMedia = (itemId: string, mediaLength: number) => {
-      setMediaIndices(prev => ({
-        ...prev,
-        [itemId]: prev[itemId] > 0 ? prev[itemId] - 1 : mediaLength - 1
-      }));
-    };
-
-    const handleNextMedia = (itemId: string, mediaLength: number) => {
-      setMediaIndices(prev => ({
-        ...prev,
-        [itemId]: prev[itemId] < mediaLength - 1 ? prev[itemId] + 1 : 0
-      }));
-    };
-
-    // Create touch handlers for swipe detection
-    const createTouchHandlers = (itemId: string, mediaLength: number) => {
-      let startX = 0;
-      let startY = 0;
-      
-      return {
-        onTouchStart: (e: any) => {
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        },
-        onTouchEnd: (e: any) => {
-          if (!startX || !startY) return;
-          
-          const endX = e.changedTouches[0].clientX;
-          const endY = e.changedTouches[0].clientY;
-          const diffX = startX - endX;
-          const diffY = startY - endY;
-          
-          // Only handle horizontal swipes (ignore vertical scrolling)
-          if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-            e.preventDefault();
-            if (diffX > 0) {
-              // Swiped left - next media
-              handleNextMedia(itemId, mediaLength);
-            } else {
-              // Swiped right - previous media
-              handlePrevMedia(itemId, mediaLength);
-            }
-          }
-          
-          startX = 0;
-          startY = 0;
-        }
-      };
-    };
-    
-    const isMobileView = window.innerWidth < 768;
-    
     return (
       <>
-        {/* Discover Page Layout - Dynamic Mobile Grid */}
-        <div className={`grid ${isMobileView ? 'grid-cols-3' : 'grid-cols-4'} gap-0.5 auto-rows-fr`}>
-        {layoutItems.map((layoutItem, index) => {
-          const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
-          const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
-          const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
-
-            if (layoutItem.type === 'large') {
-              return (
-                <div
-                  key={`discover-large-${layoutItem.item.id}-${index}`}
-                  className={`${isMobileView ? 'col-span-2 row-span-2' : 'col-span-2 row-span-2'} relative overflow-hidden cursor-pointer group aspect-square`}
-                  style={{ borderRadius: '0px' }}
-                  onClick={() => onMediaClick?.(layoutItem.item)}
-                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-                >
-                   {/* Shimmer loading placeholder */}
-                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
-                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                   </div>
-                
-                {/* Large Video Card - Always Autoplay */}
+        {/* Simple Instagram-style grid that works on profile pages */}
+        <div className="grid grid-cols-3 gap-1 md:gap-2">
+          {content.map((item, index) => {
+            // Create larger featured cards every 9-12 items
+            const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
+            
+            return (
+              <div
+                key={`discover-${item.id}-${index}`}
+                className={`
+                  relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02]
+                  ${isLargeCard 
+                    ? 'col-span-2 row-span-2 aspect-square' 
+                    : 'aspect-square'
+                  }
+                `}
+                onClick={() => onMediaClick?.(item)}
+              >
                 <MediaDisplay
-                  media={hasMultipleMedia && currentMedia ? {
-                    id: currentMedia.id,
-                    media_type: currentMedia.media_type,
-                    media_url: currentMedia.media_url
-                  } : {
-                    id: layoutItem.item.id,
-                    media_type: layoutItem.item.type as 'video' | 'image',
-                    media_url: layoutItem.item.src
+                  media={{
+                    id: item.id,
+                    media_type: item.type as 'video' | 'image',
+                    media_url: item.src
                   }}
-                  itemTitle={layoutItem.item.title}
-                  shouldAutoplay={true}
-                  isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
+                  itemTitle={item.title}
+                  shouldAutoplay={false}
+                  isLoading={itemLoadingStates[item.id] ?? true}
                   onImageError={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
                   }}
                   onImageLoad={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
+                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
                   }}
-                  itemId={layoutItem.item.id}
-                  currentIndex={layoutItem.index}
+                  itemId={item.id}
+                  currentIndex={index}
                   loop={true}
-                  hidePlayButton={true}
                 />
                 
-                {/* Context Label */}
-                {!hideBadges && (
-                  <div className="absolute top-2 left-2 z-30">
-                    <div className="bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-white">
-                        {(() => {
-                          const labels = [
-                            '🔥 Trending Now',
-                            '🎯 Shot of the Week', 
-                            '💡 From the Pros',
-                            '⭐ Featured',
-                            '🚀 Going Viral',
-                            '🏆 Top Pick'
-                          ];
-                          // Use item ID to consistently pick the same label for the same content
-                          const labelIndex = layoutItem.item.id.charCodeAt(0) % labels.length;
-                          return labels[labelIndex];
-                        })()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Golf Club Tag for large cards - only in full screen modal, not in grid thumbnails */}
-                
-                {/* Film icon for videos */}
-                {layoutItem.item.type === 'video' && (
-                  <div className="absolute bottom-3 right-3 z-20">
-                    <div 
-                      className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
-                      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                    >
-                      <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
-                    </div>
+                {/* Video play icon */}
+                {item.type === 'video' && (
+                  <div className="absolute top-2 right-2">
+                    <MdOutlinePlayCircle className="w-6 h-6 text-white/90 drop-shadow-md" />
                   </div>
                 )}
                 
-                {/* Media navigation dots for multiple media */}
-                {hasMultipleMedia && (
-                  <MediaNavigationDots
-                    mediaCount={layoutItem.item.media!.length}
-                    currentIndex={currentMediaIndex}
-                  />
-                )}
-                
-                {/* User info for large cards */}
-                <div className="absolute bottom-3 left-3 right-12">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
-                      alt={layoutItem.item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
-                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
-                      </p>
-                      {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm max-w-[75%] md:max-w-none line-clamp-2 md:line-clamp-none">
-                          {cleanTitleText(layoutItem.item.title)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hover animation */}
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-              );
-            } else if (layoutItem.type === 'tall') {
-              return (
-                <div
-                  key={`discover-tall-${layoutItem.item.id}-${index}`}
-                  className={`${isMobileView ? 'col-span-1 row-span-2' : 'col-span-1 row-span-2'} relative overflow-hidden cursor-pointer group`}
-                  style={{ borderRadius: '0px' }}
-                  onClick={() => onMediaClick?.(layoutItem.item)}
-                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-                >
-                  {/* Shimmer loading placeholder */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                  </div>
-                  
-                  {/* Tall Portrait Card */}
-                  <MediaDisplay
-                    media={hasMultipleMedia && currentMedia ? {
-                      id: currentMedia.id,
-                      media_type: currentMedia.media_type,
-                      media_url: currentMedia.media_url
-                    } : {
-                      id: layoutItem.item.id,
-                      media_type: layoutItem.item.type as 'video' | 'image',
-                      media_url: layoutItem.item.src
-                    }}
-                    itemTitle={layoutItem.item.title}
-                    shouldAutoplay={layoutItem.shouldAutoplay}
-                    isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
-                    onImageError={() => {
-                      setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
-                    }}
-                    onImageLoad={() => {
-                      setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
-                    }}
-                    itemId={layoutItem.item.id}
-                    currentIndex={layoutItem.index}
-                    loop={true}
-                    hidePlayButton={true}
-                  />
-                  
-                  {/* Film icon for videos in tall cards */}
-                  {layoutItem.item.type === 'video' && (
-                    <div className="absolute bottom-2 right-2 z-20">
-                      <div 
-                        className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
-                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                      >
-                        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Media navigation dots for multiple media */}
-                  {hasMultipleMedia && (
+                {/* Multiple media indicator */}
+                {item.media && item.media.length > 1 && (
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
                     <MediaNavigationDots
-                      mediaCount={layoutItem.item.media!.length}
-                      currentIndex={currentMediaIndex}
+                      mediaCount={item.media.length}
+                      currentIndex={0}
                     />
-                  )}
-                  
-                  {/* Hover animation */}
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-              );
-            } else {
-              return (
-                <div
-                  key={`discover-regular-${layoutItem.item.id}-${index}`}
-                  className="relative overflow-hidden cursor-pointer group aspect-square"
-                  style={{ borderRadius: '0px' }}
-                  onClick={() => onMediaClick?.(layoutItem.item)}
-                  {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
-                >
-                {/* Shimmer loading placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                </div>
-                
-                {/* Regular Card */}
-                <MediaDisplay
-                  media={hasMultipleMedia && currentMedia ? {
-                    id: currentMedia.id,
-                    media_type: currentMedia.media_type,
-                    media_url: currentMedia.media_url
-                  } : {
-                    id: layoutItem.item.id,
-                    media_type: layoutItem.item.type as 'video' | 'image',
-                    media_url: layoutItem.item.src
-                  }}
-                  itemTitle={layoutItem.item.title}
-                  shouldAutoplay={layoutItem.shouldAutoplay}
-                  isLoading={itemLoadingStates[layoutItem.item.id] ?? true}
-                  onImageError={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
-                  }}
-                  onImageLoad={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [layoutItem.item.id]: false }));
-                  }}
-                  itemId={layoutItem.item.id}
-                  currentIndex={layoutItem.index}
-                  loop={true}
-                  hidePlayButton={true}
-                />
-                
-                {/* Film icon for videos in regular cards */}
-                {layoutItem.item.type === 'video' && (
-                  <div className="absolute bottom-2 right-2 z-20">
-                    <div 
-                      className="w-7 h-7 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
-                      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                    >
-                      <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
-                    </div>
                   </div>
                 )}
-                
-                  {/* Media navigation dots for multiple media */}
-                  {hasMultipleMedia && (
-                    <MediaNavigationDots
-                      mediaCount={layoutItem.item.media!.length}
-                      currentIndex={currentMediaIndex}
-                    />
-                  )}
-                </div>
-              );
-            }
+              </div>
+            );
           })}
         </div>
         
