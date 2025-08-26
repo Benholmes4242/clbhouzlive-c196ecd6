@@ -34,7 +34,7 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full px-4 pt-4 pb-8">
+    <div className="w-full px-4 pt-0 pb-8">
       <div className="max-w-6xl mx-auto">
         {/* Highlights From My Journey title - matches Top 10 Rated by You exact structure */}
         <div className="flex items-center justify-between mb-0">

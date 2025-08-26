@@ -218,7 +218,7 @@ const VideoCard: React.FC<{
       <div className="absolute top-3 left-3 z-10">
         <div className="relative flex items-center px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
           <div className="relative z-10 flex items-center">
-            <span className="text-sm text-foreground">
+            <span className="text-sm text-white">
               {isOwnProfile ? "My Highlights" : `${userFirstName}'s Highlights`}
             </span>
           </div>
