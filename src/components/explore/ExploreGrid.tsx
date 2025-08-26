@@ -793,7 +793,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 if (portraitItem) {
                   const portraitCol = isPortraitOnRight ? 3 : 1;
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
+                    <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -883,11 +883,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   return (
     <>
       {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[1/2]" style={{ gridRow: 'span 2' }}>
+              <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
