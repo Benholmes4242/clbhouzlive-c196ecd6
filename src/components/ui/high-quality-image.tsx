@@ -75,12 +75,9 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
       return directUrl;
     }
     
-    // If it's a Supabase storage URL, we can add optimization parameters
+    // For activity feeds, return direct URL without optimization to avoid loading issues
     if (directUrl.includes('supabase') && directUrl.includes('storage')) {
-      const separator = directUrl.includes('?') ? '&' : '?';
-      // Use maximum quality settings to avoid graininess
-      const optimizedUrl = `${directUrl}${separator}quality=100&width=${width || 2160}&height=${height || 2160}`;
-      return optimizedUrl;
+      return directUrl;
     }
     
     return directUrl;
