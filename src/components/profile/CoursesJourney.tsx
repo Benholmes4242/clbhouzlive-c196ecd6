@@ -1074,7 +1074,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
                 }}
               >
-                {filteredCourses.map((userCourse, index) => (
+                {filteredCourses.map((userCourse) => (
                   <div 
                     key={userCourse.id} 
                     className="flex-shrink-0 w-[calc(27%-12px)]" // Reduced width by another 10% (from 30% to 27%)
@@ -1087,15 +1087,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       isReadOnly={!isOwnProfile}
                       showUserRating={true}
                       isFromUserCoursesPage={true}
-                      customHeight="aspect-video"
+                      customHeight="h-[400px]"
                       hideRankingBadges={true}
                       showCountryWithFlag={true}
                       showXP={true}
                       xp={100}
                       disableClick={true}
-                      isVideoCard={true}
-                      videoThumbnail={userCourse.videoThumbnail}
-                      autoPlay={index === currentIndex} // Only autoplay the first visible card
                     />
                   </div>
                 ))}
