@@ -486,9 +486,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // Load from conversation session hook (localStorage) first
+      // Load from conversation session hook (database) first
       console.log('📱 Loading from conversation session...');
-      conversationSession.loadConversations();
+      await conversationSession.loadConversations();
       console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
       
       // Convert conversation session format to our chat conversation format

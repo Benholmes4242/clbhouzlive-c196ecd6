@@ -6,6 +6,7 @@ import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
 
 const POSTS_PER_PAGE = 15; // Increased to fill viewport better
+const PRELOAD_THRESHOLD = 3; // Preload when user is 3 items from bottom
 
 export const useInfiniteExploreContent = (activeFilter?: string) => {
   // Cache content by filter type to avoid reloading when switching tabs
@@ -14,6 +15,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
   const [hasMoreStates, setHasMoreStates] = useState<Record<string, boolean>>({});
   const [offsetStates, setOffsetStates] = useState<Record<string, number>>({});
   const [mockOffsetStates, setMockOffsetStates] = useState<Record<string, number>>({});
+  const [preloadedContent, setPreloadedContent] = useState<Record<string, ExploreContentItem[]>>({});
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   
@@ -26,8 +28,65 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
   const currentOffset = offsetStates[currentFilter] || 0;
   const currentMockOffset = mockOffsetStates[currentFilter] || 0;
 
+  // Preload content function
+  const preloadMore = useCallback(async () => {
+    if (loading || !hasMore || preloadedContent[currentFilter]?.length > 0) {
+      return;
+    }
+    
+    try {
+      const freshOffset = offsetStates[currentFilter] || 0;
+      let posts = [];
+      
+      if (currentFilter === 'Friends') {
+        posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
+      } else {
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, currentFilter);
+      }
+      
+      if (posts.length > 0) {
+        setPreloadedContent(prev => ({
+          ...prev,
+          [currentFilter]: posts
+        }));
+      }
+    } catch (error) {
+      console.error('Error preloading content:', error);
+    }
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
+
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
+      return;
+    }
+    
+    // Check if we have preloaded content to use first
+    const preloaded = preloadedContent[currentFilter];
+    if (preloaded && preloaded.length > 0) {
+      // Use preloaded content instantly
+      setContentCache(prev => ({
+        ...prev,
+        [currentFilter]: [...(prev[currentFilter] || []), ...preloaded]
+      }));
+      
+      setOffsetStates(prev => ({
+        ...prev,
+        [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
+      }));
+      
+      // Clear preloaded content
+      setPreloadedContent(prev => ({
+        ...prev,
+        [currentFilter]: []
+      }));
+      
+      // Start preloading the next batch
+      setTimeout(() => preloadMore(), 100);
+      
+      if (preloaded.length < POSTS_PER_PAGE) {
+        setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
+      }
+      
       return;
     }
     
@@ -60,6 +119,9 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
           [currentFilter]: freshOffset + POSTS_PER_PAGE
         }));
         
+        // Start preloading next batch
+        setTimeout(() => preloadMore(), 100);
+        
         // If we got fewer posts than requested, we might be at the end
         if (posts.length < POSTS_PER_PAGE) {
           setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
@@ -74,7 +136,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     } finally {
       setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore]);
 
   // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {

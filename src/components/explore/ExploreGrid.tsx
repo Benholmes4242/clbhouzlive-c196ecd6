@@ -84,7 +84,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   // Temporarily disable autoplay manager to fix loading issues
   // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
-  // Intersection observer for infinite scroll
+  // Intersection observer for infinite scroll with preload threshold
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -92,17 +92,38 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           onLoadMore();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
+    );
+
+    // Preload observer - triggers earlier to preload content
+    const preloadObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          // Trigger preload when user is closer to bottom
+          const event = new CustomEvent('triggerPreload');
+          window.dispatchEvent(event);
+        }
+      },
+      { threshold: 0.8 }
     );
 
     const sentinel = document.getElementById('scroll-sentinel');
+    const preloadSentinel = document.getElementById('preload-sentinel');
+    
     if (sentinel) {
       observer.observe(sentinel);
+    }
+    
+    if (preloadSentinel) {
+      preloadObserver.observe(preloadSentinel);
     }
 
     return () => {
       if (sentinel) {
         observer.unobserve(sentinel);
+      }
+      if (preloadSentinel) {
+        preloadObserver.unobserve(preloadSentinel);
       }
     };
   }, [hasMore, isLoading, onLoadMore]);
@@ -352,7 +373,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           ))}
         </div>
         
-        {/* Infinite scroll sentinel */}
+        {/* Preload sentinel and Infinite scroll sentinel */}
+        <div id="preload-sentinel" className="h-20" />
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -636,7 +658,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           })()}
         </div>
         
-        {/* Infinite scroll sentinel */}
+        {/* Preload sentinel and Infinite scroll sentinel */}
+        <div id="preload-sentinel" className="h-20" />
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -821,7 +844,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           })()}
         </div>
         
-        {/* Infinite scroll sentinel */}
+        {/* Preload sentinel and Infinite scroll sentinel */}
+        <div id="preload-sentinel" className="h-20" />
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
@@ -877,7 +901,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         })}
       </div>
       
-      {/* Infinite scroll sentinel */}
+      {/* Preload sentinel and Infinite scroll sentinel */}
+      <div id="preload-sentinel" className="h-20" />
       <div id="scroll-sentinel" className="h-4">
         {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
           <div className="flex justify-center py-4">
