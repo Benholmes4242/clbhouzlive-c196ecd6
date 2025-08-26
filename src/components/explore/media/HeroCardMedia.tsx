@@ -46,6 +46,13 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           className="w-full h-full object-cover"
         />
         
+        {/* Play icon for non-video fallback images */}
+        <div className="absolute bottom-3 right-3 z-20">
+          <svg className="w-6 h-6 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8 5v10l8-5-8-5z" />
+          </svg>
+        </div>
+        
         {/* Hero overlay gradient for visual appeal */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       </div>
