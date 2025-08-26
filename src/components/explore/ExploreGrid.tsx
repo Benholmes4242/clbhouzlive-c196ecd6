@@ -625,7 +625,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     </div>
                   );
                 });
-              }
+              } // Fixed row3Squares reference issue
               
               currentSection++;
             }
