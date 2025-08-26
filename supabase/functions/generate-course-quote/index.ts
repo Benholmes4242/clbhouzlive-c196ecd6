@@ -34,11 +34,11 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a golf course expert with deep knowledge of famous golf courses worldwide. For each course, create a unique, poetic quote (8-12 words) that captures what makes that SPECIFIC course legendary. Consider the course\'s: signature holes, dramatic landscapes, historical moments, architectural features, and unique challenges. Examples: "Where the ocean meets golfing perfection" (Pebble Beach), "Links golf at its most sublime" (St. Andrews), "Drama carved into coastal cliffs" (for clifftop courses). Be specific to each course\'s identity.' 
+            content: 'You are a golf expert with knowledge of famous quotes about golf courses. When asked for the best quote about a specific golf course, provide multiple options but clearly mark your "Top Pick" at the beginning of your response. The Top Pick should be the most famous, authentic, or meaningful quote about that specific course.' 
           },
           { 
             role: 'user', 
-            content: `Create a distinctive quote for "${courseName}"${country ? ` in ${country}` : ''}. Think about what golfers and experts say about this specific course - its signature features, famous holes, setting, or what makes it stand out from other courses. Create a poetic quote that only applies to THIS course, not generic golf language.` 
+            content: `best quote about ${courseName}` 
           }
         ],
         max_tokens: 60,
@@ -52,7 +52,16 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const quote = data.choices[0].message.content.trim();
+    const fullResponse = data.choices[0].message.content.trim();
+    
+    // Extract the "Top Pick" quote from the response
+    let quote = fullResponse;
+    const topPickMatch = fullResponse.match(/Top Pick[:\-]?\s*["']?([^"\n]+)["']?/i);
+    if (topPickMatch) {
+      quote = topPickMatch[1].trim();
+      // Remove any trailing attribution if present (e.g., " — Jack Nicklaus")
+      quote = quote.replace(/\s*—\s*.+$/, '').trim();
+    }
 
     console.log(`Generated quote: ${quote}`);
 
