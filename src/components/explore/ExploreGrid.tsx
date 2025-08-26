@@ -158,14 +158,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     let portraitIndex = 0;
     let generalIndex = 0;
     let sectionIndex = 0;
+    let heroCount = 0; // Track hero sections for alternation
     
     while (generalIndex < generalQueue.length && sectionIndex < 20) { // Limit sections
       const isHeroSection = (sectionIndex + 1) % 3 === 0; // Every 3rd section (3,6,9...)
       
       if (isHeroSection) {
         // Hero section
-        const heroIndex = Math.floor(sectionIndex / 3); // Which hero section this is (0,1,2...)
-        const isHeroOnRight = heroIndex % 2 === 0; // Alternate hero position
+        const isHeroOnRight = heroCount % 2 === 0; // Alternate hero position: 0→right, 1→left, 2→right, etc.
         
         // Add hero card
         if (generalIndex < generalQueue.length) {
@@ -190,9 +190,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             heroOnRight: isHeroOnRight
           });
         }
+        
+        heroCount++; // Increment hero counter for alternation
       } else {
         // Standard section
-        const isPortraitOnRight = sectionIndex % 2 === 0; // Alternate portrait position
+        const isPortraitOnRight = sectionIndex % 2 === 0; // Alternate portrait position: 0→right, 1→left, 2→right, etc.
         
         // Add portrait card (spans 2 rows)
         if (portraitIndex < portraitQueue.length) {
