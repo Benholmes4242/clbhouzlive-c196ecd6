@@ -262,7 +262,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Simple Instagram-style grid that works on profile pages */}
-        <div className="grid grid-cols-3 gap-1 md:gap-2">
+        <div className="grid grid-cols-3 gap-px">
           {content.map((item, index) => {
             // Create larger featured cards every 9-12 items
             const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
@@ -299,12 +299,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   loop={true}
                 />
                 
-                {/* Video play icon */}
-                {item.type === 'video' && (
-                  <div className="absolute top-2 right-2">
-                    <MdOutlinePlayCircle className="w-6 h-6 text-white/90 drop-shadow-md" />
-                  </div>
-                )}
                 
                 {/* Multiple media indicator */}
                 {item.media && item.media.length > 1 && (
@@ -335,7 +329,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   return (
     <>
       {/* Instagram-style Grid Layout with Featured Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-0 md:gap-1 auto-rows-fr -mx-0 md:mx-0">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
         {gridItems.map((gridItem) => (
           gridItem.type === 'featured' ? (
             <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
