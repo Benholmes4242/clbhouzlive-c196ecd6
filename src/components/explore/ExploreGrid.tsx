@@ -401,7 +401,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return (
       <>
         {/* New Grid Layout for Discover Page - Section-based with alternating portraits */}
-        <div className="grid grid-cols-4 gap-px">
+        <div className="grid grid-cols-4 gap-px" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
           {(() => {
             const sections = [];
             let currentSection = 0;
@@ -471,7 +471,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 // Portrait card (spans 2 rows)
                 if (portraitItem) {
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2]" style={{ gridColumn: 4, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
+                    <div key={portraitItem.key} className="aspect-[1/2.1]" style={{ gridColumn: 4, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -768,7 +768,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 if (portraitItem) {
                   const portraitCol = isPortraitOnRight ? 3 : 1;
                   sections.push(
-                    <div key={portraitItem.key} className="aspect-[1/2] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
+                    <div key={portraitItem.key} className="aspect-[1/2.1] row-span-2" style={{ gridColumn: portraitCol, gridRow: `${sectionStart + 1} / ${sectionStart + 3}` }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02] h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
@@ -862,7 +862,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[1/2] row-span-2">
+              <div key={gridItem.key} className="aspect-[1/2.1] row-span-2">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
