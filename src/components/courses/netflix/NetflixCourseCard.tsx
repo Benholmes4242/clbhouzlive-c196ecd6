@@ -130,13 +130,24 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
     );
   }
 
+  // Determine aspect ratio based on card size and context
+  const getAspectRatio = () => {
+    if (size === 'large') {
+      // Recently Played and Highlight Reel: 3:4 portrait
+      return 'aspect-[3/4]';
+    } else {
+      // Top 10 Rated and other medium cards: wide landscape
+      return 'aspect-[2/1]';
+    }
+  };
+
   return (
     <div 
       className={`relative group cursor-pointer hover:scale-[1.02] ${className}`}
       onClick={onClick}
     >
-      {/* Main card container with 2:1 aspect ratio */}
-      <div className={`relative w-full aspect-[2/1] ${cornerRadius} overflow-hidden bg-muted ${shadowClass}`}>
+      {/* Main card container with responsive aspect ratio */}
+      <div className={`relative w-full ${getAspectRatio()} ${cornerRadius} overflow-hidden bg-muted ${shadowClass}`}>
         {/* Course image */}
         {course.thumbnail_image ? (
           <img

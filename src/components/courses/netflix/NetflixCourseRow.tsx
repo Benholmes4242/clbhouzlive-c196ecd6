@@ -35,8 +35,8 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
 
   return (
     <div className={`relative group/row ${isFirstRow ? 'mb-4 md:mb-6' : 'mb-4 md:mb-6 lg:mb-8'}`}>
-      {/* Row title */}
-      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3 px-4 md:px-0">
+      {/* Row title with responsive typography */}
+      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground mb-3 px-4 md:px-0">
         {title}
       </h2>
       
@@ -79,11 +79,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {/* Scrollable course cards */}
         <div
           ref={carouselRef}
-          className={`flex overflow-x-auto scrollbar-hide px-4 md:px-0 snap-x snap-mandatory ${
-            size === 'large' 
-              ? 'gap-3 sm:gap-4 md:gap-5 lg:gap-6' 
-              : 'gap-3 sm:gap-4 md:gap-5 lg:gap-6'
-          }`}
+          className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 snap-x snap-mandatory gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -105,14 +101,34 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           
           {/* Regular course cards */}
           {courses.slice(hasHeroBanner ? 1 : 0).map((course, index) => {
-            // Responsive width classes based on size and breakpoints
-            // For top rated section with hero banner, show peek of next card
-            const isTopRatedWithHero = hasHeroBanner && title.includes("Top 10 Rated");
-            const widthClasses = size === 'large' 
-              ? isTopRatedWithHero 
-                ? 'flex-shrink-0 w-[85vw] sm:w-[47%] md:w-[34%] lg:w-[33%] snap-start'  // Slightly wider to show peek
-                : 'flex-shrink-0 w-[82vw] sm:w-[45%] md:w-[32%] lg:w-[31%] snap-start'  // Large cards
-              : 'flex-shrink-0 w-[77vw] sm:w-[41%] md:w-[29%] lg:w-[28%] snap-start';   // Medium cards
+            // Responsive width classes based on breakpoints and section type
+            const isRecentlyPlayed = title === "Recently Played";
+            const isTopRated = title.includes("Top 10 Rated");
+            const isHighlightReel = title.includes("Highlight");
+            const isCoursesByRegion = title === "Courses by Region" || ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'].includes(title);
+            
+            let widthClasses = '';
+            
+            // Recently Played: Desktop: 4, Laptop: 3, Tablet: 2, Mobile: 1 with peek
+            if (isRecentlyPlayed) {
+              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
+            }
+            // Top 10 Rated: Wide landscape cards with peek at all breakpoints  
+            else if (isTopRated) {
+              widthClasses = 'flex-shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(100vw-4rem)] md:w-[calc(100vw-5rem)] lg:w-[calc(100vw-6rem)] xl:w-[calc(100vw-8rem)] snap-start';
+            }
+            // Highlight Reel: Same height as Recently Played but wider cards
+            else if (isHighlightReel) {
+              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+            }
+            // Courses by Region: Same as Recently Played (3:4 portrait)
+            else if (isCoursesByRegion) {
+              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+            }
+            // Default fallback
+            else {
+              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+            }
             
             const cardTransition = isFirstRow 
               ? 'transition-all duration-200 ease-out' 

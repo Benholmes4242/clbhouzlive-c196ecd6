@@ -52,7 +52,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       rows.push({
         title: "Recently Played",
         courses: recentCourses,
-        size: 'large' as const
+        size: 'large' as const // Portrait 3:4 cards
       });
     }
 
@@ -66,7 +66,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       rows.push({
         title: isOwnProfile ? "Top 10 Rated by You" : `Top 10 Rated by ${displayName}`,
         courses: highRatedCourses,
-        size: 'large' as const,
+        size: 'medium' as const, // Wide landscape cards
         hasHeroBanner: true
       });
     }
@@ -123,6 +123,20 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
       });
     }
 
+    // Highlight Reel (special courses - same height as Recently Played but wider cards)
+    const highlightCourses = allCourses
+      .filter(course => course.rating && course.rating >= 7)
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, 8);
+
+    if (highlightCourses.length > 0) {
+      rows.push({
+        title: isOwnProfile ? "Highlight Reel" : `${displayName}'s Highlights`,
+        courses: highlightCourses,
+        size: 'large' as const // Same height as Recently Played but wider cards
+      });
+    }
+
     // All Courses (if we have more than what's shown in other rows)
     const remainingCourses = allCourses
       .filter(course => {
@@ -133,8 +147,11 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
         const isInHighRated = highRatedCourses.some(hrc => 
           (hrc.course_id || hrc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
         );
+        const isInHighlight = highlightCourses.some(hlc => 
+          (hlc.course_id || hlc.golf_courses?.id) === (course.course_id || course.golf_courses?.id)
+        );
         
-        return !isInRecent && !isInHighRated;
+        return !isInRecent && !isInHighRated && !isInHighlight;
       })
       .slice(0, 15);
 
@@ -178,7 +195,7 @@ const NetflixCoursesLayout: React.FC<NetflixCoursesLayoutProps> = ({
                         courses={regionCourses}
                         onCourseClick={onCourseClick}
                         getUserRating={getUserRating}
-                        size="medium"
+                        size="large"
                         onRegionClick={handleRegionClick}
                       />
                     </div>
