@@ -401,15 +401,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems
           .filter(item => item.videoUrl) // Hide cards without videos
           .map((item, index) => {
-            // Calculate responsive width based on visible cards
+            // Calculate responsive width based on visible cards - made bigger
             const getCardWidth = () => {
-              if (typeof window === 'undefined') return 'w-80'; // SSR fallback
+              if (typeof window === 'undefined') return 'w-96'; // SSR fallback - bigger
               
               const width = window.innerWidth;
-              if (width <= 430) return 'w-[calc(87vw)]'; // Mobile: ~1.15 cards visible
-              if (width <= 768) return 'w-[calc(59vw)]'; // Small tablet: ~1.7 cards visible
-              if (width <= 1024) return 'w-[calc(45vw)]'; // Large tablet: ~2.2 cards visible
-              return 'w-80'; // Desktop: 3 cards visible (320px each)
+              if (width <= 430) return 'w-[calc(92vw)]'; // Mobile: bigger cards
+              if (width <= 768) return 'w-[calc(65vw)]'; // Small tablet: bigger cards  
+              if (width <= 1024) return 'w-[calc(50vw)]'; // Large tablet: bigger cards
+              return 'w-96'; // Desktop: bigger cards (384px each, was 320px)
             };
 
             return (

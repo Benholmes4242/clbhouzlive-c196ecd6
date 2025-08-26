@@ -36,9 +36,9 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   return (
     <div className="w-full px-4 pt-4 pb-8">
       <div className="max-w-6xl mx-auto">
-        {/* Highlights from my journey title - matches Top 10 Rated by You style */}
-        <h3 className="text-3xl text-foreground mb-0">
-          Highlights from my journey
+        {/* Highlights From My Journey title - matches Top 10 Rated by You style */}
+        <h3 className="text-3xl text-foreground mb-6">
+          Highlights From My Journey
         </h3>
         
         <LatestHighlights 
