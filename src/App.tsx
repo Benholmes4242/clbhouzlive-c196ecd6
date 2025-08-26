@@ -19,14 +19,16 @@ import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import '@/utils/runMigration';
 
 
-const Auth = lazy(() => import("./pages/Auth"));
+// Import core pages directly to avoid loading delays
+import Auth from "./pages/Auth";
+import Clubhouse from "./pages/Clubhouse";
+import Discover from "./pages/Discover";
+
+// Keep less frequently used pages lazy-loaded
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
-// Explore page removed - replaced by Discover
-const Clubhouse = lazy(() => import("./pages/Clubhouse"));
-const Discover = lazy(() => import("./pages/Discover"));
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
