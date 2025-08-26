@@ -1,5 +1,5 @@
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { HiTrendingUp } from 'react-icons/hi';
@@ -8,8 +8,9 @@ import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
-
-// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
+import UltraFastImage from '@/components/ui/ultra-fast-image';
+import UltraFastVideo from '@/components/ui/ultra-fast-video';
+import { ultraThrottle, microCacheGet, microCacheSet } from '@/utils/ultraPerformance';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -25,7 +26,7 @@ interface ExploreGridProps {
   hideBadges?: boolean;
 }
 
-const ExploreGrid: React.FC<ExploreGridProps> = ({ 
+const ExploreGrid: React.FC<ExploreGridProps> = memo(({ 
   content, 
   onLike, 
   onFollow, 
@@ -42,12 +43,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
-  // Check if mobile for TrendingVideos-style layout
+  // Ultra-fast mobile detection with throttling
+  const checkMobile = useCallback(ultraThrottle(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, 100), []);
+
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -912,6 +913,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       </div>
     </>
   );
-};
+});
 
-export default memo(ExploreGrid);
+export default ExploreGrid;

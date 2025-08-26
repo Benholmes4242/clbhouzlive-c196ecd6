@@ -5,18 +5,17 @@ import App from './App.tsx'
 import './index.css'
 import './styles/superellipse.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
+import './utils/globalPerformanceOptimizations'
 
 const container = document.getElementById("root");
 if (!container) {
   throw new Error("Root element not found");
 }
 
-// Initialize performance monitoring
+// Initialize minimal performance monitoring
 initializePerformanceMonitoring();
 
 const root = createRoot(container);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+
+// Ultra-fast rendering with minimal overhead
+root.render(<App />);

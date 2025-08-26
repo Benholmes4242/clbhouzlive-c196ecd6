@@ -2,34 +2,39 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
-
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
+import { microCacheGet, microCacheSet, ultraThrottle } from '@/utils/ultraPerformance';
 
-const POSTS_PER_PAGE = 15; // Increased to fill viewport better
-const PRELOAD_THRESHOLD = 3; // Preload when user is 3 items from bottom
+const POSTS_PER_PAGE = 20; // Increased for better performance
+const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 
 export const useInfiniteExploreContent = (activeFilter?: string) => {
-  // Cache content by filter type to avoid reloading when switching tabs
+  // Ultra-fast content caching by filter type
   const [contentCache, setContentCache] = useState<Record<string, ExploreContentItem[]>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [hasMoreStates, setHasMoreStates] = useState<Record<string, boolean>>({});
   const [offsetStates, setOffsetStates] = useState<Record<string, number>>({});
   const [mockOffsetStates, setMockOffsetStates] = useState<Record<string, number>>({});
+  
+  // Ultra-aggressive preloading cache
   const [preloadedContent, setPreloadedContent] = useState<Record<string, ExploreContentItem[]>>({});
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
-  
   const { getMockPosts } = useMockPostsHandler();
   
   const currentFilter = activeFilter || 'Friends';
-  const content = contentCache[currentFilter] || [];
+  
+  // Use micro-cache for current state
+  const cacheKey = `explore-content-${currentFilter}`;
+  const content = microCacheGet<ExploreContentItem[]>(cacheKey) || contentCache[currentFilter] || [];
   const loading = loadingStates[currentFilter] || false;
   const hasMore = hasMoreStates[currentFilter] ?? true;
   const currentOffset = offsetStates[currentFilter] || 0;
   const currentMockOffset = mockOffsetStates[currentFilter] || 0;
 
-  // Preload content function
-  const preloadMore = useCallback(async () => {
+  // Ultra-fast preload with aggressive caching
+
+  const preloadMore = useCallback(ultraThrottle(async () => {
     if (loading || !hasMore || preloadedContent[currentFilter]?.length > 0) {
       return;
     }
@@ -53,35 +58,37 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     } catch (error) {
       console.error('Error preloading content:', error);
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
+  }, 300), [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
       return;
     }
     
-    // Check if we have preloaded content to use first
+    // Ultra-fast: Check preloaded content first
     const preloaded = preloadedContent[currentFilter];
     if (preloaded && preloaded.length > 0) {
-      // Use preloaded content instantly
+      const newContent = [...content, ...preloaded];
+      
+      // Update cache and micro-cache instantly
       setContentCache(prev => ({
         ...prev,
-        [currentFilter]: [...(prev[currentFilter] || []), ...preloaded]
+        [currentFilter]: newContent
       }));
+      microCacheSet(cacheKey, newContent, 5000);
       
       setOffsetStates(prev => ({
         ...prev,
         [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
       }));
       
-      // Clear preloaded content
+      // Clear preloaded content and start next preload
       setPreloadedContent(prev => ({
         ...prev,
         [currentFilter]: []
       }));
       
-      // Start preloading the next batch
-      setTimeout(() => preloadMore(), 100);
+      setTimeout(() => preloadMore(), 50); // Ultra-fast preload trigger
       
       if (preloaded.length < POSTS_PER_PAGE) {
         setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));

@@ -1,56 +1,40 @@
-// Initialize performance monitoring and optimizations for the entire app
-import { initPerformanceObserver, analyzeBundleSize, monitorMemoryUsage } from './performanceEnhancements';
+// Minimal performance monitoring for ultra-fast performance
+import { cleanupPerformanceOverhead } from './ultraPerformance';
 
-// Performance initialization function to be called on app startup
+let performanceCleanupInterval: number;
+
+// Ultra-minimal performance initialization
 export const initializePerformanceMonitoring = () => {
   if (typeof window === 'undefined') return;
 
-  // Start performance observers with reduced frequency
-  initPerformanceObserver();
-
-  // Log initial bundle analysis after app loads
+  // Only essential monitoring
   setTimeout(() => {
-    analyzeBundleSize();
-    monitorMemoryUsage();
+    if (window.performance?.getEntriesByType) {
+      const navigation = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation?.loadEventEnd > 3000) {
+        console.warn(`⚠️ Page load time: ${navigation.loadEventEnd}ms`);
+      }
+    }
   }, 1000);
 
-  // Monitor memory usage less frequently to reduce overhead
-  setInterval(() => {
-    monitorMemoryUsage();
-  }, 300000); // Every 5 minutes instead of 1 minute
-
-  // Set up performance budget warnings
-  const performanceBudget = {
-    maxJSSize: 2 * 1024 * 1024, // 2MB
-    maxLoadTime: 3000, // 3 seconds
-    maxMemoryUsage: 100 * 1024 * 1024, // 100MB
-  };
-
-  // Check performance budget
-  const checkPerformanceBudget = () => {
-    const analysis = analyzeBundleSize();
-    const memory = monitorMemoryUsage();
-
-    if (analysis) {
-      if (analysis.totalJSSize > performanceBudget.maxJSSize) {
-        console.warn(`⚠️ JS Bundle exceeds budget: ${(analysis.totalJSSize / 1024 / 1024).toFixed(2)}MB`);
-      }
-      if (analysis.loadTime > performanceBudget.maxLoadTime) {
-        console.warn(`⚠️ Load time exceeds budget: ${analysis.loadTime}ms`);
+  // Minimal memory monitoring
+  performanceCleanupInterval = window.setInterval(() => {
+    cleanupPerformanceOverhead();
+    
+    // Check memory only if available
+    if ('memory' in performance) {
+      const memory = (performance as any).memory;
+      if (memory.usedJSHeapSize > 150 * 1024 * 1024) { // 150MB threshold
+        console.warn(`⚠️ High memory usage: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`);
       }
     }
-
-    if (memory && memory.used > performanceBudget.maxMemoryUsage) {
-      console.warn(`⚠️ Memory usage exceeds budget: ${(memory.used / 1024 / 1024).toFixed(2)}MB`);
-    }
-  };
-
-  // Check budget on page load only to reduce overhead
-  window.addEventListener('load', checkPerformanceBudget);
+  }, 120000); // Every 2 minutes
 };
 
-// Cleanup function for when app unmounts
+// Cleanup function
 export const cleanupPerformanceMonitoring = () => {
-  // Clean up any performance observers or intervals if needed
+  if (performanceCleanupInterval) {
+    clearInterval(performanceCleanupInterval);
+  }
   console.log('🧹 Performance monitoring cleanup');
 };
