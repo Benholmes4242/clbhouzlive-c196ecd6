@@ -34,14 +34,12 @@ const MyHighlightsSection: React.FC<MyHighlightsSectionProps> = ({
   userFirstName = 'User'
 }) => {
   return (
-    <div className="w-full px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <LatestHighlights 
-          userId={userId || ''} 
-          isOwnProfile={isOwnProfile}
-          userFirstName={userFirstName}
-        />
-      </div>
+    <div className="w-full">
+      <LatestHighlights 
+        userId={userId || ''} 
+        isOwnProfile={isOwnProfile}
+        userFirstName={userFirstName}
+      />
     </div>
   );
 };
@@ -485,8 +483,15 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       {/* Top 10 Rated by You Section */}
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* My Highlights Section */}
-      <MyHighlightsSection userId={userId} isOwnProfile={isOwnProfile} userFirstName={userDisplayName?.split(' ')[0] || 'User'} />
+      {/* My Highlights Section with title */}
+      <div className="mt-4">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-xl font-semibold text-foreground mb-0">
+            Highlights from my journey
+          </h2>
+        </div>
+        <MyHighlightsSection userId={userId} isOwnProfile={isOwnProfile} userFirstName={userDisplayName?.split(' ')[0] || 'User'} />
+      </div>
 
       {/* Courses by Region Section */}
       <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
@@ -984,10 +989,10 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   isOwnProfile = false
 }) => {
   return (
-    <div className="w-full px-4 py-8 mb-0">
+    <div className="w-full px-4 py-0 mb-0 mt-4">
       <div className="max-w-6xl mx-auto">
         {/* Section Titles */}
-        <div className="mb-8">
+        <div className="mb-0">
           <h2 className="text-2xl font-bold text-foreground mb-2">
             Courses by Region
           </h2>
@@ -1139,7 +1144,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   return (
     <div className="w-full px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-0">
+          <div></div>
           <div className="flex gap-2">
             <Button
               variant="outline"
