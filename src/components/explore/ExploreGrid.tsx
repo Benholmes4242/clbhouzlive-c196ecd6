@@ -862,7 +862,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[1/2] row-span-2">
+              <div key={gridItem.key} className="aspect-[1/2]" style={{ gridRow: 'span 2' }}>
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
