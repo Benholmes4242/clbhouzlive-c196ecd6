@@ -6,6 +6,8 @@ import { MdOutlinePlayCircle } from 'react-icons/md';
 import { Loader2 } from 'lucide-react';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import SmartCardMedia from './media/SmartCardMedia';
+import { CardType } from './media/CardMediaTypes';
 
 interface MediaItem {
   id: string;
@@ -25,6 +27,10 @@ interface MediaDisplayProps {
   loop?: boolean;
   muted?: boolean;
   hidePlayButton?: boolean;
+  // New props for smart media handling
+  cardType?: CardType;
+  useSmartMedia?: boolean;
+  onMediaClick?: () => void;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -38,7 +44,10 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   currentIndex,
   loop = false,
   muted = true,
-  hidePlayButton = false
+  hidePlayButton = false,
+  cardType,
+  useSmartMedia = false,
+  onMediaClick
 }) => {
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
@@ -77,6 +86,23 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
   const hasCloudflareThumb = thumbnailUrl !== null;
+
+  // Use smart media logic if enabled
+  if (useSmartMedia && cardType) {
+    return (
+      <SmartCardMedia
+        media={{
+          ...media,
+          thumbnail_url: thumbnailUrl || undefined,
+          poster_url: thumbnailUrl || undefined
+        }}
+        cardType={cardType}
+        shouldAutoplay={shouldAutoplay}
+        onMediaClick={onMediaClick}
+        className="w-full h-full"
+      />
+    );
+  }
 
   // Handle smooth transition for autoplay videos
   React.useEffect(() => {
