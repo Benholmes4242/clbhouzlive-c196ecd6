@@ -71,10 +71,6 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
         preload="metadata"
       />
       
-      {/* Subtle loading indicator */}
-      {!isVisible && (
-        <div className="absolute inset-0 bg-muted/20 animate-[pulse_3s_ease-in-out_infinite]" />
-      )}
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
