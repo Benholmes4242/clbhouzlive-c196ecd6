@@ -117,16 +117,43 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Helper functions for mobile layout
-  const isPortraitMedia = (item: ExploreContentItem, index: number): boolean => {
-    return index % 3 === 0; // Every 3rd item is portrait for demo
+  // Content assignment logic with queues
+  const isPortraitMedia = (item: ExploreContentItem): boolean => {
+    // Check if media has portrait aspect ratio (height > width)
+    // For demo purposes, every 3rd item is considered portrait
+    // In real implementation, you'd check actual media dimensions
+    const index = content.indexOf(item);
+    return index % 3 === 0;
   };
 
-  const createMobileLayout = () => {
-    const items = [];
-    let contentIndex = 0;
+  const createContentQueues = () => {
+    const generalQueue = [...content]; // All items
+    const portraitQueue = content.filter(item => isPortraitMedia(item)); // Portrait-only items
     
-    for (let section = 0; section < Math.ceil(content.length / 6) && section < 20; section++) {
+    return { generalQueue, portraitQueue };
+  };
+
+  const createFallbackTile = (type: 'portrait' | 'square' | 'hero') => ({
+    id: `fallback-${type}-${Date.now()}`,
+    type: 'image' as const,
+    src: '/placeholder.svg',
+    title: 'Loading more content...',
+    likes: 0,
+    user: {
+      id: 'fallback',
+      name: 'System',
+      username: 'system',
+      avatar: '/placeholder.svg'
+    }
+  });
+
+  const createMobileLayout = () => {
+    const { generalQueue, portraitQueue } = createContentQueues();
+    const items = [];
+    let generalIndex = 0;
+    let portraitIndex = 0;
+    
+    for (let section = 0; section < 20; section++) {
       const isHeroSection = (section + 1) % 3 === 0;
       
       if (isHeroSection) {
@@ -134,48 +161,117 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         const heroIndex = Math.floor(section / 3);
         const heroOnRight = heroIndex % 2 === 0;
         
-        if (contentIndex < content.length) {
-          items.push({
-            type: 'hero',
-            item: content[contentIndex++],
-            heroOnRight,
-            section
-          });
-        }
+        // Pull hero from GeneralQueue
+        const heroItem = generalIndex < generalQueue.length 
+          ? generalQueue[generalIndex++] 
+          : createFallbackTile('hero');
         
-        for (let i = 0; i < 2 && contentIndex < content.length; i++) {
+        items.push({
+          type: 'hero',
+          item: heroItem,
+          heroOnRight,
+          section
+        });
+        
+        // Pull 2 squares from GeneralQueue
+        for (let i = 0; i < 2; i++) {
+          const squareItem = generalIndex < generalQueue.length 
+            ? generalQueue[generalIndex++] 
+            : createFallbackTile('square');
+          
           items.push({
             type: 'square',
-            item: content[contentIndex++],
+            item: squareItem,
             heroOnRight,
             stackIndex: i,
             section
           });
         }
       } else {
-        // Standard section: 4 squares + 1 portrait
+        // Standard section: 1 portrait + 4 squares
         const portraitOnRight = section % 2 === 0;
         
-        // Add portrait
-        if (contentIndex < content.length) {
-          items.push({
-            type: 'portrait',
-            item: content[contentIndex++],
-            portraitOnRight,
-            section
-          });
-        }
+        // Pull portrait from PortraitQueue
+        const portraitItem = portraitIndex < portraitQueue.length 
+          ? portraitQueue[portraitIndex++] 
+          : createFallbackTile('portrait');
         
-        // Add 4 squares
-        for (let i = 0; i < 4 && contentIndex < content.length; i++) {
+        items.push({
+          type: 'portrait',
+          item: portraitItem,
+          portraitOnRight,
+          section
+        });
+        
+        // Pull 4 squares from GeneralQueue
+        for (let i = 0; i < 4; i++) {
+          const squareItem = generalIndex < generalQueue.length 
+            ? generalQueue[generalIndex++] 
+            : createFallbackTile('square');
+          
           items.push({
             type: 'square',
-            item: content[contentIndex++],
+            item: squareItem,
             portraitOnRight,
             squareIndex: i,
             section
           });
         }
+      }
+      
+      // Stop if we've used all content and don't need more fallbacks
+      if (generalIndex >= generalQueue.length && portraitIndex >= portraitQueue.length) {
+        break;
+      }
+    }
+    
+    return items;
+  };
+
+  const createDesktopLayout = () => {
+    const { generalQueue, portraitQueue } = createContentQueues();
+    const items = [];
+    let generalIndex = 0;
+    let portraitIndex = 0;
+    
+    for (let section = 0; section < 10; section++) {
+      const portraitOnRight = section % 2 === 0; // Alternate portrait column left/right
+      
+      // Pull portrait from PortraitQueue
+      const portraitItem = portraitIndex < portraitQueue.length 
+        ? portraitQueue[portraitIndex++] 
+        : createFallbackTile('portrait');
+      
+      items.push({
+        type: 'portrait',
+        item: portraitItem,
+        portraitOnRight,
+        section
+      });
+      
+      // Pull squares from GeneralQueue for 3 rows
+      for (let row = 1; row <= 3; row++) {
+        const squaresInRow = row === 3 ? 4 : 3; // Row 3 has 4 squares, rows 1-2 have 3
+        
+        for (let i = 0; i < squaresInRow; i++) {
+          const squareItem = generalIndex < generalQueue.length 
+            ? generalQueue[generalIndex++] 
+            : createFallbackTile('square');
+          
+          items.push({
+            type: 'square',
+            item: squareItem,
+            portraitOnRight,
+            section,
+            row,
+            position: i
+          });
+        }
+      }
+      
+      // Stop if we've used all content
+      if (generalIndex >= generalQueue.length && portraitIndex >= portraitQueue.length) {
+        break;
       }
     }
     
@@ -280,25 +376,27 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     style={{ gridColumn, gridRow }}
                     onClick={() => onMediaClick?.(item)}
                   >
-                    <MediaDisplay
-                      media={{
-                        id: item.id,
-                        media_type: item.type as 'video' | 'image',
-                        media_url: item.src
-                      }}
-                      itemTitle={item.title}
-                      shouldAutoplay={false}
-                      isLoading={itemLoadingStates[item.id] ?? true}
-                      onImageError={() => {
-                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                      }}
-                      onImageLoad={() => {
-                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                      }}
-                      itemId={item.id}
-                      currentIndex={index}
-                      loop={true}
-                    />
+                    <div className="absolute inset-0">
+                      <MediaDisplay
+                        media={{
+                          id: item.id,
+                          media_type: item.type as 'video' | 'image',
+                          media_url: item.src
+                        }}
+                        itemTitle={item.title}
+                        shouldAutoplay={false}
+                        isLoading={itemLoadingStates[item.id] ?? true}
+                        onImageError={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        onImageLoad={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        itemId={item.id}
+                        currentIndex={index}
+                        loop={true}
+                      />
+                    </div>
                   </div>
                 );
               }
@@ -315,25 +413,27 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     style={{ gridColumn, gridRow }}
                     onClick={() => onMediaClick?.(item)}
                   >
-                    <MediaDisplay
-                      media={{
-                        id: item.id,
-                        media_type: item.type as 'video' | 'image',
-                        media_url: item.src
-                      }}
-                      itemTitle={item.title}
-                      shouldAutoplay={false}
-                      isLoading={itemLoadingStates[item.id] ?? true}
-                      onImageError={() => {
-                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                      }}
-                      onImageLoad={() => {
-                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                      }}
-                      itemId={item.id}
-                      currentIndex={index}
-                      loop={true}
-                    />
+                    <div className="absolute inset-0" style={{ objectFit: 'contain', objectPosition: 'center' }}>
+                      <MediaDisplay
+                        media={{
+                          id: item.id,
+                          media_type: item.type as 'video' | 'image',
+                          media_url: item.src
+                        }}
+                        itemTitle={item.title}
+                        shouldAutoplay={false}
+                        isLoading={itemLoadingStates[item.id] ?? true}
+                        onImageError={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        onImageLoad={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        itemId={item.id}
+                        currentIndex={index}
+                        loop={true}
+                      />
+                    </div>
                   </div>
                 );
               }
@@ -367,6 +467,113 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     style={{ gridColumn, gridRow }}
                     onClick={() => onMediaClick?.(item)}
                   >
+                    <div className="absolute inset-0">
+                      <MediaDisplay
+                        media={{
+                          id: item.id,
+                          media_type: item.type as 'video' | 'image',
+                          media_url: item.src
+                        }}
+                        itemTitle={item.title}
+                        shouldAutoplay={false}
+                        isLoading={itemLoadingStates[item.id] ?? true}
+                        onImageError={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        onImageLoad={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                        }}
+                        itemId={item.id}
+                        currentIndex={index}
+                        loop={true}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+              
+              return null;
+            })}
+          </div>
+          
+          <div id="scroll-sentinel" className="h-4">
+            {isLoading && hasMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+        </>
+      );
+    } else {
+      // Desktop layout with queue-based assignment
+      const desktopItems = createDesktopLayout();
+      
+      return (
+        <>
+          <div className="grid grid-cols-4 gap-2 auto-rows-fr">
+            {desktopItems.map((layoutItem, index) => {
+              const { type, item, section, portraitOnRight } = layoutItem;
+              
+              if (type === 'portrait') {
+                const gridColumn = portraitOnRight ? '4 / 5' : '1 / 2';
+                const gridRow = `${section * 3 + 1} / ${section * 3 + 3}`;
+                
+                return (
+                  <div
+                    key={`desktop-portrait-${item.id}-${index}`}
+                    className="relative bg-muted overflow-hidden cursor-pointer"
+                    style={{ 
+                      gridColumn, 
+                      gridRow,
+                      aspectRatio: '2/3' // Portrait ratio
+                    }}
+                    onClick={() => onMediaClick?.(item)}
+                  >
+                    <MediaDisplay
+                      media={{
+                        id: item.id,
+                        media_type: item.type as 'video' | 'image',
+                        media_url: item.src
+                      }}
+                      itemTitle={item.title}
+                      shouldAutoplay={false}
+                      isLoading={itemLoadingStates[item.id] ?? true}
+                      onImageError={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      onImageLoad={() => {
+                        setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                      }}
+                      itemId={item.id}
+                      currentIndex={index}
+                      loop={true}
+                    />
+                  </div>
+                );
+              }
+              
+              if (type === 'square') {
+                const { row, position } = layoutItem;
+                let gridColumn, gridRow;
+                
+                if (portraitOnRight) {
+                  // Portrait on right, squares fill columns 1-3
+                  gridColumn = `${position + 1} / ${position + 2}`;
+                } else {
+                  // Portrait on left, squares fill columns 2-4
+                  gridColumn = `${position + 2} / ${position + 3}`;
+                }
+                
+                gridRow = `${section * 3 + row} / ${section * 3 + row + 1}`;
+                
+                return (
+                  <div
+                    key={`desktop-square-${item.id}-${index}`}
+                    className="aspect-square relative bg-muted overflow-hidden cursor-pointer"
+                    style={{ gridColumn, gridRow }}
+                    onClick={() => onMediaClick?.(item)}
+                  >
                     <MediaDisplay
                       media={{
                         id: item.id,
@@ -391,35 +598,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               }
               
               return null;
-            })}
-          </div>
-          
-          <div id="scroll-sentinel" className="h-4">
-            {isLoading && hasMore && (
-              <div className="flex justify-center py-4">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            )}
-          </div>
-        </>
-      );
-    } else {
-      // Desktop layout - simple masonry
-      return (
-        <>
-          <div className="columns-4 gap-2 space-y-2">
-            {content.map((item, index) => {
-              const { aspect } = getAspectRatio(index);
-              return (
-                <div key={`desktop-${item.id}-${index}`} className={`break-inside-avoid ${aspect} relative bg-muted overflow-hidden cursor-pointer group`}>
-                  <ExploreContentCard 
-                    item={item} 
-                    onLike={onLike} 
-                    onFollow={onFollow} 
-                    onMediaClick={onMediaClick}
-                  />
-                </div>
-              );
             })}
           </div>
           
