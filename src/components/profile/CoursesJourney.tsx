@@ -463,39 +463,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     staleTime: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Swipe gesture handlers
-  const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (currentIndex < maxIndex) {
-        setCurrentIndex(prev => prev + 1);
-      }
-    },
-    onSwipeRight: () => {
-      if (currentIndex > 0) {
-        setCurrentIndex(prev => prev - 1);
-      }
-    }
-  });
-
-  const swipeRef = useRef<HTMLDivElement>(null);
-
-  // Apply swipe handlers
-  useEffect(() => {
-    const element = swipeRef.current;
-    if (element && swipeHandlers && typeof swipeHandlers === 'object') {
-      // Swipe handlers would be applied here if properly implemented
-      
-      element.addEventListener('touchstart', onTouchStart, { passive: false });
-      element.addEventListener('touchmove', onTouchMove, { passive: false });
-      element.addEventListener('touchend', onTouchEnd, { passive: false });
-      
-      return () => {
-        element.removeEventListener('touchstart', onTouchStart);
-        element.removeEventListener('touchmove', onTouchMove);
-        element.removeEventListener('touchend', onTouchEnd);
-      };
-    }
-  }, [swipeHandlers]);
 
   // Navigation helpers
   const maxIndex = Math.max(0, recentlyPlayedCourses.length - cardsPerView);
@@ -548,7 +515,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
         </div>
         
         <div className="relative">
-          <div ref={swipeRef} className="overflow-hidden">
+          <div className="overflow-hidden">
             <div 
               className="flex transition-transform duration-300 ease-in-out gap-3"
               style={{ 
@@ -564,7 +531,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                     course={userCourse.golf_courses}
                     viewingUserId={userId}
                     viewContext="global"
-                    userRating={userCourse.rating || null}
+                    userRating={null}
                     isReadOnly={!isOwnProfile}
                     showUserRating={true}
                     isFromUserCoursesPage={true}
@@ -637,39 +604,6 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     staleTime: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Swipe gesture handlers
-  const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (currentIndex < maxIndex) {
-        setCurrentIndex(prev => prev + 1);
-      }
-    },
-    onSwipeRight: () => {
-      if (currentIndex > 0) {
-        setCurrentIndex(prev => prev - 1);
-      }
-    }
-  });
-
-  const swipeRef = useRef<HTMLDivElement>(null);
-
-  // Apply swipe handlers
-  useEffect(() => {
-    const element = swipeRef.current;
-    if (element && swipeHandlers) {
-      const { onTouchStart, onTouchMove, onTouchEnd } = swipeHandlers;
-      
-      element.addEventListener('touchstart', onTouchStart, { passive: false });
-      element.addEventListener('touchmove', onTouchMove, { passive: false });
-      element.addEventListener('touchend', onTouchEnd, { passive: false });
-      
-      return () => {
-        element.removeEventListener('touchstart', onTouchStart);
-        element.removeEventListener('touchmove', onTouchMove);
-        element.removeEventListener('touchend', onTouchEnd);
-      };
-    }
-  }, [swipeHandlers]);
 
   // Navigation helpers
   const maxIndex = Math.max(0, topRatedCourses.length - cardsPerView);
@@ -722,7 +656,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         </div>
         
         <div className="relative">
-          <div ref={swipeRef} className="overflow-hidden">
+          <div className="overflow-hidden">
             <div 
               className="flex transition-transform duration-300 ease-in-out gap-3"
               style={{ 
@@ -851,55 +785,6 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
     staleTime: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Swipe gesture handlers
-  const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (currentIndex < maxIndex) {
-        setCurrentIndex(prev => prev + 1);
-      }
-    },
-    onSwipeRight: () => {
-      if (currentIndex > 0) {
-        setCurrentIndex(prev => prev - 1);
-      }
-    }
-  });
-
-  const swipeRef = useRef<HTMLDivElement>(null);
-
-  // Apply swipe handlers
-  useEffect(() => {
-    const element = swipeRef.current;
-    if (element && swipeHandlers) {
-      const { onTouchStart, onTouchMove, onTouchEnd } = swipeHandlers;
-      
-      element.addEventListener('touchstart', onTouchStart, { passive: false });
-      element.addEventListener('touchmove', onTouchMove, { passive: false });
-      element.addEventListener('touchend', onTouchEnd, { passive: false });
-      
-      return () => {
-        element.removeEventListener('touchstart', onTouchStart);
-        element.removeEventListener('touchmove', onTouchMove);
-        element.removeEventListener('touchend', onTouchEnd);
-      };
-    }
-  }, [swipeHandlers]);
-
-  // Navigation helpers
-  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
-  
-  const nextSlide = () => {
-    if (currentIndex < maxIndex) {
-      setCurrentIndex(prev => prev + 1);
-    }
-  };
-
-  const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-    }
-  };
-
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
     let courses = [...allPlayedCourses];
@@ -936,6 +821,22 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
 
     return courses;
   }, [allPlayedCourses, activeFilter, sortBy]);
+
+
+  // Navigation helpers
+  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+  
+  const nextSlide = () => {
+    if (currentIndex < maxIndex) {
+      setCurrentIndex(prev => prev + 1);
+    }
+  };
+
+  const prevSlide = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
 
   if (filteredCourses.length === 0) {
     return null;
@@ -983,7 +884,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-300 ease-in-out gap-3"
                 style={{ 
