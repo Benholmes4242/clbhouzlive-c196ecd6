@@ -553,7 +553,24 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
   const { viewType, setViewType, isHydrated } = useViewPreference();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2; // Show 2 cards at a time
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Track window width for responsive breakpoints
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Calculate cards per view based on exact breakpoints
+  const getCardsPerView = () => {
+    if (windowWidth >= 1200) return 4; // Desktop
+    if (windowWidth >= 1024) return 3; // Laptop  
+    if (windowWidth >= 768) return 2;  // Tablet
+    return 1; // Mobile
+  };
+  
+  const cardsPerView = getCardsPerView();
 
   // Query to get all played courses (from both tables) for filtering
   const { data: allPlayedCourses = [] } = useQuery({
@@ -751,32 +768,46 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           ) : filteredCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-300 ease-in-out gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
+                className="flex transition-transform duration-300 ease-in-out"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (50)}%)` // Move by half container width to show 2 cards
+                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
-                {filteredCourses.map((userCourse) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start"
-                  >
-                    <CourseCard 
-                      course={userCourse.golf_courses}
-                      viewingUserId={userId}
-                      viewContext="global"
-                      userRating={userCourse.rating}
-                      isReadOnly={!isOwnProfile}
-                      showUserRating={true}
-                      isFromUserCoursesPage={true}
-                      customHeight="aspect-[3/4]"
-                      hideRankingBadges={true}
-                      showCountryWithFlag={true}
-                      showXP={true}
-                      xp={100}
-                    />
-                  </div>
-                ))}
+                {filteredCourses.map((userCourse, index) => {
+                  // Calculate responsive width based on exact breakpoints
+                  const getCardWidth = () => {
+                    if (windowWidth >= 1200) return 'calc(25% - 18px)'; // Desktop: 4 cards
+                    if (windowWidth >= 1024) return 'calc(33.333% - 16px)'; // Laptop: 3 cards
+                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
+                  };
+
+                  return (
+                    <div 
+                      key={userCourse.id} 
+                      className="flex-shrink-0 snap-start"
+                      style={{ width: getCardWidth() }}
+                    >
+                      <div className="aspect-[3/4] w-full">
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          hideRankingBadges={true}
+                          showCountryWithFlag={true}
+                          showXP={true}
+                          xp={100}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : activeFilter ? (
