@@ -126,101 +126,39 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Helper to check if media is portrait (H/W >= 1.1)
-  const isPortraitMedia = (item: ExploreContentItem) => {
-    // For now, we'll assume all items are eligible for portrait
-    // In real implementation, this would check actual media dimensions
-    return true;
-  };
-
-  // Create system fallback tile
-  const createSystemTile = (id: string): ExploreContentItem => ({
-    id: `system-${id}`,
-    type: 'cta',
-    src: '/placeholder.svg',
-    title: 'Discover More Golf Content',
-    likes: 0,
-    ctaTitle: 'Join the Community',
-    ctaDescription: 'Follow golfers and discover amazing content',
-    ctaButton: 'Explore Now'
-  });
-
-  // Queue-based content assignment
-  const createQueueBasedLayout = () => {
-    // Create queues
-    const generalQueue = [...content];
-    const portraitQueue = content.filter(isPortraitMedia);
-    
-    let generalIndex = 0;
-    let portraitIndex = 0;
+  // Create layout with featured big cards every 9-12 items
+  const createGridLayout = () => {
     const gridItems = [];
-    let sectionCount = 0;
-
-    while (generalIndex < generalQueue.length || portraitIndex < portraitQueue.length) {
-      const isPortraitLeft = sectionCount % 2 === 1; // Alternate portrait position
+    let index = 0;
+    
+    while (index < content.length) {
+      // Add 8-10 regular items
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
       
-      // Each section has 3 rows with specific layout
-      for (let row = 0; row < 3; row++) {
-        if (row < 2) {
-          // Row 1 & 2: three squares + portrait (top/bottom half)
-          for (let col = 0; col < 3; col++) {
-            if (generalIndex < generalQueue.length) {
-              gridItems.push({
-                type: 'square',
-                item: generalQueue[generalIndex],
-                key: `square-${generalQueue[generalIndex].id}-${sectionCount}-${row}-${col}`,
-                position: { section: sectionCount, row, col: isPortraitLeft ? col + 1 : col }
-              });
-              generalIndex++;
-            }
-          }
-          
-          // Add portrait half (only add once per section, not per row)
-          if (row === 0) {
-            const portraitItem = portraitIndex < portraitQueue.length 
-              ? portraitQueue[portraitIndex++] 
-              : createSystemTile(`${sectionCount}-portrait`);
-            
-            gridItems.push({
-              type: 'portrait',
-              item: portraitItem,
-              key: `portrait-${portraitItem.id}-${sectionCount}`,
-              position: { 
-                section: sectionCount, 
-                row: 0, 
-                col: isPortraitLeft ? 0 : 3,
-                isLeft: isPortraitLeft
-              }
-            });
-          }
-        } else {
-          // Row 3: four squares
-          for (let col = 0; col < 4; col++) {
-            if (generalIndex < generalQueue.length) {
-              gridItems.push({
-                type: 'square',
-                item: generalQueue[generalIndex],
-                key: `square-${generalQueue[generalIndex].id}-${sectionCount}-${row}-${col}`,
-                position: { section: sectionCount, row, col }
-              });
-              generalIndex++;
-            }
-          }
-        }
+      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
+        gridItems.push({
+          type: 'regular',
+          item: content[index],
+          key: `regular-${content[index].id}`,
+        });
+        index++;
       }
       
-      sectionCount++;
-      
-      // Break if we've run out of content
-      if (generalIndex >= generalQueue.length && portraitIndex >= portraitQueue.length) {
-        break;
+      // Add one big featured card if we have more content
+      if (index < content.length) {
+        gridItems.push({
+          type: 'featured',
+          item: content[index],
+          key: `featured-${content[index].id}`,
+        });
+        index++;
       }
     }
     
     return gridItems;
   };
 
-  const gridItems = createQueueBasedLayout();
+  const gridItems = createGridLayout();
 
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
@@ -313,44 +251,55 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Use queue-based layout for both discover pages and activity feeds
-  // Keep the simple grid only for very specific legacy cases if needed
-
   return (
     <>
-      {/* Desktop: 4-column grid with queue-based layout */}
-      <div className="grid grid-cols-3 md:grid-cols-4 gap-px auto-rows-fr -mx-0 md:mx-0">
-        {gridItems.map((gridItem) => {
-          const { type, item, key, position } = gridItem;
+      {/* Simple Instagram-style grid that works on profile pages */}
+      <div className="grid grid-cols-3 gap-px">
+        {content.map((item, index) => {
+          // Create larger featured cards every 9-12 items
+          const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
           
-          if (type === 'portrait') {
-            return (
-              <div 
-                key={key} 
-                className={`
-                  row-span-2 aspect-[1/2]
-                  ${position?.isLeft ? 'col-start-1' : 'col-start-4 md:col-start-4'}
-                `}
-              >
-                <ExploreContentCard 
-                  item={item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          }
-          
-          // Square cards (default)
           return (
-            <div key={key} className="aspect-square">
-              <ExploreContentCard 
-                item={item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
+            <div
+              key={`discover-${item.id}-${index}`}
+              className={`
+                relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02]
+                ${isLargeCard 
+                  ? 'col-span-2 row-span-2 aspect-square' 
+                  : 'aspect-square'
+                }
+              `}
+              onClick={() => onMediaClick?.(item)}
+            >
+              <MediaDisplay
+                media={{
+                  id: item.id,
+                  media_type: item.type as 'video' | 'image',
+                  media_url: item.src
+                }}
+                itemTitle={item.title}
+                shouldAutoplay={false}
+                isLoading={itemLoadingStates[item.id] ?? true}
+                onImageError={() => {
+                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                }}
+                onImageLoad={() => {
+                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+                }}
+                itemId={item.id}
+                currentIndex={index}
+                loop={true}
               />
+              
+              {/* Multiple media indicator */}
+              {item.media && item.media.length > 1 && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                  <MediaNavigationDots
+                    mediaCount={item.media.length}
+                    currentIndex={0}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
@@ -358,7 +307,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
+        {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
           </div>
