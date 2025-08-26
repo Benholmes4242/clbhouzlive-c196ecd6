@@ -869,6 +869,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
         .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false });
 
+      console.log('Highlight Reel - Found posts with videos:', posts?.length);
+
       if (postsError) throw postsError;
 
       if (!posts || posts.length === 0) {
@@ -917,6 +919,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
         .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null'); // Only top 100 courses
 
       if (coursesError) throw coursesError;
+      console.log('Highlight Reel - Sample course:', courses?.[0]);
 
     // Transform posts into course format for existing card structure
       const courseData = posts
@@ -931,7 +934,21 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
           // Get video thumbnail from post media
           const videoMedia = post.post_media?.[0];
-          const videoThumbnail = videoMedia?.media_url;
+          let videoThumbnail = videoMedia?.media_url;
+          
+          // For videos, try to get thumbnail by modifying the URL or use the video URL as fallback
+          if (videoMedia?.media_type === 'video' && videoThumbnail) {
+            // If it's a Cloudflare Stream video, we can generate thumbnail URL
+            if (videoThumbnail.includes('cloudflarestream.com') || videoThumbnail.includes('videodelivery.net')) {
+              // Extract video ID and create thumbnail URL
+              const videoId = videoThumbnail.split('/').pop()?.split('.')[0];
+              if (videoId) {
+                videoThumbnail = `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg`;
+              }
+            }
+          }
+          
+          console.log('Processing post:', post.id, 'Video thumbnail:', videoThumbnail);
 
           return {
             id: `video-${post.id}`,
@@ -947,6 +964,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           };
         })
         .filter(Boolean);
+
+      console.log('Highlight Reel - Final course data:', courseData.length, courseData);
 
       // Apply sorting here to ensure proper order
       return getSortedUserCourses(courseData, 'recent');
