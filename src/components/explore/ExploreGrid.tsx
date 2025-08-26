@@ -313,74 +313,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout - use simple Instagram-style grid like profile
-  if (isDiscoverPage) {
-    return (
-      <>
-        {/* Simple Instagram-style grid that works on profile pages */}
-        <div className="grid grid-cols-3 gap-px">
-          {content.map((item, index) => {
-            // Create larger featured cards every 9-12 items
-            const isLargeCard = index > 0 && (index + 1) % (9 + Math.floor(index / 50)) === 0;
-            
-            return (
-              <div
-                key={`discover-${item.id}-${index}`}
-                className={`
-                  relative bg-muted overflow-hidden cursor-pointer group transition-all hover:scale-[1.02]
-                  ${isLargeCard 
-                    ? 'col-span-2 row-span-2 aspect-square' 
-                    : 'aspect-square'
-                  }
-                `}
-                onClick={() => onMediaClick?.(item)}
-              >
-                <MediaDisplay
-                  media={{
-                    id: item.id,
-                    media_type: item.type as 'video' | 'image',
-                    media_url: item.src
-                  }}
-                  itemTitle={item.title}
-                  shouldAutoplay={false}
-                  isLoading={itemLoadingStates[item.id] ?? true}
-                  onImageError={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                  }}
-                  onImageLoad={() => {
-                    setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                  }}
-                  itemId={item.id}
-                  currentIndex={index}
-                  loop={true}
-                />
-                
-                
-                {/* Multiple media indicator */}
-                {item.media && item.media.length > 1 && (
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                    <MediaNavigationDots
-                      mediaCount={item.media.length}
-                      currentIndex={0}
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        
-        {/* Infinite scroll sentinel */}
-        <div id="scroll-sentinel" className="h-4">
-          {isLoading && hasMore && (
-            <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-        </div>
-      </>
-    );
-  }
+  // Use queue-based layout for both discover pages and activity feeds
+  // Keep the simple grid only for very specific legacy cases if needed
 
   return (
     <>
