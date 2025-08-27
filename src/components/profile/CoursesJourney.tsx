@@ -1562,7 +1562,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/0.8]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
