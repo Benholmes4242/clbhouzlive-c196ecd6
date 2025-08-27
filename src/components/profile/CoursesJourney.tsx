@@ -13,6 +13,7 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MdOutlinePlayCircle } from 'react-icons/md';
+import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
 
 
 interface CoursesJourneyProps {
@@ -1279,11 +1280,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   const isSlotOne = index === 0;
                   const videoId = `video-${userCourse.id}`;
                   const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
-                  console.log('Video card:', { videoId, videoUrl, isSlotOne, userCourse });
                   
                   // Skip if no valid video URL
                   if (!videoUrl) {
-                    console.warn('No video URL for course:', userCourse.golf_courses.name);
                     return null;
                   }
 
@@ -1299,11 +1298,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       }}
                     >
                       <div className="aspect-[5/4] w-full relative group">
-                        {/* Video Element */}
-                        <video
-                          ref={(el) => {
-                            if (el) {
-                              const cleanup = registerVideo(videoId, el);
+                        {/* Video Element - Use FeedVideoPlayer for HLS support */}
+                        <FeedVideoPlayer
+                          ref={(videoElement) => {
+                            if (videoElement) {
+                              const cleanup = registerVideo(videoId, videoElement);
                               return cleanup;
                             }
                           }}
@@ -1313,13 +1312,6 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           playsInline
                           preload="metadata"
                           muted={isMuted}
-                          onError={(e) => {
-                            console.error('Video error for:', videoId, e);
-                            console.error('Video URL:', videoUrl);
-                          }}
-                          onLoadStart={() => {
-                            console.log('Video load started for:', videoId, videoUrl);
-                          }}
                           onClick={() => {
                             if (!isSlotOne) {
                               if (playingVideoId === videoId) {
