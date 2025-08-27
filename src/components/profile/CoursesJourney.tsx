@@ -34,7 +34,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   const { generateMotivation } = useProgressMotivation(userId, userDisplayName, isOwnProfile);
   const [motivationalMessages, setMotivationalMessages] = useState<{[key: string]: string}>({});
 
-  // Define the four regional achievements in order: Left → Right
+  // Define the four regional achievements in order: Worldwide → USA → Great Britain & Ireland → Continental Europe
   const achievementRings = [
     {
       id: 'legends-club',
@@ -1613,65 +1613,22 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
             Courses by Region
           </h3>
-          <div className="flex gap-2">
-            {/* Navigation buttons moved here from Great Britain section */}
-            <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
-          </div>
         </div>
-        
-        {/* Great Britain & Ireland subtitle */}
-        <h4 className="text-xl text-muted-foreground mb-0">
-          Great Britain & Ireland
-        </h4>
       </div>
       
-      {/* Great Britain & Ireland Courses Section - no gap */}
-      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Reordered sections: Worldwide, USA, Great Britain & Ireland, Continental Europe */}
       
       {/* Worldwide Section */}
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">
-              Worldwide
-            </h4>
-            <div className="flex gap-2">
-              <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
+      <WorldwideConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
       
       {/* USA Section */}
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">
-              USA
-            </h4>
-            <div className="flex gap-2">
-              <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <USASection userId={userId} isOwnProfile={isOwnProfile} />
+      <USAConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      
+      {/* Great Britain & Ireland Section */}
+      <GreatBritainIrelandConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
       
       {/* Continental Europe Section */}
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">
-              Continental Europe
-            </h4>
-            <div className="flex gap-2">
-              <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
+      <ContinentalEuropeConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -2025,7 +1982,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                       className="flex-shrink-0 snap-start"
                       style={{ width: getCardWidth() }}
                     >
-                      <div className="aspect-[3/4] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
@@ -2392,7 +2349,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                       className="flex-shrink-0 snap-start"
                       style={{ width: getCardWidth() }}
                     >
-                      <div className="aspect-[3/4] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
@@ -2758,7 +2715,7 @@ const USASection: React.FC<USASectionProps> = ({
                       className="flex-shrink-0 snap-start"
                       style={{ width: getCardWidth() }}
                     >
-                      <div className="aspect-[3/4] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
@@ -3124,7 +3081,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                       className="flex-shrink-0 snap-start"
                       style={{ width: getCardWidth() }}
                     >
-                      <div className="aspect-[3/4] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
@@ -3151,6 +3108,192 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
         </div>
       </div>
     </div>
+  );
+};
+
+// Conditional Section Wrappers - Only render if courses exist
+interface ConditionalSectionProps {
+  userId?: string;
+  isOwnProfile?: boolean;
+}
+
+const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+  const { data: courses = [] } = useQuery({
+    queryKey: ['worldwideCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`golf_courses (global_rank)`)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`golf_courses (global_rank)`)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.global_rank && c.golf_courses.global_rank <= 100);
+    },
+    enabled: !!userId,
+  });
+
+  if (courses.length === 0) return null;
+
+  return (
+    <>
+      <div className="w-full px-4 pt-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-0">
+            <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
+            <div className="flex gap-2">
+              <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
+    </>
+  );
+};
+
+const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+  const { data: courses = [] } = useQuery({
+    queryKey: ['usaCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.country === 'USA');
+    },
+    enabled: !!userId,
+  });
+
+  if (courses.length === 0) return null;
+
+  return (
+    <>
+      <div className="w-full px-4 pt-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-0">
+            <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
+            <div className="flex gap-2">
+              <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <USASection userId={userId} isOwnProfile={isOwnProfile} />
+    </>
+  );
+};
+
+const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+  const { data: courses = [] } = useQuery({
+    queryKey: ['gbIrelandCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.country === 'Britain & Ireland');
+    },
+    enabled: !!userId,
+  });
+
+  if (courses.length === 0) return null;
+
+  return (
+    <>
+      <div className="w-full px-4 pt-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-0">
+            <h4 className="text-xl text-muted-foreground mb-0">Great Britain & Ireland</h4>
+            <div className="flex gap-2">
+              <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
+    </>
+  );
+};
+
+const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+  const { data: courses = [] } = useQuery({
+    queryKey: ['europeCourses', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`golf_courses (country)`)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.country === 'Continental Europe');
+    },
+    enabled: !!userId,
+  });
+
+  if (courses.length === 0) return null;
+
+  return (
+    <>
+      <div className="w-full px-4 pt-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-0">
+            <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
+            <div className="flex gap-2">
+              <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
+    </>
   );
 };
 
