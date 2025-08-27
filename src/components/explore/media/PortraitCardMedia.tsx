@@ -49,8 +49,8 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center">
-            <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
+          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+            <IoPlayOutline className="w-4 h-4 md:w-5 md:h-5 text-white" />
           </div>
         </div>
       </div>
@@ -83,8 +83,8 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center">
-          <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
+        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+          <IoPlayOutline className="w-4 h-4 md:w-5 md:h-5 text-white" />
         </div>
       </div>
       

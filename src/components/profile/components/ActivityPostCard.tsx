@@ -119,8 +119,8 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 />
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
-                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-9 h-9 flex items-center justify-center">
-                    <IoPlayOutline className="w-6 h-6 text-white" />
+                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
+                    <IoPlayOutline className="w-4 h-4 text-white" />
                   </div>
                 </div>
               </div>
