@@ -745,6 +745,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                           cardType={CardType.HERO}
                           useSmartMedia={true}
                           onMediaClick={() => onMediaClick?.(heroItem.item)}
+                          showFeaturedBadge={!hideBadges}
                         />
                       </div>
                     </div>

@@ -31,6 +31,7 @@ interface MediaDisplayProps {
   cardType?: CardType;
   useSmartMedia?: boolean;
   onMediaClick?: () => void;
+  showFeaturedBadge?: boolean;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -47,7 +48,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   hidePlayButton = false,
   cardType,
   useSmartMedia = false,
-  onMediaClick
+  onMediaClick,
+  showFeaturedBadge = true
 }) => {
   // Generate thumbnail URL for Cloudflare Stream videos - keep this function always available
   const getVideoThumbnail = (videoUrl: string) => {
@@ -79,6 +81,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         shouldAutoplay={shouldAutoplay}
         onMediaClick={onMediaClick}
         className="w-full h-full"
+        showFeaturedBadge={showFeaturedBadge}
       />
     );
   }

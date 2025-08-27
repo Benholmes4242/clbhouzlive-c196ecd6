@@ -21,7 +21,8 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   media,
   shouldAutoplay = true,
   onMediaClick,
-  className = ''
+  className = '',
+  showFeaturedBadge = true
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
@@ -93,9 +94,11 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       </div>
       
       {/* Hero badge indicator */}
-      <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
-        <span className="text-sm font-medium text-white">Featured</span>
-      </div>
+      {showFeaturedBadge && (
+        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+          <span className="text-base font-medium text-white">Featured</span>
+        </div>
+      )}
     </div>
   );
 });

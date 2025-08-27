@@ -20,4 +20,5 @@ export interface CardMediaProps {
   isLazyLoaded?: boolean;
   onMediaClick?: () => void;
   className?: string;
+  showFeaturedBadge?: boolean;
 }
