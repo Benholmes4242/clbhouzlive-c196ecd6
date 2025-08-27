@@ -1361,8 +1361,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                               {userCourse.golf_courses.region || userCourse.golf_courses.country}
                             </p>
                           </div>
-                        </div>
-                          disableClick={true}
+                         </div>
                       </div>
                     </div>
                   );
