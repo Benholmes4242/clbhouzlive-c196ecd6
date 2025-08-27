@@ -748,7 +748,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
             Recently Played
           </h3>
           <div className="flex gap-2">
@@ -1206,7 +1206,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
             Highlights From My Journey
           </h3>
           <div className="flex gap-2">
@@ -1485,7 +1485,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0">
-            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
               Top 10 Rated by You
             </h3>
           <div className="flex gap-2">
@@ -1612,7 +1612,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
             Courses by Region
           </h3>
         </div>
