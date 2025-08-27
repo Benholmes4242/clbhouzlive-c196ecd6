@@ -7,7 +7,6 @@ import CourseRankBadges from './CourseRankBadges';
 import CountryFlag from '@/components/ui/country-flag';
 import { supabase } from '@/integrations/supabase/client';
 import { callEdgeFunctionDebounced } from '@/utils/edgeFunctionHelper';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Course {
   id: string;
@@ -115,7 +114,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
   disableClick = false
 }) => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [courseQuote, setCourseQuote] = useState<string>('');
 
   // Generate AI quote for course
@@ -190,38 +188,38 @@ const CourseCard: React.FC<CourseCardProps> = ({
         )}
 
         {/* Course Information Overlay - positioned at bottom */}
-        <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'p-2' : 'p-4'}`}>
+        <div className="absolute bottom-0 left-0 right-0 p-4">
           {/* XP earned - show above course name */}
           {showXP && xp && (
-            <div className={`text-white/90 leading-tight mb-1 drop-shadow-lg ${isMobile ? 'text-sm' : 'text-2xl'}`}>
+            <div className="text-2xl text-white/90 leading-tight mb-1 drop-shadow-lg">
               + {xp} XP
             </div>
           )}
           
           {/* Course Name */}
-          <h3 className={`text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${isMobile ? 'text-lg' : 'text-3xl'} ${hideRankingBadges ? '' : ''}`}>
+          <h3 className={`text-3xl text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : ''}`}>
             {course.name}
           </h3>
           
           {/* AI Quote or Location */}
           {showAIQuote ? (
-            <div className={`text-white/90 leading-relaxed drop-shadow-lg italic ${isMobile ? 'text-xs' : 'text-2xl'}`}>
+            <div className="text-white/90 text-2xl leading-relaxed drop-shadow-lg italic">
               {courseQuote || 'A golf experience like no other'}
             </div>
           ) : (
-            <div className={`flex items-center text-white/90 drop-shadow-lg ${isMobile ? 'text-xs' : 'text-2xl'}`}>
+            <div className="flex items-center text-white/90 text-2xl drop-shadow-lg">
               {showCountryWithFlag ? (
                 <>
                   <CountryFlag 
                     country={getCountryForFlag(course)} 
-                    size={isMobile ? "sm" : "lg"}
+                    size="lg"
                     className="mr-2 flex-shrink-0" 
                   />
                   <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
                 </>
               ) : (
                 <>
-                  <MapPin className={`mr-2 flex-shrink-0 ${isMobile ? 'h-3 w-3' : 'h-5 w-5'}`} />
+                  <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
                   <span>{formatLocation(course)}</span>
                 </>
               )}
