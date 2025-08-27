@@ -9,6 +9,7 @@ export const isVideoUrl = (url: string): boolean => {
          url?.includes('.m3u8') || 
          url?.includes('.mp4') || 
          url?.includes('.mov') ||
+         url?.includes('.webm') ||
          url?.includes('customer-') || false;
 };
 

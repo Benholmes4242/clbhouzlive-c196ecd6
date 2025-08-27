@@ -39,6 +39,24 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Check if this is actually a video file being passed to an image component
+    const isVideoFile = imageSrc.includes('.mp4') || imageSrc.includes('.mov') || 
+                       imageSrc.includes('.webm') || imageSrc.includes('cloudflarestream.com');
+    
+    if (isVideoFile) {
+      console.warn('🚨 VIDEO FILE PASSED TO IMAGE COMPONENT:', {
+        src: imageSrc,
+        optimizedSrc: getOptimizedImageUrl(imageSrc),
+        message: 'Video files should be handled by video components, not image components'
+      });
+      setHasError(true);
+      setIsLoading(false);
+      if (onError) {
+        onError(e);
+      }
+      return;
+    }
+    
     console.log('🔴 IMAGE ERROR - Failed to load:', {
       src: imageSrc,
       optimizedSrc: getOptimizedImageUrl(imageSrc),
