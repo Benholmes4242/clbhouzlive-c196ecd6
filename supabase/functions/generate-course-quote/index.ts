@@ -62,6 +62,19 @@ serve(async (req) => {
       // Remove any trailing attribution if present (e.g., " — Jack Nicklaus")
       quote = quote.replace(/\s*—\s*.+$/, '').trim();
     }
+    
+    // Clean up markdown formatting and ** artifacts
+    quote = quote.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
+    
+    // If quote is empty or just asterisks, use the full response cleaned up
+    if (!quote || quote === '' || /^\*+$/.test(quote)) {
+      quote = fullResponse.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
+    }
+    
+    // Final fallback
+    if (!quote || quote === '') {
+      quote = 'A golf experience like no other';
+    }
 
     console.log(`Generated quote: ${quote}`);
 

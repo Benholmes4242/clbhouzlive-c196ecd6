@@ -1286,7 +1286,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       className="flex-shrink-0 snap-start"
                       style={{ width: getCardWidth() }}
                     >
-                      <div className="aspect-[2.5/1] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.3]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
