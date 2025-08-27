@@ -40,6 +40,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
@@ -119,9 +120,12 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div className="px-4 md:px-0">
           {/* Filter Dropdown */}
           <div className="flex justify-end my-4">
-            <DropdownMenu>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen} modal={false}>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 hover:bg-muted/50 transition-colors">
+                <button 
+                  className="p-2 hover:bg-muted/50 transition-colors"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
               </DropdownMenuTrigger>
@@ -130,28 +134,40 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 className="bg-background border border-border"
               >
                 <DropdownMenuItem 
-                  onClick={() => setActiveFilter('all')}
+                  onClick={() => {
+                    setActiveFilter('all');
+                    setDropdownOpen(false);
+                  }}
                   className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
                 >
                   <span className="mr-2">📱</span>
                   All Posts
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => setActiveFilter('videos')}
+                  onClick={() => {
+                    setActiveFilter('videos');
+                    setDropdownOpen(false);
+                  }}
                   className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
                 >
                   <Video className="mr-2 h-4 w-4" />
                   Videos only
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => setActiveFilter('photos')}
+                  onClick={() => {
+                    setActiveFilter('photos');
+                    setDropdownOpen(false);
+                  }}
                   className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
                 >
                   <Image className="mr-2 h-4 w-4" />
                   Photos only
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => setActiveFilter('golf-courses')}
+                  onClick={() => {
+                    setActiveFilter('golf-courses');
+                    setDropdownOpen(false);
+                  }}
                   className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
                 >
                   <MapPin className="mr-2 h-4 w-4" />

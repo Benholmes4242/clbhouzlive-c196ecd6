@@ -1326,7 +1326,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                         {/* Video Play Icon - Bottom Right - Hide for playing videos */}
                         {(playingVideoId !== videoId || isSlotOne) && (
                           <div className="absolute bottom-3 right-3 z-10 transition-opacity group-hover:opacity-80">
-                            <MdOutlinePlayCircle 
+                            <MdOutlinePlayCircle
                               className="w-8 h-8 text-white drop-shadow-lg" 
                             />
                           </div>

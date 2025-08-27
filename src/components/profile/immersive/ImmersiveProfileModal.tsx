@@ -320,28 +320,37 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }
   }, [handleFileUpload]);
 
-  // Progress timer for current media
+  // Progress timer for current media - only start when media is actually ready
   useEffect(() => {
-    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading || isVideoPaused) return;
+    if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading) return;
+
+    // For videos, don't start timer if paused or if we haven't started playing yet
+    if (currentItem.media_type === 'video' && isVideoPaused) return;
 
     const duration = currentItem.media_type === 'image' ? 3000 : currentItem.duration;
-    startTimeRef.current = Date.now();
-    setProgress(0);
+    
+    // Only start timer if we don't already have one running
+    if (!intervalRef.current) {
+      startTimeRef.current = Date.now();
+      setProgress(0);
 
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / duration) * 100, 100);
-      setProgress(newProgress);
+      const updateProgress = () => {
+        const elapsed = Date.now() - startTimeRef.current;
+        const newProgress = Math.min((elapsed / duration) * 100, 100);
+        setProgress(newProgress);
 
-      if (newProgress >= 100) {
-        handleNext();
-      }
-    };
+        if (newProgress >= 100) {
+          handleNext();
+        }
+      };
 
-    intervalRef.current = setInterval(updateProgress, 50);
+      intervalRef.current = setInterval(updateProgress, 50);
+    }
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, [isOpen, currentItem, isTransitioning, handleNext, isVideoPaused]);
@@ -441,7 +450,14 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             loop={true}
             enableHLS={true}
             className="w-full h-full"
-            onPlay={() => setIsVideoPaused(false)}
+            onPlay={() => {
+              setIsVideoPaused(false);
+              // Start progress timer when video actually starts playing
+              if (!intervalRef.current) {
+                startTimeRef.current = Date.now();
+                setProgress(0);
+              }
+            }}
             onPause={() => setIsVideoPaused(true)}
           />
         ) : (

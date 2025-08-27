@@ -36,7 +36,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
       {/* Video play icon in bottom right for video sources */}
       {media.media_type === 'video' && (
         <div className="absolute bottom-3 right-3 z-20">
-          <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+          <MdOutlinePlayCircle className="w-7 h-7 text-white drop-shadow-lg" />
         </div>
       )}
     </div>
