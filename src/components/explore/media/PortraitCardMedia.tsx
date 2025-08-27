@@ -1,9 +1,10 @@
 import React, { memo, useRef } from 'react';
 import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
-import { useGlobalAudio } from '@/hooks/useGlobalAudio';
+import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 
 /**
@@ -23,7 +24,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isGloballyMuted } = useGlobalAudio();
+  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`portrait-${media.media_url}`);
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
@@ -90,17 +91,11 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Mute/Unmute Button - Top Right */}
       <div className="absolute top-3 right-3 z-20">
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            // Add mute toggle functionality here
-          }}
-          className="p-2 bg-white/10 backdrop-blur-sm rounded-full transition-all duration-200 hover:bg-white/20"
-        >
-          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-          </svg>
-        </button>
+        <SoundToggle
+          isMuted={videoIsMuted}
+          onToggle={toggleVideoMute}
+          size="sm"
+        />
       </div>
     </div>
   );
