@@ -810,8 +810,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 className="flex"
                 style={{ 
                   gap: '12px',
-                  paddingLeft: windowWidth < 768 ? '10px' : '0px', // Add 10px left margin on mobile
-                  paddingRight: windowWidth < 768 ? '10px' : '0px'  // Add 10px right margin on mobile
+                  paddingLeft: windowWidth < 768 ? '0px' : '0px', // Remove extra left padding to align with sections below
+                  paddingRight: windowWidth < 768 ? '10px' : '0px'  // Keep right padding for proper spacing
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
