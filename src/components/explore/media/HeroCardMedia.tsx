@@ -49,7 +49,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center">
             <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
           </div>
         </div>
@@ -89,7 +89,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-9 h-9 md:w-11 md:h-11 flex items-center justify-center">
           <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
         </div>
       </div>

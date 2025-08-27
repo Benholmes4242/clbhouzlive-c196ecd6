@@ -36,7 +36,7 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
     <div
       className={`
         ${sizeClasses[size]}
-        rounded-full bg-white/10 backdrop-blur-2xl 
+        rounded-full bg-white/10 backdrop-blur-2xl border border-white/20
         flex items-center justify-center cursor-pointer
         transition-all duration-200 ease-in-out
         transform hover:scale-110 active:scale-95
