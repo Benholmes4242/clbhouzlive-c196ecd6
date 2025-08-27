@@ -5,7 +5,7 @@ import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { FaPlay } from 'react-icons/fa';
+// Play icon already imported from lucide-react above
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -120,7 +120,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
                   <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
-                    <FaPlay className="w-3 h-3 text-white ml-0.5" />
+                    <Play className="w-3 h-3 text-white ml-0.5" />
                   </div>
                 </div>
               </div>

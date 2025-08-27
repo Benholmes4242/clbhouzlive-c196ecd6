@@ -1,5 +1,5 @@
 import React, { memo, useRef } from 'react';
-import { FaPlay } from 'react-icons/fa';
+import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
@@ -50,7 +50,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
           <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-            <FaPlay className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" />
+            <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" />
           </div>
         </div>
         
@@ -90,7 +90,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
         <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-          <FaPlay className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" />
+          <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" />
         </div>
       </div>
       
