@@ -14,6 +14,7 @@ interface MediaCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
+  isPortrait?: boolean;
   autoplayManager?: {
     registerVideo: (videoId: string, element: HTMLElement, index: number) => void;
     unregisterVideo: (videoId: string) => void;
@@ -23,7 +24,7 @@ interface MediaCardProps {
   videoIndex?: number;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, autoplayManager, videoIndex, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, isPortrait, autoplayManager, videoIndex, ...props }) => {
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -51,6 +52,8 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
     item, 
     onLike, 
     onMediaClick: props.onMediaClick,
+    isFeatured,
+    isPortrait,
     autoplayManager,
     videoIndex
   });

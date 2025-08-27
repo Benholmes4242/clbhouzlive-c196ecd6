@@ -10,6 +10,7 @@ interface ExploreContentCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
+  isPortrait?: boolean;
   autoplayManager?: {
     registerVideo: (videoId: string, element: HTMLElement, index: number) => void;
     unregisterVideo: (videoId: string) => void;
@@ -20,7 +21,7 @@ interface ExploreContentCardProps {
 }
 
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, autoplayManager, videoIndex }) => {
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, isPortrait, autoplayManager, videoIndex }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -37,6 +38,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, o
         onFollow={onFollow} 
         onMediaClick={onMediaClick} 
         isFeatured={isFeatured}
+        isPortrait={isPortrait}
         autoplayManager={autoplayManager}
         videoIndex={videoIndex}
       />

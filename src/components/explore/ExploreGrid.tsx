@@ -805,7 +805,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                             media_url: portraitItem.item.src
                           }}
                           itemTitle={portraitItem.item.title}
-                          shouldAutoplay={false}
+                          shouldAutoplay={true}
                           isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
                           onImageError={() => {
                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
@@ -893,6 +893,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onLike={onLike} 
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
+                  isPortrait={true}
                 />
               </div>
             );

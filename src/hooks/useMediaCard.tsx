@@ -8,6 +8,8 @@ interface UseMediaCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
+  isFeatured?: boolean;
+  isPortrait?: boolean;
   autoplayManager?: {
     registerVideo: (videoId: string, element: HTMLElement, index: number) => void;
     unregisterVideo: (videoId: string) => void;
@@ -17,7 +19,7 @@ interface UseMediaCardProps {
   videoIndex?: number;
 }
 
-export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, videoIndex = 0 }: UseMediaCardProps) => {
+export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, isPortrait = false, autoplayManager, videoIndex = 0 }: UseMediaCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -28,7 +30,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, vide
   const cardRef = useRef<HTMLElement | null>(null);
 
   const { ref: autoplayRef, shouldAutoplay: defaultShouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: false,  // Disable default autoplay for explore page
+    enabled: isFeatured || isPortrait, // Enable autoplay for featured (hero) cards and portrait cards
     threshold: 0.5
   });
 
