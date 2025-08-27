@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData.tsx';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
@@ -554,6 +554,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const { viewType, setViewType, isHydrated } = useViewPreference();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const recentlyPlayedSwipeRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -718,11 +719,29 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   });
 
   const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+    const container = recentlyPlayedSwipeRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
+      const targetCard = cards[nextIndex] as HTMLElement;
+      if (targetCard) {
+        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
+        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    const container = recentlyPlayedSwipeRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const prevIndex = Math.max(currentIndex - 1, 0);
+      const targetCard = cards[prevIndex] as HTMLElement;
+      if (targetCard) {
+        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
+        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   return (
@@ -766,12 +785,33 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={recentlyPlayedSwipeRef}
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+              }}
+              onScroll={(e) => {
+                const container = e.target as HTMLElement;
+                const cards = container.querySelectorAll('[data-card]');
+                if (cards.length > 0) {
+                  const cardWidth = (cards[0] as HTMLElement).offsetWidth;
+                  const gap = windowWidth >= 1200 ? 24 : windowWidth >= 1024 ? 20 : windowWidth >= 768 ? 16 : 12;
+                  const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
+                  if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
+                    setCurrentIndex(newIndex);
+                  }
+                }
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
+                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
@@ -786,8 +826,13 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      data-card
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className="aspect-[3/4] w-full">
                         <CourseCard 
@@ -840,6 +885,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const { viewType, setViewType, isHydrated } = useViewPreference();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1026,11 +1072,29 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   });
 
   const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+    const container = highlightReelSwipeRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
+      const targetCard = cards[nextIndex] as HTMLElement;
+      if (targetCard) {
+        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
+        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    const container = highlightReelSwipeRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const prevIndex = Math.max(currentIndex - 1, 0);
+      const targetCard = cards[prevIndex] as HTMLElement;
+      if (targetCard) {
+        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
+        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   // Hide section if no video highlights available
@@ -1079,12 +1143,33 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={highlightReelSwipeRef}
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+              }}
+              onScroll={(e) => {
+                const container = e.target as HTMLElement;
+                const cards = container.querySelectorAll('[data-card]');
+                if (cards.length > 0) {
+                  const cardWidth = (cards[0] as HTMLElement).offsetWidth;
+                  const gap = windowWidth >= 1200 ? 24 : windowWidth >= 1024 ? 20 : windowWidth >= 768 ? 16 : 12;
+                  const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
+                  if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
+                    setCurrentIndex(newIndex);
+                  }
+                }
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
+                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
@@ -1099,8 +1184,13 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      data-card
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className="aspect-[4/5] w-full">
                         <CourseCard 
@@ -1151,6 +1241,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const topRatedSwipeRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1215,11 +1306,23 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   });
 
   const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+    const container = topRatedSwipeRef.current;
+    if (container) {
+      const cardWidth = container.scrollWidth / topRatedCourses.length;
+      const nextIndex = Math.min(currentIndex + 1, topRatedCourses.length - 1);
+      const scrollPosition = nextIndex * cardWidth;
+      container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    const container = topRatedSwipeRef.current;
+    if (container) {
+      const cardWidth = container.scrollWidth / topRatedCourses.length;
+      const prevIndex = Math.max(currentIndex - 1, 0);
+      const scrollPosition = prevIndex * cardWidth;
+      container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -1263,12 +1366,29 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               </div>
             </div>
           ) : topRatedCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={topRatedSwipeRef} 
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+              }}
+              onScroll={(e) => {
+                const container = e.target as HTMLElement;
+                const cardWidth = container.scrollWidth / topRatedCourses.length;
+                const newIndex = Math.round(container.scrollLeft / cardWidth);
+                if (newIndex !== currentIndex) {
+                  setCurrentIndex(newIndex);
+                }
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100)}%)`, // Move by full container width for feature cards
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
+                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
+                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
                 }}
               >
                 {topRatedCourses.map((userCourse, index) => {
@@ -1283,8 +1403,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                         <CourseCard 
