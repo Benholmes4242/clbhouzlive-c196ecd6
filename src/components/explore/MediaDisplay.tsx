@@ -208,7 +208,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       ) : (
         <div className="relative w-full h-full">
            <HighQualityImage
-             src={isInvalidSrc ? fallbackImage : media.media_url}
+             src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
              alt={itemTitle || 'Content'}
              className="w-full h-full object-cover"
              onLoad={() => {
