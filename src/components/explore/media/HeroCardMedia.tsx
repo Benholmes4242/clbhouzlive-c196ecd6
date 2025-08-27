@@ -48,12 +48,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           className="w-full h-full object-cover"
         />
         
-        {/* Play icon for non-video fallback images */}
-        <div className="absolute bottom-3 right-3 z-20">
-          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-            <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-          </div>
-        </div>
         
         {/* Hero overlay gradient for visual appeal */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
@@ -88,12 +82,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       
       
-      {/* Video play icon for autoplaying videos */}
-      <div className="absolute bottom-3 right-3 z-20">
-        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-          <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-        </div>
-      </div>
       
       {/* Mute/Unmute Button - Top Right */}
       <div className="absolute top-3 right-3 z-20">
