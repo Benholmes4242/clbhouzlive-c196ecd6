@@ -984,7 +984,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const { data: allPlayedCourses = [] } = useQuery({
     queryKey: ['highlightReelCourses', userId],
     queryFn: async () => {
-      if (!userId) return [];
+      console.log('Highlight Reel - Starting query for userId:', userId);
+      if (!userId) {
+        console.log('Highlight Reel - No userId provided');
+        return [];
+      }
 
       // Get all posts with video media
       const { data: posts, error: postsError } = await supabase
@@ -1004,10 +1008,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
         .order('created_at', { ascending: false });
 
       console.log('Highlight Reel - Found posts with videos:', posts?.length);
-
-      if (postsError) throw postsError;
-
+      console.log('Highlight Reel - Sample post:', posts?.[0]);
+      
       if (!posts || posts.length === 0) {
+        console.log('Highlight Reel - No posts found, returning empty array');
         return [];
       }
 
@@ -1066,16 +1070,17 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           const course = courses?.find(c => c.id === postTag.taggable_entities.entity_id);
           if (!course) return null;
 
-          // Get video thumbnail from post media
+          // Get video URL from post media (keep original for video playback)
           const videoMedia = post.post_media?.[0];
-          let videoThumbnail = videoMedia?.media_url;
+          const videoUrl = videoMedia?.media_url; // Keep original URL for video playback
+          let videoThumbnail = videoUrl;
           
-          // For videos, try to get thumbnail by modifying the URL or use the video URL as fallback
-          if (videoMedia?.media_type === 'video' && videoThumbnail) {
-            // If it's a Cloudflare Stream video, we can generate thumbnail URL
-            if (videoThumbnail.includes('customer-') && videoThumbnail.includes('cloudflarestream.com')) {
+          // For videos, try to get thumbnail by modifying the URL for display purposes only
+          if (videoMedia?.media_type === 'video' && videoUrl) {
+            // If it's a Cloudflare Stream video, we can generate thumbnail URL for poster
+            if (videoUrl.includes('customer-') && videoUrl.includes('cloudflarestream.com')) {
               // Extract video ID from URLs like: https://customer-4ah4gni80ytefpck.cloudflarestream.com/bfaa2b729eed40d2b3292f40035e8231/manifest/video.m3u8
-              const matches = videoThumbnail.match(/customer-[^\/]+\.cloudflarestream\.com\/([^\/]+)/);
+              const matches = videoUrl.match(/customer-[^\/]+\.cloudflarestream\.com\/([^\/]+)/);
               if (matches && matches[1]) {
                 const videoId = matches[1];
                 videoThumbnail = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
@@ -1083,7 +1088,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             }
           }
           
-          console.log('Processing post:', post.id, 'Original URL:', videoMedia?.media_url, 'Thumbnail URL:', videoThumbnail);
+          console.log('Processing post:', post.id, 'Video URL:', videoUrl, 'Thumbnail URL:', videoThumbnail);
+          console.log('Video media details:', videoMedia);
 
           return {
             id: `video-${post.id}`,
@@ -1092,10 +1098,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             created_at: post.created_at,
             rating: null,
             videoThumbnail: videoThumbnail,
-            videoUrl: videoMedia?.media_url, // Store the actual video URL
+            videoUrl: videoUrl, // Store the actual video URL for playback
             golf_courses: {
               ...course,
-              thumbnail_image: videoThumbnail || course.thumbnail_image // Use video thumbnail as course image
+              thumbnail_image: videoThumbnail || course.thumbnail_image // Use video thumbnail as course image for display
             }
           };
         })
@@ -1189,6 +1195,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   // Hide section if no video highlights available
   if (isHydrated && filteredCourses.length === 0) {
+    console.log('Highlight Reel - No filtered courses, hiding section');
     return null;
   }
 
@@ -1272,6 +1279,13 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   const isSlotOne = index === 0;
                   const videoId = `video-${userCourse.id}`;
                   const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
+                  console.log('Video card:', { videoId, videoUrl, isSlotOne, userCourse });
+                  
+                  // Skip if no valid video URL
+                  if (!videoUrl) {
+                    console.warn('No video URL for course:', userCourse.golf_courses.name);
+                    return null;
+                  }
 
                   return (
                     <div 
@@ -1299,6 +1313,13 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           playsInline
                           preload="metadata"
                           muted={isMuted}
+                          onError={(e) => {
+                            console.error('Video error for:', videoId, e);
+                            console.error('Video URL:', videoUrl);
+                          }}
+                          onLoadStart={() => {
+                            console.log('Video load started for:', videoId, videoUrl);
+                          }}
                           onClick={() => {
                             if (!isSlotOne) {
                               if (playingVideoId === videoId) {
