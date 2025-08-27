@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import SoundToggle from '@/components/ui/sound-toggle';
-import { IoPlayOutline } from 'react-icons/io5';
+import { FaPlay } from 'react-icons/fa';
 import { Loader2 } from 'lucide-react';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import HighQualityImage from '@/components/ui/high-quality-image';
@@ -201,7 +201,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             {!hidePlayButton && (
               <div className="absolute bottom-3 right-3 z-20">
                 <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                  <IoPlayOutline className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                  <FaPlay className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" />
                 </div>
               </div>
             )}

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { IoPlayOutline } from 'react-icons/io5';
+import { FaPlay } from 'react-icons/fa';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 
@@ -37,7 +37,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
       {media.media_type === 'video' && (
         <div className="absolute bottom-3 right-3 z-20">
           <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
-            <IoPlayOutline className="w-4 h-4 text-white" />
+            <FaPlay className="w-3 h-3 text-white ml-0.5" />
           </div>
         </div>
       )}
