@@ -54,25 +54,32 @@ serve(async (req) => {
     const data = await response.json();
     const fullResponse = data.choices[0].message.content.trim();
     
-    // Extract the "Top Pick" quote from the response
+    // Extract and clean the quote from the response
     let quote = fullResponse;
-    const topPickMatch = fullResponse.match(/Top Pick[:\-]?\s*["']?([^"\n]+)["']?/i);
-    if (topPickMatch) {
-      quote = topPickMatch[1].trim();
-      // Remove any trailing attribution if present (e.g., " — Jack Nicklaus")
-      quote = quote.replace(/\s*—\s*.+$/, '').trim();
-    }
+    
+    // Remove "Top Pick:" prefix if present
+    quote = quote.replace(/^Top Pick[:\-]?\s*/i, '').trim();
     
     // Clean up markdown formatting and ** artifacts
     quote = quote.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
     
-    // If quote is empty or just asterisks, use the full response cleaned up
-    if (!quote || quote === '' || /^\*+$/.test(quote)) {
-      quote = fullResponse.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
+    // Extract content within quotation marks if present
+    const quotedMatch = quote.match(/[""]([^"""]+)[""]/) || quote.match(/"([^"]+)"/);
+    if (quotedMatch) {
+      quote = quotedMatch[1].trim();
+    } else {
+      // If no quotes found, take the first sentence/paragraph and stop at first period or newline
+      const firstSentence = quote.split(/[\n\r]|\.(?=\s)/)[0];
+      if (firstSentence && firstSentence.length > 10) {
+        quote = firstSentence.trim();
+        if (!quote.endsWith('.')) {
+          quote += '.';
+        }
+      }
     }
     
     // Final fallback
-    if (!quote || quote === '') {
+    if (!quote || quote === '' || quote.length < 5) {
       quote = 'A golf experience like no other';
     }
 
