@@ -725,8 +725,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
       const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
       const targetCard = cards[nextIndex] as HTMLElement;
       if (targetCard) {
-        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
-        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
       }
     }
   };
@@ -738,8 +737,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
       const prevIndex = Math.max(currentIndex - 1, 0);
       const targetCard = cards[prevIndex] as HTMLElement;
       if (targetCard) {
-        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
-        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
       }
     }
   };
@@ -790,8 +788,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
               }}
               onScroll={(e) => {
                 const container = e.target as HTMLElement;
@@ -809,9 +807,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
-                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
@@ -1078,8 +1074,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
       const targetCard = cards[nextIndex] as HTMLElement;
       if (targetCard) {
-        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
-        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
       }
     }
   };
@@ -1091,8 +1086,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       const prevIndex = Math.max(currentIndex - 1, 0);
       const targetCard = cards[prevIndex] as HTMLElement;
       if (targetCard) {
-        const scrollPosition = targetCard.offsetLeft - (windowWidth >= 768 ? 24 : 16);
-        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
       }
     }
   };
@@ -1148,8 +1142,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
               }}
               onScroll={(e) => {
                 const container = e.target as HTMLElement;
@@ -1167,9 +1161,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
-                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
@@ -1371,8 +1363,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                scrollPaddingRight: windowWidth >= 768 ? '24px' : '16px'
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
               }}
               onScroll={(e) => {
                 const container = e.target as HTMLElement;
@@ -1386,9 +1378,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px',
-                  paddingLeft: windowWidth >= 768 ? '24px' : '16px',
-                  paddingRight: windowWidth >= 768 ? '24px' : '16px'
+                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
                 }}
               >
                 {topRatedCourses.map((userCourse, index) => {
