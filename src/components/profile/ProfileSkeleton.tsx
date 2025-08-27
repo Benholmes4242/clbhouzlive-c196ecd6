@@ -1,57 +1,8 @@
 import React from 'react';
+import ClubhouzLoading from '@/components/ClubhouzLoading';
 
 export const ProfileHeaderSkeleton = () => {
-  return (
-    <div className="relative w-full overflow-hidden" 
-         style={{ 
-           marginTop: '-8rem',
-           height: '65vh',
-           minHeight: '600px',
-           maxHeight: '800px',
-           paddingTop: '8rem'
-         }}>
-      
-      {/* Background Skeleton */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 animate-pulse" />
-      
-      {/* Central Media Skeleton */}
-      <div className="relative z-10 w-full h-full flex items-start justify-center pt-20">
-        <div 
-          className="clbhouz-squircle overflow-hidden bg-gray-300 dark:bg-gray-600 animate-pulse"
-          style={{
-            width: '400px',
-            height: '400px',
-          }}
-        />
-      </div>
-
-      {/* Profile Info Skeleton */}
-      <div className="absolute bottom-[-16rem] left-0 right-0 z-50 flex flex-col items-center text-center pb-8 px-4 pt-16">
-        {/* User Name Skeleton */}
-        <div className="text-center mb-6">
-          <div className="h-12 md:h-16 w-64 bg-gray-300 dark:bg-gray-600 rounded-lg animate-pulse mb-3" />
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-2" />
-          <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-4" />
-        </div>
-
-        {/* Stats Skeleton */}
-        <div className="flex items-center justify-center gap-4 w-full">
-          <div className="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse" />
-          <div className="flex-shrink-0 overflow-hidden rounded-lg w-full md:w-[520px]">
-            <div className="flex gap-6 md:gap-16 px-2 py-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex-shrink-0 text-center w-20">
-                  <div className="h-12 w-12 bg-gray-300 dark:bg-gray-600 rounded-lg animate-pulse mb-2 mx-auto" />
-                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse" />
-        </div>
-      </div>
-    </div>
-  );
+  return <ClubhouzLoading />;
 };
 
 export const ProfileTabsSkeleton = () => {
