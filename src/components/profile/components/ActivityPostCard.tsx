@@ -5,7 +5,7 @@ import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { MdOutlinePlayCircle } from 'react-icons/md';
+import { IoPlayOutline } from 'react-icons/io5';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -119,7 +119,9 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 />
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
-                  <MdOutlinePlayCircle className="w-7 h-7 text-white drop-shadow-lg" />
+                  <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 flex items-center justify-center">
+                    <IoPlayOutline className="w-6 h-6 text-white" />
+                  </div>
                 </div>
               </div>
             )

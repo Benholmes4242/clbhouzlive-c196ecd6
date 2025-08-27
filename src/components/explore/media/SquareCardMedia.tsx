@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { MdOutlinePlayCircle } from 'react-icons/md';
+import { IoPlayOutline } from 'react-icons/io5';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 
@@ -36,7 +36,9 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
       {/* Video play icon in bottom right for video sources */}
       {media.media_type === 'video' && (
         <div className="absolute bottom-3 right-3 z-20">
-          <MdOutlinePlayCircle className="w-7 h-7 text-white drop-shadow-lg" />
+          <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 flex items-center justify-center">
+            <IoPlayOutline className="w-6 h-6 text-white" />
+          </div>
         </div>
       )}
     </div>

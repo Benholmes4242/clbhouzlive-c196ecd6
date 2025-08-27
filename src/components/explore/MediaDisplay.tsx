@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import SoundToggle from '@/components/ui/sound-toggle';
-import { MdOutlinePlayCircle } from 'react-icons/md';
+import { IoPlayOutline } from 'react-icons/io5';
 import { Loader2 } from 'lucide-react';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import HighQualityImage from '@/components/ui/high-quality-image';
@@ -200,7 +200,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             {/* Play icon for non-autoplaying videos */}
             {!hidePlayButton && (
               <div className="absolute bottom-3 right-3 z-20">
-                <MdOutlinePlayCircle className="h-6 w-6 md:h-7 md:w-7 text-white drop-shadow-lg" />
+                <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                  <IoPlayOutline className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                </div>
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import React, { memo, useRef } from 'react';
-import { MdOutlinePlayCircle } from 'react-icons/md';
+import { IoPlayOutline } from 'react-icons/io5';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
@@ -49,7 +49,9 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <MdOutlinePlayCircle className="w-6 h-6 md:w-7 md:h-7 text-white drop-shadow-lg" />
+          <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+            <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
+          </div>
         </div>
       </div>
     );
@@ -81,7 +83,9 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <MdOutlinePlayCircle className="w-6 h-6 md:w-7 md:h-7 text-white drop-shadow-lg" />
+        <div className="rounded-full bg-white/10 backdrop-blur-2xl w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+          <IoPlayOutline className="w-6 h-6 md:w-7 md:h-7 text-white" />
+        </div>
       </div>
       
       {/* Mute/Unmute Button - Top Right */}
