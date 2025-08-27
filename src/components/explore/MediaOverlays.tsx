@@ -47,12 +47,12 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
           <img
             src={user.avatar}
             alt={user.name}
-            className={`rounded-full object-cover ${isFeatured ? 'w-16 h-16' : 'w-14 h-14'}`}
+            className={`rounded-full object-cover ${isFeatured ? 'w-12 h-12 md:w-16 md:h-16' : 'w-10 h-10 md:w-14 md:h-14'}`}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
             }}
           />
-          <span className="text-white font-medium drop-shadow-lg text-base">
+          <span className="text-white font-medium drop-shadow-lg text-sm md:text-base">
             {user.name}
           </span>
         </div>

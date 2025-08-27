@@ -49,7 +49,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+          <MdOutlinePlayCircle className="w-5 h-5 md:w-6 md:h-6 text-white drop-shadow-lg" />
         </div>
         
         {/* Hero overlay gradient for visual appeal */}
@@ -87,12 +87,12 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+        <MdOutlinePlayCircle className="w-5 h-5 md:w-6 md:h-6 text-white drop-shadow-lg" />
       </div>
       
       {/* Hero badge indicator */}
-      <div className="absolute top-3 right-3 bg-primary/20 backdrop-blur-sm px-2 py-1 rounded-full">
-        <span className="text-xs font-medium text-primary-foreground">Featured</span>
+      <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-lg">
+        <span className="text-xs font-medium text-white">Featured</span>
       </div>
     </div>
   );

@@ -49,7 +49,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+          <MdOutlinePlayCircle className="w-5 h-5 md:w-6 md:h-6 text-white drop-shadow-lg" />
         </div>
       </div>
     );
@@ -81,7 +81,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+        <MdOutlinePlayCircle className="w-5 h-5 md:w-6 md:h-6 text-white drop-shadow-lg" />
       </div>
     </div>
   );
