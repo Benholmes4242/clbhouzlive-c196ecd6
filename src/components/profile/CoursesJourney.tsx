@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData.tsx';
 import { useProgressMotivation } from '@/hooks/useProgressMotivation';
 import CountryFlag from '@/components/ui/country-flag';
@@ -10,8 +10,9 @@ import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStat
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MdOutlinePlayCircle } from 'react-icons/md';
 
 
 interface CoursesJourneyProps {
@@ -883,12 +884,91 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
+  // Video state management
+  const [isMuted, setIsMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('highlightReelMuted');
+      return saved ? JSON.parse(saved) : true; // Default muted
+    }
+    return true;
+  });
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  
   // Track window width for responsive breakpoints
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Persist mute state
+  useEffect(() => {
+    localStorage.setItem('highlightReelMuted', JSON.stringify(isMuted));
+  }, [isMuted]);
+
+  // Video management functions
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+    // Update all videos with new mute state
+    videoRefs.current.forEach(video => {
+      video.muted = !isMuted;
+    });
+  }, [isMuted]);
+
+  const playVideo = useCallback((videoId: string) => {
+    const targetVideo = videoRefs.current.get(videoId);
+    if (!targetVideo) return;
+
+    // Pause all other videos
+    videoRefs.current.forEach((video, id) => {
+      if (id !== videoId && !video.paused) {
+        video.pause();
+      }
+    });
+
+    setPlayingVideoId(videoId);
+    targetVideo.muted = isMuted;
+    targetVideo.play().catch(console.error);
+  }, [isMuted]);
+
+  const pauseVideo = useCallback((videoId: string) => {
+    const targetVideo = videoRefs.current.get(videoId);
+    if (targetVideo && !targetVideo.paused) {
+      targetVideo.pause();
+    }
+    if (playingVideoId === videoId) {
+      setPlayingVideoId(null);
+    }
+  }, [playingVideoId]);
+
+  const registerVideo = useCallback((videoId: string, video: HTMLVideoElement) => {
+    videoRefs.current.set(videoId, video);
+    video.muted = isMuted;
+    
+    // Set up event listeners
+    const handleEnded = () => {
+      const slotOneId = filteredCourses.length > 0 ? `video-${filteredCourses[0].id}` : null;
+      if (videoId !== slotOneId) {
+        // If non-slot-one video ends, resume slot one
+        if (slotOneId) {
+          playVideo(slotOneId);
+        }
+      } else {
+        // Slot one video ended, restart it
+        video.currentTime = 0;
+        video.play().catch(console.error);
+      }
+    };
+
+    video.addEventListener('ended', handleEnded);
+    
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+      videoRefs.current.delete(videoId);
+    };
+  }, [isMuted, playVideo]);
+
   
   // Calculate cards per view for Highlight Reel
   const getCardsPerView = () => {
@@ -1012,6 +1092,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             created_at: post.created_at,
             rating: null,
             videoThumbnail: videoThumbnail,
+            videoUrl: videoMedia?.media_url, // Store the actual video URL
             golf_courses: {
               ...course,
               thumbnail_image: videoThumbnail || course.thumbnail_image // Use video thumbnail as course image
@@ -1060,6 +1141,21 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   }, [allPlayedCourses, activeFilter, sortBy]);
 
   const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+
+  const getSlotOneVideoId = useCallback(() => {
+    return filteredCourses.length > 0 ? `video-${filteredCourses[0].id}` : null;
+  }, [filteredCourses]);
+
+  // Auto-play slot one video when data loads
+  useEffect(() => {
+    if (filteredCourses.length > 0 && isHydrated) {
+      const slotOneId = getSlotOneVideoId();
+      if (slotOneId) {
+        // Small delay to ensure video element is registered
+        setTimeout(() => playVideo(slotOneId), 100);
+      }
+    }
+  }, [filteredCourses, isHydrated, playVideo, getSlotOneVideoId]);
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
@@ -1173,6 +1269,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
                   };
 
+                  const isSlotOne = index === 0;
+                  const videoId = `video-${userCourse.id}`;
+                  const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
+
                   return (
                     <div 
                       key={userCourse.id} 
@@ -1184,22 +1284,72 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className="aspect-[5/4] w-full">
-                        <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
-                          showCountryWithFlag={true}
-                          showXP={true}
-                          xp={100}
-                          disableClick={true}
+                      <div className="aspect-[5/4] w-full relative group">
+                        {/* Video Element */}
+                        <video
+                          ref={(el) => {
+                            if (el) {
+                              const cleanup = registerVideo(videoId, el);
+                              return cleanup;
+                            }
+                          }}
+                          src={videoUrl}
+                          className="w-full h-full object-cover rounded-lg cursor-pointer"
+                          loop={isSlotOne}
+                          playsInline
+                          preload="metadata"
+                          muted={isMuted}
+                          onClick={() => {
+                            if (!isSlotOne) {
+                              if (playingVideoId === videoId) {
+                                pauseVideo(videoId);
+                              } else {
+                                playVideo(videoId);
+                              }
+                            }
+                          }}
                         />
+
+                        {/* Video Play Icon - Bottom Right - Hide for playing videos */}
+                        {(playingVideoId !== videoId || isSlotOne) && (
+                          <div className="absolute bottom-3 right-3 z-10 transition-opacity group-hover:opacity-80">
+                            <MdOutlinePlayCircle 
+                              className="w-8 h-8 text-white drop-shadow-lg" 
+                            />
+                          </div>
+                        )}
+
+                        {/* Mute/Unmute Button - Top Right */}
+                        <div className="absolute top-3 right-3 z-10">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleMute();
+                            }}
+                            className="h-8 w-8 p-0 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                          >
+                            {isMuted ? (
+                              <VolumeX className="h-4 w-4" />
+                            ) : (
+                              <Volume2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+
+                        {/* Course Info Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
+                          <div className="text-white">
+                            <h4 className="font-semibold text-sm line-clamp-1">
+                              {userCourse.golf_courses.name}
+                            </h4>
+                            <p className="text-xs opacity-80 line-clamp-1">
+                              {userCourse.golf_courses.region || userCourse.golf_courses.country}
+                            </p>
+                          </div>
+                        </div>
+                          disableClick={true}
                       </div>
                     </div>
                   );
