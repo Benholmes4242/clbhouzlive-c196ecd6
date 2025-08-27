@@ -9,6 +9,8 @@ import MediaDisplay from './MediaDisplay';
 import { CardType } from './media/CardMediaTypes';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
+import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
+import { PlacementConfig } from './types/PostPlacementTypes';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -154,151 +156,22 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return index % 3 === 0; // Every 3rd item is considered portrait
   };
 
-  // Create media queues
-  const createMediaQueues = () => {
-    const portraitQueue: ExploreContentItem[] = [];
-    const generalQueue: ExploreContentItem[] = [];
-    
-    content.forEach(item => {
-      if (isPortraitMedia(item)) {
-        portraitQueue.push(item);
-        generalQueue.push(item); // Portrait items can also be used in square/hero cards
-      } else {
-        generalQueue.push(item);
-      }
-    });
-    
-    return { portraitQueue, generalQueue };
+  // Configuration for post placement
+  const placementConfig: PlacementConfig = {
+    maxSections: isMobile ? 20 : 10,
+    isPortraitMedia
   };
 
-  // Create mobile layout (3 columns, section-based)
+  // Create mobile layout with deduplication (3 columns, section-based)
   const createMobileGridLayout = () => {
-    const { portraitQueue, generalQueue } = createMediaQueues();
-    const gridItems = [];
-    let portraitIndex = 0;
-    let generalIndex = 0;
-    let sectionIndex = 0;
-    let heroCount = 0; // Track hero sections for alternation
-    
-    while (generalIndex < generalQueue.length && sectionIndex < 20) { // Limit sections
-      const isHeroSection = (sectionIndex + 1) % 3 === 0; // Every 3rd section (3,6,9...)
-      
-      if (isHeroSection) {
-        // Hero section
-        const isHeroOnRight = heroCount % 2 === 0; // Alternate hero position: 0→right, 1→left, 2→right, etc.
-        
-        // Add hero card
-        if (generalIndex < generalQueue.length) {
-          gridItems.push({
-            type: 'hero',
-            item: generalQueue[generalIndex++],
-            key: `hero-${sectionIndex}-${generalQueue[generalIndex - 1]?.id}`,
-            sectionIndex,
-            isOnRight: isHeroOnRight
-          });
-        }
-        
-        // Add 2 stacked squares on opposite side
-        for (let i = 0; i < 2 && generalIndex < generalQueue.length; i++) {
-          gridItems.push({
-            type: 'square',
-            item: generalQueue[generalIndex++],
-            key: `square-hero-${sectionIndex}-${i}-${generalQueue[generalIndex - 1]?.id}`,
-            sectionIndex,
-            row: i + 1,
-            isHeroSection: true,
-            heroOnRight: isHeroOnRight
-          });
-        }
-        
-        heroCount++; // Increment hero counter for alternation
-      } else {
-        // Standard section
-        const isPortraitOnRight = sectionIndex % 2 === 0; // Alternate portrait position: 0→right, 1→left, 2→right, etc.
-        
-        // Add portrait card (spans 2 rows)
-        if (portraitIndex < portraitQueue.length) {
-          gridItems.push({
-            type: 'portrait',
-            item: portraitQueue[portraitIndex++],
-            key: `portrait-${sectionIndex}-${portraitQueue[portraitIndex - 1]?.id}`,
-            sectionIndex,
-            isOnRight: isPortraitOnRight
-          });
-        }
-        
-        // Add 4 squares (2 top row, 2 bottom row)
-        for (let row = 1; row <= 2; row++) {
-          for (let col = 0; col < 2 && generalIndex < generalQueue.length; col++) {
-            gridItems.push({
-              type: 'square',
-              item: generalQueue[generalIndex++],
-              key: `square-${sectionIndex}-${row}-${col}-${generalQueue[generalIndex - 1]?.id}`,
-              sectionIndex,
-              row,
-              col,
-              portraitOnRight: isPortraitOnRight
-            });
-          }
-        }
-      }
-      
-      sectionIndex++;
-    }
-    
-    return gridItems;
+    const result = createMobileGridLayoutWithDeduplication(content, placementConfig);
+    return result.gridItems;
   };
 
-  // Create layout with fixed grid structure - 2 rows per section (Desktop)
+  // Create layout with fixed grid structure and deduplication - 2 rows per section (Desktop)
   const createGridLayout = () => {
-    const { portraitQueue, generalQueue } = createMediaQueues();
-    const gridItems = [];
-    let portraitIndex = 0;
-    let generalIndex = 0;
-    let sectionIndex = 0;
-    
-    while (generalIndex < generalQueue.length && sectionIndex < 10) { // Limit sections to prevent infinite loop
-      const isPortraitOnRight = sectionIndex % 2 === 0; // Section 0,2,4... = right, Section 1,3,5... = left
-      
-      // Add portrait card first (spans rows 1 and 2 of this section)
-      if (portraitIndex < portraitQueue.length) {
-        gridItems.push({
-          type: 'portrait',
-          item: portraitQueue[portraitIndex++],
-          key: `portrait-${sectionIndex}-${portraitQueue[portraitIndex - 1]?.id}`,
-          sectionIndex,
-          isOnRight: isPortraitOnRight
-        });
-      }
-      
-      // Row 1: 3 squares (portrait takes up column 1 or 4)
-      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-1-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 1,
-          position: i
-        });
-      }
-      
-      // Row 2: 3 squares (portrait continues in column 1 or 4)
-      for (let i = 0; i < 3 && generalIndex < generalQueue.length; i++) {
-        gridItems.push({
-          type: 'square',
-          item: generalQueue[generalIndex++],
-          key: `square-${sectionIndex}-2-${i}-${generalQueue[generalIndex - 1]?.id}`,
-          sectionIndex,
-          row: 2,
-          position: i
-        });
-      }
-      
-      sectionIndex++;
-    }
-    
-    return gridItems;
+    const result = createDesktopGridLayoutWithDeduplication(content, placementConfig);
+    return result.gridItems;
   };
 
   const gridItems = createGridLayout();
