@@ -1101,7 +1101,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground">
-            Highlight Reel
+            Highlights From My Journey
           </h3>
           <div className="flex gap-2">
             {currentIndex > 0 && (
@@ -1184,7 +1184,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className="aspect-[4/5] w-full">
+                      <div className="aspect-[3/4] w-full">
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
