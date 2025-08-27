@@ -1,6 +1,6 @@
 
 import React from 'react';
-import ProfileSkeleton from '@/components/ui/profile-skeleton';
+import ClubhouzLoading from '@/components/ClubhouzLoading';
 
 interface UserProfileLoaderProps {
   isLoading: boolean;
@@ -11,7 +11,7 @@ const UserProfileLoader: React.FC<UserProfileLoaderProps> = ({ isLoading, profil
   console.log('UserProfileLoader - isLoading:', isLoading, 'profile:', profile);
   
   if (isLoading) {
-    return <ProfileSkeleton />;
+    return <ClubhouzLoading />;
   }
 
   if (!profile) {
