@@ -796,7 +796,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 const cards = container.querySelectorAll('[data-card]');
                 if (cards.length > 0) {
                   const cardWidth = (cards[0] as HTMLElement).offsetWidth;
-                  const gap = windowWidth >= 1200 ? 24 : windowWidth >= 1024 ? 20 : windowWidth >= 768 ? 16 : 12;
+                  const gap = 12;
                   const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
                   if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
                     setCurrentIndex(newIndex);
@@ -807,15 +807,15 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: '12px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
                   // Calculate responsive width based on exact breakpoints
                   const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(25% - 18px)'; // Desktop: 4 cards
-                    if (windowWidth >= 1024) return 'calc(33.333% - 16px)'; // Laptop: 3 cards
-                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
+                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
                     return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
                   };
 
@@ -1150,7 +1150,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                 const cards = container.querySelectorAll('[data-card]');
                 if (cards.length > 0) {
                   const cardWidth = (cards[0] as HTMLElement).offsetWidth;
-                  const gap = windowWidth >= 1200 ? 24 : windowWidth >= 1024 ? 20 : windowWidth >= 768 ? 16 : 12;
+                  const gap = 12;
                   const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
                   if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
                     setCurrentIndex(newIndex);
@@ -1161,15 +1161,15 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: '12px'
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
                   // Calculate responsive width for Highlight Reel (slightly shorter than Recently Played, but wider cards)
                   const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 16px)'; // Desktop: 3 cards
-                    if (windowWidth >= 1024) return 'calc(33.333% - 14px)'; // Laptop: 3 cards
-                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
                     return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
                   };
 
@@ -1378,7 +1378,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               <div 
                 className="flex"
                 style={{ 
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: '12px'
                 }}
               >
                 {topRatedCourses.map((userCourse, index) => {
@@ -1800,15 +1800,15 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                 className="flex transition-transform duration-300 ease-in-out"
                 style={{ 
                   transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: windowWidth >= 1200 ? '24px' : windowWidth >= 1024 ? '20px' : windowWidth >= 768 ? '16px' : '12px'
+                  gap: '12px'
                 }}
               >
                 {gbIrelandCourses.map((userCourse, index) => {
                   // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
                   const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 16px)'; // Desktop: 3 cards
-                    if (windowWidth >= 1024) return 'calc(33.333% - 14px)'; // Laptop: 3 cards
-                    if (windowWidth >= 768) return 'calc(50% - 12px)'; // Tablet: 2 cards
+                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
                     return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
                   };
 
