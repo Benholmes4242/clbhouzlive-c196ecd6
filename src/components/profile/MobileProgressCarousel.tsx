@@ -203,20 +203,20 @@ const MobileProgressCarousel: React.FC<MobileProgressCarouselProps> = ({
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Regional Lists</h3>
         
-        {/* Mobile: All 4 rings in one row with smaller gaps */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1">
+        {/* Mobile: All 4 rings in one row fitting viewport */}
+        <div className="flex gap-1 justify-between px-2">
           {regionalCards.map((region) => {
             const progress = region.total > 0 ? (region.completed / region.total) * 100 : 0;
             
             return (
-              <div key={region.id} className="flex-shrink-0 w-20 text-center">
-                <div className="space-y-2">
-                  <div className="text-lg">{region.flag}</div>
+              <div key={region.id} className="flex-1 max-w-[72px] text-center">
+                <div className="space-y-1.5">
+                  <div className="text-sm">{region.flag}</div>
                   <CircularProgress 
                     completed={region.completed}
                     total={region.total}
-                    size={60}
-                    strokeWidth={4}
+                    size={48}
+                    strokeWidth={3}
                     className="mx-auto"
                   />
                   <div className="space-y-0.5">
