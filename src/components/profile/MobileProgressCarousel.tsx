@@ -199,45 +199,37 @@ const MobileProgressCarousel: React.FC<MobileProgressCarouselProps> = ({
         </Card>
       </div>
 
-      {/* Regional Progress Carousel */}
+      {/* Regional Progress Carousel - Fitted for mobile viewport */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Regional Lists</h3>
-        <SwipeableCarousel
-          itemWidth="80%"
-          gap="16px"
-          showDots={true}
-        >
+        
+        {/* Mobile: All 4 rings in one row with smaller gaps */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1">
           {regionalCards.map((region) => {
             const progress = region.total > 0 ? (region.completed / region.total) * 100 : 0;
             
             return (
-              <Card key={region.id} className="h-full">
-                <CardContent className="p-6 text-center h-full flex flex-col justify-between">
-                  <div>
-                    <div className="text-4xl mb-3">{region.flag}</div>
-                    <h4 className="font-semibold mb-2 text-sm leading-tight">{region.name}</h4>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <CircularProgress 
-                      completed={region.completed}
-                      total={region.total}
-                      size={80}
-                      strokeWidth={6}
-                      className="mx-auto"
-                    />
-                    <div className="space-y-1">
-                      <div className="text-lg font-bold">{region.completed}/{region.total}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {Math.round(progress)}% Complete
-                      </div>
+              <div key={region.id} className="flex-shrink-0 w-20 text-center">
+                <div className="space-y-2">
+                  <div className="text-lg">{region.flag}</div>
+                  <CircularProgress 
+                    completed={region.completed}
+                    total={region.total}
+                    size={60}
+                    strokeWidth={4}
+                    className="mx-auto"
+                  />
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-bold">{region.completed}/{region.total}</div>
+                    <div className="text-xs text-muted-foreground leading-tight">
+                      {region.name.split(' ')[0]}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
-        </SwipeableCarousel>
+        </div>
       </div>
 
       {/* Achievements Feed */}

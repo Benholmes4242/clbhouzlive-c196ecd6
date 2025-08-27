@@ -832,7 +832,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className="aspect-[3/4] w-full">
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
@@ -1562,7 +1562,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/0.8]'}`}>
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
