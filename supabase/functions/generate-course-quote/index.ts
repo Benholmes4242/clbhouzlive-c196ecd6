@@ -63,20 +63,32 @@ serve(async (req) => {
     // Clean up markdown formatting and ** artifacts
     quote = quote.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
     
+    // Stop at "Additional Options:" or numbered lists
+    quote = quote.split(/Additional Options:|(?:^|\s)[1-9]\./)[0].trim();
+    
     // Extract content within quotation marks if present
     const quotedMatch = quote.match(/[""]([^"""]+)[""]/) || quote.match(/"([^"]+)"/);
     if (quotedMatch) {
       quote = quotedMatch[1].trim();
     } else {
-      // If no quotes found, take the first sentence/paragraph and stop at first period or newline
-      const firstSentence = quote.split(/[\n\r]|\.(?=\s)/)[0];
-      if (firstSentence && firstSentence.length > 10) {
-        quote = firstSentence.trim();
-        if (!quote.endsWith('.')) {
-          quote += '.';
+      // If no quotes found, take the first complete sentence
+      const sentenceMatch = quote.match(/^[^.!?]*[.!?]/);
+      if (sentenceMatch) {
+        quote = sentenceMatch[0].trim();
+      } else {
+        // Take content up to first newline or period
+        const firstPart = quote.split(/[\n\r]|\.(?=\s)/)[0];
+        if (firstPart && firstPart.length > 10) {
+          quote = firstPart.trim();
+          if (!quote.endsWith('.')) {
+            quote += '.';
+          }
         }
       }
     }
+    
+    // Remove any remaining attribution (— Author Name)
+    quote = quote.replace(/\s*—\s*.+$/, '').trim();
     
     // Final fallback
     if (!quote || quote === '' || quote.length < 5) {
