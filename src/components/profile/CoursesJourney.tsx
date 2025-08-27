@@ -1184,7 +1184,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className="aspect-[4/3] w-full">
+                      <div className="aspect-[5/4] w-full">
                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
