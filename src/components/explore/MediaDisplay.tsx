@@ -201,7 +201,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             {!hidePlayButton && (
               <div className="absolute bottom-3 right-3 z-20">
                 <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                  <Play className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" />
+                  <Play className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" fill="currentColor" />
                 </div>
               </div>
             )}

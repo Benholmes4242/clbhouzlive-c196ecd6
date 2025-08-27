@@ -35,9 +35,9 @@ export const VideoCornerControls: React.FC<VideoCornerControlsProps> = ({
         className="h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm"
       >
         {isMuted ? (
-          <VolumeX className="h-4 w-4" />
+          <VolumeX className="h-4 w-4" fill="currentColor" />
         ) : (
-          <Volume2 className="h-4 w-4" />
+          <Volume2 className="h-4 w-4" fill="currentColor" />
         )}
       </Button>
 

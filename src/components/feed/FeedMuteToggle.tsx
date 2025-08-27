@@ -34,9 +34,9 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({ isVideoPost = false }) 
       title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
     >
       {isGloballyMuted ? (
-        <VolumeX className="h-4 w-4 mr-1" />
+        <VolumeX className="h-4 w-4 mr-1" fill="currentColor" />
       ) : (
-        <Volume2 className="h-4 w-4 mr-1" />
+        <Volume2 className="h-4 w-4 mr-1" fill="currentColor" />
       )}
       {isGloballyMuted ? 'Unmute' : 'Mute'}
     </Button>

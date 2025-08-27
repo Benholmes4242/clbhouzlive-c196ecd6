@@ -120,7 +120,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
                   <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
-                    <Play className="w-3 h-3 text-white ml-0.5" />
+                    <Play className="w-3 h-3 text-white ml-0.5" fill="currentColor" />
                   </div>
                 </div>
               </div>
