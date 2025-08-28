@@ -88,8 +88,8 @@ const VideoWithAutoplay: React.FC<{
         // For Cloudflare iframe, send postMessage to play
         iframeRef.current.contentWindow?.postMessage({ method: 'play' }, '*');
         console.log('✅ VideoWithAutoplay: Cloudflare iframe play triggered:', src.slice(-20));
-      } else if (videoRef.current && videoRef.current instanceof HTMLVideoElement) {
-        // For regular videos - ensure it's actually a video element
+      } else if (videoRef.current) {
+        // For regular videos
         const video = videoRef.current;
         video.muted = isGloballyMuted;
         video.playsInline = true;
@@ -138,7 +138,7 @@ const VideoWithAutoplay: React.FC<{
 
   // Update video mute state when global mute changes
   useEffect(() => {
-    if (videoRef.current && videoRef.current instanceof HTMLVideoElement) {
+    if (videoRef.current) {
       videoRef.current.muted = isGloballyMuted;
     }
   }, [isGloballyMuted]);
