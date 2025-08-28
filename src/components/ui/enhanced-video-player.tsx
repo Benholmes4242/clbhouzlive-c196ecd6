@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import CloudflareIframePlayer, { CloudflareIframePlayerRef } from '@/components/ui/CloudflareIframePlayer';
-import { isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
+import { isCloudflareStreamUrl, blockHLSUsage, transformToIframeUrl } from '@/utils/cloudflareStreamTransform';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -15,8 +15,8 @@ interface EnhancedVideoPlayerProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
-  enableHLS?: boolean; // Enable HLS streaming
-  adaptiveBitrate?: boolean; // Enable adaptive bitrate
+  enableHLS?: boolean; // DEPRECATED - HLS is disabled, iframe-only policy
+  adaptiveBitrate?: boolean; // DEPRECATED - not applicable to iframe embeds
   preloadLevel?: 'none' | 'metadata' | 'auto';
   quality?: 'auto' | '240p' | '360p' | '480p' | '720p' | '1080p';
   hideControls?: boolean; // Hide play/pause controls
@@ -39,8 +39,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   onPlay,
   onPause,
   onClick,
-  enableHLS = false,
-  adaptiveBitrate = true,
+  enableHLS = false, // DEPRECATED - ignored
+  adaptiveBitrate = true, // DEPRECATED - ignored
   preloadLevel = 'metadata',
   quality = 'auto',
   hideControls = false,
@@ -48,12 +48,12 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<CloudflareIframePlayerRef>(null);
-  const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const { isGloballyMuted } = useGlobalAudio();
   
-  // Check if this is a Cloudflare Stream URL
-  const useIframePlayer = isCloudflareStreamUrl(src);
+  // ENFORCE IFRAME-ONLY POLICY
+  const safeSrc = transformToIframeUrl(src);
+  const useIframePlayer = isCloudflareStreamUrl(safeSrc);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,19 +112,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       return;
     }
 
-    // Clear any existing HLS instance
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
-
     // Clear any existing timeout
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
       loadingTimeoutRef.current = null;
     }
 
-    // Skip HLS initialization for Cloudflare Stream URLs - use iframe instead
+    // Skip initialization for Cloudflare Stream URLs - use iframe instead
     if (useIframePlayer) {
       setIsLoading(false);
       return;
@@ -221,7 +215,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         });
 
 
-        hlsRef.current = hls;
+        // HLS functionality removed - iframe-only policy
+        console.warn('HLS functionality disabled - use iframe embeds only');
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
         console.log('Using native HLS support');
@@ -369,12 +364,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     video.muted = muted;
   }, [muted]);
 
-  // Cleanup HLS on unmount
+  // Cleanup on unmount - HLS removed for iframe-only policy
   useEffect(() => {
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-      }
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
@@ -437,7 +429,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       >
         <CloudflareIframePlayer
           ref={iframeRef}
-          src={src}
+          src={safeSrc}
           className="w-full h-full"
           autoplay={autoplay}
           muted={muted}
@@ -503,7 +495,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         autoPlay={autoplay}
         playsInline
         preload="metadata"
-        src={src}
+        src={safeSrc}
         className={`w-full h-full ${
           objectFit === 'smart' 
             ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')
