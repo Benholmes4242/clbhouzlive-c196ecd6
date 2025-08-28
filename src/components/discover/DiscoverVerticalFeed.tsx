@@ -418,7 +418,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black overflow-hidden">
+    <div className="fixed inset-0 z-[70] bg-black overflow-hidden">
       {/* Scrollable Content */}
       <div 
         ref={scrollViewRef}
