@@ -16,8 +16,16 @@ export const SecurityHeaders = () => {
     };
 
     // Apply Content Security Policy
-    setMetaTag('http-equiv', 'Content-Security-Policy');
-    setMetaTag('content', RECOMMENDED_CSP);
+    const setCSPMeta = () => {
+      let meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('http-equiv', 'Content-Security-Policy');
+        document.head.appendChild(meta);
+      }
+      meta.content = RECOMMENDED_CSP;
+    };
+    setCSPMeta();
     
     // Referrer Policy
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
