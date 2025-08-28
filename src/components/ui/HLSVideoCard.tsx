@@ -44,6 +44,14 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Sync internal muted state with prop changes
+  useEffect(() => {
+    setIsMuted(muted);
+    if (videoRef.current) {
+      videoRef.current.muted = muted;
+    }
+  }, [muted]);
+
   // Expose video element to parent
   useImperativeHandle(ref, () => videoRef.current, []);
 

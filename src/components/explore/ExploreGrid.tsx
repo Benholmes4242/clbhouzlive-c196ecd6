@@ -190,28 +190,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
-              <MediaDisplay
-                media={{
-                  id: item.id,
-                  media_type: item.type as 'video' | 'image',
-                  media_url: item.src
-                }}
-                itemTitle={item.title}
-                shouldAutoplay={true}
-                isLoading={itemLoadingStates[item.id] ?? true}
-                onImageError={() => {
-                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                }}
-                onImageLoad={() => {
-                  setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
-                }}
-                itemId={item.id}
-                currentIndex={index}
-                loop={true}
-                cardType={CardType.PORTRAIT}
-                useSmartMedia={true}
-                onMediaClick={() => onMediaClick?.(item)}
-              />
+          <MediaDisplay
+            media={{
+              id: item.id,
+              media_type: item.type as 'video' | 'image',
+              media_url: item.src
+            }}
+            itemTitle={item.title}
+            shouldAutoplay={true}
+            isLoading={itemLoadingStates[item.id] ?? true}
+            onImageError={() => {
+              setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+            }}
+            onImageLoad={() => {
+              setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+            }}
+            itemId={item.id}
+            currentIndex={index}
+            loop={true}
+            cardType={CardType.PORTRAIT}
+            useSmartMedia={true}
+            onMediaClick={() => onMediaClick?.(item)}
+          />
               
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
