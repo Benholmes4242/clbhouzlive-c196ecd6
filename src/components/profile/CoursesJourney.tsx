@@ -1557,7 +1557,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                           hideRankingBadges={true}
-                          showAIQuote={true}
+                          showCountryWithFlag={true}
                         />
                       </div>
                     </div>
