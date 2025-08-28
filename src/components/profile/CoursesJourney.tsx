@@ -488,10 +488,6 @@ const getCourseRanking = (course: any) => {
 
 // Custom sorting function for user courses with different sort options
 const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
-  console.log('Sorting user courses in RecentlyPlayed:', userCourses.map(c => ({ 
-    name: c.golf_courses?.name, 
-    rating: c.rating 
-  })));
   
   const sortedCourses = userCourses.sort((a, b) => {
     switch (sortBy) {
@@ -539,10 +535,6 @@ const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
     }
   });
   
-  console.log('Final sorted order in RecentlyPlayed:', sortedCourses.map(c => ({ 
-    name: c.golf_courses?.name, 
-    rating: c.rating 
-  })));
   
   return sortedCourses;
 };
