@@ -217,13 +217,16 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         hls.attachMedia(video);
         
         // 🐛 DEBUG: Check video element state after HLS attachment
-        console.log('🔍 Video element state after HLS attachment:', {
-          videoSrc: video.src,
-          videoCurrentSrc: video.currentSrc,
-          readyState: video.readyState,
-          networkState: video.networkState,
-          hasAttribute_src: video.hasAttribute('src')
-        });
+        setTimeout(() => {
+          console.log('🔍 Video element state after HLS attachment:', {
+            videoSrc: video.src,
+            videoCurrentSrc: video.currentSrc,
+            readyState: video.readyState,
+            networkState: video.networkState,
+            hasAttribute_src: video.hasAttribute('src'),
+            hlsAttached: hls.media === video
+          });
+        }, 100);
         
         // Add timeout for manifest loading
         const manifestTimeout = setTimeout(() => {
@@ -240,13 +243,32 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           }
           setIsLoading(false);
           
-          console.log('📊 Video ready state:', {
-            readyState: video.readyState,
-            networkState: video.networkState,
-            duration: video.duration,
-            videoWidth: video.videoWidth,
-            videoHeight: video.videoHeight
-          });
+          // Wait a bit and check if media data is actually loading
+          setTimeout(() => {
+            console.log('📊 Video ready state after manifest parse:', {
+              readyState: video.readyState,
+              networkState: video.networkState,
+              duration: video.duration,
+              videoWidth: video.videoWidth,
+              videoHeight: video.videoHeight,
+              currentSrc: video.currentSrc,
+              hlsAttached: hls.media === video
+            });
+            
+            // If still no media data after 2 seconds, try fallback
+            if (video.readyState === 0 && video.networkState === 3) {
+              console.warn('🚨 HLS attached but no media data loading, trying fallback');
+              // Try to reattach HLS
+              try {
+                hls.detachMedia();
+                setTimeout(() => {
+                  hls.attachMedia(video);
+                }, 100);
+              } catch (err) {
+                console.error('❌ Failed to reattach HLS:', err);
+              }
+            }
+          }, 2000);
           
           if (autoplay) {
             console.log('▶️ Attempting autoplay');
