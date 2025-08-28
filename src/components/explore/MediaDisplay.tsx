@@ -51,6 +51,24 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   onMediaClick,
   showFeaturedBadge = true
 }) => {
+  // 🐛 DEBUG: Log MediaDisplay props and media object
+  console.log('📺 MediaDisplay Props:', {
+    mediaType: media.media_type,
+    mediaUrl: media.media_url,
+    itemTitle,
+    shouldAutoplay,
+    isLoading,
+    itemId,
+    currentIndex,
+    loop,
+    muted,
+    hidePlayButton,
+    cardType,
+    useSmartMedia,
+    hasOnMediaClick: !!onMediaClick,
+    showFeaturedBadge
+  });
+
   // Generate thumbnail URL for Cloudflare Stream videos - keep this function always available
   const getVideoThumbnail = (videoUrl: string) => {
     if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {

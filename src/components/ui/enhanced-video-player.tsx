@@ -44,6 +44,24 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   hideControls = false,
   objectFit = 'cover'
 }, ref) => {
+  // 🐛 DEBUG: Log all props received by video player
+  console.log('🎥 EnhancedVideoPlayer Props:', {
+    src,
+    poster,
+    autoplay,
+    muted,
+    loop,
+    className,
+    enableHLS,
+    adaptiveBitrate,
+    preloadLevel,
+    quality,
+    hideControls,
+    objectFit,
+    hasOnPlay: !!onPlay,
+    hasOnPause: !!onPause,
+    hasOnClick: !!onClick
+  });
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -68,44 +86,62 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
 
   // Mobile lazy loading logic - more aggressive for autoplay videos
   useEffect(() => {
+    console.log('🔄 shouldLoadVideo effect:', { autoplay, isMobile, isInView, shouldLoadVideo, src });
+    
     if (autoplay) {
       // For autoplay videos, load immediately regardless of mobile
+      console.log('📱 Setting shouldLoadVideo=true (autoplay)');
       setShouldLoadVideo(true);
     } else if (isMobile) {
       // On mobile, only load when actually in view for non-autoplay videos
       if (isInView && !shouldLoadVideo) {
+        console.log('📱 Setting shouldLoadVideo=true (mobile + in view)');
         setShouldLoadVideo(true);
       }
     } else {
       // On desktop, load immediately
+      console.log('🖥️ Setting shouldLoadVideo=true (desktop)');
       setShouldLoadVideo(true);
     }
   }, [isInView, isMobile, shouldLoadVideo, src, autoplay]);
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
-    if (!shouldLoadVideo) return;
+    console.log('🚀 HLS loading effect:', { shouldLoadVideo, enableHLS, hasHls: !!window.Hls });
+    
+    if (!shouldLoadVideo) {
+      console.log('⏸️ Skipping video load - shouldLoadVideo is false');
+      return;
+    }
     
     if (enableHLS && !window.Hls) {
+      console.log('📦 Loading HLS.js script...');
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-      script.onload = () => initializeVideo();
+      script.onload = () => {
+        console.log('✅ HLS.js loaded successfully');
+        initializeVideo();
+      };
       script.onerror = (error) => {
         console.error('❌ Failed to load HLS.js:', error);
         setError('Failed to load video player');
       };
       document.head.appendChild(script);
     } else {
+      console.log('🎬 Initializing video directly');
       initializeVideo();
     }
   }, [shouldLoadVideo, enableHLS]);
   
   const initializeVideo = () => {
+    console.log('🎬 initializeVideo called');
     const video = videoRef.current;
     if (!video) {
+      console.log('❌ No video ref found');
       return;
     }
 
+    console.log('🧹 Clearing existing instances');
     // Clear any existing HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
@@ -123,17 +159,36 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     const isM3U8 = src.includes('.m3u8');
     const isSupabaseStorage = src.includes('supabase.co/storage');
     
+    console.log('🔍 Video URL Analysis:', { 
+      src, 
+      isCloudflareStream, 
+      isM3U8, 
+      enableHLS, 
+      isSupabaseStorage,
+      videoElement: {
+        readyState: video.readyState,
+        networkState: video.networkState,
+        currentSrc: video.currentSrc
+      }
+    });
+    
     // Handle incomplete URLs (like '/manifest/video.m3u8')
     if (src.startsWith('/manifest/video.m3u8')) {
+      console.log('❌ Invalid video URL detected');
       setError('Invalid video URL - video not found');
       setIsLoading(false);
       return;
     }
     
-    console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS, isSupabaseStorage });
-    
     if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
+      console.log('🎯 Using HLS playback');
       if (window.Hls && window.Hls.isSupported()) {
+        console.log('✅ HLS.js is supported, creating instance');
+        
+        // 🐛 CRITICAL FIX: Clear video src before HLS takes control
+        video.removeAttribute('src');
+        video.load(); // Reset video element
+        
         const hls = new window.Hls({
           enableWorker: true,
           lowLatencyMode: true,
@@ -156,8 +211,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           abrBandWidthUpFactor: 0.7,
         });
 
-        console.log('Loading HLS source:', src);
+        console.log('📥 Loading HLS source:', src);
         hls.loadSource(src);
+        console.log('🔗 Attaching HLS to video element');
         hls.attachMedia(video);
         
         // Add timeout for manifest loading
@@ -168,14 +224,26 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         }, 10000);
         
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+          console.log('🎉 HLS manifest parsed successfully for:', src);
           clearTimeout(manifestTimeout);
           if (loadingTimeoutRef.current) {
             clearTimeout(loadingTimeoutRef.current);
           }
           setIsLoading(false);
-          console.log('HLS manifest parsed successfully for:', src);
+          
+          console.log('📊 Video ready state:', {
+            readyState: video.readyState,
+            networkState: video.networkState,
+            duration: video.duration,
+            videoWidth: video.videoWidth,
+            videoHeight: video.videoHeight
+          });
+          
           if (autoplay) {
-            video.play().catch(console.error);
+            console.log('▶️ Attempting autoplay');
+            video.play().catch((err) => {
+              console.log('❌ Autoplay failed:', err);
+            });
           }
         });
 
@@ -212,14 +280,14 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         hlsRef.current = hls;
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
-        console.log('Using native HLS support');
+        console.log('🍎 Using native HLS support (Safari)');
         video.src = src;
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
         }
         setIsLoading(false);
       } else {
-        console.log('HLS not supported or Supabase storage video, using direct video');
+        console.log('⚠️ HLS not supported, falling back to direct video');
         video.src = src;
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
@@ -228,7 +296,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       }
     } else {
       // Standard video or Supabase storage video
-      console.log('Using standard video playback for:', src);
+      console.log('📼 Using standard video playback for:', src);
       video.src = src;
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
@@ -243,11 +311,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     if (!video) return;
 
     const handlePlay = () => {
+      console.log('▶️ Video play event');
       setIsPlaying(true);
       onPlay?.();
     };
 
     const handlePause = () => {
+      console.log('⏸️ Video pause event');
       setIsPlaying(false);
       onPause?.();
     };
@@ -257,6 +327,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       // Only show for initial load
     };
     const handleCanPlay = () => {
+      console.log('✅ Video can play event');
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
@@ -451,7 +522,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         autoPlay={autoplay}
         playsInline
         preload="metadata"
-        src={src}
         className={`w-full h-full ${
           objectFit === 'smart' 
             ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')

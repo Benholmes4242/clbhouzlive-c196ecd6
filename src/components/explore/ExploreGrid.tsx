@@ -200,9 +200,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 shouldAutoplay={true}
                 isLoading={itemLoadingStates[item.id] ?? true}
                 onImageError={() => {
+                  // 🐛 DEBUG: Image error for item
+                  console.log('🖼️ Image error for item:', { id: item.id, src: item.src, type: item.type });
                   setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
                 }}
                 onImageLoad={() => {
+                  // 🐛 DEBUG: Image loaded for item
+                  console.log('🖼️ Image loaded for item:', { id: item.id, src: item.src, type: item.type });
                   setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
                 }}
                 itemId={item.id}
