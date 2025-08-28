@@ -1579,6 +1579,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                             customHeight="h-full"
                             hideRankingBadges={false}
                             showAIQuote={false}
+                            showRatingOnRight={true}
                           />
                        </div>
                     </div>
