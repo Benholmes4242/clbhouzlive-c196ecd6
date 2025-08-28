@@ -816,7 +816,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
                         {/* Mobile scaling wrapper for Recently Played cards */}
-                        <div className={windowWidth < 768 ? 'transform scale-[0.85] origin-center w-full h-full' : ''}>
+                        <div className={windowWidth < 768 ? 'scale-75 origin-center' : ''}>
                           <CourseCard 
                             course={userCourse.golf_courses}
                             viewingUserId={userId}
