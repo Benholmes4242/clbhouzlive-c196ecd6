@@ -40,8 +40,8 @@ const CourseRankBadges = ({
   // Create array of ranking badges to display
   const rankingBadges = [];
 
-  // Add worldwide ranking first (highest priority)
-  if (globalRank && globalRank <= 100) {
+  // Add worldwide ranking first (highest priority) - for Top 10 Rated cards, show even if over 100
+  if (globalRank && (positioning === 'bottom-left' || globalRank <= 100)) {
     rankingBadges.push({
       rank: globalRank,
       icon: <Earth className="h-5 w-5 text-white" />,
@@ -49,20 +49,20 @@ const CourseRankBadges = ({
     });
   }
 
-  // Add regional ranking second
-  if (isGBI && regionalRank && regionalRank <= 100) {
+  // Add regional ranking second - for Top 10 Rated cards, show even if over 100
+  if (isGBI && regionalRank && (positioning === 'bottom-left' || regionalRank <= 100)) {
     rankingBadges.push({
       rank: regionalRank,
       icon: <CountryFlag country="Britain & Ireland" size="md" />,
       tooltip: "GB&I Ranking"
     });
-  } else if (isUSA && usaRank && usaRank <= 100) {
+  } else if (isUSA && usaRank && (positioning === 'bottom-left' || usaRank <= 100)) {
     rankingBadges.push({
       rank: usaRank,
       icon: <CountryFlag country="USA" size="md" />,
       tooltip: "USA Ranking"
     });
-  } else if (isEurope && regionalRank && regionalRank <= 100) {
+  } else if (isEurope && regionalRank && (positioning === 'bottom-left' || regionalRank <= 100)) {
     rankingBadges.push({
       rank: regionalRank,
       icon: <CountryFlag country="Continental Europe" size="md" />,
