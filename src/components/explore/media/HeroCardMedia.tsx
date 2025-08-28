@@ -2,10 +2,11 @@ import React, { memo, useRef } from 'react';
 import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -26,6 +27,11 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
+  
+  // Generate HLS URL from media URL
+  const uid = uidFromNode(media);
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
@@ -62,16 +68,17 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
       onClick={onMediaClick}
     >
-      {/* Only render video if we have a valid URL */}
-      {media.media_url && (media.media_url.startsWith('http') || media.media_url.startsWith('/')) ? (
-        <FeedVideoPlayer
-          ref={videoRef}
-          src={media.media_url}
-          className="w-full h-full object-cover"
+      {/* Only render video if we have a valid HLS URL */}
+      {hlsUrl ? (
+        <HLSVideoCard
+          hlsUrl={hlsUrl}
+          poster={poster}
+          className="w-full h-full"
+          aspectRatio="auto"
           muted={videoIsMuted}
           loop={true}
-          playsInline={true}
-          preload="auto" // Higher preload for hero cards
+          autoplay={shouldAutoplay}
+          showMuteButton={false}
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">

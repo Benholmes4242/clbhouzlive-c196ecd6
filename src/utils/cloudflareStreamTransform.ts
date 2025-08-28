@@ -1,11 +1,10 @@
-// UNIVERSAL CLOUDFLARE STREAM EMBED TRANSFORM
-// Transforms video objects to include embed_url for iframe playback
+// CLOUDFLARE STREAM → HLS TRANSFORM
+// Transforms video objects to include hls_url, poster, uid for every video object
 
-const IFRAME_BASE = 'https://iframe.videodelivery.net/';
 const UID_RE = /([0-9a-f]{32})/i;
 
 // Extract Cloudflare Stream UID from various possible fields or URLs
-function uidFromNode(obj: any): string | null {
+export function uidFromNode(obj: any): string | null {
   if (!obj || typeof obj !== 'object') return null;
 
   // Common Cloudflare Stream keys
@@ -37,9 +36,19 @@ function visit(node: any): any {
 
   if (node && typeof node === 'object') {
     const uid = uidFromNode(node);
-    if (uid && !node.embed_url) {
-      node.embed_url = `${IFRAME_BASE}${uid}`;
-      node.iframe_src = node.embed_url; // convenience alias
+    if (uid) {
+      node.uid = uid;
+      // Try common locations for HLS + poster; keep existing if already present
+      node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
+                    `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
+                   `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+      
+      // Keep embed_url for backward compatibility
+      if (!node.embed_url) {
+        node.embed_url = `https://iframe.videodelivery.net/${uid}`;
+        node.iframe_src = node.embed_url; // convenience alias
+      }
     }
     
     // Recursively transform nested objects
@@ -55,7 +64,7 @@ function visit(node: any): any {
   return node;
 }
 
-// Main transform function
+// Main transform function - now adds HLS data instead of just embed URLs
 export function transformCloudflareStreamData(data: any): any {
   return visit(data);
 }
@@ -77,8 +86,13 @@ export function extractVideoId(url: string): string | null {
 
 // Helper to generate embed URL from video ID
 export function generateEmbedUrl(videoId: string, token?: string): string {
-  const baseUrl = `${IFRAME_BASE}${videoId}`;
+  const baseUrl = `https://iframe.videodelivery.net/${videoId}`;
   return token ? `${baseUrl}?token=${token}` : baseUrl;
+}
+
+// Helper to generate HLS URL from video ID
+export function generateHlsUrl(videoId: string): string {
+  return `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
 }
 
 // Helper to generate thumbnail URL from video ID
@@ -88,5 +102,5 @@ export function generateThumbnailUrl(videoId: string, options: {
   time?: number;
 } = {}): string {
   const { width = 1280, height = 720, time = 1 } = options;
-  return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
+  return `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
 }

@@ -1,9 +1,11 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import CloudflareIframePlayer, { CloudflareIframePlayerRef } from '@/components/ui/CloudflareIframePlayer';
-import { isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { isCloudflareStreamUrl, uidFromNode } from '@/utils/cloudflareStreamTransform';
 
 interface FeedVideoPlayerProps {
   src: string;
+  hlsUrl?: string;
+  poster?: string;
   className?: string;
   muted?: boolean;
   loop?: boolean;
@@ -27,6 +29,8 @@ export interface FeedVideoPlayerRef {
 
 const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   src,
+  hlsUrl: propHlsUrl,
+  poster: propPoster,
   className = '',
   muted = true,
   loop = false,
@@ -34,25 +38,17 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   preload = 'metadata',
   onClick
 }, ref) => {
-  const iframeRef = useRef<CloudflareIframePlayerRef>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Generate HLS URL and poster if not provided
+  const uid = uidFromNode({ src, hls_url: propHlsUrl });
+  const hlsUrl = propHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
+  const poster = propPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
   // Expose unified ref interface to parent
   useImperativeHandle(ref, () => {
-    if (isCloudflareStreamUrl(src) && iframeRef.current) {
-      const iframe = iframeRef.current;
-      return {
-        play: () => iframe.play(),
-        pause: () => iframe.pause(),
-        element: iframe.iframe,
-        get currentTime() { return 0; }, // Async, would need proper implementation
-        get duration() { return 0; },
-        get paused() { return false; },
-        get muted() { return true; },
-        get volume() { return 0; }
-      };
-    } else if (videoRef.current) {
-      const video = videoRef.current;
+    const video = videoRef.current;
+    if (video) {
       return {
         play: () => video.play(),
         pause: () => video.pause(),
@@ -65,11 +61,11 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
       };
     }
     return {};
-  }, [src]);
+  }, []);
 
   // Validate video source
-  if (!src || typeof src !== 'string' || src.trim() === '') {
-    console.error('FeedVideoPlayer - Invalid video source:', src);
+  if (!hlsUrl || typeof hlsUrl !== 'string' || hlsUrl.trim() === '') {
+    console.error('FeedVideoPlayer - Invalid HLS source:', { src, hlsUrl });
     return (
       <div className={`${className} bg-muted flex items-center justify-center`}>
         <p className="text-muted-foreground text-sm">Invalid video source</p>
@@ -77,39 +73,17 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // Use Cloudflare iframe for Stream URLs
-  if (isCloudflareStreamUrl(src)) {
-    return (
-      <CloudflareIframePlayer
-        ref={iframeRef}
-        src={src}
-        className={className}
-        autoplay={false} // Control autoplay externally
-        muted={muted}
-        loop={loop}
-        onClick={onClick}
-        onError={() => {
-          console.error('FeedVideoPlayer - Cloudflare iframe error:', src);
-        }}
-      />
-    );
-  }
-
-  // Fallback to regular video element for non-Cloudflare URLs
+  // Use HLS Video Card for all videos
   return (
-    <video
-      ref={videoRef}
-      src={src}
+    <HLSVideoCard
+      hlsUrl={hlsUrl}
+      poster={poster}
       className={className}
       muted={muted}
       loop={loop}
-      playsInline={playsInline}
-      preload={preload}
-      crossOrigin="anonymous"
+      autoplay={false} // Control autoplay externally
+      showMuteButton={false} // Let parent handle mute controls
       onClick={onClick}
-      onError={(e) => {
-        console.error('FeedVideoPlayer - Video error:', e, 'Source:', src);
-      }}
     />
   );
 });

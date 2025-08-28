@@ -10,7 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
@@ -48,131 +49,27 @@ const VideoWithAutoplay: React.FC<{
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
   // Check if this is a Cloudflare Stream URL
-  const isCloudflareStream = src.includes('cloudflarestream.com') || src.includes('videodelivery.net');
-  const videoId = isCloudflareStream ? src.match(/([0-9a-f]{32})/i)?.[1] : null;
-
-  // Use intersection observer with proper typing
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const newIsInView = entry.isIntersecting && entry.intersectionRatio >= 0.8;
-        setIsInView(newIsInView);
-        
-        // Reset hasAttemptedPlay when video goes out of view
-        if (!newIsInView) {
-          setHasAttemptedPlay(false);
-        }
-      },
-      {
-        threshold: 0.8,
-        rootMargin: '0px'
-      }
-    );
-
-    const currentRef = intersectionRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
-
-  // Register video with manager when component mounts
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        removeVideo(videoRef.current);
-      }
-    };
-  }, [removeVideo]);
-
-  // Combined ref callback
-  const combinedRef = useCallback((node: HTMLVideoElement | HTMLIFrameElement | null) => {
-    if (videoRef.current) {
-      removeVideo(videoRef.current);
-    }
-    
-    if (node instanceof HTMLVideoElement) {
-      videoRef.current = node;
-      intersectionRef.current = node;
-      if (node) {
-        addVideo(node);
-      }
-    } else if (node instanceof HTMLIFrameElement) {
-      iframeRef.current = node;
-      intersectionRef.current = node;
-    }
-  }, [addVideo, removeVideo]);
-
-  useEffect(() => {
-    if (!isInView || hasAttemptedPlay) return;
-
-    const attemptPlay = async () => {
-      try {
-        setHasAttemptedPlay(true);
-        
-        if (isCloudflareStream && iframeRef.current) {
-          // For Cloudflare iframe, send postMessage to play
-          iframeRef.current.contentWindow?.postMessage({ method: 'play' }, '*');
-          console.log('✅ VideoWithAutoplay: Cloudflare iframe play triggered');
-        } else if (videoRef.current) {
-          // For regular videos
-          const video = videoRef.current;
-          setActiveVideo(video);
-          video.muted = isGloballyMuted;
-          video.currentTime = 0;
-          await video.play();
-          console.log('✅ VideoWithAutoplay: Video autoplay successful');
-        }
-      } catch (error) {
-        console.warn('Video autoplay failed:', error);
-      }
-    };
-
-    // Delay to ensure proper intersection detection
-    const timer = setTimeout(attemptPlay, 100);
-    return () => clearTimeout(timer);
-  }, [isInView, hasAttemptedPlay, isGloballyMuted, setActiveVideo, isCloudflareStream]);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = muted;
-    }
-  }, [muted]);
-
-  // Reset hasAttemptedPlay when src changes
-  useEffect(() => {
-    setHasAttemptedPlay(false);
-  }, [src]);
+  const uid = uidFromNode({ src });
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
-      {isCloudflareStream && videoId ? (
-        <iframe
-          ref={combinedRef as any}
-          src={`https://iframe.videodelivery.net/${videoId}?autoplay=true&muted=${isGloballyMuted}&loop=true&controls=false`}
-          className="w-full h-full border-none"
-          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-          allowFullScreen
-          style={{ border: 'none' }}
-        />
-      ) : (
-        <EnhancedVideoPlayer
-          ref={combinedRef as any}
-          src={src}
-          autoplay={false}
+      {hlsUrl ? (
+        <HLSVideoCard
+          hlsUrl={hlsUrl}
+          poster={poster}
+          className="w-full h-full"
+          aspectRatio="auto"
           muted={muted}
           loop={true}
-          className="w-full h-full"
-          enableHLS={false}
-          preloadLevel="metadata"
-          poster=""
-          objectFit={objectFit}
+          autoplay={true}
+          showMuteButton={false}
         />
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Invalid video source</span>
+        </div>
       )}
     </div>
   );
