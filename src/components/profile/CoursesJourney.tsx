@@ -281,28 +281,20 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
             })}
           </div>
 
-          {/* Mobile: Swipeable carousel */}
+          {/* Mobile: Grid layout (same as desktop) */}
           <div className="md:hidden">
-            <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-4 px-0"
-                 style={{
-                   scrollbarWidth: 'none',
-                   msOverflowStyle: 'none',
-                   WebkitOverflowScrolling: 'touch',
-                   scrollSnapType: 'x mandatory'
-                 }}>
+            <div className="grid grid-cols-2 gap-4 px-4">
               {achievementRings.map((achievement, index) => {
                 const progress = getProgressData(achievement.region);
-                const isLast = index === achievementRings.length - 1;
                 const animationDelay = index * 0.15;
                 const completedAngle = (progress.percentage / 100) * 283;
                 
                 return (
                   <div 
                     key={achievement.id} 
-                    className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-0' : ''}`}
-                    style={{ scrollSnapAlign: 'start', minWidth: '24vw' }}
+                    className="flex flex-col items-center cursor-pointer"
                   >
-                    <div className="w-28 h-28 relative transition-all duration-300">
+                    <div className="w-32 h-32 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
@@ -316,7 +308,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <stop offset="100%" stopColor={achievement.color} stopOpacity="0.04" />
                           </linearGradient>
                         </defs>
-                        
                         
                         {/* Remaining portion (full ring) */}
                         <circle
@@ -441,17 +432,14 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     </div>
                     
                      {/* Achievement info */}
-                     <div className="mt-1 text-center max-w-[80px]">
-                       <div className="text-xs text-foreground leading-tight">
+                     <div className="mt-2 text-center">
+                       <div className="text-sm text-foreground leading-tight">
                          {achievement.title}
                        </div>
                      </div>
                   </div>
                 );
               })}
-              
-              {/* Peek indicator for mobile */}
-              <div className="flex-shrink-0 w-4"></div>
             </div>
           </div>
         </div>
