@@ -2016,6 +2016,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                           showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
+                          hideRankingBadges={true}
                         />
                       </div>
                     </div>
@@ -2401,6 +2402,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                           showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
+                          hideRankingBadges={true}
                         />
                       </div>
                     </div>
@@ -2785,6 +2787,7 @@ const USASection: React.FC<USASectionProps> = ({
                           showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
+                          hideRankingBadges={true}
                         />
                       </div>
                     </div>
@@ -3169,6 +3172,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                           showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
+                          hideRankingBadges={true}
                         />
                       </div>
                     </div>
