@@ -15,18 +15,7 @@ export const SecurityHeaders = () => {
       meta.content = content;
     };
 
-    // Apply Content Security Policy
-    const setCSPMeta = () => {
-      let meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('http-equiv', 'Content-Security-Policy');
-        document.head.appendChild(meta);
-      }
-      meta.content = RECOMMENDED_CSP;
-    };
-    setCSPMeta();
-    
+    // CSP removed to allow video playback
     // Referrer Policy
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
     
