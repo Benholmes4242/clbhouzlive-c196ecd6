@@ -84,26 +84,11 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     rootMargin: autoplay ? '200px' : (isMobile ? '0px' : '100px') // Larger margin for autoplay videos
   });
 
-  // Mobile lazy loading logic - more aggressive for autoplay videos
+  // FORCE IMMEDIATE LOADING - bypass all lazy loading logic
   useEffect(() => {
-    console.log('🔄 shouldLoadVideo effect:', { autoplay, isMobile, isInView, shouldLoadVideo, src });
-    
-    if (autoplay) {
-      // For autoplay videos, load immediately regardless of mobile
-      console.log('📱 Setting shouldLoadVideo=true (autoplay)');
-      setShouldLoadVideo(true);
-    } else if (isMobile) {
-      // On mobile, only load when actually in view for non-autoplay videos
-      if (isInView && !shouldLoadVideo) {
-        console.log('📱 Setting shouldLoadVideo=true (mobile + in view)');
-        setShouldLoadVideo(true);
-      }
-    } else {
-      // On desktop, load immediately
-      console.log('🖥️ Setting shouldLoadVideo=true (desktop)');
-      setShouldLoadVideo(true);
-    }
-  }, [isInView, isMobile, shouldLoadVideo, src, autoplay]);
+    console.log('🚨 FORCE LOADING - Setting shouldLoadVideo=true immediately');
+    setShouldLoadVideo(true);
+  }, [src]);
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
@@ -133,7 +118,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     }
   }, [shouldLoadVideo, enableHLS]);
   
-  const initializeVideo = () => {
+  const initializeVideo = async () => {
     console.log('🎬 initializeVideo called');
     const video = videoRef.current;
     if (!video) {
@@ -185,9 +170,45 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       if (window.Hls && window.Hls.isSupported()) {
         console.log('✅ HLS.js is supported, creating instance');
         
-        // 🐛 CRITICAL FIX: Clear video src before HLS takes control
+        // 🐛 CRITICAL FIX: Completely reset video element
+        console.log('🧹 Aggressively clearing video element');
+        
+        // Debug BEFORE clearing
+        console.log('📊 BEFORE clear - Video state:', {
+          src: video.src,
+          currentSrc: video.currentSrc,
+          readyState: video.readyState,
+          networkState: video.networkState,
+          hasAttribute_src: video.hasAttribute('src')
+        });
+        
+        // Remove all source-related attributes
         video.removeAttribute('src');
-        video.load(); // Reset video element
+        video.src = '';
+        
+        // Force element reset
+        video.load();
+        
+        // Debug AFTER clearing but before wait
+        console.log('📊 AFTER clear - Video state:', {
+          src: video.src,
+          currentSrc: video.currentSrc,
+          readyState: video.readyState,
+          networkState: video.networkState,
+          hasAttribute_src: video.hasAttribute('src')
+        });
+        
+        // Wait for reset to complete
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Debug AFTER wait
+        console.log('📊 AFTER wait - Video state:', {
+          src: video.src,
+          currentSrc: video.currentSrc,
+          readyState: video.readyState,
+          networkState: video.networkState,
+          hasAttribute_src: video.hasAttribute('src')
+        });
         
         const hls = new window.Hls({
           enableWorker: true,
