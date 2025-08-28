@@ -15,7 +15,10 @@ export const SecurityHeaders = () => {
       meta.content = content;
     };
 
-    // CSP removed to allow video playback
+    // Apply Content Security Policy
+    setMetaTag('http-equiv', 'Content-Security-Policy');
+    setMetaTag('content', RECOMMENDED_CSP);
+    
     // Referrer Policy
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
     

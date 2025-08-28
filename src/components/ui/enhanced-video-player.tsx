@@ -44,24 +44,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   hideControls = false,
   objectFit = 'cover'
 }, ref) => {
-  // 🐛 DEBUG: Log all props received by video player
-  console.log('🎥 EnhancedVideoPlayer Props:', {
-    src,
-    poster,
-    autoplay,
-    muted,
-    loop,
-    className,
-    enableHLS,
-    adaptiveBitrate,
-    preloadLevel,
-    quality,
-    hideControls,
-    objectFit,
-    hasOnPlay: !!onPlay,
-    hasOnPause: !!onPause,
-    hasOnClick: !!onClick
-  });
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -84,49 +66,46 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     rootMargin: autoplay ? '200px' : (isMobile ? '0px' : '100px') // Larger margin for autoplay videos
   });
 
-  // FORCE IMMEDIATE LOADING - bypass all lazy loading logic
+  // Mobile lazy loading logic - more aggressive for autoplay videos
   useEffect(() => {
-    console.log('🚨 FORCE LOADING - Setting shouldLoadVideo=true immediately');
-    setShouldLoadVideo(true);
-  }, [src]);
+    if (autoplay) {
+      // For autoplay videos, load immediately regardless of mobile
+      setShouldLoadVideo(true);
+    } else if (isMobile) {
+      // On mobile, only load when actually in view for non-autoplay videos
+      if (isInView && !shouldLoadVideo) {
+        setShouldLoadVideo(true);
+      }
+    } else {
+      // On desktop, load immediately
+      setShouldLoadVideo(true);
+    }
+  }, [isInView, isMobile, shouldLoadVideo, src, autoplay]);
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
-    console.log('🚀 HLS loading effect:', { shouldLoadVideo, enableHLS, hasHls: !!window.Hls });
-    
-    if (!shouldLoadVideo) {
-      console.log('⏸️ Skipping video load - shouldLoadVideo is false');
-      return;
-    }
+    if (!shouldLoadVideo) return;
     
     if (enableHLS && !window.Hls) {
-      console.log('📦 Loading HLS.js script...');
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-      script.onload = () => {
-        console.log('✅ HLS.js loaded successfully');
-        initializeVideo();
-      };
+      script.onload = () => initializeVideo();
       script.onerror = (error) => {
         console.error('❌ Failed to load HLS.js:', error);
         setError('Failed to load video player');
       };
       document.head.appendChild(script);
     } else {
-      console.log('🎬 Initializing video directly');
       initializeVideo();
     }
   }, [shouldLoadVideo, enableHLS]);
   
-  const initializeVideo = async () => {
-    console.log('🎬 initializeVideo called');
+  const initializeVideo = () => {
     const video = videoRef.current;
     if (!video) {
-      console.log('❌ No video ref found');
       return;
     }
 
-    console.log('🧹 Clearing existing instances');
     // Clear any existing HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
@@ -139,30 +118,122 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       loadingTimeoutRef.current = null;
     }
 
-    // 🔥 NUCLEAR OPTION: Force native video only, no HLS.js at all
-    console.log('💥 FORCING NATIVE VIDEO - Bypassing all HLS.js logic');
+    // Check if HLS is needed and supported
+    const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
+    const isM3U8 = src.includes('.m3u8');
+    const isSupabaseStorage = src.includes('supabase.co/storage');
     
-    // Clear video completely
-    video.removeAttribute('src');
-    video.src = '';
-    video.load();
+    // Handle incomplete URLs (like '/manifest/video.m3u8')
+    if (src.startsWith('/manifest/video.m3u8')) {
+      setError('Invalid video URL - video not found');
+      setIsLoading(false);
+      return;
+    }
     
-    // Wait for complete reset
-    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS, isSupabaseStorage });
     
-    // Set source directly - let browser handle HLS natively
-    video.src = src;
-    console.log('🎬 DIRECT VIDEO SOURCE SET:', src);
-    
-    setIsLoading(false);
-    
-    if (autoplay) {
-      console.log('▶️ Attempting direct autoplay');
-      setTimeout(() => {
-        video.play().catch((err) => {
-          console.log('❌ Direct autoplay failed:', err);
+    if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
+      if (window.Hls && window.Hls.isSupported()) {
+        const hls = new window.Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+          backBufferLength: 90,
+          maxBufferLength: 30,
+          maxMaxBufferLength: 60,
+          // Optimized settings for Cloudflare Stream
+          ...(isCloudflareStream && {
+            maxBufferLength: 60,
+            maxMaxBufferLength: 120,
+            startLevel: -1, // Auto-select quality
+            capLevelToPlayerSize: false, // Always allow highest quality regardless of player size
+            abrEwmaDefaultEstimate: 2000000,
+            abrBandWidthFactor: 0.8,
+            abrBandWidthUpFactor: 0.6,
+          }),
+          // Adaptive bitrate settings
+          abrEwmaDefaultEstimate: adaptiveBitrate ? 1000000 : 5000000,
+          abrBandWidthFactor: 0.95,
+          abrBandWidthUpFactor: 0.7,
         });
-      }, 500);
+
+        console.log('Loading HLS source:', src);
+        hls.loadSource(src);
+        hls.attachMedia(video);
+        
+        // Add timeout for manifest loading
+        const manifestTimeout = setTimeout(() => {
+          console.error('HLS manifest load timeout for:', src);
+          setError('Video loading timeout - please try again');
+          setIsLoading(false);
+        }, 10000);
+        
+        hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+          clearTimeout(manifestTimeout);
+          if (loadingTimeoutRef.current) {
+            clearTimeout(loadingTimeoutRef.current);
+          }
+          setIsLoading(false);
+          console.log('HLS manifest parsed successfully for:', src);
+          if (autoplay) {
+            video.play().catch(console.error);
+          }
+        });
+
+        hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
+          console.error('HLS Error:', { event, data, src });
+          if (data.fatal) {
+            console.error('Fatal HLS error:', data.type, data.details);
+            
+            // Provide more specific error messages
+            let errorMessage = 'Video playback error';
+            if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
+              errorMessage = 'Network error - please check your connection';
+            } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
+              errorMessage = 'Media error - video format not supported';
+            } else if (data.details === window.Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
+              errorMessage = 'Video not found or inaccessible';
+            }
+            
+            setError(errorMessage);
+            if (loadingTimeoutRef.current) {
+              clearTimeout(loadingTimeoutRef.current);
+            }
+            setIsLoading(false);
+          } else {
+            // Non-fatal errors, try to recover
+            console.warn('Non-fatal HLS error, attempting recovery:', data);
+            if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
+              hls.recoverMediaError();
+            }
+          }
+        });
+
+
+        hlsRef.current = hls;
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (Safari)
+        console.log('Using native HLS support');
+        video.src = src;
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+        }
+        setIsLoading(false);
+      } else {
+        console.log('HLS not supported or Supabase storage video, using direct video');
+        video.src = src;
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+        }
+        setIsLoading(false);
+      }
+    } else {
+      // Standard video or Supabase storage video
+      console.log('Using standard video playback for:', src);
+      video.src = src;
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      setIsLoading(false);
     }
   };
 
@@ -172,13 +243,11 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     if (!video) return;
 
     const handlePlay = () => {
-      console.log('▶️ Video play event');
       setIsPlaying(true);
       onPlay?.();
     };
 
     const handlePause = () => {
-      console.log('⏸️ Video pause event');
       setIsPlaying(false);
       onPause?.();
     };
@@ -188,7 +257,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       // Only show for initial load
     };
     const handleCanPlay = () => {
-      console.log('✅ Video can play event');
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
@@ -383,6 +451,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         autoPlay={autoplay}
         playsInline
         preload="metadata"
+        src={src}
         className={`w-full h-full ${
           objectFit === 'smart' 
             ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')
