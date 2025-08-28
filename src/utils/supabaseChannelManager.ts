@@ -1,4 +1,4 @@
-import { secureSupabase as supabase } from '@/integrations/supabase/secureClient';
+import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 class SupabaseChannelManager {
@@ -22,30 +22,16 @@ class SupabaseChannelManager {
     }
 
     console.log(`Creating new channel: ${channelName}`);
-    
-    try {
-      // Create channel with basic configuration
-      const channel = supabase.channel(channelName);
-      this.channels.set(channelName, channel);
-      return channel;
-    } catch (error) {
-      console.error(`Failed to create channel ${channelName}:`, error);
-      // Return a basic channel as fallback
-      const fallbackChannel = supabase.channel(`fallback_${channelName}`);
-      this.channels.set(channelName, fallbackChannel);
-      return fallbackChannel;
-    }
+    const channel = supabase.channel(channelName);
+    this.channels.set(channelName, channel);
+    return channel;
   }
 
   removeChannel(channelName: string): void {
     const channel = this.channels.get(channelName);
     if (channel) {
       console.log(`Removing channel: ${channelName}`);
-      try {
-        supabase.removeChannel(channel);
-      } catch (error) {
-        console.warn(`Error removing channel ${channelName}:`, error);
-      }
+      supabase.removeChannel(channel);
       this.channels.delete(channelName);
     }
   }
@@ -53,11 +39,7 @@ class SupabaseChannelManager {
   removeAllChannels(): void {
     console.log('Removing all channels');
     this.channels.forEach((channel, name) => {
-      try {
-        supabase.removeChannel(channel);
-      } catch (error) {
-        console.warn(`Error removing channel ${name}:`, error);
-      }
+      supabase.removeChannel(channel);
     });
     this.channels.clear();
   }

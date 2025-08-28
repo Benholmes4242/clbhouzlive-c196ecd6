@@ -451,7 +451,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         autoPlay={autoplay}
         playsInline
         preload="metadata"
-        crossOrigin="anonymous"
+        src={src}
         className={`w-full h-full ${
           objectFit === 'smart' 
             ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')

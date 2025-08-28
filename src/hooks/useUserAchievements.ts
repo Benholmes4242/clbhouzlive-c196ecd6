@@ -145,54 +145,39 @@ export const useUserAchievements = (limit: number = 5) => {
     console.log('Setting up user achievements subscription for user:', user.id);
     const channelName = `user_achievements_${user.id}`;
     
-    const setupSubscription = async () => {
-      try {
-        // Import the channel manager
-        import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
-          const channel = channelManager.createChannel(channelName);
-          
-          channel
-            .on(
-              'postgres_changes',
-              {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'user_achievements',
-                filter: `user_id=eq.${user.id}`
-              },
-              () => {
-                console.log('New user achievement detected, refetching...');
-                // Inline the fetch logic to avoid dependency issues
-                supabase
-                  .rpc('get_user_recent_achievements', {
-                    user_id_param: user.id,
-                    limit_param: limit
-                  })
-                  .then(({ data, error: fetchError }) => {
-                    if (fetchError) {
-                      console.error('Error fetching achievements:', fetchError);
-                      return;
-                    }
-                    const formattedAchievements = (data || []).map(formatAchievement);
-                    setAchievements(formattedAchievements);
-                  });
-              }
-            )
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                console.log('Successfully subscribed to user achievements');
-              } else if (status === 'CHANNEL_ERROR') {
-                console.warn('User achievements realtime subscription failed - continuing without realtime updates');
-              }
-            });
-        });
-      } catch (error) {
-        console.warn('Failed to setup user achievements realtime subscription:', error);
-        // App continues to work without realtime achievements updates
-      }
-    };
-
-    setupSubscription();
+    // Import the channel manager
+    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+      const channel = channelManager.createChannel(channelName);
+      
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_achievements',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            console.log('New user achievement detected, refetching...');
+            // Inline the fetch logic to avoid dependency issues
+            supabase
+              .rpc('get_user_recent_achievements', {
+                user_id_param: user.id,
+                limit_param: limit
+              })
+              .then(({ data, error: fetchError }) => {
+                if (fetchError) {
+                  console.error('Error fetching achievements:', fetchError);
+                  return;
+                }
+                const formattedAchievements = (data || []).map(formatAchievement);
+                setAchievements(formattedAchievements);
+              });
+          }
+        )
+        .subscribe();
+    });
 
     return () => {
       console.log('Cleaning up user achievements subscription');

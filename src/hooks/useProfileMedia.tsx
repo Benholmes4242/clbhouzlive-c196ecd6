@@ -54,53 +54,28 @@ export const useProfileMedia = (userId: string) => {
     fetchMediaItems();
   }, [userId]);
 
-  // Subscribe to real-time changes with error handling
+  // Subscribe to real-time changes
   useEffect(() => {
     if (!userId) return;
 
-    let subscription: any = null;
-    
-    const setupRealtimeSubscription = async () => {
-      try {
-        subscription = supabase
-          .channel(`profile_media_${userId}`)
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'profile_media',
-              filter: `user_id=eq.${userId}`
-            },
-            () => {
-              fetchMediaItems();
-            }
-          )
-          .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-              console.log('Profile media realtime subscription active');
-            } else if (status === 'CLOSED') {
-              console.log('Profile media realtime subscription closed');
-            } else if (status === 'CHANNEL_ERROR') {
-              console.warn('Profile media realtime subscription error - continuing without realtime updates');
-            }
-          });
-      } catch (error) {
-        console.warn('Failed to setup realtime subscription for profile media:', error);
-        // Continue without realtime updates - app still functional
-      }
-    };
-
-    setupRealtimeSubscription();
+    const subscription = supabase
+      .channel(`profile_media_${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profile_media',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          fetchMediaItems();
+        }
+      )
+      .subscribe();
 
     return () => {
-      if (subscription) {
-        try {
-          subscription.unsubscribe();
-        } catch (error) {
-          console.warn('Error unsubscribing from profile media realtime:', error);
-        }
-      }
+      subscription.unsubscribe();
     };
   }, [userId]);
 
