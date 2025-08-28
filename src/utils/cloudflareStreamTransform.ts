@@ -1,5 +1,8 @@
 // CLOUDFLARE STREAM → HLS TRANSFORM
 // Transforms video objects to include hls_url, poster, uid for every video object
+// Now fetches actual URLs from Cloudflare API instead of constructing them
+
+import { getCloudflareStreamHLS, getCloudflareStreamPoster, batchFetchCloudflareStreamVideos } from './cloudflareStreamAPI';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -28,34 +31,74 @@ export function uidFromNode(obj: any): string | null {
   return null;
 }
 
+// Collect all video UIDs from an object/array
+function collectVideoUIDs(node: any): Set<string> {
+  const uids = new Set<string>();
+  
+  function traverse(obj: any) {
+    if (Array.isArray(obj)) {
+      obj.forEach(traverse);
+    } else if (obj && typeof obj === 'object') {
+      const uid = uidFromNode(obj);
+      if (uid) uids.add(uid);
+      
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          traverse(obj[key]);
+        }
+      }
+    }
+  }
+  
+  traverse(node);
+  return uids;
+}
+
 // Recursively visit and transform objects/arrays
-function visit(node: any): any {
+async function visit(node: any, videoDetails: Map<string, any>): Promise<any> {
   if (Array.isArray(node)) {
-    return node.map(visit);
+    return Promise.all(node.map(item => visit(item, videoDetails)));
   }
 
   if (node && typeof node === 'object') {
     const uid = uidFromNode(node);
     if (uid) {
-      node.uid = uid;
-      // Try common locations for HLS + poster; keep existing if already present
-      node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
-                    `https://videodelivery.net/${uid}/manifest/video.m3u8`;
-      node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
-                   `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+      const videoDetail = videoDetails.get(uid);
+      
+      if (videoDetail && videoDetail.status.state === 'ready') {
+        // Use API data if available and ready
+        node.uid = uid;
+        node.hls_url = videoDetail.playback?.hls || `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        node.poster = videoDetail.thumbnail || `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+      } else {
+        // Fallback to constructed URLs
+        node.uid = uid;
+        node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
+                      `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
+                     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+      }
       
       // Keep embed_url for backward compatibility
       if (!node.embed_url) {
         node.embed_url = `https://iframe.videodelivery.net/${uid}`;
-        node.iframe_src = node.embed_url; // convenience alias
+        node.iframe_src = node.embed_url;
       }
     }
     
     // Recursively transform nested objects
+    const transformPromises = [];
     for (const key in node) {
       if (node.hasOwnProperty(key)) {
-        node[key] = visit(node[key]);
+        transformPromises.push(
+          visit(node[key], videoDetails).then(result => ({ key, result }))
+        );
       }
+    }
+    
+    const results = await Promise.all(transformPromises);
+    for (const { key, result } of results) {
+      node[key] = result;
     }
     
     return node;
@@ -64,9 +107,66 @@ function visit(node: any): any {
   return node;
 }
 
-// Main transform function - now adds HLS data instead of just embed URLs
-export function transformCloudflareStreamData(data: any): any {
-  return visit(data);
+// Main transform function - now fetches HLS URLs from Cloudflare API
+export async function transformCloudflareStreamData(data: any): Promise<any> {
+  try {
+    // Collect all video UIDs first
+    const videoUIDs = collectVideoUIDs(data);
+    
+    if (videoUIDs.size === 0) {
+      return data; // No videos to process
+    }
+
+    // Batch fetch video details from API
+    const videoDetails = await batchFetchCloudflareStreamVideos(Array.from(videoUIDs));
+    
+    // Transform the data with fetched video details
+    return await visit(data, videoDetails);
+  } catch (error) {
+    console.error('Error transforming Cloudflare Stream data:', error);
+    // Fallback to original data if API fails
+    return data;
+  }
+}
+
+// Synchronous version for immediate use (falls back to constructed URLs)
+export function transformCloudflareStreamDataSync(data: any): any {
+  function visitSync(node: any): any {
+    if (Array.isArray(node)) {
+      return node.map(visitSync);
+    }
+
+    if (node && typeof node === 'object') {
+      const uid = uidFromNode(node);
+      if (uid) {
+        node.uid = uid;
+        // Use constructed URLs for immediate sync transform
+        node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
+                      `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
+                     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+        
+        // Keep embed_url for backward compatibility
+        if (!node.embed_url) {
+          node.embed_url = `https://iframe.videodelivery.net/${uid}`;
+          node.iframe_src = node.embed_url;
+        }
+      }
+      
+      // Recursively transform nested objects
+      for (const key in node) {
+        if (node.hasOwnProperty(key)) {
+          node[key] = visitSync(node[key]);
+        }
+      }
+      
+      return node;
+    }
+    
+    return node;
+  }
+
+  return visitSync(data);
 }
 
 // Helper to check if a URL is a Cloudflare Stream URL

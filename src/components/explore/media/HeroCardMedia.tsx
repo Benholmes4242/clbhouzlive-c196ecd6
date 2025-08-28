@@ -1,4 +1,4 @@
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useEffect, useState } from 'react';
 import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
@@ -7,6 +7,7 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -28,10 +29,41 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
   
-  // Generate HLS URL from media URL
+  // State for API-fetched URLs
+  const [hlsUrl, setHlsUrl] = useState<string | null>(null);
+  const [poster, setPoster] = useState<string | undefined>(undefined);
+  
+  // Generate initial URLs (fallback) and fetch real ones from API
   const uid = uidFromNode(media);
-  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
-  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
+  
+  useEffect(() => {
+    if (!uid) return;
+    
+    // Set fallback URLs immediately
+    const fallbackHlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+    const fallbackPoster = `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
+    
+    setHlsUrl(fallbackHlsUrl);
+    setPoster(fallbackPoster);
+    
+    // Fetch real URLs from Cloudflare API in the background
+    const fetchRealUrls = async () => {
+      try {
+        const [realHlsUrl, realPoster] = await Promise.all([
+          getCloudflareStreamHLS(uid),
+          getCloudflareStreamPoster(uid, { height: 600 })
+        ]);
+        
+        if (realHlsUrl) setHlsUrl(realHlsUrl);
+        if (realPoster) setPoster(realPoster);
+      } catch (error) {
+        console.warn('Failed to fetch real Cloudflare URLs, using fallback:', error);
+        // Keep fallback URLs if API fails
+      }
+    };
+    
+    fetchRealUrls();
+  }, [uid]);
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
