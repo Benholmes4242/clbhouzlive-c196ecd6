@@ -3200,9 +3200,26 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
     queryKey: ['worldwideCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
+
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`golf_courses (global_rank)`)
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -3210,13 +3227,47 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`golf_courses (global_rank)`)
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.global_rank && c.golf_courses.global_rank <= 100);
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null,
+          id: `top100-${course.course_id}`
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at,
+          id: `rating-${course.course_id}`
+        }))
+      ];
+
+      const worldwideCourses = combinedCourses.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        return course && course.global_rank && course.global_rank <= 100;
+      });
+
+      return worldwideCourses;
     },
     enabled: !!userId,
   });
@@ -3335,9 +3386,26 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
     queryKey: ['europeCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
+
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`golf_courses (country)`)
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -3345,13 +3413,47 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`golf_courses (country)`)
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.country === 'Continental Europe');
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null,
+          id: `top100-${course.course_id}`
+        })),
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at,
+          id: `rating-${course.course_id}`
+        }))
+      ];
+
+      const europeCourses = combinedCourses.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        return course && course.country === 'Continental Europe';
+      });
+
+      return europeCourses;
     },
     enabled: !!userId,
   });
