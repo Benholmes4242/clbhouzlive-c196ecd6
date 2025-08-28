@@ -190,11 +190,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
+                            <div className="text-base md:text-lg font-medium text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black mt-1">
+                             <div className="text-sm md:text-base font-medium text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -209,11 +209,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
+                            <div className="text-base md:text-lg font-medium text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black mt-1">
+                             <div className="text-sm md:text-base font-medium text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -228,11 +228,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
+                            <div className="text-base md:text-lg font-medium text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black mt-1">
+                             <div className="text-sm md:text-base font-medium text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
@@ -247,22 +247,22 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
+                            <div className="text-base md:text-lg font-medium text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xl text-black mt-1">
+                             <div className="text-sm md:text-base font-medium text-black mt-1">
                                {progress.played * 120} XP
                              </div>
                           </div>
                         </div>
                       ) : (
                         <>
-                          <div className="text-2xl text-black leading-none">
+                          <div className="text-base md:text-lg font-medium text-black leading-none">
                             <span>{progress.played}</span>
                             <span className="text-black/60"> / {progress.total}</span>
                           </div>
-                           <div className="text-xl text-black mt-1">
+                           <div className="text-sm md:text-base font-medium text-black mt-1">
                              {progress.played * 120} XP
                            </div>
                         </>
@@ -272,7 +272,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   
                    {/* Achievement info below ring - desktop size */}
                    <div className="mt-0.5 text-center max-w-[200px]">
-                     <div className="text-xl text-foreground">
+                     <div className="text-base md:text-lg font-medium text-foreground">
                        {achievement.title}
                      </div>
                    </div>
@@ -351,11 +351,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-base md:text-lg font-medium text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-sm md:text-base font-medium text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -370,11 +370,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-base md:text-lg font-medium text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-sm md:text-base font-medium text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -389,11 +389,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-base md:text-lg font-medium text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-sm md:text-base font-medium text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
@@ -408,22 +408,22 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-base md:text-lg font-medium text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-sm md:text-base font-medium text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
                           </div>
                         ) : (
                           <>
-                            <div className="text-sm text-black leading-none">
+                            <div className="text-base md:text-lg font-medium text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-black mt-0.5">
+                             <div className="text-sm md:text-base font-medium text-black mt-0.5">
                                {progress.played * 120} XP
                              </div>
                           </>
@@ -433,7 +433,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     
                      {/* Achievement info */}
                      <div className="mt-2 text-center">
-                       <div className="text-sm text-foreground leading-tight">
+                       <div className="text-base md:text-lg font-medium text-foreground leading-tight">
                          {achievement.title}
                        </div>
                      </div>
@@ -728,7 +728,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+          <h3 className="text-base md:text-lg font-medium text-foreground">
             Recently Played
           </h3>
           <div className="flex gap-2">
@@ -1186,7 +1186,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+          <h3 className="text-base md:text-lg font-medium text-foreground">
             Highlights From My Journey
           </h3>
           <div className="flex gap-2">
@@ -1465,7 +1465,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       <div className="w-full px-4 pt-0 pb-0">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0">
-            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+            <h3 className="text-base md:text-lg font-medium text-foreground">
               Top 10 Rated by You
             </h3>
           <div className="flex gap-2">
@@ -1592,7 +1592,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+          <h3 className="text-base md:text-lg font-medium text-foreground">
             Courses by Region
           </h3>
         </div>
