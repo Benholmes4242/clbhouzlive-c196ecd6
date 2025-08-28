@@ -2,7 +2,7 @@ import React, { memo, useRef } from 'react';
 import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
+import FeedVideoPlayer, { FeedVideoPlayerRef } from '@/components/feed/FeedVideoPlayer';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
@@ -24,7 +24,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   className = '',
   showFeaturedBadge = true
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<FeedVideoPlayerRef>(null);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
   
   // Use video visibility hook for autoplay management
