@@ -178,7 +178,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
 
         {/* Course ranking badges - positioned at top-left - conditionally hide */}
-        {!hideRankingBadges && (
+        {!hideRankingBadges && !showRatingOnRight && (
           <CourseRankBadges
             globalRank={course.global_rank}
             regionalRank={course.regional_rank}
@@ -204,7 +204,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
           
           {/* Course Name - moved up when showing rating badges */}
-          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-4' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
+          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-2' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
             {course.name}
           </h3>
           
@@ -231,7 +231,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {userRating && (
                 <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                   <div className="relative z-10 flex items-center gap-1.5">
-                    <Star className="h-4 w-4 text-white fill-white" />
                     <span className="text-sm font-bold text-white">{userRating}/10</span>
                   </div>
                 </div>
