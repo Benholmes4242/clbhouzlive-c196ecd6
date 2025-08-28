@@ -218,10 +218,23 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {course.name}
           </h3>
           
-          {/* AI Quote or Location */}
+          {/* AI Quote or Location or Ranking Badges */}
           {showAIQuote ? (
             <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} leading-relaxed drop-shadow-lg italic`}>
               {courseQuote || 'A golf experience like no other'}
+            </div>
+          ) : showRatingOnRight ? (
+            // Show ranking badges for Top 10 Rated cards
+            <div className="flex flex-wrap gap-2 mt-2">
+              <CourseRankBadges
+                globalRank={course.global_rank}
+                regionalRank={course.regional_rank}
+                usaRank={course.usa_rank}
+                country={course.country}
+                positioning="bottom-left"
+                showUserRating={false}
+                showXP={false}
+              />
             </div>
           ) : (
             <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
