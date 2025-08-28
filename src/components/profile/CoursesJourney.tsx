@@ -1256,7 +1256,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
+                    return 'calc(40vw - 0.5rem)'; // Mobile: 2.5 cards visible
                   };
 
                   const isSlotOne = index === 0;
