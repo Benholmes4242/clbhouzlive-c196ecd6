@@ -1546,20 +1546,21 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                        <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
-                          showAIQuote={true}
-                        />
-                      </div>
+                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
+                         <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           hideRankingBadges={false}
+                           showAIQuote={false}
+                           showRatingOnRight={true}
+                         />
+                       </div>
                     </div>
                   );
                 })}

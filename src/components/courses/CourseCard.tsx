@@ -42,6 +42,7 @@ interface CourseCardProps {
   disableClick?: boolean;
   mobileTextScale?: 'small' | 'normal';
   mobileFlagSize?: 'sm' | 'md' | 'lg';
+  showRatingOnRight?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -115,7 +116,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showAIQuote = false,
   disableClick = false,
   mobileTextScale = 'normal',
-  mobileFlagSize = 'lg'
+  mobileFlagSize = 'lg',
+  showRatingOnRight = false
 }) => {
   const navigate = useNavigate();
   const [courseQuote, setCourseQuote] = useState<string>('');
@@ -189,6 +191,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
             xp={xp}
             showXP={showXP}
           />
+        )}
+
+        {/* User Rating on Right - for Top 10 Rated cards */}
+        {showRatingOnRight && userRating && (
+          <div className="absolute top-4 right-4 z-20">
+            <div className="bg-black/30 backdrop-blur-sm border border-white/20 px-3 py-2 rounded-lg">
+              <span className="text-2xl font-bold text-white drop-shadow-lg">
+                {userRating}/10
+              </span>
+            </div>
+          </div>
         )}
 
         {/* Course Information Overlay - positioned at bottom */}
