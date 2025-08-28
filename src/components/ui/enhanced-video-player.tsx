@@ -216,6 +216,15 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         console.log('🔗 Attaching HLS to video element');
         hls.attachMedia(video);
         
+        // 🐛 DEBUG: Check video element state after HLS attachment
+        console.log('🔍 Video element state after HLS attachment:', {
+          videoSrc: video.src,
+          videoCurrentSrc: video.currentSrc,
+          readyState: video.readyState,
+          networkState: video.networkState,
+          hasAttribute_src: video.hasAttribute('src')
+        });
+        
         // Add timeout for manifest loading
         const manifestTimeout = setTimeout(() => {
           console.error('HLS manifest load timeout for:', src);
