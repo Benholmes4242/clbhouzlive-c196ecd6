@@ -800,7 +800,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                     if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(67.5vw - 10px)'; // Mobile: 67.5% of viewport width for 1.5 cards visible with margins
+                    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible (40% width per card)
                   };
 
                   return (
