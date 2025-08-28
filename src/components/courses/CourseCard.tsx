@@ -219,9 +219,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {courseQuote || 'A golf experience like no other'}
             </div>
            ) : showRatingOnRight ? (
-            // Show ranking badges and average rating for Top 10 Rated cards
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex flex-wrap gap-2">
+             // Show ranking badges and average rating for Top 10 Rated cards
+             <div className="flex items-center justify-between">
+               <div className="flex flex-wrap gap-2">
                 <CourseRankBadges
                   globalRank={course.global_rank}
                   regionalRank={course.regional_rank}
