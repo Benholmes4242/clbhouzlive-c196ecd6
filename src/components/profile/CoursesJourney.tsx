@@ -1404,7 +1404,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           course_id,
           rating,
           created_at,
-          golf_courses (
+          golf_courses!inner (
             id,
             name,
             country,
@@ -1416,9 +1416,6 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1427,15 +1424,29 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 
       if (ratedError) throw ratedError;
 
+      // Now get the course rating stats separately
+      const courseIds = (ratedData || []).map(course => course.course_id);
+      
+      const { data: statsData, error: statsError } = await supabase
+        .from('course_rating_stats')
+        .select('course_id, average_rating')
+        .in('course_id', courseIds);
+
+      if (statsError) throw statsError;
+
+      // Create a map for quick lookup
+      const statsMap = new Map();
+      (statsData || []).forEach(stat => {
+        statsMap.set(stat.course_id, stat.average_rating);
+      });
+
       return (ratedData || []).map(course => ({
         ...course,
         played_date: course.created_at, // Use rating date as played date
         id: `rating-${course.course_id}`, // Unique ID
         golf_courses: {
           ...course.golf_courses,
-          average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-            ? course.course_rating_stats[0].average_rating 
-            : null
+          average_rating: statsMap.get(course.course_id) || null
         }
       }));
     },
@@ -1568,7 +1579,6 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                             customHeight="h-full"
                             hideRankingBadges={false}
                             showAIQuote={false}
-                            showRatingOnRight={true}
                           />
                        </div>
                     </div>
