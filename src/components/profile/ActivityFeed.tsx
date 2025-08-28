@@ -66,28 +66,40 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const exploreContent: ExploreContentItem[] = useMemo(() => 
     filteredPosts
       .filter(post => post.post_media && post.post_media.length > 0) // Only include posts with media
-      .map(post => ({
-        id: post.id,
-        type: post.post_media[0].media_type === 'video' ? 'video' : 'image',
-        src: post.post_media[0].media_url,
-        title: post.content || '',
-        likes: 0,
-        comments: 0,
-        shares: 0,
-        user: {
-          id: post.user.id,
-          name: post.user.display_name || post.user.username || 'Anonymous',
-          username: post.user.username || undefined,
-          avatar: post.user.profile_photo_url || '/placeholder.svg',
-          verified: false
-        },
-        // Add the full media array for multiple media navigation
-        media: post.post_media.map(media => ({
-          id: media.id,
-          media_type: media.media_type,
-          media_url: media.media_url
-        }))
-      })), [filteredPosts]);
+      .map(post => {
+        // Extract golf course information from post tags
+        const golfCourseTag = post.post_tags.find(tag => tag.entity_type === 'golf_club');
+        const golfCourse = golfCourseTag ? {
+          id: golfCourseTag.entity_id,
+          name: golfCourseTag.name,
+          country: 'Unknown' // Post tags don't include country, so we use a default
+        } : undefined;
+
+        return {
+          id: post.id,
+          type: post.post_media[0].media_type === 'video' ? 'video' : 'image',
+          src: post.post_media[0].media_url,
+          title: post.content || '',
+          likes: 0,
+          comments: 0,
+          shares: 0,
+          user: {
+            id: post.user.id,
+            name: post.user.display_name || post.user.username || 'Anonymous',
+            username: post.user.username || undefined,
+            avatar: post.user.profile_photo_url || '/placeholder.svg',
+            verified: false
+          },
+          // Add golf course information if available
+          golfCourse,
+          // Add the full media array for multiple media navigation
+          media: post.post_media.map(media => ({
+            id: media.id,
+            media_type: media.media_type,
+            media_url: media.media_url
+          }))
+        };
+      }), [filteredPosts]);
 
   const handleLike = useCallback((contentId: string) => {
     console.log('Like:', contentId);
