@@ -15,6 +15,8 @@ interface CourseRankBadgesProps {
   viewContext?: 'global' | 'regional' | 'usa' | 'europe';
   userRating?: number | null;
   showUserRating?: boolean;
+  averageRating?: number | null;
+  showAverageRating?: boolean;
   positioning?: 'top-left' | 'bottom-left';
   xp?: number;
   showXP?: boolean;
@@ -28,6 +30,8 @@ const CourseRankBadges = ({
   viewContext = 'global',
   userRating,
   showUserRating = false,
+  averageRating,
+  showAverageRating = false,
   positioning = 'top-left',
   xp,
   showXP = false
@@ -76,6 +80,12 @@ const CourseRankBadges = ({
     tooltip: "Your Rating"
   } : null;
 
+  // Average course rating badge (clbhouzrating)
+  const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
+    content: `${averageRating.toFixed(1)}`,
+    tooltip: "Average Rating"
+  } : null;
+
   // Determine positioning classes
   const getPositioningClasses = () => {
     switch (positioning) {
@@ -89,8 +99,8 @@ const CourseRankBadges = ({
 
   return (
     <TooltipProvider>
-      {/* Ranking badges with integrated player rating */}
-      {(rankingBadges.length > 0 || playerRatingBadge) && (
+      {/* Ranking badges with integrated player rating and average rating */}
+      {(rankingBadges.length > 0 || playerRatingBadge || averageRatingBadge) && (
         <div className={getPositioningClasses()}>
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
@@ -108,6 +118,23 @@ const CourseRankBadges = ({
             </Tooltip>
           ))}
           
+           {/* Add Average Course Rating badge (clbhouzrating) */}
+           {averageRatingBadge && (
+             <Tooltip>
+               <TooltipTrigger asChild>
+                    <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                     <div className="relative z-10 flex items-center gap-1.5">
+                       <ClubhouseLogo size="sm" />
+                       <span className="text-sm font-bold text-white">{averageRatingBadge.content}</span>
+                     </div>
+                   </div>
+               </TooltipTrigger>
+               <TooltipContent>
+                 <p>{averageRatingBadge.tooltip}</p>
+               </TooltipContent>
+             </Tooltip>
+           )}
+
            {/* Add Clubhouse rating badge */}
            {playerRatingBadge && (
              <Tooltip>
@@ -142,7 +169,7 @@ const CourseRankBadges = ({
       )}
 
       {/* Player rating badge - integrated with ranking badges */}
-      {playerRatingBadge && rankingBadges.length === 0 && (
+      {playerRatingBadge && rankingBadges.length === 0 && !averageRatingBadge && (
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -155,6 +182,25 @@ const CourseRankBadges = ({
             </TooltipTrigger>
             <TooltipContent>
               <p>{playerRatingBadge.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+
+      {/* Average rating badge - standalone when no rankings */}
+      {averageRatingBadge && rankingBadges.length === 0 && !playerRatingBadge && (
+        <div className="absolute top-2 right-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+               <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                 <div className="relative z-10 flex items-center gap-1.5">
+                   <ClubhouseLogo size="sm" />
+                   <span className="text-sm font-bold text-white">{averageRatingBadge.content}</span>
+                 </div>
+               </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{averageRatingBadge.tooltip}</p>
             </TooltipContent>
           </Tooltip>
         </div>
