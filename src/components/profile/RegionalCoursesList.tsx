@@ -73,7 +73,7 @@ const RegionalCoursesList: React.FC<RegionalCoursesListProps> = ({
             return (
               <div 
                 key={course.id}
-                className={`flex-shrink-0 w-80 ${isLast ? 'pr-4' : ''}`}
+                className={`flex-shrink-0 w-64 md:w-80 ${isLast ? 'pr-4' : ''}`}
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <CourseCard 
