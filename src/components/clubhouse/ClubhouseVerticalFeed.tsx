@@ -11,7 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -39,136 +40,32 @@ const VideoWithAutoplay: React.FC<{
     threshold: 0.8, // Video must be 80% visible to autoplay (more restrictive)
     rootMargin: '0px' // No margin to prevent multiple videos triggering
   });
-  const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
-  const { isGloballyMuted } = useGlobalAudio();
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  // Check if this is a Cloudflare Stream URL
-  const isCloudflareStream = src.includes('cloudflarestream.com') || src.includes('videodelivery.net');
-  const videoId = isCloudflareStream ? src.match(/([0-9a-f]{32})/i)?.[1] : null;
-
-  // Register video with manager when component mounts
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        removeVideo(videoRef.current);
-      }
-    };
-  }, [removeVideo]);
-
-  // Handle video ref and registration for regular videos
-  const handleVideoRef = useCallback((video: HTMLVideoElement | null) => {
-    if (videoRef.current) {
-      removeVideo(videoRef.current);
-    }
-    
-    videoRef.current = video;
-    
-    if (video) {
-      addVideo(video);
-    }
-  }, [addVideo, removeVideo]);
-
-  const attemptVideoPlay = useCallback(async () => {
-    if (hasAttemptedPlay) return;
-    
-    console.log('🎬 VideoWithAutoplay: Attempting to play video:', src.slice(-20), {
-      isInView,
-      hasAttemptedPlay,
-      isCloudflareStream
-    });
-    
-    try {
-      setHasAttemptedPlay(true);
-      
-      if (isCloudflareStream && iframeRef.current) {
-        // For Cloudflare iframe, send postMessage to play
-        iframeRef.current.contentWindow?.postMessage({ method: 'play' }, '*');
-        console.log('✅ VideoWithAutoplay: Cloudflare iframe play triggered:', src.slice(-20));
-      } else if (videoRef.current) {
-        // For regular videos
-        const video = videoRef.current;
-        video.muted = isGloballyMuted;
-        video.playsInline = true;
-        
-        setActiveVideo(video);
-        await video.play();
-        console.log('✅ VideoWithAutoplay: Video autoplay successful:', src.slice(-20));
-      }
-    } catch (error) {
-      console.log('❌ VideoWithAutoplay: Video autoplay failed:', error);
-      
-      // On mobile, try again after a brief delay
-      if (isMobile && videoRef.current) {
-        setTimeout(() => {
-          videoRef.current?.play().catch(() => {
-            console.log('❌ Mobile autoplay retry failed');
-          });
-        }, 100);
-      }
-    }
-  }, [hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted, isInView, isCloudflareStream]);
-
-  // Handle initial autoplay attempt when video comes into view
-  useEffect(() => {
-    console.log('📱 VideoWithAutoplay: View state changed:', {
-      src: src.slice(-20),
-      isInView,
-      hasAttemptedPlay,
-      isCloudflareStream
-    });
-    
-    if (isInView && !hasAttemptedPlay) {
-      // Small delay to ensure video is ready
-      setTimeout(attemptVideoPlay, 100);
-    } else if (!isInView) {
-      // Pause when out of view
-      if (isCloudflareStream && iframeRef.current) {
-        iframeRef.current.contentWindow?.postMessage({ method: 'pause' }, '*');
-      } else if (videoRef.current && !videoRef.current.paused) {
-        console.log('📱 VideoWithAutoplay: Video went out of view, pausing:', src.slice(-20));
-        videoRef.current.pause();
-      }
-      setHasAttemptedPlay(false); // Reset to allow autoplay when coming back into view
-    }
-  }, [isInView, attemptVideoPlay, hasAttemptedPlay, src, isCloudflareStream]);
-
-  // Update video mute state when global mute changes
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = isGloballyMuted;
-    }
-  }, [isGloballyMuted]);
+  // Generate HLS URL from source
+  const uid = uidFromNode({ src });
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
+  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
   return (
     <div 
       ref={ref}
       className={className}
     >
-      {isCloudflareStream && videoId ? (
-        <iframe
-          ref={iframeRef}
-          src={`https://iframe.videodelivery.net/${videoId}?autoplay=true&muted=${isGloballyMuted}&loop=true&controls=false`}
-          className="w-full h-full border-none"
-          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-          allowFullScreen
-          style={{ border: 'none' }}
+      {hlsUrl ? (
+        <HLSVideoCard
+          hlsUrl={hlsUrl}
+          poster={poster}
+          className="w-full h-full"
+          aspectRatio="auto"
+          muted={muted}
+          loop={true}
+          autoplay={isInView}
+          showMuteButton={false}
         />
       ) : (
-        <EnhancedVideoPlayer
-          ref={handleVideoRef}
-          src={src}
-          autoplay={isInView}
-          muted={isGloballyMuted}
-          loop={true}
-          className="w-full h-full"
-          enableHLS={false}
-          hideControls={true}
-          objectFit={isMobileProp ? "smart" : "contain"}
-        />
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Invalid video source</span>
+        </div>
       )}
     </div>
   );
