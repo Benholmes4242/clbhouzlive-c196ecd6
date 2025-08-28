@@ -25,6 +25,7 @@ const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const Discover = lazy(() => import("./pages/Discover"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -88,6 +89,7 @@ const App: React.FC = () => {
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/create-profile" element={<CreateProfile />} />
                         <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/profile-test" element={<ProfileTestPage />} />
                         <Route path="/profile/:username" element={<UserProfilePage />} />
                         <Route path="/settings" element={<Settings />} />
                         {/* Explore route removed - redirects to discover */}
