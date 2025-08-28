@@ -79,11 +79,10 @@ async function visit(node: any, videoDetails: Map<string, any>): Promise<any> {
                      `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
       }
       
-      // Keep embed_url for backward compatibility
-      if (!node.embed_url) {
-        node.embed_url = `https://iframe.videodelivery.net/${uid}`;
-        node.iframe_src = node.embed_url;
-      }
+      // Remove any iframe/embed references - HLS only
+      delete node.embed_url;
+      delete node.iframe_src;
+      delete node.iframe_url;
     }
     
     // Recursively transform nested objects
@@ -140,17 +139,16 @@ export function transformCloudflareStreamDataSync(data: any): any {
       const uid = uidFromNode(node);
       if (uid) {
         node.uid = uid;
-        // Use constructed URLs for immediate sync transform
+        // ALWAYS use HLS manifest URLs - NO iframes allowed
         node.hls_url = node.hls_url || node?.playback?.hls || node?.manifestUrl || node?.manifest || 
                       `https://videodelivery.net/${uid}/manifest/video.m3u8`;
         node.poster = node.poster || node.thumbnail || node?.input?.poster || node?.thumbnail?.src ||
                      `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600`;
         
-        // Keep embed_url for backward compatibility
-        if (!node.embed_url) {
-          node.embed_url = `https://iframe.videodelivery.net/${uid}`;
-          node.iframe_src = node.embed_url;
-        }
+        // Remove any iframe/embed references - HLS only
+        delete node.embed_url;
+        delete node.iframe_src;
+        delete node.iframe_url;
       }
       
       // Recursively transform nested objects
@@ -184,13 +182,7 @@ export function extractVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-// Helper to generate embed URL from video ID
-export function generateEmbedUrl(videoId: string, token?: string): string {
-  const baseUrl = `https://iframe.videodelivery.net/${videoId}`;
-  return token ? `${baseUrl}?token=${token}` : baseUrl;
-}
-
-// Helper to generate HLS URL from video ID
+// Helper to generate HLS manifest URL from video ID - NO iframe generation
 export function generateHlsUrl(videoId: string): string {
   return `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
 }
@@ -198,7 +190,7 @@ export function generateHlsUrl(videoId: string): string {
 // Helper to generate thumbnail URL from video ID
 export function generateThumbnailUrl(videoId: string, options: {
   width?: number;
-  height?: number;
+  height?: number; 
   time?: number;
 } = {}): string {
   const { width = 1280, height = 720, time = 1 } = options;
