@@ -149,12 +149,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       isCloudflareStream, 
       isM3U8, 
       enableHLS, 
-      isSupabaseStorage,
-      videoElement: {
-        readyState: video.readyState,
-        networkState: video.networkState,
-        currentSrc: video.currentSrc
-      }
+      isSupabaseStorage
     });
     
     // Handle incomplete URLs (like '/manifest/video.m3u8')
@@ -165,194 +160,89 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       return;
     }
     
+    // 🔥 NEW APPROACH: Try native HLS first for Cloudflare Stream
     if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
-      console.log('🎯 Using HLS playback');
-      if (window.Hls && window.Hls.isSupported()) {
-        console.log('✅ HLS.js is supported, creating instance');
+      console.log('🎯 Attempting native HLS first for Cloudflare Stream');
+      
+      // Try native HLS support first (works in most modern browsers)
+      if (video.canPlayType('application/vnd.apple.mpegurl') || isCloudflareStream) {
+        console.log('🍎 Using native HLS support');
         
-        // 🐛 CRITICAL FIX: Completely reset video element
-        console.log('🧹 Aggressively clearing video element');
-        
-        // Debug BEFORE clearing
-        console.log('📊 BEFORE clear - Video state:', {
-          src: video.src,
-          currentSrc: video.currentSrc,
-          readyState: video.readyState,
-          networkState: video.networkState,
-          hasAttribute_src: video.hasAttribute('src')
-        });
-        
-        // Remove all source-related attributes
+        // Clear any existing src
         video.removeAttribute('src');
         video.src = '';
-        
-        // Force element reset
         video.load();
         
-        // Debug AFTER clearing but before wait
-        console.log('📊 AFTER clear - Video state:', {
-          src: video.src,
-          currentSrc: video.currentSrc,
-          readyState: video.readyState,
-          networkState: video.networkState,
-          hasAttribute_src: video.hasAttribute('src')
-        });
+        // Wait a moment for reset
+        await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Wait for reset to complete
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Set the HLS source directly
+        video.src = src;
+        console.log('📺 Set native HLS source:', src);
         
-        // Debug AFTER wait
-        console.log('📊 AFTER wait - Video state:', {
-          src: video.src,
-          currentSrc: video.currentSrc,
-          readyState: video.readyState,
-          networkState: video.networkState,
-          hasAttribute_src: video.hasAttribute('src')
-        });
+        setIsLoading(false);
         
+        if (autoplay) {
+          console.log('▶️ Attempting autoplay with native HLS');
+          setTimeout(() => {
+            video.play().catch((err) => {
+              console.log('❌ Native HLS autoplay failed:', err);
+            });
+          }, 500);
+        }
+        
+        return; // Exit early if native HLS works
+      }
+      
+      // Fallback to HLS.js only if native doesn't work
+      if (window.Hls && window.Hls.isSupported()) {
+        console.log('📦 Falling back to HLS.js');
+        
+        // Simple HLS.js setup without aggressive clearing
         const hls = new window.Hls({
           enableWorker: true,
-          lowLatencyMode: true,
-          backBufferLength: 90,
+          lowLatencyMode: false, // Disable for stability
           maxBufferLength: 30,
           maxMaxBufferLength: 60,
-          // Optimized settings for Cloudflare Stream
-          ...(isCloudflareStream && {
-            maxBufferLength: 60,
-            maxMaxBufferLength: 120,
-            startLevel: -1, // Auto-select quality
-            capLevelToPlayerSize: false, // Always allow highest quality regardless of player size
-            abrEwmaDefaultEstimate: 2000000,
-            abrBandWidthFactor: 0.8,
-            abrBandWidthUpFactor: 0.6,
-          }),
-          // Adaptive bitrate settings
-          abrEwmaDefaultEstimate: adaptiveBitrate ? 1000000 : 5000000,
-          abrBandWidthFactor: 0.95,
-          abrBandWidthUpFactor: 0.7,
         });
 
-        console.log('📥 Loading HLS source:', src);
+        console.log('📥 Loading HLS source with HLS.js:', src);
         hls.loadSource(src);
-        console.log('🔗 Attaching HLS to video element');
         hls.attachMedia(video);
         
-        // 🐛 DEBUG: Check video element state after HLS attachment
-        setTimeout(() => {
-          console.log('🔍 Video element state after HLS attachment:', {
-            videoSrc: video.src,
-            videoCurrentSrc: video.currentSrc,
-            readyState: video.readyState,
-            networkState: video.networkState,
-            hasAttribute_src: video.hasAttribute('src'),
-            hlsAttached: hls.media === video
-          });
-        }, 100);
-        
-        // Add timeout for manifest loading
-        const manifestTimeout = setTimeout(() => {
-          console.error('HLS manifest load timeout for:', src);
-          setError('Video loading timeout - please try again');
-          setIsLoading(false);
-        }, 10000);
-        
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          console.log('🎉 HLS manifest parsed successfully for:', src);
-          clearTimeout(manifestTimeout);
-          if (loadingTimeoutRef.current) {
-            clearTimeout(loadingTimeoutRef.current);
-          }
+          console.log('🎉 HLS.js manifest parsed for:', src);
           setIsLoading(false);
-          
-          // Wait a bit and check if media data is actually loading
-          setTimeout(() => {
-            console.log('📊 Video ready state after manifest parse:', {
-              readyState: video.readyState,
-              networkState: video.networkState,
-              duration: video.duration,
-              videoWidth: video.videoWidth,
-              videoHeight: video.videoHeight,
-              currentSrc: video.currentSrc,
-              hlsAttached: hls.media === video
-            });
-            
-            // If still no media data after 2 seconds, try fallback
-            if (video.readyState === 0 && video.networkState === 3) {
-              console.warn('🚨 HLS attached but no media data loading, trying fallback');
-              // Try to reattach HLS
-              try {
-                hls.detachMedia();
-                setTimeout(() => {
-                  hls.attachMedia(video);
-                }, 100);
-              } catch (err) {
-                console.error('❌ Failed to reattach HLS:', err);
-              }
-            }
-          }, 2000);
           
           if (autoplay) {
-            console.log('▶️ Attempting autoplay');
+            console.log('▶️ Attempting autoplay with HLS.js');
             video.play().catch((err) => {
-              console.log('❌ Autoplay failed:', err);
+              console.log('❌ HLS.js autoplay failed:', err);
             });
           }
         });
 
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
-          console.error('HLS Error:', { event, data, src });
+          console.error('HLS.js Error:', { event, data, src });
           if (data.fatal) {
-            console.error('Fatal HLS error:', data.type, data.details);
-            
-            // Provide more specific error messages
-            let errorMessage = 'Video playback error';
-            if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
-              errorMessage = 'Network error - please check your connection';
-            } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
-              errorMessage = 'Media error - video format not supported';
-            } else if (data.details === window.Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
-              errorMessage = 'Video not found or inaccessible';
-            }
-            
-            setError(errorMessage);
-            if (loadingTimeoutRef.current) {
-              clearTimeout(loadingTimeoutRef.current);
-            }
+            console.error('Fatal HLS.js error, trying native fallback');
+            setError('Video playback error - trying fallback');
+            // Try native as last resort
+            video.src = src;
             setIsLoading(false);
-          } else {
-            // Non-fatal errors, try to recover
-            console.warn('Non-fatal HLS error, attempting recovery:', data);
-            if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
-              hls.recoverMediaError();
-            }
           }
         });
 
-
         hlsRef.current = hls;
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native HLS support (Safari)
-        console.log('🍎 Using native HLS support (Safari)');
-        video.src = src;
-        if (loadingTimeoutRef.current) {
-          clearTimeout(loadingTimeoutRef.current);
-        }
-        setIsLoading(false);
       } else {
-        console.log('⚠️ HLS not supported, falling back to direct video');
+        console.log('⚠️ No HLS support, using direct video');
         video.src = src;
-        if (loadingTimeoutRef.current) {
-          clearTimeout(loadingTimeoutRef.current);
-        }
         setIsLoading(false);
       }
     } else {
       // Standard video or Supabase storage video
       console.log('📼 Using standard video playback for:', src);
       video.src = src;
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-      }
       setIsLoading(false);
     }
   };
