@@ -4,7 +4,7 @@ interface UseVideoVisibilityOptions {
   threshold?: number;
   onEnterView?: () => void;
   onExitView?: () => void;
-  videoRef?: React.RefObject<HTMLVideoElement>;
+  videoRef?: React.RefObject<HTMLVideoElement | any>;
   shouldAutoplay?: boolean;
   globallyMuted?: boolean;
 }
@@ -36,15 +36,21 @@ export const useVideoVisibility = ({
 
     if (isNowVisible) {
       // Video entered view
-      video.muted = globallyMuted;
+      if (video instanceof HTMLVideoElement) {
+        video.muted = globallyMuted;
+      }
       if (shouldAutoplay) {
-        video.play().catch(console.error);
+        video.play?.().catch(console.error);
       }
       onEnterView?.();
     } else {
       // Video exited view - always mute and optionally pause
-      video.muted = true;
-      if (!video.paused) {
+      if (video instanceof HTMLVideoElement) {
+        video.muted = true;
+        if (!video.paused) {
+          video.pause();
+        }
+      } else if (video.pause) {
         video.pause();
       }
       onExitView?.();
@@ -72,7 +78,9 @@ export const useVideoVisibility = ({
     const video = videoRef?.current;
     if (!video || !isVisible) return;
     
-    video.muted = globallyMuted;
+    if (video instanceof HTMLVideoElement) {
+      video.muted = globallyMuted;
+    }
   }, [globallyMuted, isVisible, videoRef]);
 
   return {
