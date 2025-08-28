@@ -100,24 +100,39 @@ export function useMessages() {
     // Set up real-time subscription for new messages
     const channelName = `messages_${user.id}`;
     
-    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
-      const channel = channelManager.createChannel(channelName);
-      
-      channel
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'messages',
-            filter: `recipient_id=eq.${user.id}`
-          },
-          () => {
-            fetchConversations();
-          }
-        )
-        .subscribe();
-    });
+    const setupSubscription = async () => {
+      try {
+        import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+          const channel = channelManager.createChannel(channelName);
+          
+          channel
+            .on(
+              'postgres_changes',
+              {
+                event: '*',
+                schema: 'public',
+                table: 'messages',
+                filter: `recipient_id=eq.${user.id}`
+              },
+              () => {
+                fetchConversations();
+              }
+            )
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                console.log('Successfully subscribed to messages');
+              } else if (status === 'CHANNEL_ERROR') {
+                console.warn('Messages realtime subscription failed - continuing without realtime updates');
+              }
+            });
+        });
+      } catch (error) {
+        console.warn('Failed to setup messages realtime subscription:', error);
+        // App continues to work without realtime message updates
+      }
+    };
+
+    setupSubscription();
 
     return () => {
       import('@/utils/supabaseChannelManager').then(({ channelManager }) => {

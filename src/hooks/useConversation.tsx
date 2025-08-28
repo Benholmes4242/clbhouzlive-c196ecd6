@@ -36,24 +36,39 @@ export function useConversation(friendId: string | null) {
     // Set up real-time subscription for this conversation
     const channelName = `conversation_${user.id}_${friendId}`;
     
-    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
-      const channel = channelManager.createChannel(channelName);
-      
-      channel
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'messages',
-            filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id}))`
-          },
-          () => {
-            fetchMessages();
-          }
-        )
-        .subscribe();
-    });
+    const setupSubscription = async () => {
+      try {
+        import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+          const channel = channelManager.createChannel(channelName);
+          
+          channel
+            .on(
+              'postgres_changes',
+              {
+                event: '*',
+                schema: 'public',
+                table: 'messages',
+                filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id}))`
+              },
+              () => {
+                fetchMessages();
+              }
+            )
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                console.log('Successfully subscribed to conversation messages');
+              } else if (status === 'CHANNEL_ERROR') {
+                console.warn('Conversation messages realtime subscription failed - continuing without realtime updates');
+              }
+            });
+        });
+      } catch (error) {
+        console.warn('Failed to setup conversation realtime subscription:', error);
+        // App continues to work without realtime message updates
+      }
+    };
+
+    setupSubscription();
 
     return () => {
       import('@/utils/supabaseChannelManager').then(({ channelManager }) => {

@@ -24,24 +24,14 @@ class SupabaseChannelManager {
     console.log(`Creating new channel: ${channelName}`);
     
     try {
-      // Create channel with error handling for secure environments
-      const channel = supabase.channel(channelName, {
-        config: {
-          presence: {
-            key: channelName
-          },
-          broadcast: {
-            self: true
-          }
-        }
-      });
-      
+      // Create channel with basic configuration
+      const channel = supabase.channel(channelName);
       this.channels.set(channelName, channel);
       return channel;
     } catch (error) {
       console.error(`Failed to create channel ${channelName}:`, error);
       // Return a basic channel as fallback
-      const fallbackChannel = supabase.channel(channelName);
+      const fallbackChannel = supabase.channel(`fallback_${channelName}`);
       this.channels.set(channelName, fallbackChannel);
       return fallbackChannel;
     }
@@ -51,7 +41,11 @@ class SupabaseChannelManager {
     const channel = this.channels.get(channelName);
     if (channel) {
       console.log(`Removing channel: ${channelName}`);
-      supabase.removeChannel(channel);
+      try {
+        supabase.removeChannel(channel);
+      } catch (error) {
+        console.warn(`Error removing channel ${channelName}:`, error);
+      }
       this.channels.delete(channelName);
     }
   }
@@ -59,7 +53,11 @@ class SupabaseChannelManager {
   removeAllChannels(): void {
     console.log('Removing all channels');
     this.channels.forEach((channel, name) => {
-      supabase.removeChannel(channel);
+      try {
+        supabase.removeChannel(channel);
+      } catch (error) {
+        console.warn(`Error removing channel ${name}:`, error);
+      }
     });
     this.channels.clear();
   }
