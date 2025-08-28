@@ -281,9 +281,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
             })}
           </div>
 
-          {/* Mobile: Grid layout (same as desktop) */}
+          {/* Mobile: Grid layout - single row */}
           <div className="md:hidden">
-            <div className="grid grid-cols-2 gap-4 px-4">
+            <div className="grid grid-cols-4 gap-1 px-2">
               {achievementRings.map((achievement, index) => {
                 const progress = getProgressData(achievement.region);
                 const animationDelay = index * 0.15;
@@ -294,7 +294,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     key={achievement.id} 
                     className="flex flex-col items-center cursor-pointer"
                   >
-                    <div className="w-32 h-32 relative transition-all duration-300">
+                    <div className="w-20 h-20 relative transition-all duration-300">
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
@@ -342,7 +342,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Map Background */}
                             <img
                               src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
@@ -351,17 +351,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-xs text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-[0.6rem] text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Continental Europe Map Background */}
                             <img
                               src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
@@ -370,17 +370,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-xs text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-[0.6rem] text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* UK & Ireland Map Background */}
                             <img
                               src="/lovable-uploads/dc0f671b-b75f-4121-8ebd-18dd7f9b67c3.png"
@@ -389,17 +389,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-xs text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-[0.6rem] text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* World Map Background */}
                             <img
                               src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
@@ -408,22 +408,22 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
+                              <div className="text-xs text-black leading-none">
                                 <span>{progress.played}</span>
                                 <span className="text-black/60"> / {progress.total}</span>
                               </div>
-                               <div className="text-xs text-black mt-0.5">
+                               <div className="text-[0.6rem] text-black mt-0.5">
                                  {progress.played * 120} XP
                                </div>
                             </div>
                           </div>
                         ) : (
                           <>
-                            <div className="text-sm text-black leading-none">
+                            <div className="text-xs text-black leading-none">
                               <span>{progress.played}</span>
                               <span className="text-black/60"> / {progress.total}</span>
                             </div>
-                             <div className="text-xs text-black mt-0.5">
+                             <div className="text-[0.6rem] text-black mt-0.5">
                                {progress.played * 120} XP
                              </div>
                           </>
@@ -432,8 +432,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     </div>
                     
                      {/* Achievement info */}
-                     <div className="mt-2 text-center">
-                       <div className="text-sm text-foreground leading-tight">
+                     <div className="mt-1 text-center">
+                       <div className="text-xs text-foreground leading-tight">
                          {achievement.title}
                        </div>
                      </div>
