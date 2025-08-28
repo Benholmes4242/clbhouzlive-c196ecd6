@@ -219,7 +219,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {courseQuote || 'A golf experience like no other'}
             </div>
            ) : showRatingOnRight ? (
-            // Show ranking badges and user rating in same row for Top 10 Rated cards
+            // Show ranking badges and average rating for Top 10 Rated cards
             <div className="flex items-center justify-between mt-2">
               <div className="flex flex-wrap gap-2">
                 <CourseRankBadges
@@ -230,7 +230,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   positioning="bottom-left"
                   showUserRating={false}
                   averageRating={course.average_rating}
-                  showAverageRating={showAverageRating}
+                  showAverageRating={true}
                   showXP={false}
                 />
               </div>
