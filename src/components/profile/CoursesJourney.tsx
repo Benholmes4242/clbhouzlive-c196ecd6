@@ -828,6 +828,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                           showCountryWithFlag={true}
                           showXP={true}
                           xp={100}
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                          mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                         />
                       </div>
                     </div>

@@ -40,6 +40,8 @@ interface CourseCardProps {
   showCountryWithFlag?: boolean;
   showAIQuote?: boolean;
   disableClick?: boolean;
+  mobileTextScale?: 'small' | 'normal';
+  mobileFlagSize?: 'sm' | 'md' | 'lg';
 }
 
 // Helper function to format description text with line breaks
@@ -111,7 +113,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   hideRankingBadges = false,
   showCountryWithFlag = false,
   showAIQuote = false,
-  disableClick = false
+  disableClick = false,
+  mobileTextScale = 'normal',
+  mobileFlagSize = 'lg'
 }) => {
   const navigate = useNavigate();
   const [courseQuote, setCourseQuote] = useState<string>('');
@@ -191,28 +195,28 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {/* XP earned - show above course name */}
           {showXP && xp && (
-            <div className="text-2xl text-white/90 leading-tight mb-1 drop-shadow-lg">
+            <div className={`${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} text-white/90 leading-tight mb-1 drop-shadow-lg`}>
               + {xp} XP
             </div>
           )}
           
           {/* Course Name */}
-          <h3 className={`text-3xl text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : ''}`}>
+          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : ''}`}>
             {course.name}
           </h3>
           
           {/* AI Quote or Location */}
           {showAIQuote ? (
-            <div className="text-white/90 text-2xl leading-relaxed drop-shadow-lg italic">
+            <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} leading-relaxed drop-shadow-lg italic`}>
               {courseQuote || 'A golf experience like no other'}
             </div>
           ) : (
-            <div className="flex items-center text-white/90 text-2xl drop-shadow-lg">
+            <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
               {showCountryWithFlag ? (
                 <>
                   <CountryFlag 
                     country={getCountryForFlag(course)} 
-                    size="lg"
+                    size={mobileFlagSize}
                     className="mr-2 flex-shrink-0" 
                   />
                   <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
