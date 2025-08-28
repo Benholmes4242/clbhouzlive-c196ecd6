@@ -571,7 +571,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               </div>
 
               {/* User Profile and Caption - Bottom Left */}
-              <div className="absolute bottom-24 left-3 right-20 z-20">
+              <div className="absolute bottom-6 left-3 right-20 z-20">
                 {/* User Profile Section */}
                 {index === currentIndex && (
                   <div className="mb-3 flex items-end space-x-3">
@@ -622,7 +622,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               </div>
 
               {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
+              <div className="absolute bottom-6 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
                   <button 
