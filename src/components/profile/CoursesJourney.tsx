@@ -347,7 +347,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <img
                               src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
                               alt="USA map background"
-                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                              className="absolute inset-0 w-full h-full object-contain opacity-25"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
@@ -366,7 +366,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <img
                               src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
                               alt="Continental Europe map background"
-                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                              className="absolute inset-0 w-full h-full object-contain opacity-25"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
@@ -380,12 +380,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-20 h-20 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* UK & Ireland Map Background */}
                             <img
                               src="/lovable-uploads/dc0f671b-b75f-4121-8ebd-18dd7f9b67c3.png"
                               alt="UK & Ireland map background"
-                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                              className="absolute inset-0 w-full h-full object-contain opacity-25"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
@@ -404,7 +404,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             <img
                               src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
                               alt="World map background"
-                              className="absolute inset-0 w-full h-full object-contain opacity-20"
+                              className="absolute inset-0 w-full h-full object-contain opacity-25"
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
