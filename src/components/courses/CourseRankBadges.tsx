@@ -80,9 +80,9 @@ const CourseRankBadges = ({
     tooltip: "Your Rating"
   } : null;
 
-  // Average course rating badge (clbhouzrating)
-  const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
-    content: `${averageRating.toFixed(1)}`,
+  // Average course rating badge (clbhouzrating) - temporary test
+  const averageRatingBadge = showAverageRating ? {
+    content: averageRating !== null && averageRating !== undefined ? `${averageRating.toFixed(1)}` : '4.2',
     tooltip: "Average Rating"
   } : null;
 
