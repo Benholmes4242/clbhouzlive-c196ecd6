@@ -208,10 +208,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           )}
           
-           {/* Course Name - moved up when showing rating badges */}
-           <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
-             {course.name}
-           </h3>
+          {/* Course Name - moved up when showing rating badges */}
+          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-2' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
+            {course.name}
+          </h3>
           
           {/* AI Quote or Location or Ranking Badges */}
           {showAIQuote ? (
@@ -219,9 +219,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {courseQuote || 'A golf experience like no other'}
             </div>
            ) : showRatingOnRight ? (
-             // Show ranking badges and average rating for Top 10 Rated cards
-             <div className="flex items-center justify-between">
-               <div className="flex flex-wrap gap-2">
+            // Show ranking badges and average rating for Top 10 Rated cards
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex flex-wrap gap-2">
                 <CourseRankBadges
                   globalRank={course.global_rank}
                   regionalRank={course.regional_rank}
@@ -234,8 +234,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   showXP={false}
                 />
               </div>
-              {/* User Rating in liquid glass container */}
-              {userRating && showUserRating && (
+              {/* User Rating in liquid glass container - only show if not showing average rating */}
+              {userRating && !showAverageRating && (
                 <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                   <div className="relative z-10 flex items-center gap-1.5">
                     <span className="text-sm font-bold text-white">{userRating}/10</span>
@@ -255,12 +255,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
                 </>
               ) : (
-                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                  <div className="relative z-10 flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 flex-shrink-0 text-white" />
-                    <span className="text-sm font-medium text-white">{formatLocation(course)}</span>
-                  </div>
-                </div>
+                <>
+                  <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span>{formatLocation(course)}</span>
+                </>
               )}
             </div>
           )}

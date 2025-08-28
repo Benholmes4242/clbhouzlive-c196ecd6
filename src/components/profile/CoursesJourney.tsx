@@ -815,20 +815,21 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
-                         <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                           showCountryWithFlag={true}
-                           showXP={false}
-                           mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                           mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          hideRankingBadges={true}
+                          showCountryWithFlag={true}
+                          showXP={true}
+                          xp={100}
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                          mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                         />
                       </div>
                     </div>
@@ -1403,7 +1404,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
           course_id,
           rating,
           created_at,
-          golf_courses!inner (
+          golf_courses (
             id,
             name,
             country,
@@ -1415,6 +1416,9 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1423,29 +1427,15 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 
       if (ratedError) throw ratedError;
 
-      // Now get the course rating stats separately
-      const courseIds = (ratedData || []).map(course => course.course_id);
-      
-      const { data: statsData, error: statsError } = await supabase
-        .from('course_rating_stats')
-        .select('course_id, average_rating')
-        .in('course_id', courseIds);
-
-      if (statsError) throw statsError;
-
-      // Create a map for quick lookup
-      const statsMap = new Map();
-      (statsData || []).forEach(stat => {
-        statsMap.set(stat.course_id, stat.average_rating);
-      });
-
       return (ratedData || []).map(course => ({
         ...course,
         played_date: course.created_at, // Use rating date as played date
         id: `rating-${course.course_id}`, // Unique ID
         golf_courses: {
           ...course.golf_courses,
-          average_rating: statsMap.get(course.course_id) || null
+          average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+            ? course.course_rating_stats[0].average_rating 
+            : null
         }
       }));
     },
@@ -1566,20 +1556,19 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       }}
                     >
                        <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                          <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={true}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                            hideRankingBadges={false}
-                            showAIQuote={false}
-                            showRatingOnRight={true}
-                          />
+                         <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           hideRankingBadges={false}
+                           showAIQuote={false}
+                           showRatingOnRight={true}
+                         />
                        </div>
                     </div>
                   );
@@ -2006,16 +1995,16 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={false}
+                          showAverageRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -2071,9 +2060,6 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2099,9 +2085,6 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2112,24 +2095,12 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          id: `top100-${course.course_id}`
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          id: `rating-${course.course_id}`
         }))
       ];
 
@@ -2392,16 +2363,15 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -2777,16 +2747,15 @@ const USASection: React.FC<USASectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                         <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -2842,9 +2811,6 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2870,9 +2836,6 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2883,24 +2846,12 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          id: `top100-${course.course_id}`
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          id: `rating-${course.course_id}`
         }))
       ];
 
@@ -3162,16 +3113,15 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -3203,26 +3153,9 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
     queryKey: ['worldwideCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
-
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses (global_rank)`)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -3230,47 +3163,13 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses (global_rank)`)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.global_rank && course.global_rank <= 100;
-      });
-
-      return worldwideCourses;
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.global_rank && c.golf_courses.global_rank <= 100);
     },
     enabled: !!userId,
   });
@@ -3389,26 +3288,9 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
     queryKey: ['europeCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
-
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses (country)`)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -3416,47 +3298,13 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses (country)`)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      return europeCourses;
+      const combined = [...(top100Data || []), ...(ratedData || [])];
+      return combined.filter(c => c.golf_courses?.country === 'Continental Europe');
     },
     enabled: !!userId,
   });
