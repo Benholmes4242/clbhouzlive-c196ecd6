@@ -31,116 +31,18 @@ interface DiscoverVerticalFeedProps {
   initialItem?: ExploreContentItem;
 }
 
-// VideoWithAutoplay component moved outside to prevent recreation on re-renders
+// VideoWithAutoplay component simplified to remove conflicts with EnhancedVideoPlayer
 const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
   objectFit?: 'cover' | 'contain';
 }> = React.memo(({ src, muted, className, objectFit = 'cover' }) => {
-  const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const intersectionRef = useRef<HTMLVideoElement | null>(null);
-  const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
-  const { isGloballyMuted } = useGlobalAudio();
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  // Use intersection observer with proper typing
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const newIsInView = entry.isIntersecting && entry.intersectionRatio >= 0.8;
-        setIsInView(newIsInView);
-        
-        // Reset hasAttemptedPlay when video goes out of view
-        if (!newIsInView) {
-          setHasAttemptedPlay(false);
-        }
-      },
-      {
-        threshold: 0.8,
-        rootMargin: '0px'
-      }
-    );
-
-    const currentRef = intersectionRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
-
-  // Register video with manager when component mounts
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        removeVideo(videoRef.current);
-      }
-    };
-  }, [removeVideo]);
-
-  // Combined ref callback
-  const combinedRef = useCallback((node: HTMLVideoElement | null) => {
-    if (videoRef.current) {
-      removeVideo(videoRef.current);
-    }
-    
-    videoRef.current = node;
-    intersectionRef.current = node;
-    
-    if (node) {
-      addVideo(node);
-    }
-  }, [addVideo, removeVideo]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !isInView || hasAttemptedPlay) return;
-
-    const attemptPlay = async () => {
-      try {
-        setHasAttemptedPlay(true);
-        
-        // Set video as active in manager
-        setActiveVideo(video);
-        
-        video.muted = isGloballyMuted;
-        video.currentTime = 0;
-        await video.play();
-      } catch (error) {
-        console.warn('Video autoplay failed:', error);
-      }
-    };
-
-    // Delay to ensure proper intersection detection
-    const timer = setTimeout(attemptPlay, 100);
-    return () => clearTimeout(timer);
-  }, [isInView, hasAttemptedPlay, isGloballyMuted, setActiveVideo]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.muted = muted;
-  }, [muted]);
-
-  // Reset hasAttemptedPlay when src changes
-  useEffect(() => {
-    setHasAttemptedPlay(false);
-  }, [src]);
-
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
       <EnhancedVideoPlayer
-        ref={combinedRef}
         src={src}
-        autoplay={false}
+        autoplay={true}
         muted={muted}
         loop={true}
         className="w-full h-full"
