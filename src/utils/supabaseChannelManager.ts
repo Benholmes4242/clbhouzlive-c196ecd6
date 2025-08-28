@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { secureSupabase as supabase } from '@/integrations/supabase/secureClient';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 class SupabaseChannelManager {
@@ -22,9 +22,29 @@ class SupabaseChannelManager {
     }
 
     console.log(`Creating new channel: ${channelName}`);
-    const channel = supabase.channel(channelName);
-    this.channels.set(channelName, channel);
-    return channel;
+    
+    try {
+      // Create channel with error handling for secure environments
+      const channel = supabase.channel(channelName, {
+        config: {
+          presence: {
+            key: channelName
+          },
+          broadcast: {
+            self: true
+          }
+        }
+      });
+      
+      this.channels.set(channelName, channel);
+      return channel;
+    } catch (error) {
+      console.error(`Failed to create channel ${channelName}:`, error);
+      // Return a basic channel as fallback
+      const fallbackChannel = supabase.channel(channelName);
+      this.channels.set(channelName, fallbackChannel);
+      return fallbackChannel;
+    }
   }
 
   removeChannel(channelName: string): void {
