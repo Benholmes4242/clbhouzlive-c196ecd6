@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import CloudflareIframePlayer, { CloudflareIframePlayerRef } from '@/components/ui/CloudflareIframePlayer';
+import { isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -45,9 +47,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   objectFit = 'cover'
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const iframeRef = useRef<CloudflareIframePlayerRef>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const { isGloballyMuted } = useGlobalAudio();
+  
+  // Check if this is a Cloudflare Stream URL
+  const useIframePlayer = isCloudflareStreamUrl(src);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +122,12 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
       loadingTimeoutRef.current = null;
+    }
+
+    // Skip HLS initialization for Cloudflare Stream URLs - use iframe instead
+    if (useIframePlayer) {
+      setIsLoading(false);
+      return;
     }
 
     // Check if HLS is needed and supported
@@ -403,10 +415,50 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   const handleVideoClick = (e: React.MouseEvent) => {
     if (onClick) {
       onClick();
+    } else if (useIframePlayer && iframeRef.current) {
+      // For iframe player, use postMessage to control playback
+      if (isPlaying) {
+        iframeRef.current.pause();
+      } else {
+        iframeRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
     } else {
       togglePlayPause(e);
     }
   };
+
+  // If using Cloudflare iframe player, render that instead
+  if (useIframePlayer) {
+    return (
+      <div 
+        className={`relative group cursor-pointer ${className}`}
+        onClick={handleVideoClick}
+      >
+        <CloudflareIframePlayer
+          ref={iframeRef}
+          src={src}
+          className="w-full h-full"
+          autoplay={autoplay}
+          muted={muted}
+          loop={loop}
+          poster={poster}
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setError('Failed to load video');
+            setIsLoading(false);
+          }}
+        />
+        
+        {/* Loading indicator for iframe */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-20">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (error) {
     return (
