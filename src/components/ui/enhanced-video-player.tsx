@@ -105,6 +105,17 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     }
   }, [isInView, isMobile, shouldLoadVideo, src, autoplay]);
 
+  // 🐛 DEBUG: Force load videos on desktop for debugging
+  useEffect(() => {
+    console.log('🚨 FORCE DEBUG - shouldLoadVideo state:', { shouldLoadVideo, isInView, isMobile, autoplay });
+    
+    // Force load for debugging - bypass intersection observer on desktop
+    if (!isMobile && !shouldLoadVideo) {
+      console.log('🚨 FORCE DEBUG - Setting shouldLoadVideo=true (forced)');
+      setShouldLoadVideo(true);
+    }
+  }, [shouldLoadVideo, isInView, isMobile, autoplay]);
+
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
     console.log('🚀 HLS loading effect:', { shouldLoadVideo, enableHLS, hasHls: !!window.Hls });
