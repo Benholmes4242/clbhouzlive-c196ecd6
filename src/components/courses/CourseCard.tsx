@@ -209,7 +209,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
           
            {/* Course Name - moved up when showing rating badges */}
-           <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-4' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
+           <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-2' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
              {course.name}
            </h3>
           
