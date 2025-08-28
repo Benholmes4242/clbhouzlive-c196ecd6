@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { isCloudflareStreamUrl, uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 
 interface FeedVideoPlayerProps {
   src: string;
@@ -39,11 +40,24 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   onClick
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
+  const [apiPoster, setApiPoster] = useState<string | null>(null);
 
-  // Generate HLS URL and poster if not provided
+  // Extract video ID and fetch from API
   const uid = uidFromNode({ src, hls_url: propHlsUrl });
-  const hlsUrl = propHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
-  const poster = propPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
+  
+  useEffect(() => {
+    if (uid && !propHlsUrl) {
+      getCloudflareStreamHLS(uid).then(setApiHlsUrl);
+    }
+    if (uid && !propPoster) {
+      getCloudflareStreamPoster(uid).then(setApiPoster);
+    }
+  }, [uid, propHlsUrl, propPoster]);
+
+  // Use prop values first, then API values, then fallbacks
+  const hlsUrl = propHlsUrl || apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
+  const poster = propPoster || apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
   // Expose unified ref interface to parent
   useImperativeHandle(ref, () => {

@@ -12,6 +12,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
@@ -41,6 +42,8 @@ const VideoWithAutoplay: React.FC<{
 }> = React.memo(({ src, muted, className, objectFit = 'cover' }) => {
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
+  const [apiPoster, setApiPoster] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const intersectionRef = useRef<HTMLVideoElement | HTMLIFrameElement | null>(null);
@@ -48,10 +51,19 @@ const VideoWithAutoplay: React.FC<{
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  // Check if this is a Cloudflare Stream URL
+  // Extract video ID and fetch from API
   const uid = uidFromNode({ src });
-  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
-  const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
+  
+  useEffect(() => {
+    if (uid) {
+      getCloudflareStreamHLS(uid).then(setApiHlsUrl);
+      getCloudflareStreamPoster(uid).then(setApiPoster);
+    }
+  }, [uid]);
+
+  // Use API values first, then fallbacks
+  const hlsUrl = apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
+  const poster = apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
