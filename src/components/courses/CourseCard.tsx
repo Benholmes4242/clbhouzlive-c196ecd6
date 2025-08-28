@@ -221,7 +221,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
            ) : showRatingOnRight ? (
              // Show ranking badges and average rating for Top 10 Rated cards
              <div className="flex items-center justify-between">
-               <div className="flex flex-wrap gap-2">
+               <div className="flex flex-wrap gap-2 -ml-1">
                 <CourseRankBadges
                   globalRank={course.global_rank}
                   regionalRank={course.regional_rank}
