@@ -210,10 +210,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} leading-relaxed drop-shadow-lg italic`}>
               {courseQuote || 'A golf experience like no other'}
             </div>
-          ) : showUserRating && userRating ? (
-            <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg font-bold`}>
-              {userRating}/10
-            </div>
           ) : (
             <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
               {showCountryWithFlag ? (
