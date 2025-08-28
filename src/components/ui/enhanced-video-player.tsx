@@ -134,6 +134,10 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     
     if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
       if (window.Hls && window.Hls.isSupported()) {
+        // Completely clear video element for HLS.js management
+        video.removeAttribute('src');
+        video.load(); // Reset video element state
+        
         const hls = new window.Hls({
           enableWorker: true,
           lowLatencyMode: true,
@@ -174,8 +178,21 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           }
           setIsLoading(false);
           console.log('HLS manifest parsed successfully for:', src);
-          if (autoplay) {
-            video.play().catch(console.error);
+          
+          // Ensure video is ready before attempting autoplay
+          if (autoplay && video.readyState >= 2) {
+            video.play().catch((error) => {
+              console.warn('Autoplay failed after manifest parsed:', error);
+            });
+          }
+        });
+
+        // Add additional event for when video can play
+        hls.on(window.Hls.Events.LEVEL_LOADED, () => {
+          if (autoplay && video.paused && video.readyState >= 2) {
+            video.play().catch((error) => {
+              console.warn('Autoplay failed on level loaded:', error);
+            });
           }
         });
 
