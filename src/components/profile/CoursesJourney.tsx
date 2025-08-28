@@ -1416,6 +1416,9 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1427,7 +1430,13 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
       return (ratedData || []).map(course => ({
         ...course,
         played_date: course.created_at, // Use rating date as played date
-        id: `rating-${course.course_id}` // Unique ID
+        id: `rating-${course.course_id}`, // Unique ID
+        golf_courses: {
+          ...course.golf_courses,
+          average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+            ? course.course_rating_stats[0].average_rating 
+            : null
+        }
       }));
     },
     enabled: !!userId,
@@ -1819,6 +1828,9 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1845,6 +1857,9 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -1856,12 +1871,24 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null, // Add rating field for consistency
-          id: `top100-${course.course_id}` // Unique ID for deduplication
+          id: `top100-${course.course_id}`, // Unique ID for deduplication
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at, // Use rating date as played date
-          id: `rating-${course.course_id}` // Unique ID for deduplication
+          id: `rating-${course.course_id}`, // Unique ID for deduplication
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         }))
       ];
 
@@ -1974,7 +2001,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={true}
+                          showUserRating={false}
+                          showAverageRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />
@@ -2561,6 +2589,9 @@ const USASection: React.FC<USASectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2586,6 +2617,9 @@ const USASection: React.FC<USASectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2596,12 +2630,24 @@ const USASection: React.FC<USASectionProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`
+          id: `top100-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`
+          id: `rating-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         }))
       ];
 
