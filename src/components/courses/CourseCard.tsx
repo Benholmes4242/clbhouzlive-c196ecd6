@@ -193,16 +193,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
           />
         )}
 
-        {/* User Rating on Right - for Top 10 Rated cards */}
-        {showRatingOnRight && userRating && (
-          <div className="absolute top-4 right-4 z-20">
-            <div className="bg-black/30 backdrop-blur-sm border border-white/20 px-3 py-2 rounded-lg">
-              <span className="text-2xl font-bold text-white drop-shadow-lg">
-                {userRating}/10
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Course Information Overlay - positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -213,8 +203,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           )}
           
-          {/* Course Name */}
-          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${hideRankingBadges ? '' : ''}`}>
+          {/* Course Name - moved up when showing rating badges */}
+          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-4' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
             {course.name}
           </h3>
           
@@ -223,18 +213,29 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} leading-relaxed drop-shadow-lg italic`}>
               {courseQuote || 'A golf experience like no other'}
             </div>
-          ) : showRatingOnRight ? (
-            // Show ranking badges for Top 10 Rated cards
-            <div className="flex flex-wrap gap-2 mt-2">
-              <CourseRankBadges
-                globalRank={course.global_rank}
-                regionalRank={course.regional_rank}
-                usaRank={course.usa_rank}
-                country={course.country}
-                positioning="bottom-left"
-                showUserRating={false}
-                showXP={false}
-              />
+           ) : showRatingOnRight ? (
+            // Show ranking badges and user rating in same row for Top 10 Rated cards
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex flex-wrap gap-2">
+                <CourseRankBadges
+                  globalRank={course.global_rank}
+                  regionalRank={course.regional_rank}
+                  usaRank={course.usa_rank}
+                  country={course.country}
+                  positioning="bottom-left"
+                  showUserRating={false}
+                  showXP={false}
+                />
+              </div>
+              {/* User Rating in liquid glass container */}
+              {userRating && (
+                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                  <div className="relative z-10 flex items-center gap-1.5">
+                    <Star className="h-4 w-4 text-white fill-white" />
+                    <span className="text-sm font-bold text-white">{userRating}/10</span>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
