@@ -2007,14 +2007,13 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                        <CourseCard 
+                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={false}
-                          showAverageRating={true}
+                          showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />
@@ -2399,8 +2398,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={false}
-                          showAverageRating={true}
+                          showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />
@@ -3168,8 +3166,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={false}
-                          showAverageRating={true}
+                          showUserRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />

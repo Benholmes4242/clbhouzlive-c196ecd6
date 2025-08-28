@@ -208,10 +208,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           )}
           
-          {/* Course Name - moved up when showing rating badges */}
-          <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-2' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
-            {course.name}
-          </h3>
+           {/* Course Name - moved up when showing rating badges */}
+           <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-8' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
+             {course.name}
+           </h3>
           
           {/* AI Quote or Location or Ranking Badges */}
           {showAIQuote ? (
@@ -234,10 +234,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   showXP={false}
                 />
               </div>
-              {/* User Rating in liquid glass container - only show if not showing average rating */}
-              {userRating && !showAverageRating && (
+              {/* User Rating in liquid glass container with star emoji */}
+              {userRating && showUserRating && (
                 <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                   <div className="relative z-10 flex items-center gap-1.5">
+                    <span className="text-sm">⭐</span>
                     <span className="text-sm font-bold text-white">{userRating}/10</span>
                   </div>
                 </div>
