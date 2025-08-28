@@ -4,7 +4,6 @@ import { Progress } from '@/components/ui/progress';
 import { Trophy, Target, MapPin, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import CircularProgress from '@/components/ui/circular-progress';
-import MobileProgressCarousel from './MobileProgressCarousel';
 
 interface ProfileProgressSectionProps {
   coursesPlayed: number;
@@ -99,27 +98,8 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
 
   return (
     <>
-      {/* Mobile Layout */}
-      <div className="block md:hidden">
-        <MobileProgressCarousel
-          coursesPlayed={coursesPlayed}
-          totalXP={totalXP}
-          maxCourses={maxCourses}
-          britainIrelandCompleted={britainIrelandCompleted}
-          britainIrelandTotal={britainIrelandTotal}
-          europeCompleted={europeCompleted}
-          europeTotal={europeTotal}
-          usaCompleted={usaCompleted}
-          usaTotal={usaTotal}
-          worldwideCompleted={worldwideCompleted}
-          worldwideTotal={worldwideTotal}
-          achievements={achievements}
-          className={className}
-        />
-      </div>
-
-      {/* Desktop Layout */}
-      <Card className={cn('w-full hidden md:block', className)}>
+      {/* Unified Layout - Same grid for both mobile and desktop */}
+      <Card className={cn('w-full', className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
