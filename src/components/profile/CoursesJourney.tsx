@@ -1283,9 +1283,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       <div className="aspect-[5/4] w-full relative group">
                         {/* Video Element - Use FeedVideoPlayer for HLS support */}
                         <FeedVideoPlayer
-                          ref={(videoElement) => {
-                            if (videoElement) {
-                              const cleanup = registerVideo(videoId, videoElement);
+                          ref={(videoPlayerRef) => {
+                            if (videoPlayerRef?.element && videoPlayerRef.element instanceof HTMLVideoElement) {
+                              const cleanup = registerVideo(videoId, videoPlayerRef.element);
                               return cleanup;
                             }
                           }}

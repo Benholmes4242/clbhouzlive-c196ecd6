@@ -1,4 +1,6 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import CloudflareIframePlayer, { CloudflareIframePlayerRef } from '@/components/ui/CloudflareIframePlayer';
+import { isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
 
 interface FeedVideoPlayerProps {
   src: string;
@@ -10,13 +12,20 @@ interface FeedVideoPlayerProps {
   onClick?: () => void;
 }
 
-declare global {
-  interface Window {
-    Hls: any;
-  }
+// Unified ref type that provides basic video controls for both implementations
+export interface FeedVideoPlayerRef {
+  play?: () => void;
+  pause?: () => void;
+  currentTime?: number;
+  duration?: number;
+  paused?: boolean;
+  muted?: boolean;
+  volume?: number;
+  // Keep native element for backward compatibility
+  element?: HTMLVideoElement | HTMLIFrameElement;
 }
 
-const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
+const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   src,
   className = '',
   muted = true,
@@ -25,111 +34,77 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
   preload = 'metadata',
   onClick
 }, ref) => {
+  const iframeRef = useRef<CloudflareIframePlayerRef>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<any>(null);
 
-  // Expose the video element to parent via ref
-  useImperativeHandle(ref, () => videoRef.current!, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // Validate video source
-    if (!src || typeof src !== 'string' || src.trim() === '') {
-      console.error('FeedVideoPlayer - Invalid video source:', src);
-      return;
+  // Expose unified ref interface to parent
+  useImperativeHandle(ref, () => {
+    if (isCloudflareStreamUrl(src) && iframeRef.current) {
+      const iframe = iframeRef.current;
+      return {
+        play: () => iframe.play(),
+        pause: () => iframe.pause(),
+        element: iframe.iframe,
+        get currentTime() { return 0; }, // Async, would need proper implementation
+        get duration() { return 0; },
+        get paused() { return false; },
+        get muted() { return true; },
+        get volume() { return 0; }
+      };
+    } else if (videoRef.current) {
+      const video = videoRef.current;
+      return {
+        play: () => video.play(),
+        pause: () => video.pause(),
+        element: video,
+        get currentTime() { return video.currentTime; },
+        get duration() { return video.duration; },
+        get paused() { return video.paused; },
+        get muted() { return video.muted; },
+        get volume() { return video.volume; }
+      };
     }
-
-    // Clear any existing HLS instance
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
-
-    // Check if HLS is needed and if source is a proper URL
-    const isValidUrl = src.startsWith('http') || src.startsWith('/');
-    const isHLS = src.includes('.m3u8') || src.includes('cloudflarestream.com');
-    
-    // Reduced logging - only log errors
-    if (!isValidUrl) {
-      console.error('FeedVideoPlayer - Invalid video URL format:', src);
-      return;
-    }
-    
-    if (isHLS) {
-      // Load HLS.js if not already loaded
-      if (!window.Hls) {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-        script.onload = () => initializeHLS();
-        script.onerror = () => {
-          console.error('FeedVideoPlayer - Failed to load HLS.js');
-          video.src = src; // Fallback to direct src
-        };
-        document.head.appendChild(script);
-      } else {
-        initializeHLS();
-      }
-    } else {
-      // Regular video
-      video.src = src;
-    }
-
-    function initializeHLS() {
-      if (window.Hls && window.Hls.isSupported()) {
-        const hls = new window.Hls({
-          enableWorker: true,
-          lowLatencyMode: false,
-          backBufferLength: 30,
-          maxBufferLength: 20,
-          maxMaxBufferLength: 40,
-          startLevel: -1, // Let HLS.js choose the best quality
-          capLevelToPlayerSize: true,
-          debug: false,
-          progressive: true,
-          liveSyncDurationCount: 3,
-          liveMaxLatencyDurationCount: 10,
-          enableSoftwareAES: false
-        });
-
-        hls.loadSource(src);
-        hls.attachMedia(video);
-        hlsRef.current = hls;
-
-        hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
-          console.error('FeedVideoPlayer - HLS Error:', event, data);
-          if (data.fatal) {
-            console.error('FeedVideoPlayer - Fatal HLS Error, trying fallback');
-            // Fallback to direct video src
-            video.src = src;
-          }
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native HLS support (Safari)
-        video.src = src;
-      } else {
-        // Fallback to regular video
-        video.src = src;
-      }
-    }
-
-    return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-    };
+    return {};
   }, [src]);
 
+  // Validate video source
+  if (!src || typeof src !== 'string' || src.trim() === '') {
+    console.error('FeedVideoPlayer - Invalid video source:', src);
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center`}>
+        <p className="text-muted-foreground text-sm">Invalid video source</p>
+      </div>
+    );
+  }
+
+  // Use Cloudflare iframe for Stream URLs
+  if (isCloudflareStreamUrl(src)) {
+    return (
+      <CloudflareIframePlayer
+        ref={iframeRef}
+        src={src}
+        className={className}
+        autoplay={false} // Control autoplay externally
+        muted={muted}
+        loop={loop}
+        onClick={onClick}
+        onError={() => {
+          console.error('FeedVideoPlayer - Cloudflare iframe error:', src);
+        }}
+      />
+    );
+  }
+
+  // Fallback to regular video element for non-Cloudflare URLs
   return (
     <video
       ref={videoRef}
+      src={src}
       className={className}
       muted={muted}
       loop={loop}
       playsInline={playsInline}
-      preload="metadata"
+      preload={preload}
       crossOrigin="anonymous"
       onClick={onClick}
       onError={(e) => {

@@ -41,10 +41,15 @@ const VideoWithAutoplay: React.FC<{
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const intersectionRef = useRef<HTMLVideoElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const intersectionRef = useRef<HTMLVideoElement | HTMLIFrameElement | null>(null);
   const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // Check if this is a Cloudflare Stream URL
+  const isCloudflareStream = src.includes('cloudflarestream.com') || src.includes('videodelivery.net');
+  const videoId = isCloudflareStream ? src.match(/([0-9a-f]{32})/i)?.[1] : null;
 
   // Use intersection observer with proper typing
   useEffect(() => {
@@ -86,33 +91,43 @@ const VideoWithAutoplay: React.FC<{
   }, [removeVideo]);
 
   // Combined ref callback
-  const combinedRef = useCallback((node: HTMLVideoElement | null) => {
+  const combinedRef = useCallback((node: HTMLVideoElement | HTMLIFrameElement | null) => {
     if (videoRef.current) {
       removeVideo(videoRef.current);
     }
     
-    videoRef.current = node;
-    intersectionRef.current = node;
-    
-    if (node) {
-      addVideo(node);
+    if (node instanceof HTMLVideoElement) {
+      videoRef.current = node;
+      intersectionRef.current = node;
+      if (node) {
+        addVideo(node);
+      }
+    } else if (node instanceof HTMLIFrameElement) {
+      iframeRef.current = node;
+      intersectionRef.current = node;
     }
   }, [addVideo, removeVideo]);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !isInView || hasAttemptedPlay) return;
+    if (!isInView || hasAttemptedPlay) return;
 
     const attemptPlay = async () => {
       try {
         setHasAttemptedPlay(true);
         
-        // Set video as active in manager
-        setActiveVideo(video);
-        
-        video.muted = isGloballyMuted;
-        video.currentTime = 0;
-        await video.play();
+        if (isCloudflareStream && iframeRef.current) {
+          // For Cloudflare iframe, send postMessage to play
+          iframeRef.current.contentWindow?.postMessage({ method: 'play' }, '*');
+          console.log('✅ VideoWithAutoplay: Cloudflare iframe play triggered');
+        } else if (videoRef.current) {
+          // For regular videos
+          const video = videoRef.current;
+          setActiveVideo(video);
+          video.muted = isGloballyMuted;
+          video.currentTime = 0;
+          await video.play();
+          console.log('✅ VideoWithAutoplay: Video autoplay successful');
+        }
       } catch (error) {
         console.warn('Video autoplay failed:', error);
       }
@@ -121,13 +136,12 @@ const VideoWithAutoplay: React.FC<{
     // Delay to ensure proper intersection detection
     const timer = setTimeout(attemptPlay, 100);
     return () => clearTimeout(timer);
-  }, [isInView, hasAttemptedPlay, isGloballyMuted, setActiveVideo]);
+  }, [isInView, hasAttemptedPlay, isGloballyMuted, setActiveVideo, isCloudflareStream]);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.muted = muted;
+    if (videoRef.current) {
+      videoRef.current.muted = muted;
+    }
   }, [muted]);
 
   // Reset hasAttemptedPlay when src changes
@@ -137,18 +151,29 @@ const VideoWithAutoplay: React.FC<{
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
-      <EnhancedVideoPlayer
-        ref={combinedRef}
-        src={src}
-        autoplay={false}
-        muted={muted}
-        loop={true}
-        className="w-full h-full"
-        enableHLS={true}
-        preloadLevel="metadata"
-        poster=""
-        objectFit={objectFit}
-      />
+      {isCloudflareStream && videoId ? (
+        <iframe
+          ref={combinedRef as any}
+          src={`https://iframe.videodelivery.net/${videoId}?autoplay=true&muted=${isGloballyMuted}&loop=true&controls=false`}
+          className="w-full h-full border-none"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+          allowFullScreen
+          style={{ border: 'none' }}
+        />
+      ) : (
+        <EnhancedVideoPlayer
+          ref={combinedRef as any}
+          src={src}
+          autoplay={false}
+          muted={muted}
+          loop={true}
+          className="w-full h-full"
+          enableHLS={false}
+          preloadLevel="metadata"
+          poster=""
+          objectFit={objectFit}
+        />
+      )}
     </div>
   );
 });
