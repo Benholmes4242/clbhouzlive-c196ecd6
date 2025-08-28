@@ -342,7 +342,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <div className="relative w-14 h-14 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Map Background */}
                             <img
                               src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
@@ -361,7 +361,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
-                          <div className="relative w-14 h-14 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Continental Europe Map Background */}
                             <img
                               src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
@@ -380,7 +380,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
-                          <div className="relative w-14 h-14 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* UK & Ireland Map Background */}
                             <img
                               src="/lovable-uploads/dc0f671b-b75f-4121-8ebd-18dd7f9b67c3.png"
@@ -399,7 +399,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
-                          <div className="relative w-14 h-14 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-16 h-16 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* World Map Background */}
                             <img
                               src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
