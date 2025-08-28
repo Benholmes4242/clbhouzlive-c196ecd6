@@ -1556,19 +1556,20 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       }}
                     >
                        <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                         <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                           hideRankingBadges={false}
-                           showAIQuote={false}
-                           showRatingOnRight={true}
-                         />
+                          <CourseCard 
+                            course={userCourse.golf_courses}
+                            viewingUserId={userId}
+                            viewContext="global"
+                            userRating={userCourse.rating}
+                            isReadOnly={!isOwnProfile}
+                            showUserRating={true}
+                            showAverageRating={true}
+                            isFromUserCoursesPage={true}
+                            customHeight="h-full"
+                            hideRankingBadges={false}
+                            showAIQuote={false}
+                            showRatingOnRight={true}
+                          />
                        </div>
                     </div>
                   );
@@ -2060,6 +2061,9 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2085,6 +2089,9 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2095,12 +2102,24 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`
+          id: `top100-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`
+          id: `rating-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         }))
       ];
 
@@ -2363,13 +2382,14 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                        <CourseCard 
+                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={true}
+                          showUserRating={false}
+                          showAverageRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />
@@ -2811,6 +2831,9 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2836,6 +2859,9 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
+          ),
+          course_rating_stats (
+            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2846,12 +2872,24 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`
+          id: `top100-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`
+          id: `rating-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
+              ? course.course_rating_stats[0].average_rating 
+              : null
+          }
         }))
       ];
 
@@ -3113,13 +3151,14 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                        <CourseCard 
+                         <CourseCard 
                           course={userCourse.golf_courses}
                           viewingUserId={userId}
                           viewContext="global"
                           userRating={userCourse.rating}
                           isReadOnly={!isOwnProfile}
-                          showUserRating={true}
+                          showUserRating={false}
+                          showAverageRating={true}
                           isFromUserCoursesPage={true}
                           customHeight="h-full"
                         />
