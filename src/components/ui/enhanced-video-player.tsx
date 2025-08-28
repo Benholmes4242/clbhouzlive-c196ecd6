@@ -139,111 +139,30 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       loadingTimeoutRef.current = null;
     }
 
-    // Check if HLS is needed and supported
-    const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
-    const isM3U8 = src.includes('.m3u8');
-    const isSupabaseStorage = src.includes('supabase.co/storage');
+    // 🔥 NUCLEAR OPTION: Force native video only, no HLS.js at all
+    console.log('💥 FORCING NATIVE VIDEO - Bypassing all HLS.js logic');
     
-    console.log('🔍 Video URL Analysis:', { 
-      src, 
-      isCloudflareStream, 
-      isM3U8, 
-      enableHLS, 
-      isSupabaseStorage
-    });
+    // Clear video completely
+    video.removeAttribute('src');
+    video.src = '';
+    video.load();
     
-    // Handle incomplete URLs (like '/manifest/video.m3u8')
-    if (src.startsWith('/manifest/video.m3u8')) {
-      console.log('❌ Invalid video URL detected');
-      setError('Invalid video URL - video not found');
-      setIsLoading(false);
-      return;
-    }
+    // Wait for complete reset
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    // 🔥 NEW APPROACH: Try native HLS first for Cloudflare Stream
-    if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
-      console.log('🎯 Attempting native HLS first for Cloudflare Stream');
-      
-      // Try native HLS support first (works in most modern browsers)
-      if (video.canPlayType('application/vnd.apple.mpegurl') || isCloudflareStream) {
-        console.log('🍎 Using native HLS support');
-        
-        // Clear any existing src
-        video.removeAttribute('src');
-        video.src = '';
-        video.load();
-        
-        // Wait a moment for reset
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Set the HLS source directly
-        video.src = src;
-        console.log('📺 Set native HLS source:', src);
-        
-        setIsLoading(false);
-        
-        if (autoplay) {
-          console.log('▶️ Attempting autoplay with native HLS');
-          setTimeout(() => {
-            video.play().catch((err) => {
-              console.log('❌ Native HLS autoplay failed:', err);
-            });
-          }, 500);
-        }
-        
-        return; // Exit early if native HLS works
-      }
-      
-      // Fallback to HLS.js only if native doesn't work
-      if (window.Hls && window.Hls.isSupported()) {
-        console.log('📦 Falling back to HLS.js');
-        
-        // Simple HLS.js setup without aggressive clearing
-        const hls = new window.Hls({
-          enableWorker: true,
-          lowLatencyMode: false, // Disable for stability
-          maxBufferLength: 30,
-          maxMaxBufferLength: 60,
+    // Set source directly - let browser handle HLS natively
+    video.src = src;
+    console.log('🎬 DIRECT VIDEO SOURCE SET:', src);
+    
+    setIsLoading(false);
+    
+    if (autoplay) {
+      console.log('▶️ Attempting direct autoplay');
+      setTimeout(() => {
+        video.play().catch((err) => {
+          console.log('❌ Direct autoplay failed:', err);
         });
-
-        console.log('📥 Loading HLS source with HLS.js:', src);
-        hls.loadSource(src);
-        hls.attachMedia(video);
-        
-        hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          console.log('🎉 HLS.js manifest parsed for:', src);
-          setIsLoading(false);
-          
-          if (autoplay) {
-            console.log('▶️ Attempting autoplay with HLS.js');
-            video.play().catch((err) => {
-              console.log('❌ HLS.js autoplay failed:', err);
-            });
-          }
-        });
-
-        hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
-          console.error('HLS.js Error:', { event, data, src });
-          if (data.fatal) {
-            console.error('Fatal HLS.js error, trying native fallback');
-            setError('Video playback error - trying fallback');
-            // Try native as last resort
-            video.src = src;
-            setIsLoading(false);
-          }
-        });
-
-        hlsRef.current = hls;
-      } else {
-        console.log('⚠️ No HLS support, using direct video');
-        video.src = src;
-        setIsLoading(false);
-      }
-    } else {
-      // Standard video or Supabase storage video
-      console.log('📼 Using standard video playback for:', src);
-      video.src = src;
-      setIsLoading(false);
+      }, 500);
     }
   };
 
