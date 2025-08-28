@@ -815,21 +815,20 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
-                        <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
-                          showCountryWithFlag={true}
-                          showXP={true}
-                          xp={100}
-                          mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                          mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                         <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           showCountryWithFlag={true}
+                           showXP={false}
+                           mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                           mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                         />
                       </div>
                     </div>
@@ -2007,16 +2006,16 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                         <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -2393,16 +2392,16 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                         <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -2778,16 +2777,16 @@ const USASection: React.FC<USASectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                        <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
+                         <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
                         />
                       </div>
                     </div>
@@ -3163,16 +3162,16 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                         <CourseCard 
-                          course={userCourse.golf_courses}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.rating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          hideRankingBadges={true}
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
                         />
                       </div>
                     </div>
