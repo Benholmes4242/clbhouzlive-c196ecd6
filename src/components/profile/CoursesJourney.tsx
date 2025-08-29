@@ -1014,19 +1014,24 @@ interface HLSVideoElement extends HTMLVideoElement {
   }, [playingVideoId, firstCardId, playExclusive]);
 
   const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
-    // Prevent duplicate registration
-    if (videoRefs.current.has(videoId)) {
-      return () => {}; // Return empty cleanup silently
-    }
-    
-    console.log('🎥 Registering video:', videoId);
-    
     // Ensure video is a valid HTMLVideoElement
     if (!video || typeof video.addEventListener !== 'function') {
       console.error('🎥 Invalid video element:', video);
       return () => {}; // Return empty cleanup function
     }
     
+    // Clean up any existing registration for this video ID
+    const existingVideo = videoRefs.current.get(videoId);
+    if (existingVideo && existingVideo !== video) {
+      console.log('🎥 Replacing existing video registration:', videoId);
+      const existingCleanup = videoCleanupRefs.current.get(videoId);
+      if (existingCleanup) {
+        existingCleanup();
+        videoCleanupRefs.current.delete(videoId);
+      }
+    }
+    
+    console.log('🎥 Registering video:', videoId);
     videoRefs.current.set(videoId, video);
     
     // Set initial mute state (default to muted)
@@ -1432,9 +1437,14 @@ interface HLSVideoElement extends HTMLVideoElement {
                         <HLSVideoCard
                           key={videoId} // Add key to ensure proper remounting
                           ref={(videoElement: HTMLVideoElement | null) => {
-                            if (videoElement && !videoRefs.current.has(videoId)) {
+                            if (videoElement) {
                               const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
                               videoCleanupRefs.current.set(videoId, cleanup);
+                              
+                              // Auto-play first card if this is the first card and no user interaction yet
+                              if (index === 0 && !firstCardId) {
+                                setFirstCardId(videoId);
+                              }
                             }
                           }}
                           hlsUrl={videoUrl}
