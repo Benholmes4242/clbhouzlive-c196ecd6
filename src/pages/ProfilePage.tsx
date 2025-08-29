@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-// Adding back components one by one to isolate the issue
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
-// Still commenting out the large HeroProfileHeader for now
-// import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+// Adding back the problematic component to confirm it causes the issue
+import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -94,17 +93,13 @@ const ProfilePage = () => {
       {/* Header */}
       <Header />
       
-      {/* Temporarily render a simple fallback instead of HeroProfileHeader */}
-      <div className="p-4">
-        <h1 className="text-2xl font-bold">Profile Page</h1>
-        <p>This is a temporary simplified version to test the import issue.</p>
-        {profile && (
-          <div className="mt-4">
-            <p>Profile loaded successfully</p>
-            <p>User: {profile.display_name || profile.username || 'Unknown'}</p>
-          </div>
-        )}
-      </div>
+      <HeroProfileHeader 
+        profile={profile}
+        isOwnProfile={true} // This is always the user's own profile on this route
+        onProfileUpdate={refreshProfile}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
       
       <BottomNavigation />
     </div>
