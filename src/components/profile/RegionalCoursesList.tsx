@@ -4,7 +4,7 @@ import CourseCard from '@/components/courses/CourseCard';
 
 interface RegionalCoursesListProps {
   userId: string;
-  region: 'britain-ireland' | 'usa' | 'europe' | 'global';
+  region: 'britain-ireland' | 'usa' | 'europe';
   title: string;
   isOwnProfile: boolean;
 }
