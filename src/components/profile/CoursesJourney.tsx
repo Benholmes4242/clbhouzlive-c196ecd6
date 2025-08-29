@@ -918,12 +918,14 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   const pauseAllVideos = useCallback(() => {
     console.log('🎥 Pausing all videos');
-    videoRefs.current.forEach((video) => {
+    videoRefs.current.forEach((video, videoId) => {
       if (!video.paused) {
         video.pause();
+        console.log('🎥 Paused video:', videoId);
       }
-      video.muted = true; // Ensure all non-active videos are muted
+      // Don't force mute here - let individual mute states persist
     });
+    setPlayingVideoId(null);
   }, []);
 
   const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
@@ -934,8 +936,22 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       return;
     }
 
-    // Pause all other videos first
-    pauseAllVideos();
+    // Always pause all other videos first (including the currently playing one if different)
+    if (playingVideoId && playingVideoId !== videoId) {
+      console.log('🎥 Pausing currently playing video:', playingVideoId);
+      const currentlyPlaying = videoRefs.current.get(playingVideoId);
+      if (currentlyPlaying && !currentlyPlaying.paused) {
+        currentlyPlaying.pause();
+      }
+    }
+
+    // Pause all videos to be safe
+    videoRefs.current.forEach((video, id) => {
+      if (id !== videoId && !video.paused) {
+        video.pause();
+        console.log('🎥 Paused video:', id);
+      }
+    });
 
     // Set state
     setPlayingVideoId(videoId);
@@ -945,10 +961,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     const videoMuted = getVideoMuteState(videoId);
     targetVideo.muted = videoMuted;
     targetVideo.loop = true;
+    targetVideo.currentTime = 0; // Reset to beginning
     targetVideo.play().catch(error => {
       console.error('🎥 Failed to play video:', videoId, error);
     });
-  }, [pauseAllVideos, getVideoMuteState]);
+  }, [playingVideoId, getVideoMuteState]);
 
   const pauseVideo = useCallback((videoId: string) => {
     console.log('🎥 Pausing video:', videoId);
