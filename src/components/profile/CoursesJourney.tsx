@@ -454,8 +454,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
 
 
-      {/* Courses by Region Section */}
-      <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Regional Carousels */}
+      <RegionalCarouselsSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -1732,203 +1732,70 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 };
 
 
-// Courses by Region Section Component
-interface CoursesbyRegionSectionProps {
+// Regional Carousels Section Component
+interface RegionalCarouselsSectionProps {
   userId?: string;
   isOwnProfile?: boolean;
 }
 
-const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({ 
+const RegionalCarouselsSection: React.FC<RegionalCarouselsSectionProps> = ({ 
   userId,
   isOwnProfile = false
 }) => {
   return (
-    <div className="w-full px-4 pt-4 pb-8 mb-0">
-      <div className="max-w-6xl mx-auto">
-        {/* Courses by Region title - matches Top 10 Rated by You style */}
-        <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
-            Courses by Region
-          </h3>
-        </div>
-      </div>
-      
-      {/* Reordered sections: Worldwide, USA, Great Britain & Ireland, Continental Europe */}
-      
+    <div className="w-full px-4 pt-4 pb-8 mb-0">      
       {/* Worldwide Section */}
-      <WorldwideConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
-      
-      {/* USA Section */}
-      <USAConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <RegionalCarousel 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+        region="worldwide"
+        title="Worldwide"
+      />
       
       {/* Great Britain & Ireland Section */}
-      <GreatBritainIrelandConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <RegionalCarousel 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+        region="britain-ireland"
+        title="Great Britain & Ireland"
+      />
       
       {/* Continental Europe Section */}
-      <ContinentalEuropeConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <RegionalCarousel 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+        region="europe"
+        title="Continental Europe"
+      />
+      
+      {/* USA Section */}
+      <RegionalCarousel 
+        userId={userId} 
+        isOwnProfile={isOwnProfile} 
+        region="usa"
+        title="USA"
+      />
     </div>
   );
 };
 
-// Navigation component for Great Britain & Ireland section
-interface GreatBritainIrelandNavigationProps {
+// Regional Carousel Component
+interface RegionalCarouselProps {
   userId?: string;
   isOwnProfile?: boolean;
+  region: 'worldwide' | 'britain-ireland' | 'europe' | 'usa';
+  title: string;
 }
 
-const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps> = ({ 
+const RegionalCarousel: React.FC<RegionalCarouselProps> = ({ 
   userId,
-  isOwnProfile = false
-}) => {
-  // Use the same state management pattern as the main section
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
-
-  // Same query as the main section to get the data for navigation
-  const { data: gbIrelandCourses = [] } = useQuery({
-    queryKey: ['gbIrelandCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const gbIrelandCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Britain & Ireland';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      gbIrelandCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
-    // Trigger the same navigation in the main section
-    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-    // Trigger the same navigation in the main section
-    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'prev' } }));
-  };
-
-  return (
-    <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-      >
-        <ChevronRight className="h-10 w-10" />
-      </Button>
-    </>
-  );
-};
-
-// Great Britain & Ireland Section Component
-interface GreatBritainIrelandSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({ 
-  userId,
-  isOwnProfile = false
+  isOwnProfile = false,
+  region,
+  title
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const carouselRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1937,9 +1804,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Calculate cards per view based on exact breakpoints - different from Recently Played
   const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3; // Desktop: 3 cards
+    if (windowWidth >= 1200) return 4; // Desktop: 4 cards
     if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
     if (windowWidth >= 768) return 2;  // Tablet: 2 cards
     return 1; // Mobile: 1 with peek
@@ -1947,13 +1813,13 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   
   const cardsPerView = getCardsPerView();
 
-  // Query to get Great Britain & Ireland courses
-  const { data: gbIrelandCourses = [] } = useQuery({
-    queryKey: ['gbIrelandCourses', userId],
+  // Query to get regional courses
+  const { data: regionalCourses = [] } = useQuery({
+    queryKey: [`${region}Courses`, userId],
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get courses from user_top100_courses table for GB&I
+      // Get courses from user_top100_courses table
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
@@ -1971,9 +1837,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1981,7 +1844,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
 
       if (top100Error) throw top100Error;
 
-      // Get courses from course_ratings table for GB&I
+      // Get courses from course_ratings table
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -2000,58 +1863,55 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
-      // Combine and filter for Great Britain & Ireland only
+      // Combine courses
       const combinedCourses = [
         ...(top100Data || []).map(course => ({
           ...course,
-          rating: null, // Add rating field for consistency
-          id: `top100-${course.course_id}`, // Unique ID for deduplication
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          rating: null,
+          id: `top100-${course.course_id}`
         })),
         ...(ratedData || []).map(course => ({
           ...course,
-          played_date: course.created_at, // Use rating date as played date
-          id: `rating-${course.course_id}`, // Unique ID for deduplication
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
+          played_date: course.created_at,
+          id: `rating-${course.course_id}`
         }))
       ];
 
-      // Filter for Great Britain & Ireland courses only
-      const gbIrelandCourses = combinedCourses.filter((userCourse) => {
+      // Filter by region
+      const filteredCourses = combinedCourses.filter((userCourse) => {
         const course = userCourse.golf_courses;
-        return course && course.country === 'Britain & Ireland';
+        if (!course) return false;
+
+        switch (region) {
+          case 'britain-ireland':
+            return course.country === 'Britain & Ireland';
+          case 'europe':
+            return course.country === 'Continental Europe';
+          case 'usa':
+            return course.country === 'USA';
+          case 'worldwide':
+            return course.global_rank && course.global_rank <= 100;
+          default:
+            return false;
+        }
       });
 
-      // Remove duplicates based on course_id, preferring rated courses over top100 courses
+      // Remove duplicates based on course_id, preferring rated courses
       const uniqueCoursesMap = new Map();
       
-      gbIrelandCourses.forEach(course => {
+      filteredCourses.forEach(course => {
         const courseId = course.course_id;
         const existing = uniqueCoursesMap.get(courseId);
         
         if (!existing) {
           uniqueCoursesMap.set(courseId, course);
         } else {
-          // Prefer courses with ratings over those without
           if (course.rating !== null && course.rating !== undefined && 
               (existing.rating === null || existing.rating === undefined)) {
             uniqueCoursesMap.set(courseId, course);
@@ -2060,1617 +1920,165 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      
-      // Apply sorting by recent play date
-      return getSortedUserCourses(rawCourses, 'recent');
+      // Sort by rating (highest first) - default order
+      return rawCourses.sort((a, b) => {
+        const ratingA = a.rating || 0;
+        const ratingB = b.rating || 0;
+        if (ratingA !== ratingB) return ratingB - ratingA;
+        
+        // Secondary sort by played date (most recent first)
+        const dateA = new Date(a.played_date || 0).getTime();
+        const dateB = new Date(b.played_date || 0).getTime();
+        return dateB - dateA;
+      });
     },
     enabled: !!userId,
   });
 
-  const { isHydrated } = useViewPreference();
-
-  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
+  const maxIndex = Math.max(0, regionalCourses.length - cardsPerView);
 
   const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+    const container = carouselRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
+      const targetCard = cards[nextIndex] as HTMLElement;
+      if (targetCard) {
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
+      }
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    const container = carouselRef.current;
+    if (container) {
+      const cards = container.querySelectorAll('[data-card]');
+      const prevIndex = Math.max(currentIndex - 1, 0);
+      const targetCard = cards[prevIndex] as HTMLElement;
+      if (targetCard) {
+        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
+      }
+    }
   };
 
-  // Listen for navigation events from the navigation component
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('gbireland-nav', handleNavigation);
-    return () => window.removeEventListener('gbireland-nav', handleNavigation);
-  }, []);
+  // Don't render if no courses
+  if (regionalCourses.length === 0) return null;
 
   return (
-    <div className="w-full px-4 pt-0">
+    <div className="w-full px-4 pt-4 pb-4">
       <div className="max-w-6xl mx-auto">
-        {/* Empty header container to match structure */}
-      </div>
-      
-      <div className="relative">
-        {!isHydrated ? (
-          <div className="text-center py-8">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-muted-foreground">
-                Loading preferences...
-              </span>
-            </div>
+        <div className="flex items-center justify-between mb-0">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+            {title}
+          </h3>
+          <div className="flex gap-2 items-center">
+            {/* View All button */}
+            <Button
+              variant="ghost"
+              size="sm"  
+              className="text-muted-foreground hover:text-foreground h-8 px-2 text-sm"
+            >
+              View All ›
+            </Button>
+            
+            {/* Navigation buttons */}
+            {currentIndex > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={prevSlide}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+            >
+              <ChevronRight className="h-10 w-10" />
+            </Button>
           </div>
-        ) : gbIrelandCourses.length > 0 ? (
+        </div>
+        
+        <div className="relative">
+          <div 
+            ref={carouselRef}
+            className="overflow-x-auto scrollbar-hide"
+            style={{
+              scrollSnapType: 'x mandatory',
+              scrollPaddingLeft: '0px',
+              scrollPaddingRight: '0px'
+            }}
+            onScroll={(e) => {
+              const container = e.target as HTMLElement;
+              const cards = container.querySelectorAll('[data-card]');
+              if (cards.length > 0) {
+                const cardWidth = (cards[0] as HTMLElement).offsetWidth;
+                const gap = 12;
+                const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
+                if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
+                  setCurrentIndex(newIndex);
+                }
+              }
+            }}
+          >
             <div 
-              ref={swipeRef} 
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '16px',
-                scrollPaddingRight: '16px',
-                paddingLeft: '16px',
-                marginLeft: '-16px',
-                paddingRight: '16px',
-                marginRight: '-16px'
+              className="flex"
+              style={{ 
+                gap: '12px'
               }}
             >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px'
-                }}
-              >
-                {gbIrelandCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
-                  };
+              {regionalCourses.map((userCourse, index) => {
+                // Calculate responsive width based on exact breakpoints
+                const getCardWidth = () => {
+                  if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards
+                  if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards
+                  if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
+                  return 'calc(100% - 6px)'; // Mobile: 1 card
+                };
 
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
-                      }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                        />
-                      </div>
+                return (
+                  <div 
+                    key={userCourse.id} 
+                    data-card
+                    className="flex-shrink-0"
+                    style={{ 
+                      width: getCardWidth(),
+                      scrollSnapAlign: 'start',
+                      scrollSnapStop: 'always'
+                    }}
+                  >
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
+                        <CourseCard 
+                          course={userCourse.golf_courses}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.rating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={false}
+                          showAverageRating={false}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          showCountryWithFlag={true}
+                          xp={120}
+                          showXP={true}
+                          hideRankingBadges={true}
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                          mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                       />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
-              </p>
-            </div>
-          )}
-      </div>
-    </div>
-  );
-};
-
-// Worldwide Navigation Component
-interface WorldwideNavigationProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
-
-  const { data: worldwideCourses = [] } = useQuery({
-    queryKey: ['worldwideCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        }))
-      ];
-
-      // Filter for courses with global ranking (worldwide)
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.global_rank && course.global_rank <= 100;
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      worldwideCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const maxIndex = Math.max(0, worldwideCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('worldwide-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('worldwide-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (worldwideCourses.length <= cardsPerView) return null;
-
-  return (
-    <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-      >
-        <ChevronRight className="h-10 w-10" />
-      </Button>
-    </>
-  );
-};
-
-// Worldwide Section Component
-interface WorldwideSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const WorldwideSection: React.FC<WorldwideSectionProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
-
-  const { data: worldwideCourses = [] } = useQuery({
-    queryKey: ['worldwideCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.global_rank && course.global_rank <= 100;
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      worldwideCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const { isHydrated } = useViewPreference();
-
-  const maxIndex = Math.max(0, worldwideCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('worldwide-nav', handleNavigation);
-    return () => window.removeEventListener('worldwide-nav', handleNavigation);
-  }, []);
-
-  return (
-    <div className="w-full px-4 pt-0">
-      <div className="max-w-6xl mx-auto">
-        {/* Empty header container to match structure */}
-      </div>
-      
-      <div className="relative">
-        {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
-            </div>
-          ) : worldwideCourses.length > 0 ? (
-            <div 
-              ref={swipeRef} 
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '16px',
-                scrollPaddingRight: '16px',
-                paddingLeft: '16px',
-                marginLeft: '-16px',
-                paddingRight: '16px',
-                marginRight: '-16px'
-              }}
-            >
-              <div 
-                className="flex"
-                style={{ gap: '12px' }}
-              >
-                {worldwideCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
-                      }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {isOwnProfile ? "You haven't played any worldwide courses yet." : "No worldwide courses found."}
-              </p>
-            </div>
-          )}
-      </div>
-    </div>
-  );
-};
-
-// USA Navigation Component
-interface USANavigationProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const USANavigation: React.FC<USANavigationProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
-
-  const { data: usaCourses = [] } = useQuery({
-    queryKey: ['usaCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const usaCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'USA';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      usaCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const maxIndex = Math.max(0, usaCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('usa-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('usa-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (usaCourses.length <= cardsPerView) return null;
-
-  return (
-    <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-      >
-        <ChevronRight className="h-10 w-10" />
-      </Button>
-    </>
-  );
-};
-
-// USA Section Component
-interface USASectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const USASection: React.FC<USASectionProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
-
-  const { data: usaCourses = [] } = useQuery({
-    queryKey: ['usaCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        }))
-      ];
-
-      const usaCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'USA';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      usaCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const { isHydrated } = useViewPreference();
-
-  const maxIndex = Math.max(0, usaCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('usa-nav', handleNavigation);
-    return () => window.removeEventListener('usa-nav', handleNavigation);
-  }, []);
-
-  return (
-    <div className="w-full px-4 pt-0">
-      <div className="max-w-6xl mx-auto">
-        {/* Empty header container to match structure */}
-      </div>
-      
-      <div className="relative">
-        {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
-            </div>
-          ) : usaCourses.length > 0 ? (
-            <div 
-              ref={swipeRef} 
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '16px',
-                scrollPaddingRight: '16px',
-                paddingLeft: '16px',
-                marginLeft: '-16px',
-                paddingRight: '16px',
-                marginRight: '-16px'
-              }}
-            >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px'
-                }}
-              >
-                {usaCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
-                      }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                         <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
-              </p>
-            </div>
-          )}
-      </div>
-    </div>
-  );
-};
-
-// Continental Europe Navigation Component
-interface ContinentalEuropeNavigationProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
-
-  const { data: europeCourses = [] } = useQuery({
-    queryKey: ['europeCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
-        }))
-      ];
-
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      europeCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const maxIndex = Math.max(0, europeCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('europe-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('europe-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (europeCourses.length <= cardsPerView) return null;
-
-  return (
-    <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-      >
-        <ChevronRight className="h-10 w-10" />
-      </Button>
-    </>
-  );
-};
-
-// Continental Europe Section Component
-interface ContinentalEuropeSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({ 
-  userId,
-  isOwnProfile = false
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
-
-  const { data: europeCourses = [] } = useQuery({
-    queryKey: ['europeCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      europeCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
-  });
-
-  const { isHydrated } = useViewPreference();
-
-  const maxIndex = Math.max(0, europeCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('europe-nav', handleNavigation);
-    return () => window.removeEventListener('europe-nav', handleNavigation);
-  }, []);
-
-  return (
-    <div className="w-full px-4 pt-0">
-      <div className="max-w-6xl mx-auto">
-        {/* Empty header container to match structure */}
-      </div>
-      
-      <div className="relative">
-        {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
-            </div>
-          ) : europeCourses.length > 0 ? (
-            <div 
-              ref={swipeRef} 
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '16px',
-                scrollPaddingRight: '16px',
-                paddingLeft: '16px',
-                marginLeft: '-16px',
-                paddingRight: '16px',
-                marginRight: '-16px'
-              }}
-            >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px'
-                }}
-              >
-                {europeCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
-                      }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
-                          <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
-              </p>
-            </div>
-          )}
-      </div>
-    </div>
-  );
-};
-
-// Conditional Section Wrappers - Only render if courses exist
-interface ConditionalSectionProps {
-  userId?: string;
-  isOwnProfile?: boolean;
-}
-
-const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
-  const { data: courses = [] } = useQuery({
-    queryKey: ['worldwideCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.global_rank && course.global_rank <= 100;
-      });
-
-      return worldwideCourses;
-    },
-    enabled: !!userId,
-  });
-
-  if (courses.length === 0) return null;
-
-  return (
-    <>
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
-            <div className="flex gap-2">
-              <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
-      <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
-    </>
-  );
-};
-
-const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
-  const { data: courses = [] } = useQuery({
-    queryKey: ['usaCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.country === 'USA');
-    },
-    enabled: !!userId,
-  });
-
-  if (courses.length === 0) return null;
-
-  return (
-    <>
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
-            <div className="flex gap-2">
-              <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <USASection userId={userId} isOwnProfile={isOwnProfile} />
-    </>
-  );
-};
-
-const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
-  const { data: courses = [] } = useQuery({
-    queryKey: ['gbIrelandCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.country === 'Britain & Ireland');
-    },
-    enabled: !!userId,
-  });
-
-  if (courses.length === 0) return null;
-
-  return (
-    <>
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">Great Britain & Ireland</h4>
-            <div className="flex gap-2">
-              <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
-    </>
-  );
-};
-
-const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
-  const { data: courses = [] } = useQuery({
-    queryKey: ['europeCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
-
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      return europeCourses;
-    },
-    enabled: !!userId,
-  });
-
-  if (courses.length === 0) return null;
-
-  return (
-    <>
-      <div className="w-full px-4 pt-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
-            <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
-            <div className="flex gap-2">
-              <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
-            </div>
-          </div>
-        </div>
-      </div>
-      <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
-    </>
+    </div>
   );
 };
 
