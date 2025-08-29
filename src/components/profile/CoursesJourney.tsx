@@ -821,7 +821,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                             userRating={userCourse.rating}
                             isReadOnly={!isOwnProfile}
                             showUserRating={false}
-                            showAverageRating={true}
+                            showAverageRating={false}
                             isFromUserCoursesPage={true}
                             customHeight="h-full"
                             showCountryWithFlag={true}
@@ -2138,17 +2138,17 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                        />
                       </div>
                     </div>
                   );
@@ -2524,17 +2524,17 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                        />
                       </div>
                     </div>
                   );
@@ -2909,17 +2909,17 @@ const USASection: React.FC<USASectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                          <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                         <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                        />
                       </div>
                     </div>
                   );
@@ -3294,17 +3294,17 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                       style={{ width: getCardWidth() }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                          <CourseCard 
+                           course={userCourse.golf_courses}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.rating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           showAverageRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                        />
                       </div>
                     </div>
                   );
