@@ -89,12 +89,6 @@ const CourseRankBadges = ({
     tooltip: "Your Rating"
   } : null;
 
-  // Average course rating badge (clbhouzrating)
-  const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
-    content: `${averageRating.toFixed(1)}`,
-    tooltip: "Community Rating"
-  } : null;
-
   // Determine positioning classes
   const getPositioningClasses = () => {
     switch (positioning) {
@@ -108,8 +102,8 @@ const CourseRankBadges = ({
 
   return (
     <TooltipProvider>
-      {/* Ranking badges with integrated player rating and average rating */}
-      {(rankingBadges.length > 0 || playerRatingBadge || averageRatingBadge) && (
+      {/* Ranking badges with integrated player rating */}
+      {(rankingBadges.length > 0 || playerRatingBadge) && (
         <div className={getPositioningClasses()}>
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
@@ -126,7 +120,7 @@ const CourseRankBadges = ({
               </TooltipContent>
             </Tooltip>
           ))}
-           
+          
            {/* Add Clubhouse rating badge */}
            {playerRatingBadge && (
              <Tooltip>
