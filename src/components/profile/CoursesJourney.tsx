@@ -885,10 +885,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   // Track window width for responsive breakpoints
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (firstCardId && !userInitiated) {
+      console.log('🎥 Auto-playing first card:', firstCardId);
+      playExclusive(firstCardId, false);
+    }
+  }, [firstCardId]);
 
   // Helper function to get mute state for a video (default to muted)
   const getVideoMuteState = useCallback((videoId: string) => {
@@ -917,14 +918,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   const pauseAllVideos = useCallback(() => {
     console.log('🎥 Pausing all videos');
-    videoRefs.current.forEach((video, videoId) => {
+    videoRefs.current.forEach((video) => {
       if (!video.paused) {
         video.pause();
-        console.log('🎥 Paused video:', videoId);
       }
-      // Don't force mute here - let individual mute states persist
+      video.muted = true; // Ensure all non-active videos are muted
     });
-    setPlayingVideoId(null);
   }, []);
 
   const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
@@ -935,22 +934,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       return;
     }
 
-    // Always pause all other videos first (including the currently playing one if different)
-    if (playingVideoId && playingVideoId !== videoId) {
-      console.log('🎥 Pausing currently playing video:', playingVideoId);
-      const currentlyPlaying = videoRefs.current.get(playingVideoId);
-      if (currentlyPlaying && !currentlyPlaying.paused) {
-        currentlyPlaying.pause();
-      }
-    }
-
-    // Pause all videos to be safe
-    videoRefs.current.forEach((video, id) => {
-      if (id !== videoId && !video.paused) {
-        video.pause();
-        console.log('🎥 Paused video:', id);
-      }
-    });
+    // Pause all other videos first
+    pauseAllVideos();
 
     // Set state
     setPlayingVideoId(videoId);
@@ -960,11 +945,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     const videoMuted = getVideoMuteState(videoId);
     targetVideo.muted = videoMuted;
     targetVideo.loop = true;
-    targetVideo.currentTime = 0; // Reset to beginning
     targetVideo.play().catch(error => {
       console.error('🎥 Failed to play video:', videoId, error);
     });
-  }, [playingVideoId, getVideoMuteState]);
+  }, [pauseAllVideos, getVideoMuteState]);
 
   const pauseVideo = useCallback((videoId: string) => {
     console.log('🎥 Pausing video:', videoId);
@@ -989,38 +973,52 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     console.log('🎥 Registering video:', videoId);
     videoRefs.current.set(videoId, video);
     
-    // initial config
-    video.muted = getVideoMuteState(videoId);
+    // Set initial mute state (default to muted)
+    const videoMuted = getVideoMuteState(videoId);
+    video.muted = videoMuted;
     video.loop = true;
     video.playsInline = true;
     video.preload = 'metadata';
+    
+    // Set up event listeners
+    const handleEnded = () => {
+      console.log('🎥 Video ended:', videoId);
+      if (playingVideoId === videoId) {
+        if (videoId === firstCardId) {
+          // First card ended, restart it
+          video.currentTime = 0;
+          video.play().catch(console.error);
+        } else {
+          // Non-first card ended, resume first card
+          setPlayingVideoId(null);
+          setUserInitiated(false);
+          if (firstCardId) {
+            setTimeout(() => playExclusive(firstCardId, false), 100);
+          }
+        }
+      }
+    };
 
     const handlePlay = () => {
-      // If some other video is marked playing, stop it
-      if (playingVideoId && playingVideoId !== videoId) {
-        pauseAllVideos();
-      }
-      // Mark this one as the exclusive active video
-      setPlayingVideoId(videoId);
+      console.log('🎥 Video started playing:', videoId);
     };
 
-    const handleEnded = () => {
-      if (playingVideoId === videoId) {
-        setPlayingVideoId(null);
-        // If it wasn't the first card OR user stopped it, resume first
-        if (firstCardId) setTimeout(() => playExclusive(firstCardId, false), 100);
-      }
+    const handlePause = () => {
+      console.log('🎥 Video paused:', videoId);
     };
 
-    video.addEventListener('play', handlePlay);
     video.addEventListener('ended', handleEnded);
-
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    
     return () => {
-      video.removeEventListener('play', handlePlay);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
       videoRefs.current.delete(videoId);
+      console.log('🎥 Unregistered video:', videoId);
     };
-  }, [getVideoMuteState, playingVideoId, firstCardId, pauseAllVideos, playExclusive]);
+  }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive]);
 
   
   // Calculate cards per view for Highlight Reel
@@ -1201,54 +1199,20 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
 
-  // Helper function to try playing first card with retry if ref not ready
-  const tryPlayFirstWhenReady = useCallback((id: string) => {
-    const v = videoRefs.current.get(id);
-    if (v) {
-      playExclusive(id, false);
-    } else {
-      // ref not mounted yet—retry shortly
-      setTimeout(() => tryPlayFirstWhenReady(id), 50);
-    }
-  }, [playExclusive]);
-
-  // === NEW: hook up firstCardId, autoplay, and scroll tracking ===
+  // Update first card ID when filteredCourses change or current index changes
   useEffect(() => {
-    // set initial firstCardId when data arrives
-    if (filteredCourses?.length) {
-      setFirstCardId(String(filteredCourses[0].id));
+    const newFirstCardId = filteredCourses.length > currentIndex ? filteredCourses[currentIndex].id : null;
+    if (newFirstCardId !== firstCardId) {
+      console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
+      setFirstCardId(newFirstCardId);
     }
+  }, [filteredCourses, currentIndex, firstCardId]);
+
+  const getSlotOneVideoId = useCallback(() => {
+    return filteredCourses.length > 0 ? filteredCourses[0].id : null;
   }, [filteredCourses]);
 
-  // Keep firstCardId synced with the leftmost visible card
-  useEffect(() => {
-    const el = highlightReelSwipeRef.current;
-    if (!el) return;
-
-    const onScroll = () => {
-      // Find the card whose left edge is closest to the container's left edge
-      const cards = Array.from(el.querySelectorAll<HTMLElement>('[data-card]'));
-      const containerLeft = el.getBoundingClientRect().left;
-
-      let best: { id: string | null; dist: number } = { id: null, dist: Infinity };
-      for (const c of cards) {
-        const left = c.getBoundingClientRect().left - containerLeft;
-        const dist = Math.abs(left);
-        if (dist < best.dist) best = { id: c.dataset.id || null, dist };
-      }
-      if (best.id && best.id !== firstCardId) setFirstCardId(best.id);
-    };
-
-    const throttled = () => requestAnimationFrame(onScroll);
-    el.addEventListener('scroll', throttled, { passive: true });
-    onScroll(); // initialize once
-    return () => el.removeEventListener('scroll', throttled);
-  }, [firstCardId]);
-
-  useEffect(() => {
-    if (!firstCardId || playingVideoId) return;
-    tryPlayFirstWhenReady(firstCardId);
-  }, [firstCardId, playingVideoId, tryPlayFirstWhenReady]);
+  // This effect is replaced by our new firstCardId management
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
@@ -1376,7 +1340,6 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     <div 
                       key={userCourse.id} 
                       data-card
-                      data-id={videoId}          // <-- needed for firstCardId calc
                       className="flex-shrink-0"
                       style={{ 
                         width: getCardWidth(),
@@ -1400,10 +1363,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           preload="metadata"
                           muted={getVideoMuteState(videoId)}
                           onClick={() => {
-                            if (playingVideoId === videoId) {
-                              pauseVideo(videoId);
-                            } else {
-                              playExclusive(videoId, true);
+                            if (!isSlotOne) {
+                              if (playingVideoId === videoId) {
+                                pauseVideo(videoId);
+                              } else {
+                                playExclusive(videoId, true);
+                              }
                             }
                           }}
                         />

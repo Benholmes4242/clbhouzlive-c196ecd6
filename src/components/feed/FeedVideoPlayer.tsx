@@ -87,16 +87,15 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // Use HLS Video Card for all videos - disable internal autoplay for external management
+  // Use HLS Video Card for all videos
   return (
     <HLSVideoCard
-      ref={videoRef}
       hlsUrl={hlsUrl}
       poster={poster}
       className={className}
       muted={muted}
       loop={loop}
-      autoplay={false} // Disable internal autoplay for external management
+      autoplay={false} // Control autoplay externally
       showMuteButton={false} // Let parent handle mute controls
       onClick={onClick}
     />

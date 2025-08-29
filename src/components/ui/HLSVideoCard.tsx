@@ -15,11 +15,6 @@ interface HLSVideoCardProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
-  // External video management
-  externalVideoManager?: {
-    onVideoReady: (video: HTMLVideoElement) => () => void;
-    shouldAutoplay?: boolean;
-  };
 }
 
 declare global {
@@ -41,15 +36,13 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   loop = true,
   onPlay,
   onPause,
-  onClick,
-  externalVideoManager
+  onClick
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsInstanceRef = useRef<any>(null);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoaded, setIsLoaded] = useState(false);
-  const cleanupRef = useRef<(() => void) | null>(null);
 
   // Sync internal muted state with prop changes
   useEffect(() => {
@@ -109,33 +102,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   };
 
-  // Register with external video manager or use intersection observer
+  // Intersection observer for autoplay
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // If external video manager is provided, register and let it handle autoplay
-    if (externalVideoManager) {
-      const cleanup = externalVideoManager.onVideoReady(video);
-      cleanupRef.current = cleanup;
-      
-      // Still load HLS but don't auto-play
-      attachHLS();
-      
-      return () => {
-        if (cleanupRef.current) {
-          cleanupRef.current();
-          cleanupRef.current = null;
-        }
-        if (hlsInstanceRef.current) {
-          hlsInstanceRef.current.destroy();
-        }
-      };
-    }
-
-    // Original intersection observer logic for non-managed videos
     const container = containerRef.current;
-    if (!container || !autoplay) return;
+    const video = videoRef.current;
+    if (!container || !video || !autoplay) return;
 
     const observer = new IntersectionObserver(
       async (entries) => {
@@ -164,7 +135,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         hlsInstanceRef.current.destroy();
       }
     };
-  }, [hlsUrl, autoplay, onPlay, onPause, externalVideoManager]);
+  }, [hlsUrl, autoplay, onPlay, onPause]);
 
   // Handle mute toggle
   const toggleMute = (e: React.MouseEvent) => {
