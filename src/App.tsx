@@ -15,6 +15,8 @@ import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
+// Trigger migration on app start
+import '@/utils/runMigration';
 
 
 // Lazy load all pages for better code splitting and loading screen experience
