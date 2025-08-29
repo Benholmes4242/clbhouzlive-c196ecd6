@@ -10,9 +10,8 @@ import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStat
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MdOutlinePlayCircle } from 'react-icons/md';
 import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
 
 
@@ -1311,9 +1310,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                          {/* Video Play Icon - Bottom Right - Hide for playing videos */}
                          {(playingVideoId !== videoId || isSlotOne) && (
                            <div className="absolute bottom-3 right-3 z-10 transition-opacity group-hover:opacity-80">
-                             <MdOutlinePlayCircle
-                               className="w-8 h-8 text-white drop-shadow-lg" 
-                             />
+                             <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                               <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
+                             </div>
                            </div>
                          )}
 
