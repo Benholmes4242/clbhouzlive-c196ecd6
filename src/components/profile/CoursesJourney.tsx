@@ -1380,12 +1380,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           preload="metadata"
                           muted={getVideoMuteState(videoId)}
                           onClick={() => {
-                            if (!isSlotOne) {
-                              if (playingVideoId === videoId) {
-                                pauseVideo(videoId);
-                              } else {
-                                playExclusive(videoId, true);
-                              }
+                            if (playingVideoId === videoId) {
+                              pauseVideo(videoId);
+                            } else {
+                              playExclusive(videoId, true);
                             }
                           }}
                         />
