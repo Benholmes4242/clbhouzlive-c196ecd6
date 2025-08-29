@@ -93,10 +93,10 @@ const CourseRankBadges = ({
   const getPositioningClasses = () => {
     switch (positioning) {
       case 'bottom-left':
-        return 'absolute bottom-3 left-6 flex flex-row gap-2 z-10';
+        return 'absolute bottom-3 left-6 flex flex-row gap-2 z-20'; // Increased z-index
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-row gap-1.5 z-10';
+        return 'absolute top-2 left-2 flex flex-row gap-1.5 z-20'; // Increased z-index
     }
   };
 
@@ -156,7 +156,7 @@ const CourseRankBadges = ({
 
       {/* Player rating badge - standalone when no rankings */}
       {playerRatingBadge && rankingBadges.length === 0 && (
-        <div className="absolute top-2 left-2">
+        <div className="absolute top-2 left-2 z-20"> {/* Increased z-index */}
           <Tooltip>
             <TooltipTrigger asChild>
                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
