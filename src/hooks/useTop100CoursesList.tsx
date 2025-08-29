@@ -85,11 +85,13 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     enabled: !!userId,
   });
 
-  // Update played courses set when data changes
+  // Update played courses set when data changes - include both played and rated courses
   useEffect(() => {
     const playedSet = new Set(userPlayedCourses.map(pc => pc.course_id));
+    // Also include courses that have been rated by the user
+    userRatings.forEach(rating => playedSet.add(rating.course_id));
     setPlayedCourses(playedSet);
-  }, [userPlayedCourses]);
+  }, [userPlayedCourses, userRatings]);
 
   const toggleCourse = async (courseId: string) => {
     if (!isOwnProfile) return;
