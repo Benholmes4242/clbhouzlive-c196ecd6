@@ -87,7 +87,7 @@ export const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({
             <div className="mb-6">
               <div className="flex items-center justify-center mb-4">
                 <Sparkles className={`h-8 w-8 text-yellow-400 ${isAnimating ? 'animate-spin' : ''}`} />
-                <h2 className="text-2xl font-bold text-white mx-3">Badge Unlocked!</h2>
+                <h2 className="text-2xl font-bold text-white mx-3" aria-describedby="badge-description">Badge Unlocked!</h2>
                 <Sparkles className={`h-8 w-8 text-yellow-400 ${isAnimating ? 'animate-spin' : ''}`} />
               </div>
               <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-orange-400 mx-auto rounded-full" />

@@ -59,7 +59,7 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
       {/* Lightbox Modal */}
       <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-          <DialogTitle className="sr-only">Review Media</DialogTitle>
+          <DialogTitle className="sr-only">Review Media Viewer</DialogTitle>
           {selectedMedia && (
             <div className="relative w-full h-full">
               {selectedMedia.media_type === 'video' ? (

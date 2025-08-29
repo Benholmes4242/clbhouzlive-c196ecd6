@@ -1329,7 +1329,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   };
 
                   const isSlotOne = index === currentIndex; // The card in slot one is the one at currentIndex
-                  const videoId = `video-${userCourse.id}`;
+                  const videoId = userCourse.id; // userCourse.id already has 'video-' prefix from line 1147
                   const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
                   
                   // Skip if no valid video URL
