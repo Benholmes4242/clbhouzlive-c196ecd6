@@ -2121,14 +2121,17 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollPaddingLeft: '16px',
+                scrollPaddingRight: '16px',
+                paddingLeft: '16px',
+                marginLeft: '-16px',
+                paddingRight: '16px',
+                marginRight: '-16px'
               }}
             >
               <div 
                 className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
                 }}
               >
@@ -2521,8 +2524,12 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollPaddingLeft: '16px',
+                scrollPaddingRight: '16px',
+                paddingLeft: '16px',
+                marginLeft: '-16px',
+                paddingRight: '16px',
+                marginRight: '-16px'
               }}
             >
               <div 
@@ -2916,14 +2923,17 @@ const USASection: React.FC<USASectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollPaddingLeft: '16px',
+                scrollPaddingRight: '16px',
+                paddingLeft: '16px',
+                marginLeft: '-16px',
+                paddingRight: '16px',
+                marginRight: '-16px'
               }}
             >
               <div 
                 className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
                 }}
               >
@@ -3314,14 +3324,17 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollPaddingLeft: '16px',
+                scrollPaddingRight: '16px',
+                paddingLeft: '16px',
+                marginLeft: '-16px',
+                paddingRight: '16px',
+                marginRight: '-16px'
               }}
             >
               <div 
                 className="flex"
                 style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
                 }}
               >
