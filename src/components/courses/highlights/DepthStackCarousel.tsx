@@ -244,11 +244,7 @@ const VideoCard: React.FC<{
 
       {/* Course rankings - removed for highlights section */}
 
-      {/* Course info overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <h3 className="text-white font-semibold text-lg mb-1">{video.courseName}</h3>
-        <p className="text-white/80 text-sm">{video.location}</p>
-      </div>
+      {/* Course info overlay - removed course name and location */}
     </div>
   );
 };
