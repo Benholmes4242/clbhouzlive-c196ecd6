@@ -109,9 +109,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             
             let widthClasses = '';
             
-            // Recently Played: Desktop: 4, Laptop: 3, Tablet: 2, Mobile: 2.5 cards visible
+            // Recently Played: 2.1 cards visible across all breakpoints
             if (isRecentlyPlayed) {
-              widthClasses = 'flex-shrink-0 w-[calc(40vw-0.5rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
+              widthClasses = 'flex-shrink-0 w-[calc(47.6%-0.5rem)] sm:w-[calc(47.6%-0.5rem)] md:w-[calc(47.6%-0.75rem)] lg:w-[calc(47.6%-1rem)] xl:w-[calc(47.6%-1.125rem)] snap-start';
             }
             // Top 10 Rated: Feature-wide cards with specific peek percentages
             else if (isTopRated) {
