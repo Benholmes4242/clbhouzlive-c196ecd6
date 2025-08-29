@@ -950,9 +950,12 @@ interface HLSVideoElement extends HTMLVideoElement {
       const currentPlayingVideo = videoRefs.current.get(playingVideoId);
       if (currentPlayingVideo) {
         // Transfer the current audio state to the new video
-        transferredMuteState = !currentPlayingVideo.muted; // invert because we want to transfer the unmuted state
+        transferredMuteState = currentPlayingVideo.muted; // Use the actual muted state
         shouldTransferAudio = true;
-        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- unmuted:', !transferredMuteState);
+        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- muted:', transferredMuteState);
+        
+        // Update the state immediately for UI reactivity
+        setVideoMuteState(videoId, transferredMuteState);
       }
     }
 
@@ -974,8 +977,6 @@ interface HLSVideoElement extends HTMLVideoElement {
         let videoMuted;
         if (shouldTransferAudio) {
           videoMuted = transferredMuteState;
-          // Update the stored mute state for this video
-          setVideoMuteState(videoId, transferredMuteState);
         } else {
           videoMuted = getVideoMuteState(videoId);
         }
