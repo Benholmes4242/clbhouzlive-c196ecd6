@@ -74,8 +74,9 @@ const CourseRankBadges = ({
     });
   }
 
-  // Add Clubhouse rating badge right after regional badge - even if no regional badge exists
-  if (showAverageRating && averageRating !== null && averageRating !== undefined) {
+  // Only add Clubhouse rating badge to rankingBadges if there are already ranking badges
+  const hasRankingBadges = rankingBadges.length > 0;
+  if (hasRankingBadges && showAverageRating && averageRating !== null && averageRating !== undefined) {
     rankingBadges.push({
       rank: averageRating.toFixed(1),
       icon: <ClubhouseLogo size="sm" />,
@@ -156,7 +157,7 @@ const CourseRankBadges = ({
 
       {/* Player rating badge - standalone when no rankings */}
       {playerRatingBadge && rankingBadges.length === 0 && (
-        <div className="absolute top-2 left-2 z-20"> {/* Increased z-index */}
+        <div className="absolute top-2 left-2 z-20">
           <Tooltip>
             <TooltipTrigger asChild>
                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
@@ -168,6 +169,25 @@ const CourseRankBadges = ({
             </TooltipTrigger>
             <TooltipContent>
               <p>{playerRatingBadge.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+
+      {/* Average rating badge - standalone when no rankings and no player rating */}
+      {showAverageRating && averageRating !== null && averageRating !== undefined && !hasRankingBadges && !playerRatingBadge && (
+        <div className="absolute top-2 left-2 z-20">
+          <Tooltip>
+            <TooltipTrigger asChild>
+               <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                 <div className="relative z-10 flex items-center gap-1.5">
+                   <ClubhouseLogo size="sm" />
+                   <span className="text-sm font-bold text-white">{averageRating.toFixed(1)}</span>
+                 </div>
+               </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Community Rating</p>
             </TooltipContent>
           </Tooltip>
         </div>
