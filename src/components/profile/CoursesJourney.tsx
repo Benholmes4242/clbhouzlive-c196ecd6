@@ -815,21 +815,22 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
-                         <CourseCard 
-                           course={userCourse.golf_courses}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.rating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={false}
-                           showAverageRating={false}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                           showCountryWithFlag={true}
-                           showXP={false}
-                           mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                           mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
-                        />
+                          <CourseCard 
+                            course={userCourse.golf_courses}
+                            viewingUserId={userId}
+                            viewContext="global"
+                            userRating={userCourse.rating}
+                            isReadOnly={!isOwnProfile}
+                            showUserRating={false}
+                            showAverageRating={false}
+                            isFromUserCoursesPage={true}
+                            customHeight="h-full"
+                            showCountryWithFlag={true}
+                            showXP={false}
+                            hideRankingBadges={true}
+                            mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                            mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                         />
                       </div>
                     </div>
                   );
