@@ -12,7 +12,11 @@ import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-import CoursesJourney from './CoursesJourney';
+import ProgressRingsSection from './ProgressRingsSection';
+import RecentlyPlayedSection from './RecentlyPlayedSection';
+import TopRatedSection from './TopRatedSection';
+import HighlightsSection from './HighlightsSection';
+import CoursesPlayedSection from './CoursesPlayedSection';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast as useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -234,13 +238,39 @@ const HeroProfileHeader = ({
             />
           );
         case 'courses':
-          console.log('Rendering courses section with CoursesJourney');
           return (
-            <CoursesJourney 
-              userId={profile?.id || ''}
-              userDisplayName={profile?.display_name || 'User'}
-              isOwnProfile={isOwnProfile}
-            />
+            <div className="w-full space-y-0">
+              {/* Progress rings section */}
+              <ProgressRingsSection 
+                userId={profile?.id || ''}
+                userDisplayName={profile?.display_name || 'User'}
+                isOwnProfile={isOwnProfile}
+              />
+              
+              {/* Recently played section */}
+              <RecentlyPlayedSection 
+                userId={profile?.id || ''}
+                isOwnProfile={isOwnProfile}
+              />
+              
+              {/* Top 10 rated section */}
+              <TopRatedSection 
+                userId={profile?.id || ''}
+                isOwnProfile={isOwnProfile}
+              />
+              
+              {/* Highlights from my journey section */}
+              <HighlightsSection 
+                userId={profile?.id || ''}
+                isOwnProfile={isOwnProfile}
+              />
+              
+              {/* Courses played section */}
+              <CoursesPlayedSection 
+                userId={profile?.id || ''}
+                isOwnProfile={isOwnProfile}
+              />
+            </div>
           );
         case 'achievements':
           return (
@@ -902,90 +932,9 @@ const HeroProfileHeader = ({
         </ProfileTabs>
       </div>
 
-      {/* Hero Section - Achievements or Courses Journey */}
-      <div className="relative">
-        {/* During transition, both sections are visible with absolute positioning */}
-        {transitionState === 'transitioning' ? (
-          <>
-            {/* Outgoing section */}
-            <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
-              {transitionDirection === 'right' ? (
-                /* Moving away from current section */
-                activeSection === 'activity' ? (
-                  <div></div> // Achievements moved to dedicated tab
-                ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
-                ) : (
-                  <div></div> // stats section has no hero content
-                )
-              ) : (
-                /* Moving to current section from right */
-                activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
-                ) : activeSection === 'stats' ? (
-                  <div></div> // stats section has no hero content
-                ) : (
-                  <div></div> // Achievements moved to dedicated tab
-                )
-              )}
-            </div>
-            
-            {/* Incoming section */}
-            <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
-              {transitionDirection === 'right' ? (
-                /* Moving to next section */
-                activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
-                ) : activeSection === 'stats' ? (
-                  <div></div> // stats section has no hero content
-                ) : (
-                  <div></div> // Achievements moved to dedicated tab
-                )
-              ) : (
-                /* Moving to previous section */
-                activeSection === 'activity' ? (
-                  <div></div> // Achievements moved to dedicated tab
-                ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
-                ) : (
-                  <div></div> // stats section has no hero content
-                )
-              )}
-            </div>
-          </>
-        ) : (
-          /* Normal state - only show active section */
-          <>
-            {activeSection === 'courses' ? (
-              <CoursesJourney 
-                userId={profile?.id}
-                userDisplayName={profile?.display_name || 'User'}
-                isOwnProfile={isOwnProfile}
-              />
-            ) : activeSection === 'stats' ? (
-              // No hero section for handicap tab - achievements are removed
-              <div></div>
-            ) : (
-              <div></div> // Achievements moved to dedicated tab
-            )}
-          </>
-        )}
+      {/* Hero Section - No longer used, content moved to individual sections */}
+      <div className="relative" style={{ display: 'none' }}>
+        {/* Legacy hero section code - hidden but kept for reference */}
       </div>
 
       {/* Content sections with slide transitions */}
