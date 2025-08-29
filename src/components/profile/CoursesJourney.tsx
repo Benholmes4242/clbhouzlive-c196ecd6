@@ -924,13 +924,15 @@ interface HLSVideoElement extends HTMLVideoElement {
 
   const pauseAllVideos = useCallback(() => {
     console.log('🎥 Pausing all videos');
-    videoRefs.current.forEach((video) => {
+    videoRefs.current.forEach((video, videoId) => {
       if (!video.paused) {
         video.pause();
       }
       video.muted = true; // Ensure all non-active videos are muted
+      // Reset stored mute state to muted for paused videos
+      setVideoMuteState(videoId, true);
     });
-  }, []);
+  }, [setVideoMuteState]);
 
   const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
     console.log('🎥 Playing exclusive:', videoId, 'User initiated:', isUserInitiated);
@@ -940,7 +942,21 @@ interface HLSVideoElement extends HTMLVideoElement {
       return;
     }
 
-    // Pause all other videos first
+    // If user-initiated and there's a currently playing video, transfer its audio state
+    let shouldTransferAudio = false;
+    let transferredMuteState = true; // default to muted
+    
+    if (isUserInitiated && playingVideoId && playingVideoId !== videoId) {
+      const currentPlayingVideo = videoRefs.current.get(playingVideoId);
+      if (currentPlayingVideo) {
+        // Transfer the current audio state to the new video
+        transferredMuteState = !currentPlayingVideo.muted; // invert because we want to transfer the unmuted state
+        shouldTransferAudio = true;
+        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- unmuted:', !transferredMuteState);
+      }
+    }
+
+    // Pause all other videos first (this will mute them)
     pauseAllVideos();
 
     // Set state
@@ -954,18 +970,28 @@ interface HLSVideoElement extends HTMLVideoElement {
           await targetVideo.attachHLS();
         }
         
-        // Configure and play target video - use per-video mute state
-        const videoMuted = getVideoMuteState(videoId);
+        // Configure mute state - use transferred state if applicable, otherwise use stored state
+        let videoMuted;
+        if (shouldTransferAudio) {
+          videoMuted = transferredMuteState;
+          // Update the stored mute state for this video
+          setVideoMuteState(videoId, transferredMuteState);
+        } else {
+          videoMuted = getVideoMuteState(videoId);
+        }
+        
         targetVideo.muted = videoMuted;
         targetVideo.loop = true;
         await targetVideo.play();
+        
+        console.log('🎥 Video playing with muted state:', videoMuted);
       } catch (error) {
         console.error('🎥 Failed to play video:', videoId, error);
       }
     };
 
     playVideo();
-  }, [pauseAllVideos, getVideoMuteState]);
+  }, [pauseAllVideos, getVideoMuteState, setVideoMuteState, playingVideoId]);
 
   const pauseVideo = useCallback((videoId: string) => {
     console.log('🎥 Pausing video:', videoId);
