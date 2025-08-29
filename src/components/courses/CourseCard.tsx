@@ -201,15 +201,18 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
         {/* Course Information Overlay - positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          {/* XP earned - show above course name */}
+          {/* XP earned - show above course name for recently played cards */}
           {showXP && xp && (
             <div className={`${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} text-white/90 leading-tight mb-1 drop-shadow-lg`}>
-              + {xp} XP
+              {xp} XP
             </div>
           )}
           
-           {/* Course Name - moved up when showing rating badges */}
-           <h3 className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors`}>
+           {/* Course Name - with truncation and hover for recently played cards */}
+           <h3 
+             className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
+             title={showXP ? course.name : undefined}
+           >
              {course.name}
            </h3>
           
