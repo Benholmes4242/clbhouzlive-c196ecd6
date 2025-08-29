@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import UserCoursesContent from '@/components/courses/UserCoursesContent';
-import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
+// Temporarily comment out potentially problematic imports
+// import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+// import UserCoursesContent from '@/components/courses/UserCoursesContent';
+// import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -92,16 +93,17 @@ const ProfilePage = () => {
       {/* Header */}
       <Header />
       
-      <HeroProfileHeader 
-        profile={profile}
-        isOwnProfile={true} // This is always the user's own profile on this route
-        onProfileUpdate={refreshProfile}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
-      
-      {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
-      
+      {/* Temporarily render a simple fallback instead of HeroProfileHeader */}
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Profile Page</h1>
+        <p>This is a temporary simplified version to test the import issue.</p>
+        {profile && (
+          <div className="mt-4">
+            <p>Profile loaded successfully</p>
+            <p>User: {profile.display_name || profile.username || 'Unknown'}</p>
+          </div>
+        )}
+      </div>
       
       <BottomNavigation />
     </div>
