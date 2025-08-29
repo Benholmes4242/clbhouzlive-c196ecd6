@@ -57,19 +57,19 @@ const CourseRankBadges = ({
   if (isGBI && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Britain & Ireland" size="md" />,
+      icon: <CountryFlag country="Britain & Ireland" size="lg" />,
       tooltip: "GB&I Ranking"
     });
   } else if (isUSA && usaRank && usaRank <= 100) {
     rankingBadges.push({
       rank: usaRank,
-      icon: <CountryFlag country="USA" size="md" />,
+      icon: <CountryFlag country="USA" size="lg" />,
       tooltip: "USA Ranking"
     });
   } else if (isEurope && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Continental Europe" size="md" />,
+      icon: <CountryFlag country="Continental Europe" size="lg" />,
       tooltip: "Continental Europe Ranking"
     });
   }
@@ -106,9 +106,11 @@ const CourseRankBadges = ({
             <Tooltip key={index}>
               <TooltipTrigger asChild>
                 <div className="relative flex items-center px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                  <div className="relative z-10 flex items-center gap-1.5">
-                    {badge.icon}
-                    <span className="text-sm font-bold text-white">{badge.rank}</span>
+                  <div className="relative z-10 flex items-center justify-center gap-1.5">
+                    <div className="flex items-center justify-center">
+                      {badge.icon}
+                    </div>
+                    <span className="text-sm font-bold text-white flex items-center">{badge.rank}</span>
                   </div>
                 </div>
               </TooltipTrigger>
