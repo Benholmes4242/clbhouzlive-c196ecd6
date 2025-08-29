@@ -1698,20 +1698,20 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       }}
                     >
                        <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                           <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             hideRankingBadges={true}
-                             showAIQuote={false}
-                             showRatingOnRight={true}
-                           />
+                            <CourseCard 
+                              course={userCourse.golf_courses}
+                              viewingUserId={userId}
+                              viewContext="global"
+                              userRating={userCourse.rating}
+                              isReadOnly={!isOwnProfile}
+                              showUserRating={false}
+                              showAverageRating={true}
+                              isFromUserCoursesPage={true}
+                              customHeight="h-full"
+                              hideRankingBadges={true}
+                              showAIQuote={false}
+                              showRatingOnRight={true}
+                            />
                        </div>
                     </div>
                   );
