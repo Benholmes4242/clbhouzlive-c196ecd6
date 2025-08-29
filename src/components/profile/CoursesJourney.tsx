@@ -1743,7 +1743,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   isOwnProfile = false
 }) => {
   return (
-    <div className="w-full pl-4 pt-4 pb-8 mb-0">
+    <div className="w-full px-4 pt-4 pb-8 mb-0">
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
