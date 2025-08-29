@@ -314,16 +314,17 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           {viewType === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredCourses.map((userCourse) => (
-                <CourseCard 
-                  key={userCourse.id} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={targetUserId}
-                  viewContext="global"
-                  userRating={userCourse.rating}
-                  isReadOnly={!finalIsOwnProfile}
-                  showUserRating={true}
-                  isFromUserCoursesPage={true}
-                />
+                 <CourseCard 
+                   key={userCourse.id} 
+                   course={userCourse.golf_courses}
+                   viewingUserId={targetUserId}
+                   viewContext="global"
+                   userRating={userCourse.rating}
+                   isReadOnly={!finalIsOwnProfile}
+                   showUserRating={true}
+                   isFromUserCoursesPage={true}
+                   hideRankingBadges={sortBy === 'recent' || sortBy === 'recently-played'}
+                 />
               ))}
             </div>
           ) : (
