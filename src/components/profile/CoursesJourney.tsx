@@ -272,7 +272,14 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                    {/* Achievement info below ring - desktop size */}
                    <div className="mt-0.5 text-center max-w-[200px]">
                      <div className="text-xl text-foreground">
-                       {achievement.title}
+                       {achievement.title === 'Great Britain & Ireland' ? (
+                         <>
+                           <div>Great Britain</div>
+                           <div>& Ireland</div>
+                         </>
+                       ) : (
+                         achievement.title
+                       )}
                      </div>
                    </div>
                 </div>
@@ -433,7 +440,14 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                      {/* Achievement info */}
                      <div className="mt-1 text-center">
                        <div className="text-base text-foreground leading-tight">
-                         {achievement.title}
+                         {achievement.title === 'Great Britain & Ireland' ? (
+                           <>
+                             <div>Great Britain</div>
+                             <div>& Ireland</div>
+                           </>
+                         ) : (
+                           achievement.title
+                         )}
                        </div>
                      </div>
                   </div>
