@@ -12,7 +12,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
 
 
 interface CoursesJourneyProps {
@@ -1385,20 +1385,17 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       }}
                     >
                       <div className="aspect-[5/4] w-full relative group">
-                        {/* Video Element - Use FeedVideoPlayer for HLS support */}
-                        <FeedVideoPlayer
-                          ref={(videoPlayerRef) => {
-                            if (videoPlayerRef?.element && videoPlayerRef.element instanceof HTMLVideoElement) {
-                              const cleanup = registerVideo(videoId, videoPlayerRef.element);
-                              return cleanup;
-                            }
-                          }}
-                          src={videoUrl}
+                        {/* Video Element - Use HLSVideoCard with external manager */}
+                        <HLSVideoCard
+                          hlsUrl={videoUrl}
                           className="w-full h-full object-cover rounded-lg cursor-pointer"
-                          loop={true} // All videos loop
-                          playsInline
-                          preload="metadata"
+                          loop={true}
                           muted={getVideoMuteState(videoId)}
+                          autoplay={false}
+                          showMuteButton={false}
+                          externalVideoManager={{
+                            onVideoReady: (video: HTMLVideoElement) => registerVideo(videoId, video)
+                          }}
                           onClick={() => {
                             if (playingVideoId === videoId) {
                               pauseVideo(videoId);
