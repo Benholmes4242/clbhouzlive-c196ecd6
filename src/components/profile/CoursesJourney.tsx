@@ -1393,11 +1393,11 @@ interface HLSVideoElement extends HTMLVideoElement {
                       <div className="aspect-[5/4] w-full relative group">
                         {/* Video Element - Use HLSVideoCard with external management */}
                         <HLSVideoCard
-                          ref={useCallback((videoElement: HTMLVideoElement | null) => {
+                          ref={(videoElement: HTMLVideoElement | null) => {
                             if (videoElement) {
                               registerVideo(videoId, videoElement as HLSVideoElement);
                             }
-                          }, [videoId, registerVideo])}
+                          }}
                           hlsUrl={videoUrl}
                           className="w-full h-full object-cover rounded-lg cursor-pointer"
                           loop={true}
