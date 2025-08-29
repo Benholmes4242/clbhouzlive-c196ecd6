@@ -870,7 +870,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
   // Video state management for exclusive playback
-  const [isMuted, setIsMuted] = useState(true); // Always default to muted
+  const [videoMuteStates, setVideoMuteStates] = useState<Map<string, boolean>>(new Map()); // Individual mute state per video
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [firstCardId, setFirstCardId] = useState<string | null>(null);
   const [userInitiated, setUserInitiated] = useState(false);
@@ -891,21 +891,30 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     }
   }, [firstCardId]);
 
+  // Helper function to get mute state for a video (default to muted)
+  const getVideoMuteState = useCallback((videoId: string) => {
+    return videoMuteStates.get(videoId) ?? true; // Default to muted
+  }, [videoMuteStates]);
+
+  // Helper function to set mute state for a video
+  const setVideoMuteState = useCallback((videoId: string, isMuted: boolean) => {
+    setVideoMuteStates(prev => new Map(prev.set(videoId, isMuted)));
+  }, []);
+
   // Video management functions
-  const toggleMute = useCallback(() => {
-    console.log('🎥 Toggling mute from', isMuted, 'to', !isMuted);
-    setIsMuted(prev => {
-      const newMuted = !prev;
-      // Update currently playing video with new mute state
-      if (playingVideoId) {
-        const video = videoRefs.current.get(playingVideoId);
-        if (video) {
-          video.muted = newMuted;
-        }
-      }
-      return newMuted;
-    });
-  }, [isMuted, playingVideoId]);
+  const toggleMute = useCallback((videoId: string) => {
+    const currentMuted = getVideoMuteState(videoId);
+    const newMuted = !currentMuted;
+    console.log('🎥 Toggling mute for video', videoId, 'from', currentMuted, 'to', newMuted);
+    
+    setVideoMuteState(videoId, newMuted);
+    
+    // Update the actual video element if it exists
+    const video = videoRefs.current.get(videoId);
+    if (video) {
+      video.muted = newMuted;
+    }
+  }, [getVideoMuteState, setVideoMuteState]);
 
   const pauseAllVideos = useCallback(() => {
     console.log('🎥 Pausing all videos');
@@ -932,13 +941,14 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     setPlayingVideoId(videoId);
     setUserInitiated(isUserInitiated);
 
-    // Configure and play target video
-    targetVideo.muted = isMuted;
+    // Configure and play target video - use per-video mute state
+    const videoMuted = getVideoMuteState(videoId);
+    targetVideo.muted = videoMuted;
     targetVideo.loop = true;
     targetVideo.play().catch(error => {
       console.error('🎥 Failed to play video:', videoId, error);
     });
-  }, [isMuted, pauseAllVideos]);
+  }, [pauseAllVideos, getVideoMuteState]);
 
   const pauseVideo = useCallback((videoId: string) => {
     console.log('🎥 Pausing video:', videoId);
@@ -962,7 +972,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const registerVideo = useCallback((videoId: string, video: HTMLVideoElement) => {
     console.log('🎥 Registering video:', videoId);
     videoRefs.current.set(videoId, video);
-    video.muted = isMuted;
+    
+    // Set initial mute state (default to muted)
+    const videoMuted = getVideoMuteState(videoId);
+    video.muted = videoMuted;
     video.loop = true;
     video.playsInline = true;
     video.preload = 'metadata';
@@ -1005,7 +1018,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       videoRefs.current.delete(videoId);
       console.log('🎥 Unregistered video:', videoId);
     };
-  }, [isMuted, playingVideoId, firstCardId, playExclusive]);
+  }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive]);
 
   
   // Calculate cards per view for Highlight Reel
@@ -1348,7 +1361,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           loop={true} // All videos loop
                           playsInline
                           preload="metadata"
-                          muted={isMuted}
+                          muted={getVideoMuteState(videoId)}
                           onClick={() => {
                             if (!isSlotOne) {
                               if (playingVideoId === videoId) {
@@ -1374,9 +1387,9 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                            <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center cursor-pointer" 
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  toggleMute();
+                                  toggleMute(videoId);
                                 }}>
-                             {isMuted ? (
+                             {getVideoMuteState(videoId) ? (
                                <VolumeX className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
                              ) : (
                                <Volume2 className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
