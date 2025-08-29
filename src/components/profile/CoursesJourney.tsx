@@ -1070,9 +1070,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   // Auto-play first card on load
   useEffect(() => {
+    console.log('🎥 Highlights autoplay check:', { firstCardId, isHydrated, playingCardId });
     if (firstCardId && isHydrated && !playingCardId) {
       // Delay to ensure video is registered and visible
       const timer = setTimeout(() => {
+        console.log('🎥 Attempting first card autoplay:', firstCardId);
         tryAutoPlayFirstCard();
       }, 300);
       
@@ -1302,9 +1304,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   // Hide section if no video highlights available
   if (isHydrated && filteredCourses.length === 0) {
-    console.log('Highlight Reel - No filtered courses, hiding section');
+    console.log('🎥 Highlights section hidden - no videos found');
     return null;
   }
+
+  console.log('🎥 Highlights section rendering with', filteredCourses.length, 'videos');
 
   return (
     <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
