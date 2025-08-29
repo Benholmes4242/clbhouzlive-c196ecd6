@@ -74,7 +74,7 @@ const CourseRankBadges = ({
     });
   }
 
-  // Add Clubhouse rating badge right after regional badge
+  // Add Clubhouse rating badge right after regional badge - even if no regional badge exists
   if (showAverageRating && averageRating !== null && averageRating !== undefined) {
     rankingBadges.push({
       rank: averageRating.toFixed(1),
