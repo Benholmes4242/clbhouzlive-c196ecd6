@@ -74,15 +74,6 @@ const CourseRankBadges = ({
     });
   }
 
-  // Add Clubhouse rating badge right after regional badge
-  if (showAverageRating && averageRating !== null && averageRating !== undefined) {
-    rankingBadges.push({
-      rank: averageRating.toFixed(1),
-      icon: <ClubhouseLogo size="sm" />,
-      tooltip: "Community Rating"
-    });
-  }
-
   // Player rating badge (separate from rankings) - remove star emoji, just use numbers
   const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
     content: `${userRating}/10`,
