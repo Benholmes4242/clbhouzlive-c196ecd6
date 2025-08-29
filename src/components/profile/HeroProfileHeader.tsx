@@ -237,10 +237,10 @@ const HeroProfileHeader = ({
           );
         case 'courses':
           return (
-            <UserCoursesContent 
-              username={profile?.username || ''}
+            <CoursesJourney 
+              userId={profile?.id}
+              userDisplayName={profile?.display_name || 'User'}
               isOwnProfile={isOwnProfile}
-              displayName={profile?.display_name || 'User'}
             />
           );
         case 'achievements':
