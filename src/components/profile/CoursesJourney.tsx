@@ -454,8 +454,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
 
 
-      {/* Regional Carousels */}
-      <RegionalCarouselsSection userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Courses by Region Section */}
+      <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
@@ -1732,13 +1732,13 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 };
 
 
-// Regional Carousels Section Component
-interface RegionalCarouselsSectionProps {
+// Courses by Region Section Component  
+interface CoursesbyRegionSectionProps {
   userId?: string;
   isOwnProfile?: boolean;
 }
 
-const RegionalCarouselsSection: React.FC<RegionalCarouselsSectionProps> = ({ 
+const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({ 
   userId,
   isOwnProfile = false
 }) => {
