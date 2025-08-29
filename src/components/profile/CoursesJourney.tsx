@@ -987,6 +987,13 @@ interface HLSVideoElement extends HTMLVideoElement {
 
   const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
     console.log('🎥 Registering video:', videoId);
+    
+    // Ensure video is a valid HTMLVideoElement
+    if (!video || typeof video.addEventListener !== 'function') {
+      console.error('🎥 Invalid video element:', video);
+      return () => {}; // Return empty cleanup function
+    }
+    
     videoRefs.current.set(videoId, video);
     
     // Set initial mute state (default to muted)

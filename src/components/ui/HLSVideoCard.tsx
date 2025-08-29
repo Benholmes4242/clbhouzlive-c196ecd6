@@ -55,10 +55,15 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   }, [muted]);
 
   // Expose video element and methods to parent
-  useImperativeHandle(ref, () => ({
-    ...videoRef.current,
-    attachHLS
-  }), []);
+  useImperativeHandle(ref, () => {
+    const video = videoRef.current;
+    if (video) {
+      // Add attachHLS method to the video element
+      (video as any).attachHLS = attachHLS;
+      return video;
+    }
+    return null;
+  }, []);
 
   // Check if browser supports native HLS
   const canPlayHLSNatively = () => {
