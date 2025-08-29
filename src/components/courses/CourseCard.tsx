@@ -118,55 +118,62 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
           
            {/* Course Name - with truncation and hover for recently played cards */}
-           <h3 
-             className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
-             title={showXP ? course.name : undefined}
-           >
-             {course.name}
-           </h3>
-          
-           {/* AI Quote or Location or Ranking Badges */}
-           {showAIQuote ? (
-             <CourseCardAIQuote 
-               courseName={course.name}
-               country={course.country}
-               enabled={showAIQuote}
-               mobileTextScale={mobileTextScale}
-             />
-            ) : showRatingOnRight ? (
-             // Show ranking badges and average rating for Top 10 Rated cards
+           {showRatingOnRight ? (
+             // For Top 10 Rated cards, show course name and ranking badges on same row
              <div className="flex items-center justify-between">
-               <div className="flex flex-wrap gap-2">
-                <CourseRankBadges
-                  globalRank={course.global_rank}
-                  regionalRank={course.regional_rank}
-                  usaRank={course.usa_rank}
-                  country={course.country}
-                  positioning="bottom-left"
-                  showUserRating={false}
-                  averageRating={course.average_rating}
-                  showAverageRating={true}
-                  showXP={false}
-                />
-              </div>
-              {/* User Rating in liquid glass container */}
-              {userRating && showUserRating && (
-                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                  <div className="relative z-10 flex items-center gap-1.5">
-                    <span className="text-sm font-bold text-white">{userRating}/10</span>
-                  </div>
-                </div>
-              )}
-            </div>
+               <div className="flex items-center gap-2">
+                 <h3 
+                   className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight drop-shadow-lg group-hover:text-white/80 transition-colors`}
+                 >
+                   {course.name}
+                 </h3>
+                 <div className="flex flex-wrap gap-2">
+                   <CourseRankBadges
+                     globalRank={course.global_rank}
+                     regionalRank={course.regional_rank}
+                     usaRank={course.usa_rank}
+                     country={course.country}
+                     positioning="bottom-left"
+                     showUserRating={false}
+                     averageRating={course.average_rating}
+                     showAverageRating={true}
+                     showXP={false}
+                   />
+                 </div>
+               </div>
+               {/* User Rating in liquid glass container */}
+               {userRating && showUserRating && (
+                 <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                   <div className="relative z-10 flex items-center gap-1.5">
+                     <span className="text-sm font-bold text-white">{userRating}/10</span>
+                   </div>
+                 </div>
+               )}
+             </div>
            ) : (
-             showCountryWithFlag && (
-               <CourseCardLocation 
-                 course={course}
-                 mobileTextScale={mobileTextScale}
-                 mobileFlagSize={mobileFlagSize}
-               />
-             )
+             <h3 
+               className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight mb-0 drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
+               title={showXP ? course.name : undefined}
+             >
+               {course.name}
+             </h3>
            )}
+           
+            {/* AI Quote or Location */}
+            {showAIQuote ? (
+              <CourseCardAIQuote 
+                courseName={course.name}
+                country={course.country}
+                enabled={showAIQuote}
+                mobileTextScale={mobileTextScale}
+              />
+           ) : !showRatingOnRight && showCountryWithFlag ? (
+                <CourseCardLocation 
+                  course={course}
+                  mobileTextScale={mobileTextScale}
+                  mobileFlagSize={mobileFlagSize}
+                />
+           ) : null}
         </div>
       </div>
     </>
