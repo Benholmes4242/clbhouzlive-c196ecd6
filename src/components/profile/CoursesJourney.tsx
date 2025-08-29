@@ -870,13 +870,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
   // Video state management for exclusive playback
-  const [isMuted, setIsMuted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('highlightReelMuted');
-      return saved ? JSON.parse(saved) : true; // Default muted
-    }
-    return true;
-  });
+  const [isMuted, setIsMuted] = useState(true); // Always default to muted
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [firstCardId, setFirstCardId] = useState<string | null>(null);
   const [userInitiated, setUserInitiated] = useState(false);
@@ -889,15 +883,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Persist mute state
-  useEffect(() => {
-    localStorage.setItem('highlightReelMuted', JSON.stringify(isMuted));
-  }, [isMuted]);
-
-  // Update first card ID when filteredCourses change or current index changes
-  // This will be handled after filteredCourses is declared
-
-  // Auto-play first card when it changes and no user-initiated video is playing
+  // Track window width for responsive breakpoints
   useEffect(() => {
     if (firstCardId && !userInitiated) {
       console.log('🎥 Auto-playing first card:', firstCardId);
