@@ -141,15 +141,16 @@ const MyCoursesTabs = ({
           <h3 className="text-lg font-semibold">Recently Played (Last 30 Days)</h3>
           {recentCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recentCourses.map((userCourse) => (
-                <CourseCard 
-                  key={`${userCourse.id}-recent-${userCourse.source}`} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={userId}
-                  userRating={userCourse.rating || null}
-                  showUserRating={true}
-                />
-              ))}
+               {recentCourses.map((userCourse) => (
+                 <CourseCard 
+                   key={`${userCourse.id}-recent-${userCourse.source}`} 
+                   course={userCourse.golf_courses}
+                   viewingUserId={userId}
+                   userRating={userCourse.rating || null}
+                   showUserRating={true}
+                   hideRankingBadges={true}
+                 />
+               ))}
             </div>
           ) : (
             <Card>
