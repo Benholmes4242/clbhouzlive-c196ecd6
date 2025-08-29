@@ -1310,7 +1310,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                          {/* Video Play Icon - Bottom Right - Hide for playing videos */}
                          {(playingVideoId !== videoId || isSlotOne) && (
                            <div className="absolute bottom-3 right-3 z-10 transition-opacity group-hover:opacity-80">
-                             <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                             <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
                                <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
                              </div>
                            </div>
@@ -1318,21 +1318,17 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
                          {/* Mute/Unmute Button - Top Right */}
                          <div className="absolute top-3 right-3 z-10">
-                           <Button
-                             variant="ghost"
-                             size="sm"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               toggleMute();
-                             }}
-                             className="h-8 w-8 p-0 rounded-full bg-black/50 hover:bg-black/70 text-white"
-                           >
+                           <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center cursor-pointer" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleMute();
+                                }}>
                              {isMuted ? (
-                               <VolumeX className="h-4 w-4" />
+                               <VolumeX className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
                              ) : (
-                               <Volume2 className="h-4 w-4" />
+                               <Volume2 className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
                              )}
-                           </Button>
+                           </div>
                          </div>
 
                         {/* Course Info Overlay */}

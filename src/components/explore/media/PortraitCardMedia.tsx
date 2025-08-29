@@ -88,7 +88,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
         
         {/* Play icon for non-video fallback images */}
         <div className="absolute bottom-3 right-3 z-20">
-          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+          <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
             <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
           </div>
         </div>
@@ -123,7 +123,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon for autoplaying videos */}
       <div className="absolute bottom-3 right-3 z-20">
-        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+        <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
           <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
         </div>
       </div>
