@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
+import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
-// Adding back the problematic component to confirm it causes the issue
-import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -100,6 +99,9 @@ const ProfilePage = () => {
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
+      
+      {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
+      
       
       <BottomNavigation />
     </div>
