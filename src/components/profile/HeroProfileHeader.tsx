@@ -234,6 +234,7 @@ const HeroProfileHeader = ({
             />
           );
         case 'courses':
+          console.log('Rendering courses section with CoursesJourney');
           return (
             <CoursesJourney 
               userId={profile?.id || ''}

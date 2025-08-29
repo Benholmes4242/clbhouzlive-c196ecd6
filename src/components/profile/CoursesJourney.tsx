@@ -29,6 +29,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   userDisplayName = 'User',
   isOwnProfile = false 
 }) => {
+  console.log('CoursesJourney rendering with props:', { userId, userDisplayName, isOwnProfile });
   const { regionProgress, isLoading } = useTop100CoursesData(userId || '', isOwnProfile);
   const { generateMotivation } = useProgressMotivation(userId, userDisplayName, isOwnProfile);
   const [motivationalMessages, setMotivationalMessages] = useState<{[key: string]: string}>({});
