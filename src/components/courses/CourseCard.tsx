@@ -225,17 +225,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
              // Show ranking badges and average rating for Top 10 Rated cards
              <div className="flex items-center justify-between">
                <div className="flex flex-wrap gap-2">
-                 <CourseRankBadges
-                   globalRank={course.global_rank}
-                   regionalRank={course.regional_rank}
-                   usaRank={course.usa_rank}
-                   country={course.country}
-                   positioning="bottom-left"
-                   showUserRating={false}
-                   averageRating={course.average_rating}
-                   showAverageRating={showAverageRating}
-                   showXP={false}
-                 />
+                <CourseRankBadges
+                  globalRank={course.global_rank}
+                  regionalRank={course.regional_rank}
+                  usaRank={course.usa_rank}
+                  country={course.country}
+                  positioning="bottom-left"
+                  showUserRating={false}
+                  averageRating={course.average_rating}
+                  showAverageRating={true}
+                  showXP={false}
+                />
               </div>
               {/* User Rating in liquid glass container */}
               {userRating && showUserRating && (
@@ -248,7 +248,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </div>
           ) : (
             <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
-              {showCountryWithFlag && (
+              {showCountryWithFlag ? (
                 <>
                   <CountryFlag 
                     country={getCountryForFlag(course)} 
@@ -257,6 +257,13 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   />
                   <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
                 </>
+              ) : (
+                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                  <div className="relative z-10 flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 flex-shrink-0 text-white" />
+                    <span className="text-sm font-medium text-white">{formatLocation(course)}</span>
+                  </div>
+                </div>
               )}
             </div>
           )}
