@@ -908,8 +908,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   }, []);
 
   const playExclusive = useCallback((cardId: string, isUserInit = false) => {
+    console.log('🎥 playExclusive called:', { cardId, isUserInit });
     const targetVideo = videoRefs.current.get(cardId);
-    if (!targetVideo) return;
+    if (!targetVideo) {
+      console.log('🎥 Target video not found in refs:', cardId);
+      return;
+    }
 
     // Pause and mute all other videos
     pauseAll();
@@ -917,28 +921,38 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     // Play target video
     targetVideo.loop = true;
     targetVideo.muted = isMuted;
-    targetVideo.play().catch(console.error);
+    targetVideo.play().then(() => {
+      console.log('🎥 Video playing successfully:', cardId);
+    }).catch(error => {
+      console.error('🎥 Video play failed:', cardId, error);
+    });
     
     setPlayingCardId(cardId);
     setUserInitiated(isUserInit);
   }, [isMuted, pauseAll]);
 
   const tryAutoPlayFirstCard = useCallback(() => {
+    console.log('🎥 tryAutoPlayFirstCard called:', { playingCardId, firstCardId, visibleIds: Array.from(visibleIds) });
     if (playingCardId || !firstCardId) return;
     
     // Only autoplay if first card is visible above 60% threshold
     if (visibleIds.has(firstCardId)) {
+      console.log('🎥 Starting autoplay for first card:', firstCardId);
       playExclusive(firstCardId, false); // Auto-play (not user-initiated)
+    } else {
+      console.log('🎥 First card not visible enough for autoplay');
     }
   }, [playingCardId, firstCardId, visibleIds, playExclusive]);
 
   // Event Handlers
   const onCardTap = useCallback((cardId: string) => {
+    console.log('🎥 Card tapped:', cardId, { currentPlaying: playingCardId });
     if (playingCardId === cardId) {
       // Pause current video
       const video = videoRefs.current.get(cardId);
       if (video) {
         video.pause();
+        console.log('🎥 Paused video:', cardId);
       }
       setPlayingCardId(null);
       setUserInitiated(false);
@@ -947,6 +961,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       setTimeout(() => tryAutoPlayFirstCard(), 100);
     } else {
       // Play new video
+      console.log('🎥 Playing new video:', cardId);
       playExclusive(cardId, true); // User-initiated
     }
   }, [playingCardId, tryAutoPlayFirstCard, playExclusive]);
@@ -984,6 +999,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   }, [playingCardId]);
 
   const registerVideo = useCallback((videoId: string, video: HTMLVideoElement) => {
+    console.log('🎥 Registering video:', videoId, video);
     videoRefs.current.set(videoId, video);
     
     // Configure video element
@@ -993,8 +1009,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     video.preload = 'metadata';
     
     // Set up event listeners
-    const handleEnded = () => onVideoEnded(videoId);
+    const handleEnded = () => {
+      console.log('🎥 Video ended:', videoId);
+      onVideoEnded(videoId);
+    };
     const handlePause = () => {
+      console.log('🎥 Video paused:', videoId);
       // Handle visibility-based pause
       if (videoId === firstCardId && playingCardId === videoId && !userInitiated) {
         // First card paused due to visibility, clear playing state
@@ -1005,82 +1025,48 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     video.addEventListener('ended', handleEnded);
     video.addEventListener('pause', handlePause);
     
+    // If this is the first card and no video is playing, start autoplay after a short delay
+    if (videoId === firstCardId && !playingCardId) {
+      setTimeout(() => {
+        console.log('🎥 Auto-triggering first card play on registration:', videoId);
+        playExclusive(videoId, false);
+      }, 500);
+    }
+    
     return () => {
+      console.log('🎥 Unregistering video:', videoId);
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('pause', handlePause);
       videoRefs.current.delete(videoId);
     };
-  }, [onVideoEnded, firstCardId, playingCardId, userInitiated]);
+  }, [onVideoEnded, firstCardId, playingCardId, userInitiated, playExclusive]);
 
-  // Visibility Detection with IntersectionObserver
+  // Simplified visibility - just mark first card as always visible for now
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (firstCardId) {
+      setVisibleIds(new Set([firstCardId]));
+    }
+  }, [firstCardId]);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const newVisibleIds = new Set(visibleIds);
-        
-        entries.forEach((entry) => {
-          const cardElement = entry.target as HTMLElement;
-          const videoId = cardElement.getAttribute('data-video-id');
-          if (!videoId) return;
-
-          if (entry.intersectionRatio >= 0.6) {
-            // Card is 60%+ visible
-            newVisibleIds.add(videoId);
-            
-            // Auto-play first card if conditions are met
-            if (videoId === firstCardId && !playingCardId && !userInitiated) {
-              setTimeout(() => playExclusive(videoId, false), 100);
-            }
-          } else if (entry.intersectionRatio < 0.4) {
-            // Card is less than 40% visible
-            newVisibleIds.delete(videoId);
-            
-            // Pause if this is the first card and it's auto-playing
-            if (videoId === firstCardId && playingCardId === videoId && !userInitiated) {
-              const video = videoRefs.current.get(videoId);
-              if (video) {
-                video.pause();
-              }
-            }
-          }
-        });
-
-        setVisibleIds(newVisibleIds);
-      },
-      { 
-        threshold: [0.4, 0.6],
-        root: null,
-        rootMargin: '0px'
-      }
-    );
-
-    observerRef.current = observer;
-
-    // Observe all video cards
-    const videoCards = containerRef.current.querySelectorAll('[data-video-id]');
-    videoCards.forEach(card => observer.observe(card));
-
-    return () => {
-      observer.disconnect();
-      observerRef.current = null;
-    };
-  }, [firstCardId, playingCardId, userInitiated, visibleIds, playExclusive]);
-
-  // Auto-play first card on load
+  // Auto-play first card on load (simplified approach)
   useEffect(() => {
     console.log('🎥 Highlights autoplay check:', { firstCardId, isHydrated, playingCardId });
     if (firstCardId && isHydrated && !playingCardId) {
       // Delay to ensure video is registered and visible
       const timer = setTimeout(() => {
         console.log('🎥 Attempting first card autoplay:', firstCardId);
-        tryAutoPlayFirstCard();
-      }, 300);
+        const video = videoRefs.current.get(firstCardId);
+        if (video) {
+          console.log('🎥 First card video found, playing:', firstCardId);
+          playExclusive(firstCardId, false);
+        } else {
+          console.log('🎥 First card video not found in refs yet');
+        }
+      }, 1000); // Longer delay to ensure video is registered
       
       return () => clearTimeout(timer);
     }
-  }, [firstCardId, isHydrated, playingCardId, tryAutoPlayFirstCard]);
+  }, [firstCardId, isHydrated, playingCardId, playExclusive]);
   
   // Calculate cards per view for Highlight Reel
   const getCardsPerView = () => {
