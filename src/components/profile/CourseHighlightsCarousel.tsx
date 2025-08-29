@@ -76,12 +76,7 @@ const CourseHighlightsCarousel: React.FC<CourseHighlightsCarouselProps> = ({
               </div>
             </div>
 
-            {/* Course Info - Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <p className="text-sm text-white/90">
-                {course.rank}
-              </p>
-            </div>
+            {/* Course Info - Bottom - removed course name and location */}
           </div>
         ))}
       </div>
