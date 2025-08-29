@@ -181,11 +181,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
 
         {/* Course ranking badges - positioned at top-left - conditionally hide */}
-        {!hideRankingBadges && !showRatingOnRight && (
+        {!showRatingOnRight && (
           <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
+            globalRank={hideRankingBadges ? null : course.global_rank}
+            regionalRank={hideRankingBadges ? null : course.regional_rank}
+            usaRank={hideRankingBadges ? null : course.usa_rank}
             country={course.country}
             viewContext={viewContext}
             userRating={userRating}
