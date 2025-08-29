@@ -869,7 +869,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
-  // Video state management
+  // Video state management for exclusive playback
   const [isMuted, setIsMuted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('highlightReelMuted');
@@ -878,6 +878,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     return true;
   });
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [firstCardId, setFirstCardId] = useState<string | null>(null);
+  const [userInitiated, setUserInitiated] = useState(false);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   
   // Track window width for responsive breakpoints
@@ -892,67 +894,132 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     localStorage.setItem('highlightReelMuted', JSON.stringify(isMuted));
   }, [isMuted]);
 
+  // Update first card ID when filteredCourses change or current index changes
+  // This will be handled after filteredCourses is declared
+
+  // Auto-play first card when it changes and no user-initiated video is playing
+  useEffect(() => {
+    if (firstCardId && !userInitiated) {
+      console.log('🎥 Auto-playing first card:', firstCardId);
+      playExclusive(firstCardId, false);
+    }
+  }, [firstCardId]);
+
   // Video management functions
   const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev);
-    // Update all videos with new mute state
-    videoRefs.current.forEach(video => {
-      video.muted = !isMuted;
+    console.log('🎥 Toggling mute from', isMuted, 'to', !isMuted);
+    setIsMuted(prev => {
+      const newMuted = !prev;
+      // Update currently playing video with new mute state
+      if (playingVideoId) {
+        const video = videoRefs.current.get(playingVideoId);
+        if (video) {
+          video.muted = newMuted;
+        }
+      }
+      return newMuted;
     });
-  }, [isMuted]);
+  }, [isMuted, playingVideoId]);
 
-  const playVideo = useCallback((videoId: string) => {
-    const targetVideo = videoRefs.current.get(videoId);
-    if (!targetVideo) return;
-
-    // Pause all other videos
-    videoRefs.current.forEach((video, id) => {
-      if (id !== videoId && !video.paused) {
+  const pauseAllVideos = useCallback(() => {
+    console.log('🎥 Pausing all videos');
+    videoRefs.current.forEach((video) => {
+      if (!video.paused) {
         video.pause();
       }
+      video.muted = true; // Ensure all non-active videos are muted
     });
+  }, []);
 
+  const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
+    console.log('🎥 Playing exclusive:', videoId, 'User initiated:', isUserInitiated);
+    const targetVideo = videoRefs.current.get(videoId);
+    if (!targetVideo) {
+      console.log('🎥 Video not found:', videoId);
+      return;
+    }
+
+    // Pause all other videos first
+    pauseAllVideos();
+
+    // Set state
     setPlayingVideoId(videoId);
+    setUserInitiated(isUserInitiated);
+
+    // Configure and play target video
     targetVideo.muted = isMuted;
-    targetVideo.play().catch(console.error);
-  }, [isMuted]);
+    targetVideo.loop = true;
+    targetVideo.play().catch(error => {
+      console.error('🎥 Failed to play video:', videoId, error);
+    });
+  }, [isMuted, pauseAllVideos]);
 
   const pauseVideo = useCallback((videoId: string) => {
+    console.log('🎥 Pausing video:', videoId);
     const targetVideo = videoRefs.current.get(videoId);
     if (targetVideo && !targetVideo.paused) {
       targetVideo.pause();
     }
+    
     if (playingVideoId === videoId) {
       setPlayingVideoId(null);
+      setUserInitiated(false);
+      
+      // Resume first card autoplay if available
+      if (firstCardId && firstCardId !== videoId) {
+        console.log('🎥 Resuming first card autoplay:', firstCardId);
+        setTimeout(() => playExclusive(firstCardId, false), 100);
+      }
     }
-  }, [playingVideoId]);
+  }, [playingVideoId, firstCardId, playExclusive]);
 
   const registerVideo = useCallback((videoId: string, video: HTMLVideoElement) => {
+    console.log('🎥 Registering video:', videoId);
     videoRefs.current.set(videoId, video);
     video.muted = isMuted;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
     
     // Set up event listeners
     const handleEnded = () => {
-      const slotOneId = filteredCourses.length > 0 ? `video-${filteredCourses[0].id}` : null;
-      if (videoId !== slotOneId) {
-        // If non-slot-one video ends, resume slot one
-        if (slotOneId) {
-          playVideo(slotOneId);
+      console.log('🎥 Video ended:', videoId);
+      if (playingVideoId === videoId) {
+        if (videoId === firstCardId) {
+          // First card ended, restart it
+          video.currentTime = 0;
+          video.play().catch(console.error);
+        } else {
+          // Non-first card ended, resume first card
+          setPlayingVideoId(null);
+          setUserInitiated(false);
+          if (firstCardId) {
+            setTimeout(() => playExclusive(firstCardId, false), 100);
+          }
         }
-      } else {
-        // Slot one video ended, restart it
-        video.currentTime = 0;
-        video.play().catch(console.error);
       }
     };
 
+    const handlePlay = () => {
+      console.log('🎥 Video started playing:', videoId);
+    };
+
+    const handlePause = () => {
+      console.log('🎥 Video paused:', videoId);
+    };
+
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
     
     return () => {
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
       videoRefs.current.delete(videoId);
+      console.log('🎥 Unregistered video:', videoId);
     };
-  }, [isMuted, playVideo]);
+  }, [isMuted, playingVideoId, firstCardId, playExclusive]);
 
   
   // Calculate cards per view for Highlight Reel
@@ -1133,20 +1200,20 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
 
+  // Update first card ID when filteredCourses change or current index changes
+  useEffect(() => {
+    const newFirstCardId = filteredCourses.length > currentIndex ? `video-${filteredCourses[currentIndex].id}` : null;
+    if (newFirstCardId !== firstCardId) {
+      console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
+      setFirstCardId(newFirstCardId);
+    }
+  }, [filteredCourses, currentIndex, firstCardId]);
+
   const getSlotOneVideoId = useCallback(() => {
     return filteredCourses.length > 0 ? `video-${filteredCourses[0].id}` : null;
   }, [filteredCourses]);
 
-  // Auto-play slot one video when data loads
-  useEffect(() => {
-    if (filteredCourses.length > 0 && isHydrated) {
-      const slotOneId = getSlotOneVideoId();
-      if (slotOneId) {
-        // Small delay to ensure video element is registered
-        setTimeout(() => playVideo(slotOneId), 100);
-      }
-    }
-  }, [filteredCourses, isHydrated, playVideo, getSlotOneVideoId]);
+  // This effect is replaced by our new firstCardId management
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
@@ -1261,7 +1328,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     return 'calc(40vw - 0.5rem)'; // Mobile: 2.5 cards visible
                   };
 
-                  const isSlotOne = index === 0;
+                  const isSlotOne = index === currentIndex; // The card in slot one is the one at currentIndex
                   const videoId = `video-${userCourse.id}`;
                   const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
                   
@@ -1292,7 +1359,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                           }}
                           src={videoUrl}
                           className="w-full h-full object-cover rounded-lg cursor-pointer"
-                          loop={isSlotOne}
+                          loop={true} // All videos loop
                           playsInline
                           preload="metadata"
                           muted={isMuted}
@@ -1301,7 +1368,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                               if (playingVideoId === videoId) {
                                 pauseVideo(videoId);
                               } else {
-                                playVideo(videoId);
+                                playExclusive(videoId, true);
                               }
                             }
                           }}
