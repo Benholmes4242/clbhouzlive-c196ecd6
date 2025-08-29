@@ -119,14 +119,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
            {/* Course Name and Ranking Badges Row */}
            {showRatingOnRight ? (
-             <div className="flex items-start justify-between mb-2">
-               <div className="flex flex-col">
-                 <h3 
-                   className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight mb-1 drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
-                   title={showXP ? course.name : undefined}
-                 >
-                   {course.name}
-                 </h3>
+             <div className="flex items-center justify-between mb-2">
+               <div className="flex items-center gap-3">
                  <div className="flex flex-wrap gap-2">
                    <CourseRankBadges
                      globalRank={course.global_rank}
@@ -140,6 +134,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
                      showXP={false}
                    />
                  </div>
+                 <h3 
+                   className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
+                   title={showXP ? course.name : undefined}
+                 >
+                   {course.name}
+                 </h3>
                </div>
                {/* User Rating in liquid glass container */}
                {userRating && showUserRating && (
