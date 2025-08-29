@@ -236,13 +236,7 @@ const HeroProfileHeader = ({
             />
           );
         case 'courses':
-          return (
-            <UserCoursesContent 
-              username={profile?.username || ''}
-              isOwnProfile={isOwnProfile}
-              displayName={profile?.display_name || 'User'}
-            />
-          );
+          return null;
         case 'achievements':
           return (
             <AchievementsPane 
