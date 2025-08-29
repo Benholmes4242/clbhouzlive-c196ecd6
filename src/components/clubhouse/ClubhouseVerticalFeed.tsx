@@ -57,6 +57,7 @@ const VideoWithAutoplay: React.FC<{
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
+          objectFit="cover"
           muted={muted}
           loop={true}
           autoplay={isInView}
@@ -466,10 +467,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               ref={(el) => {
                 if (el) itemRefs.current[index] = el;
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center"
+              className="relative w-full snap-start snap-always"
               style={{ 
                 height: '100vh', // Full screen height now that nav is transparent
                 minHeight: '100vh',
+                maxHeight: '100vh',
+                width: '100vw',
+                maxWidth: '100vw',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always'
               }}
@@ -509,7 +513,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     }
                   }
                 }}
-                className="relative w-full h-full flex items-center justify-center z-10"
+                className="relative w-full h-full z-10"
                 // Removed mouse enter/leave handlers that were causing re-renders
               >
                 {currentMedia.media_type === 'video' ? (
@@ -520,11 +524,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     isMobile={isMobile}
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-black">
+                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
