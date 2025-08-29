@@ -4,8 +4,8 @@ import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
-// Using the new refactored ProfileHeaderContainer instead of HeroProfileHeader
-import ProfileHeaderContainer from '@/components/profile/header/ProfileHeaderContainer';
+// Adding back the problematic component to confirm it causes the issue
+import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -93,7 +93,7 @@ const ProfilePage = () => {
       {/* Header */}
       <Header />
       
-      <ProfileHeaderContainer 
+      <HeroProfileHeader 
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
         onProfileUpdate={refreshProfile}
