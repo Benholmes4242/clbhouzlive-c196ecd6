@@ -15,6 +15,7 @@ interface HLSVideoCardProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
+  externallyManaged?: boolean; // Disable internal autoplay when externally managed
 }
 
 declare global {
@@ -36,7 +37,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   loop = true,
   onPlay,
   onPause,
-  onClick
+  onClick,
+  externallyManaged = false
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -52,8 +54,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   }, [muted]);
 
-  // Expose video element to parent
-  useImperativeHandle(ref, () => videoRef.current, []);
+  // Expose video element and methods to parent
+  useImperativeHandle(ref, () => ({
+    ...videoRef.current,
+    attachHLS
+  }), []);
 
   // Check if browser supports native HLS
   const canPlayHLSNatively = () => {
@@ -102,11 +107,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   };
 
-  // Intersection observer for autoplay
+  // Intersection observer for autoplay - skip if externally managed
   useEffect(() => {
     const container = containerRef.current;
     const video = videoRef.current;
-    if (!container || !video || !autoplay) return;
+    if (!container || !video || !autoplay || externallyManaged) return;
 
     const observer = new IntersectionObserver(
       async (entries) => {
@@ -135,7 +140,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         hlsInstanceRef.current.destroy();
       }
     };
-  }, [hlsUrl, autoplay, onPlay, onPause]);
+  }, [hlsUrl, autoplay, externallyManaged, onPlay, onPause]);
 
   // Handle mute toggle
   const toggleMute = (e: React.MouseEvent) => {
@@ -152,8 +157,13 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   };
 
-  // Handle video click
+  // Handle video click - if externally managed, just call onClick
   const handleVideoClick = () => {
+    if (externallyManaged) {
+      onClick?.();
+      return;
+    }
+
     const video = videoRef.current;
     if (!video) return;
 

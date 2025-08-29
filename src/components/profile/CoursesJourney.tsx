@@ -12,7 +12,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import FeedVideoPlayer from '@/components/feed/FeedVideoPlayer';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
 
 
 interface CoursesJourneyProps {
@@ -869,12 +869,17 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
-  // Video state management for exclusive playback
+// Enhanced video element interface for HLS videos
+interface HLSVideoElement extends HTMLVideoElement {
+  attachHLS?: () => Promise<void>;
+}
+
+// Video state management for exclusive playback
   const [videoMuteStates, setVideoMuteStates] = useState<Map<string, boolean>>(new Map()); // Individual mute state per video
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [firstCardId, setFirstCardId] = useState<string | null>(null);
   const [userInitiated, setUserInitiated] = useState(false);
-  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const videoRefs = useRef<Map<string, HLSVideoElement>>(new Map());
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -941,13 +946,24 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     setPlayingVideoId(videoId);
     setUserInitiated(isUserInitiated);
 
-    // Configure and play target video - use per-video mute state
-    const videoMuted = getVideoMuteState(videoId);
-    targetVideo.muted = videoMuted;
-    targetVideo.loop = true;
-    targetVideo.play().catch(error => {
-      console.error('🎥 Failed to play video:', videoId, error);
-    });
+    // Attach HLS if needed and play
+    const playVideo = async () => {
+      try {
+        if (targetVideo.attachHLS) {
+          await targetVideo.attachHLS();
+        }
+        
+        // Configure and play target video - use per-video mute state
+        const videoMuted = getVideoMuteState(videoId);
+        targetVideo.muted = videoMuted;
+        targetVideo.loop = true;
+        await targetVideo.play();
+      } catch (error) {
+        console.error('🎥 Failed to play video:', videoId, error);
+      }
+    };
+
+    playVideo();
   }, [pauseAllVideos, getVideoMuteState]);
 
   const pauseVideo = useCallback((videoId: string) => {
@@ -969,7 +985,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     }
   }, [playingVideoId, firstCardId, playExclusive]);
 
-  const registerVideo = useCallback((videoId: string, video: HTMLVideoElement) => {
+  const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
     console.log('🎥 Registering video:', videoId);
     videoRefs.current.set(videoId, video);
     
@@ -979,6 +995,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     video.loop = true;
     video.playsInline = true;
     video.preload = 'metadata';
+    
+    // Attach HLS source if video has attachHLS method
+    if (video.attachHLS) {
+      video.attachHLS().catch(console.error);
+    }
     
     // Set up event listeners
     const handleEnded = () => {
@@ -1001,6 +1022,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
     const handlePlay = () => {
       console.log('🎥 Video started playing:', videoId);
+      // Ensure exclusivity when any video starts playing
+      if (playingVideoId && playingVideoId !== videoId) {
+        pauseAllVideos();
+      }
+      setPlayingVideoId(videoId);
     };
 
     const handlePause = () => {
@@ -1018,7 +1044,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
       videoRefs.current.delete(videoId);
       console.log('🎥 Unregistered video:', videoId);
     };
-  }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive]);
+  }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive, pauseAllVideos]);
 
   
   // Calculate cards per view for Highlight Reel
@@ -1199,20 +1225,24 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
 
-  // Update first card ID when filteredCourses change or current index changes
+  // Update first card ID and trigger autoplay when current index changes
   useEffect(() => {
-    const newFirstCardId = filteredCourses.length > currentIndex ? filteredCourses[currentIndex].id : null;
-    if (newFirstCardId !== firstCardId) {
-      console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
-      setFirstCardId(newFirstCardId);
+    if (filteredCourses.length > 0) {
+      const newFirstCardId = `video-${filteredCourses[currentIndex]?.id}`;
+      if (newFirstCardId !== firstCardId) {
+        console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
+        setFirstCardId(newFirstCardId);
+      }
     }
   }, [filteredCourses, currentIndex, firstCardId]);
 
-  const getSlotOneVideoId = useCallback(() => {
-    return filteredCourses.length > 0 ? filteredCourses[0].id : null;
-  }, [filteredCourses]);
-
-  // This effect is replaced by our new firstCardId management
+  // Auto-play first card when it changes and no user interaction
+  useEffect(() => {
+    if (firstCardId && !userInitiated && videoRefs.current.has(firstCardId)) {
+      console.log('🎥 Auto-playing first card:', firstCardId);
+      setTimeout(() => playExclusive(firstCardId, false), 100);
+    }
+  }, [firstCardId, userInitiated, playExclusive]);
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
@@ -1348,27 +1378,26 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       }}
                     >
                       <div className="aspect-[5/4] w-full relative group">
-                        {/* Video Element - Use FeedVideoPlayer for HLS support */}
-                        <FeedVideoPlayer
-                          ref={(videoPlayerRef) => {
-                            if (videoPlayerRef?.element && videoPlayerRef.element instanceof HTMLVideoElement) {
-                              const cleanup = registerVideo(videoId, videoPlayerRef.element);
+                        {/* Video Element - Use HLSVideoCard with external management */}
+                        <HLSVideoCard
+                          ref={(videoElement) => {
+                            if (videoElement) {
+                              const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
                               return cleanup;
                             }
                           }}
-                          src={videoUrl}
+                          hlsUrl={videoUrl}
                           className="w-full h-full object-cover rounded-lg cursor-pointer"
-                          loop={true} // All videos loop
-                          playsInline
-                          preload="metadata"
+                          loop={true}
                           muted={getVideoMuteState(videoId)}
+                          autoplay={false}
+                          externallyManaged={true}
+                          showMuteButton={false}
                           onClick={() => {
-                            if (!isSlotOne) {
-                              if (playingVideoId === videoId) {
-                                pauseVideo(videoId);
-                              } else {
-                                playExclusive(videoId, true);
-                              }
+                            if (playingVideoId === videoId) {
+                              pauseVideo(videoId);
+                            } else {
+                              playExclusive(videoId, true);
                             }
                           }}
                         />
