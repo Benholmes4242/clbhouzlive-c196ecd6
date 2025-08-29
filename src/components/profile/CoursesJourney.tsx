@@ -7,7 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import CourseCard from '@/components/courses/CourseCard';
 import CourseListItem from '@/components/courses/CourseListItem';
 import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStates';
-import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
