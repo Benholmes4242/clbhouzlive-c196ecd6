@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-// Temporarily comment out potentially problematic imports
+// Adding back components one by one to isolate the issue
+import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
+// Still commenting out the large HeroProfileHeader for now
 // import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-// import UserCoursesContent from '@/components/courses/UserCoursesContent';
-// import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
