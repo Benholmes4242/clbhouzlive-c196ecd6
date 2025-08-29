@@ -74,37 +74,33 @@ const CourseRankBadges = ({
     });
   }
 
-  // Only add Clubhouse rating badge to rankingBadges if there are already ranking badges
-  const hasRankingBadges = rankingBadges.length > 0;
-  if (hasRankingBadges && showAverageRating && averageRating !== null && averageRating !== undefined) {
-    rankingBadges.push({
-      rank: averageRating.toFixed(1),
-      icon: <ClubhouseLogo size="sm" />,
-      tooltip: "Community Rating"
-    });
-  }
-
   // Player rating badge (separate from rankings) - remove star emoji, just use numbers
   const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
     content: `${userRating}/10`,
     tooltip: "Your Rating"
   } : null;
 
+  // Average course rating badge (clbhouzrating)
+  const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
+    content: `${averageRating.toFixed(1)}`,
+    tooltip: "Community Rating"
+  } : null;
+
   // Determine positioning classes
   const getPositioningClasses = () => {
     switch (positioning) {
       case 'bottom-left':
-        return 'absolute bottom-3 left-6 flex flex-row gap-2 z-20'; // Increased z-index
+        return 'absolute bottom-3 left-6 flex flex-row gap-2 z-10';
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-row gap-1.5 z-20'; // Increased z-index
+        return 'absolute top-2 right-2 flex flex-row gap-1.5 z-10'; // Reduced gap and kept right positioning
     }
   };
 
   return (
     <TooltipProvider>
-      {/* Ranking badges with integrated player rating */}
-      {(rankingBadges.length > 0 || playerRatingBadge) && (
+      {/* Ranking badges with integrated player rating and average rating */}
+      {(rankingBadges.length > 0 || playerRatingBadge || averageRatingBadge) && (
         <div className={getPositioningClasses()}>
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
@@ -122,6 +118,23 @@ const CourseRankBadges = ({
             </Tooltip>
           ))}
           
+           {/* Add Average Course Rating badge (clbhouzrating) */}
+           {averageRatingBadge && (
+             <Tooltip>
+               <TooltipTrigger asChild>
+                    <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                     <div className="relative z-10 flex items-center gap-1.5">
+                       <ClubhouseLogo size="sm" />
+                       <span className="text-sm font-bold text-white">{averageRatingBadge.content}</span>
+                     </div>
+                   </div>
+               </TooltipTrigger>
+               <TooltipContent>
+                 <p>{averageRatingBadge.tooltip}</p>
+               </TooltipContent>
+             </Tooltip>
+           )}
+
            {/* Add Clubhouse rating badge */}
            {playerRatingBadge && (
              <Tooltip>
@@ -155,9 +168,9 @@ const CourseRankBadges = ({
         </div>
       )}
 
-      {/* Player rating badge - standalone when no rankings */}
-      {playerRatingBadge && rankingBadges.length === 0 && (
-        <div className="absolute top-2 left-2 z-20">
+      {/* Player rating badge - integrated with ranking badges */}
+      {playerRatingBadge && rankingBadges.length === 0 && !averageRatingBadge && (
+        <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
@@ -174,20 +187,20 @@ const CourseRankBadges = ({
         </div>
       )}
 
-      {/* Average rating badge - standalone when no rankings and no player rating */}
-      {showAverageRating && averageRating !== null && averageRating !== undefined && !hasRankingBadges && !playerRatingBadge && (
-        <div className="absolute top-2 left-2 z-20">
+      {/* Average rating badge - standalone when no rankings */}
+      {averageRatingBadge && rankingBadges.length === 0 && !playerRatingBadge && (
+        <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
                  <div className="relative z-10 flex items-center gap-1.5">
                    <ClubhouseLogo size="sm" />
-                   <span className="text-sm font-bold text-white">{averageRating.toFixed(1)}</span>
+                   <span className="text-sm font-bold text-white">{averageRatingBadge.content}</span>
                  </div>
                </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Community Rating</p>
+              <p>{averageRatingBadge.tooltip}</p>
             </TooltipContent>
           </Tooltip>
         </div>
