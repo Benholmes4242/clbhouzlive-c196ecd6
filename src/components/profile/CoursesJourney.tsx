@@ -2116,9 +2116,17 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             </div>
           </div>
         ) : gbIrelandCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={swipeRef} 
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
                   transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
@@ -2136,8 +2144,12 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                           <CourseCard 
@@ -2504,13 +2516,18 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               </div>
             </div>
           ) : worldwideCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={swipeRef} 
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: '12px'
-                }}
+                className="flex"
+                style={{ gap: '12px' }}
               >
                 {worldwideCourses.map((userCourse, index) => {
                   const getCardWidth = () => {
@@ -2523,8 +2540,12 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                           <CourseCard 
@@ -2890,9 +2911,17 @@ const USASection: React.FC<USASectionProps> = ({
               </div>
             </div>
           ) : usaCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={swipeRef} 
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
                   transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
@@ -2909,8 +2938,12 @@ const USASection: React.FC<USASectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                          <CourseCard 
@@ -3276,9 +3309,17 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               </div>
             </div>
           ) : europeCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div 
+              ref={swipeRef} 
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '0px',
+                scrollPaddingRight: '0px'
+              }}
+            >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
+                className="flex"
                 style={{ 
                   transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
                   gap: '12px'
@@ -3295,8 +3336,12 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                   return (
                     <div 
                       key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: getCardWidth(),
+                        scrollSnapAlign: 'start',
+                        scrollSnapStop: 'always'
+                      }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.7]' : 'aspect-[2.5/1]'}`}>
                           <CourseCard 
