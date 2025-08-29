@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+import ProfileHeaderContainer from '@/components/profile/header/ProfileHeaderContainer';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -97,9 +97,9 @@ const ProfileTestPage = () => {
         <span className="text-yellow-600 font-medium text-sm">TEST PAGE - Profile Clone</span>
       </div>
       
-      <HeroProfileHeader 
+      <ProfileHeaderContainer 
         profile={profile}
-        isOwnProfile={true} // This is always the user's own profile on this route
+        isOwnProfile={true}
         onProfileUpdate={refreshProfile}
         activeSection={activeSection}
         onSectionChange={setActiveSection}

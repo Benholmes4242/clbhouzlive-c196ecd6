@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import { ProfileHeaderSkeleton } from './ProfileSkeleton';
-import HeroProfileHeader from './HeroProfileHeader';
+import ProfileHeaderContainer from './header/ProfileHeaderContainer';
 
 interface OptimizedProfileLoaderProps {
   userId: string;
@@ -32,14 +32,11 @@ const OptimizedProfileLoader: React.FC<OptimizedProfileLoaderProps> = ({
 
   const { profile } = data;
 
-  // Use the same HeroProfileHeader component for consistent Benjamin Holmes layout
   return (
-    <HeroProfileHeader 
+    <ProfileHeaderContainer 
       profile={profile}
       isOwnProfile={isOwnProfile}
-      onProfileUpdate={() => {
-        // Profile update will be handled by the HeroProfileHeader component
-      }}
+      onProfileUpdate={() => {}}
       activeSection={activeSection}
       onSectionChange={onSectionChange}
     />

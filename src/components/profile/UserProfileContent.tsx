@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import HeroProfileHeader from './HeroProfileHeader';
+import ProfileHeaderContainer from './header/ProfileHeaderContainer';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
@@ -27,17 +27,13 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   }
 
   return (
-    <>
-      <HeroProfileHeader 
-        profile={profile}
-        isOwnProfile={isOwnProfile}
-        onProfileUpdate={() => {
-          // Profile update will be handled by the HeroProfileHeader component
-        }}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
-    </>
+    <ProfileHeaderContainer 
+      profile={profile}
+      isOwnProfile={isOwnProfile}
+      onProfileUpdate={() => {}}
+      activeSection={activeSection}
+      onSectionChange={setActiveSection}
+    />
   );
 };
 
