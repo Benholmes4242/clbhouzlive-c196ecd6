@@ -21,7 +21,7 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
   };
 
   const sizeClasses = {
-    sm: 'h-6 w-6',
+    sm: 'h-5 w-5 md:h-7 md:w-7',
     md: 'h-8 w-8', 
     lg: 'h-10 w-10'
   };
