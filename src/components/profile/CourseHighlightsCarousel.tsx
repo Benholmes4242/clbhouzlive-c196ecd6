@@ -78,16 +78,9 @@ const CourseHighlightsCarousel: React.FC<CourseHighlightsCarouselProps> = ({
 
             {/* Course Info - Bottom */}
             <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <h3 className="font-semibold text-lg mb-1">
-                {course.name}
-              </h3>
-              <p className="text-sm text-white/90 mb-1">
+              <p className="text-sm text-white/90">
                 {course.rank}
               </p>
-              <div className="flex items-center text-xs text-white/80">
-                <MapPin className="h-3 w-3 mr-1" />
-                <span>{course.location}</span>
-              </div>
             </div>
           </div>
         ))}
