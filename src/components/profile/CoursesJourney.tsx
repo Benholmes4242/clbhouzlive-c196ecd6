@@ -986,6 +986,12 @@ interface HLSVideoElement extends HTMLVideoElement {
   }, [playingVideoId, firstCardId, playExclusive]);
 
   const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
+    // Prevent duplicate registration
+    if (videoRefs.current.has(videoId)) {
+      console.log('🎥 Video already registered:', videoId);
+      return () => {}; // Return empty cleanup
+    }
+    
     console.log('🎥 Registering video:', videoId);
     
     // Ensure video is a valid HTMLVideoElement
@@ -1387,12 +1393,11 @@ interface HLSVideoElement extends HTMLVideoElement {
                       <div className="aspect-[5/4] w-full relative group">
                         {/* Video Element - Use HLSVideoCard with external management */}
                         <HLSVideoCard
-                          ref={(videoElement) => {
+                          ref={useCallback((videoElement: HTMLVideoElement | null) => {
                             if (videoElement) {
-                              const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
-                              return cleanup;
+                              registerVideo(videoId, videoElement as HLSVideoElement);
                             }
-                          }}
+                          }, [videoId, registerVideo])}
                           hlsUrl={videoUrl}
                           className="w-full h-full object-cover rounded-lg cursor-pointer"
                           loop={true}
