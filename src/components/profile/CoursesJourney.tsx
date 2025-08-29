@@ -1476,17 +1476,7 @@ interface HLSVideoElement extends HTMLVideoElement {
                            </div>
                          </div>
 
-                        {/* Course Info Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
-                          <div className="text-white">
-                            <h4 className="font-semibold text-sm line-clamp-1">
-                              {userCourse.golf_courses.name}
-                            </h4>
-                            <p className="text-xs opacity-80 line-clamp-1">
-                              {userCourse.golf_courses.region || userCourse.golf_courses.country}
-                            </p>
-                          </div>
-                         </div>
+                         {/* Course Info Overlay - removed course name and location */}
                       </div>
                     </div>
                   );
