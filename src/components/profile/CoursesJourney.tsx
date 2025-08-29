@@ -880,6 +880,7 @@ interface HLSVideoElement extends HTMLVideoElement {
   const [firstCardId, setFirstCardId] = useState<string | null>(null);
   const [userInitiated, setUserInitiated] = useState(false);
   const videoRefs = useRef<Map<string, HLSVideoElement>>(new Map());
+  const videoCleanupRefs = useRef<Map<string, () => void>>(new Map());
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -988,8 +989,7 @@ interface HLSVideoElement extends HTMLVideoElement {
   const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
     // Prevent duplicate registration
     if (videoRefs.current.has(videoId)) {
-      console.log('🎥 Video already registered:', videoId);
-      return () => {}; // Return empty cleanup
+      return () => {}; // Return empty cleanup silently
     }
     
     console.log('🎥 Registering video:', videoId);
@@ -1257,6 +1257,16 @@ interface HLSVideoElement extends HTMLVideoElement {
     }
   }, [firstCardId, userInitiated, playExclusive]);
 
+  // Cleanup effect for video registrations
+  useEffect(() => {
+    return () => {
+      // Clean up all video registrations when component unmounts
+      videoCleanupRefs.current.forEach(cleanup => cleanup());
+      videoCleanupRefs.current.clear();
+      videoRefs.current.clear();
+    };
+  }, []);
+
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
     onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
@@ -1393,9 +1403,11 @@ interface HLSVideoElement extends HTMLVideoElement {
                       <div className="aspect-[5/4] w-full relative group">
                         {/* Video Element - Use HLSVideoCard with external management */}
                         <HLSVideoCard
+                          key={videoId} // Add key to ensure proper remounting
                           ref={(videoElement: HTMLVideoElement | null) => {
-                            if (videoElement) {
-                              registerVideo(videoId, videoElement as HLSVideoElement);
+                            if (videoElement && !videoRefs.current.has(videoId)) {
+                              const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
+                              videoCleanupRefs.current.set(videoId, cleanup);
                             }
                           }}
                           hlsUrl={videoUrl}
