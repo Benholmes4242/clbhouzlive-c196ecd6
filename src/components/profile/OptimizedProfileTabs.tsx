@@ -6,7 +6,7 @@ import AchievementsPane from './AchievementsPane';
 
 // Lazy load heavy components for better initial load
 const CourseHighlightsCarousel = lazy(() => import('./CourseHighlightsCarousel'));
-const CoursesJourney = lazy(() => import('./CoursesJourney'));
+const RegionalCoursesCarousel = lazy(() => import('./RegionalCoursesCarousel'));
 const PinnedAchievements = lazy(() => import('./PinnedAchievements'));
 const ProfileProgressSection = lazy(() => import('./ProfileProgressSection'));
 
@@ -69,7 +69,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
       
       case 'courses':
         return (
-          <CoursesJourney 
+          <RegionalCoursesCarousel 
             userId={userId}
             userDisplayName={profileData.profile?.display_name || 'User'}
             isOwnProfile={isOwnProfile}

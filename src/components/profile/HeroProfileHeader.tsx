@@ -12,7 +12,7 @@ import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-import CoursesJourney from './CoursesJourney';
+import RegionalCoursesCarousel from './RegionalCoursesCarousel';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast as useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -912,11 +912,11 @@ const HeroProfileHeader = ({
             <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
               {transitionDirection === 'right' ? (
                 /* Moving away from current section */
-                activeSection === 'activity' ? (
+                 activeSection === 'activity' ? (
                   <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
+                  <RegionalCoursesCarousel 
+                    userId={profile?.id || ''}
                     userDisplayName={profile?.display_name || 'User'}
                     isOwnProfile={isOwnProfile}
                   />
@@ -926,8 +926,8 @@ const HeroProfileHeader = ({
               ) : (
                 /* Moving to current section from right */
                 activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
+                  <RegionalCoursesCarousel 
+                    userId={profile?.id || ''}
                     userDisplayName={profile?.display_name || 'User'}
                     isOwnProfile={isOwnProfile}
                   />
@@ -944,8 +944,8 @@ const HeroProfileHeader = ({
               {transitionDirection === 'right' ? (
                 /* Moving to next section */
                 activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
+                  <RegionalCoursesCarousel 
+                    userId={profile?.id || ''}
                     userDisplayName={profile?.display_name || 'User'}
                     isOwnProfile={isOwnProfile}
                   />
@@ -959,8 +959,8 @@ const HeroProfileHeader = ({
                 activeSection === 'activity' ? (
                   <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
+                  <RegionalCoursesCarousel 
+                    userId={profile?.id || ''}
                     userDisplayName={profile?.display_name || 'User'}
                     isOwnProfile={isOwnProfile}
                   />
@@ -974,8 +974,8 @@ const HeroProfileHeader = ({
           /* Normal state - only show active section */
           <>
             {activeSection === 'courses' ? (
-              <CoursesJourney 
-                userId={profile?.id}
+              <RegionalCoursesCarousel 
+                userId={profile?.id || ''}
                 userDisplayName={profile?.display_name || 'User'}
                 isOwnProfile={isOwnProfile}
               />
