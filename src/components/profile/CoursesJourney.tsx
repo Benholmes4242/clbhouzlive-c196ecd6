@@ -1202,7 +1202,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
   // Update first card ID when filteredCourses change or current index changes
   useEffect(() => {
-    const newFirstCardId = filteredCourses.length > currentIndex ? `video-${filteredCourses[currentIndex].id}` : null;
+    const newFirstCardId = filteredCourses.length > currentIndex ? filteredCourses[currentIndex].id : null;
     if (newFirstCardId !== firstCardId) {
       console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
       setFirstCardId(newFirstCardId);
@@ -1210,7 +1210,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   }, [filteredCourses, currentIndex, firstCardId]);
 
   const getSlotOneVideoId = useCallback(() => {
-    return filteredCourses.length > 0 ? `video-${filteredCourses[0].id}` : null;
+    return filteredCourses.length > 0 ? filteredCourses[0].id : null;
   }, [filteredCourses]);
 
   // This effect is replaced by our new firstCardId management
