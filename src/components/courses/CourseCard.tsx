@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Star } from 'lucide-react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
-import CountryFlag from '@/components/ui/country-flag';
-import { supabase } from '@/integrations/supabase/client';
-import { callEdgeFunctionDebounced } from '@/utils/edgeFunctionHelper';
+import CourseCardBackground from './CourseCardBackground';
+import CourseCardAIQuote from './CourseCardAIQuote';
+import CourseCardLocation from './CourseCardLocation';
+import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
 
 interface Course {
   id: string;
@@ -47,60 +45,6 @@ interface CourseCardProps {
   showRatingOnRight?: boolean;
 }
 
-// Helper function to format description text with line breaks
-const formatDescription = (description: string) => {
-  return (
-    <span>
-      {description
-        .split('\n')
-        .map((line, index, array) => {
-          // Extract only valid Fragment props (key and children)
-          const fragmentProps = { key: index };
-          return (
-            <span key={index}>
-              {line}
-              {index < array.length - 1 && <br />}
-            </span>
-          );
-        })}
-    </span>
-  );
-};
-
-const formatLocation = (course: Course) => {
-  // For GB&I and Continental Europe, use sub_country (like "Portugal") 
-  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    return course.sub_country || course.region || course.country;
-  }
-  
-  // For USA and other countries, use the country field
-  return course.country;
-};
-
-// Helper function to get the country for flag display
-const getCountryForFlag = (course: Course) => {
-  // For GB&I and Continental Europe, use sub_country if available
-  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    return course.sub_country || course.region || course.country;
-  }
-  
-  // For USA and other countries, use the country field
-  return course.country;
-};
-
-// Helper function to get the location text to display
-const getLocationText = (course: Course) => {
-  // For GB&I and Continental Europe, ALWAYS use sub_country if it exists
-  if (course.country === 'Britain & Ireland' || course.country === 'Continental Europe') {
-    if (course.sub_country) {
-      return course.sub_country; // This will be "Portugal", "Spain", "England", etc.
-    }
-    return course.region || course.country;
-  }
-  
-  // For USA and other countries, use the country field
-  return course.country;
-};
 
 const CourseCard: React.FC<CourseCardProps> = ({ 
   course, 
@@ -123,42 +67,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showRatingOnRight = false
 }) => {
   const navigate = useNavigate();
-  const [courseQuote, setCourseQuote] = useState<string>('');
+  
+  // Memory monitoring for this component
+  useMemoryMonitor('CourseCard', process.env.NODE_ENV === 'development');
 
-  // Generate AI quote for course
-  useEffect(() => {
-    if (showAIQuote && course.name) {
-      const generateQuote = async () => {
-        try {
-          const debounceKey = `quote-${course.name}-${course.country}`;
-          
-          const data = await callEdgeFunctionDebounced(
-            'generate-course-quote',
-            { 
-              courseName: course.name,
-              country: course.country 
-            },
-            debounceKey,
-            2000, // 2 second debounce for quotes
-            { timeout: 8000, retries: 1 }
-          );
-
-          setCourseQuote(data?.quote || 'A golf experience like no other');
-        } catch (error) {
-          console.error('Error calling quote function:', error);
-          setCourseQuote('A golf experience like no other');
-        }
-      };
-
-      generateQuote();
-    }
-  }, [showAIQuote, course.name, course.country]);
-
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     if (!disableClick) {
       navigate(`/courses/${course.id}`);
     }
-  };
+  }, [disableClick, navigate, course.id]);
 
   return (
     <>
@@ -167,18 +84,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: course.thumbnail_image 
-              ? `url(${course.thumbnail_image})`
-              : `url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop')`
-          }}
-        >
-          {/* Gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        </div>
+        <CourseCardBackground 
+          thumbnailImage={course.thumbnail_image}
+          courseName={course.name}
+        />
 
         {/* Course ranking badges - positioned at top-left - conditionally hide */}
         {!hideRankingBadges && !showRatingOnRight && (
@@ -216,12 +125,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
              {course.name}
            </h3>
           
-          {/* AI Quote or Location or Ranking Badges */}
-          {showAIQuote ? (
-            <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} leading-relaxed drop-shadow-lg italic`}>
-              {courseQuote || 'A golf experience like no other'}
-            </div>
-           ) : showRatingOnRight ? (
+           {/* AI Quote or Location or Ranking Badges */}
+           {showAIQuote ? (
+             <CourseCardAIQuote 
+               courseName={course.name}
+               country={course.country}
+               enabled={showAIQuote}
+               mobileTextScale={mobileTextScale}
+             />
+            ) : showRatingOnRight ? (
              // Show ranking badges and average rating for Top 10 Rated cards
              <div className="flex items-center justify-between">
                <div className="flex flex-wrap gap-2">
@@ -246,24 +158,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 </div>
               )}
             </div>
-          ) : (
-            <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} drop-shadow-lg`}>
-              {showCountryWithFlag && (
-                <>
-                  <CountryFlag 
-                    country={getCountryForFlag(course)} 
-                    size={mobileFlagSize}
-                    className="mr-2 flex-shrink-0" 
-                  />
-                  <span style={{ transform: 'translateY(2px)' }}>{getLocationText(course)}</span>
-                </>
-              )}
-            </div>
-          )}
+           ) : (
+             showCountryWithFlag && (
+               <CourseCardLocation 
+                 course={course}
+                 mobileTextScale={mobileTextScale}
+                 mobileFlagSize={mobileFlagSize}
+               />
+             )
+           )}
         </div>
       </div>
     </>
   );
 };
 
-export default CourseCard;
+export default React.memo(CourseCard);

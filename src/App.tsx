@@ -15,6 +15,7 @@ import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
+import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 
 
 // Lazy load all pages for better code splitting and loading screen experience
@@ -68,6 +69,9 @@ const queryClient = new QueryClient({
 const App: React.FC = () => {
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
+  
+  // Monitor global memory usage
+  useGlobalMemoryMonitor(60000); // Check every minute
   
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
