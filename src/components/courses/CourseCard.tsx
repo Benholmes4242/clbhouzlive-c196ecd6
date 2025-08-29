@@ -225,17 +225,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
              // Show ranking badges and average rating for Top 10 Rated cards
              <div className="flex items-center justify-between">
                <div className="flex flex-wrap gap-2">
-                <CourseRankBadges
-                  globalRank={course.global_rank}
-                  regionalRank={course.regional_rank}
-                  usaRank={course.usa_rank}
-                  country={course.country}
-                  positioning="bottom-left"
-                  showUserRating={false}
-                  averageRating={course.average_rating}
-                  showAverageRating={true}
-                  showXP={false}
-                />
+                 <CourseRankBadges
+                   globalRank={course.global_rank}
+                   regionalRank={course.regional_rank}
+                   usaRank={course.usa_rank}
+                   country={course.country}
+                   positioning="bottom-left"
+                   showUserRating={false}
+                   averageRating={course.average_rating}
+                   showAverageRating={showAverageRating}
+                   showXP={false}
+                 />
               </div>
               {/* User Rating in liquid glass container */}
               {userRating && showUserRating && (
