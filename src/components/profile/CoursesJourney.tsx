@@ -929,10 +929,9 @@ interface HLSVideoElement extends HTMLVideoElement {
         video.pause();
       }
       video.muted = true; // Ensure all non-active videos are muted
-      // Reset stored mute state to muted for paused videos
-      setVideoMuteState(videoId, true);
+      // Don't reset stored mute state - preserve user's audio preference
     });
-  }, [setVideoMuteState]);
+  }, []);
 
   const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
     console.log('🎥 Playing exclusive:', videoId, 'User initiated:', isUserInitiated);
@@ -949,10 +948,10 @@ interface HLSVideoElement extends HTMLVideoElement {
     if (isUserInitiated && playingVideoId && playingVideoId !== videoId) {
       const currentPlayingVideo = videoRefs.current.get(playingVideoId);
       if (currentPlayingVideo) {
-        // Transfer the current audio state to the new video
-        transferredMuteState = !currentPlayingVideo.muted; // invert because we want to transfer the unmuted state
+        // Transfer the stored audio state to the new video (not DOM state)
+        transferredMuteState = getVideoMuteState(playingVideoId);
         shouldTransferAudio = true;
-        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- unmuted:', !transferredMuteState);
+        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- muted:', transferredMuteState);
       }
     }
 
