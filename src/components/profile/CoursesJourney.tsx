@@ -2102,18 +2102,20 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
-        <div className="relative">
-          {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
+        {/* Empty header container to match structure */}
+      </div>
+      
+      <div className="relative">
+        {!isHydrated ? (
+          <div className="text-center py-8">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-muted-foreground">
+                Loading preferences...
+              </span>
             </div>
-          ) : gbIrelandCourses.length > 0 ? (
+          </div>
+        ) : gbIrelandCourses.length > 0 ? (
             <div ref={swipeRef} className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-300 ease-in-out"
@@ -2162,7 +2164,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
@@ -2489,9 +2490,11 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
-        <div className="relative">
-          {!isHydrated ? (
+        {/* Empty header container to match structure */}
+      </div>
+      
+      <div className="relative">
+        {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
@@ -2548,7 +2551,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
@@ -2874,9 +2876,11 @@ const USASection: React.FC<USASectionProps> = ({
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
-        <div className="relative">
-          {!isHydrated ? (
+        {/* Empty header container to match structure */}
+      </div>
+      
+      <div className="relative">
+        {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
@@ -2933,7 +2937,6 @@ const USASection: React.FC<USASectionProps> = ({
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
@@ -3259,9 +3262,11 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
-        <div className="relative">
-          {!isHydrated ? (
+        {/* Empty header container to match structure */}
+      </div>
+      
+      <div className="relative">
+        {!isHydrated ? (
             <div className="text-center py-8">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
@@ -3318,7 +3323,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
