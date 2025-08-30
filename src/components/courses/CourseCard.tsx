@@ -82,9 +82,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
     }
   }, [disableClick, navigate, course.id]);
 
-  // Debug log to see if CourseCard is rendering
-  console.log('CourseCard rendering:', { courseName: course.name, customHeight, thumbnailImage: course.thumbnail_image });
-
   return (
     <>
       <div 
