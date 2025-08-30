@@ -62,6 +62,7 @@ const VideoWithAutoplay: React.FC<{
           loop={true}
           autoplay={isInView}
           showMuteButton={false}
+          externallyManaged={true}
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">

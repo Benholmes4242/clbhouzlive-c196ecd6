@@ -112,11 +112,29 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   };
 
-  // Intersection observer for autoplay - skip if externally managed
+  // Handle autoplay prop changes when externally managed
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !externallyManaged) return;
+
+    if (autoplay) {
+      attachHLS().then(() => {
+        video.play().catch(() => {
+          // Autoplay failed, which is expected in some browsers
+        });
+        onPlay?.();
+      });
+    } else {
+      video.pause();
+      onPause?.();
+    }
+  }, [autoplay, externallyManaged, onPlay, onPause]);
+
+  // Intersection observer for autoplay - only when NOT externally managed
   useEffect(() => {
     const container = containerRef.current;
     const video = videoRef.current;
-    if (!container || !video || !autoplay || externallyManaged) return;
+    if (!container || !video || externallyManaged) return;
 
     const observer = new IntersectionObserver(
       async (entries) => {
@@ -145,7 +163,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         hlsInstanceRef.current.destroy();
       }
     };
-  }, [hlsUrl, autoplay, externallyManaged, onPlay, onPause]);
+  }, [hlsUrl, externallyManaged, onPlay, onPause]);
 
   // Handle mute toggle
   const toggleMute = (e: React.MouseEvent) => {
