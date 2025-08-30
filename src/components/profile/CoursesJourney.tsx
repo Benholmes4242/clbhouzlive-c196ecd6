@@ -2172,41 +2172,50 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                   gap: '12px'
                 }}
               >
-                {gbIrelandCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
-                  };
+                 {gbIrelandCourses.map((userCourse, index) => {
+                   // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
+                   const getCardWidth = () => {
+                     if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
+                     return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
+                   };
 
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <LockedCourseCard 
-                              course={userCourse.golf_courses}
-                              viewingUserId={userId}
-                              viewContext="global"
-                              userRating={userCourse.rating}
-                              isReadOnly={!isOwnProfile}
-                              showUserRating={true}
-                              showAverageRating={true}
-                              showRatingOnRight={true}
-                              isFromUserCoursesPage={true}
-                              customHeight="h-full"
-                              currentUserId={userId}
-                              profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                              isLocked={!userCourse.is_played}
-                           />
-                      </div>
-                    </div>
-                  );
-                })}
+                   // Debug logging for each card
+                   const isLocked = !userCourse.is_played;
+                   console.log(`GB Ireland card ${index}:`, {
+                     name: userCourse.golf_courses?.name,
+                     is_played: userCourse.is_played,
+                     isLocked: isLocked,
+                     rank: userCourse.golf_courses?.regional_rank
+                   });
+
+                   return (
+                     <div 
+                       key={userCourse.id} 
+                       className="flex-shrink-0 snap-start"
+                       style={{ width: getCardWidth() }}
+                     >
+                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
+                            <LockedCourseCard 
+                               course={userCourse.golf_courses}
+                               viewingUserId={userId}
+                               viewContext="global"
+                               userRating={userCourse.rating}
+                               isReadOnly={!isOwnProfile}
+                               showUserRating={true}
+                               showAverageRating={true}
+                               showRatingOnRight={true}
+                               isFromUserCoursesPage={true}
+                               customHeight="h-full"
+                               currentUserId={userId}
+                               profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                               isLocked={isLocked}
+                            />
+                       </div>
+                     </div>
+                   );
+                 })}
               </div>
             </div>
           ) : (
