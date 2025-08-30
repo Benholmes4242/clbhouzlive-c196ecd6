@@ -13,6 +13,7 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
 interface CoursesJourneyProps {
@@ -921,20 +922,10 @@ interface HLSVideoElement extends HTMLVideoElement {
     setVideoMuteStates(prev => new Map(prev.set(videoId, isMuted)));
   }, []);
 
-  // Video management functions
+  // Video management functions - disabled for highlights
   const toggleMute = useCallback((videoId: string) => {
-    const currentMuted = getVideoMuteState(videoId);
-    const newMuted = !currentMuted;
-    console.log('🎥 Toggling mute for video', videoId, 'from', currentMuted, 'to', newMuted);
-    
-    setVideoMuteState(videoId, newMuted);
-    
-    // Update the actual video element if it exists
-    const video = videoRefs.current.get(videoId);
-    if (video) {
-      video.muted = newMuted;
-    }
-  }, [getVideoMuteState, setVideoMuteState]);
+    // Audio controls disabled - no mute toggle functionality
+  }, []);
 
   const pauseAllVideos = useCallback(() => {
     console.log('🎥 Pausing all videos');
@@ -1042,8 +1033,8 @@ interface HLSVideoElement extends HTMLVideoElement {
     
     videoRefs.current.set(videoId, video);
     
-    // Set initial mute state (default to muted)
-    const videoMuted = getVideoMuteState(videoId);
+    // Set initial mute state (always muted for highlights)
+    const videoMuted = true; // Always muted, no audio controls
     video.muted = videoMuted;
     video.loop = true;
     video.playsInline = true;
@@ -1442,29 +1433,29 @@ interface HLSVideoElement extends HTMLVideoElement {
                     >
                       <div className="aspect-[5/4] w-full relative group">
                         {/* Video Element - Use HLSVideoCard with external management */}
-                        <HLSVideoCard
-                          key={videoId} // Add key to ensure proper remounting
-                          ref={(videoElement: HTMLVideoElement | null) => {
-                            if (videoElement && !videoRefs.current.has(videoId)) {
-                              const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
-                              videoCleanupRefs.current.set(videoId, cleanup);
-                            }
-                          }}
-                          hlsUrl={videoUrl}
-                          className="w-full h-full object-cover rounded-lg cursor-pointer"
-                          loop={true}
-                          muted={getVideoMuteState(videoId)}
-                          autoplay={false}
-                          externallyManaged={true}
-                          showMuteButton={false}
-                          onClick={() => {
-                            if (playingVideoId === videoId) {
-                              pauseVideo(videoId);
-                            } else {
-                              playExclusive(videoId, true);
-                            }
-                          }}
-                        />
+                         <HLSVideoCard
+                           key={videoId} // Add key to ensure proper remounting
+                           ref={(videoElement: HTMLVideoElement | null) => {
+                             if (videoElement && !videoRefs.current.has(videoId)) {
+                               const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
+                               videoCleanupRefs.current.set(videoId, cleanup);
+                             }
+                           }}
+                           hlsUrl={videoUrl}
+                           className="w-full h-full object-cover rounded-lg cursor-pointer"
+                           loop={true}
+                           muted={true}
+                           autoplay={false}
+                           externallyManaged={true}
+                           showMuteButton={false}
+                           onClick={() => {
+                             if (playingVideoId === videoId) {
+                               pauseVideo(videoId);
+                             } else {
+                               playExclusive(videoId, true);
+                             }
+                           }}
+                         />
 
                          {/* Video Play Icon - Bottom Right - Hide for playing videos */}
                          {(playingVideoId !== videoId || isSlotOne) && (
@@ -1475,20 +1466,7 @@ interface HLSVideoElement extends HTMLVideoElement {
                            </div>
                          )}
 
-                         {/* Mute/Unmute Button - Top Right */}
-                         <div className="absolute top-3 right-3 z-10">
-                           <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center cursor-pointer" 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleMute(videoId);
-                                }}>
-                             {getVideoMuteState(videoId) ? (
-                               <VolumeX className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
-                             ) : (
-                               <Volume2 className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" />
-                             )}
-                           </div>
-                         </div>
+                          {/* Audio controls removed - muted autoplay only */}
 
                          {/* Course Info Overlay - removed course name and location */}
                       </div>
@@ -1522,9 +1500,26 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
+  const { user: currentUser } = useSupabaseSession();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const topRatedSwipeRef = useRef<HTMLDivElement>(null);
+  
+  // Get profile owner's first name for tooltip
+  const { data: profileOwner } = useQuery({
+    queryKey: ['profileOwner', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('display_name')
+        .eq('id', userId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId
+  });
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1712,20 +1707,22 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       }}
                     >
                        <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                           <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             hideRankingBadges={true}
-                             showAIQuote={false}
-                             showRatingOnRight={true}
-                           />
+                            <CourseCard 
+                              course={userCourse.golf_courses}
+                              viewingUserId={userId}
+                              viewContext="global"
+                              userRating={userCourse.rating}
+                              isReadOnly={!isOwnProfile}
+                              showUserRating={true}
+                              showAverageRating={true}
+                              isFromUserCoursesPage={true}
+                              customHeight="h-full"
+                              hideRankingBadges={true}
+                              showAIQuote={false}
+                              showRatingOnRight={true}
+                              currentUserId={currentUser?.id}
+                              profileOwnerFirstName={profileOwner?.display_name}
+                            />
                        </div>
                     </div>
                   );
