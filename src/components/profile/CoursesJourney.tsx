@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import RegionalCoursesModal from './RegionalCoursesModal';
+import { useDragScroll } from '@/hooks/useDragScroll';
 
 
 interface CoursesJourneyProps {
@@ -1934,8 +1935,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1943,16 +1944,31 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  // Calculate cards per view based on exact breakpoints - different from Recently Played
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3; // Desktop: 3 cards
-    if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
-    if (windowWidth >= 768) return 2;  // Tablet: 2 cards
-    return 1; // Mobile: 1 with peek
-  };
-  
-  const cardsPerView = getCardsPerView();
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / gbIrelandCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Drag scroll functionality
+  const dragScrollRef = useDragScroll({ 
+    enabled: true,
+    direction: 'horizontal'
+  });
 
   // Query to get Great Britain & Ireland courses
   const { data: gbIrelandCourses = [] } = useQuery({
@@ -2076,35 +2092,21 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
-  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  // Calculate card dimensions
+  const getCardWidth = () => {
+    if (windowWidth >= 768) {
+      // Desktop: 3.1 cards visible (3 full + 0.1 peek)
+      return `calc((100% - 64px) / 3.1 - 12px)`; // 64px for container padding, 12px gap
+    } else {
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  // Listen for navigation events from the navigation component
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('gbireland-nav', handleNavigation);
-    return () => window.removeEventListener('gbireland-nav', handleNavigation);
-  }, []);
+  const combinedRef = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    if (dragScrollRef) dragScrollRef(node);
+  }, [dragScrollRef]);
 
   return (
     <div className="w-full px-4 pt-0 pb-2">
@@ -2121,48 +2123,50 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               </div>
             </div>
           ) : gbIrelandCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div className="relative">
+              {/* Edge padding for title alignment */}
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: '12px'
+                ref={combinedRef}
+                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
+                tabIndex={0}
               >
-                {gbIrelandCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Courses by Region (3:4 portrait, same as Recently Played)
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(92vw - 2rem)'; // Mobile: 1 with 8% peek
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             showRatingOnRight={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             currentUserId={userId}
-                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          />
-                      </div>
+                {gbIrelandCourses.map((userCourse, index) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 snap-start snap-always"
+                    style={{ width: getCardWidth() }}
+                  >
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
+                      <CourseCard 
+                        course={userCourse.golf_courses}
+                        viewingUserId={userId}
+                        viewContext="global"
+                        userRating={userCourse.rating}
+                        isReadOnly={!isOwnProfile}
+                        showUserRating={true}
+                        showAverageRating={true}
+                        showRatingOnRight={true}
+                        isFromUserCoursesPage={true}
+                        customHeight="h-full"
+                        currentUserId={userId}
+                        profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                      />
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
+                
+                {/* See All button as last item */}
+                <div 
+                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
+                  style={{ width: getCardWidth() }}
+                >
+                  <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
+                </div>
               </div>
             </div>
           ) : (
@@ -2335,23 +2339,40 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const containerRef = useRef<HTMLDivElement>(null);
   
+  // Track window width for responsive breakpoints
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / worldwideCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Drag scroll functionality
+  const dragScrollRef = useDragScroll({ 
+    enabled: true,
+    direction: 'horizontal'
+  });
 
   const { data: worldwideCourses = [] } = useQuery({
     queryKey: ['worldwideCourses', userId],
@@ -2448,34 +2469,21 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
-  const maxIndex = Math.max(0, worldwideCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  // Calculate card dimensions
+  const getCardWidth = () => {
+    if (windowWidth >= 768) {
+      // Desktop: 3.1 cards visible (3 full + 0.1 peek)
+      return `calc((100% - 64px) / 3.1 - 12px)`; // 64px for container padding, 12px gap
+    } else {
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('worldwide-nav', handleNavigation);
-    return () => window.removeEventListener('worldwide-nav', handleNavigation);
-  }, []);
+  const combinedRef = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    if (dragScrollRef) dragScrollRef(node);
+  }, [dragScrollRef]);
 
   return (
     <div className="w-full px-4 pt-0 pb-2">
@@ -2491,47 +2499,50 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               </div>
             </div>
           ) : worldwideCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div className="relative">
+              {/* Edge padding for title alignment */}
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: '12px'
+                ref={combinedRef}
+                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
+                tabIndex={0}
               >
-                {worldwideCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             showRatingOnRight={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             currentUserId={userId}
-                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          />
-                      </div>
+                {worldwideCourses.map((userCourse, index) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 snap-start snap-always"
+                    style={{ width: getCardWidth() }}
+                  >
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
+                      <CourseCard 
+                        course={userCourse.golf_courses}
+                        viewingUserId={userId}
+                        viewContext="global"
+                        userRating={userCourse.rating}
+                        isReadOnly={!isOwnProfile}
+                        showUserRating={true}
+                        showAverageRating={true}
+                        showRatingOnRight={true}
+                        isFromUserCoursesPage={true}
+                        customHeight="h-full"
+                        currentUserId={userId}
+                        profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                      />
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
+                
+                {/* See All button as last item */}
+                <div 
+                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
+                  style={{ width: getCardWidth() }}
+                >
+                  <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
+                </div>
               </div>
             </div>
           ) : (
@@ -2685,23 +2696,40 @@ const USASection: React.FC<USASectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const containerRef = useRef<HTMLDivElement>(null);
   
+  // Track window width for responsive breakpoints
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / usaCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Drag scroll functionality
+  const dragScrollRef = useDragScroll({ 
+    enabled: true,
+    direction: 'horizontal'
+  });
 
   const { data: usaCourses = [] } = useQuery({
     queryKey: ['usaCourses', userId],
@@ -2816,39 +2844,25 @@ const USASection: React.FC<USASectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
-  const maxIndex = Math.max(0, usaCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  // Calculate card dimensions
+  const getCardWidth = () => {
+    if (windowWidth >= 768) {
+      // Desktop: 3.1 cards visible (3 full + 0.1 peek)
+      return `calc((100% - 64px) / 3.1 - 12px)`; // 64px for container padding, 12px gap
+    } else {
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('usa-nav', handleNavigation);
-    return () => window.removeEventListener('usa-nav', handleNavigation);
-  }, []);
+  const combinedRef = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    if (dragScrollRef) dragScrollRef(node);
+  }, [dragScrollRef]);
 
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
         <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
@@ -2860,47 +2874,50 @@ const USASection: React.FC<USASectionProps> = ({
               </div>
             </div>
           ) : usaCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div className="relative">
+              {/* Edge padding for title alignment */}
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: '12px'
+                ref={combinedRef}
+                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
+                tabIndex={0}
               >
-                {usaCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                          <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             showRatingOnRight={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             currentUserId={userId}
-                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          />
-                      </div>
+                {usaCourses.map((userCourse, index) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 snap-start snap-always"
+                    style={{ width: getCardWidth() }}
+                  >
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
+                      <CourseCard 
+                        course={userCourse.golf_courses}
+                        viewingUserId={userId}
+                        viewContext="global"
+                        userRating={userCourse.rating}
+                        isReadOnly={!isOwnProfile}
+                        showUserRating={true}
+                        showAverageRating={true}
+                        showRatingOnRight={true}
+                        isFromUserCoursesPage={true}
+                        customHeight="h-full"
+                        currentUserId={userId}
+                        profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                      />
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
+                
+                {/* See All button as last item */}
+                <div 
+                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
+                  style={{ width: getCardWidth() }}
+                >
+                  <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
+                </div>
               </div>
             </div>
           ) : (
@@ -3072,23 +3089,40 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const containerRef = useRef<HTMLDivElement>(null);
   
+  // Track window width for responsive breakpoints
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3;
-    if (windowWidth >= 1024) return 3;
-    if (windowWidth >= 768) return 2;
-    return 1;
-  };
-  
-  const cardsPerView = getCardsPerView();
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / europeCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Drag scroll functionality
+  const dragScrollRef = useDragScroll({ 
+    enabled: true,
+    direction: 'horizontal'
+  });
 
   const { data: europeCourses = [] } = useQuery({
     queryKey: ['europeCourses', userId],
@@ -3185,34 +3219,21 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
-  const maxIndex = Math.max(0, europeCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  // Calculate card dimensions
+  const getCardWidth = () => {
+    if (windowWidth >= 768) {
+      // Desktop: 3.1 cards visible (3 full + 0.1 peek)
+      return `calc((100% - 64px) / 3.1 - 12px)`; // 64px for container padding, 12px gap
+    } else {
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: any) => {
-      if (event.detail.action === 'next') {
-        nextSlide();
-      } else if (event.detail.action === 'prev') {
-        prevSlide();
-      }
-    };
-
-    window.addEventListener('europe-nav', handleNavigation);
-    return () => window.removeEventListener('europe-nav', handleNavigation);
-  }, []);
+  const combinedRef = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    if (dragScrollRef) dragScrollRef(node);
+  }, [dragScrollRef]);
 
   return (
     <div className="w-full px-4 pt-0">
@@ -3228,47 +3249,50 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               </div>
             </div>
           ) : europeCourses.length > 0 ? (
-            <div ref={swipeRef} className="overflow-hidden">
+            <div className="relative">
+              {/* Edge padding for title alignment */}
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
-                  gap: '12px'
+                ref={combinedRef}
+                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
+                tabIndex={0}
               >
-                {europeCourses.map((userCourse, index) => {
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)';
-                    if (windowWidth >= 768) return 'calc(50% - 6px)';
-                    return 'calc(92vw - 2rem)';
-                  };
-
-                  return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0 snap-start"
-                      style={{ width: getCardWidth() }}
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
-                           <CourseCard 
-                             course={userCourse.golf_courses}
-                             viewingUserId={userId}
-                             viewContext="global"
-                             userRating={userCourse.rating}
-                             isReadOnly={!isOwnProfile}
-                             showUserRating={true}
-                             showAverageRating={true}
-                             showRatingOnRight={true}
-                             isFromUserCoursesPage={true}
-                             customHeight="h-full"
-                             currentUserId={userId}
-                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          />
-                      </div>
+                {europeCourses.map((userCourse, index) => (
+                  <div 
+                    key={userCourse.id} 
+                    className="flex-shrink-0 snap-start snap-always"
+                    style={{ width: getCardWidth() }}
+                  >
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
+                      <CourseCard 
+                        course={userCourse.golf_courses}
+                        viewingUserId={userId}
+                        viewContext="global"
+                        userRating={userCourse.rating}
+                        isReadOnly={!isOwnProfile}
+                        showUserRating={true}
+                        showAverageRating={true}
+                        showRatingOnRight={true}
+                        isFromUserCoursesPage={true}
+                        customHeight="h-full"
+                        currentUserId={userId}
+                        profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                      />
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
+                
+                {/* See All button as last item */}
+                <div 
+                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
+                  style={{ width: getCardWidth() }}
+                >
+                  <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
+                </div>
               </div>
             </div>
           ) : (
