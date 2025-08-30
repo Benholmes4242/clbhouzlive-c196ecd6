@@ -2092,14 +2092,14 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gbIrelandCourses.length]);
 
-  // Calculate card dimensions
+  // Calculate card dimensions  
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc((100% - 64px) / 2.5 - 12px)`; // 64px for container padding, 12px gap
+      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
     } else {
-      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)  
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -2127,11 +2127,15 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
@@ -2465,10 +2469,10 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc((100% - 64px) / 2.5 - 12px)`; // 64px for container padding, 12px gap
+      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -2495,11 +2499,15 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
@@ -2832,10 +2840,10 @@ const USASection: React.FC<USASectionProps> = ({
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc((100% - 64px) / 2.5 - 12px)`; // 64px for container padding, 12px gap
+      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -2862,11 +2870,15 @@ const USASection: React.FC<USASectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
@@ -3199,10 +3211,10 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc((100% - 64px) / 2.5 - 12px)`; // 64px for container padding, 12px gap
+      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc((100% - 32px) / 1.1 - 6px)`; // 32px for container padding, 6px gap
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -3229,11 +3241,15 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
@@ -3379,18 +3395,22 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
             <div className="relative">
               {/* Empty state with See All button */}
               <div 
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
                 {/* Empty message card */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
@@ -3402,7 +3422,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
@@ -3463,18 +3483,22 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
             <div className="relative">
               {/* Empty state with See All button */}
               <div 
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
                 {/* Empty message card */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
@@ -3486,7 +3510,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
@@ -3545,18 +3569,22 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
             <div className="relative">
               {/* Empty state with See All button */}
               <div 
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
                 {/* Empty message card */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
@@ -3568,7 +3596,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
@@ -3678,18 +3706,22 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
             <div className="relative">
               {/* Empty state with See All button */}
               <div 
-                className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pl-2 pr-2"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
+                  gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory',
+                  scrollPaddingLeft: '0px',
+                  scrollPaddingRight: '0px'
                 }}
                 tabIndex={0}
               >
                 {/* Empty message card */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
@@ -3701,7 +3733,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc((100% - 64px) / 2.5 - 12px)` }}
+                  style={{ width: `calc(40% - 7.2px)` }}
                 >
                   <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
