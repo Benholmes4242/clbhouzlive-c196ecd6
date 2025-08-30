@@ -3634,7 +3634,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
     <>
       <div className="w-full px-4 pt-2"> {/* 8px spacing above title */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
+          <div className="flex items-center justify-between mb-2"> {/* 8px gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
             <div className="flex gap-2">
               <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
