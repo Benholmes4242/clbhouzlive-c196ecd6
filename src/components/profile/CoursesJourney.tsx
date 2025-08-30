@@ -94,6 +94,14 @@ const fetchRegionalCourses = async (userId: string, region: 'global' | 'usa' | '
     rank_value: course[rankField] || 999
   }));
 
+  // Debug logging
+  console.log(`Regional courses for ${region}:`, {
+    totalCourses: processedCourses.length,
+    playedCount: processedCourses.filter(c => c.is_played).length,
+    unplayedCount: processedCourses.filter(c => !c.is_played).length,
+    sampleCourse: processedCourses[0]
+  });
+
   // Separate and sort
   const playedCourses = processedCourses.filter(c => c.is_played).sort((a, b) => a.rank_value - b.rank_value);
   const unplayedCourses = processedCourses.filter(c => !c.is_played).sort((a, b) => a.rank_value - b.rank_value);
