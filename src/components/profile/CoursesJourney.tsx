@@ -2503,7 +2503,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   }, []);
 
   return (
-    <div className="w-full px-4 pt-0">
+    <div className="w-full px-4 pt-0 pb-2">
       <div className="max-w-6xl mx-auto">
         
         <div className="relative">
@@ -3477,7 +3477,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
     enabled: !!userId,
   });
 
-  if (courses.length === 0) return null;
+  // Always show USA section, even if empty
 
   return (
     <>
@@ -3486,12 +3486,24 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
           <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
             <div className="flex gap-2">
-              <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
+              {courses.length > 0 && <USANavigation userId={userId} isOwnProfile={isOwnProfile} />}
             </div>
           </div>
         </div>
       </div>
-      <USASection userId={userId} isOwnProfile={isOwnProfile} />
+      {courses.length > 0 ? (
+        <USASection userId={userId} isOwnProfile={isOwnProfile} />
+      ) : (
+        <div className="w-full px-4 pt-0 pb-2">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
