@@ -5,6 +5,7 @@ import CourseCardBackground from './CourseCardBackground';
 import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface Course {
   id: string;
@@ -43,6 +44,8 @@ interface CourseCardProps {
   mobileTextScale?: 'small' | 'normal';
   mobileFlagSize?: 'sm' | 'md' | 'lg';
   showRatingOnRight?: boolean;
+  currentUserId?: string;
+  profileOwnerFirstName?: string;
 }
 
 
@@ -64,7 +67,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   disableClick = false,
   mobileTextScale = 'normal',
   mobileFlagSize = 'lg',
-  showRatingOnRight = false
+  showRatingOnRight = false,
+  currentUserId,
+  profileOwnerFirstName
 }) => {
   const navigate = useNavigate();
   
@@ -151,15 +156,26 @@ const CourseCard: React.FC<CourseCardProps> = ({
               </div>
                {/* User Rating in liquid glass container */}
                {userRating && showUserRating && (
-                 <div 
-                   className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
-                   style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
-                   onClick={(e) => e.stopPropagation()}
-                 >
-                   <div className="relative z-10 flex items-center gap-1.5">
-                     <span className="text-sm font-bold text-white">{userRating}/10</span>
-                   </div>
-                 </div>
+                 <TooltipProvider>
+                   <Tooltip>
+                     <TooltipTrigger asChild>
+                       <div 
+                         className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                         style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                         onClick={(e) => e.stopPropagation()}
+                       >
+                         <div className="relative z-10 flex items-center gap-1.5">
+                           <span className="text-sm font-bold text-white">{userRating}/10</span>
+                         </div>
+                       </div>
+                     </TooltipTrigger>
+                     <TooltipContent>
+                       <p>
+                         {currentUserId === viewingUserId ? 'Your rating' : `${profileOwnerFirstName || 'User'}'s rating`}
+                       </p>
+                     </TooltipContent>
+                   </Tooltip>
+                 </TooltipProvider>
                )}
             </div>
            ) : (
