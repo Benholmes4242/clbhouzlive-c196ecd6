@@ -10,10 +10,11 @@ import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStat
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import RegionalCoursesModal from './RegionalCoursesModal';
 
 
 interface CoursesJourneyProps {
@@ -1804,11 +1805,9 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
   userId,
   isOwnProfile = false
 }) => {
-  // Use the same state management pattern as the main section
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
+  const [modalOpen, setModalOpen] = useState(false);
 
-  // Same query as the main section to get the data for navigation
+  // Same query as the main section to get the data for the modal
   const { data: gbIrelandCourses = [] } = useQuery({
     queryKey: ['gbIrelandCourses', userId],
     queryFn: async () => {
@@ -1902,41 +1901,25 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
     enabled: !!userId,
   });
 
-  const maxIndex = Math.max(0, gbIrelandCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
-    // Trigger the same navigation in the main section
-    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
-    // Trigger the same navigation in the main section
-    window.dispatchEvent(new CustomEvent('gbireland-nav', { detail: { action: 'prev' } }));
-  };
+  if (gbIrelandCourses.length === 0) return null;
 
   return (
     <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
       <Button
         variant="ghost"
         size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+        onClick={() => setModalOpen(true)}
+        className="text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronRight className="h-10 w-10" />
+        See All
       </Button>
+      <RegionalCoursesModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        regionName="Great Britain & Ireland"
+        courses={gbIrelandCourses}
+        isOwnProfile={isOwnProfile}
+      />
     </>
   );
 };
@@ -2205,8 +2188,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { data: worldwideCourses = [] } = useQuery({
     queryKey: ['worldwideCourses', userId],
@@ -2320,43 +2302,25 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
     enabled: !!userId,
   });
 
-  const maxIndex = Math.max(0, worldwideCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('worldwide-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('worldwide-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (worldwideCourses.length <= cardsPerView) return null;
+  if (worldwideCourses.length === 0) return null;
 
   return (
     <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
       <Button
         variant="ghost"
         size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+        onClick={() => setModalOpen(true)}
+        className="text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronRight className="h-10 w-10" />
+        See All
       </Button>
+      <RegionalCoursesModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        regionName="Worldwide"
+        courses={worldwideCourses}
+        isOwnProfile={isOwnProfile}
+      />
     </>
   );
 };
@@ -2593,8 +2557,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { data: usaCourses = [] } = useQuery({
     queryKey: ['usaCourses', userId],
@@ -2689,43 +2652,25 @@ const USANavigation: React.FC<USANavigationProps> = ({
     enabled: !!userId,
   });
 
-  const maxIndex = Math.max(0, usaCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('usa-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('usa-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (usaCourses.length <= cardsPerView) return null;
+  if (usaCourses.length === 0) return null;
 
   return (
     <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
       <Button
         variant="ghost"
         size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+        onClick={() => setModalOpen(true)}
+        className="text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronRight className="h-10 w-10" />
+        See All
       </Button>
+      <RegionalCoursesModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        regionName="USA"
+        courses={usaCourses}
+        isOwnProfile={isOwnProfile}
+      />
     </>
   );
 };
@@ -2981,8 +2926,7 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
   userId,
   isOwnProfile = false
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { data: europeCourses = [] } = useQuery({
     queryKey: ['europeCourses', userId],
@@ -3095,43 +3039,25 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
     enabled: !!userId,
   });
 
-  const maxIndex = Math.max(0, europeCourses.length - cardsPerView);
-
-  const nextSlide = () => {
-    const newIndex = Math.min(currentIndex + 1, maxIndex);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('europe-nav', { detail: { action: 'next' } }));
-  };
-
-  const prevSlide = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    window.dispatchEvent(new CustomEvent('europe-nav', { detail: { action: 'prev' } }));
-  };
-
-  if (europeCourses.length <= cardsPerView) return null;
+  if (europeCourses.length === 0) return null;
 
   return (
     <>
-      {currentIndex > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={prevSlide}
-          className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-        >
-          <ChevronLeft className="h-10 w-10" />
-        </Button>
-      )}
       <Button
         variant="ghost"
         size="sm"
-        onClick={nextSlide}
-        disabled={currentIndex >= maxIndex}
-        className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+        onClick={() => setModalOpen(true)}
+        className="text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronRight className="h-10 w-10" />
+        See All
       </Button>
+      <RegionalCoursesModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        regionName="Continental Europe"
+        courses={europeCourses}
+        isOwnProfile={isOwnProfile}
+      />
     </>
   );
 };
