@@ -1945,25 +1945,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / gbIrelandCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Drag scroll functionality
   const dragScrollRef = useDragScroll({ 
     enabled: true,
@@ -2091,6 +2072,27 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   });
 
   const { isHydrated } = useViewPreference();
+
+  // Keyboard navigation - only setup when gbIrelandCourses is available
+  useEffect(() => {
+    if (gbIrelandCourses.length === 0) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / gbIrelandCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gbIrelandCourses.length]);
 
   // Calculate card dimensions
   const getCardWidth = () => {
@@ -2349,25 +2351,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / worldwideCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Drag scroll functionality
   const dragScrollRef = useDragScroll({ 
     enabled: true,
@@ -2468,6 +2451,27 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   });
 
   const { isHydrated } = useViewPreference();
+
+  // Keyboard navigation - only setup when worldwideCourses is available
+  useEffect(() => {
+    if (worldwideCourses.length === 0) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / worldwideCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [worldwideCourses.length]);
 
   // Calculate card dimensions
   const getCardWidth = () => {
@@ -2706,25 +2710,6 @@ const USASection: React.FC<USASectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / usaCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Drag scroll functionality
   const dragScrollRef = useDragScroll({ 
     enabled: true,
@@ -2843,6 +2828,27 @@ const USASection: React.FC<USASectionProps> = ({
   });
 
   const { isHydrated } = useViewPreference();
+
+  // Keyboard navigation - only setup when usaCourses is available
+  useEffect(() => {
+    if (usaCourses.length === 0) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / usaCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [usaCourses.length]);
 
   // Calculate card dimensions
   const getCardWidth = () => {
@@ -3099,25 +3105,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / europeCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Drag scroll functionality
   const dragScrollRef = useDragScroll({ 
     enabled: true,
@@ -3218,6 +3205,27 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   });
 
   const { isHydrated } = useViewPreference();
+
+  // Keyboard navigation - only setup when europeCourses is available
+  useEffect(() => {
+    if (europeCourses.length === 0) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current) return;
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const container = containerRef.current;
+        const cardWidth = container.scrollWidth / europeCourses.length;
+        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
+        
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [europeCourses.length]);
 
   // Calculate card dimensions
   const getCardWidth = () => {
