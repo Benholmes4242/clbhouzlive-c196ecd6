@@ -102,7 +102,7 @@ const CourseRankBadges = ({
         return 'absolute bottom-3 left-4 flex flex-row gap-2 z-10';
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-row gap-1.5 z-10';
+        return 'absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10';
     }
   };
 
@@ -115,7 +115,7 @@ const CourseRankBadges = ({
             <Tooltip key={index}>
               <TooltipTrigger asChild>
                 <div className="relative flex items-center px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                  <div className="relative z-10 flex items-center gap-1.5">
+                  <div className="relative z-10 flex items-center justify-center gap-1.5">
                     {badge.icon}
                     <span className="text-sm font-bold text-white">{badge.rank}</span>
                   </div>
@@ -131,12 +131,12 @@ const CourseRankBadges = ({
            {playerRatingBadge && (
              <Tooltip>
                <TooltipTrigger asChild>
-                    <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                     <div className="relative z-10 flex items-center gap-1.5">
-                       <ClubhouseLogo size="sm" />
-                       <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
-                     </div>
-                   </div>
+                     <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+                      <div className="relative z-10 flex items-center justify-center gap-1.5">
+                        <ClubhouseLogo size="sm" />
+                        <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
+                      </div>
+                    </div>
                </TooltipTrigger>
                <TooltipContent>
                  <p>{playerRatingBadge.tooltip}</p>
@@ -166,7 +166,7 @@ const CourseRankBadges = ({
           <Tooltip>
             <TooltipTrigger asChild>
                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                 <div className="relative z-10 flex items-center gap-1.5">
+                 <div className="relative z-10 flex items-center justify-center gap-1.5">
                    <ClubhouseLogo size="sm" />
                    <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
                  </div>
