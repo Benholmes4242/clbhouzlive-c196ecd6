@@ -490,6 +490,17 @@ const getCourseRanking = (course: any) => {
   return 9999;
 };
 
+// Regional sorting function - sorts by regional rank only (ascending order: #1, #2, #3...)
+const getRegionalSortedCourses = (userCourses: any[]) => {
+  return userCourses.sort((a, b) => {
+    const aRegionalRank = a.golf_courses?.regional_rank || 9999;
+    const bRegionalRank = b.golf_courses?.regional_rank || 9999;
+    
+    // Sort by regional rank ascending (lowest number first)
+    return aRegionalRank - bRegionalRank;
+  });
+};
+
 // Custom sorting function for user courses with different sort options
 const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
   
@@ -1886,7 +1897,7 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -2074,8 +2085,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
       
-      // Apply sorting by recent play date
-      return getSortedUserCourses(rawCourses, 'recent');
+      // Apply sorting by regional rank only (ascending order)
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -2304,7 +2315,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -2466,7 +2477,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -2673,7 +2684,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -2853,7 +2864,7 @@ const USASection: React.FC<USASectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -3079,7 +3090,7 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
@@ -3241,7 +3252,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getSortedUserCourses(rawCourses, 'recent');
+      return getRegionalSortedCourses(rawCourses);
     },
     enabled: !!userId,
   });
