@@ -52,7 +52,7 @@ const CourseHighlightsCarousel: React.FC<CourseHighlightsCarouselProps> = ({
         {courseHighlights.map((course, index) => (
           <div
             key={course.id}
-            className={`flex-shrink-0 w-[280px] h-[200px] relative rounded-lg overflow-hidden cursor-pointer transition-transform ${
+            className={`flex-shrink-0 w-[280px] h-[240px] relative rounded-lg overflow-hidden cursor-pointer transition-transform ${
               index === 0 ? 'ring-4 ring-red-500' : ''
             }`}
             onClick={() => setCurrentIndex(index)}
