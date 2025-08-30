@@ -66,7 +66,7 @@ const VideoCard: React.FC<{
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(() => getSessionMutePreference());
+  const [isMuted, setIsMuted] = useState(true); // Always muted since no audio controls
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(
     video.videoUrl || '', 
     video.id, 
@@ -123,17 +123,15 @@ const VideoCard: React.FC<{
     return () => videoElement.removeEventListener('loadeddata', handleLoadedData);
   }, [video.videoUrl]);
 
-  // Handle autoplay and hover logic
+  // Handle autoplay logic - always autoplay but muted
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
-    videoElement.muted = isMuted;
-
-    // Play logic: first card auto-plays when shouldAutoPlay is true, other cards play on hover
-    const shouldPlay = isFirstCard ? shouldAutoPlay : isHovered;
-
-    if (shouldPlay && isInView) {
+    videoElement.muted = true; // Always muted
+    
+    // Always autoplay when in view
+    if (isInView) {
       videoElement.play().catch(() => {});
       setIsPlaying(true);
     } else {
@@ -142,15 +140,15 @@ const VideoCard: React.FC<{
       videoElement.currentTime = 0; // Reset to first frame
       setIsPlaying(false);
     }
-  }, [isHovered, isFirstCard, shouldAutoPlay, isInView, isMuted]);
+  }, [isInView]);
 
-  // Update video mute state when session preference changes
+  // Update video mute state - always muted
   useEffect(() => {
     const videoElement = videoRef.current;
     if (videoElement) {
-      videoElement.muted = isMuted;
+      videoElement.muted = true;
     }
-  }, [isMuted]);
+  }, []);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -166,14 +164,7 @@ const VideoCard: React.FC<{
   };
 
   const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newMutedState = !isMuted;
-    setIsMuted(newMutedState);
-    setSessionMutePreference(newMutedState);
-    
-    if (videoRef.current) {
-      videoRef.current.muted = newMutedState;
-    }
+    // Audio controls removed - no mute toggle functionality
   };
 
   return (
@@ -188,7 +179,7 @@ const VideoCard: React.FC<{
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
-          muted={isMuted}
+          muted
           loop
           playsInline
           controls={false}
@@ -225,22 +216,7 @@ const VideoCard: React.FC<{
         </div>
       </div>
       
-      {/* Mute button */}
-      <Button
-        onClick={toggleMute}
-        variant="ghost"
-        size="icon"
-        className="absolute top-3 right-3 h-8 w-8 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity shadow-lg shadow-black/10"
-        style={{ 
-          backdropFilter: 'blur(40px) saturate(180%)'
-        }}
-      >
-        <div className="absolute inset-0 bg-white/10 border border-white/20 rounded-full" />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-full" />
-        <div className="relative z-10 text-white">
-          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        </div>
-      </Button>
+      {/* Mute button removed - no audio controls */}
 
       {/* Course rankings - removed for highlights section */}
 

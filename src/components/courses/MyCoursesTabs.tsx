@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Target, Trophy, Calendar } from 'lucide-react';
 import CourseCard from './CourseCard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Course {
   id: string;
@@ -21,6 +22,7 @@ interface MyCoursesTabsProps {
   userId: string | undefined;
   isLoading: boolean;
   isLoadingTop100: boolean;
+  profileOwnerFirstName?: string;
 }
 
 const MyCoursesTabs = ({
@@ -31,8 +33,10 @@ const MyCoursesTabs = ({
   recentCourses,
   userId,
   isLoading,
-  isLoadingTop100
+  isLoadingTop100,
+  profileOwnerFirstName
 }: MyCoursesTabsProps) => {
+  const { user: currentUser } = useSupabaseSession();
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-3 h-auto">
@@ -82,13 +86,15 @@ const MyCoursesTabs = ({
           ) : allPlayedCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {allPlayedCourses.map((userCourse) => (
-                <CourseCard 
-                  key={`${userCourse.id}-${userCourse.source}`} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={userId}
-                  userRating={userCourse.rating || null}
-                  showUserRating={true}
-                />
+                 <CourseCard 
+                   key={`${userCourse.id}-${userCourse.source}`} 
+                   course={userCourse.golf_courses}
+                   viewingUserId={userId}
+                   userRating={userCourse.rating || null}
+                   showUserRating={true}
+                   currentUserId={currentUser?.id}
+                   profileOwnerFirstName={profileOwnerFirstName}
+                 />
               ))}
             </div>
           ) : (
@@ -113,13 +119,15 @@ const MyCoursesTabs = ({
           ) : top100Courses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {top100Courses.map((userCourse) => (
-                <CourseCard 
-                  key={userCourse.id} 
-                  course={userCourse.golf_courses}
-                  viewingUserId={userId}
-                  userRating={userCourse.rating || null}
-                  showUserRating={true}
-                />
+                 <CourseCard 
+                   key={userCourse.id} 
+                   course={userCourse.golf_courses}
+                   viewingUserId={userId}
+                   userRating={userCourse.rating || null}
+                   showUserRating={true}
+                   currentUserId={currentUser?.id}
+                   profileOwnerFirstName={profileOwnerFirstName}
+                 />
               ))}
             </div>
           ) : (
@@ -142,14 +150,16 @@ const MyCoursesTabs = ({
           {recentCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                {recentCourses.map((userCourse) => (
-                 <CourseCard 
-                   key={`${userCourse.id}-recent-${userCourse.source}`} 
-                   course={userCourse.golf_courses}
-                   viewingUserId={userId}
-                   userRating={userCourse.rating || null}
-                   showUserRating={true}
-                   hideRankingBadges={true}
-                 />
+                  <CourseCard 
+                    key={`${userCourse.id}-recent-${userCourse.source}`} 
+                    course={userCourse.golf_courses}
+                    viewingUserId={userId}
+                    userRating={userCourse.rating || null}
+                    showUserRating={true}
+                    hideRankingBadges={true}
+                    currentUserId={currentUser?.id}
+                    profileOwnerFirstName={profileOwnerFirstName}
+                  />
                ))}
             </div>
           ) : (
