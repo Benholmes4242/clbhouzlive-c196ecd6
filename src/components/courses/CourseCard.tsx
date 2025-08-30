@@ -149,14 +149,18 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   showXP={false}
                 />
               </div>
-              {/* User Rating in liquid glass container */}
-              {userRating && showUserRating && (
-                <div className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-                  <div className="relative z-10 flex items-center gap-1.5">
-                    <span className="text-sm font-bold text-white">{userRating}/10</span>
-                  </div>
-                </div>
-              )}
+               {/* User Rating in liquid glass container */}
+               {userRating && showUserRating && (
+                 <div 
+                   className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                   style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                   onClick={(e) => e.stopPropagation()}
+                 >
+                   <div className="relative z-10 flex items-center gap-1.5">
+                     <span className="text-sm font-bold text-white">{userRating}/10</span>
+                   </div>
+                 </div>
+               )}
             </div>
            ) : (
              showCountryWithFlag && (
