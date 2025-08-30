@@ -2505,7 +2505,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0 pb-2">
       <div className="max-w-6xl mx-auto">
-        
         <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
@@ -3281,7 +3280,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
-        
         <div className="relative">
           {!isHydrated ? (
             <div className="text-center py-8">
