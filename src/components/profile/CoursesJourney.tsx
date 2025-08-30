@@ -470,7 +470,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
 
       {/* Courses by Region Section - 16px below Highlights */}
-      <div className="mt-4"> {/* 16px spacing */}
+      <div className="mt-2"> {/* 8px spacing */}
         <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
       </div>
     </div>
@@ -1337,7 +1337,7 @@ interface HLSVideoElement extends HTMLVideoElement {
   }
 
   return (
-    <div className="w-full px-4 pb-4" style={{ paddingTop: '16px' }}>
+    <div className="w-full px-4 pb-2" style={{ paddingTop: '16px' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
@@ -1756,7 +1756,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   isOwnProfile = false
 }) => {
   return (
-    <div className="w-full px-4 pt-4 pb-8 mb-0">
+    <div className="w-full px-4 pt-2 pb-8 mb-0">
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
@@ -3436,7 +3436,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
   return (
     <>
-      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
+      <div className="w-full px-4 pt-2"> {/* 8px spacing above title */}
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
