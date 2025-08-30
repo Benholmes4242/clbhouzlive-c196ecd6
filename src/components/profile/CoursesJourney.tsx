@@ -130,8 +130,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
               const remainingAngle = 283 - completedAngle;
               
               return (
-                <div key={achievement.id} className="flex flex-col items-center cursor-pointer group">
-                  <div className="w-44 h-44 relative transition-all duration-300">
+                  <div key={achievement.id} className="flex flex-col items-center cursor-pointer group">
+                    <div className="w-52 h-52 relative transition-all duration-300">{/* Increased from w-44 h-44 to w-52 h-52 */}
                     {/* Progress Ring with Full Circle */}
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                       {/* Gradient Definitions */}
@@ -300,7 +300,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     key={achievement.id} 
                     className="flex flex-col items-center cursor-pointer"
                   >
-                    <div className="w-24 h-24 relative transition-all duration-300">
+                    <div className="w-28 h-28 relative transition-all duration-300">{/* Increased from w-24 h-24 to w-28 h-28 */}
                       {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
@@ -813,12 +813,12 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                      if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
                      if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                      if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                     return 'calc(54vw - 5px)'; // Mobile: ~1.85 cards visible (54% width per card)
+                     return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible (51% width per card)
                    };
 
                   return (
                     <div 
-                      key={userCourse.id} 
+                      key={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`} 
                       data-card
                       className="flex-shrink-0"
                       style={{ 
