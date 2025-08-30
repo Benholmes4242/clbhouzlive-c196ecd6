@@ -469,8 +469,10 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
 
 
-      {/* Courses by Region Section */}
-      <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Courses by Region Section - 16px below Highlights */}
+      <div className="mt-4"> {/* 16px spacing */}
+        <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
+      </div>
     </div>
   );
 };
@@ -2150,16 +2152,19 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
                            <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                             course={userCourse.golf_courses}
+                             viewingUserId={userId}
+                             viewContext="global"
+                             userRating={userCourse.rating}
+                             isReadOnly={!isOwnProfile}
+                             showUserRating={true}
+                             showAverageRating={true}
+                             showRatingOnRight={true}
+                             isFromUserCoursesPage={true}
+                             customHeight="h-full"
+                             currentUserId={userId}
+                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          />
                       </div>
                     </div>
                   );
@@ -2536,16 +2541,19 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
                            <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                             course={userCourse.golf_courses}
+                             viewingUserId={userId}
+                             viewContext="global"
+                             userRating={userCourse.rating}
+                             isReadOnly={!isOwnProfile}
+                             showUserRating={true}
+                             showAverageRating={true}
+                             showRatingOnRight={true}
+                             isFromUserCoursesPage={true}
+                             customHeight="h-full"
+                             currentUserId={userId}
+                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          />
                       </div>
                     </div>
                   );
@@ -2921,16 +2929,19 @@ const USASection: React.FC<USASectionProps> = ({
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
                           <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                             course={userCourse.golf_courses}
+                             viewingUserId={userId}
+                             viewContext="global"
+                             userRating={userCourse.rating}
+                             isReadOnly={!isOwnProfile}
+                             showUserRating={true}
+                             showAverageRating={true}
+                             showRatingOnRight={true}
+                             isFromUserCoursesPage={true}
+                             customHeight="h-full"
+                             currentUserId={userId}
+                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          />
                       </div>
                     </div>
                   );
@@ -3306,16 +3317,19 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/1.0]' : 'aspect-[2.5/1.4]'}`}>
                            <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={true}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                         />
+                             course={userCourse.golf_courses}
+                             viewingUserId={userId}
+                             viewContext="global"
+                             userRating={userCourse.rating}
+                             isReadOnly={!isOwnProfile}
+                             showUserRating={true}
+                             showAverageRating={true}
+                             showRatingOnRight={true}
+                             isFromUserCoursesPage={true}
+                             customHeight="h-full"
+                             currentUserId={userId}
+                             profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          />
                       </div>
                     </div>
                   );
@@ -3422,9 +3436,9 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
   return (
     <>
-      <div className="w-full px-4 pt-4">
+      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
             <div className="flex gap-2">
               <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3467,9 +3481,9 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
 
   return (
     <>
-      <div className="w-full px-4 pt-4">
+      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
             <div className="flex gap-2">
               <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3512,9 +3526,9 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
 
   return (
     <>
-      <div className="w-full px-4 pt-4">
+      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Great Britain & Ireland</h4>
             <div className="flex gap-2">
               <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3608,9 +3622,9 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
 
   return (
     <>
-      <div className="w-full px-4 pt-4">
+      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
             <div className="flex gap-2">
               <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
