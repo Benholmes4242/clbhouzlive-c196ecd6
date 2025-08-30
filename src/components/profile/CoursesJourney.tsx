@@ -1446,7 +1446,7 @@ interface HLSVideoElement extends HTMLVideoElement {
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className="aspect-[5/4] w-full relative group">
+                      <div className="aspect-[4/5] w-full relative group">
                         {/* Video Element - Use HLSVideoCard with external management */}
                          <HLSVideoCard
                            key={videoId} // Add key to ensure proper remounting
