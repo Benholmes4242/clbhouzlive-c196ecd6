@@ -2161,14 +2161,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     </div>
                   </div>
                 ))}
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: getCardWidth() }}
-                >
-                  <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
               </div>
             </div>
           ) : (
@@ -2539,14 +2531,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     </div>
                   </div>
                 ))}
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: getCardWidth() }}
-                >
-                  <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
               </div>
             </div>
           ) : (
@@ -2916,14 +2900,6 @@ const USASection: React.FC<USASectionProps> = ({
                     </div>
                   </div>
                 ))}
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: getCardWidth() }}
-                >
-                  <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
               </div>
             </div>
           ) : (
@@ -3293,14 +3269,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     </div>
                   </div>
                 ))}
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: getCardWidth() }}
-                >
-                  <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
               </div>
             </div>
           ) : (
