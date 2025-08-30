@@ -3278,7 +3278,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   }, []);
 
   return (
-    <div className="w-full px-4 pt-2">
+    <div className="w-full px-4 pt-0">
       <div className="max-w-6xl mx-auto">
         <div className="relative">
           {!isHydrated ? (
