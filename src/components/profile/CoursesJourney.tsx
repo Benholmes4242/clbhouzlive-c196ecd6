@@ -150,6 +150,9 @@ const LockedCourseCard: React.FC<LockedCourseCardProps> = ({
   isLocked = false, 
   ...courseCardProps 
 }) => {
+  // Debug the isLocked prop
+  console.log('LockedCourseCard received isLocked:', isLocked, 'for course:', courseCardProps.course?.name);
+  
   return (
     <div className="relative">
       <CourseCard {...courseCardProps} />
@@ -2113,7 +2116,15 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   // Query to get Great Britain & Ireland courses
   const { data: gbIrelandCourses = [] } = useQuery({
     queryKey: ['gbIrelandCourses', userId],
-    queryFn: () => fetchRegionalCourses(userId || '', 'britain-ireland'),
+    queryFn: async () => {
+      const result = await fetchRegionalCourses(userId || '', 'britain-ireland');
+      console.log('GB Ireland - Raw query result (first 3):', result.slice(0, 3).map(c => ({
+        name: c.golf_courses?.name,
+        is_played: c.is_played,
+        has_is_played: c.hasOwnProperty('is_played')
+      })));
+      return result;
+    },
     enabled: !!userId,
   });
 
