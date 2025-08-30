@@ -9,6 +9,9 @@ const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({
   thumbnailImage, 
   courseName 
 }) => {
+  // Debug log to see if background is rendering
+  console.log('CourseCardBackground rendering:', { courseName, thumbnailImage });
+  
   return (
     <div 
       className="absolute inset-0 bg-cover bg-center"
