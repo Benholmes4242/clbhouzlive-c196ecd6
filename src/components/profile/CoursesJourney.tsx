@@ -3481,7 +3481,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
 
   return (
     <>
-      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
+      <div className="w-full px-4 pt-2"> {/* 8px spacing above title */}
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
@@ -3526,7 +3526,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
 
   return (
     <>
-      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
+      <div className="w-full px-4 pt-2"> {/* 8px spacing above title */}
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Great Britain & Ireland</h4>
@@ -3622,7 +3622,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
 
   return (
     <>
-      <div className="w-full px-4 pt-4"> {/* 16px spacing above title */}
+      <div className="w-full px-4 pt-2"> {/* 8px spacing above title */}
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
             <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
