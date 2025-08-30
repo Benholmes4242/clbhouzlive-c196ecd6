@@ -1902,8 +1902,6 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
     enabled: !!userId,
   });
 
-  if (gbIrelandCourses.length === 0) return null;
-
   return (
     <>
       <Button
@@ -2300,8 +2298,6 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
     enabled: !!userId,
   });
 
-  if (worldwideCourses.length === 0) return null;
-
   return (
     <>
       <Button
@@ -2650,8 +2646,6 @@ const USANavigation: React.FC<USANavigationProps> = ({
     },
     enabled: !!userId,
   });
-
-  if (usaCourses.length === 0) return null;
 
   return (
     <>
@@ -3037,8 +3031,6 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
     },
     enabled: !!userId,
   });
-
-  if (europeCourses.length === 0) return null;
 
   return (
     <>
