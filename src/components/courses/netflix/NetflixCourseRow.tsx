@@ -111,7 +111,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             
             // Recently Played: Mobile: larger cards, Desktop: 4, Laptop: 3, Tablet: 2 cards visible
             if (isRecentlyPlayed) {
-              widthClasses = 'flex-shrink-0 w-[calc(52%-0.5rem)] sm:w-[calc(47.6%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
+              widthClasses = 'flex-shrink-0 w-[calc(60%-0.5rem)] sm:w-[calc(47.6%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
             }
             // Top 10 Rated: Feature-wide cards with specific peek percentages
             else if (isTopRated) {
