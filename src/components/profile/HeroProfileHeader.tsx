@@ -237,11 +237,7 @@ const HeroProfileHeader = ({
           );
         case 'courses':
           return (
-            <CoursesJourney 
-              userId={profile?.id}
-              userDisplayName={profile?.display_name || 'User'}
-              isOwnProfile={isOwnProfile}
-            />
+            <div></div> // CoursesJourney is already shown in the main content area
           );
         case 'achievements':
           return (
