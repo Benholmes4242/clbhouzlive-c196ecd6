@@ -189,13 +189,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
-                              <span>{progress.played}</span>
-                              <span className="text-black/60"> / {progress.total}</span>
-                            </div>
-                             <div className="text-xl text-black mt-1">
-                               {progress.played * 120} XP
+                             <div className="text-3xl text-black leading-none">
+                               <span>{progress.played}</span>
+                               <span className="text-black/60"> / {progress.total}</span>
                              </div>
+                              <div className="text-2xl text-black mt-1">
+                                {progress.played * 120} XP
+                              </div>
                           </div>
                         </div>
                       ) : achievement.region === 'europe' ? (
@@ -208,13 +208,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
-                              <span>{progress.played}</span>
-                              <span className="text-black/60"> / {progress.total}</span>
-                            </div>
-                             <div className="text-xl text-black mt-1">
-                               {progress.played * 120} XP
+                             <div className="text-3xl text-black leading-none">
+                               <span>{progress.played}</span>
+                               <span className="text-black/60"> / {progress.total}</span>
                              </div>
+                              <div className="text-2xl text-black mt-1">
+                                {progress.played * 120} XP
+                              </div>
                           </div>
                         </div>
                       ) : achievement.region === 'britain-ireland' ? (
@@ -227,13 +227,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
-                              <span>{progress.played}</span>
-                              <span className="text-black/60"> / {progress.total}</span>
-                            </div>
-                             <div className="text-xl text-black mt-1">
-                               {progress.played * 120} XP
+                             <div className="text-3xl text-black leading-none">
+                               <span>{progress.played}</span>
+                               <span className="text-black/60"> / {progress.total}</span>
                              </div>
+                              <div className="text-2xl text-black mt-1">
+                                {progress.played * 120} XP
+                              </div>
                           </div>
                         </div>
                       ) : achievement.region === 'global' ? (
@@ -246,24 +246,24 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           />
                           {/* Overlay content */}
                           <div className="relative z-10 text-center">
-                            <div className="text-2xl text-black leading-none">
-                              <span>{progress.played}</span>
-                              <span className="text-black/60"> / {progress.total}</span>
-                            </div>
-                             <div className="text-xl text-black mt-1">
-                               {progress.played * 120} XP
+                             <div className="text-3xl text-black leading-none">
+                               <span>{progress.played}</span>
+                               <span className="text-black/60"> / {progress.total}</span>
                              </div>
+                              <div className="text-2xl text-black mt-1">
+                                {progress.played * 120} XP
+                              </div>
                           </div>
                         </div>
                       ) : (
                         <>
-                          <div className="text-2xl text-black leading-none">
-                            <span>{progress.played}</span>
-                            <span className="text-black/60"> / {progress.total}</span>
-                          </div>
-                           <div className="text-xl text-black mt-1">
-                             {progress.played * 120} XP
+                           <div className="text-3xl text-black leading-none">
+                             <span>{progress.played}</span>
+                             <span className="text-black/60"> / {progress.total}</span>
                            </div>
+                            <div className="text-2xl text-black mt-1">
+                              {progress.played * 120} XP
+                            </div>
                         </>
                       )}
                     </div>
@@ -357,13 +357,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
-                                <span>{progress.played}</span>
-                                <span className="text-black/60"> / {progress.total}</span>
-                              </div>
-                               <div className="text-xs text-black mt-0.5">
-                                 {progress.played * 120} XP
+                               <div className="text-base text-black leading-none">
+                                 <span>{progress.played}</span>
+                                 <span className="text-black/60"> / {progress.total}</span>
                                </div>
+                                <div className="text-sm text-black mt-0.5">
+                                  {progress.played * 120} XP
+                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
@@ -376,13 +376,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
-                                <span>{progress.played}</span>
-                                <span className="text-black/60"> / {progress.total}</span>
-                              </div>
-                               <div className="text-xs text-black mt-0.5">
-                                 {progress.played * 120} XP
+                               <div className="text-base text-black leading-none">
+                                 <span>{progress.played}</span>
+                                 <span className="text-black/60"> / {progress.total}</span>
                                </div>
+                                <div className="text-sm text-black mt-0.5">
+                                  {progress.played * 120} XP
+                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'britain-ireland' ? (
@@ -395,13 +395,13 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
-                                <span>{progress.played}</span>
-                                <span className="text-black/60"> / {progress.total}</span>
-                              </div>
-                               <div className="text-xs text-black mt-0.5">
-                                 {progress.played * 120} XP
+                               <div className="text-base text-black leading-none">
+                                 <span>{progress.played}</span>
+                                 <span className="text-black/60"> / {progress.total}</span>
                                </div>
+                                <div className="text-sm text-black mt-0.5">
+                                  {progress.played * 120} XP
+                                </div>
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
@@ -414,24 +414,24 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             />
                             {/* Overlay content */}
                             <div className="relative z-10 text-center">
-                              <div className="text-sm text-black leading-none">
-                                <span>{progress.played}</span>
-                                <span className="text-black/60"> / {progress.total}</span>
-                              </div>
-                               <div className="text-xs text-black mt-0.5">
-                                 {progress.played * 120} XP
+                               <div className="text-base text-black leading-none">
+                                 <span>{progress.played}</span>
+                                 <span className="text-black/60"> / {progress.total}</span>
                                </div>
+                                <div className="text-sm text-black mt-0.5">
+                                  {progress.played * 120} XP
+                                </div>
                             </div>
                           </div>
                         ) : (
                           <>
-                            <div className="text-sm text-black leading-none">
-                              <span>{progress.played}</span>
-                              <span className="text-black/60"> / {progress.total}</span>
-                            </div>
-                             <div className="text-xs text-black mt-0.5">
-                               {progress.played * 120} XP
+                             <div className="text-base text-black leading-none">
+                               <span>{progress.played}</span>
+                               <span className="text-black/60"> / {progress.total}</span>
                              </div>
+                              <div className="text-sm text-black mt-0.5">
+                                {progress.played * 120} XP
+                              </div>
                           </>
                         )}
                       </div>
