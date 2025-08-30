@@ -2109,7 +2109,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   }, [dragScrollRef]);
 
   return (
-    <div className="w-full px-4 pt-0 pb-2">
+    <div className="w-full pt-0 pb-2">
       <div className="max-w-6xl mx-auto">
         
         <div className="relative">
@@ -2482,7 +2482,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   }, [dragScrollRef]);
 
   return (
-    <div className="w-full px-4 pt-0 pb-2">
+    <div className="w-full pt-0 pb-2">
       <div className="max-w-6xl mx-auto">
         <div className="relative">
           {!isHydrated ? (
@@ -2853,7 +2853,7 @@ const USASection: React.FC<USASectionProps> = ({
   }, [dragScrollRef]);
 
   return (
-    <div className="w-full px-4 pt-0">
+    <div className="w-full pt-0">
       <div className="max-w-6xl mx-auto">
         <div className="relative">
           {!isHydrated ? (
@@ -3224,7 +3224,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   }, [dragScrollRef]);
 
   return (
-    <div className="w-full px-4 pt-0">
+    <div className="w-full pt-0">
       <div className="max-w-6xl mx-auto">
         <div className="relative">
           {!isHydrated ? (
@@ -3390,7 +3390,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
       {courses.length > 0 ? (
         <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
       ) : (
-        <div className="w-full px-4 pt-0 pb-2">
+        <div className="w-full pt-0 pb-2">
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               {/* Empty state with See All button */}
@@ -3478,7 +3478,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
       {courses.length > 0 ? (
         <USASection userId={userId} isOwnProfile={isOwnProfile} />
       ) : (
-        <div className="w-full px-4 pt-0 pb-2">
+        <div className="w-full pt-0 pb-2">
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               {/* Empty state with See All button */}
@@ -3564,7 +3564,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
       {courses.length > 0 ? (
         <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
       ) : (
-        <div className="w-full px-4 pt-0 pb-2">
+        <div className="w-full pt-0 pb-2">
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               {/* Empty state with See All button */}
@@ -3701,7 +3701,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
       {courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
       ) : (
-        <div className="w-full px-4 pt-0 pb-2">
+        <div className="w-full pt-0 pb-2">
           <div className="max-w-6xl mx-auto">
             <div className="relative">
               {/* Empty state with See All button */}
