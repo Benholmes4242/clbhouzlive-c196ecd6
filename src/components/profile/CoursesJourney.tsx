@@ -18,31 +18,8 @@ import HLSVideoCard from '@/components/ui/HLSVideoCard';
 const fetchRegionalCourses = async (userId: string, region: 'global' | 'usa' | 'britain-ireland' | 'europe') => {
   if (!userId) return [];
 
-  // Get all courses in the region
-  let courseFilter = {};
-  let rankField = 'global_rank';
-  
-  switch (region) {
-    case 'global':
-      courseFilter = { global_rank: { not: null } };
-      rankField = 'global_rank';
-      break;
-    case 'usa':
-      courseFilter = { country: 'USA', regional_rank: { not: null } };
-      rankField = 'regional_rank';
-      break;
-    case 'britain-ireland':
-      courseFilter = { country: 'Britain & Ireland', regional_rank: { not: null } };
-      rankField = 'regional_rank';
-      break;
-    case 'europe':
-      courseFilter = { country: 'Continental Europe', regional_rank: { not: null } };
-      rankField = 'regional_rank';
-      break;
-  }
-
-  // Fetch all courses in region
-  const { data: allCourses, error: coursesError } = await supabase
+  // Build query based on region
+  let query = supabase
     .from('golf_courses')
     .select(`
       id,
@@ -56,8 +33,31 @@ const fetchRegionalCourses = async (userId: string, region: 'global' | 'usa' | '
       usa_rank,
       description,
       thumbnail_image
-    `)
-    .match(courseFilter)
+    `);
+  
+  let rankField = 'global_rank';
+  
+  switch (region) {
+    case 'global':
+      query = query.not('global_rank', 'is', null);
+      rankField = 'global_rank';
+      break;
+    case 'usa':
+      query = query.eq('country', 'USA').not('regional_rank', 'is', null);
+      rankField = 'regional_rank';
+      break;
+    case 'britain-ireland':
+      query = query.eq('country', 'Britain & Ireland').not('regional_rank', 'is', null);
+      rankField = 'regional_rank';
+      break;
+    case 'europe':
+      query = query.eq('country', 'Continental Europe').not('regional_rank', 'is', null);
+      rankField = 'regional_rank';
+      break;
+  }
+
+  // Execute query with proper ordering
+  const { data: allCourses, error: coursesError } = await query
     .order(rankField, { ascending: true });
 
   if (coursesError) throw coursesError;
