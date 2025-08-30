@@ -106,8 +106,27 @@ const fetchRegionalCourses = async (userId: string, region: 'global' | 'usa' | '
   const playedCourses = processedCourses.filter(c => c.is_played).sort((a, b) => a.rank_value - b.rank_value);
   const unplayedCourses = processedCourses.filter(c => !c.is_played).sort((a, b) => a.rank_value - b.rank_value);
 
+  // Debug individual courses
+  console.log(`${region} - First 3 played courses:`, playedCourses.slice(0, 3).map(c => ({
+    name: c.golf_courses.name,
+    is_played: c.is_played,
+    rank: c.rank_value
+  })));
+  console.log(`${region} - First 3 unplayed courses:`, unplayedCourses.slice(0, 3).map(c => ({
+    name: c.golf_courses.name,
+    is_played: c.is_played,
+    rank: c.rank_value
+  })));
+
   // Return played first, then unplayed
-  return [...playedCourses, ...unplayedCourses];
+  const finalCourses = [...playedCourses, ...unplayedCourses];
+  console.log(`${region} - Final order (first 5):`, finalCourses.slice(0, 5).map(c => ({
+    name: c.golf_courses.name,
+    is_played: c.is_played,
+    willBeLocked: !c.is_played
+  })));
+  
+  return finalCourses;
 };
 
 // Locked Course Card Component
