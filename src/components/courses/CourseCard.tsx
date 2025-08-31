@@ -98,7 +98,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
         {/* Enhanced bottom gradient for better text readability when badges are on top */}
         {badgesOnTop && (
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none z-0" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none z-0" />
         )}
 
         {/* Course ranking badges - new split layout for badgesOnTop */}
