@@ -2010,27 +2010,24 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
-         .from('user_top100_courses')
-         .select(`
-           course_id,
-           played_date,
-           golf_courses (
-             id,
-             name,
-             country,
-             region,
-             sub_country,
-             continent,
-             global_rank,
-             regional_rank,
-             usa_rank,
-             description,
-             thumbnail_image
-           ),
-           course_rating_stats (
-             average_rating
-           )
-         `)
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -2038,27 +2035,24 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-         .select(`
-           course_id,
-           rating,
-           created_at,
-           golf_courses (
-             id,
-             name,
-             country,
-             region,
-             sub_country,
-             continent,
-             global_rank,
-             regional_rank,
-             usa_rank,
-             description,
-             thumbnail_image
-           ),
-           course_rating_stats (
-             average_rating
-           )
-         `)
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
@@ -2067,20 +2061,12 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) ? course.course_rating_stats[0]?.average_rating : null
-          }
+          id: `top100-${course.course_id}`
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) ? course.course_rating_stats[0]?.average_rating : null
-          }
+          id: `rating-${course.course_id}`
         }))
       ];
 
@@ -2768,27 +2754,24 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
-         .from('user_top100_courses')
-         .select(`
-           course_id,
-           played_date,
-           golf_courses (
-             id,
-             name,
-             country,
-             region,
-             sub_country,
-             continent,
-             global_rank,
-             regional_rank,
-             usa_rank,
-             description,
-             thumbnail_image
-           ),
-           course_rating_stats (
-             average_rating
-           )
-         `)
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -2796,27 +2779,24 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-         .select(`
-           course_id,
-           rating,
-           created_at,
-           golf_courses (
-             id,
-             name,
-             country,
-             region,
-             sub_country,
-             continent,
-             global_rank,
-             regional_rank,
-             usa_rank,
-             description,
-             thumbnail_image
-           ),
-           course_rating_stats (
-             average_rating
-           )
-         `)
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
