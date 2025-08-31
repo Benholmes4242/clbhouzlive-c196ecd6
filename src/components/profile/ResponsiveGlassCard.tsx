@@ -136,9 +136,9 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       )}
 
-      {/* Home Club & Handicap side-by-side */}
+      {/* Home Club & Handicap centered */}
       <div className="space-y-2 mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center gap-2">
           <span className={`
             text-xs transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
@@ -154,7 +154,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
           </span>
         </div>
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center gap-2">
           <span className={`
             text-xs transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
