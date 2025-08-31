@@ -1675,27 +1675,27 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     style={{ width: getCardWidth() }}
                   >
                      <div 
-                       className="w-full overflow-hidden rounded-lg relative" 
-                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
                      >
-                       <CourseCard 
-                         course={{
-                           ...userCourse.golf_courses,
-                           average_rating: userCourse.averageRating
-                         }}
-                         viewingUserId={userId}
-                         viewContext="global"
-                         userRating={userCourse.userRating}
-                         isReadOnly={!isOwnProfile}
-                         showUserRating={true}
-                         showAverageRating={true}
-                         showRatingOnRight={true}
-                         isFromUserCoursesPage={true}
-                         customHeight="h-full"
-                         currentUserId={userId}
-                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                         badgesOnTop={true}
-                       />
+                        <CourseCard 
+                          course={{
+                            ...userCourse.golf_courses,
+                            average_rating: userCourse.averageRating
+                          }}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.userRating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          showAverageRating={true}
+                          showRatingOnRight={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          currentUserId={userId}
+                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          badgesOnTop={true}
+                          mobileTextScale="small"
+                        />
                     </div>
                   </div>
                 ))}
@@ -1958,27 +1958,27 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     style={{ width: getCardWidth() }}
                   >
                      <div 
-                       className="w-full overflow-hidden rounded-lg relative" 
-                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
                      >
-                       <CourseCard 
-                         course={{
-                           ...userCourse.golf_courses,
-                           average_rating: userCourse.averageRating
-                         }}
-                         viewingUserId={userId}
-                         viewContext="global"
-                         userRating={userCourse.userRating}
-                         isReadOnly={!isOwnProfile}
-                         showUserRating={true}
-                         showAverageRating={true}
-                         showRatingOnRight={true}
-                         isFromUserCoursesPage={true}
-                         customHeight="h-full"
-                         currentUserId={userId}
-                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                         badgesOnTop={true}
-                       />
+                        <CourseCard 
+                          course={{
+                            ...userCourse.golf_courses,
+                            average_rating: userCourse.averageRating
+                          }}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.userRating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          showAverageRating={true}
+                          showRatingOnRight={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          currentUserId={userId}
+                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          badgesOnTop={true}
+                          mobileTextScale="small"
+                        />
                     </div>
                   </div>
                 ))}
@@ -2243,27 +2243,27 @@ const USASection: React.FC<USASectionProps> = ({
                     style={{ width: getCardWidth() }}
                   >
                      <div 
-                       className="w-full overflow-hidden rounded-lg relative" 
-                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
                      >
-                       <CourseCard 
-                         course={{
-                           ...userCourse.golf_courses,
-                           average_rating: userCourse.averageRating
-                         }}
-                         viewingUserId={userId}
-                         viewContext="global"
-                         userRating={userCourse.userRating}
-                         isReadOnly={!isOwnProfile}
-                         showUserRating={true}
-                         showAverageRating={true}
-                         showRatingOnRight={true}
-                         isFromUserCoursesPage={true}
-                         customHeight="h-full"
-                         currentUserId={userId}
-                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                         badgesOnTop={true}
-                       />
+                        <CourseCard 
+                          course={{
+                            ...userCourse.golf_courses,
+                            average_rating: userCourse.averageRating
+                          }}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.userRating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          showAverageRating={true}
+                          showRatingOnRight={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          currentUserId={userId}
+                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                          badgesOnTop={true}
+                          mobileTextScale="small"
+                        />
                     </div>
                   </div>
                 ))}
@@ -2430,27 +2430,27 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     style={{ width: getCardWidth() }}
                   >
                      <div 
-                       className="w-full overflow-hidden rounded-lg relative" 
-                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
                      >
-                        <CourseCard 
-                          course={{
-                            ...userCourse.golf_courses,
-                            average_rating: userCourse.averageRating
-                          }}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.userRating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          showAverageRating={true}
-                          showRatingOnRight={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          currentUserId={userId}
-                          profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
-                          badgesOnTop={true}
-                        />
+                         <CourseCard 
+                           course={{
+                             ...userCourse.golf_courses,
+                             average_rating: userCourse.averageRating
+                           }}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.userRating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={true}
+                           showAverageRating={true}
+                           showRatingOnRight={true}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           currentUserId={userId}
+                           profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
+                           badgesOnTop={true}
+                           mobileTextScale="small"
+                         />
                     </div>
                   </div>
                 ))}
