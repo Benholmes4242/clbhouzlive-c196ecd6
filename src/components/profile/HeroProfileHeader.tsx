@@ -14,7 +14,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast as useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
