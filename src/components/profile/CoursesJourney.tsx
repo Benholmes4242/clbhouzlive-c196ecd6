@@ -1627,9 +1627,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -1656,9 +1653,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -1671,23 +1665,11 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
           ...course,
           rating: null, // Add rating field for consistency
           id: `top100-${course.course_id}`, // Unique ID for deduplication
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at, // Use rating date as played date
           id: `rating-${course.course_id}`, // Unique ID for deduplication
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
-          }
         }))
       ];
 
@@ -1895,9 +1877,6 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -1911,9 +1890,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
           id: `top100-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         })),
         ...(ratedData || []).map(course => ({
@@ -1922,9 +1899,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
           id: `rating-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         }))
       ];
@@ -2054,9 +2029,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2070,9 +2042,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
           id: `top100-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         })),
         ...(ratedData || []).map(course => ({
@@ -2081,9 +2051,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
           id: `rating-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         }))
       ];
@@ -2398,9 +2366,6 @@ const USASection: React.FC<USASectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2426,9 +2391,6 @@ const USASection: React.FC<USASectionProps> = ({
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2442,9 +2404,7 @@ const USASection: React.FC<USASectionProps> = ({
           id: `top100-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         })),
         ...(ratedData || []).map(course => ({
@@ -2453,9 +2413,7 @@ const USASection: React.FC<USASectionProps> = ({
           id: `rating-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         }))
       ];
@@ -2630,9 +2588,6 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId)
@@ -2658,9 +2613,6 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
             usa_rank,
             description,
             thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
           )
         `)
         .eq('user_id', userId);
@@ -2674,9 +2626,7 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
           id: `top100-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         })),
         ...(ratedData || []).map(course => ({
@@ -2685,9 +2635,7 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
           id: `rating-${course.course_id}`,
           golf_courses: {
             ...course.golf_courses,
-            average_rating: Array.isArray(course.course_rating_stats) && course.course_rating_stats.length > 0 
-              ? course.course_rating_stats[0].average_rating 
-              : null
+            average_rating: null
           }
         }))
       ];
