@@ -68,7 +68,7 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
 
       {/* Desktop: Wide Blurred Header Gradient */}
       {!isMobile && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/8 to-transparent" />
       )}
 
       {/* Mobile: Subtle overlay */}
