@@ -1095,7 +1095,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible (40% width per card)
+                    return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible
                   };
 
                   // Use static image from course data
@@ -1627,8 +1627,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 2.5 cards visible  
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)  
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -1911,8 +1911,8 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 2.5 cards visible
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -2196,8 +2196,8 @@ const USASection: React.FC<USASectionProps> = ({
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 2.5 cards visible
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
@@ -2383,8 +2383,8 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 2.5 cards visible
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
+      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
+      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
     }
   };
 
