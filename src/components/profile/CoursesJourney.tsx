@@ -677,12 +677,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Raw combined courses before sorting in RecentlyPlayed:', rawCourses.map(c => ({ 
-          name: c.golf_courses?.name, 
-          rating: c.rating 
-        })));
-      }
       
       // Apply sorting here to ensure proper order
       return getSortedUserCourses(rawCourses, 'recent');
@@ -717,14 +711,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     
     // Then apply sorting
     const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
-    
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Final filtered and sorted courses in RecentlyPlayed:', sortedCourses.map(c => ({ 
-        name: c.golf_courses?.name, 
-        rating: c.rating,
-        sortBy 
-      })));
-    }
     
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
@@ -2316,12 +2302,12 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
   return (
     <>
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={() => setModalOpen(true)}
-        className="text-sm h-8 px-3"
+        className="text-sm text-muted-foreground hover:text-foreground"
       >
-        View All ({europeCourses.length})
+        See All
       </Button>
       
       <RegionalCoursesModal
@@ -2367,15 +2353,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   });
 
   const { data: europeCourses = [], isLoading: europeLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
-
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('ContinentalEuropeSection - courses from shared hook:', {
-        count: europeCourses.length,
-        isLoading: europeLoading
-      });
-    }
-  }, [europeCourses.length, europeLoading]);
 
   const { isHydrated } = useViewPreference();
 
@@ -2456,24 +2433,24 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                        className="w-full overflow-hidden rounded-lg relative" 
                        style={{ height: 'var(--rated-card-h, 240px)' }}
                      >
-                       <CourseCard 
-                         course={{
-                           ...userCourse.golf_courses,
-                           average_rating: userCourse.averageRating
-                         }}
-                         viewingUserId={userId}
-                         viewContext="global"
-                         userRating={userCourse.userRating}
-                         isReadOnly={!isOwnProfile}
-                         showUserRating={true}
-                         showAverageRating={true}
-                         showRatingOnRight={true}
-                         isFromUserCoursesPage={true}
-                         customHeight="h-full"
-                         currentUserId={userId}
-                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                         badgesOnTop={true}
-                       />
+                        <CourseCard 
+                          course={{
+                            ...userCourse.golf_courses,
+                            average_rating: userCourse.averageRating
+                          }}
+                          viewingUserId={userId}
+                          viewContext="global"
+                          userRating={userCourse.userRating}
+                          isReadOnly={!isOwnProfile}
+                          showUserRating={true}
+                          showAverageRating={true}
+                          showRatingOnRight={true}
+                          isFromUserCoursesPage={true}
+                          customHeight="h-full"
+                          currentUserId={userId}
+                          profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
+                          badgesOnTop={true}
+                        />
                     </div>
                   </div>
                 ))}
@@ -2531,19 +2508,10 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
         ...(ratedData || [])
       ];
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Worldwide courses found:', combinedCourses.length);
-      }
       return combinedCourses;
     },
     enabled: !!userId,
   });
-
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('WorldwideConditionalSection - courses:', courses.length, 'isLoading:', isLoading);
-    }
-  }, [courses.length, isLoading]);
 
   return (
     <>
@@ -2604,9 +2572,6 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
         ...(ratedData || [])
       ];
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('USA courses found:', combinedCourses.length);
-      }
       return combinedCourses;
     },
     enabled: !!userId,
@@ -2671,9 +2636,6 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
         ...(ratedData || [])
       ];
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('GB&I courses found:', combinedCourses.length);
-      }
       return combinedCourses;
     },
     enabled: !!userId,
@@ -2714,20 +2676,6 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
   // Use the same shared hook as other regions for consistency
   const { data: courses = [], isLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('ContinentalEuropeConditionalSection - unified hook results:', {
-        count: courses.length,
-        isLoading,
-        sampleCourses: courses.slice(0, 2).map(c => ({
-          name: c.golf_courses.name,
-          country: c.golf_courses.country,
-          continent: c.golf_courses.continent
-        }))
-      });
-    }
-  }, [courses.length, isLoading]);
-
   return (
     <>
       <div className="w-full pt-2">
@@ -2742,19 +2690,19 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
       </div>
       {!isLoading && courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
-      ) : !isLoading ? (
+      ) : !isLoading && courses.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isOwnProfile 
               ? "You haven't played any Continental Europe courses yet." 
-              : `${userDisplayName || 'User'} hasn't played any Continental Europe courses yet.`}
+              : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any Continental Europe courses yet.`}
           </p>
         </div>
-      ) : (
+      ) : isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Loading...</p>
         </div>
-      )}
+      ) : null}
     </>
   );
 };
