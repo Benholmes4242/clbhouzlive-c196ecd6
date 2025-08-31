@@ -843,7 +843,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                         scrollSnapStop: 'always'
                       }}
                     >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[3/4]' : 'aspect-[3/3.5]'}`}>
+                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[5/4]' : 'aspect-[5/4]'}`}>
                           <CourseCard 
                             course={userCourse.golf_courses}
                             viewingUserId={userId}
