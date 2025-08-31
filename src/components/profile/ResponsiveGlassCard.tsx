@@ -136,38 +136,42 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       )}
 
-      {/* Home Club & Handicap centered */}
+      {/* Home Club & Handicap with equal spacing */}
       <div className="space-y-2 mb-4">
-        <div className="flex items-center justify-center gap-2">
-          <span className={`
-            text-xs transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
-          `}>
-            Home Club:
-          </span>
-          <span className={`
-            font-normal transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
-            ${isMobile ? 'text-sm' : 'text-base'}
-          `}>
-            {homeClub}
-          </span>
+        <div className="flex justify-center">
+          <div className="flex items-center justify-between w-48">
+            <span className={`
+              text-xs transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
+            `}>
+              Home Club:
+            </span>
+            <span className={`
+              font-normal transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
+              ${isMobile ? 'text-sm' : 'text-base'}
+            `}>
+              {homeClub}
+            </span>
+          </div>
         </div>
         
-        <div className="flex items-center justify-center gap-2">
-          <span className={`
-            text-xs transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
-          `}>
-            Handicap:
-          </span>
-          <span className={`
-            font-semibold transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
-            ${isMobile ? 'text-sm' : 'text-base'}
-          `}>
-            {handicap ? handicap.toFixed(1) : 'N/A'}
-          </span>
+        <div className="flex justify-center">
+          <div className="flex items-center justify-between w-48">
+            <span className={`
+              text-xs transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
+            `}>
+              Handicap:
+            </span>
+            <span className={`
+              font-semibold transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
+              ${isMobile ? 'text-sm' : 'text-base'}
+            `}>
+              {handicap ? handicap.toFixed(1) : 'N/A'}
+            </span>
+          </div>
         </div>
       </div>
 
