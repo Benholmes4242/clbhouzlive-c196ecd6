@@ -1106,9 +1106,9 @@ interface HLSVideoElement extends HTMLVideoElement {
   }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive, pauseAllVideos]);
 
   
-  // Calculate cards per view for Highlight Reel
+  // Calculate cards per view for Highlight Reel to match Recently Played
   const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 3; // Desktop: 3 cards
+    if (windowWidth >= 1200) return 4; // Desktop: 4 cards (matches Recently Played)
     if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
     if (windowWidth >= 768) return 2;  // Tablet: 2 cards
     return 1; // Mobile: 1 with peek
@@ -1418,12 +1418,12 @@ interface HLSVideoElement extends HTMLVideoElement {
                 }}
               >
                 {filteredCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Highlight Reel (slightly shorter than Recently Played, but wider cards)
+                  // Calculate responsive width to match Recently Played cards exactly
                   const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(33.333% - 8px)'; // Desktop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+                    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(40vw - 0.5rem)'; // Mobile: 2.5 cards visible
+                    return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible
                   };
 
                   const isSlotOne = index === currentIndex; // The card in slot one is the one at currentIndex
