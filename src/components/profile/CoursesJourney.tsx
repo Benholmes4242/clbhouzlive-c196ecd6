@@ -2067,12 +2067,20 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
-          id: `top100-${course.course_id}`
+          id: `top100-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) ? course.course_rating_stats[0]?.average_rating : null
+          }
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
-          id: `rating-${course.course_id}`
+          id: `rating-${course.course_id}`,
+          golf_courses: {
+            ...course.golf_courses,
+            average_rating: Array.isArray(course.course_rating_stats) ? course.course_rating_stats[0]?.average_rating : null
+          }
         }))
       ];
 
