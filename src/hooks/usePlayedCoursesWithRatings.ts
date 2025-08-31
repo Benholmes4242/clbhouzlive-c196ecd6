@@ -141,6 +141,18 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   }, [userRatings]);
 
   const normalized = useMemo(() => {
+    if (process.env.NODE_ENV !== 'production' && region === 'europe') {
+      console.log('usePlayedCoursesWithRatings - raw playedRows for europe:', {
+        totalRows: playedRows?.length || 0,
+        sampleRows: playedRows?.slice(0, 3).map(row => ({
+          id: row.course_id,
+          courseName: row.golf_courses?.name,
+          country: row.golf_courses?.country,
+          continent: row.golf_courses?.continent
+        }))
+      });
+    }
+
     const courses = (playedRows ?? [])
       .map(row => {
         const gc = row.golf_courses;
