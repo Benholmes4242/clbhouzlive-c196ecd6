@@ -2145,7 +2145,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -2517,7 +2517,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -2888,7 +2888,7 @@ const USASection: React.FC<USASectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -3259,7 +3259,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -3409,11 +3409,11 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
               >
                 {/* Empty message card */}
                 <div 
-                  className="flex-shrink-0 snap-start snap-always"
-                  style={{ width: `calc(40% - 7.2px)`, minHeight: '200px' }}
+                  className="flex-shrink-0 snap-start snap-always w-full"
+                  style={{ minHeight: '200px' }}
                 >
                   <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-center">
                       {isOwnProfile ? "You haven't played any worldwide courses yet." : "No worldwide courses found."}
                     </p>
                   </div>
@@ -3497,11 +3497,11 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
               >
                 {/* Empty message card */}
                 <div 
-                  className="flex-shrink-0 snap-start snap-always"
-                  style={{ width: `calc(80% - 7.2px)`, minHeight: '200px' }}
+                  className="flex-shrink-0 snap-start snap-always w-full"
+                  style={{ minHeight: '200px' }}
                 >
                   <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-center">
                       {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
                     </p>
                   </div>
@@ -3575,11 +3575,11 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
               >
                 {/* Empty message card */}
                 <div 
-                  className="flex-shrink-0 snap-start snap-always"
-                  style={{ width: `calc(40% - 7.2px)`, minHeight: '200px' }}
+                  className="flex-shrink-0 snap-start snap-always w-full"
+                  style={{ minHeight: '200px' }}
                 >
                   <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-center">
                       {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
                     </p>
                   </div>
@@ -3712,11 +3712,11 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
               >
                 {/* Empty message card */}
                 <div 
-                  className="flex-shrink-0 snap-start snap-always"
-                  style={{ width: `calc(40% - 7.2px)`, minHeight: '200px' }}
+                  className="flex-shrink-0 snap-start snap-always w-full"
+                  style={{ minHeight: '200px' }}
                 >
                   <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-center">
                       {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
                     </p>
                   </div>
