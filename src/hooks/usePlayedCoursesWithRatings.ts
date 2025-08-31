@@ -33,6 +33,17 @@ function regionMatch(country: string | null, continent: string | null, globalRan
   const c = (country ?? "").toLowerCase();
   const cont = (continent ?? "").toLowerCase();
   
+  if (process.env.NODE_ENV !== 'production' && r === 'europe') {
+    console.log('Checking Europe match:', { 
+      country, 
+      continent, 
+      c, 
+      cont, 
+      region: r,
+      match: cont === "europe" && c !== "britain & ireland"
+    });
+  }
+  
   if (r === "worldwide") {
     // Worldwide: courses with global rank <= 100
     return globalRank !== null && globalRank <= 100;
@@ -164,6 +175,19 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
     const filtered = normalized.filter(c => 
       regionMatch(c.golf_courses.country, c.golf_courses.continent, c.globalRank, region)
     );
+    
+    if (process.env.NODE_ENV !== 'production' && region === 'europe') {
+      console.log('Continental Europe filtering results:', {
+        totalCourses: normalized.length,
+        filteredCount: filtered.length,
+        region,
+        sampleCourses: normalized.slice(0, 3).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        }))
+      });
+    }
     
     // Remove duplicates based on course_id, preferring rated courses
     const uniqueCoursesMap = new Map();
