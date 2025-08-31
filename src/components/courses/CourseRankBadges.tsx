@@ -38,6 +38,22 @@ const CourseRankBadges = ({
   showXP = false,
   splitBadges = false
 }: CourseRankBadgesProps) => {
+  // Diagnostic logging
+  if (process.env.NODE_ENV === 'development' && splitBadges) {
+    console.log('CourseRankBadges props', {
+      country,
+      averageRating,
+      userRating,
+      showAverageRating,
+      showUserRating,
+      hasAverage: typeof averageRating === 'number' && !Number.isNaN(averageRating),
+      hasUser: typeof userRating === 'number' && !Number.isNaN(userRating),
+    });
+  }
+  // Numeric-safe checks for ratings
+  const hasAverage = typeof averageRating === 'number' && !Number.isNaN(averageRating);
+  const hasUser = typeof userRating === 'number' && !Number.isNaN(userRating);
+
   // Check for GB&I countries - including all possible variations
   const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
   const isUSA = ['United States', 'USA'].includes(country);
@@ -76,8 +92,8 @@ const CourseRankBadges = ({
     });
   }
 
-  // Add Clubhouse rating badge right after regional badge
-  if (showAverageRating && averageRating !== null && averageRating !== undefined) {
+  // Add Clubhouse rating badge right after regional badge - but NOT when splitBadges (we handle it separately)
+  if (!splitBadges && hasAverage && showAverageRating) {
     rankingBadges.push({
       rank: averageRating.toFixed(1),
       icon: <ClubhouseLogo size="sm" />,
@@ -85,14 +101,14 @@ const CourseRankBadges = ({
     });
   }
 
-  // Player rating badge (separate from rankings) - remove star emoji, just use numbers
-  const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
+  // Player rating badge (separate from rankings) - use numeric-safe check
+  const playerRatingBadge = hasUser && showUserRating ? {
     content: `${userRating}/10`,
     tooltip: "Your Rating"
   } : null;
 
-  // Average course rating badge (clbhouzrating)
-  const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
+  // Average course rating badge (clbhouzrating) - use numeric-safe check
+  const averageRatingBadge = hasAverage && showAverageRating ? {
     content: `${averageRating.toFixed(1)}`,
     tooltip: "Clbhouz Community Rating"
   } : null;
@@ -110,31 +126,30 @@ const CourseRankBadges = ({
     }
   };
 
-  // When splitBadges is true, separate ranking badges (left) from rating badges (right)
+  // When splitBadges is true, create separate left and right clusters  
   if (splitBadges) {
-    const rankingBadgesOnly = rankingBadges.filter(badge => 
-      badge.tooltip !== "Clbhouz Community Rating"
-    );
-    
-    // Add average rating badge to left cluster if it exists
-    if (showAverageRating && averageRating) {
-      rankingBadgesOnly.push({
+    // Left cluster: ranking badges + average rating badge
+    const leftCluster = [
+      ...rankingBadges, // globe, flags, etc.
+      ...(hasAverage && showAverageRating ? [{
         rank: averageRating.toFixed(1),
         icon: <ClubhouseLogo size="sm" />,
         tooltip: "Clbhouz Community Rating"
-      });
-    }
-    
-    const ratingBadgesOnly = [
-      ...(showUserRating && userRating ? [{ content: `${userRating}/10`, tooltip: "Your Rating" }] : [])
+      }] : [])
     ];
+    
+    // Right cluster: only user rating badge
+    const rightCluster = hasUser && showUserRating ? [{
+      content: `${userRating}/10`,
+      tooltip: "Your Rating"
+    }] : [];
     
     return (
       <TooltipProvider>
-        {/* Left cluster: Ranking badges (globe, flags) */}
-        {rankingBadgesOnly.length > 0 && (
+        {/* Left cluster: Ranking badges + Average rating badge */}
+        {leftCluster.length > 0 && (
           <div className="absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10">
-            {rankingBadgesOnly.map((badge, index) => (
+            {leftCluster.map((badge, index) => (
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <div 
@@ -156,10 +171,10 @@ const CourseRankBadges = ({
           </div>
         )}
 
-        {/* Right cluster: Rating badge */}
-        {ratingBadgesOnly.length > 0 && (
+        {/* Right cluster: User rating badge */}
+        {rightCluster.length > 0 && (
           <div className="absolute top-2 right-2 flex flex-row items-center gap-1.5 z-10">
-            {ratingBadgesOnly.map((badge, index) => (
+            {rightCluster.map((badge, index) => (
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                    <div 
