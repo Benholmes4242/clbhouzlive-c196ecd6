@@ -739,7 +739,7 @@ const HeroProfileHeader = ({
             
             {/* Home Club & Handicap Row */}
             <div className="flex gap-2 mb-4">
-              <div className="flex-1">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-xs leading-4 font-semibold mb-1"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
@@ -753,7 +753,7 @@ const HeroProfileHeader = ({
                   {homeClub}
                 </div>
               </div>
-              <div className="flex-1 text-right">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-xs leading-4 font-semibold mb-1"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
@@ -950,7 +950,7 @@ const HeroProfileHeader = ({
             
             {/* Home Club & Handicap Row */}
             <div className="flex gap-4 mb-6">
-              <div className="flex-1">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-sm leading-5 font-semibold mb-2"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
@@ -964,7 +964,7 @@ const HeroProfileHeader = ({
                   {homeClub}
                 </div>
               </div>
-              <div className="flex-1 text-right">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-sm leading-5 font-semibold mb-2"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
