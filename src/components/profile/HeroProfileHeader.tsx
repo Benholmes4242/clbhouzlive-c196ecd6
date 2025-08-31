@@ -773,39 +773,39 @@ const HeroProfileHeader = ({
               <div className={`grid gap-2 ${hasImmersiveMedia ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 <button
                   onClick={() => setEditDialogOpen(true)}
-                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight"
+                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
                   style={{
                     borderColor: 'hsl(var(--profile-border-button))',
                     color: 'hsl(var(--profile-text-primary))',
                     backgroundColor: 'hsl(var(--profile-card))'
                   }}
                 >
-                  Edit Profile
+                  {"Edit\nProfile"}
                 </button>
                 
                 <button
                   onClick={() => setMediaManagerOpen(true)}
-                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight"
+                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
                   style={{
                     borderColor: 'hsl(var(--profile-border-button))',
                     color: 'hsl(var(--profile-text-primary))',
                     backgroundColor: 'hsl(var(--profile-card))'
                   }}
                 >
-                  Media Manager
+                  {"Media\nManager"}
                 </button>
                 
                 {hasImmersiveMedia && (
                   <button
                     onClick={previewImmersive}
-                    className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight"
+                    className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
                     style={{
                       borderColor: 'hsl(var(--profile-border-button))',
                       color: 'hsl(var(--profile-text-primary))',
                       backgroundColor: 'hsl(var(--profile-card))'
                     }}
                   >
-                    Immersive Preview
+                    {"Immersive\nPreview"}
                   </button>
                 )}
               </div>
