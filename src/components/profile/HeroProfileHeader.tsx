@@ -710,7 +710,7 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Profile content on white background below media */}
-          <div className="bg-white px-4 py-8 space-y-6">
+          <div className="bg-white px-4 pt-8 pb-0 space-y-6">
             {/* User name (immediately below header media) */}
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900">
@@ -808,7 +808,7 @@ const HeroProfileHeader = ({
       <div className={`
         transition-all duration-300
         ${isMobile 
-          ? 'px-6 py-8 bg-white' // Mobile: increased padding to match bio spacing
+          ? 'px-6 pt-8 pb-8 bg-white' // Mobile: 32px top gap from profile info, 32px bottom gap to tabs
           : 'px-4 md:px-8 py-6' // Desktop: existing layout
         }
       `}>
