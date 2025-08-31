@@ -2368,15 +2368,19 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
   const { data: europeCourses = [], isLoading: europeLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
-  // Debug logging with proper useEffect to prevent spam
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('ContinentalEuropeSection', { 
-        count: europeCourses.length, 
-        isLoading: europeLoading 
-      });
-    }
-  }, [europeCourses.length, europeLoading]);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('ContinentalEuropeSection - europeCourses from hook:', {
+      count: europeCourses.length,
+      isLoading: europeLoading,
+      courses: europeCourses.map(c => ({
+        name: c.golf_courses.name,
+        country: c.golf_courses.country,
+        continent: c.golf_courses.continent,
+        averageRating: c.averageRating,
+        userRating: c.userRating
+      }))
+    });
+  }
 
   const { isHydrated } = useViewPreference();
 

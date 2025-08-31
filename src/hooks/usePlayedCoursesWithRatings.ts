@@ -1,6 +1,6 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useMemo } from "react";
 
 type RegionKey = "worldwide" | "usa" | "gb_i" | "europe";
 
@@ -19,58 +19,76 @@ type RawPlayedRow = {
     usa_rank: number | null;
     description: string | null;
     thumbnail_image: string | null;
-    course_rating_stats: Array<{
-      average_rating: number | null;
-    }> | null;
+    course_rating_stats?: { average_rating: number | null }[];
   } | null;
 };
 
-type RatingRow = {
-  course_id: string;
+type RatingRow = { 
+  course_id: string; 
   rating: number | null;
   created_at: string;
 };
 
-// Bulletproof region matching with consistent lowercase comparison
 function regionMatch(country: string | null, continent: string | null, globalRank: number | null, r: RegionKey) {
   const c = (country ?? "").toLowerCase();
   const cont = (continent ?? "").toLowerCase();
+  
+  if (r === "europe") {
+    // Debug logging for Continental Europe specifically
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Europe region match check:', {
+        country,
+        continent, 
+        c,
+        cont,
+        isEurope: cont === "europe",
+        isNotGB: c !== "britain & ireland",
+        finalMatch: cont === "europe" && c !== "britain & ireland"
+      });
+    }
+  }
   
   if (r === "worldwide") {
     // Worldwide: courses with global rank <= 100
     return globalRank !== null && globalRank <= 100;
   }
   if (r === "usa") return c === "usa";
-  
-  // GB&I helper
-  const isGBI = ['great britain & ireland', 'britain & ireland'].includes(c);
-  
-  if (r === "gb_i") return isGBI;
-  
+  if (r === "gb_i") return c === "britain & ireland";
   if (r === "europe") {
     // Continental Europe: Europe continent but NOT Great Britain & Ireland
-    return cont === "europe" && !isGBI;
+    return cont === "europe" && c !== "britain & ireland";
   }
   
   return false;
 }
 
 async function fetchPlayedWithAverages(userId: string) {
+  // ✅ average rating nested under golf_courses to avoid 400s
   const { data, error } = await supabase
     .from("user_top100_courses")
     .select(`
-      course_id, played_date,
+      course_id,
+      played_date,
       golf_courses (
-        id, name, country, region, sub_country, continent,
-        global_rank, regional_rank, usa_rank, description, thumbnail_image,
-        course_rating_stats!course_rating_stats_course_id_fkey(average_rating)
+        id,
+        name,
+        country,
+        region,
+        sub_country,
+        continent,
+        global_rank,
+        regional_rank,
+        usa_rank,
+        description,
+        thumbnail_image,
+        course_rating_stats(average_rating)
       )
     `)
     .eq("user_id", userId)
     .eq("played", true);
     
   if (error) throw error;
-  return (data ?? []) as any[];
+  return (data ?? []) as RawPlayedRow[];
 }
 
 async function fetchViewerRatings(userId: string) {
@@ -83,37 +101,32 @@ async function fetchViewerRatings(userId: string) {
   return (data ?? []) as RatingRow[];
 }
 
-// Sort courses by user rating (descending) then by official ranking (ascending)
 function getRegionalSortedCourses(courses: any[]) {
   return courses.sort((a, b) => {
-    // 1. User rating first (higher is better)
-    const aUserRating = a.userRating || 0;
-    const bUserRating = b.userRating || 0;
-    if (aUserRating !== bUserRating) {
-      return bUserRating - aUserRating;
+    // First sort by user rating (descending)
+    if (a.userRating !== null && b.userRating === null) return -1;
+    if (a.userRating === null && b.userRating !== null) return 1;
+    if (a.userRating !== null && b.userRating !== null) {
+      if (a.userRating !== b.userRating) return b.userRating - a.userRating;
     }
     
-    // 2. Then by official ranking (lower rank number is better)
+    // Then by official ranking (ascending - lower is better)
     const aRank = a.globalRank || a.regionRank || a.usaRank || 999999;
     const bRank = b.globalRank || b.regionRank || b.usaRank || 999999;
     return aRank - bRank;
   });
 }
 
-/**
- * Hook that fetches and processes a user's played golf courses for a specific region.
- * Combines courses with their ratings and sorts them appropriately.
- */
 export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   const { data: playedRows, isLoading: playedLoading, error: playedError } = useQuery({
-    queryKey: ['played-courses-with-averages', userId],
+    queryKey: ["played-courses-with-averages", userId],
     queryFn: () => fetchPlayedWithAverages(userId),
     enabled: !!userId,
-    staleTime: 30_000,
+    staleTime: 60_000,
   });
 
   const { data: userRatings, isLoading: ratingsLoading, error: ratingsError } = useQuery({
-    queryKey: ['viewer-ratings', userId],
+    queryKey: ["user-course-ratings", userId],
     queryFn: () => fetchViewerRatings(userId),
     enabled: !!userId,
     staleTime: 60_000,
@@ -159,6 +172,24 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
         usaRank: number | null;
       }>;
 
+    if (process.env.NODE_ENV !== 'production' && region === 'europe') {
+      console.log('usePlayedCoursesWithRatings - normalized data for europe:', {
+        totalNormalized: courses.length,
+        sampleCourses: courses.slice(0, 5).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        })),
+        continentalEuropeCourses: courses.filter(c => 
+          c.golf_courses.country?.toLowerCase() === 'continental europe'
+        ).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        }))
+      });
+    }
+
     return courses;
   }, [playedRows, ratingMap, region]);
 
@@ -177,23 +208,21 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
       if (!existing) {
         uniqueCoursesMap.set(courseId, course);
       } else {
-        // Keep the one with user rating if available
-        if (course.userRating !== null && existing.userRating === null) {
+        // Prefer courses with user ratings
+        if (course.userRating !== null && course.userRating !== undefined && 
+            (existing.userRating === null || existing.userRating === undefined)) {
           uniqueCoursesMap.set(courseId, course);
         }
       }
     });
-    
-    const unique = Array.from(uniqueCoursesMap.values());
-    return getRegionalSortedCourses(unique);
+
+    const uniqueCourses = Array.from(uniqueCoursesMap.values());
+    return getRegionalSortedCourses(uniqueCourses);
   }, [normalized, region]);
 
-  const isLoading = playedLoading || ratingsLoading;
-  const error = playedError || ratingsError;
-
-  return {
-    data: regionPlayed,
-    isLoading,
-    error,
+  return { 
+    data: regionPlayed, 
+    isLoading: playedLoading || ratingsLoading, 
+    error: playedError ?? ratingsError 
   };
 }
