@@ -2729,7 +2729,10 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         .eq('golf_courses.continent', 'Europe')
         .neq('golf_courses.country', 'Britain & Ireland');
 
-      if (top100Error) throw top100Error;
+      if (top100Error) {
+        console.error('Continental Europe top100 query error:', top100Error);
+        throw top100Error;
+      }
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
@@ -2738,12 +2741,24 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         .eq('golf_courses.continent', 'Europe')
         .neq('golf_courses.country', 'Britain & Ireland');
 
-      if (ratedError) throw ratedError;
+      if (ratedError) {
+        console.error('Continental Europe ratings query error:', ratedError);
+        throw ratedError;
+      }
 
       const combinedCourses = [
         ...(top100Data || []),
         ...(ratedData || [])
       ];
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('ContinentalEuropeConditionalSection check results:', {
+          top100Count: top100Data?.length || 0,
+          ratingsCount: ratedData?.length || 0,
+          totalFound: combinedCourses.length,
+          sampleData: combinedCourses.slice(0, 2)
+        });
+      }
 
       return combinedCourses;
     },
