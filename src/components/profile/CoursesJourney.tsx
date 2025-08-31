@@ -2010,24 +2010,27 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+         .from('user_top100_courses')
+         .select(`
+           course_id,
+           played_date,
+           golf_courses (
+             id,
+             name,
+             country,
+             region,
+             sub_country,
+             continent,
+             global_rank,
+             regional_rank,
+             usa_rank,
+             description,
+             thumbnail_image
+           ),
+           course_rating_stats (
+             average_rating
+           )
+         `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -2035,24 +2038,27 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+         .select(`
+           course_id,
+           rating,
+           created_at,
+           golf_courses (
+             id,
+             name,
+             country,
+             region,
+             sub_country,
+             continent,
+             global_rank,
+             regional_rank,
+             usa_rank,
+             description,
+             thumbnail_image
+           ),
+           course_rating_stats (
+             average_rating
+           )
+         `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
@@ -2754,24 +2760,27 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+         .from('user_top100_courses')
+         .select(`
+           course_id,
+           played_date,
+           golf_courses (
+             id,
+             name,
+             country,
+             region,
+             sub_country,
+             continent,
+             global_rank,
+             regional_rank,
+             usa_rank,
+             description,
+             thumbnail_image
+           ),
+           course_rating_stats (
+             average_rating
+           )
+         `)
         .eq('user_id', userId)
         .eq('played', true);
 
@@ -2779,24 +2788,27 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+         .select(`
+           course_id,
+           rating,
+           created_at,
+           golf_courses (
+             id,
+             name,
+             country,
+             region,
+             sub_country,
+             continent,
+             global_rank,
+             regional_rank,
+             usa_rank,
+             description,
+             thumbnail_image
+           ),
+           course_rating_stats (
+             average_rating
+           )
+         `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
