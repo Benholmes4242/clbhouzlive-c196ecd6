@@ -2095,8 +2095,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   // Calculate card dimensions  
   const getCardWidth = () => {
     if (windowWidth >= 768) {
-      // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
+      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
+      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)  
       return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
@@ -2468,8 +2468,8 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   // Calculate card dimensions
   const getCardWidth = () => {
     if (windowWidth >= 768) {
-      // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
+      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
+      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
       return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
@@ -2839,8 +2839,8 @@ const USASection: React.FC<USASectionProps> = ({
   // Calculate card dimensions
   const getCardWidth = () => {
     if (windowWidth >= 768) {
-      // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
+      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
+      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
       return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
@@ -3210,8 +3210,8 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   // Calculate card dimensions
   const getCardWidth = () => {
     if (windowWidth >= 768) {
-      // Desktop: 2.5 cards visible (2 full + 0.5 peek)
-      return `calc(40% - 7.2px)`; // 100% / 2.5 = 40%, gap adjustment: 18px / 2.5 = 7.2px
+      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
+      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
       // Mobile: 1.1 cards visible (1 full + 0.1 peek)
       return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
@@ -3422,7 +3422,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(40% - 7.2px)` }}
+                  style={{ width: `calc(31.25% - 3.75px)` }}
                 >
                   <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
@@ -3588,7 +3588,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(40% - 7.2px)` }}
+                  style={{ width: `calc(31.25% - 3.75px)` }}
                 >
                   <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
@@ -3725,7 +3725,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
                 {/* See All button as last item */}
                 <div 
                   className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(40% - 7.2px)` }}
+                  style={{ width: `calc(31.25% - 3.75px)` }}
                 >
                   <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
                 </div>
