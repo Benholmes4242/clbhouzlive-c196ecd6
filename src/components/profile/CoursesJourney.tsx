@@ -3093,7 +3093,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
 const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
   const { data: courses = [] } = useQuery({
-    queryKey: ['usaCourses', userId],
+    queryKey: ['usaCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
       const { data: top100Data, error: top100Error } = await supabase
@@ -3173,7 +3173,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
 
 const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
   const { data: courses = [] } = useQuery({
-    queryKey: ['gbIrelandCourses', userId],
+    queryKey: ['gbIrelandCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
       const { data: top100Data, error: top100Error } = await supabase
@@ -3259,7 +3259,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
 
 const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
   const { data: courses = [] } = useQuery({
-    queryKey: ['europeCourses', userId],
+    queryKey: ['europeCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
 
