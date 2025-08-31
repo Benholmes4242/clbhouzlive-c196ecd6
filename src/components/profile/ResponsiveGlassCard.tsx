@@ -136,38 +136,38 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       )}
 
-      {/* Home Club & Handicap in two columns */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="text-center">
-          <p className={`
-            text-xs mb-1 transition-colors duration-300
+      {/* Home Club & Handicap side-by-side */}
+      <div className="space-y-2 mb-4">
+        <div className="flex items-center justify-between">
+          <span className={`
+            text-xs transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
           `}>
-            Home Club
-          </p>
-          <p className={`
-            font-normal text-center transition-colors duration-300
+            Home Club:
+          </span>
+          <span className={`
+            font-normal transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
             ${isMobile ? 'text-sm' : 'text-base'}
           `}>
             {homeClub}
-          </p>
+          </span>
         </div>
         
-        <div className="text-center">
-          <p className={`
-            text-xs mb-1 transition-colors duration-300
+        <div className="flex items-center justify-between">
+          <span className={`
+            text-xs transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-600' : 'text-white/60'}
           `}>
-            Handicap
-          </p>
-          <p className={`
-            font-semibold text-center transition-colors duration-300
+            Handicap:
+          </span>
+          <span className={`
+            font-semibold transition-colors duration-300
             ${glassMode === 'elevated' ? 'text-gray-900' : 'text-white'}
             ${isMobile ? 'text-sm' : 'text-base'}
           `}>
             {handicap ? handicap.toFixed(1) : 'N/A'}
-          </p>
+          </span>
         </div>
       </div>
 
