@@ -66,20 +66,8 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
       )}
 
 
-      {/* Desktop: Wide Blurred Header Gradient */}
-      {!isMobile && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-      )}
-
-      {/* Mobile: Subtle overlay */}
-      {isMobile && (
-        <div className="absolute inset-0 bg-black/20" />
-      )}
-
-      {/* Blur overlay for desktop when collapsed */}
-      {!isMobile && isCollapsed && (
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/20" />
-      )}
+      {/* White fade-out at bottom edge for seamless transition to profile card */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent" />
     </div>
   );
 };
