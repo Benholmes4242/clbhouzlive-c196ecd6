@@ -39,7 +39,10 @@ function regionMatch(country: string | null, continent: string | null, globalRan
   }
   if (r === "usa") return c === "usa";
   if (r === "gb_i") return c === "britain & ireland";
-  if (r === "europe") return c === "continental europe";
+  if (r === "europe") {
+    // Continental Europe: Europe continent but NOT Great Britain & Ireland
+    return cont === "europe" && c !== "britain & ireland";
+  }
   
   return false;
 }

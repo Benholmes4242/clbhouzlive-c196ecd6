@@ -2312,122 +2312,28 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { data: europeCourses = [] } = useQuery({
-    queryKey: ['europeCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (ratedError) throw ratedError;
-
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
-        }))
-      ];
-
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      const uniqueCoursesMap = new Map();
-      
-      europeCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      return getRegionalSortedCourses(rawCourses);
-    },
-    enabled: !!userId,
-  });
+  // Use the same shared hook as the ContinentalEuropeSection for consistency
+  const { data: europeCourses = [] } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
   return (
     <>
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => setModalOpen(true)}
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="text-sm h-8 px-3"
       >
-        See All
+        View All ({europeCourses.length})
       </Button>
+      
       <RegionalCoursesModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         regionName="Continental Europe"
-        courses={europeCourses}
+        courses={europeCourses.map(course => ({
+          ...course.golf_courses,
+          average_rating: course.averageRating
+        }))}
         isOwnProfile={isOwnProfile}
       />
     </>
@@ -2626,9 +2532,11 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
     enabled: !!userId,
   });
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('WorldwideConditionalSection - courses:', courses.length, 'isLoading:', isLoading);
-  }
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('WorldwideConditionalSection - courses:', courses.length, 'isLoading:', isLoading);
+    }
+  }, [courses.length, isLoading]);
 
   return (
     <>
@@ -2803,18 +2711,20 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
 
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`golf_courses!inner(country)`)
+        .select(`golf_courses!inner(continent, country)`)
         .eq('user_id', userId)
         .eq('played', true)
-        .eq('golf_courses.country', 'Continental Europe');
+        .eq('golf_courses.continent', 'Europe')
+        .neq('golf_courses.country', 'Britain & Ireland');
 
       if (top100Error) throw top100Error;
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`golf_courses!inner(country)`)
+        .select(`golf_courses!inner(continent, country)`)
         .eq('user_id', userId)
-        .eq('golf_courses.country', 'Continental Europe');
+        .eq('golf_courses.continent', 'Europe')
+        .neq('golf_courses.country', 'Britain & Ireland');
 
       if (ratedError) throw ratedError;
 
@@ -2823,9 +2733,6 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         ...(ratedData || [])
       ];
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Continental Europe courses found:', combinedCourses.length);
-      }
       return combinedCourses;
     },
     enabled: !!userId,
@@ -2844,11 +2751,13 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         </div>
       </div>
       {!isLoading && courses.length > 0 ? (
-        <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
+        <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
+            {isOwnProfile 
+              ? "You haven't played any Continental Europe courses yet." 
+              : `${userDisplayName || 'User'} hasn't played any Continental Europe courses yet.`}
           </p>
         </div>
       ) : (
