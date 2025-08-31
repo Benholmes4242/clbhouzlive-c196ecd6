@@ -3064,51 +3064,8 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {courses.length > 0 && (
         <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
-        <div className="w-full pt-0 pb-2">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative">
-              {/* Empty state with See All button */}
-              <div 
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
-                }}
-                tabIndex={0}
-              >
-                {/* Empty message card */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always w-full"
-                  style={{ minHeight: '200px' }}
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground text-center">
-                      {isOwnProfile 
-                        ? "You haven't played any worldwide courses yet." 
-                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any worldwide courses yet.`}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(31.25% - 3.75px)` }}
-                >
-                  <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );
@@ -3154,43 +3111,8 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {courses.length > 0 && (
         <USASection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
-        <div className="w-full pt-0 pb-2">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative">
-              {/* Empty state with See All button */}
-              <div 
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
-                }}
-                tabIndex={0}
-              >
-                {/* Empty message card */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always w-full"
-                  style={{ minHeight: '200px' }}
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground text-center">
-                      {isOwnProfile 
-                        ? "You haven't played any USA courses yet." 
-                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any USA courses yet.`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );
@@ -3234,51 +3156,8 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {courses.length > 0 && (
         <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
-        <div className="w-full pt-0 pb-2">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative">
-              {/* Empty state with See All button */}
-              <div 
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
-                }}
-                tabIndex={0}
-              >
-                {/* Empty message card */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always w-full"
-                  style={{ minHeight: '200px' }}
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground text-center">
-                      {isOwnProfile 
-                        ? "You haven't played any Great Britain & Ireland courses yet." 
-                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any Great Britain & Ireland courses yet.`}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(31.25% - 3.75px)` }}
-                >
-                  <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );
@@ -3373,51 +3252,8 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {courses.length > 0 && (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
-        <div className="w-full pt-0 pb-2">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative">
-              {/* Empty state with See All button */}
-              <div 
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
-                }}
-                tabIndex={0}
-              >
-                {/* Empty message card */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always w-full"
-                  style={{ minHeight: '200px' }}
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-muted-foreground text-center">
-                      {isOwnProfile 
-                        ? "You haven't played any Continental Europe courses yet." 
-                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any Continental Europe courses yet.`}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* See All button as last item */}
-                <div 
-                  className="flex-shrink-0 snap-start snap-always flex items-center justify-center pl-4"
-                  style={{ width: `calc(31.25% - 3.75px)` }}
-                >
-                  <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );
