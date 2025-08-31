@@ -115,8 +115,17 @@ const CourseRankBadges = ({
     const rankingBadgesOnly = rankingBadges.filter(badge => 
       badge.tooltip !== "Clbhouz Community Rating"
     );
+    
+    // Add average rating badge to left cluster if it exists
+    if (showAverageRating && averageRating) {
+      rankingBadgesOnly.push({
+        rank: averageRating.toFixed(1),
+        icon: <ClubhouseLogo size="sm" />,
+        tooltip: "Clbhouz Community Rating"
+      });
+    }
+    
     const ratingBadgesOnly = [
-      ...(showAverageRating && averageRating ? [{ content: `${averageRating.toFixed(1)}`, tooltip: "Clbhouz Community Rating", icon: <ClubhouseLogo size="sm" /> }] : []),
       ...(showUserRating && userRating ? [{ content: `${userRating}/10`, tooltip: "Your Rating" }] : [])
     ];
     
@@ -158,10 +167,9 @@ const CourseRankBadges = ({
                      style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
                      onClick={(e) => e.stopPropagation()}
                    >
-                     <div className="relative z-10 flex items-center gap-1.5">
-                       {badge.icon && badge.icon}
-                       <span className="text-sm font-bold text-white">{badge.content}</span>
-                     </div>
+                      <div className="relative z-10 flex items-center gap-1.5">
+                        <span className="text-sm font-bold text-white">{badge.content}</span>
+                      </div>
                    </div>
                 </TooltipTrigger>
                 <TooltipContent>
