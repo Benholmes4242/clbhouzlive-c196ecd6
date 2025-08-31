@@ -115,7 +115,10 @@ const CourseRankBadges = ({
     const rankingBadgesOnly = rankingBadges.filter(badge => 
       badge.tooltip !== "Clbhouz Community Rating"
     );
-    const ratingBadgesOnly = [...(showUserRating && userRating ? [{ content: `${userRating}/10`, tooltip: "Your Rating" }] : [])];
+    const ratingBadgesOnly = [
+      ...(showAverageRating && averageRating ? [{ content: `${averageRating.toFixed(1)}`, tooltip: "Clbhouz Community Rating", icon: <ClubhouseLogo size="sm" /> }] : []),
+      ...(showUserRating && userRating ? [{ content: `${userRating}/10`, tooltip: "Your Rating" }] : [])
+    ];
     
     return (
       <TooltipProvider>
@@ -150,15 +153,16 @@ const CourseRankBadges = ({
             {ratingBadgesOnly.map((badge, index) => (
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
-                  <div 
-                    className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
-                    style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="relative z-10 flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-white">{badge.content}</span>
-                    </div>
-                  </div>
+                   <div 
+                     className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                     style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                     onClick={(e) => e.stopPropagation()}
+                   >
+                     <div className="relative z-10 flex items-center gap-1.5">
+                       {badge.icon && badge.icon}
+                       <span className="text-sm font-bold text-white">{badge.content}</span>
+                     </div>
+                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{badge.tooltip}</p>
