@@ -33,6 +33,21 @@ function regionMatch(country: string | null, continent: string | null, globalRan
   const c = (country ?? "").toLowerCase();
   const cont = (continent ?? "").toLowerCase();
   
+  if (r === "europe") {
+    // Debug logging for Continental Europe specifically
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Europe region match check:', {
+        country,
+        continent, 
+        c,
+        cont,
+        isEurope: cont === "europe",
+        isNotGB: c !== "britain & ireland",
+        finalMatch: cont === "europe" && c !== "britain & ireland"
+      });
+    }
+  }
+  
   if (r === "worldwide") {
     // Worldwide: courses with global rank <= 100
     return globalRank !== null && globalRank <= 100;

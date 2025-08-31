@@ -2368,6 +2368,20 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
   const { data: europeCourses = [], isLoading: europeLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('ContinentalEuropeSection - europeCourses from hook:', {
+      count: europeCourses.length,
+      isLoading: europeLoading,
+      courses: europeCourses.map(c => ({
+        name: c.golf_courses.name,
+        country: c.golf_courses.country,
+        continent: c.golf_courses.continent,
+        averageRating: c.averageRating,
+        userRating: c.userRating
+      }))
+    });
+  }
+
   const { isHydrated } = useViewPreference();
 
   // Keyboard navigation - only setup when europeCourses is available
