@@ -708,7 +708,7 @@ const HeroProfileHeader = ({
             )}
             
             {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[15px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
+            <div className="absolute left-0 right-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
           {/* Overlapping White Card */}
@@ -921,7 +921,7 @@ const HeroProfileHeader = ({
             )}
             
             {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[15px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
+            <div className="absolute left-0 right-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
           {/* Overlapping White Card - Desktop styling */}
