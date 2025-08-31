@@ -1763,10 +1763,8 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             regional_rank,
             usa_rank,
             description,
-            thumbnail_image
-          ),
-          course_rating_stats (
-            average_rating
+            thumbnail_image,
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId)
