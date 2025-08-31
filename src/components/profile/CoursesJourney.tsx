@@ -677,10 +677,12 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
       });
 
       const rawCourses = Array.from(uniqueCoursesMap.values());
-      console.log('Raw combined courses before sorting in RecentlyPlayed:', rawCourses.map(c => ({ 
-        name: c.golf_courses?.name, 
-        rating: c.rating 
-      })));
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Raw combined courses before sorting in RecentlyPlayed:', rawCourses.map(c => ({ 
+          name: c.golf_courses?.name, 
+          rating: c.rating 
+        })));
+      }
       
       // Apply sorting here to ensure proper order
       return getSortedUserCourses(rawCourses, 'recent');
@@ -716,11 +718,13 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     // Then apply sorting
     const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
     
-    console.log('Final filtered and sorted courses in RecentlyPlayed:', sortedCourses.map(c => ({ 
-      name: c.golf_courses?.name, 
-      rating: c.rating,
-      sortBy 
-    })));
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Final filtered and sorted courses in RecentlyPlayed:', sortedCourses.map(c => ({ 
+        name: c.golf_courses?.name, 
+        rating: c.rating,
+        sortBy 
+      })));
+    }
     
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
@@ -1684,7 +1688,10 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className="w-full h-[var(--rated-card-h)] overflow-hidden rounded-lg relative">
+                     <div 
+                       className="w-full overflow-hidden rounded-lg relative" 
+                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                     >
                        <CourseCard 
                          course={{
                            ...userCourse.golf_courses,
@@ -1966,7 +1973,10 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className="w-full h-[var(--rated-card-h)] overflow-hidden rounded-lg relative">
+                     <div 
+                       className="w-full overflow-hidden rounded-lg relative" 
+                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                     >
                        <CourseCard 
                          course={{
                            ...userCourse.golf_courses,
@@ -2248,7 +2258,10 @@ const USASection: React.FC<USASectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className="w-full h-[var(--rated-card-h)] overflow-hidden rounded-lg relative">
+                     <div 
+                       className="w-full overflow-hidden rounded-lg relative" 
+                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                     >
                        <CourseCard 
                          course={{
                            ...userCourse.golf_courses,
@@ -2526,7 +2539,10 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className="w-full h-[var(--rated-card-h)] overflow-hidden rounded-lg relative">
+                     <div 
+                       className="w-full overflow-hidden rounded-lg relative" 
+                       style={{ height: 'var(--rated-card-h, 240px)' }}
+                     >
                        <CourseCard 
                          course={{
                            ...userCourse.golf_courses,
@@ -2807,7 +2823,9 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         ...(ratedData || [])
       ];
 
-      console.log('Continental Europe courses found:', combinedCourses.length);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Continental Europe courses found:', combinedCourses.length);
+      }
       return combinedCourses;
     },
     enabled: !!userId,
