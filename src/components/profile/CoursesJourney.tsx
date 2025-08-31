@@ -2382,6 +2382,7 @@ const USASection: React.FC<USASectionProps> = ({
     queryFn: async () => {
       if (!userId) return [];
 
+      // Get courses from user_top100_courses table for USA
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
@@ -2398,7 +2399,8 @@ const USASection: React.FC<USASectionProps> = ({
             regional_rank,
             usa_rank,
             description,
-            thumbnail_image
+            thumbnail_image,
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId)
@@ -2406,6 +2408,7 @@ const USASection: React.FC<USASectionProps> = ({
 
       if (top100Error) throw top100Error;
 
+      // Get courses from course_ratings table for USA
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -2423,39 +2426,39 @@ const USASection: React.FC<USASectionProps> = ({
             regional_rank,
             usa_rank,
             description,
-            thumbnail_image
+            thumbnail_image,
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId);
 
       if (ratedError) throw ratedError;
 
+      // Combine and deduplicate courses
       const combinedCourses = [
         ...(top100Data || []).map(course => ({
           ...course,
           rating: null,
           id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
+          averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
+          userRating: null
         })),
         ...(ratedData || []).map(course => ({
           ...course,
           played_date: course.created_at,
           id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
+          averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
+          userRating: course.rating
         }))
       ];
 
+      // Filter for USA courses only
       const usaCourses = combinedCourses.filter((userCourse) => {
         const course = userCourse.golf_courses;
         return course && course.country === 'USA';
       });
 
+      // Remove duplicates based on course_id, preferring rated courses
       const uniqueCoursesMap = new Map();
       
       usaCourses.forEach(course => {
@@ -2465,8 +2468,9 @@ const USASection: React.FC<USASectionProps> = ({
         if (!existing) {
           uniqueCoursesMap.set(courseId, course);
         } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
+          // Prefer courses with user ratings
+          if (course.userRating !== null && course.userRating !== undefined && 
+              (existing.userRating === null || existing.userRating === undefined)) {
             uniqueCoursesMap.set(courseId, course);
           }
         }
