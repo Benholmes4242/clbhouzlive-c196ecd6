@@ -1621,14 +1621,14 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gbIrelandCourses.length]);
 
-  // Calculate card dimensions  
+  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 1.1 cards visible (1 full + 0.1 peek)  
-      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
+      // Mobile: 2.5 cards visible to match Recently Played
+      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
     }
   };
 
@@ -1905,14 +1905,14 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [worldwideCourses.length]);
 
-  // Calculate card dimensions
+  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
+      // Mobile: 2.5 cards visible to match Recently Played
+      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
     }
   };
 
@@ -2190,14 +2190,14 @@ const USASection: React.FC<USASectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [usaCourses.length]);
 
-  // Calculate card dimensions
+  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
+      // Mobile: 2.5 cards visible to match Recently Played
+      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
     }
   };
 
@@ -2377,14 +2377,14 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [europeCourses.length]);
 
-  // Calculate card dimensions
+  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
   const getCardWidth = () => {
     if (windowWidth >= 768) {
       // Desktop: 3.2 cards visible (3 full + 0.2 peek)
       return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
     } else {
-      // Mobile: 1.1 cards visible (1 full + 0.1 peek)
-      return `calc(90.9% - 1.1px)`; // 100% / 1.1 = 90.9%, gap adjustment: 1.2px / 1.1 = 1.1px
+      // Mobile: 2.5 cards visible to match Recently Played
+      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
     }
   };
 
