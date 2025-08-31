@@ -136,8 +136,8 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       )}
 
-      {/* Home Club & Handicap in two columns */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      {/* Home Club & Handicap stacked vertically */}
+      <div className="flex flex-col items-center gap-4 mb-4">
         <div className="text-center">
           <p className={`
             text-xs mb-1 transition-colors duration-300
