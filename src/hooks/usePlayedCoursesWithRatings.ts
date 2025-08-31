@@ -172,6 +172,24 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
         usaRank: number | null;
       }>;
 
+    if (process.env.NODE_ENV !== 'production' && region === 'europe') {
+      console.log('usePlayedCoursesWithRatings - normalized data for europe:', {
+        totalNormalized: courses.length,
+        sampleCourses: courses.slice(0, 5).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        })),
+        continentalEuropeCourses: courses.filter(c => 
+          c.golf_courses.country?.toLowerCase() === 'continental europe'
+        ).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        }))
+      });
+    }
+
     return courses;
   }, [playedRows, ratingMap, region]);
 
