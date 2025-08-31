@@ -29,34 +29,29 @@ type RatingRow = {
   created_at: string;
 };
 
+// Regional predicates - shared, bulletproof filtering
+const isGBI = (country: string) => 
+  ['great britain & ireland', 'britain & ireland'].includes(country);
+
+const isEuropeStrict = (country: string, continent: string) =>
+  continent === 'europe' && country === 'continental europe';
+
+const isEuropeContinental = (country: string, continent: string) =>
+  continent === 'europe' && !isGBI(country);
+
 function regionMatch(country: string | null, continent: string | null, globalRank: number | null, r: RegionKey) {
   const c = (country ?? "").toLowerCase();
   const cont = (continent ?? "").toLowerCase();
-  
-  if (r === "europe") {
-    // Debug logging for Continental Europe specifically
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('Europe region match check:', {
-        country,
-        continent, 
-        c,
-        cont,
-        isEurope: cont === "europe",
-        isNotGB: c !== "britain & ireland",
-        finalMatch: cont === "europe" && c !== "britain & ireland"
-      });
-    }
-  }
   
   if (r === "worldwide") {
     // Worldwide: courses with global rank <= 100
     return globalRank !== null && globalRank <= 100;
   }
   if (r === "usa") return c === "usa";
-  if (r === "gb_i") return c === "britain & ireland";
+  if (r === "gb_i") return isGBI(c);
   if (r === "europe") {
-    // Continental Europe: Europe continent but NOT Great Britain & Ireland
-    return cont === "europe" && c !== "britain & ireland";
+    // Continental Europe: strict matching for 'continental europe' 
+    return isEuropeStrict(c, cont);
   }
   
   return false;
@@ -119,7 +114,7 @@ function getRegionalSortedCourses(courses: any[]) {
 
 export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   const { data: playedRows, isLoading: playedLoading, error: playedError } = useQuery({
-    queryKey: ["played-courses-with-averages", userId],
+    queryKey: ["played-courses-with-averages", region, userId], // include region to avoid cache collisions
     queryFn: () => fetchPlayedWithAverages(userId),
     enabled: !!userId,
     staleTime: 60_000,
@@ -153,8 +148,11 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
           course_id: gc.id,
           golf_courses: gc,
           played_date: row.played_date,
-          averageRating: gc.course_rating_stats?.[0]?.average_rating ?? null,
-          userRating: userRatingData?.rating ?? null,
+          // Normalize data with lower-case strings to avoid case bugs
+          country: (gc.country ?? '').toLowerCase(),
+          continent: (gc.continent ?? '').toLowerCase(),
+          averageRating: Number(gc.course_rating_stats?.[0]?.average_rating ?? NaN),
+          userRating: Number(userRatingData?.rating ?? NaN),
           globalRank: gc.global_rank,
           regionRank: gc.regional_rank,
           usaRank: gc.usa_rank,
@@ -165,30 +163,14 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
         course_id: string;
         golf_courses: NonNullable<RawPlayedRow['golf_courses']>;
         played_date: string | null;
-        averageRating: number | null;
-        userRating: number | null;
+        country: string;
+        continent: string;
+        averageRating: number;
+        userRating: number;
         globalRank: number | null;
         regionRank: number | null;
         usaRank: number | null;
       }>;
-
-    if (process.env.NODE_ENV !== 'production' && region === 'europe') {
-      console.log('usePlayedCoursesWithRatings - normalized data for europe:', {
-        totalNormalized: courses.length,
-        sampleCourses: courses.slice(0, 5).map(c => ({
-          name: c.golf_courses.name,
-          country: c.golf_courses.country,
-          continent: c.golf_courses.continent
-        })),
-        continentalEuropeCourses: courses.filter(c => 
-          c.golf_courses.country?.toLowerCase() === 'continental europe'
-        ).map(c => ({
-          name: c.golf_courses.name,
-          country: c.golf_courses.country,
-          continent: c.golf_courses.continent
-        }))
-      });
-    }
 
     return courses;
   }, [playedRows, ratingMap, region]);

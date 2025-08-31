@@ -2368,19 +2368,14 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 
   const { data: europeCourses = [], isLoading: europeLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('ContinentalEuropeSection - europeCourses from hook:', {
-      count: europeCourses.length,
-      isLoading: europeLoading,
-      courses: europeCourses.map(c => ({
-        name: c.golf_courses.name,
-        country: c.golf_courses.country,
-        continent: c.golf_courses.continent,
-        averageRating: c.averageRating,
-        userRating: c.userRating
-      }))
-    });
-  }
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('ContinentalEuropeSection - courses from shared hook:', {
+        count: europeCourses.length,
+        isLoading: europeLoading
+      });
+    }
+  }, [europeCourses.length, europeLoading]);
 
   const { isHydrated } = useViewPreference();
 
@@ -2716,54 +2711,22 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
 };
 
 const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [], isLoading } = useQuery({
-    queryKey: ['europeCoursesCheck', userId],
-    queryFn: async () => {
-      if (!userId) return [];
+  // Use the same shared hook as other regions for consistency
+  const { data: courses = [], isLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses!inner(continent, country)`)
-        .eq('user_id', userId)
-        .eq('played', true)
-        .eq('golf_courses.continent', 'Europe')
-        .neq('golf_courses.country', 'Britain & Ireland');
-
-      if (top100Error) {
-        console.error('Continental Europe top100 query error:', top100Error);
-        throw top100Error;
-      }
-
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`golf_courses!inner(continent, country)`)
-        .eq('user_id', userId)
-        .eq('golf_courses.continent', 'Europe')
-        .neq('golf_courses.country', 'Britain & Ireland');
-
-      if (ratedError) {
-        console.error('Continental Europe ratings query error:', ratedError);
-        throw ratedError;
-      }
-
-      const combinedCourses = [
-        ...(top100Data || []),
-        ...(ratedData || [])
-      ];
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('ContinentalEuropeConditionalSection check results:', {
-          top100Count: top100Data?.length || 0,
-          ratingsCount: ratedData?.length || 0,
-          totalFound: combinedCourses.length,
-          sampleData: combinedCourses.slice(0, 2)
-        });
-      }
-
-      return combinedCourses;
-    },
-    enabled: !!userId,
-  });
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('ContinentalEuropeConditionalSection - unified hook results:', {
+        count: courses.length,
+        isLoading,
+        sampleCourses: courses.slice(0, 2).map(c => ({
+          name: c.golf_courses.name,
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent
+        }))
+      });
+    }
+  }, [courses.length, isLoading]);
 
   return (
     <>
