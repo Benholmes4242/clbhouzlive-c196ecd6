@@ -8,6 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 // Import content components
 import ActivityFeed from '@/components/profile/ActivityFeed';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import AchievementsPane from '@/components/profile/AchievementsPane';
 import ThomasHandicapLayout from './handicap/ThomasHandicapLayout';
 
 interface UserProfile {
@@ -73,9 +74,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         return <UserCoursesContent username={profile?.username} isOwnProfile={isOwnProfile} />;
       case 'achievements':
         return (
-          <div className="text-center py-12">
-            <span className="text-muted-foreground">Achievements coming soon</span>
-          </div>
+          <AchievementsPane 
+            userId={user?.id}
+            userDisplayName={profile?.display_name}
+            userHandicap={profile?.eg_handicap_index}
+            userProfilePhotoUrl={profile?.profile_photo_url}
+            isCurrentUser={isOwnProfile}
+          />
         );
       case 'handicap':
         return <ThomasHandicapLayout />;
