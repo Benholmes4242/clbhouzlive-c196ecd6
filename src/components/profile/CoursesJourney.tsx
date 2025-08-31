@@ -2976,87 +2976,48 @@ interface ConditionalSectionProps {
 }
 
 const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [] } = useQuery({
-    queryKey: ['worldwideCourses', userId],
+  const { data: courses = [], isLoading } = useQuery({
+    queryKey: ['worldwideCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses!inner(global_rank)`)
         .eq('user_id', userId)
-        .eq('played', true);
+        .eq('played', true)
+        .not('golf_courses.global_rank', 'is', null)
+        .lte('golf_courses.global_rank', 100);
 
       if (top100Error) throw top100Error;
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
+        .select(`golf_courses!inner(global_rank)`)
+        .eq('user_id', userId)
+        .not('golf_courses.global_rank', 'is', null)
+        .lte('golf_courses.global_rank', 100);
 
       if (ratedError) throw ratedError;
 
       const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
+        ...(top100Data || []),
+        ...(ratedData || [])
       ];
 
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.global_rank && course.global_rank <= 100;
-      });
-
-      return worldwideCourses;
+      console.log('Worldwide courses found:', combinedCourses.length);
+      return combinedCourses;
     },
     enabled: !!userId,
   });
 
+  console.log('WorldwideConditionalSection - courses:', courses.length, 'isLoading:', isLoading);
+
   return (
     <>
-      <div className="w-full pt-2"> {/* 8px spacing above title */}
+      <div className="w-full pt-2">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
+          <div className="flex items-center justify-between mb-0">
             <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
             <div className="flex gap-2">
               <WorldwideNavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3064,13 +3025,17 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {!isLoading && courses.length > 0 ? (
         <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isOwnProfile ? "You haven't played any worldwide courses yet." : "No worldwide courses found."}
           </p>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       )}
     </>
@@ -3078,38 +3043,44 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 };
 
 const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [] } = useQuery({
+  const { data: courses = [], isLoading } = useQuery({
     queryKey: ['usaCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
+      
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`golf_courses (country)`)
+        .select(`golf_courses!inner(country)`)
         .eq('user_id', userId)
-        .eq('played', true);
+        .eq('played', true)
+        .eq('golf_courses.country', 'USA');
 
       if (top100Error) throw top100Error;
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId);
+        .select(`golf_courses!inner(country)`)
+        .eq('user_id', userId)
+        .eq('golf_courses.country', 'USA');
 
       if (ratedError) throw ratedError;
 
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.country === 'USA');
+      const combinedCourses = [
+        ...(top100Data || []),
+        ...(ratedData || [])
+      ];
+
+      console.log('USA courses found:', combinedCourses.length);
+      return combinedCourses;
     },
     enabled: !!userId,
   });
 
-  // Always show USA section, even if empty
-
   return (
     <>
-      <div className="w-full pt-2"> {/* 8px spacing above title */}
+      <div className="w-full pt-2">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
+          <div className="flex items-center justify-between mb-0">
             <h4 className="text-xl text-muted-foreground mb-0">USA</h4>
             <div className="flex gap-2">
               <USANavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3117,13 +3088,17 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {!isLoading && courses.length > 0 ? (
         <USASection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
           </p>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       )}
     </>
@@ -3131,36 +3106,44 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
 };
 
 const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [] } = useQuery({
+  const { data: courses = [], isLoading } = useQuery({
     queryKey: ['gbIrelandCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
+
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`golf_courses (country)`)
+        .select(`golf_courses!inner(country)`)
         .eq('user_id', userId)
-        .eq('played', true);
+        .eq('played', true)
+        .eq('golf_courses.country', 'Britain & Ireland');
 
       if (top100Error) throw top100Error;
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`golf_courses (country)`)
-        .eq('user_id', userId);
+        .select(`golf_courses!inner(country)`)
+        .eq('user_id', userId)
+        .eq('golf_courses.country', 'Britain & Ireland');
 
       if (ratedError) throw ratedError;
 
-      const combined = [...(top100Data || []), ...(ratedData || [])];
-      return combined.filter(c => c.golf_courses?.country === 'Britain & Ireland');
+      const combinedCourses = [
+        ...(top100Data || []),
+        ...(ratedData || [])
+      ];
+
+      console.log('GB&I courses found:', combinedCourses.length);
+      return combinedCourses;
     },
     enabled: !!userId,
   });
 
   return (
     <>
-      <div className="w-full pt-2"> {/* 8px spacing above title */}
+      <div className="w-full pt-2">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-0"> {/* no gap below title */}
+          <div className="flex items-center justify-between mb-0">
             <h4 className="text-xl text-muted-foreground mb-0">Great Britain & Ireland</h4>
             <div className="flex gap-2">
               <GreatBritainIrelandNavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3168,13 +3151,17 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {!isLoading && courses.length > 0 ? (
         <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
           </p>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       )}
     </>
@@ -3182,87 +3169,44 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
 };
 
 const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [] } = useQuery({
+  const { data: courses = [], isLoading } = useQuery({
     queryKey: ['europeCoursesCheck', userId],
     queryFn: async () => {
       if (!userId) return [];
 
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
+        .select(`golf_courses!inner(country)`)
         .eq('user_id', userId)
-        .eq('played', true);
+        .eq('played', true)
+        .eq('golf_courses.country', 'Continental Europe');
 
       if (top100Error) throw top100Error;
 
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
+        .select(`golf_courses!inner(country)`)
+        .eq('user_id', userId)
+        .eq('golf_courses.country', 'Continental Europe');
 
       if (ratedError) throw ratedError;
 
       const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
+        ...(top100Data || []),
+        ...(ratedData || [])
       ];
 
-      const europeCourses = combinedCourses.filter((userCourse) => {
-        const course = userCourse.golf_courses;
-        return course && course.country === 'Continental Europe';
-      });
-
-      return europeCourses;
+      console.log('Continental Europe courses found:', combinedCourses.length);
+      return combinedCourses;
     },
     enabled: !!userId,
   });
 
   return (
     <>
-      <div className="w-full pt-2"> {/* 8px spacing above title */}
+      <div className="w-full pt-2">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-2"> {/* 8px gap below title */}
+          <div className="flex items-center justify-between mb-2">
             <h4 className="text-xl text-muted-foreground mb-0">Continental Europe</h4>
             <div className="flex gap-2">
               <ContinentalEuropeNavigation userId={userId} isOwnProfile={isOwnProfile} />
@@ -3270,13 +3214,17 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
           </div>
         </div>
       </div>
-      {courses.length > 0 ? (
+      {!isLoading && courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
           </p>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       )}
     </>
