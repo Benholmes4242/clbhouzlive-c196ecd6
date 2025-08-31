@@ -3064,8 +3064,14 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
           </div>
         </div>
       </div>
-      {courses.length > 0 && (
+      {courses.length > 0 ? (
         <WorldwideSection userId={userId} isOwnProfile={isOwnProfile} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            {isOwnProfile ? "You haven't played any worldwide courses yet." : "No worldwide courses found."}
+          </p>
+        </div>
       )}
     </>
   );
@@ -3111,8 +3117,14 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
           </div>
         </div>
       </div>
-      {courses.length > 0 && (
+      {courses.length > 0 ? (
         <USASection userId={userId} isOwnProfile={isOwnProfile} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
+          </p>
+        </div>
       )}
     </>
   );
@@ -3156,8 +3168,14 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
           </div>
         </div>
       </div>
-      {courses.length > 0 && (
+      {courses.length > 0 ? (
         <GreatBritainIrelandSection userId={userId} isOwnProfile={isOwnProfile} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
+          </p>
+        </div>
       )}
     </>
   );
@@ -3252,8 +3270,14 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
           </div>
         </div>
       </div>
-      {courses.length > 0 && (
+      {courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
+          </p>
+        </div>
       )}
     </>
   );
