@@ -10,9 +10,8 @@ import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStat
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import RegionalCoursesModal from './RegionalCoursesModal';
 import { useDragScroll } from '@/hooks/useDragScroll';
@@ -899,211 +898,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
-// Enhanced video element interface for HLS videos
-interface HLSVideoElement extends HTMLVideoElement {
-  attachHLS?: () => Promise<void>;
-}
-
-// Video state management for exclusive playback
-  const [videoMuteStates, setVideoMuteStates] = useState<Map<string, boolean>>(new Map()); // Individual mute state per video
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
-  const [firstCardId, setFirstCardId] = useState<string | null>(null);
-  const [userInitiated, setUserInitiated] = useState(false);
-  const videoRefs = useRef<Map<string, HLSVideoElement>>(new Map());
-  const videoCleanupRefs = useRef<Map<string, () => void>>(new Map());
-  
   // Track window width for responsive breakpoints
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Track window width for responsive breakpoints
-  useEffect(() => {
-    if (firstCardId && !userInitiated) {
-      console.log('🎥 Auto-playing first card:', firstCardId);
-      playExclusive(firstCardId, false);
-    }
-  }, [firstCardId]);
-
-  // Helper function to get mute state for a video (default to muted)
-  const getVideoMuteState = useCallback((videoId: string) => {
-    return videoMuteStates.get(videoId) ?? true; // Default to muted
-  }, [videoMuteStates]);
-
-  // Helper function to set mute state for a video
-  const setVideoMuteState = useCallback((videoId: string, isMuted: boolean) => {
-    setVideoMuteStates(prev => new Map(prev.set(videoId, isMuted)));
-  }, []);
-
-  // Video management functions - disabled for highlights
-  const toggleMute = useCallback((videoId: string) => {
-    // Audio controls disabled - no mute toggle functionality
-  }, []);
-
-  const pauseAllVideos = useCallback(() => {
-    console.log('🎥 Pausing all videos');
-    videoRefs.current.forEach((video, videoId) => {
-      if (!video.paused) {
-        video.pause();
-      }
-      video.muted = true; // Ensure all non-active videos are muted
-      // Reset stored mute state to muted for paused videos
-      setVideoMuteState(videoId, true);
-    });
-  }, [setVideoMuteState]);
-
-  const playExclusive = useCallback((videoId: string, isUserInitiated = true) => {
-    console.log('🎥 Playing exclusive:', videoId, 'User initiated:', isUserInitiated);
-    const targetVideo = videoRefs.current.get(videoId);
-    if (!targetVideo) {
-      console.log('🎥 Video not found:', videoId);
-      return;
-    }
-
-    // If user-initiated and there's a currently playing video, transfer its audio state
-    let shouldTransferAudio = false;
-    let transferredMuteState = true; // default to muted
-    
-    if (isUserInitiated && playingVideoId && playingVideoId !== videoId) {
-      const currentPlayingVideo = videoRefs.current.get(playingVideoId);
-      if (currentPlayingVideo) {
-        // Transfer the current audio state to the new video
-        transferredMuteState = !currentPlayingVideo.muted; // invert because we want to transfer the unmuted state
-        shouldTransferAudio = true;
-        console.log('🎥 Transferring audio state from', playingVideoId, 'to', videoId, '- unmuted:', !transferredMuteState);
-      }
-    }
-
-    // Pause all other videos first (this will mute them)
-    pauseAllVideos();
-
-    // Set state
-    setPlayingVideoId(videoId);
-    setUserInitiated(isUserInitiated);
-
-    // Attach HLS if needed and play
-    const playVideo = async () => {
-      try {
-        if (targetVideo.attachHLS) {
-          await targetVideo.attachHLS();
-        }
-        
-        // Configure mute state - use transferred state if applicable, otherwise use stored state
-        let videoMuted;
-        if (shouldTransferAudio) {
-          videoMuted = transferredMuteState;
-          // Update the stored mute state for this video
-          setVideoMuteState(videoId, transferredMuteState);
-        } else {
-          videoMuted = getVideoMuteState(videoId);
-        }
-        
-        targetVideo.muted = videoMuted;
-        targetVideo.loop = true;
-        await targetVideo.play();
-        
-        console.log('🎥 Video playing with muted state:', videoMuted);
-      } catch (error) {
-        console.error('🎥 Failed to play video:', videoId, error);
-      }
-    };
-
-    playVideo();
-  }, [pauseAllVideos, getVideoMuteState, setVideoMuteState, playingVideoId]);
-
-  const pauseVideo = useCallback((videoId: string) => {
-    console.log('🎥 Pausing video:', videoId);
-    const targetVideo = videoRefs.current.get(videoId);
-    if (targetVideo && !targetVideo.paused) {
-      targetVideo.pause();
-    }
-    
-    if (playingVideoId === videoId) {
-      setPlayingVideoId(null);
-      setUserInitiated(false);
-      
-      // Resume first card autoplay if available
-      if (firstCardId && firstCardId !== videoId) {
-        console.log('🎥 Resuming first card autoplay:', firstCardId);
-        setTimeout(() => playExclusive(firstCardId, false), 100);
-      }
-    }
-  }, [playingVideoId, firstCardId, playExclusive]);
-
-  const registerVideo = useCallback((videoId: string, video: HLSVideoElement) => {
-    // Prevent duplicate registration
-    if (videoRefs.current.has(videoId)) {
-      return () => {}; // Return empty cleanup silently
-    }
-    
-    console.log('🎥 Registering video:', videoId);
-    
-    // Ensure video is a valid HTMLVideoElement
-    if (!video || typeof video.addEventListener !== 'function') {
-      console.error('🎥 Invalid video element:', video);
-      return () => {}; // Return empty cleanup function
-    }
-    
-    videoRefs.current.set(videoId, video);
-    
-    // Set initial mute state (always muted for highlights)
-    const videoMuted = true; // Always muted, no audio controls
-    video.muted = videoMuted;
-    video.loop = true;
-    video.playsInline = true;
-    video.preload = 'metadata';
-    
-    // Attach HLS source if video has attachHLS method
-    if (video.attachHLS) {
-      video.attachHLS().catch(console.error);
-    }
-    
-    // Set up event listeners
-    const handleEnded = () => {
-      console.log('🎥 Video ended:', videoId);
-      if (playingVideoId === videoId) {
-        if (videoId === firstCardId) {
-          // First card ended, restart it
-          video.currentTime = 0;
-          video.play().catch(console.error);
-        } else {
-          // Non-first card ended, resume first card
-          setPlayingVideoId(null);
-          setUserInitiated(false);
-          if (firstCardId) {
-            setTimeout(() => playExclusive(firstCardId, false), 100);
-          }
-        }
-      }
-    };
-
-    const handlePlay = () => {
-      console.log('🎥 Video started playing:', videoId);
-      // Ensure exclusivity when any video starts playing
-      if (playingVideoId && playingVideoId !== videoId) {
-        pauseAllVideos();
-      }
-      setPlayingVideoId(videoId);
-    };
-
-    const handlePause = () => {
-      console.log('🎥 Video paused:', videoId);
-    };
-
-    video.addEventListener('ended', handleEnded);
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-    
-    return () => {
-      video.removeEventListener('ended', handleEnded);
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-      videoRefs.current.delete(videoId);
-      console.log('🎥 Unregistered video:', videoId);
-    };
-  }, [getVideoMuteState, playingVideoId, firstCardId, playExclusive, pauseAllVideos]);
 
   
   // Calculate cards per view for Highlight Reel to match Recently Played
@@ -1116,141 +916,48 @@ interface HLSVideoElement extends HTMLVideoElement {
   
   const cardsPerView = getCardsPerView();
 
-  // Query to get courses from videos tagged at top 100 courses
+  // Query to get courses from user's top 100 courses
   const { data: allPlayedCourses = [] } = useQuery({
     queryKey: ['highlightReelCourses', userId],
     queryFn: async () => {
-      console.log('Highlight Reel - Starting query for userId:', userId);
-      if (!userId) {
-        console.log('Highlight Reel - No userId provided');
-        return [];
-      }
+      if (!userId) return [];
 
-      // Get all posts with video media
-      const { data: posts, error: postsError } = await supabase
-        .from('posts')
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
         .select(`
-          id,
-          content,
-          created_at,
-          post_media!inner (
+          course_id,
+          played_date,
+          golf_courses (
             id,
-            media_type,
-            media_url
+            name,
+            country,
+            region,
+            sub_country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
           )
         `)
         .eq('user_id', userId)
-        .eq('post_media.media_type', 'video')
-        .order('created_at', { ascending: false });
+        .eq('played', true)
+        .order('played_date', { ascending: false })
+        .limit(10);
 
-      console.log('Highlight Reel - Found posts with videos:', posts?.length);
-      console.log('Highlight Reel - Sample post:', posts?.[0]);
-      
-      if (!posts || posts.length === 0) {
-        console.log('Highlight Reel - No posts found, returning empty array');
-        return [];
-      }
+      if (top100Error) throw top100Error;
 
-      // Get post tags for these posts
-      const postIds = posts.map(p => p.id);
-      const { data: tags, error: tagsError } = await supabase
-        .from('post_tags')
-        .select(`
-          post_id,
-          taggable_entities!inner (
-            entity_type,
-            entity_id,
-            name
-          )
-        `)
-        .in('post_id', postIds)
-        .eq('taggable_entities.entity_type', 'golf_club');
-
-      if (tagsError) throw tagsError;
-
-      // Get golf course details for tagged courses
-      const courseIds = tags?.map(tag => tag.taggable_entities.entity_id) || [];
-      if (courseIds.length === 0) {
-        return [];
-      }
-
-      const { data: courses, error: coursesError } = await supabase
-        .from('golf_courses')
-        .select(`
-          id,
-          name,
-          country,
-          region,
-          sub_country,
-          continent,
-          global_rank,
-          regional_rank,
-          usa_rank,
-          description,
-          thumbnail_image
-        `)
-        .in('id', courseIds)
-        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null'); // Only top 100 courses
-
-      if (coursesError) throw coursesError;
-      console.log('Highlight Reel - Sample course:', courses?.[0]);
-
-    // Transform posts into course format for existing card structure
-      const courseData = posts
-        .map(post => {
-          // Find the tag for this post
-          const postTag = tags?.find(tag => tag.post_id === post.id);
-          if (!postTag) return null;
-
-          // Find the course details
-          const course = courses?.find(c => c.id === postTag.taggable_entities.entity_id);
-          if (!course) return null;
-
-          // Get video URL from post media (keep original for video playback)
-          const videoMedia = post.post_media?.[0];
-          const videoUrl = videoMedia?.media_url; // Keep original URL for video playback
-          let videoThumbnail = videoUrl;
-          
-          // For videos, try to get thumbnail by modifying the URL for display purposes only
-          if (videoMedia?.media_type === 'video' && videoUrl) {
-            // If it's a Cloudflare Stream video, we can generate thumbnail URL for poster
-            if (videoUrl.includes('customer-') && videoUrl.includes('cloudflarestream.com')) {
-              // Extract video ID from URLs like: https://customer-4ah4gni80ytefpck.cloudflarestream.com/bfaa2b729eed40d2b3292f40035e8231/manifest/video.m3u8
-              const matches = videoUrl.match(/customer-[^\/]+\.cloudflarestream\.com\/([^\/]+)/);
-              if (matches && matches[1]) {
-                const videoId = matches[1];
-                videoThumbnail = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
-              }
-            }
-          }
-          
-          console.log('Processing post:', post.id, 'Video URL:', videoUrl, 'Thumbnail URL:', videoThumbnail);
-          console.log('Video media details:', videoMedia);
-
-          return {
-            id: `video-${post.id}`,
-            course_id: course.id,
-            played_date: post.created_at,
-            created_at: post.created_at,
-            rating: null,
-            videoThumbnail: videoThumbnail,
-            videoUrl: videoUrl, // Store the actual video URL for playback
-            golf_courses: {
-              ...course,
-              thumbnail_image: videoThumbnail || course.thumbnail_image // Use video thumbnail as course image for display
-            }
-          };
-        })
-        .filter(Boolean);
-
-      console.log('Highlight Reel - Final course data:', courseData.length, courseData);
-
-      // Apply sorting here to ensure proper order
-      return getSortedUserCourses(courseData, 'recent');
+      // Transform to course format
+      return (top100Data || []).map(course => ({
+        ...course,
+        id: `course-${course.course_id}`,
+        golf_courses: course.golf_courses
+      }));
     },
     enabled: !!userId,
   });
-
   // Filter and sort courses based on active filter and sort option
   const filteredCourses = useMemo(() => {
     let coursesToFilter = allPlayedCourses;
@@ -1284,35 +991,6 @@ interface HLSVideoElement extends HTMLVideoElement {
 
   const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
 
-  // Update first card ID and trigger autoplay when current index changes
-  useEffect(() => {
-    if (filteredCourses.length > 0) {
-      const newFirstCardId = `video-${filteredCourses[currentIndex]?.id}`;
-      if (newFirstCardId !== firstCardId) {
-        console.log('🎥 First card changed from', firstCardId, 'to', newFirstCardId);
-        setFirstCardId(newFirstCardId);
-      }
-    }
-  }, [filteredCourses, currentIndex, firstCardId]);
-
-  // Auto-play first card when it changes and no user interaction
-  useEffect(() => {
-    if (firstCardId && !userInitiated && videoRefs.current.has(firstCardId)) {
-      console.log('🎥 Auto-playing first card:', firstCardId);
-      setTimeout(() => playExclusive(firstCardId, false), 100);
-    }
-  }, [firstCardId, userInitiated, playExclusive]);
-
-  // Cleanup effect for video registrations
-  useEffect(() => {
-    return () => {
-      // Clean up all video registrations when component unmounts
-      videoCleanupRefs.current.forEach(cleanup => cleanup());
-      videoCleanupRefs.current.clear();
-      videoRefs.current.clear();
-    };
-  }, []);
-
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
     onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
@@ -1343,9 +1021,8 @@ interface HLSVideoElement extends HTMLVideoElement {
     }
   };
 
-  // Hide section if no video highlights available
+  // Hide section if no highlights available
   if (isHydrated && filteredCourses.length === 0) {
-    console.log('Highlight Reel - No filtered courses, hiding section');
     return null;
   }
 
@@ -1417,7 +1094,7 @@ interface HLSVideoElement extends HTMLVideoElement {
                   gap: '12px'
                 }}
               >
-                {filteredCourses.map((userCourse, index) => {
+                 {filteredCourses.map((userCourse, index) => {
                   // Calculate responsive width to match Recently Played cards exactly
                   const getCardWidth = () => {
                     if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
@@ -1426,12 +1103,11 @@ interface HLSVideoElement extends HTMLVideoElement {
                     return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible
                   };
 
-                  const isSlotOne = index === currentIndex; // The card in slot one is the one at currentIndex
-                  const videoId = userCourse.id; // userCourse.id already has 'video-' prefix from line 1147
-                  const videoUrl = (userCourse as any).videoUrl || userCourse.golf_courses.thumbnail_image;
+                  // Use static image from course data
+                  const imageUrl = userCourse.golf_courses.thumbnail_image;
                   
-                  // Skip if no valid video URL
-                  if (!videoUrl) {
+                  // Skip if no valid image URL
+                  if (!imageUrl) {
                     return null;
                   }
 
@@ -1447,43 +1123,14 @@ interface HLSVideoElement extends HTMLVideoElement {
                       }}
                     >
                       <div className="aspect-[4/5] w-full relative group">
-                        {/* Video Element - Use HLSVideoCard with external management */}
-                         <HLSVideoCard
-                           key={videoId} // Add key to ensure proper remounting
-                           ref={(videoElement: HTMLVideoElement | null) => {
-                             if (videoElement && !videoRefs.current.has(videoId)) {
-                               const cleanup = registerVideo(videoId, videoElement as HLSVideoElement);
-                               videoCleanupRefs.current.set(videoId, cleanup);
-                             }
-                           }}
-                           hlsUrl={videoUrl}
-                           className="w-full h-full object-cover rounded-lg cursor-pointer"
-                           loop={true}
-                           muted={true}
-                           autoplay={false}
-                           externallyManaged={true}
-                           showMuteButton={false}
-                           onClick={() => {
-                             if (playingVideoId === videoId) {
-                               pauseVideo(videoId);
-                             } else {
-                               playExclusive(videoId, true);
-                             }
-                           }}
-                         />
+                        {/* Static Image Element */}
+                        <img
+                          src={imageUrl}
+                          alt={userCourse.golf_courses.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
 
-                         {/* Video Play Icon - Bottom Right - Hide for playing videos */}
-                         {(playingVideoId !== videoId || isSlotOne) && (
-                           <div className="absolute bottom-3 right-3 z-10 transition-opacity group-hover:opacity-80">
-                             <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
-                               <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-                             </div>
-                           </div>
-                         )}
-
-                          {/* Audio controls removed - muted autoplay only */}
-
-                         {/* Course Info Overlay - removed course name and location */}
+                        {/* Course Info Overlay - removed course name and location */}
                       </div>
                     </div>
                   );
