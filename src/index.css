@@ -105,9 +105,23 @@
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    
+    /* Profile Design System Colors */
+    --profile-bg: 0 0% 100%;
+    --profile-card: 0 0% 100%;
+    --profile-text-primary: 218 11% 6%;
+    --profile-text-secondary: 215 11% 45%;
+    --profile-border-card: 220 14% 93%;
+    --profile-border-tile: 217 12% 94%;
+    --profile-border-button: 220 13% 91%;
+    --profile-accent: 141 15% 57%;
+    
+    /* Profile Shadows */
+    --profile-shadow-card: 0 6px 16px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.06);
+    --profile-shadow-tile: 0 2px 8px rgba(16,24,40,0.06);
 }
 
 /* Hide scrollbars for Netflix-style carousels */
