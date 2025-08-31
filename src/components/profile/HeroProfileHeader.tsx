@@ -768,19 +768,49 @@ const HeroProfileHeader = ({
               </div>
             </div>
             
-            {/* Edit Profile Button */}
+            {/* Action Buttons for Own Profile */}
             {isOwnProfile && (
-              <button
-                onClick={() => setEditDialogOpen(true)}
-                className="w-full py-3 px-4 text-base leading-6 font-semibold rounded-xl border border-solid transition-colors duration-200"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-button))',
-                  color: 'hsl(var(--profile-text-primary))',
-                  backgroundColor: 'hsl(var(--profile-card))'
-                }}
-              >
-                Edit Profile
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() => setEditDialogOpen(true)}
+                  className="w-full py-3 px-4 text-base leading-6 font-semibold rounded-xl border border-solid transition-colors duration-200"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Edit Profile
+                </button>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setMediaManagerOpen(true)}
+                    className="py-2.5 px-3 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200"
+                    style={{
+                      borderColor: 'hsl(var(--profile-border-button))',
+                      color: 'hsl(var(--profile-text-primary))',
+                      backgroundColor: 'hsl(var(--profile-card))'
+                    }}
+                  >
+                    Media Manager
+                  </button>
+                  
+                  {hasImmersiveMedia && (
+                    <button
+                      onClick={previewImmersive}
+                      className="py-2.5 px-3 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200"
+                      style={{
+                        borderColor: 'hsl(var(--profile-border-button))',
+                        color: 'hsl(var(--profile-text-primary))',
+                        backgroundColor: 'hsl(var(--profile-card))'
+                      }}
+                    >
+                      Immersive Preview
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
           </div>
           
