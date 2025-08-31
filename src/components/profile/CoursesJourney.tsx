@@ -1388,6 +1388,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                               showRatingOnRight={true}
                               currentUserId={currentUser?.id}
                               profileOwnerFirstName={profileOwner?.display_name}
+                              badgesOnTop={true}
                             />
                        </div>
                     </div>
@@ -1810,6 +1811,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                         customHeight="h-full"
                         currentUserId={userId}
                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                        badgesOnTop={true}
                       />
                     </div>
                   </div>
@@ -2182,6 +2184,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                         customHeight="h-full"
                         currentUserId={userId}
                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                        badgesOnTop={true}
                       />
                     </div>
                   </div>
@@ -2553,6 +2556,7 @@ const USASection: React.FC<USASectionProps> = ({
                         customHeight="h-full"
                         currentUserId={userId}
                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                        badgesOnTop={true}
                       />
                     </div>
                   </div>
@@ -2924,6 +2928,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                         customHeight="h-full"
                         currentUserId={userId}
                         profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                        badgesOnTop={true}
                       />
                     </div>
                   </div>

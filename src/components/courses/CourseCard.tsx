@@ -46,6 +46,7 @@ interface CourseCardProps {
   showRatingOnRight?: boolean;
   currentUserId?: string;
   profileOwnerFirstName?: string;
+  badgesOnTop?: boolean;
 }
 
 
@@ -69,7 +70,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   mobileFlagSize = 'lg',
   showRatingOnRight = false,
   currentUserId,
-  profileOwnerFirstName
+  profileOwnerFirstName,
+  badgesOnTop = false
 }) => {
   const navigate = useNavigate();
   
@@ -94,8 +96,13 @@ const CourseCard: React.FC<CourseCardProps> = ({
           courseName={course.name}
         />
 
-        {/* Course ranking badges - positioned at top-left - conditionally hide */}
-        {!hideRankingBadges && !showRatingOnRight && (
+        {/* Enhanced bottom gradient for better text readability when badges are on top */}
+        {badgesOnTop && (
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-0" />
+        )}
+
+        {/* Course ranking badges - new split layout for badgesOnTop */}
+        {badgesOnTop ? (
           <CourseRankBadges
             globalRank={course.global_rank}
             regionalRank={course.regional_rank}
@@ -106,87 +113,112 @@ const CourseCard: React.FC<CourseCardProps> = ({
             showUserRating={showUserRating}
             averageRating={course.average_rating}
             showAverageRating={showAverageRating}
-            positioning="top-left"
+            splitBadges={true}
             xp={xp}
             showXP={showXP}
           />
+        ) : (
+          /* Original badge layout */
+          !hideRankingBadges && !showRatingOnRight && (
+            <CourseRankBadges
+              globalRank={course.global_rank}
+              regionalRank={course.regional_rank}
+              usaRank={course.usa_rank}
+              country={course.country}
+              viewContext={viewContext}
+              userRating={userRating}
+              showUserRating={showUserRating}
+              averageRating={course.average_rating}
+              showAverageRating={showAverageRating}
+              positioning="top-left"
+              xp={xp}
+              showXP={showXP}
+            />
+          )
         )}
 
-
-        {/* Course Information Overlay - positioned at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
+        {/* Course Information Overlay */}
+        <div className={badgesOnTop ? 
+          "absolute bottom-0 left-0 right-0 p-4 z-10" : 
+          "absolute bottom-0 left-0 right-0 p-4"
+        }>
           {/* XP earned - show above course name for recently played cards */}
-          {showXP && xp && (
+          {showXP && xp && !badgesOnTop && (
             <div className={`${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} text-white/90 leading-tight mb-1 drop-shadow-lg`}>
               {xp} XP
             </div>
           )}
           
-           {/* Course Name - with truncation and hover for recently played cards */}
-           <h3 
-             className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP ? 'line-clamp-2 cursor-pointer' : ''}`}
-             title={showXP ? course.name : undefined}
-           >
-             {course.name}
-           </h3>
+          {/* Course Name - positioned at bottom when badgesOnTop is true */}
+          <h3 
+            className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg group-hover:text-white/80 transition-colors ${showXP && !badgesOnTop ? 'line-clamp-2 cursor-pointer' : ''} ${badgesOnTop ? 'font-semibold' : ''}`}
+            title={showXP && !badgesOnTop ? course.name : undefined}
+          >
+            {course.name}
+          </h3>
           
-           {/* AI Quote or Location or Ranking Badges */}
-           {showAIQuote ? (
-             <CourseCardAIQuote 
-               courseName={course.name}
-               country={course.country}
-               enabled={showAIQuote}
-               mobileTextScale={mobileTextScale}
-             />
-            ) : showRatingOnRight ? (
-             // Show ranking badges and average rating for Top 10 Rated cards
-             <div className="flex items-center justify-between">
-               <div className="flex flex-wrap gap-2">
-                <CourseRankBadges
-                  globalRank={course.global_rank}
-                  regionalRank={course.regional_rank}
-                  usaRank={course.usa_rank}
+          {/* Content below course name - hide when badgesOnTop to keep title at bottom edge */}
+          {!badgesOnTop && (
+            <>
+              {/* AI Quote or Location or Ranking Badges */}
+              {showAIQuote ? (
+                <CourseCardAIQuote 
+                  courseName={course.name}
                   country={course.country}
-                  positioning="bottom-left"
-                  showUserRating={false}
-                  averageRating={course.average_rating}
-                  showAverageRating={true}
-                  showXP={false}
+                  enabled={showAIQuote}
+                  mobileTextScale={mobileTextScale}
                 />
-              </div>
-               {/* User Rating in liquid glass container */}
-               {userRating && showUserRating && (
-                 <TooltipProvider>
-                   <Tooltip>
-                     <TooltipTrigger asChild>
-                       <div 
-                         className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
-                         style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
-                         onClick={(e) => e.stopPropagation()}
-                       >
-                         <div className="relative z-10 flex items-center gap-1.5">
-                           <span className="text-sm font-bold text-white">{userRating}/10</span>
-                         </div>
-                       </div>
-                     </TooltipTrigger>
-                     <TooltipContent>
-                       <p>
-                         {currentUserId === viewingUserId ? 'Your rating' : `${profileOwnerFirstName || 'User'}'s rating`}
-                       </p>
-                     </TooltipContent>
-                   </Tooltip>
-                 </TooltipProvider>
-               )}
-            </div>
-           ) : (
-             showCountryWithFlag && (
-               <CourseCardLocation 
-                 course={course}
-                 mobileTextScale={mobileTextScale}
-                 mobileFlagSize={mobileFlagSize}
-               />
-             )
-           )}
+              ) : showRatingOnRight ? (
+                // Show ranking badges and average rating for Top 10 Rated cards
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap gap-2">
+                   <CourseRankBadges
+                     globalRank={course.global_rank}
+                     regionalRank={course.regional_rank}
+                     usaRank={course.usa_rank}
+                     country={course.country}
+                     positioning="bottom-left"
+                     showUserRating={false}
+                     averageRating={course.average_rating}
+                     showAverageRating={true}
+                     showXP={false}
+                   />
+                 </div>
+                  {/* User Rating in liquid glass container */}
+                  {userRating && showUserRating && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div 
+                            className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                            style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="relative z-10 flex items-center gap-1.5">
+                              <span className="text-sm font-bold text-white">{userRating}/10</span>
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {currentUserId === viewingUserId ? 'Your rating' : `${profileOwnerFirstName || 'User'}'s rating`}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+               </div>
+              ) : (
+                showCountryWithFlag && (
+                  <CourseCardLocation 
+                    course={course}
+                    mobileTextScale={mobileTextScale}
+                    mobileFlagSize={mobileFlagSize}
+                  />
+                )
+              )}
+            </>
+          )}
         </div>
       </div>
     </>

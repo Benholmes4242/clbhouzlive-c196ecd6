@@ -17,9 +17,10 @@ interface CourseRankBadgesProps {
   showUserRating?: boolean;
   averageRating?: number | null;
   showAverageRating?: boolean;
-  positioning?: 'top-left' | 'bottom-left';
+  positioning?: 'top-left' | 'bottom-left' | 'top-right';
   xp?: number;
   showXP?: boolean;
+  splitBadges?: boolean;
 }
 
 const CourseRankBadges = ({ 
@@ -34,7 +35,8 @@ const CourseRankBadges = ({
   showAverageRating = false,
   positioning = 'top-left',
   xp,
-  showXP = false
+  showXP = false,
+  splitBadges = false
 }: CourseRankBadgesProps) => {
   // Check for GB&I countries - including all possible variations
   const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
@@ -100,11 +102,74 @@ const CourseRankBadges = ({
     switch (positioning) {
       case 'bottom-left':
         return 'absolute bottom-3 left-4 flex flex-row gap-2 z-10';
+      case 'top-right':
+        return 'absolute top-2 right-2 flex flex-row items-center gap-1.5 z-10';
       case 'top-left':
       default:
         return 'absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10';
     }
   };
+
+  // When splitBadges is true, separate ranking badges (left) from rating badges (right)
+  if (splitBadges) {
+    const rankingBadgesOnly = rankingBadges.filter(badge => 
+      badge.tooltip !== "Clbhouz Community Rating"
+    );
+    const ratingBadgesOnly = [...(showUserRating && userRating ? [{ content: `${userRating}/10`, tooltip: "Your Rating" }] : [])];
+    
+    return (
+      <TooltipProvider>
+        {/* Left cluster: Ranking badges (globe, flags) */}
+        {rankingBadgesOnly.length > 0 && (
+          <div className="absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10">
+            {rankingBadgesOnly.map((badge, index) => (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="relative flex items-center justify-center px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                    style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="relative z-10 flex items-center justify-center gap-1.5">
+                      {badge.icon}
+                      <span className="text-sm font-bold text-white flex items-center">{badge.rank}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{badge.tooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        )}
+
+        {/* Right cluster: Rating badge */}
+        {ratingBadgesOnly.length > 0 && (
+          <div className="absolute top-2 right-2 flex flex-row items-center gap-1.5 z-10">
+            {ratingBadgesOnly.map((badge, index) => (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                    style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="relative z-10 flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-white">{badge.content}</span>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{badge.tooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        )}
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TooltipProvider>
