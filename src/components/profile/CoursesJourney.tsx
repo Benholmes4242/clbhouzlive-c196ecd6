@@ -2145,7 +2145,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -2517,7 +2517,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -2888,7 +2888,7 @@ const USASection: React.FC<USASectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
@@ -3259,7 +3259,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     className="flex-shrink-0 snap-start snap-always"
                     style={{ width: getCardWidth() }}
                   >
-                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.4]' : 'aspect-[2.5/0.8]'}`}>
+                    <div className={`w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                       <CourseCard 
                         course={userCourse.golf_courses}
                         viewingUserId={userId}
