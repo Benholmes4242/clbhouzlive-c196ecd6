@@ -15,6 +15,7 @@ interface HLSVideoCardProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
+  onEnded?: () => void;
   externallyManaged?: boolean; // Disable internal autoplay when externally managed
 }
 
@@ -38,6 +39,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   onPlay,
   onPause,
   onClick,
+  onEnded,
   externallyManaged = false
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -221,6 +223,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         poster={poster}
         preload="metadata"
         onClick={handleVideoClick}
+        onEnded={onEnded}
       />
       
       {showMuteButton && (

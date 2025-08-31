@@ -12,6 +12,7 @@ interface EnhancedVideoPlayerProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClick?: () => void;
+  onEnded?: () => void;
   enableHLS?: boolean; // Enable HLS streaming
   adaptiveBitrate?: boolean; // Enable adaptive bitrate
   preloadLevel?: 'none' | 'metadata' | 'auto';
@@ -49,7 +50,8 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   onVolumeChange,
   onSeeking,
   onSeeked,
-  onClick
+  onClick,
+  onEnded
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -78,6 +80,7 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
         onClick={onClick}
         onPlay={() => onLoad?.()}
         onPause={() => {}}
+        onEnded={onEnded}
       />
     );
   }
@@ -105,6 +108,7 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
       onVolumeChange={onVolumeChange}
       onSeeking={onSeeking}
       onSeeked={onSeeked}
+      onEnded={onEnded}
       style={{
         objectFit: objectFit === 'smart' ? 'cover' : objectFit
       }}

@@ -324,28 +324,29 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   useEffect(() => {
     if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading) return;
 
-    // For videos, don't start timer if paused or if we haven't started playing yet
-    if (currentItem.media_type === 'video' && isVideoPaused) return;
+    // Only use timer for images, videos will use onEnded callback for auto-advance
+    if (currentItem.media_type === 'image') {
+      const duration = 3000; // 3 seconds for images
+      
+      // Only start timer if we don't already have one running
+      if (!intervalRef.current) {
+        startTimeRef.current = Date.now();
+        setProgress(0);
 
-    const duration = currentItem.media_type === 'image' ? 3000 : currentItem.duration;
-    
-    // Only start timer if we don't already have one running
-    if (!intervalRef.current) {
-      startTimeRef.current = Date.now();
-      setProgress(0);
+        const updateProgress = () => {
+          const elapsed = Date.now() - startTimeRef.current;
+          const newProgress = Math.min((elapsed / duration) * 100, 100);
+          setProgress(newProgress);
 
-      const updateProgress = () => {
-        const elapsed = Date.now() - startTimeRef.current;
-        const newProgress = Math.min((elapsed / duration) * 100, 100);
-        setProgress(newProgress);
+          if (newProgress >= 100) {
+            handleNext();
+          }
+        };
 
-        if (newProgress >= 100) {
-          handleNext();
-        }
-      };
-
-      intervalRef.current = setInterval(updateProgress, 50);
+        intervalRef.current = setInterval(updateProgress, 50);
+      }
     }
+    // For videos, progress is handled by the video duration and onEnded callback
 
     return () => {
       if (intervalRef.current) {
@@ -353,7 +354,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         intervalRef.current = null;
       }
     };
-  }, [isOpen, currentItem, isTransitioning, handleNext, isVideoPaused]);
+  }, [isOpen, currentItem, isTransitioning, handleNext]);
 
   // Reset video pause state when changing media
   useEffect(() => {
@@ -447,18 +448,23 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             poster={currentItem.thumbnail_url}
             autoplay={true}
             muted={isGloballyMuted}
-            loop={true}
+            loop={false} // Disable loop so video can end and trigger onEnded
             enableHLS={true}
             className="w-full h-full"
             onPlay={() => {
               setIsVideoPaused(false);
-              // Start progress timer when video actually starts playing
-              if (!intervalRef.current) {
-                startTimeRef.current = Date.now();
-                setProgress(0);
-              }
+              // Don't start progress timer for videos - they use onEnded callback
             }}
             onPause={() => setIsVideoPaused(true)}
+            onEnded={() => {
+              // Clear any existing timer
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+              }
+              // Auto-advance to next video
+              handleNext();
+            }}
           />
         ) : (
           <img
