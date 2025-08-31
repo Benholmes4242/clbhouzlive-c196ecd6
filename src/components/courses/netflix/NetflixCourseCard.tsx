@@ -69,11 +69,21 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
     ? 'shadow-lg shadow-black/20' 
     : 'shadow-md shadow-black/15';
   
-  // Text sizing - larger for Row 1 (Recently Played)
+  // Text sizing - larger for Row 1 (Recently Played), smaller for region cards on mobile
+  const isRegionCard = ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'].some(region => 
+    course.region === region || course.name?.includes(region)
+  );
+  
   const textSizing = size === 'large' ? {
     title: 'text-base md:text-lg font-bold',
     badge: 'text-xs',
     rating: 'text-base md:text-lg font-bold',
+    xp: 'text-xs font-semibold'
+  } : isRegionCard ? {
+    // Smaller text for region cards on mobile to match Recently Played scale
+    title: 'text-xs sm:text-sm md:text-base font-bold', 
+    badge: 'text-xs',
+    rating: 'text-xs sm:text-sm md:text-base font-bold',
     xp: 'text-xs font-semibold'
   } : {
     title: 'text-sm md:text-base font-bold', 

@@ -121,9 +121,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             else if (isHighlightReel) {
               widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
             }
-            // Courses by Region: Same as Recently Played (3:4 portrait)
+            // Courses by Region: Match Recently Played sizing (2.5 cards on mobile)
             else if (isCoursesByRegion) {
-              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+              widthClasses = 'flex-shrink-0 w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
             }
             // Default fallback
             else {
