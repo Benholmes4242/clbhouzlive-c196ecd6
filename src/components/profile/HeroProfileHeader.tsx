@@ -787,23 +787,23 @@ const HeroProfileHeader = ({
           
           {/* Stats Tiles */}
           <div className="px-3 mt-4 mb-4">
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-4 gap-2">
               {/* Posts */}
               <div 
-                className="bg-white rounded-[14px] border border-solid p-3 text-center min-h-[74px] flex flex-col justify-center"
+                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
                 style={{
                   borderColor: 'hsl(var(--profile-border-tile))',
                   boxShadow: 'var(--profile-shadow-tile)'
                 }}
               >
                 <div 
-                  className="text-xl leading-6 font-bold"
+                  className="text-lg leading-5 font-bold"
                   style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
                   {postsCount}
                 </div>
                 <div 
-                  className="text-sm leading-5 font-medium"
+                  className="text-xs leading-4 font-medium"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
                   Posts
@@ -812,20 +812,20 @@ const HeroProfileHeader = ({
               
               {/* XP */}
               <div 
-                className="bg-white rounded-[14px] border border-solid p-3 text-center min-h-[74px] flex flex-col justify-center"
+                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
                 style={{
                   borderColor: 'hsl(var(--profile-border-tile))',
                   boxShadow: 'var(--profile-shadow-tile)'
                 }}
               >
                 <div 
-                  className="text-xl leading-6 font-bold"
+                  className="text-lg leading-5 font-bold"
                   style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
                   2,500
                 </div>
                 <div 
-                  className="text-sm leading-5 font-medium"
+                  className="text-xs leading-4 font-medium"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
                   Total XP
@@ -834,20 +834,20 @@ const HeroProfileHeader = ({
               
               {/* Following */}
               <div 
-                className="bg-white rounded-[14px] border border-solid p-3 text-center min-h-[74px] flex flex-col justify-center"
+                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
                 style={{
                   borderColor: 'hsl(var(--profile-border-tile))',
                   boxShadow: 'var(--profile-shadow-tile)'
                 }}
               >
                 <div 
-                  className="text-xl leading-6 font-bold"
+                  className="text-lg leading-5 font-bold"
                   style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
                   {followingCount}
                 </div>
                 <div 
-                  className="text-sm leading-5 font-medium"
+                  className="text-xs leading-4 font-medium"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
                   Following
@@ -856,20 +856,20 @@ const HeroProfileHeader = ({
               
               {/* Followers */}
               <div 
-                className="bg-white rounded-[14px] border border-solid p-3 text-center min-h-[74px] flex flex-col justify-center"
+                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
                 style={{
                   borderColor: 'hsl(var(--profile-border-tile))',
                   boxShadow: 'var(--profile-shadow-tile)'
                 }}
               >
                 <div 
-                  className="text-xl leading-6 font-bold"
+                  className="text-lg leading-5 font-bold"
                   style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
                   {followersCount}
                 </div>
                 <div 
-                  className="text-sm leading-5 font-medium"
+                  className="text-xs leading-4 font-medium"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
                   Followers
