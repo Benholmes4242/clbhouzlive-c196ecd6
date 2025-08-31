@@ -14,7 +14,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast as useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
@@ -769,19 +768,47 @@ const HeroProfileHeader = ({
               </div>
             </div>
             
-            {/* Edit Profile Button */}
+            {/* Action Buttons for Own Profile */}
             {isOwnProfile && (
-              <button
-                onClick={() => setEditDialogOpen(true)}
-                className="w-full py-3 px-4 text-base leading-6 font-semibold rounded-xl border border-solid transition-colors duration-200"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-button))',
-                  color: 'hsl(var(--profile-text-primary))',
-                  backgroundColor: 'hsl(var(--profile-card))'
-                }}
-              >
-                Edit Profile
-              </button>
+              <div className={`grid gap-2 ${hasImmersiveMedia ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <button
+                  onClick={() => setEditDialogOpen(true)}
+                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  {"Edit\nProfile"}
+                </button>
+                
+                <button
+                  onClick={() => setMediaManagerOpen(true)}
+                  className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  {"Media\nManager"}
+                </button>
+                
+                {hasImmersiveMedia && (
+                  <button
+                    onClick={previewImmersive}
+                    className="py-2.5 px-2 text-sm font-semibold rounded-xl border border-solid transition-colors duration-200 leading-tight whitespace-pre-line"
+                    style={{
+                      borderColor: 'hsl(var(--profile-border-button))',
+                      color: 'hsl(var(--profile-text-primary))',
+                      backgroundColor: 'hsl(var(--profile-card))'
+                    }}
+                  >
+                    {"Immersive\nPreview"}
+                  </button>
+                )}
+              </div>
             )}
           </div>
           
