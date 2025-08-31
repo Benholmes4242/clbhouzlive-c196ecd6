@@ -476,7 +476,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
       {/* Courses by Region Section - 16px below Highlights */}
       <div className="mt-2"> {/* 8px spacing */}
-        <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} />
+        <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       </div>
     </div>
   );
@@ -1414,11 +1414,13 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 interface CoursesbyRegionSectionProps {
   userId?: string;
   isOwnProfile?: boolean;
+  userDisplayName?: string;
 }
 
 const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({ 
   userId,
-  isOwnProfile = false
+  isOwnProfile = false,
+  userDisplayName
 }) => {
   return (
     <div className="w-full px-4 pt-2 pb-8 mb-0">
@@ -1434,16 +1436,16 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       {/* Reordered sections: Worldwide, USA, Great Britain & Ireland, Continental Europe */}
       
       {/* Worldwide Section */}
-      <WorldwideConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <WorldwideConditionalSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       
       {/* USA Section */}
-      <USAConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <USAConditionalSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       
       {/* Great Britain & Ireland Section */}
-      <GreatBritainIrelandConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <GreatBritainIrelandConditionalSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       
       {/* Continental Europe Section */}
-      <ContinentalEuropeConditionalSection userId={userId} isOwnProfile={isOwnProfile} />
+      <ContinentalEuropeConditionalSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
     </div>
   );
 };
@@ -2952,9 +2954,10 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
 interface ConditionalSectionProps {
   userId?: string;
   isOwnProfile?: boolean;
+  userDisplayName?: string;
 }
 
-const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
   const { data: courses = [] } = useQuery({
     queryKey: ['worldwideCourses', userId],
     queryFn: async () => {
@@ -3070,7 +3073,9 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
                 >
                   <div className="w-full h-full flex items-center justify-center">
                     <p className="text-muted-foreground text-center">
-                      {isOwnProfile ? "You haven't played any worldwide courses yet." : "No worldwide courses found."}
+                      {isOwnProfile 
+                        ? "You haven't played any worldwide courses yet." 
+                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any worldwide courses yet.`}
                     </p>
                   </div>
                 </div>
@@ -3091,7 +3096,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
   );
 };
 
-const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
   const { data: courses = [] } = useQuery({
     queryKey: ['usaCoursesCheck', userId],
     queryFn: async () => {
@@ -3158,7 +3163,9 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
                 >
                   <div className="w-full h-full flex items-center justify-center">
                     <p className="text-muted-foreground text-center">
-                      {isOwnProfile ? "You haven't played any USA courses yet." : "No USA courses found."}
+                      {isOwnProfile 
+                        ? "You haven't played any USA courses yet." 
+                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any USA courses yet.`}
                     </p>
                   </div>
                 </div>
@@ -3171,7 +3178,7 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
   );
 };
 
-const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
   const { data: courses = [] } = useQuery({
     queryKey: ['gbIrelandCoursesCheck', userId],
     queryFn: async () => {
@@ -3236,7 +3243,9 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
                 >
                   <div className="w-full h-full flex items-center justify-center">
                     <p className="text-muted-foreground text-center">
-                      {isOwnProfile ? "You haven't played any Great Britain & Ireland courses yet." : "No Great Britain & Ireland courses found."}
+                      {isOwnProfile 
+                        ? "You haven't played any Great Britain & Ireland courses yet." 
+                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any Great Britain & Ireland courses yet.`}
                     </p>
                   </div>
                 </div>
@@ -3257,7 +3266,7 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
   );
 };
 
-const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile }) => {
+const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
   const { data: courses = [] } = useQuery({
     queryKey: ['europeCoursesCheck', userId],
     queryFn: async () => {
@@ -3373,7 +3382,9 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
                 >
                   <div className="w-full h-full flex items-center justify-center">
                     <p className="text-muted-foreground text-center">
-                      {isOwnProfile ? "You haven't played any Continental Europe courses yet." : "No Continental Europe courses found."}
+                      {isOwnProfile 
+                        ? "You haven't played any Continental Europe courses yet." 
+                        : `${userDisplayName?.split(' ')[0] || 'User'} hasn't played any Continental Europe courses yet.`}
                     </p>
                   </div>
                 </div>
