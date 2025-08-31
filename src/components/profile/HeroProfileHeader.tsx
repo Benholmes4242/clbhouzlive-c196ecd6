@@ -715,7 +715,7 @@ const HeroProfileHeader = ({
           {/* Overlapping White Card */}
           <div 
             ref={profileCardRef}
-            className="relative mx-3 -mt-14 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
+            className="relative mx-3 -mt-4 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
             style={{
               borderColor: 'hsl(var(--profile-border-card))',
               boxShadow: 'var(--profile-shadow-card)'
@@ -926,7 +926,7 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Overlapping White Card - Desktop styling */}
-          <div className="relative mx-auto max-w-2xl -mt-16 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
+          <div className="relative mx-auto max-w-2xl -mt-6 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
             style={{
               borderColor: 'hsl(var(--profile-border-card))',
               boxShadow: 'var(--profile-shadow-card)'
