@@ -80,9 +80,6 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
       {!isMobile && isCollapsed && (
         <div className="absolute inset-0 backdrop-blur-sm bg-black/20" />
       )}
-
-      {/* White fade at bottom edge */}
-      <div className="absolute bottom-0 left-0 right-0 h-[10px] bg-gradient-to-b from-transparent to-white" />
     </div>
   );
 };
