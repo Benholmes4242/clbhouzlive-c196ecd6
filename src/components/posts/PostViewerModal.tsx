@@ -280,7 +280,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     <HighQualityImage
                       src={currentMedia.media_url}
                       alt="Post content"
-                      className=""
+                      className="w-full h-full object-contain"
                       objectFit="contain"
                     />
                   )}
@@ -495,7 +495,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       <HighQualityImage
                         src={currentMedia.media_url}
                         alt="Post content"
-                        className=""
+                        className="w-full h-full object-contain"
                         objectFit="contain"
                       />
                     )}
