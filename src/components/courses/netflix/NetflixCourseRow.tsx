@@ -3,7 +3,6 @@ import NetflixCourseCard from './NetflixCourseCard';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { COURSE_CARD_WIDTH_CLASSES } from './shared-card-styles';
 
 interface RegionClickHandler {
   (region: string): void;
@@ -107,12 +106,34 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           
           {/* Regular course cards */}
           {courses.slice(hasHeroBanner ? 1 : 0).map((course, index) => {
-            // All course cards now use the same responsive width classes
-            const widthClasses = COURSE_CARD_WIDTH_CLASSES;
-            
-            // Determine card type based on row title for special styling props
+            // Responsive width classes based on breakpoints and section type
+            const isRecentlyPlayed = title === "Recently Played";
             const isTopRated = title.includes("Top 10 Rated");
             const isHighlightReel = title.includes("Highlight");
+            const isCoursesByRegion = title === "Courses by Region" || ['Great Britain & Ireland', 'Europe', 'USA', 'Worldwide'].includes(title);
+            
+            let widthClasses = '';
+            
+            // Recently Played: Mobile: 2.5 cards, Desktop: 4, Laptop: 3, Tablet: 2 cards visible
+            if (isRecentlyPlayed) {
+              widthClasses = 'w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]';
+            }
+            // Top 10 Rated: Feature-wide cards with specific peek percentages
+            else if (isTopRated) {
+              widthClasses = 'w-[calc(92vw-2rem)] sm:w-[calc(94vw-3rem)] md:w-[calc(92vw-4rem)] lg:w-[calc(90vw-5rem)] xl:w-[calc(80vw-6rem)]';
+            }
+            // Highlight Reel: Slightly shorter than Recently Played but wider cards
+            else if (isHighlightReel) {
+              widthClasses = 'w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
+            }
+            // Courses by Region: Match Recently Played sizing (2.5 cards on mobile)
+            else if (isCoursesByRegion) {
+              widthClasses = 'w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
+            }
+            // Default fallback
+            else {
+              widthClasses = 'w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
+            }
             
             const cardTransition = isFirstRow 
               ? 'transition-all duration-200 ease-out' 
