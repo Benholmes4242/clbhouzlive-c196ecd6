@@ -158,6 +158,11 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
   const isActive = activeId === highlight.id;
 
+  // Memoize the onReady callback to prevent infinite re-renders
+  const handleVideoReady = useCallback((el: HTMLVideoElement) => {
+    register(highlight.id, el);
+  }, [register, highlight.id]);
+
   // For videos, use the HLS URL directly without calling any Cloudflare functions
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
   const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
@@ -228,7 +233,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
               poster={thumbnailUrl || undefined}
               playing={isActive}
               muted={mutedPref}
-              onReady={(el) => register(highlight.id, el)}
+              onReady={handleVideoReady}
             />
             
             {/* Clickable layer for video control */}
