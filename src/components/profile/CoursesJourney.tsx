@@ -947,7 +947,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const highlightReelRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -1000,7 +1000,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <div 
-              ref={handleRefCallback}
+              ref={highlightReelRefCallback}
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
@@ -1192,7 +1192,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const topRatedRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -1240,7 +1240,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             </div>
           ) : topRatedCourses.length > 0 ? (
             <div 
-              ref={handleRefCallback} 
+              ref={topRatedRefCallback}
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
@@ -1519,7 +1519,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const gbIrelandRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -1550,7 +1550,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={handleRefCallback}
+                ref={gbIrelandRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
@@ -1788,7 +1788,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const worldwideRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -2058,7 +2058,7 @@ const USASection: React.FC<USASectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const usaRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -2088,7 +2088,7 @@ const USASection: React.FC<USASectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={handleRefCallback}
+                ref={usaRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
@@ -2230,7 +2230,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   });
 
   // Combined ref callback for both carousel and swipe functionality
-  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+  const europeRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
     swipeRef.current = node;
   }, [combinedRef, swipeRef]);
@@ -2260,7 +2260,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={handleRefCallback}
+                ref={europeRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
