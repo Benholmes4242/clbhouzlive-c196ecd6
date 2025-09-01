@@ -768,9 +768,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               ref={carouselRef}
               className="overflow-x-auto scrollbar-hide"
               style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
               }}
             >
               <div 
@@ -796,9 +795,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       data-card
                       className="flex-shrink-0"
                       style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
+                        width: getCardWidth()
                       }}
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
