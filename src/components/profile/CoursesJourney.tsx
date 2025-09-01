@@ -1621,15 +1621,12 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gbIrelandCourses.length]);
 
-  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
+  // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
-    if (windowWidth >= 768) {
-      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
-      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
-    } else {
-      // Mobile: 2.5 cards visible to match Recently Played
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
-    }
+    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards to match Recently Played
+    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards to match Recently Played  
+    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
+    return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
 
   const combinedRef = useCallback((node: HTMLDivElement | null) => {
@@ -1905,15 +1902,12 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [worldwideCourses.length]);
 
-  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
+  // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
-    if (windowWidth >= 768) {
-      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
-      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
-    } else {
-      // Mobile: 2.5 cards visible to match Recently Played
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
-    }
+    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards to match Recently Played
+    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards to match Recently Played  
+    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
+    return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
 
   const combinedRef = useCallback((node: HTMLDivElement | null) => {
@@ -2190,15 +2184,12 @@ const USASection: React.FC<USASectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [usaCourses.length]);
 
-  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
+  // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
-    if (windowWidth >= 768) {
-      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
-      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
-    } else {
-      // Mobile: 2.5 cards visible to match Recently Played
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
-    }
+    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards to match Recently Played
+    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards to match Recently Played  
+    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
+    return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
 
   const combinedRef = useCallback((node: HTMLDivElement | null) => {
@@ -2377,15 +2368,12 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [europeCourses.length]);
 
-  // Calculate card dimensions - match Recently Played sizing (2.5 cards on mobile)
+  // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
-    if (windowWidth >= 768) {
-      // Desktop: 3.2 cards visible (3 full + 0.2 peek)
-      return `calc(31.25% - 3.75px)`; // 100% / 3.2 = 31.25%, gap adjustment: 12px / 3.2 = 3.75px
-    } else {
-      // Mobile: 2.5 cards visible to match Recently Played
-      return `calc(40vw - 5px)`; // 40% width per card for 2.5 cards visible
-    }
+    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards to match Recently Played
+    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards to match Recently Played  
+    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
+    return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
 
   const combinedRef = useCallback((node: HTMLDivElement | null) => {
