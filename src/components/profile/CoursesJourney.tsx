@@ -1698,18 +1698,10 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     scroll
   } = useCarouselNavigation(worldwideCourses.length);
 
-  // Combine with swipe gestures
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50
-  });
-
-  // Combined ref callback for both carousel and swipe functionality
+  // Native touch scrolling only - no programmatic swipe paging
   const worldwideRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
-    swipeRef.current = node;
-  }, [combinedRef, swipeRef]);
+  }, [combinedRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -1954,18 +1946,10 @@ const USASection: React.FC<USASectionProps> = ({
     scroll
   } = useCarouselNavigation(usaCourses.length);
 
-  // Combine with swipe gestures
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50
-  });
-
-  // Combined ref callback for both carousel and swipe functionality
+  // Native touch scrolling only - no programmatic swipe paging
   const usaRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
-    swipeRef.current = node;
-  }, [combinedRef, swipeRef]);
+  }, [combinedRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -2112,18 +2096,10 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     scroll
   } = useCarouselNavigation(europeCourses.length);
 
-  // Combine with swipe gestures
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50
-  });
-
-  // Combined ref callback for both carousel and swipe functionality
+  // Native touch scrolling only - no programmatic swipe paging
   const europeRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
-    swipeRef.current = node;
-  }, [combinedRef, swipeRef]);
+  }, [combinedRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
