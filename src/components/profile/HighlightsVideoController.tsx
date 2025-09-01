@@ -67,8 +67,29 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
       pause(activeId);
     }
     
-    const el = playersRef.current.get(id);
-    console.log('🎥 Found element for play:', id, !!el);
+    // Set active first to trigger HLSPlayer render
+    setActiveId(id);
+    
+    // Wait for element to be registered (with retry mechanism)
+    const waitForElement = () => {
+      return new Promise<PlayerEl | null>((resolve) => {
+        const checkElement = (attempts = 0) => {
+          const el = playersRef.current.get(id);
+          if (el) {
+            console.log('🎥 Found element for play:', id, 'after', attempts, 'attempts');
+            resolve(el);
+          } else if (attempts < 10) {
+            setTimeout(() => checkElement(attempts + 1), 50);
+          } else {
+            console.warn('🎥 Element not found after retries:', id);
+            resolve(null);
+          }
+        };
+        checkElement();
+      });
+    };
+    
+    const el = await waitForElement();
     if (!el) return;
     
     // RULE: new video adopts previous card's audio state
@@ -76,7 +97,6 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     
     try {
       await el.play?.();
-      setActiveId(id);
       console.log('🎥 Successfully started playing:', id);
     } catch (error) {
       console.warn('Failed to play video:', error);
