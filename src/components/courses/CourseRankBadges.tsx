@@ -112,9 +112,9 @@ const CourseRankBadges = ({
     });
   }
 
-  // Player rating badge (separate from rankings) - remove star emoji, just use numbers
+  // Player rating badge (separate from rankings) - add star emoji
   const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
-    content: `${userRating}/10`,
+    content: `⭐ ${userRating}/10`,
     tooltip: "Your Rating"
   } : null;
 
@@ -154,7 +154,7 @@ const CourseRankBadges = ({
       }] : []),
       // Add user rating badge
       ...(showUserRating && userRating ? [{ 
-        content: `${userRating}/10`, 
+        content: `⭐ ${userRating}/10`, 
         tooltip: "Your Rating",
         icon: null 
       }] : [])
