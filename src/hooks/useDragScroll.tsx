@@ -44,13 +44,13 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       const y = e.pageY - element.offsetTop;
       
       if (direction === 'horizontal' || direction === 'both') {
-        const walkX = (x - startX.current) * 2;
+        const walkX = (x - startX.current) * 1;
         const newScrollLeft = scrollLeft.current - walkX;
         element.scrollLeft = newScrollLeft;
       }
       
       if (direction === 'vertical' || direction === 'both') {
-        const walkY = (y - startY.current) * 2;
+        const walkY = (y - startY.current) * 1;
         element.scrollTop = scrollTop.current - walkY;
       }
     };
