@@ -1,11 +1,13 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlights';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { format } from 'date-fns';
 import CountryFlag from '@/components/ui/country-flag';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import SoundToggle from '@/components/ui/sound-toggle';
+import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -118,14 +120,30 @@ interface HighlightCardProps {
 const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Use exclusive video audio for proper audio management
+  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`highlight-${highlight.id}`);
 
-  console.log('HighlightCard - highlight:', highlight.id);
-  console.log('HighlightCard - post_media:', highlight.post_media);
-  console.log('HighlightCard - primaryMedia:', primaryMedia);
+  const handleVideoClick = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+    } else {
+      video.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
 
   // Safety check for media
   if (!primaryMedia) {
-    console.log('HighlightCard - No primary media found');
     return (
       <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="relative h-48 bg-muted flex items-center justify-center">
@@ -161,20 +179,45 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <HLSVideoCard
-            hlsUrl={primaryMedia.media_url}
-            className="w-full h-full rounded-none"
-            aspectRatio="auto"
-            showMuteButton={true}
-            showControls={false}
-            autoplay={false}
-            muted={true}
-            loop={true}
-          />
+          <>
+            <HLSVideoCard
+              ref={videoRef}
+              hlsUrl={primaryMedia.media_url}
+              className="w-full h-full rounded-none"
+              aspectRatio="auto"
+              showMuteButton={false}
+              showControls={false}
+              autoplay={false}
+              muted={videoIsMuted}
+              loop={true}
+              onClick={handleVideoClick}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              externallyManaged={true}
+            />
+            
+            {/* Play button overlay when video is paused */}
+            {!isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-12 h-12 flex items-center justify-center">
+                  <Play className="w-6 h-6 text-white ml-0.5" fill="currentColor" />
+                </div>
+              </div>
+            )}
+            
+            {/* Mute/Unmute Button - Top Right */}
+            <div className="absolute top-3 right-3 z-20">
+              <SoundToggle
+                isMuted={videoIsMuted}
+                onToggle={toggleVideoMute}
+                size="sm"
+              />
+            </div>
+          </>
         )}
         
         {highlight.post_media.length > 1 && (
-          <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
             +{highlight.post_media.length - 1} more
           </div>
         )}
