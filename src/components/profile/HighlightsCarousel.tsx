@@ -163,13 +163,14 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
   const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
 
-  // Register the video element with the controller
+  // Register the video element with the controller when active state changes
   useEffect(() => {
-    if (videoRef.current && primaryMedia?.media_type === 'video') {
+    if (isActive && videoRef.current && primaryMedia?.media_type === 'video') {
       register(highlight.id, videoRef.current);
+    } else if (!isActive) {
+      register(highlight.id, null);
     }
-    return () => register(highlight.id, null);
-  }, [highlight.id, register, primaryMedia?.media_type]);
+  }, [isActive, highlight.id, register, primaryMedia?.media_type]);
 
   const handleVideoClick = async () => {
     if (primaryMedia?.media_type === 'video') {
@@ -225,16 +226,18 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
           />
         ) : isActive ? (
           <>
-            <video
+            <HLSVideoCard
               ref={videoRef}
-              src={primaryMedia.media_url}
-              className="w-full h-full object-cover"
-              playsInline
-              preload="metadata"
-              controls={false}
+              hlsUrl={primaryMedia.media_url}
+              className="w-full h-full rounded-none"
+              aspectRatio="auto"
+              showMuteButton={false}
+              showControls={false}
+              autoplay={true}
               muted={mutedPref}
               loop={true}
               onClick={handleVideoClick}
+              externallyManaged={true}
             />
             
             {/* Mute/Unmute Button - Top Right */}
