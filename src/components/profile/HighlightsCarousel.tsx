@@ -128,7 +128,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
     console.log('HighlightCard - No primary media found');
     return (
       <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-        <div className="relative aspect-video bg-muted flex items-center justify-center">
+        <div className="relative h-48 bg-muted flex items-center justify-center">
           <span className="text-muted-foreground">No media</span>
         </div>
         <div className="p-4">
@@ -136,10 +136,6 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
-              <div className="flex items-center gap-1 mt-1">
-                <CountryFlag country={highlight.golf_course.country} className="w-4 h-3" />
-                <span className="text-xs text-muted-foreground">{highlight.golf_course.country}</span>
-              </div>
             </div>
           </div>
           {highlight.content && (
@@ -155,24 +151,9 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
     );
   }
 
-  const getRankBadge = () => {
-    const { global_rank, regional_rank, usa_rank } = highlight.golf_course;
-    
-    if (global_rank && global_rank <= 100) {
-      return { text: `#${global_rank} World`, variant: 'gold' as const };
-    } else if (usa_rank && usa_rank <= 100) {
-      return { text: `#${usa_rank} USA`, variant: 'blue' as const };
-    } else if (regional_rank && regional_rank <= 100) {
-      return { text: `#${regional_rank} Regional`, variant: 'green' as const };
-    }
-    return null;
-  };
-
-  const rankBadge = getRankBadge();
-
   return (
     <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative aspect-video">
+      <div className="relative h-48">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
@@ -184,22 +165,12 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             hlsUrl={primaryMedia.media_url}
             className="w-full h-full rounded-none"
             aspectRatio="auto"
-            showMuteButton={false}
+            showMuteButton={true}
             showControls={false}
             autoplay={false}
             muted={true}
             loop={true}
           />
-        )}
-        
-        {rankBadge && (
-          <div className={`absolute top-3 left-3 px-2 py-1 rounded-md text-xs font-semibold ${
-            rankBadge.variant === 'gold' ? 'bg-yellow-500 text-yellow-900' :
-            rankBadge.variant === 'blue' ? 'bg-blue-500 text-blue-900' :
-            'bg-green-500 text-green-900'
-          }`}>
-            {rankBadge.text}
-          </div>
         )}
         
         {highlight.post_media.length > 1 && (
@@ -214,10 +185,6 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
           <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
-            <div className="flex items-center gap-1 mt-1">
-              <CountryFlag country={highlight.golf_course.country} className="w-4 h-3" />
-              <span className="text-xs text-muted-foreground">{highlight.golf_course.country}</span>
-            </div>
           </div>
         </div>
         
