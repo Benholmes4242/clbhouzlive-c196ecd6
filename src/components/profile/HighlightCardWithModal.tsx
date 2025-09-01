@@ -125,7 +125,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   return (
     <div 
-      className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
+      className="flex-none w-[40vw] min-w-[160px] max-w-[320px] md:w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
@@ -137,7 +137,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         }
       }}
     >
-      <div className="relative h-56">
+      <div className="relative h-40 md:h-56">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
@@ -216,16 +216,16 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         )}
       </div>
       
-      <div className="p-4">
+      <div className="p-3 md:p-4">
         <div className="flex items-start gap-2 mb-2">
-          <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <MapPin className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
+            <h4 className="font-semibold text-xs md:text-sm truncate">{highlight.golf_course.name}</h4>
           </div>
         </div>
         
         {highlight.content && (
-          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+          <p className="text-xs md:text-sm text-muted-foreground mb-2 line-clamp-2">
             {highlight.content}
           </p>
         )}

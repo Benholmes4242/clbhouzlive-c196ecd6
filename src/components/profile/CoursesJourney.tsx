@@ -994,7 +994,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                     if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible
+                    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible to match Recently Played
                   };
 
                   // Use static image from course data
@@ -1201,12 +1201,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
            ) : topRatedCourses.length > 0 ? (
             <HorizontalCarousel outerRef={topRatedRefCallback}>
                 {topRatedCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Top 10 Rated (wide feature cards with specific peek percentages)
+                  // Calculate responsive width to match Recently Played cards on mobile
                   const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(80vw - 6rem)'; // Desktop: 80% width (20% peek)
-                    if (windowWidth >= 1024) return 'calc(90vw - 5rem)'; // Laptop: 90% width (10% peek)
-                    if (windowWidth >= 768) return 'calc(92vw - 4rem)'; // Tablet: 92% width (8% peek)
-                    return 'calc(92vw - 2rem)'; // Mobile: 92% width (8% peek)
+                    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards to match Recently Played
+                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards to match Recently Played
+                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards to match Recently Played
+                    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible to match Recently Played
                   };
 
                   return (
@@ -1214,8 +1214,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       keyProp={userCourse.id}
                       width={getCardWidth()}
                     >
-                       <div className={`${index === 0 ? 'rated-card ' : ''}w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                            <CourseCard 
+                       <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5]`}>
+                             <CourseCard 
                               course={userCourse.golf_courses}
                               viewingUserId={userId}
                               viewContext="global"
@@ -1231,6 +1231,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                               currentUserId={currentUser?.id}
                               profileOwnerFirstName={profileOwner?.display_name}
                               badgesOnTop={true}
+                              mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                              mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                             />
                        </div>
                     </CarouselItem>

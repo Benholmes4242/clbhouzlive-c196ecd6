@@ -133,7 +133,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
         <div 
           ref={combinedRefCallback}
-          className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
+          className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
