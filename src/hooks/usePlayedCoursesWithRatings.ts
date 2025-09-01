@@ -123,18 +123,6 @@ async function fetchPlayedWithAverages(userId: string) {
     }))
   ];
   
-  console.log('🔍 Fetched played courses from user_top100_courses:', (top100Data ?? []).map(d => ({
-    name: d.golf_courses?.name,
-    country: d.golf_courses?.country,
-    continent: d.golf_courses?.continent
-  })));
-  
-  console.log('🔍 Fetched rated courses from course_ratings:', (ratingsData ?? []).map(d => ({
-    name: d.golf_courses?.name,
-    country: d.golf_courses?.country,
-    continent: d.golf_courses?.continent
-  })));
-  
   return combined as RawPlayedRow[];
 }
 
@@ -166,17 +154,19 @@ function getRegionalSortedCourses(courses: any[]) {
 
 export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   const { data: playedRows, isLoading: playedLoading, error: playedError } = useQuery({
-    queryKey: ["played-courses-with-averages", region, userId], // include region to avoid cache collisions
+    queryKey: ["played-courses-with-averages", userId], // Remove region from cache key to avoid cache misses
     queryFn: () => fetchPlayedWithAverages(userId),
     enabled: !!userId,
-    staleTime: 60_000,
+    staleTime: 5 * 60 * 1000, // 5 minutes - increased for stability
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection time
   });
 
   const { data: userRatings, isLoading: ratingsLoading, error: ratingsError } = useQuery({
     queryKey: ["user-course-ratings", userId],
     queryFn: () => fetchViewerRatings(userId),
     enabled: !!userId,
-    staleTime: 60_000,
+    staleTime: 5 * 60 * 1000, // 5 minutes - increased for stability
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection time
   });
 
   const ratingMap = useMemo(() => {
@@ -228,26 +218,9 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   }, [playedRows, ratingMap, region]);
 
   const regionPlayed = useMemo(() => {
-    console.log(`🔍 [${region}] Starting filter with ${normalized.length} courses`);
-    
-    const filtered = normalized.filter(c => {
-      const match = regionMatch(c.golf_courses.country, c.golf_courses.continent, c.globalRank, region);
-      
-      if (region === 'europe') {
-        console.log(`🏌️ [Continental Europe] Checking course: ${c.golf_courses.name}`, {
-          country: c.golf_courses.country,
-          continent: c.golf_courses.continent,
-          normalizedCountry: (c.golf_courses.country ?? "").toLowerCase(),
-          normalizedContinent: (c.golf_courses.continent ?? "").toLowerCase(),
-          matches: match,
-          courseId: c.course_id
-        });
-      }
-      
-      return match;
-    });
-    
-    console.log(`🎯 [${region}] Filtered to ${filtered.length} courses:`, filtered.map(c => c.golf_courses.name));
+    const filtered = normalized.filter(c => 
+      regionMatch(c.golf_courses.country, c.golf_courses.continent, c.globalRank, region)
+    );
     
     // Remove duplicates based on course_id, preferring rated courses
     const uniqueCoursesMap = new Map();
@@ -259,20 +232,15 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
       if (!existing) {
         uniqueCoursesMap.set(courseId, course);
       } else {
-        // Prefer courses with user ratings
-        if (course.userRating !== null && course.userRating !== undefined && 
-            (existing.userRating === null || existing.userRating === undefined)) {
+        // Prefer courses with user ratings over just played courses
+        if (!isNaN(course.userRating) && isNaN(existing.userRating)) {
           uniqueCoursesMap.set(courseId, course);
         }
       }
     });
 
     const uniqueCourses = Array.from(uniqueCoursesMap.values());
-    const finalCourses = getRegionalSortedCourses(uniqueCourses);
-    
-    console.log(`✅ [${region}] Final result: ${finalCourses.length} courses:`, finalCourses.map(c => c.golf_courses.name));
-    
-    return finalCourses;
+    return getRegionalSortedCourses(uniqueCourses);
   }, [normalized, region]);
 
   return { 
