@@ -101,7 +101,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   <span className="whitespace-nowrap text-xl md:text-2xl text-black font-medium">{tab.label}</span>
                   {/* Underline only under text label */}
                   {isActive && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-gray-600 dark:bg-gray-400 w-1/2" />
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-muted-foreground/40 w-1/2" />
                   )}
                 </button>
               );

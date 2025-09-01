@@ -848,9 +848,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Highlight Reel"
   const { viewType, setViewType, isHydrated } = useViewPreference();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const highlightReelSwipeRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -858,17 +856,6 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  
-  // Calculate cards per view for Highlight Reel to match Recently Played
-  const getCardsPerView = () => {
-    if (windowWidth >= 1200) return 4; // Desktop: 4 cards (matches Recently Played)
-    if (windowWidth >= 1024) return 3; // Laptop: 3 cards  
-    if (windowWidth >= 768) return 2;  // Tablet: 2 cards
-    return 1; // Mobile: 1 with peek
-  };
-  
-  const cardsPerView = getCardsPerView();
 
   // Query to get courses from user's top 100 courses
   const { data: allPlayedCourses = [] } = useQuery({
@@ -912,6 +899,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     },
     enabled: !!userId,
   });
+  
   // Filter and sort courses based on active filter and sort option
   const filteredCourses = useMemo(() => {
     let coursesToFilter = allPlayedCourses;
@@ -943,37 +931,26 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
-  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(filteredCourses.length);
 
+  // Combine with swipe gestures
   const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
     threshold: 50
   });
 
-  const nextSlide = () => {
-    const container = highlightReelSwipeRef.current;
-    if (container) {
-      const cards = container.querySelectorAll('[data-card]');
-      const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
-      const targetCard = cards[nextIndex] as HTMLElement;
-      if (targetCard) {
-        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
-      }
-    }
-  };
-
-  const prevSlide = () => {
-    const container = highlightReelSwipeRef.current;
-    if (container) {
-      const cards = container.querySelectorAll('[data-card]');
-      const prevIndex = Math.max(currentIndex - 1, 0);
-      const targetCard = cards[prevIndex] as HTMLElement;
-      if (targetCard) {
-        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
-      }
-    }
-  };
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   // Hide section if no highlights available
   if (isHydrated && filteredCourses.length === 0) {
@@ -988,25 +965,26 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             Highlights From My Journey
           </h3>
           <div className="flex gap-2">
-            {currentIndex > 0 && (
+            {canScrollLeft && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={prevSlide}
+                onClick={() => scroll('left')}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronLeft className="h-10 w-10" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-            >
-              <ChevronRight className="h-10 w-10" />
-            </Button>
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('right')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronRight className="h-10 w-10" />
+              </Button>
+            )}
           </div>
         </div>
         
@@ -1022,24 +1000,12 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <div 
-              ref={highlightReelSwipeRef}
+              ref={handleRefCallback}
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
                 scrollPaddingLeft: '0px',
                 scrollPaddingRight: '0px'
-              }}
-              onScroll={(e) => {
-                const container = e.target as HTMLElement;
-                const cards = container.querySelectorAll('[data-card]');
-                if (cards.length > 0) {
-                  const cardWidth = (cards[0] as HTMLElement).offsetWidth;
-                  const gap = 12;
-                  const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
-                  if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
-                    setCurrentIndex(newIndex);
-                  }
-                }
               }}
             >
               <div 
@@ -1098,7 +1064,11 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               </p>
             </div>
           ) : (
-            <EmptyTop100State isOwnProfile={isOwnProfile} displayName="" />
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {isOwnProfile ? "No highlights to show yet. Play some courses to see them here!" : "No highlights available."}
+              </p>
+            </div>
           )}
         </div>
       </div>
