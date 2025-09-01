@@ -243,7 +243,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             {/* Play button overlay when video is paused */}
             {!isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-16 h-16 flex items-center justify-center">
+                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-16 h-16 flex items-center justify-center">
                   <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
                 </div>
               </div>
@@ -256,7 +256,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
                   e.stopPropagation();
                   toggleVideoMute();
                 }}
-                className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-10 h-10 flex items-center justify-center hover:bg-black/30 transition-colors"
+                className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-10 h-10 flex items-center justify-center hover:bg-white/20 transition-colors"
                 aria-label={videoIsMuted ? "Unmute video" : "Mute video"}
               >
                 {videoIsMuted ? (
@@ -282,7 +282,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-16 h-16 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-16 h-16 flex items-center justify-center group-hover:bg-white/20 transition-colors">
                 <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
               </div>
             </div>
