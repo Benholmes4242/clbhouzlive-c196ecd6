@@ -1551,10 +1551,8 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  msOverflowStyle: 'none'
                 }}
-                tabIndex={0}
               >
                 {gbIrelandCourses.map((userCourse, index) => (
                   <div 
@@ -1816,10 +1814,8 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  msOverflowStyle: 'none'
                 }}
-                tabIndex={0}
               >
                 {worldwideCourses.map((userCourse, index) => (
                 <div 
@@ -2083,10 +2079,8 @@ const USASection: React.FC<USASectionProps> = ({
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  msOverflowStyle: 'none'
                 }}
-                tabIndex={0}
               >
                 {usaCourses.map((userCourse, index) => (
                   <div 
@@ -2252,10 +2246,8 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  msOverflowStyle: 'none'
                 }}
-                tabIndex={0}
               >
                 {europeCourses.map((userCourse, index) => (
                   <div 
