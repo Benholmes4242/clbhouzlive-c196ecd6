@@ -13,6 +13,7 @@ import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleto
 import { useGolfCourses } from './golf-courses/useGolfCourses';
 import { GolfCourse, RegionalFilter } from './golf-courses/types';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2 } from 'lucide-react';
 
 const GolfCoursesManagement = () => {
@@ -24,7 +25,8 @@ const GolfCoursesManagement = () => {
     top100List: null,
     sortBy: 'name-asc'
   });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearchTerm = useDebounce(searchInput, 300);
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -36,7 +38,7 @@ const GolfCoursesManagement = () => {
     hasNextPage, 
     isFetchingNextPage,
     refetch 
-  } = useGolfCourses({ regionalFilter, searchTerm });
+  } = useGolfCourses({ regionalFilter, searchTerm: debouncedSearchTerm });
 
   // Flatten all pages into a single array
   const courses = data?.pages?.flatMap(page => page.courses) || [];
@@ -107,8 +109,8 @@ const GolfCoursesManagement = () => {
 
 
         <CascadingFilters
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={searchInput}
+          onSearchChange={setSearchInput}
           regionalFilter={regionalFilter}
           onRegionalFilterChange={setRegionalFilter}
         />
@@ -124,7 +126,7 @@ const GolfCoursesManagement = () => {
 
           <div className="grid gap-4">
             {courses.length === 0 && !isLoading ? (
-              <EmptyCoursesState searchTerm={searchTerm} />
+              <EmptyCoursesState searchTerm={debouncedSearchTerm} />
             ) : (
               courses.map((course) => (
                 <GolfCourseCard
