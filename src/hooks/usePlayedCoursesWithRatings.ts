@@ -176,9 +176,26 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   }, [playedRows, ratingMap, region]);
 
   const regionPlayed = useMemo(() => {
-    const filtered = normalized.filter(c => 
-      regionMatch(c.golf_courses.country, c.golf_courses.continent, c.globalRank, region)
-    );
+    console.log(`🔍 [${region}] Starting filter with ${normalized.length} courses`);
+    
+    const filtered = normalized.filter(c => {
+      const match = regionMatch(c.golf_courses.country, c.golf_courses.continent, c.globalRank, region);
+      
+      if (region === 'europe') {
+        console.log(`🏌️ [Continental Europe] Checking course: ${c.golf_courses.name}`, {
+          country: c.golf_courses.country,
+          continent: c.golf_courses.continent,
+          normalizedCountry: (c.golf_courses.country ?? "").toLowerCase(),
+          normalizedContinent: (c.golf_courses.continent ?? "").toLowerCase(),
+          matches: match,
+          courseId: c.course_id
+        });
+      }
+      
+      return match;
+    });
+    
+    console.log(`🎯 [${region}] Filtered to ${filtered.length} courses:`, filtered.map(c => c.golf_courses.name));
     
     // Remove duplicates based on course_id, preferring rated courses
     const uniqueCoursesMap = new Map();
@@ -199,7 +216,11 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
     });
 
     const uniqueCourses = Array.from(uniqueCoursesMap.values());
-    return getRegionalSortedCourses(uniqueCourses);
+    const finalCourses = getRegionalSortedCourses(uniqueCourses);
+    
+    console.log(`✅ [${region}] Final result: ${finalCourses.length} courses:`, finalCourses.map(c => c.golf_courses.name));
+    
+    return finalCourses;
   }, [normalized, region]);
 
   return { 
