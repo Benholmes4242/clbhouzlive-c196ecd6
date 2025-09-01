@@ -18,6 +18,7 @@ import RegionalCoursesModal from './RegionalCoursesModal';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { useSyncRatedHeightVar } from '@/hooks/useSyncRatedHeightVar';
 import { usePlayedCoursesWithRatings } from '@/hooks/usePlayedCoursesWithRatings';
+import HighlightsCarousel from './HighlightsCarousel';
 
 
 interface CoursesJourneyProps {
@@ -472,8 +473,10 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       {/* Top 10 Rated by You Section */}
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* Highlight Reel Section */}
-      <HighlightReelSection userId={userId} isOwnProfile={isOwnProfile} />
+      {/* Highlights From My Journey Section */}
+      <div className="px-4">
+        <HighlightsCarousel userId={userId} className="mb-8" />
+      </div>
 
 
       {/* Courses by Region Section - 16px below Highlights */}
