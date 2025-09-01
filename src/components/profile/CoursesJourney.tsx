@@ -10,6 +10,7 @@ import { EmptyTop100State } from '@/components/courses/user/UserCoursesEmptyStat
 import CoursesControls from '@/components/profile/CoursesControls';
 import { useViewPreference } from '@/hooks/useViewPreference';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -567,9 +568,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
   const { viewType, setViewType, isHydrated } = useViewPreference();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const recentlyPlayedSwipeRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -715,37 +714,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
-  const maxIndex = Math.max(0, filteredCourses.length - cardsPerView);
-
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
-    threshold: 50
-  });
-
-  const nextSlide = () => {
-    const container = recentlyPlayedSwipeRef.current;
-    if (container) {
-      const cards = container.querySelectorAll('[data-card]');
-      const nextIndex = Math.min(currentIndex + 1, cards.length - 1);
-      const targetCard = cards[nextIndex] as HTMLElement;
-      if (targetCard) {
-        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
-      }
-    }
-  };
-
-  const prevSlide = () => {
-    const container = recentlyPlayedSwipeRef.current;
-    if (container) {
-      const cards = container.querySelectorAll('[data-card]');
-      const prevIndex = Math.max(currentIndex - 1, 0);
-      const targetCard = cards[prevIndex] as HTMLElement;
-      if (targetCard) {
-        container.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
-      }
-    }
-  };
+  // Use carousel navigation for touch/swipe and mouse drag scrolling
+  const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(filteredCourses.length);
 
   return (
     <div className="w-full px-4 pt-4 pb-4">
@@ -755,25 +725,26 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             Recently Played
           </h3>
           <div className="flex gap-2">
-            {currentIndex > 0 && (
+            {canScrollLeft && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={prevSlide}
+                onClick={() => scroll('left')}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronLeft className="h-10 w-10" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-            >
-              <ChevronRight className="h-10 w-10" />
-            </Button>
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('right')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronRight className="h-10 w-10" />
+              </Button>
+            )}
           </div>
         </div>
         
@@ -789,24 +760,12 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             </div>
           ) : filteredCourses.length > 0 ? (
             <div 
-              ref={recentlyPlayedSwipeRef}
+              ref={carouselRef}
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
                 scrollPaddingLeft: '0px',
                 scrollPaddingRight: '0px'
-              }}
-              onScroll={(e) => {
-                const container = e.target as HTMLElement;
-                const cards = container.querySelectorAll('[data-card]');
-                if (cards.length > 0) {
-                  const cardWidth = (cards[0] as HTMLElement).offsetWidth;
-                  const gap = 12;
-                  const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
-                  if (newIndex !== currentIndex && newIndex >= 0 && newIndex < cards.length) {
-                    setCurrentIndex(newIndex);
-                  }
-                }
               }}
             >
               <div 
