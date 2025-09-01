@@ -4,8 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -18,21 +16,69 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
-import GolfCourseForm from './golf-courses/GolfCourseForm';
+import { X, ExternalLink, Copy } from 'lucide-react';
+import CourseImageUpload from './golf-courses/CourseImageUpload';
 import CourseReviewsSection from './golf-courses/CourseReviewsSection';
 import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/types';
+
+// Define the primary countries that have regional Top 100 lists
+const primaryCountryOptions = [
+  'Britain & Ireland',
+  'USA', 
+  'Continental Europe'
+];
+
+// Map primary countries to their sub-countries
+const subCountryOptions: Record<string, string[]> = {
+  'Britain & Ireland': [
+    'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'
+  ],
+  'USA': [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
+    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 
+    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
+    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 
+    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
+    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
+    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 
+    'Wisconsin', 'Wyoming', 'District of Columbia'
+  ],
+  'Continental Europe': [
+    'Austria', 'Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
+    'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 
+    'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Slovenia', 'Spain', 
+    'Sweden', 'Switzerland', 'Turkey', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
+  ]
+};
+
+// Regional Top 100 options
+const regionalTop100Options = [
+  'Great Britain and Ireland',
+  'USA',
+  'Continental Europe'
+];
+
+// Generate rank options 1-100
+const rankOptions = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
 const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating, onClose }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
   
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
+  const [activeTab, setActiveTab] = useState('details');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // New state for Top 100s section
   const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
@@ -343,10 +389,40 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   };
 
   const handleDeleteCourse = () => {
-    if (window.confirm(`Are you sure you want to delete "${course?.name}"? This action cannot be undone.`)) {
-      deleteCourseMutation.mutate();
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteCourse = () => {
+    deleteCourseMutation.mutate();
+    setShowDeleteDialog(false);
+  };
+
+  const handleCloseModal = () => {
+    if (isDirty) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+        onClose();
+      }
+    } else {
+      onClose();
     }
   };
+
+  const handleCountryChange = (value: string) => {
+    setSelectedCountry(value);
+    const newAvailableSubCountries = subCountryOptions[value] || [];
+    if (selectedSubCountry && !newAvailableSubCountries.includes(selectedSubCountry)) {
+      setSelectedSubCountry('');
+    }
+  };
+
+  const handleRegionalRankingRegionChange = (value: string) => {
+    setRegionalRankingRegion(value);
+    if (!value) {
+      setRegionalRank('');
+    }
+  };
+
+  const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
 
   const handleImageChange = (imageUrl: string | null) => {
@@ -361,72 +437,433 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   return (
     <>
-      <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {isCreating ? 'Create New Golf Course' : `Edit ${course?.name}`}
-            </DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <GolfCourseForm
-              register={register}
-              selectedCountry={selectedCountry}
-              setSelectedCountry={setSelectedCountry}
-              selectedSubCountry={selectedSubCountry}
-              setSelectedSubCountry={setSelectedSubCountry}
-              selectedContinent=""
-              setSelectedContinent={() => {}}
-              errors={errors}
-              currentImageUrl={courseImageUrl}
-              onImageChange={handleImageChange}
-              regionalRankingRegion={regionalRankingRegion}
-              setRegionalRankingRegion={setRegionalRankingRegion}
-              regionalRank={regionalRank}
-              setRegionalRank={setRegionalRank}
-              globalRank={globalRank}
-              setGlobalRank={setGlobalRank}
-            />
-
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="flex gap-3">
-                <Button 
-                  type="submit" 
-                  disabled={saveMutation.isPending}
-                  className="bg-[#b66b41] hover:bg-[#a55a3a] text-white"
-                >
-                  {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
-                </Button>
-                <Button type="button" variant="outline" onClick={onClose}>
-                  Cancel
-                </Button>
-              </div>
-              
+      <Dialog open={true} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden p-0">
+          {/* Sticky Header */}
+          <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-semibold">Edit Golf Course</h1>
               {!isCreating && course && (
-                <Button 
-                  type="button" 
-                  variant="destructive" 
-                  onClick={handleDeleteCourse}
-                  disabled={deleteCourseMutation.isPending}
-                >
-                  {deleteCourseMutation.isPending ? 'Deleting...' : 'Delete Course'}
-                </Button>
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span>ID: {course.id.slice(0, 8)}...</span>
+                  <span>•</span>
+                  <span>Last saved 2m ago</span>
+                  <span>•</span>
+                  <span>by Ben</span>
+                </div>
               )}
             </div>
-          </form>
+            <div className="flex items-center gap-2">
+              <Button 
+                type="submit" 
+                form="course-form"
+                disabled={saveMutation.isPending}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {saveMutation.isPending ? 'Saving...' : 'Save changes'}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleCloseModal}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
 
-          {!isCreating && course && (
-            <CourseReviewsSection
-              ratings={ratings}
-              ratingsLoading={ratingsLoading}
-              onDeleteReview={handleDeleteReview}
-            />
-          )}
+          <div className="flex h-[calc(95vh-80px)]">
+            {/* Left Sidebar Navigation */}
+            <div className="w-48 border-r bg-muted/20">
+              <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="h-full">
+                <TabsList className="flex flex-col h-auto w-full bg-transparent p-2 gap-1">
+                  <TabsTrigger value="details" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                    Details
+                  </TabsTrigger>
+                  <TabsTrigger value="location" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                    Location
+                  </TabsTrigger>
+                  <TabsTrigger value="rankings" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                    Rankings
+                  </TabsTrigger>
+                  <TabsTrigger value="media" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                    Media
+                  </TabsTrigger>
+                  {!isCreating && (
+                    <>
+                      <TabsTrigger value="reviews" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                        Reviews
+                      </TabsTrigger>
+                      <TabsTrigger value="history" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                        History
+                      </TabsTrigger>
+                    </>
+                  )}
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 overflow-y-auto">
+              <form id="course-form" onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
+                <div className="flex-1 p-6">
+                  <Tabs value={activeTab} className="h-full">
+                    <TabsContent value="details" className="mt-0 h-full">
+                      <div className="grid grid-cols-3 gap-8 h-full">
+                        {/* Left Column - Main Fields */}
+                        <div className="col-span-2 space-y-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="name" className="flex items-center gap-1">
+                              Golf Course Name <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                              id="name"
+                              {...register('name', { required: 'Golf course name is required' })}
+                              placeholder="e.g., Royal County Down Golf Club"
+                              className={errors.name ? 'border-red-500' : ''}
+                            />
+                            {errors.name && (
+                              <p className="text-sm text-red-500">{String(errors.name.message)}</p>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="website_url">Website URL</Label>
+                            <Input
+                              id="website_url"
+                              {...register('website_url')}
+                              placeholder="www.example.com"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea
+                              id="description"
+                              {...register('description')}
+                              placeholder="Short overview of the club... (Markdown supported)"
+                              rows={6}
+                            />
+                          </div>
+
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Quick actions</h3>
+                            <div className="flex gap-3">
+                              <Button type="button" variant="outline" size="sm" className="flex items-center gap-2">
+                                <ExternalLink className="h-4 w-4" />
+                                Open public page
+                              </Button>
+                              <Button type="button" variant="outline" size="sm" className="flex items-center gap-2">
+                                <Copy className="h-4 w-4" />
+                                Duplicate course
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Column - Meta Info */}
+                        <div className="space-y-6">
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Primary Location</h3>
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Region</Label>
+                                <div className="px-3 py-2 bg-muted/30 rounded-md text-sm">
+                                  {selectedCountry || 'Not selected'}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Sub-country</Label>
+                                <div className="px-3 py-2 bg-muted/30 rounded-md text-sm">
+                                  {selectedSubCountry || 'Not selected'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Map & Coordinates</h3>
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <Label htmlFor="latitude" className="text-sm">Latitude</Label>
+                                <Input
+                                  id="latitude"
+                                  {...register('latitude')}
+                                  placeholder="Latitude"
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="longitude" className="text-sm">Longitude</Label>
+                                <Input
+                                  id="longitude"
+                                  {...register('longitude')}
+                                  placeholder="Longitude"
+                                  className="text-sm"
+                                />
+                              </div>
+                              <div className="h-32 bg-muted/30 rounded-md flex items-center justify-center text-sm text-muted-foreground">
+                                Map preview
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Top 100 Rankings</h3>
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Worldwide</Label>
+                                <Select value={globalRank} onValueChange={setGlobalRank}>
+                                  <SelectTrigger className="text-sm">
+                                    <SelectValue placeholder="Rank (1-100)" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {rankOptions.map((rank) => (
+                                      <SelectItem key={rank} value={rank}>
+                                        {rank}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Regional</Label>
+                                <div className="flex gap-2">
+                                  <Select value={regionalRankingRegion} onValueChange={handleRegionalRankingRegionChange} disabled>
+                                    <SelectTrigger className="flex-1 text-sm">
+                                      <SelectValue placeholder="GB & Ireland" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {regionalTop100Options.map((region) => (
+                                        <SelectItem key={region} value={region}>
+                                          {region}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <Select 
+                                    value={regionalRank} 
+                                    onValueChange={setRegionalRank}
+                                    disabled={!regionalRankingRegion}
+                                  >
+                                    <SelectTrigger className="w-20 text-sm">
+                                      <SelectValue placeholder="Rank" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {rankOptions.map((rank) => (
+                                        <SelectItem key={rank} value={rank}>
+                                          {rank}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="location" className="mt-0">
+                      <div className="space-y-6">
+                        <h2 className="text-lg font-semibold">Location Details</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="country" className="flex items-center gap-1">
+                              Country / Region (Primary) <span className="text-red-500">*</span>
+                            </Label>
+                            <Select value={selectedCountry} onValueChange={handleCountryChange}>
+                              <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
+                                <SelectValue placeholder="Select primary region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {primaryCountryOptions.map((country) => (
+                                  <SelectItem key={country} value={country}>
+                                    {country}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="sub_country" className="flex items-center gap-1">
+                              Sub-Country <span className="text-red-500">*</span>
+                            </Label>
+                            <Select 
+                              value={selectedSubCountry} 
+                              onValueChange={setSelectedSubCountry}
+                              disabled={!selectedCountry}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select primary region first"} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableSubCountries.map((subCountry) => (
+                                  <SelectItem key={subCountry} value={subCountry}>
+                                    {subCountry}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="region">Local Area / County / State</Label>
+                            <Input
+                              id="region"
+                              {...register('region')}
+                              placeholder="e.g. Ayrshire, California, etc."
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="rankings" className="mt-0">
+                      <div className="space-y-6">
+                        <h2 className="text-lg font-semibold">Top 100 Rankings</h2>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Worldwide Top 100</h3>
+                            <div className="flex gap-2">
+                              <Select value="Worldwide" disabled>
+                                <SelectTrigger className="flex-1">
+                                  <SelectValue placeholder="Worldwide" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Worldwide">Worldwide</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Select value={globalRank} onValueChange={setGlobalRank}>
+                                <SelectTrigger className="w-24">
+                                  <SelectValue placeholder="Rank" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {rankOptions.map((rank) => (
+                                    <SelectItem key={rank} value={rank}>
+                                      {rank}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <h3 className="font-medium">Regional Top 100</h3>
+                            <div className="flex gap-2">
+                              <Select value={regionalRankingRegion} onValueChange={handleRegionalRankingRegionChange}>
+                                <SelectTrigger className="flex-1">
+                                  <SelectValue placeholder="Select region" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {regionalTop100Options.map((region) => (
+                                    <SelectItem key={region} value={region}>
+                                      {region}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Select 
+                                value={regionalRank} 
+                                onValueChange={setRegionalRank}
+                                disabled={!regionalRankingRegion}
+                              >
+                                <SelectTrigger className="w-24">
+                                  <SelectValue placeholder="Rank" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {rankOptions.map((rank) => (
+                                    <SelectItem key={rank} value={rank}>
+                                      {rank}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="media" className="mt-0">
+                      <div className="space-y-6">
+                        <h2 className="text-lg font-semibold">Course Media</h2>
+                        <CourseImageUpload
+                          currentImageUrl={courseImageUrl}
+                          onImageChange={handleImageChange}
+                        />
+                      </div>
+                    </TabsContent>
+
+                    {!isCreating && (
+                      <TabsContent value="reviews" className="mt-0">
+                        <CourseReviewsSection
+                          ratings={ratings}
+                          ratingsLoading={ratingsLoading}
+                          onDeleteReview={handleDeleteReview}
+                        />
+                      </TabsContent>
+                    )}
+
+                    {!isCreating && (
+                      <TabsContent value="history" className="mt-0">
+                        <div className="space-y-6">
+                          <h2 className="text-lg font-semibold">Course History</h2>
+                          <p className="text-muted-foreground">Course change history will be displayed here.</p>
+                        </div>
+                      </TabsContent>
+                    )}
+                  </Tabs>
+                </div>
+
+                {/* Sticky Footer */}
+                <div className="sticky bottom-0 bg-background border-t px-6 py-4 flex justify-between items-center">
+                  <div className="flex gap-3">
+                    <Button 
+                      type="submit" 
+                      disabled={saveMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {saveMutation.isPending ? 'Saving...' : 'Save & close'}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={handleCloseModal}>
+                      Cancel
+                    </Button>
+                  </div>
+                  
+                  {!isCreating && course && (
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      onClick={handleDeleteCourse}
+                      disabled={deleteCourseMutation.isPending}
+                    >
+                      {deleteCourseMutation.isPending ? 'Deleting...' : 'Delete course'}
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Golf Course</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{course?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteCourse} className="bg-red-600 hover:bg-red-700">
+              Delete Course
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
