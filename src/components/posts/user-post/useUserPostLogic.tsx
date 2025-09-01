@@ -4,7 +4,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
-import { usePostViewer } from '@/hooks/usePostViewer';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { UserPostData, GolfCourse } from './types';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -27,7 +26,6 @@ export const useUserPostLogic = ({
   const [golfCourse, setGolfCourse] = useState<GolfCourse | null>(null);
   const { deletePost } = usePostDeletion();
   
-  const { isOpen: isPostViewerOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source });
   const { isOpen: isFullscreenOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   // Computed values
@@ -85,27 +83,8 @@ export const useUserPostLogic = ({
   };
 
   const handlePostClick = () => {
-    const transformedPost = {
-      ...post,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    };
-    
-    const transformedPosts = allUserPosts.map(p => ({
-      ...p,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    }));
-    
-    openPostViewer(transformedPost, transformedPosts);
+    // Now handled directly by UserPost component using FullscreenMediaModal
+    // This method can be removed or simplified based on the component's needs
   };
 
   return {
@@ -116,10 +95,6 @@ export const useUserPostLogic = ({
     handleDeletePost,
     handleProfileClick,
     handlePostClick,
-    isPostViewerOpen,
-    currentPost,
-    viewerPosts,
-    closePostViewer,
     isFullscreenOpen,
     currentMedia,
     openMedia,

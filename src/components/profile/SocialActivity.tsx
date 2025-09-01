@@ -4,8 +4,6 @@ import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost, SocialActivityProps } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
-import PostViewerModal from '../posts/PostViewerModal';
-import { usePostViewer } from '@/hooks/usePostViewer';
 import BadgeCarousel from '../badges/BadgeCarousel';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
@@ -18,7 +16,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   userType = 'individual'
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   const handlePostClick = (post: ActivityPost) => {
@@ -79,7 +76,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       golfCourse: extractGolfCourse(p.post_tags || [], p.content)
     }));
     
-    openPostViewer(transformedPost, transformedPosts);
+    // This function is now simplified - posts handle their own modals
+    setSelectedPost(post);
   };
 
   const handlePostUpdated = () => {
@@ -151,15 +149,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         </div>
       )}
 
-      {/* Post Viewer Modal */}
-      {currentPost && (
-        <PostViewerModal
-          isOpen={isOpen}
-          onClose={closePostViewer}
-          initialPost={currentPost}
-          allUserPosts={viewerPosts}
-        />
-      )}
+      {/* Remove FullscreenMediaModal - handled by individual components */}
     </div>
   );
 };

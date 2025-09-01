@@ -24,10 +24,6 @@ import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
-import PostViewerModal from '../posts/PostViewerModal';
-import { usePostViewer } from '@/hooks/usePostViewer';
-import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-
 import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import CoursesControls from './CoursesControls';
 import HandicapSection from './HandicapSection';
@@ -289,7 +285,6 @@ const HeroProfileHeader = ({
   
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
-  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   // Auto-open immersive mode for other users when they have media (default entry)
@@ -1347,15 +1342,7 @@ const HeroProfileHeader = ({
         )}
       </div>
       
-      {/* Post Viewer Modal */}
-      {currentPost && (
-        <PostViewerModal
-          isOpen={isOpen}
-          onClose={closePostViewer}
-          initialPost={currentPost}
-          allUserPosts={viewerPosts}
-        />
-      )}
+      {/* Remove FullscreenMediaModal - handled by individual components */}
 
       {/* Rest of content sections would continue here... */}
       

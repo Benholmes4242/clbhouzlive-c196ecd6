@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import PostViewerModal from './PostViewerModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { 
   DesktopUserPost, 
@@ -29,10 +28,6 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     handleDeletePost,
     handleProfileClick,
     handlePostClick,
-    isPostViewerOpen,
-    currentPost,
-    viewerPosts,
-    closePostViewer,
     isFullscreenOpen,
     currentMedia,
     openMedia,
@@ -105,15 +100,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
         />
       )}
 
-      {/* Post Viewer Modal for profile and index sources */}
-      {(source === 'profile' || source === 'index') && currentPost && (
-        <PostViewerModal
-          isOpen={isPostViewerOpen}
-          onClose={closePostViewer}
-          initialPost={currentPost}
-          allUserPosts={viewerPosts}
-        />
-      )}
+      {/* Remove FullscreenMediaModal for profile and index sources - now handled elsewhere */}
 
       {/* Fallback fullscreen modal for other sources */}
       <FullscreenMediaModal

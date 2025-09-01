@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import { ExploreContentItem } from './types';
 
-import PostViewerModal from '@/components/posts/PostViewerModal';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import MediaDisplay from './MediaDisplay';
 import MediaControls from './MediaControls';
 import MediaOverlays from './MediaOverlays';
@@ -106,11 +106,16 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
         />
       </div>
 
-      <PostViewerModal
+      <FullscreenMediaModal
         isOpen={isPostViewerOpen}
         onClose={() => setIsPostViewerOpen(false)}
-        initialPost={transformedPost}
-        allUserPosts={[transformedPost]}
+        mediaUrl={transformedPost.post_media[0]?.media_url || ''}
+        mediaType={transformedPost.post_media[0]?.media_type || 'image'}
+        golfCourse={transformedPost.golfCourse}
+        user={transformedPost.user}
+        displayName={transformedPost.user.display_name || transformedPost.user.username || 'User'}
+        content={transformedPost.content}
+        postTags={transformedPost.post_tags}
       />
     </>
   );

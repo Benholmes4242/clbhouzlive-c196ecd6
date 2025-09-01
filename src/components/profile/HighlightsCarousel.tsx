@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { HighlightsVideoProvider } from './HighlightsVideoController';
-import { useHighlightsPostViewer } from '@/hooks/useHighlightsPostViewer';
+import { useHighlightsModal } from '@/hooks/useHighlightsModal';
 import HighlightCardWithModal from './HighlightCardWithModal';
-import PostViewerModal from '@/components/posts/PostViewerModal';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -20,8 +20,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   
-  // PostViewerModal integration
-  const { isOpen, currentPost, allPosts, openPostViewer, closePostViewer } = useHighlightsPostViewer({
+  // FullscreenMediaModal integration
+  const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
     highlights: highlights || [],
     userId
   });
@@ -144,19 +144,26 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             <HighlightCardWithModal 
               key={highlight.id} 
               highlight={highlight}
-              onOpenModal={openPostViewer}
+              onOpenModal={openModal}
             />
           ))}
         </div>
       </div>
       
-      {/* PostViewerModal for highlights */}
-      {isOpen && currentPost && (
-        <PostViewerModal
+      {/* FullscreenMediaModal for highlights */}
+      {isOpen && currentHighlight && (
+        <FullscreenMediaModal
           isOpen={isOpen}
-          onClose={closePostViewer}
-          initialPost={currentPost}
-          allUserPosts={allPosts}
+          onClose={closeModal}
+          mediaUrl={currentHighlight.post_media[0]?.media_url || ''}
+          mediaType={currentHighlight.post_media[0]?.media_type as 'image' | 'video' || 'image'}
+          golfCourse={{
+            id: currentHighlight.golf_course.id,
+            name: currentHighlight.golf_course.name,
+            country: currentHighlight.golf_course.country
+          }}
+          displayName="User"
+          content={currentHighlight.content}
         />
       )}
     </HighlightsVideoProvider>

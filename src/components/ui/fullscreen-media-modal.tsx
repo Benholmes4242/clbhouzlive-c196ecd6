@@ -385,9 +385,7 @@ const FullscreenMediaModal = ({
         }
       }}
     >
-      {/* DEBUG: Big blue circle to verify FullscreenMediaModal */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[999999] w-32 h-32 bg-blue-500 rounded-full border-4 border-yellow-400"></div>
-      {/* Top Controls */}
+      {/* Media Content with Navigation - Fully centered and sized to fill viewport */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
         {/* Close button */}
         <button
@@ -414,7 +412,7 @@ const FullscreenMediaModal = ({
             <img
               src={mediaUrls[currentIndex]}
               alt={alt}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-black"
               draggable={false}
               style={{ maxWidth: '100vw', maxHeight: '100vh' }}
             />
@@ -422,7 +420,7 @@ const FullscreenMediaModal = ({
             <EnhancedVideoPlayer
               key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
               src={mediaUrls[currentIndex]}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-black"
               muted={isMuted}
               loop={true}
               autoplay={true}
@@ -491,7 +489,15 @@ const FullscreenMediaModal = ({
           </div>
         )}
 
-        {/* Golf Course Badge - REMOVED */}
+        {/* Golf Course Badge - Show if provided */}
+        {golfCourse && (
+          <div className="absolute top-4 right-16 z-20">
+            <CoursePostBadge 
+              course={golfCourse}
+              className="m-0"
+            />
+          </div>
+        )}
 
         {/* Caption Text (matching CaptionOverlay exactly) */}
         {content && removeGolfCourseFromContent(content) && (
