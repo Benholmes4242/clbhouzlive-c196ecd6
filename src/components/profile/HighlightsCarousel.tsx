@@ -9,6 +9,7 @@ import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
+import { HighlightsVideoProvider, useHighlightsVideo } from './HighlightsVideoController';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -94,52 +95,54 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   }
 
   return (
-    <div className={`${className}`}>
-      <div className="flex items-center justify-between mb-2 pt-2">
-        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
-        
-        {highlights.length > 1 && (
-          <div className="flex gap-2">
-            {showLeftArrow && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={scrollLeft}
-                className="w-8 h-8 p-0 hover:bg-accent"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-            )}
-            {showRightArrow && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={scrollRight}
-                className="w-8 h-8 p-0 hover:bg-accent"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
+    <HighlightsVideoProvider>
+      <div className={`${className}`}>
+        <div className="flex items-center justify-between mb-2 pt-2">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
+          
+          {highlights.length > 1 && (
+            <div className="flex gap-2">
+              {showLeftArrow && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={scrollLeft}
+                  className="w-8 h-8 p-0 hover:bg-accent"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+              )}
+              {showRightArrow && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={scrollRight}
+                  className="w-8 h-8 p-0 hover:bg-accent"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
 
-      <div 
-        ref={combinedRefCallback}
-        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          cursor: 'default'
-        }}
-      >
-        {highlights.map((highlight) => (
-          <HighlightCard key={highlight.id} highlight={highlight} />
-        ))}
+        <div 
+          ref={combinedRefCallback}
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            cursor: 'default'
+          }}
+        >
+          {highlights.map((highlight) => (
+            <HighlightCard key={highlight.id} highlight={highlight} />
+          ))}
+        </div>
       </div>
-    </div>
+    </HighlightsVideoProvider>
   );
 };
 
@@ -150,40 +153,38 @@ interface HighlightCardProps {
 const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Use exclusive video audio for proper audio management
-  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`highlight-${highlight.id}`);
+  // Use the highlights video controller
+  const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
+  const isActive = activeId === highlight.id;
 
   // Extract video ID and generate thumbnail URL
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
   const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
 
-  const handleVideoClick = () => {
-    if (!showVideoPlayer) {
-      // First click - show video player and start playing
-      setShowVideoPlayer(true);
-      setIsPlaying(true);
-      // Video will autoplay due to the autoplay prop
-    } else {
-      // Subsequent clicks - toggle play/pause
-      const video = videoRef.current;
-      if (!video) return;
+  // Register the video element with the controller
+  useEffect(() => {
+    if (videoRef.current && primaryMedia?.media_type === 'video') {
+      register(highlight.id, videoRef.current);
+    }
+    return () => register(highlight.id, null);
+  }, [highlight.id, register, primaryMedia?.media_type]);
 
-      if (isPlaying) {
-        video.pause();
-        setIsPlaying(false);
+  const handleVideoClick = async () => {
+    if (primaryMedia?.media_type === 'video') {
+      if (isActive) {
+        pause(highlight.id); // 2nd click pauses same card
       } else {
-        video.play();
-        setIsPlaying(true);
+        await play(highlight.id); // 1st click (or switching) plays
       }
     }
   };
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
+  const handleMuteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleMute();
+  };
 
   // Safety check for media
   if (!primaryMedia) {
@@ -222,44 +223,28 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             className="w-full h-full object-cover"
             loading="lazy"
           />
-        ) : showVideoPlayer ? (
+        ) : isActive ? (
           <>
-            <HLSVideoCard
+            <video
               ref={videoRef}
-              hlsUrl={primaryMedia.media_url}
-              className="w-full h-full rounded-none"
-              aspectRatio="auto"
-              showMuteButton={false}
-              showControls={false}
-              autoplay={true}
-              muted={videoIsMuted}
+              src={primaryMedia.media_url}
+              className="w-full h-full object-cover"
+              playsInline
+              preload="metadata"
+              controls={false}
+              muted={mutedPref}
               loop={true}
               onClick={handleVideoClick}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              externallyManaged={true}
             />
-            
-            {/* Play button overlay when video is paused */}
-            {!isPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
-                  <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-                </div>
-              </div>
-            )}
             
             {/* Mute/Unmute Button - Top Right */}
             <div className="absolute top-3 right-3 z-20">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleVideoMute();
-                }}
+                onClick={handleMuteToggle}
                 className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 h-5 w-5 md:h-7 md:w-7 flex items-center justify-center hover:bg-white/20 transition-colors"
-                aria-label={videoIsMuted ? "Unmute video" : "Mute video"}
+                aria-label={mutedPref ? "Unmute video" : "Mute video"}
               >
-                {videoIsMuted ? (
+                {mutedPref ? (
                   <VolumeX className="h-4 w-4 text-white" />
                 ) : (
                   <Volume2 className="h-4 w-4 text-white" />
