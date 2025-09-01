@@ -421,11 +421,12 @@ const FullscreenMediaModal = ({
             <EnhancedVideoPlayer
               key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
               src={mediaUrls[currentIndex]}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
+              className="max-w-full max-h-full w-auto h-auto"
               muted={isMuted}
               loop={true}
               autoplay={true}
               enableHLS={true}
+              objectFit="contain"
             />
           )}
         </div>
