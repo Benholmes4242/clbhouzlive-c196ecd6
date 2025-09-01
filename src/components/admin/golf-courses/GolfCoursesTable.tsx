@@ -192,13 +192,19 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
     },
     {
       id: 'updated',
-      accessorFn: (row) => row.id, // Using ID as proxy for creation/update time
+      accessorFn: (row) => row.updated_at,
       header: 'Updated',
       cell: ({ row }) => {
-        // Since we don't have actual updated_at field, we'll show a placeholder
+        const course = row.original;
+        const updatedDate = new Date(course.updated_at);
+        
         return (
           <div className="text-xs text-muted-foreground">
-            Recently
+            {updatedDate.toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric',
+              year: updatedDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+            })}
           </div>
         );
       },
