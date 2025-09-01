@@ -37,7 +37,7 @@ const isEuropeStrict = (country: string, continent: string) =>
   continent === 'europe' && country === 'continental europe';
 
 const isEuropeContinental = (country: string, continent: string) =>
-  continent === 'europe' && !isGBI(country);
+  continent === 'europe' && !isGBI(country) && country !== 'usa';
 
 function regionMatch(country: string | null, continent: string | null, globalRank: number | null, r: RegionKey) {
   const c = (country ?? "").toLowerCase();
@@ -58,8 +58,8 @@ function regionMatch(country: string | null, continent: string | null, globalRan
 }
 
 async function fetchPlayedWithAverages(userId: string) {
-  // ✅ average rating nested under golf_courses to avoid 400s
-  const { data, error } = await supabase
+  // ✅ Fetch from user_top100_courses
+  const { data: top100Data, error: top100Error } = await supabase
     .from("user_top100_courses")
     .select(`
       course_id,
@@ -82,8 +82,60 @@ async function fetchPlayedWithAverages(userId: string) {
     .eq("user_id", userId)
     .eq("played", true);
     
-  if (error) throw error;
-  return (data ?? []) as RawPlayedRow[];
+  if (top100Error) throw top100Error;
+  
+  // ✅ Also fetch from course_ratings to get Continental Europe courses
+  const { data: ratingsData, error: ratingsError } = await supabase
+    .from("course_ratings")
+    .select(`
+      course_id,
+      created_at,
+      golf_courses (
+        id,
+        name,
+        country,
+        region,
+        sub_country,
+        continent,
+        global_rank,
+        regional_rank,
+        usa_rank,
+        description,
+        thumbnail_image,
+        course_rating_stats(average_rating)
+      )
+    `)
+    .eq("user_id", userId);
+    
+  if (ratingsError) throw ratingsError;
+  
+  // Combine and normalize both datasets
+  const combined = [
+    ...(top100Data ?? []).map(d => ({
+      course_id: d.course_id,
+      played_date: d.played_date,
+      golf_courses: d.golf_courses
+    })),
+    ...(ratingsData ?? []).map(d => ({
+      course_id: d.course_id,
+      played_date: d.created_at, // Use rating date as played date
+      golf_courses: d.golf_courses
+    }))
+  ];
+  
+  console.log('🔍 Fetched played courses from user_top100_courses:', (top100Data ?? []).map(d => ({
+    name: d.golf_courses?.name,
+    country: d.golf_courses?.country,
+    continent: d.golf_courses?.continent
+  })));
+  
+  console.log('🔍 Fetched rated courses from course_ratings:', (ratingsData ?? []).map(d => ({
+    name: d.golf_courses?.name,
+    country: d.golf_courses?.country,
+    continent: d.golf_courses?.continent
+  })));
+  
+  return combined as RawPlayedRow[];
 }
 
 async function fetchViewerRatings(userId: string) {
