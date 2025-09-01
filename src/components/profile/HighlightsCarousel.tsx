@@ -7,6 +7,7 @@ import { HighlightsVideoProvider } from './HighlightsVideoController';
 import { useHighlightsModal } from '@/hooks/useHighlightsModal';
 import HighlightCardWithModal from './HighlightCardWithModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { COURSE_CARD_WIDTH_CLASSES } from '@/components/courses/netflix/shared-card-styles';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -141,11 +142,12 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           }}
         >
           {highlights.map((highlight) => (
-            <HighlightCardWithModal 
-              key={highlight.id} 
-              highlight={highlight}
-              onOpenModal={openModal}
-            />
+            <div key={highlight.id} className={`${COURSE_CARD_WIDTH_CLASSES}`}>
+              <HighlightCardWithModal 
+                highlight={highlight}
+                onOpenModal={openModal}
+              />
+            </div>
           ))}
         </div>
       </div>

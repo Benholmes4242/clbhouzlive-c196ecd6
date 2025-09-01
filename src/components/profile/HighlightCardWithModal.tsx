@@ -7,6 +7,7 @@ import { useHighlightsVideo } from './HighlightsVideoController';
 import { useLongPressPreview } from '@/hooks/useLongPressPreview';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { COURSE_CARD_WIDTH_CLASSES } from '@/components/courses/netflix/shared-card-styles';
 
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
@@ -99,23 +100,23 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   // Safety check for media
   if (!primaryMedia) {
     return (
-      <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-        <div className="relative h-48 bg-muted flex items-center justify-center">
+      <div className={`${COURSE_CARD_WIDTH_CLASSES} bg-card border border-border rounded-xl overflow-hidden shadow-sm`}>
+        <div className="relative aspect-[3/4] bg-muted flex items-center justify-center">
           <span className="text-muted-foreground">No media</span>
         </div>
-        <div className="p-4">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
           <div className="flex items-start gap-2 mb-2">
-            <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <MapPin className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
+              <h4 className="font-semibold text-sm truncate text-white">{highlight.golf_course.name}</h4>
             </div>
           </div>
           {highlight.content && (
-            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+            <p className="text-sm text-white/80 mb-2 line-clamp-2">
               {highlight.content}
             </p>
           )}
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-white/60">
             {format(createdDate, 'MMM d, yyyy')}
           </div>
         </div>
@@ -125,7 +126,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   return (
     <div 
-      className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
+      className={`${COURSE_CARD_WIDTH_CLASSES} bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer relative`}
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
@@ -137,7 +138,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         }
       }}
     >
-      <div className="relative h-56">
+      <div className="relative aspect-[3/4] w-full">{/* Changed to match course card aspect ratio */}
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
@@ -216,21 +217,22 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         )}
       </div>
       
-      <div className="p-4">
+      {/* Overlay content positioned absolutely */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
         <div className="flex items-start gap-2 mb-2">
-          <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <MapPin className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
+            <h4 className="font-semibold text-sm truncate text-white">{highlight.golf_course.name}</h4>
           </div>
         </div>
         
         {highlight.content && (
-          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+          <p className="text-sm text-white/80 mb-2 line-clamp-2">
             {highlight.content}
           </p>
         )}
         
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-white/60">
           {format(createdDate, 'MMM d, yyyy')}
         </div>
       </div>
