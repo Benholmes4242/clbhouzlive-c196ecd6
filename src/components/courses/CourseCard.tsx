@@ -151,7 +151,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
           {/* Course Name - positioned at bottom when badgesOnTop is true */}
           <h3 
-            className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg ${showXP && !badgesOnTop ? 'line-clamp-2 cursor-pointer' : ''} ${badgesOnTop ? 'font-semibold' : ''}`}
+            className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg ${showXP && !badgesOnTop ? 'line-clamp-2 cursor-pointer' : ''}`}
             title={showXP && !badgesOnTop ? course.name : undefined}
           >
             {course.name}

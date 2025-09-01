@@ -6,6 +6,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import XPBadge from '@/components/ui/xp-badge';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CourseRankBadgesProps {
   globalRank: number | null;
@@ -39,6 +40,7 @@ const CourseRankBadges = ({
   splitBadges = false
 }: CourseRankBadgesProps) => {
   const [openTooltips, setOpenTooltips] = useState<Set<string>>(new Set());
+  const isMobile = useIsMobile();
 
   // Mobile tooltip handling
   const handleTooltipToggle = (tooltipId: string, e: React.MouseEvent | React.TouchEvent) => {
@@ -176,7 +178,7 @@ const CourseRankBadges = ({
                     >
                       <div className="relative z-10 flex items-center justify-center gap-1.5">
                         {badge.icon}
-                        <span className="text-sm font-bold text-white flex items-center">{badge.rank}</span>
+                        <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{badge.rank}</span>
                       </div>
                     </div>
                   </TooltipTrigger>
@@ -206,7 +208,7 @@ const CourseRankBadges = ({
                     >
                       <div className={`relative z-10 flex items-center justify-center ${isUserRating ? '' : 'gap-1.5'}`}>
                         {badge.icon}
-                        <span className="text-sm font-bold text-white">{badge.content}</span>
+                        <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white`}>{badge.content}</span>
                       </div>
                     </div>
                   </TooltipTrigger>
@@ -240,7 +242,7 @@ const CourseRankBadges = ({
                   >
                     <div className="relative z-10 flex items-center justify-center gap-1.5">
                       {badge.icon}
-                      <span className="text-sm font-bold text-white flex items-center">{badge.rank}</span>
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{badge.rank}</span>
                     </div>
                   </div>
                 </TooltipTrigger>
@@ -263,7 +265,7 @@ const CourseRankBadges = ({
                      >
                        <div className="relative z-10 flex items-center justify-center gap-1.5">
                          <ClubhouseLogo size="sm" />
-                         <span className="text-sm font-bold text-white flex items-center">{playerRatingBadge.content}</span>
+                          <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{playerRatingBadge.content}</span>
                        </div>
                      </div>
                </TooltipTrigger>
@@ -306,7 +308,7 @@ const CourseRankBadges = ({
                >
                  <div className="relative z-10 flex items-center justify-center gap-1.5">
                    <ClubhouseLogo size="sm" />
-                   <span className="text-sm font-bold text-white flex items-center">{playerRatingBadge.content}</span>
+                   <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{playerRatingBadge.content}</span>
                  </div>
                </div>
             </TooltipTrigger>
