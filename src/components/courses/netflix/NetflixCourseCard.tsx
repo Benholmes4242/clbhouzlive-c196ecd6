@@ -144,21 +144,9 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
     );
   }
 
-  // Determine aspect ratio based on card size and context
+  // All course cards now use consistent 3:4 portrait aspect ratio
   const getAspectRatio = () => {
-    if (isTopRated) {
-      // Top 10 Rated: Wide landscape (shorter than portrait)
-      return 'aspect-[2.5/1]';
-    } else if (isHighlightReel) {
-      // Highlight Reel: Slightly shorter than Recently Played (portrait-ish)
-      return 'aspect-[4/5]';
-    } else if (size === 'large') {
-      // Recently Played and regional: 3:4 portrait
-      return 'aspect-[3/4]';
-    } else {
-      // Default medium cards: landscape
-      return 'aspect-[2/1]';
-    }
+    return 'aspect-[3/4]';
   };
 
   return (

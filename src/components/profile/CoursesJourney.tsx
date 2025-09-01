@@ -21,6 +21,7 @@ import { usePlayedCoursesWithRatings } from '@/hooks/usePlayedCoursesWithRatings
 import HighlightsCarousel from './HighlightsCarousel';
 import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
 import { CarouselItem } from '@/components/ui/CarouselItem';
+import { COURSE_CARD_WIDTH_CLASSES } from '@/components/courses/netflix/shared-card-styles';
 
 
 interface CoursesJourneyProps {
@@ -989,13 +990,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
            ) : filteredCourses.length > 0 ? (
               <HorizontalCarousel outerRef={highlightReelRefCallback}>
                  {filteredCourses.map((userCourse, index) => {
-                  // Calculate responsive width to match Recently Played cards exactly
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
-                    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                    return 'calc(51vw - 5px)'; // Mobile: ~1.96 cards visible
-                  };
+                  // Use shared width classes for consistency with all course cards
+                  const widthClasses = COURSE_CARD_WIDTH_CLASSES;
 
                   // Use static image from course data
                   const imageUrl = userCourse.golf_courses.thumbnail_image;
@@ -1008,10 +1004,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   return (
                     <CarouselItem 
                       keyProp={userCourse.id}
-                      width={getCardWidth()}
-                      className="data-card"
+                      width="auto"
+                      className={`data-card ${widthClasses}`}
                     >
-                      <div className="aspect-[4/5] w-full relative group">
+                      <div className="aspect-[3/4] w-full relative group">{/* Changed from aspect-[4/5] to match all course cards */}
                         {/* Static Image Element */}
                         <img
                           src={imageUrl}
