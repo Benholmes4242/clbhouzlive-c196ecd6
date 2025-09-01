@@ -16,9 +16,11 @@ export function CarouselItem({
   return (
     <div
       key={keyProp}
-      className={`flex-shrink-0 ${className}`}
+      className={className}
       style={{
-        width,             // e.g., getCardWidth()
+        // flex: 0 0 auto guarantees no shrinking/growing during swipe
+        flex: '0 0 auto',
+        width,
         scrollSnapAlign: 'unset'
       }}
     >

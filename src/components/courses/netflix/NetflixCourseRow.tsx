@@ -79,11 +79,16 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {/* Scrollable course cards */}
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 snap-x snap-mandatory gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
+          className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
           style={{
+            // momentum + no snap (defends against any global/parent styles)
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehaviorX: 'contain',
+            scrollSnapType: 'none',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
-            scrollBehavior: 'smooth'
+            // prevents width shift when a scrollbar appears
+            scrollbarGutter: 'stable both-edges'
           }}
         >
           {/* Hero Banner (if this row has one) */}
@@ -111,23 +116,23 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
             
             // Recently Played: Mobile: 2.5 cards, Desktop: 4, Laptop: 3, Tablet: 2 cards visible
             if (isRecentlyPlayed) {
-              widthClasses = 'flex-shrink-0 w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)] snap-start';
+              widthClasses = 'w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(25%-1.125rem)]';
             }
             // Top 10 Rated: Feature-wide cards with specific peek percentages
             else if (isTopRated) {
-              widthClasses = 'flex-shrink-0 w-[calc(92vw-2rem)] sm:w-[calc(94vw-3rem)] md:w-[calc(92vw-4rem)] lg:w-[calc(90vw-5rem)] xl:w-[calc(80vw-6rem)] snap-start';
+              widthClasses = 'w-[calc(92vw-2rem)] sm:w-[calc(94vw-3rem)] md:w-[calc(92vw-4rem)] lg:w-[calc(90vw-5rem)] xl:w-[calc(80vw-6rem)]';
             }
             // Highlight Reel: Slightly shorter than Recently Played but wider cards
             else if (isHighlightReel) {
-              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+              widthClasses = 'w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
             }
             // Courses by Region: Match Recently Played sizing (2.5 cards on mobile)
             else if (isCoursesByRegion) {
-              widthClasses = 'flex-shrink-0 w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+              widthClasses = 'w-[calc(40%-0.5rem)] sm:w-[calc(40%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
             }
             // Default fallback
             else {
-              widthClasses = 'flex-shrink-0 w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)] snap-start';
+              widthClasses = 'w-[calc(100vw-2rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] xl:w-[calc(33.333%-1.125rem)]';
             }
             
             const cardTransition = isFirstRow 
@@ -139,7 +144,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
                 key={`${course.course_id || course.id}-${index}`}
                 course={course.golf_courses || course}
                 userRating={getUserRating ? getUserRating(course.course_id || course.id) : course.rating}
-                className={`${widthClasses} ${cardTransition}`}
+                className={`flex-none ${widthClasses} ${cardTransition}`}
                 onClick={() => onCourseClick?.(course.golf_courses || course)}
                 size={size}
                 isTopRated={isTopRated}

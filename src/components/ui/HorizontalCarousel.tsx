@@ -20,11 +20,14 @@ export function HorizontalCarousel({
       ref={outerRef}
       className={`overflow-x-auto scrollbar-hide ${className}`}
       style={{
+        // momentum + no snap (defends against any global/parent styles)
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehaviorX: 'contain',
+        scrollSnapType: 'none',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',   // iOS momentum
-        overscrollBehaviorX: 'contain',     // keep gestures contained
-        scrollSnapType: 'none'              // defend against global snap bleed
+        // prevents width shift when a scrollbar appears
+        scrollbarGutter: 'stable both-edges'
       }}
     >
       <div
