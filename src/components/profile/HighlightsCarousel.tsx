@@ -118,6 +118,42 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
 
+  console.log('HighlightCard - highlight:', highlight.id);
+  console.log('HighlightCard - post_media:', highlight.post_media);
+  console.log('HighlightCard - primaryMedia:', primaryMedia);
+
+  // Safety check for media
+  if (!primaryMedia) {
+    console.log('HighlightCard - No primary media found');
+    return (
+      <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+        <div className="relative aspect-video bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground">No media</span>
+        </div>
+        <div className="p-4">
+          <div className="flex items-start gap-2 mb-2">
+            <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
+              <div className="flex items-center gap-1 mt-1">
+                <CountryFlag country={highlight.golf_course.country} className="w-4 h-3" />
+                <span className="text-xs text-muted-foreground">{highlight.golf_course.country}</span>
+              </div>
+            </div>
+          </div>
+          {highlight.content && (
+            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+              {highlight.content}
+            </p>
+          )}
+          <div className="text-xs text-muted-foreground">
+            {format(createdDate, 'MMM d, yyyy')}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const getRankBadge = () => {
     const { global_rank, regional_rank, usa_rank } = highlight.golf_course;
     
