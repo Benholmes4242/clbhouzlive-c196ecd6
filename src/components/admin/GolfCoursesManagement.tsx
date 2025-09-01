@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -11,8 +11,9 @@ import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
 
 import { useGolfCourses } from './golf-courses/useGolfCourses';
-import { filterCoursesByRegion } from './golf-courses/utils';
 import { GolfCourse, RegionalFilter } from './golf-courses/types';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { Loader2 } from 'lucide-react';
 
 const GolfCoursesManagement = () => {
   const { toast } = useToast();
@@ -28,7 +29,31 @@ const GolfCoursesManagement = () => {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  const { data: courses, isLoading, refetch } = useGolfCourses();
+  const { 
+    data, 
+    isLoading, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage,
+    refetch 
+  } = useGolfCourses({ regionalFilter, searchTerm });
+
+  // Flatten all pages into a single array
+  const courses = data?.pages?.flatMap(page => page.courses) || [];
+  const totalCount = data?.pages?.[0]?.totalCount || 0;
+
+  // Intersection observer for infinite scroll
+  const { ref: sentinelRef, isInView } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '200px'
+  });
+
+  // Trigger next page fetch when sentinel is in view
+  useEffect(() => {
+    if (isInView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isInView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 
   const handleEditCourse = (course: GolfCourse) => {
@@ -57,7 +82,7 @@ const GolfCoursesManagement = () => {
   };
 
 
-  const filteredCourses = filterCoursesByRegion(courses || [], regionalFilter, searchTerm);
+  // Courses are now pre-filtered by the server-side query
 
   if (isLoading) {
     return <GolfCoursesLoadingSkeleton />;
@@ -89,18 +114,51 @@ const GolfCoursesManagement = () => {
         />
 
 
-        <div className="grid gap-4">
-          {filteredCourses.length === 0 ? (
-            <EmptyCoursesState searchTerm={searchTerm} />
-          ) : (
-            filteredCourses.map((course) => (
-              <GolfCourseCard
-                key={course.id}
-                course={course}
-                onEdit={handleEditCourse}
-                activeTop100Filter={regionalFilter.top100List}
-              />
-            ))
+        <div className="space-y-4">
+          {/* Course count display */}
+          {totalCount > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Showing {courses.length} of {totalCount.toLocaleString()} courses
+            </div>
+          )}
+
+          <div className="grid gap-4">
+            {courses.length === 0 && !isLoading ? (
+              <EmptyCoursesState searchTerm={searchTerm} />
+            ) : (
+              courses.map((course) => (
+                <GolfCourseCard
+                  key={course.id}
+                  course={course}
+                  onEdit={handleEditCourse}
+                  activeTop100Filter={regionalFilter.top100List}
+                />
+              ))
+            )}
+          </div>
+
+          {/* Infinite scroll sentinel */}
+          {hasNextPage && (
+            <div ref={sentinelRef} className="flex justify-center py-4">
+              {isFetchingNextPage ? (
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  Load More Courses
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* End of results indicator */}
+          {!hasNextPage && courses.length > 0 && (
+            <div className="text-center py-4 text-sm text-muted-foreground">
+              End of results • {totalCount.toLocaleString()} courses total
+            </div>
           )}
         </div>
       </div>

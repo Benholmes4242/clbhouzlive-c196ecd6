@@ -1,6 +1,8 @@
 
 import { GolfCourse, ScopeKey, RegionalFilter } from './types';
 
+// This function is kept for potential future use but is no longer used 
+// in the main golf courses management since we now do server-side filtering
 export const filterCoursesByRegion = (
   courses: GolfCourse[], 
   regionalFilter: RegionalFilter,
@@ -60,25 +62,6 @@ export const filterCoursesByRegion = (
 
   // Filter by search term
   if (searchTerm) {
-    // Debug: Show what we're actually looking for
-    if (searchTerm.toLowerCase().includes('roy')) {
-      console.log('Debugging Royal courses...');
-      const allRoyalCourses = courses.filter(course => 
-        course.name.toLowerCase().includes('roy')
-      );
-      console.log('ALL courses with "roy" in name from full dataset:', allRoyalCourses.map(c => c.name));
-      
-      const countyCourses = courses.filter(course => 
-        course.name.toLowerCase().includes('county')
-      );
-      console.log('ALL courses with "county" in name:', countyCourses.map(c => c.name));
-      
-      const downCourses = courses.filter(course => 
-        course.name.toLowerCase().includes('down')
-      );
-      console.log('ALL courses with "down" in name:', downCourses.map(c => c.name));
-    }
-    
     filtered = filtered.filter(course => {
       const nameMatch = course.name.toLowerCase().includes(searchTerm.toLowerCase());
       const countryMatch = course.country.toLowerCase().includes(searchTerm.toLowerCase());
