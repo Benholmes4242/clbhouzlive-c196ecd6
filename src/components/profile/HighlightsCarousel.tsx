@@ -205,7 +205,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   }
 
   return (
-    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer">
+    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
       <div className="relative h-56">
         {primaryMedia.media_type === 'image' ? (
           <img
@@ -213,6 +213,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             alt="Golf course moment"
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
           />
         ) : isActive ? (
           <>
@@ -222,13 +223,6 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
               playing={isActive}
               muted={mutedPref}
               onReady={(el) => register(highlight.id, el)}
-            />
-            
-            {/* Clickable layer */}
-            <button
-              aria-label={isActive ? "Pause highlight" : "Play highlight"}
-              onClick={handleVideoClick}
-              className="absolute inset-0"
             />
             
             {/* Mute/Unmute Button - Top Right */}
@@ -248,15 +242,13 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
           </>
         ) : (
           /* Video thumbnail with play overlay */
-          <div
-            className="relative w-full h-full cursor-pointer group"
-            onClick={handleVideoClick}
-          >
+          <div className="relative w-full h-full">
             <img
               src={thumbnailUrl || primaryMedia.media_url}
               alt="Video thumbnail"
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
             />
             
             {/* Play button overlay */}
@@ -265,6 +257,13 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
                 <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
               </div>
             </div>
+            
+            {/* Clickable layer for thumbnail */}
+            <button
+              aria-label="Play highlight"
+              onClick={handleVideoClick}
+              className="absolute inset-0 cursor-pointer"
+            />
           </div>
         )}
         

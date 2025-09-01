@@ -44,8 +44,10 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
     onReady?.(video);
 
     return () => {
-      hlsRef.current?.destroy();
-      hlsRef.current = null;
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
     };
   }, [src, onReady]);
 
@@ -73,11 +75,9 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
       ref={videoRef}
       poster={poster}
       playsInline
-      preload="metadata"
+      preload="none"      // Don't prebuffer inactive cards
       controls={false}
       className="w-full h-full object-cover"
-      // If you use CSS overlays, ensure they don't block clicks:
-      // style={{ pointerEvents: "auto" }}
     />
   );
 }
