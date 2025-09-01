@@ -1038,9 +1038,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                       data-card
                       className="flex-shrink-0"
                       style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
+                        width: getCardWidth()
                       }}
                     >
                       <div className="aspect-[4/5] w-full relative group">
@@ -1549,7 +1547,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={gbIrelandRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
+                className="flex overflow-x-auto scrollbar-hide"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
@@ -1814,7 +1812,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
+                className="flex overflow-x-auto scrollbar-hide"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
@@ -2081,7 +2079,7 @@ const USASection: React.FC<USASectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={usaRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
+                className="flex overflow-x-auto scrollbar-hide"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
@@ -2250,7 +2248,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={europeRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
+                className="flex overflow-x-auto scrollbar-hide"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
