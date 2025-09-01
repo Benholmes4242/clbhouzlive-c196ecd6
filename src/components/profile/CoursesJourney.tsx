@@ -1117,9 +1117,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   isOwnProfile = false
 }) => {
   const { user: currentUser } = useSupabaseSession();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const topRatedSwipeRef = useRef<HTMLDivElement>(null);
   
   // Get profile owner's first name for tooltip
   const { data: profileOwner } = useQuery({
@@ -1143,9 +1141,6 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  // Top 10 Rated always shows 1 card with peek at all breakpoints
-  const cardsPerView = 1;
 
   // Query to get top rated courses by the user
   const { data: topRatedCourses = [] } = useQuery({
@@ -1190,7 +1185,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 
       if (statsError) throw statsError;
 
-      // Create a map for quick lookup
+      // Create a map for quick navigation
       const statsMap = new Map();
       (statsData || []).forEach(stat => {
         statsMap.set(stat.course_id, stat.average_rating);
@@ -1211,33 +1206,26 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
 
   const { isHydrated } = useViewPreference();
 
-  const maxIndex = Math.max(0, topRatedCourses.length - cardsPerView);
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(topRatedCourses.length);
 
+  // Combine with swipe gestures
   const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => setCurrentIndex(prev => Math.min(prev + 1, maxIndex)),
-    onSwipeRight: () => setCurrentIndex(prev => Math.max(prev - 1, 0)),
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
     threshold: 50
   });
 
-  const nextSlide = () => {
-    const container = topRatedSwipeRef.current;
-    if (container) {
-      const cardWidth = container.scrollWidth / topRatedCourses.length;
-      const nextIndex = Math.min(currentIndex + 1, topRatedCourses.length - 1);
-      const scrollPosition = nextIndex * cardWidth;
-      container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
-    }
-  };
-
-  const prevSlide = () => {
-    const container = topRatedSwipeRef.current;
-    if (container) {
-      const cardWidth = container.scrollWidth / topRatedCourses.length;
-      const prevIndex = Math.max(currentIndex - 1, 0);
-      const scrollPosition = prevIndex * cardWidth;
-      container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
-    }
-  };
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   return (
       <div className="w-full px-4 pt-0 pb-0">
@@ -1247,25 +1235,26 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               Top 10 Rated by You
             </h3>
           <div className="flex gap-2">
-            {currentIndex > 0 && (
+            {canScrollLeft && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={prevSlide}
+                onClick={() => scroll('left')}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronLeft className="h-10 w-10" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
-              className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
-            >
-              <ChevronRight className="h-10 w-10" />
-            </Button>
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('right')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronRight className="h-10 w-10" />
+              </Button>
+            )}
           </div>
         </div>
         
@@ -1281,20 +1270,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             </div>
           ) : topRatedCourses.length > 0 ? (
             <div 
-              ref={topRatedSwipeRef} 
+              ref={handleRefCallback} 
               className="overflow-x-auto scrollbar-hide"
               style={{
                 scrollSnapType: 'x mandatory',
                 scrollPaddingLeft: '0px',
                 scrollPaddingRight: '0px'
-              }}
-              onScroll={(e) => {
-                const container = e.target as HTMLElement;
-                const cardWidth = container.scrollWidth / topRatedCourses.length;
-                const newIndex = Math.round(container.scrollLeft / cardWidth);
-                if (newIndex !== currentIndex) {
-                  setCurrentIndex(newIndex);
-                }
               }}
             >
               <div 
