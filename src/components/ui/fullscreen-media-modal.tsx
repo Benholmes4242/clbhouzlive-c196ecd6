@@ -408,20 +408,23 @@ const FullscreenMediaModal = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Current Media Item with proper letterboxing */}
-        <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+        {/* Current Media Item - exact same pattern as ClubhouseVerticalFeed */}
+        <div className="relative w-full h-full">
           {mediaTypes[currentIndex] === 'image' ? (
-            <img
-              src={mediaUrls[currentIndex]}
-              alt={alt}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
-              draggable={false}
-            />
+            <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+              <img
+                src={mediaUrls[currentIndex]}
+                alt={alt}
+                className="w-full h-full object-contain"
+                draggable={false}
+                loading="eager"
+              />
+            </div>
           ) : (
             <EnhancedVideoPlayer
               key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
               src={mediaUrls[currentIndex]}
-              className="max-w-full max-h-full w-auto h-auto"
+              className="w-full h-full"
               muted={isMuted}
               loop={true}
               autoplay={true}

@@ -215,7 +215,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     >
       <video
         ref={videoRef}
-        className={`block ${className?.includes('max-w-full max-h-full w-auto h-auto') ? 'max-w-full max-h-full w-auto h-auto' : 'w-full h-full'} ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+        className={`w-full h-full block ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
         playsInline
         muted={isMuted}
         loop={loop}
