@@ -474,8 +474,10 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
       {/* Highlights From My Journey Section */}
-      <div className="px-4">
-        <HighlightsCarousel userId={userId} className="mb-8" />
+      <div className="w-full px-4 pt-4 pb-0">
+        <div className="max-w-6xl mx-auto">
+          <HighlightsCarousel userId={userId} className="mb-0" />
+        </div>
       </div>
 
 
