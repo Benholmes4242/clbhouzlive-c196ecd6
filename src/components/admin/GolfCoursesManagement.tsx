@@ -102,7 +102,8 @@ const GolfCoursesManagement = () => {
           </div>
           <Button 
             onClick={handleCreateCourse} 
-            className="flex items-center gap-2 bg-[#b66b41] hover:bg-[#a55a3a] text-white"
+            variant="secondary"
+            className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Add New Golf Club
