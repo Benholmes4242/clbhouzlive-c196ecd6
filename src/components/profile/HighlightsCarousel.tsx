@@ -132,7 +132,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          cursor: 'grab'
+          cursor: 'default'
         }}
       >
         {highlights.map((highlight) => (
@@ -213,7 +213,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   }
 
   return (
-    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer">
       <div className="relative h-56">
         {primaryMedia.media_type === 'image' ? (
           <img
