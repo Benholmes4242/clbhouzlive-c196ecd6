@@ -11,8 +11,6 @@ import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { MediaStage } from '@/components/media/MediaStage';
-import { VideoFitToContain } from '@/components/media/VideoFitToContain';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -262,41 +260,43 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             </button>
 
             {/* Media Content - Centered Full Screen */}
-            <MediaStage>
-              <div 
-                className="relative w-full h-full flex items-center justify-center"
-                onMouseEnter={() => setIsTextExpanded(true)}
-                onMouseLeave={() => setIsTextExpanded(false)}
-              >
-                {currentMedia && (
-                  <>
-                    {currentMedia.media_type === 'video' ? (
-                      <VideoFitToContain
-                        src={currentMedia.media_url}
-                        autoplay={true}
-                        muted={true}
-                        loop={true}
-                      />
-                    ) : (
-                      <img
-                        src={currentMedia.media_url}
-                        alt="Post content"
-                        className="max-w-full max-h-full object-contain bg-black select-none"
-                        draggable={false}
-                      />
-                    )}
-                  </>
-                )}
+            <div 
+              className="w-full h-full flex items-center justify-center relative"
+              onMouseEnter={() => setIsTextExpanded(true)}
+              onMouseLeave={() => setIsTextExpanded(false)}
+            >
+              {currentMedia && (
+                <>
+                  {currentMedia.media_type === 'video' ? (
+                     <EnhancedVideoPlayer
+                       src={currentMedia.media_url}
+                       autoplay={true}
+                       muted={true}
+                       loop={true}
+                       className="w-full h-full"
+                       enableHLS={true}
+                     />
+                  ) : (
+                    <HighQualityImage
+                      src={currentMedia.media_url}
+                      alt="Post content"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </>
+              )}
+              
+              {/* DEBUG: Big red circle for MOBILE */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full border-4 border-white"></div>
+              
+              {/* User Info Overlay - Top Left */}
+              <div className="absolute top-12 left-4 z-25">
+                <UserInfoOverlay
+                  user={currentPost.user}
+                  displayName={displayName}
+                  onProfileClick={() => {}} // Add profile click handler if needed
+                />
               </div>
-            </MediaStage>
-            
-            {/* User Info Overlay - Top Left */}
-            <div className="absolute top-12 left-4 z-25">
-              <UserInfoOverlay
-                user={currentPost.user}
-                displayName={displayName}
-                onProfileClick={() => {}} // Add profile click handler if needed
-              />
             </div>
 
             {/* Golf Course Badge - Top Right */}
@@ -478,114 +478,114 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             <div className="flex h-full rounded-lg overflow-hidden">
               {/* Left Side - Media */}
               <div 
-                className="flex-1 bg-black relative overflow-hidden"
+                className="flex-1 bg-black relative"
                 onMouseEnter={() => setIsTextExpanded(true)}
                 onMouseLeave={() => setIsTextExpanded(false)}
               >
-                <div className="w-full h-full grid place-items-center">
-                  {currentMedia && (
-                    <>
-                      {currentMedia.media_type === 'video' ? (
-                        <VideoFitToContain
-                          src={currentMedia.media_url}
-                          autoplay={true}
-                          muted={true}
-                          loop={true}
-                        />
-                      ) : (
-                        <img
-                          src={currentMedia.media_url}
-                          alt="Post content"
-                          className="max-w-full max-h-full object-contain bg-black select-none"
-                          draggable={false}
-                        />
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* User Info Overlay - Top Left */}
-                <div className="absolute top-4 left-4 z-10">
-                  <UserInfoOverlay
-                    user={currentPost.user}
-                    displayName={displayName}
-                    onProfileClick={() => {}} // Add profile click handler if needed
-                  />
-                </div>
-
-                {/* Golf Course Badge */}
-                {golfCourse && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <CoursePostBadge 
-                      course={golfCourse}
-                      className="m-0"
-                    />
-                  </div>
-                )}
-
-                {/* Media Navigation - Desktop */}
-                {hasMultipleMedia && (
+                {currentMedia && (
                   <>
-                    <button
-                      onClick={() => navigateMedia('prev')}
-                      disabled={currentMediaIndex === 0}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
-                      aria-label="Previous media"
-                    >
-                      <ChevronLeft className="h-6 w-6" />
-                    </button>
-                    <button
-                      onClick={() => navigateMedia('next')}
-                      disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
-                      aria-label="Next media"
-                    >
-                      <ChevronRight className="h-6 w-6" />
-                    </button>
+                    {currentMedia.media_type === 'video' ? (
+                       <EnhancedVideoPlayer
+                         src={currentMedia.media_url}
+                         autoplay={true}
+                         muted={true}
+                         loop={true}
+                         className="w-full h-full"
+                         enableHLS={true}
+                       />
+                    ) : (
+                      <HighQualityImage
+                        src={currentMedia.media_url}
+                        alt="Post content"
+                        className="w-full h-full object-contain"
+                      />
+                    )}
+                    
+                    {/* DEBUG: Big red circle for DESKTOP */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full border-4 border-white"></div>
 
-                    {/* Media Navigation Dots - Desktop */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
-                      {currentPost.post_media.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentMediaIndex(index)}
-                          className={`w-2 h-2 rounded-full border border-white/20 transition-colors ${
-                            index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
-                          }`}
+                    {/* User Info Overlay - Top Left */}
+                    <UserInfoOverlay
+                      user={currentPost.user}
+                      displayName={displayName}
+                      onProfileClick={() => {}} // Add profile click handler if needed
+                    />
+
+                    {/* Golf Course Badge */}
+                    {golfCourse && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <CoursePostBadge 
+                          course={golfCourse}
+                          className="m-0"
                         />
-                      ))}
+                      </div>
+                    )}
+
+                    {/* Media Navigation - Desktop */}
+                    {hasMultipleMedia && (
+                      <>
+                        <button
+                          onClick={() => navigateMedia('prev')}
+                          disabled={currentMediaIndex === 0}
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                          aria-label="Previous media"
+                        >
+                          <ChevronLeft className="h-6 w-6" />
+                        </button>
+                        <button
+                          onClick={() => navigateMedia('next')}
+                          disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                          aria-label="Next media"
+                        >
+                          <ChevronRight className="h-6 w-6" />
+                        </button>
+
+                        {/* Media Navigation Dots - Desktop */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
+                          {currentPost.post_media.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentMediaIndex(index)}
+                              className={`w-2 h-2 rounded-full border border-white/20 transition-colors ${
+                                index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Action Buttons - Bottom Right */}
+                    <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
+                      {/* Like Button */}
+                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <Heart className="h-8 w-8" />
+                        </div>
+                        <span className="text-xs font-medium">0</span>
+                      </button>
+
+                      {/* Comment Button */}
+                      <button 
+                        onClick={() => setShowComments(true)}
+                        className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                      >
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <MessageCircle className="h-8 w-8" />
+                        </div>
+                        <span className="text-xs font-medium">0</span>
+                      </button>
+
+                      {/* Share Button */}
+                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <Share className="h-8 w-8" />
+                        </div>
+                      </button>
                     </div>
                   </>
                 )}
-
-                {/* Action Buttons - Bottom Right */}
-                <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
-                  {/* Like Button */}
-                  <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                    <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                      <Heart className="h-8 w-8" />
-                    </div>
-                    <span className="text-xs font-medium">0</span>
-                  </button>
-
-                  {/* Comment Button */}
-                  <button 
-                    onClick={() => setShowComments(true)}
-                    className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
-                  >
-                    <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                      <MessageCircle className="h-8 w-8" />
-                    </div>
-                    <span className="text-xs font-medium">0</span>
-                  </button>
-
-                  {/* Share Button */}
-                  <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                    <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                      <Share className="h-8 w-8" />
-                    </div>
-                  </button>
-                </div>
 
                 {/* Post Navigation */}
                 {hasMultiplePosts && (
