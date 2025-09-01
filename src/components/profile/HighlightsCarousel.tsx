@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { format } from 'date-fns';
 import CountryFlag from '@/components/ui/country-flag';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -179,12 +180,15 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <video
-            src={primaryMedia.media_url}
-            className="w-full h-full object-cover"
-            muted
-            loop
-            playsInline
+          <HLSVideoCard
+            hlsUrl={primaryMedia.media_url}
+            className="w-full h-full rounded-none"
+            aspectRatio="auto"
+            showMuteButton={false}
+            showControls={false}
+            autoplay={false}
+            muted={true}
+            loop={true}
           />
         )}
         
