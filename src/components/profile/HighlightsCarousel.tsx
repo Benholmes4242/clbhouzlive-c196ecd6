@@ -243,8 +243,8 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             {/* Play button overlay when video is paused */}
             {!isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-16 h-16 flex items-center justify-center">
-                  <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
+                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
+                  <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
                 </div>
               </div>
             )}
@@ -256,13 +256,13 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
                   e.stopPropagation();
                   toggleVideoMute();
                 }}
-                className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-10 h-10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 h-5 w-5 md:h-7 md:w-7 flex items-center justify-center hover:bg-white/20 transition-colors"
                 aria-label={videoIsMuted ? "Unmute video" : "Mute video"}
               >
                 {videoIsMuted ? (
-                  <VolumeX className="w-4 h-4 text-white" />
+                  <VolumeX className="h-4 w-4 text-white" />
                 ) : (
-                  <Volume2 className="w-4 h-4 text-white" />
+                  <Volume2 className="h-4 w-4 text-white" />
                 )}
               </button>
             </div>
@@ -282,8 +282,8 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-16 h-16 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
+              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
               </div>
             </div>
           </div>
