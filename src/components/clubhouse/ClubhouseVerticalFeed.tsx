@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import HighQualityImage from '@/components/ui/high-quality-image';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
@@ -526,13 +527,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
-                    <img
+                    <HighQualityImage
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className="w-full h-full object-contain"
-                      loading="eager" // Always load media to prevent grey placeholders
+                      className=""
+                      objectFit="contain"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                        (e.target as any).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                       }}
                     />
                   </div>
