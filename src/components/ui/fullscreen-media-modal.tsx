@@ -234,31 +234,33 @@ const FullscreenMediaModal = ({
       originalGlobalMuteState.current = null;
       originalVideoData.current = null;
     }
-  }, [isOpen, initialIndex, isGloballyMuted]);
+  }, [isOpen, initialIndex, initialVideoMuted]);
 
   // Auto-play video when modal opens or index changes
   useEffect(() => {
     if (isOpen && mediaTypes[currentIndex] === 'video') {
-      // Pause all other videos and set this one as active
-      pauseAllAndSetActive(fullscreenVideoId.current);
+      // Use a timeout to prevent infinite loops
+      const timer = setTimeout(() => {
+        pauseAllAndSetActive(fullscreenVideoId.current);
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex]);
 
   // Cleanup when modal closes - restore feed video behavior
   useEffect(() => {
-    return () => {
-      if (isOpen && mediaTypes[currentIndex] === 'video') {
-        // Unregister the fullscreen video
-        unregisterVideo(fullscreenVideoId.current);
-        
-        // When modal closes, allow feed videos to resume
-        setTimeout(() => {
-          pauseAllAndSetActive('');
-          console.log('🔊 Fullscreen modal closed, feed videos will resume');
-        }, 100);
-      }
-    };
-  }, [isOpen, currentIndex, mediaTypes, unregisterVideo, pauseAllAndSetActive]);
+    if (!isOpen) {
+      // Unregister the fullscreen video
+      unregisterVideo(fullscreenVideoId.current);
+      
+      // When modal closes, allow feed videos to resume
+      const timer = setTimeout(() => {
+        pauseAllAndSetActive('');
+        console.log('🔊 Fullscreen modal closed, feed videos will resume');
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
