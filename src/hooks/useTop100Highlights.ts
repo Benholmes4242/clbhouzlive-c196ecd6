@@ -65,6 +65,7 @@ export const useTop100Highlights = (userId: string) => {
       }
 
       console.log('Found posts:', data.length);
+      console.log('Posts data:', JSON.stringify(data, null, 2));
 
       // Get all golf club entity IDs from the posts
       const golfClubEntityIds = new Set<string>();
@@ -77,8 +78,11 @@ export const useTop100Highlights = (userId: string) => {
       });
 
       if (golfClubEntityIds.size === 0) {
+        console.log('No golf club tags found in any posts');
         return [];
       }
+
+      console.log('Golf club entity IDs found:', Array.from(golfClubEntityIds));
 
       // Get golf course data for these entity IDs
       const { data: golfCourses, error: coursesError } = await supabase
@@ -134,6 +138,9 @@ export const useTop100Highlights = (userId: string) => {
       const uniqueHighlights = transformedData.filter((highlight, index, array) => 
         array.findIndex(h => h.id === highlight.id) === index
       );
+
+      console.log('Final highlights:', uniqueHighlights.length);
+      console.log('Highlights data:', JSON.stringify(uniqueHighlights, null, 2));
 
       return uniqueHighlights;
     },
