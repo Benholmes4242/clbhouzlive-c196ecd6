@@ -408,21 +408,20 @@ const FullscreenMediaModal = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Current Media Item */}
-        <div className="relative w-full h-full flex items-center justify-center">
+        {/* Current Media Item with proper letterboxing */}
+        <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
           {mediaTypes[currentIndex] === 'image' ? (
             <img
               src={mediaUrls[currentIndex]}
               alt={alt}
-              className="w-full h-full object-contain bg-black"
+              className="max-w-full max-h-full w-auto h-auto object-contain"
               draggable={false}
-              style={{ maxWidth: '100vw', maxHeight: '100vh' }}
             />
           ) : (
             <EnhancedVideoPlayer
               key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
               src={mediaUrls[currentIndex]}
-              className="w-full h-full object-contain bg-black"
+              className="max-w-full max-h-full w-auto h-auto object-contain"
               muted={isMuted}
               loop={true}
               autoplay={true}
