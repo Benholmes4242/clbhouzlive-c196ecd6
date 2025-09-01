@@ -29,15 +29,15 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
     <div className="mt-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full mb-6 grid-cols-3">
-          <TabsTrigger value="activity" className="text-sm font-medium">
+          <TabsTrigger value="activity" className="text-sm font-medium data-[state=active]:bg-muted-foreground/10 data-[state=active]:text-muted-foreground data-[state=active]:border-b-2 data-[state=active]:border-muted-foreground/40">
             Activity
           </TabsTrigger>
           {showPersonalTabs && (
             <>
-              <TabsTrigger value="handicap" className="text-sm font-medium">
+              <TabsTrigger value="handicap" className="text-sm font-medium data-[state=active]:bg-muted-foreground/10 data-[state=active]:text-muted-foreground data-[state=active]:border-b-2 data-[state=active]:border-muted-foreground/40">
                 Handicap
               </TabsTrigger>
-              <TabsTrigger value="top100" className="text-sm font-medium">
+              <TabsTrigger value="top100" className="text-sm font-medium data-[state=active]:bg-muted-foreground/10 data-[state=active]:text-muted-foreground data-[state=active]:border-b-2 data-[state=active]:border-muted-foreground/40">
                 Top 100
               </TabsTrigger>
             </>
