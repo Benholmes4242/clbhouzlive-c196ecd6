@@ -158,9 +158,12 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
   const isActive = activeId === highlight.id;
 
-  // Extract video ID and generate thumbnail URL
+  // For videos, use the HLS URL directly without calling any Cloudflare functions
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
   const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
+  
+  // Ensure we have the proper HLS URL format
+  const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : primaryMedia?.media_url;
 
   const handleVideoClick = () => {
     if (primaryMedia?.media_type === 'video') {
@@ -218,11 +221,18 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
         ) : isActive ? (
           <>
             <HLSPlayer
-              src={primaryMedia.media_url}
+              src={hlsUrl}
               poster={thumbnailUrl || undefined}
               playing={isActive}
               muted={mutedPref}
               onReady={(el) => register(highlight.id, el)}
+            />
+            
+            {/* Clickable layer for video control */}
+            <button
+              aria-label={isActive ? "Pause highlight" : "Play highlight"}
+              onClick={handleVideoClick}
+              className="absolute inset-0 cursor-pointer"
             />
             
             {/* Mute/Unmute Button - Top Right */}
