@@ -13,14 +13,21 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
 
+  console.log('🎥 HLSPlayer render:', { src, playing, muted });
+
   // attach source once video element exists
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    console.log('🎥 HLSPlayer attaching source:', src);
+
     // iOS/Safari: native HLS
     if (video.canPlayType("application/vnd.apple.mpegURL")) {
-      if (video.src !== src) video.src = src;
+      if (video.src !== src) {
+        video.src = src;
+        console.log('🎥 Safari: Set video.src directly');
+      }
     } else if (Hls.isSupported()) {
       // Chrome/Firefox: hls.js
       if (!hlsRef.current) {
@@ -32,13 +39,16 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
         hlsRef.current.attachMedia(video);
         hlsRef.current.on(Hls.Events.MEDIA_ATTACHED, () => {
           hlsRef.current?.loadSource(src);
+          console.log('🎥 HLS.js: Source loaded');
         });
       } else {
         hlsRef.current.loadSource(src);
+        console.log('🎥 HLS.js: Source reloaded');
       }
     } else {
       // (Optional) fallback: MP4 URL if you have one
       video.src = src;
+      console.log('🎥 Fallback: Set video.src directly');
     }
 
     onReady?.(video);
@@ -55,12 +65,14 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+    console.log('🎥 HLSPlayer mute change:', muted);
     v.muted = muted;
   }, [muted]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+    console.log('🎥 HLSPlayer playing state change:', playing);
     if (playing) {
       v.play().catch((err) => {
         console.warn("video.play() blocked/error", err);

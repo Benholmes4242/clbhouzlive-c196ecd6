@@ -166,10 +166,13 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : primaryMedia?.media_url;
 
   const handleVideoClick = () => {
+    console.log('🎥 Video clicked:', highlight.id, 'isActive:', isActive, 'mediaType:', primaryMedia?.media_type);
     if (primaryMedia?.media_type === 'video') {
       if (isActive) {
+        console.log('🎥 Pausing video:', highlight.id);
         pause(highlight.id); // 2nd click pauses same card
       } else {
+        console.log('🎥 Playing video:', highlight.id);
         play(highlight.id); // 1st click (or switching) plays
       }
     }

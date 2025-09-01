@@ -31,6 +31,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   const [mutedPref, setMutedPref] = useState(true);
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
+    console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');
     if (!el) { 
       playersRef.current.delete(id); 
       return; 
@@ -60,12 +61,14 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   }, [activeId]);
 
   const play = useCallback(async (id: string) => {
+    console.log('🎥 Play called for:', id, 'currentActive:', activeId);
     // RULE: only one video at a time - pause the previous one
     if (activeId && activeId !== id) {
       pause(activeId);
     }
     
     const el = playersRef.current.get(id);
+    console.log('🎥 Found element for play:', id, !!el);
     if (!el) return;
     
     // RULE: new video adopts previous card's audio state
@@ -74,6 +77,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     try {
       await el.play?.();
       setActiveId(id);
+      console.log('🎥 Successfully started playing:', id);
     } catch (error) {
       console.warn('Failed to play video:', error);
     }
