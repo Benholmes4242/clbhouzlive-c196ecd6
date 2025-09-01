@@ -1001,15 +1001,14 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
               </div>
             </div>
           ) : filteredCourses.length > 0 ? (
-            <div 
-              ref={highlightReelRefCallback}
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
-              }}
-            >
+              <div 
+                ref={highlightReelRefCallback}
+                className="overflow-x-auto scrollbar-hide"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none'
+                }}
+              >
               <div 
                 className="flex"
                 style={{ 
@@ -1550,22 +1549,19 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={gbIrelandRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
+                  WebkitOverflowScrolling: 'touch'
                 }}
                 tabIndex={0}
               >
                 {gbIrelandCourses.map((userCourse, index) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 snap-start snap-always"
+                    className="flex-shrink-0"
                     style={{ width: getCardWidth() }}
                   >
                      <div 
@@ -1818,24 +1814,21 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={combinedRef}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
+                  WebkitOverflowScrolling: 'touch'
                 }}
                 tabIndex={0}
               >
                 {worldwideCourses.map((userCourse, index) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0 snap-start snap-always"
-                    style={{ width: getCardWidth() }}
-                  >
+                <div 
+                  key={userCourse.id} 
+                  className="flex-shrink-0"
+                  style={{ width: getCardWidth() }}
+                >
                      <div 
                        className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
                      >
@@ -2088,22 +2081,19 @@ const USASection: React.FC<USASectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={usaRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
+                  WebkitOverflowScrolling: 'touch'
                 }}
                 tabIndex={0}
               >
                 {usaCourses.map((userCourse, index) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 snap-start snap-always"
+                    className="flex-shrink-0"
                     style={{ width: getCardWidth() }}
                   >
                      <div 
@@ -2260,22 +2250,19 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               {/* Edge padding for title alignment */}
               <div 
                 ref={europeRefCallback}
-                className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                className="flex overflow-x-auto scrollbar-hide scroll-smooth"
                 style={{
                   gap: '12px',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory',
-                  scrollPaddingLeft: '0px',
-                  scrollPaddingRight: '0px'
+                  WebkitOverflowScrolling: 'touch'
                 }}
                 tabIndex={0}
               >
                 {europeCourses.map((userCourse, index) => (
                   <div 
                     key={userCourse.id} 
-                    className="flex-shrink-0 snap-start snap-always"
+                    className="flex-shrink-0"
                     style={{ width: getCardWidth() }}
                   >
                      <div 
