@@ -150,20 +150,23 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         </div>
       </div>
       
-      {/* FullscreenMediaModal for highlights */}
+      {/* FullscreenMediaModal for highlights - same as used in Discover/Activity */}
       {isOpen && currentHighlight && (
         <FullscreenMediaModal
           isOpen={isOpen}
           onClose={closeModal}
-          mediaUrl={currentHighlight.post_media[0]?.media_url || ''}
-          mediaType={currentHighlight.post_media[0]?.media_type as 'image' | 'video' || 'image'}
-          golfCourse={{
+          mediaUrl={currentHighlight.post_media?.[0]?.media_url || ''}
+          mediaType={currentHighlight.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
+          alt={`Highlight at ${currentHighlight.golf_course?.name}`}
+          golfCourse={currentHighlight.golf_course ? {
             id: currentHighlight.golf_course.id,
             name: currentHighlight.golf_course.name,
             country: currentHighlight.golf_course.country
-          }}
+          } : undefined}
+          user={{ id: userId, profile_photo_url: null }}
           displayName="User"
           content={currentHighlight.content}
+          postTags={[]}
         />
       )}
     </HighlightsVideoProvider>
