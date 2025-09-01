@@ -50,8 +50,8 @@ function regionMatch(country: string | null, continent: string | null, globalRan
   if (r === "usa") return c === "usa";
   if (r === "gb_i") return isGBI(c);
   if (r === "europe") {
-    // Continental Europe: strict matching for 'continental europe' 
-    return isEuropeStrict(c, cont);
+    // Continental Europe: continent is europe but exclude Great Britain & Ireland
+    return isEuropeContinental(c, cont);
   }
   
   return false;
