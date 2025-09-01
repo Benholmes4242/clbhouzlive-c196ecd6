@@ -150,7 +150,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         </div>
       </div>
       
-      {/* FullscreenMediaModal for highlights - same as used in Discover/Activity */}
+      {/* FullscreenMediaModal for highlights - same full social features as Activity tab */}
       {isOpen && currentHighlight && (
         <FullscreenMediaModal
           isOpen={isOpen}
@@ -167,6 +167,33 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           displayName="User"
           content={currentHighlight.content}
           postTags={[]}
+          canNavigatePosts={highlights.length > 1}
+          canGoNext={highlights.findIndex(h => h.id === currentHighlight.id) < highlights.length - 1}
+          canGoPrevious={highlights.findIndex(h => h.id === currentHighlight.id) > 0}
+          onNextPost={() => {
+            const currentIndex = highlights.findIndex(h => h.id === currentHighlight.id);
+            if (currentIndex < highlights.length - 1) {
+              openModal(highlights[currentIndex + 1].id);
+            }
+          }}
+          onPreviousPost={() => {
+            const currentIndex = highlights.findIndex(h => h.id === currentHighlight.id);
+            if (currentIndex > 0) {
+              openModal(highlights[currentIndex - 1].id);
+            }
+          }}
+          currentPostIndex={highlights.findIndex(h => h.id === currentHighlight.id)}
+          totalPosts={highlights.length}
+          postId={currentHighlight.id}
+          onPostDeleted={() => {
+            // Handle post deletion - could refresh highlights
+            closeModal();
+          }}
+          onPostEdit={(postId) => {
+            // Handle post editing
+            console.log('Edit highlight post:', postId);
+            closeModal();
+          }}
         />
       )}
     </HighlightsVideoProvider>
