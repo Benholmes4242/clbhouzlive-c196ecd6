@@ -201,9 +201,9 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
         return (
           <div className="text-xs text-muted-foreground">
             {updatedDate.toLocaleDateString('en-US', { 
-              month: 'short', 
               day: 'numeric',
-              year: updatedDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+              month: 'long', 
+              year: 'numeric'
             })}
           </div>
         );
