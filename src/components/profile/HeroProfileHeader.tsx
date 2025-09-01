@@ -1185,7 +1185,7 @@ const HeroProfileHeader = ({
                     }
                     origin-center
                   `} 
-                  style={{ backgroundColor: 'hsl(var(--profile-accent))' }}
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
                 />
               </button>
             ))}
