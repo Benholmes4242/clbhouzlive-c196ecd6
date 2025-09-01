@@ -37,6 +37,7 @@ const GolfCoursesManagement = () => {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage,
+    isFetching,
     refetch 
   } = useGolfCourses({ regionalFilter, searchTerm: debouncedSearchTerm });
 
@@ -85,8 +86,9 @@ const GolfCoursesManagement = () => {
 
 
   // Courses are now pre-filtered by the server-side query
+  const isFirstLoad = isLoading && !data;
 
-  if (isLoading) {
+  if (isFirstLoad) {
     return <GolfCoursesLoadingSkeleton />;
   }
 
@@ -115,6 +117,14 @@ const GolfCoursesManagement = () => {
           onRegionalFilterChange={setRegionalFilter}
         />
 
+        {/* Loading indicator for refetches */}
+        {isFetching && data && (
+          <div className="flex items-center justify-center py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
+            <span className="text-sm text-muted-foreground">Updating results...</span>
+          </div>
+        )}
+
 
         <div className="space-y-4">
           {/* Course count display */}
@@ -125,7 +135,7 @@ const GolfCoursesManagement = () => {
           )}
 
           <div className="grid gap-4">
-            {courses.length === 0 && !isLoading ? (
+            {courses.length === 0 && !isLoading && !isFetching ? (
               <EmptyCoursesState searchTerm={debouncedSearchTerm} />
             ) : (
               courses.map((course) => (

@@ -100,5 +100,6 @@ export const useGolfCourses = ({ regionalFilter, searchTerm }: UseGolfCoursesOpt
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000, // 10 minutes for admin data
     dedupe: true,
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching
   });
 };
