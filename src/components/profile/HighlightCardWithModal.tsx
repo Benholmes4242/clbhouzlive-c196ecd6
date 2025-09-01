@@ -142,7 +142,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <img
             src={primaryMedia.media_url}
             alt="Golf course moment"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-black"
             loading="lazy"
             decoding="async"
           />
@@ -193,7 +193,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                 <img
                   src={thumbnailUrl || primaryMedia.media_url}
                   alt="Video thumbnail"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-black"
                   loading="lazy"
                   decoding="async"
                 />
@@ -206,15 +206,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                 </div>
               </div>
             ) : null}
-            
-            {/* Clickable layer for video control - only active when not in preview mode */}
-            {!gestureHandlers.isPreviewActive && (
-              <button
-                aria-label={isCarouselActive ? "Pause highlight" : "Play highlight"}
-                onClick={handleVideoClick}
-                className="absolute inset-0 z-5"
-              />
-            )}
           </>
         )}
         
@@ -223,13 +214,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             +{highlight.post_media.length - 1} more
           </div>
         )}
-        
-        {/* Absolute overlay for tap/click to open modal */}
-        <button
-          className="absolute inset-0 z-1"
-          aria-label="Open highlight post"
-          style={{ pointerEvents: gestureHandlers.isPreviewActive ? 'none' : 'auto' }}
-        />
       </div>
       
       <div className="p-4">
