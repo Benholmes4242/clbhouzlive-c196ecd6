@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import GolfCourseEditor from './GolfCourseEditor';
-import GolfCourseCard from './golf-courses/GolfCourseCard';
+import GolfCoursesTable from './golf-courses/GolfCoursesTable';
 import CascadingFilters from './golf-courses/CascadingFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
@@ -134,20 +134,15 @@ const GolfCoursesManagement = () => {
             </div>
           )}
 
-          <div className="grid gap-4">
-            {courses.length === 0 && !isLoading && !isFetching ? (
-              <EmptyCoursesState searchTerm={debouncedSearchTerm} />
-            ) : (
-              courses.map((course) => (
-                <GolfCourseCard
-                  key={course.id}
-                  course={course}
-                  onEdit={handleEditCourse}
-                  activeTop100Filter={regionalFilter.top100List}
-                />
-              ))
-            )}
-          </div>
+          {courses.length === 0 && !isLoading && !isFetching ? (
+            <EmptyCoursesState searchTerm={debouncedSearchTerm} />
+          ) : (
+            <GolfCoursesTable
+              courses={courses}
+              onEdit={handleEditCourse}
+              activeTop100Filter={regionalFilter.top100List}
+            />
+          )}
 
           {/* Infinite scroll sentinel */}
           {hasNextPage && (
