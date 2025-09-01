@@ -480,7 +480,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                 type="submit" 
                 form="course-form"
                 disabled={saveMutation.isPending}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                variant="secondary"
+                className="text-muted-foreground"
               >
                 {saveMutation.isPending ? 'Saving...' : 'Save changes'}
               </Button>
@@ -658,15 +659,15 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                                     </div>
                                   )}
                                 </div>
-                                <Button 
-                                  type="button" 
-                                  variant="link" 
-                                  size="sm" 
-                                  className="p-0 h-auto text-sm"
-                                  onClick={() => setActiveTab('rankings')}
-                                >
-                                  Edit rankings <ChevronRight className="h-3 w-3 ml-1" />
-                                </Button>
+                <Button 
+                  type="button" 
+                  variant="link" 
+                  size="sm" 
+                  className="p-0 h-auto text-sm text-muted-foreground"
+                  onClick={() => setActiveTab('rankings')}
+                >
+                  Edit rankings <ChevronRight className="h-3 w-3 ml-1" />
+                </Button>
                               </div>
                             </div>
                           </div>
@@ -834,7 +835,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                     <Button 
                       type="submit" 
                       disabled={saveMutation.isPending}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      variant="secondary"
+                      className="text-muted-foreground"
                     >
                       {saveMutation.isPending ? 'Saving...' : 'Save & close'}
                     </Button>
