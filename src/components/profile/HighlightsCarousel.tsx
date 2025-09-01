@@ -38,10 +38,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     return (
       <div className={`${className}`}>
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-muted animate-pulse rounded" />
-            <h3 className="text-xl font-semibold text-foreground">Highlights From My Journey</h3>
-          </div>
+          <h3 className="text-lg font-medium text-foreground mb-4">Highlights From My Journey</h3>
         </div>
         <div className="flex gap-4">
           {[1, 2, 3].map((i) => (
@@ -55,12 +52,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   if (error || !highlights || highlights.length === 0) {
     return (
       <div className={`${className}`}>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 text-muted-foreground">🏆</div>
-            <h3 className="text-xl font-semibold text-foreground">Highlights From My Journey</h3>
-          </div>
-        </div>
+        <h3 className="text-lg font-medium text-foreground mb-4">Highlights From My Journey</h3>
         <div className="bg-card border border-border rounded-xl p-8 text-center">
           <div className="text-4xl mb-4">🏌️‍♂️</div>
           <h4 className="text-lg font-semibold mb-2">No Top-100 Highlights Yet</h4>
@@ -74,11 +66,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
   return (
     <div className={`${className}`}>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="text-2xl">🏆</div>
-          <h3 className="text-xl font-semibold text-foreground">Highlights From My Journey</h3>
-        </div>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium text-foreground mb-4">Highlights From My Journey</h3>
         
         {highlights.length > 1 && (
           <div className="flex gap-2">

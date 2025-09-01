@@ -25,7 +25,12 @@ export const useTop100Highlights = (userId: string) => {
   const { data: highlights = [], isLoading, error } = useQuery({
     queryKey: ['top100Highlights', userId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId) {
+        console.log('No userId provided to useTop100Highlights');
+        return [];
+      }
+
+      console.log('Fetching highlights for user:', userId);
 
       // First, get posts by this user that have media and golf club tags
       const { data, error } = await supabase
@@ -55,8 +60,11 @@ export const useTop100Highlights = (userId: string) => {
       }
 
       if (!data || data.length === 0) {
+        console.log('No posts found for user:', userId);
         return [];
       }
+
+      console.log('Found posts:', data.length);
 
       // Get all golf club entity IDs from the posts
       const golfClubEntityIds = new Set<string>();
