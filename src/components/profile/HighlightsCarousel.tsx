@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { format } from 'date-fns';
 import CountryFlag from '@/components/ui/country-flag';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import HLSPlayer from '@/components/ui/HLSPlayer';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
@@ -153,7 +153,6 @@ interface HighlightCardProps {
 const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
-  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Use the highlights video controller
   const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
@@ -163,21 +162,12 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
   const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
 
-  // Register the video element with the controller when active state changes
-  useEffect(() => {
-    if (isActive && videoRef.current && primaryMedia?.media_type === 'video') {
-      register(highlight.id, videoRef.current);
-    } else if (!isActive) {
-      register(highlight.id, null);
-    }
-  }, [isActive, highlight.id, register, primaryMedia?.media_type]);
-
-  const handleVideoClick = async () => {
+  const handleVideoClick = () => {
     if (primaryMedia?.media_type === 'video') {
       if (isActive) {
         pause(highlight.id); // 2nd click pauses same card
       } else {
-        await play(highlight.id); // 1st click (or switching) plays
+        play(highlight.id); // 1st click (or switching) plays
       }
     }
   };
@@ -226,18 +216,19 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
           />
         ) : isActive ? (
           <>
-            <HLSVideoCard
-              ref={videoRef}
-              hlsUrl={primaryMedia.media_url}
-              className="w-full h-full rounded-none"
-              aspectRatio="auto"
-              showMuteButton={false}
-              showControls={false}
-              autoplay={true}
+            <HLSPlayer
+              src={primaryMedia.media_url}
+              poster={thumbnailUrl || undefined}
+              playing={isActive}
               muted={mutedPref}
-              loop={true}
+              onReady={(el) => register(highlight.id, el)}
+            />
+            
+            {/* Clickable layer */}
+            <button
+              aria-label={isActive ? "Pause highlight" : "Play highlight"}
               onClick={handleVideoClick}
-              externallyManaged={true}
+              className="absolute inset-0"
             />
             
             {/* Mute/Unmute Button - Top Right */}
