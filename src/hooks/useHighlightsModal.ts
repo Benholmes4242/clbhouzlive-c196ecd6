@@ -33,13 +33,14 @@ export const useHighlightsModal = ({ highlights, userId }: UseHighlightsModalPro
   // Check for URL param on mount and param changes
   useEffect(() => {
     const highlightPostId = searchParams.get('highlightPost');
-    if (highlightPostId && highlights.length > 0) {
+    if (highlightPostId && highlights.length > 0 && !isOpen) {
       const highlight = highlights.find(h => h.id === highlightPostId);
-      if (highlight) {
-        openModal(highlight.id);
+      if (highlight && highlight.id !== currentHighlight?.id) {
+        setCurrentHighlight(highlight);
+        setIsOpen(true);
       }
     }
-  }, [searchParams, highlights.length, highlights]);
+  }, [searchParams, highlights.length, isOpen, currentHighlight?.id]);
 
   const openModal = useCallback((postId: string) => {
     const highlight = highlights.find(h => h.id === postId);
@@ -52,15 +53,19 @@ export const useHighlightsModal = ({ highlights, userId }: UseHighlightsModalPro
     const newParams = new URLSearchParams(searchParams);
     newParams.set('highlightPost', postId);
     setSearchParams(newParams, { replace: true });
-  }, [highlights, searchParams, setSearchParams]);
+  }, [highlights, setSearchParams]);
 
   const closeModal = useCallback(() => {
     setIsOpen(false);
     setCurrentHighlight(null);
     
     // Remove URL param
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete('highlightPost');
+    const newParams = new URLSearchParams();
+    searchParams.forEach((value, key) => {
+      if (key !== 'highlightPost') {
+        newParams.set(key, value);
+      }
+    });
     setSearchParams(newParams, { replace: true });
   }, [searchParams, setSearchParams]);
 
