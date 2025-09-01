@@ -1245,9 +1245,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               ref={topRatedRefCallback}
               className="overflow-x-auto scrollbar-hide"
               style={{
-                scrollSnapType: 'x mandatory',
-                scrollPaddingLeft: '0px',
-                scrollPaddingRight: '0px'
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
               }}
             >
               <div 
@@ -1270,9 +1269,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                       key={userCourse.id} 
                       className="flex-shrink-0"
                       style={{ 
-                        width: getCardWidth(),
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
+                        width: getCardWidth()
                       }}
                     >
                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
