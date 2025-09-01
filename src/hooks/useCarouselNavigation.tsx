@@ -39,7 +39,7 @@ export const useCarouselNavigation = (itemCount: number) => {
     if (container) {
       const cardWidth = isMobile ? 212 : 252; // Approximate card width
       const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
-      container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      container.scrollBy({ left: scrollDistance, behavior: 'auto' });
     }
   };
 

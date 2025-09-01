@@ -1152,18 +1152,10 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     scroll
   } = useCarouselNavigation(topRatedCourses.length);
 
-  // Combine with swipe gestures
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50
-  });
-
-  // Combined ref callback for both carousel and swipe functionality
+  // Native touch scrolling only - no programmatic swipe paging
   const topRatedRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
-    swipeRef.current = node;
-  }, [combinedRef, swipeRef]);
+  }, [combinedRef]);
 
   return (
       <div className="w-full px-4 pt-0 pb-0">
@@ -1459,18 +1451,10 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     scroll
   } = useCarouselNavigation(gbIrelandCourses.length);
 
-  // Combine with swipe gestures
-  const swipeRef = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50
-  });
-
-  // Combined ref callback for both carousel and swipe functionality
+  // Native touch scrolling only - no programmatic swipe paging
   const gbIrelandRefCallback = useCallback((node: HTMLDivElement | null) => {
     combinedRef(node);
-    swipeRef.current = node;
-  }, [combinedRef, swipeRef]);
+  }, [combinedRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {

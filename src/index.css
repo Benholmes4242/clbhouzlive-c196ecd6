@@ -48,6 +48,11 @@
   html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
+
+  /* Ensure no smooth scrolling on carousel containers */
+  .no-smooth {
+    scroll-behavior: auto !important;
+  }
     height: -webkit-fill-available; /* iOS viewport fix */
   }
   

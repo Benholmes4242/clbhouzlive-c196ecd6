@@ -18,7 +18,7 @@ export function HorizontalCarousel({
   return (
     <div
       ref={outerRef}
-      className={`overflow-x-auto scrollbar-hide ${className}`}
+      className={`overflow-x-auto scrollbar-hide no-smooth ${className}`}
       style={{
         // momentum + no snap (defends against any global/parent styles)
         WebkitOverflowScrolling: 'touch',
