@@ -767,47 +767,42 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
            ) : filteredCourses.length > 0 ? (
-            <HorizontalCarousel 
-              outerRef={carouselRef}
-              rightPad={windowWidth < 768 ? 10 : 0}
-            >
-                {filteredCourses.map((userCourse, index) => {
-                   // Calculate responsive width based on exact breakpoints
-                   const getCardWidth = () => {
-                     if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
-                     if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-                     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-                     return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible (40% width per card)
-                   };
+             <HorizontalCarousel 
+               outerRef={carouselRef}
+               rightPad={windowWidth < 768 ? 10 : 0}
+             >
+                 {filteredCourses.map((userCourse, index) => {
+                    // Use shared width classes for consistency
+                    const widthClasses = COURSE_CARD_WIDTH_CLASSES;
 
-                  return (
-                    <CarouselItem 
-                      keyProp={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`}
-                      width={getCardWidth()}
-                      className="data-card"
-                    >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
-                          <CourseCard 
-                            course={userCourse.golf_courses}
-                            viewingUserId={userId}
-                            viewContext="global"
-                            userRating={userCourse.rating}
-                            isReadOnly={!isOwnProfile}
-                            showUserRating={false}
-                            showAverageRating={false}
-                            isFromUserCoursesPage={true}
-                            customHeight="h-full"
-                            showCountryWithFlag={true}
-                            xp={120}
-                            showXP={true}
-                            hideRankingBadges={true}
-                            mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                            mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
-                         />
-                      </div>
-                    </CarouselItem>
-                  );
-                })}
+                   return (
+                     <CarouselItem 
+                       keyProp={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`}
+                       width="auto"
+                       className={`data-card ${widthClasses}`}
+                     >
+                       <div className="w-full aspect-[3/4]">{/* Changed to consistent 3:4 aspect ratio */}
+                           <CourseCard 
+                             course={userCourse.golf_courses}
+                             viewingUserId={userId}
+                             viewContext="global"
+                             userRating={userCourse.rating}
+                             isReadOnly={!isOwnProfile}
+                             showUserRating={false}
+                             showAverageRating={false}
+                             isFromUserCoursesPage={true}
+                             customHeight="h-full"
+                             showCountryWithFlag={true}
+                             xp={120}
+                             showXP={true}
+                             hideRankingBadges={true}
+                             mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                             mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                          />
+                       </div>
+                     </CarouselItem>
+                   );
+                 })}
             </HorizontalCarousel>
           ) : activeFilter ? (
             <div className="text-center py-12">
@@ -1195,43 +1190,39 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               </div>
             </div>
            ) : topRatedCourses.length > 0 ? (
-            <HorizontalCarousel outerRef={topRatedRefCallback}>
-                {topRatedCourses.map((userCourse, index) => {
-                  // Calculate responsive width for Top 10 Rated (wide feature cards with specific peek percentages)
-                  const getCardWidth = () => {
-                    if (windowWidth >= 1200) return 'calc(80vw - 6rem)'; // Desktop: 80% width (20% peek)
-                    if (windowWidth >= 1024) return 'calc(90vw - 5rem)'; // Laptop: 90% width (10% peek)
-                    if (windowWidth >= 768) return 'calc(92vw - 4rem)'; // Tablet: 92% width (8% peek)
-                    return 'calc(92vw - 2rem)'; // Mobile: 92% width (8% peek)
-                  };
+             <HorizontalCarousel outerRef={topRatedRefCallback}>
+                 {topRatedCourses.map((userCourse, index) => {
+                   // Use shared width classes for consistency 
+                   const widthClasses = COURSE_CARD_WIDTH_CLASSES;
 
-                  return (
-                    <CarouselItem 
-                      keyProp={userCourse.id}
-                      width={getCardWidth()}
-                    >
-                       <div className={`${index === 0 ? 'rated-card ' : ''}w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
-                            <CourseCard 
-                              course={userCourse.golf_courses}
-                              viewingUserId={userId}
-                              viewContext="global"
-                              userRating={userCourse.rating}
-                              isReadOnly={!isOwnProfile}
-                              showUserRating={true}
-                              showAverageRating={true}
-                              isFromUserCoursesPage={true}
-                              customHeight="h-full"
-                              hideRankingBadges={true}
-                              showAIQuote={false}
-                              showRatingOnRight={true}
-                              currentUserId={currentUser?.id}
-                              profileOwnerFirstName={profileOwner?.display_name}
-                              badgesOnTop={true}
-                            />
-                       </div>
-                    </CarouselItem>
-                  );
-                })}
+                   return (
+                     <CarouselItem 
+                       keyProp={userCourse.id}
+                       width="auto"
+                       className={`${widthClasses}`}
+                     >
+                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[3/4]`}>{/* Changed to consistent 3:4 aspect ratio */}
+                             <CourseCard 
+                               course={userCourse.golf_courses}
+                               viewingUserId={userId}
+                               viewContext="global"
+                               userRating={userCourse.rating}
+                               isReadOnly={!isOwnProfile}
+                               showUserRating={true}
+                               showAverageRating={true}
+                               isFromUserCoursesPage={true}
+                               customHeight="h-full"
+                               hideRankingBadges={true}
+                               showAIQuote={false}
+                               showRatingOnRight={true}
+                               currentUserId={currentUser?.id}
+                               profileOwnerFirstName={profileOwner?.display_name}
+                               badgesOnTop={true}
+                             />
+                        </div>
+                     </CarouselItem>
+                   );
+                 })}
             </HorizontalCarousel>
           ) : (
             <div className="text-center py-12">
@@ -1477,15 +1468,16 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
            ) : gbIrelandCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <HorizontalCarousel outerRef={gbIrelandRefCallback}>
-                {gbIrelandCourses.map((userCourse, index) => (
-                  <CarouselItem 
-                    keyProp={userCourse.id}
-                    width={getCardWidth()}
-                  >
-                     <div 
-                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
-                     >
+               <HorizontalCarousel outerRef={gbIrelandRefCallback}>
+                 {gbIrelandCourses.map((userCourse, index) => (
+                   <CarouselItem 
+                     keyProp={userCourse.id}
+                     width="auto"
+                     className={`${COURSE_CARD_WIDTH_CLASSES}`}
+                   >
+                      <div 
+                        className="w-full overflow-hidden rounded-lg relative aspect-[3/4]"
+                      >
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -1723,15 +1715,16 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
            ) : worldwideCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <HorizontalCarousel outerRef={combinedRef}>
-                {worldwideCourses.map((userCourse, index) => (
-                <CarouselItem 
-                  keyProp={userCourse.id}
-                  width={getCardWidth()}
-                >
-                     <div 
-                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
-                     >
+               <HorizontalCarousel outerRef={combinedRef}>
+                 {worldwideCourses.map((userCourse, index) => (
+                 <CarouselItem 
+                   keyProp={userCourse.id}
+                   width="auto"
+                   className={`${COURSE_CARD_WIDTH_CLASSES}`}
+                 >
+                      <div 
+                        className="w-full overflow-hidden rounded-lg relative aspect-[3/4]"
+                      >
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -1971,15 +1964,16 @@ const USASection: React.FC<USASectionProps> = ({
            ) : usaCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <HorizontalCarousel outerRef={usaRefCallback}>
-                {usaCourses.map((userCourse, index) => (
-                  <CarouselItem 
-                    keyProp={userCourse.id}
-                    width={getCardWidth()}
-                  >
-                     <div 
-                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
-                     >
+               <HorizontalCarousel outerRef={usaRefCallback}>
+                 {usaCourses.map((userCourse, index) => (
+                   <CarouselItem 
+                     keyProp={userCourse.id}
+                     width="auto"
+                     className={`${COURSE_CARD_WIDTH_CLASSES}`}
+                   >
+                      <div 
+                        className="w-full overflow-hidden rounded-lg relative aspect-[3/4]"
+                      >
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -2121,15 +2115,16 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
            ) : europeCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <HorizontalCarousel outerRef={europeRefCallback}>
-                {europeCourses.map((userCourse, index) => (
-                  <CarouselItem 
-                    keyProp={userCourse.id}
-                    width={getCardWidth()}
-                  >
-                     <div 
-                       className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
-                     >
+               <HorizontalCarousel outerRef={europeRefCallback}>
+                 {europeCourses.map((userCourse, index) => (
+                   <CarouselItem 
+                     keyProp={userCourse.id}
+                     width="auto"
+                     className={`${COURSE_CARD_WIDTH_CLASSES}`}
+                   >
+                      <div 
+                        className="w-full overflow-hidden rounded-lg relative aspect-[3/4]"
+                      >
                          <CourseCard 
                            course={{
                              ...userCourse.golf_courses,
