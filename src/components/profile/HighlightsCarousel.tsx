@@ -1,15 +1,12 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlights';
-import { ChevronLeft, ChevronRight, MapPin, Play, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
-import { format } from 'date-fns';
-import CountryFlag from '@/components/ui/country-flag';
-import HLSPlayer from '@/components/ui/HLSPlayer';
-import SoundToggle from '@/components/ui/sound-toggle';
-import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import { HighlightsVideoProvider, useHighlightsVideo } from './HighlightsVideoController';
+import { HighlightsVideoProvider } from './HighlightsVideoController';
+import { useHighlightsPostViewer } from '@/hooks/useHighlightsPostViewer';
+import HighlightCardWithModal from './HighlightCardWithModal';
+import PostViewerModal from '@/components/posts/PostViewerModal';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -22,6 +19,12 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  
+  // PostViewerModal integration
+  const { isOpen, currentPost, allPosts, openPostViewer, closePostViewer } = useHighlightsPostViewer({
+    highlights: highlights || [],
+    userId
+  });
 
   // Combined ref callback that handles both scroll container and drag functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -138,179 +141,25 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           }}
         >
           {highlights.map((highlight) => (
-            <HighlightCard key={highlight.id} highlight={highlight} />
+            <HighlightCardWithModal 
+              key={highlight.id} 
+              highlight={highlight}
+              onOpenModal={openPostViewer}
+            />
           ))}
         </div>
       </div>
-    </HighlightsVideoProvider>
-  );
-};
-
-interface HighlightCardProps {
-  highlight: Top100Highlight;
-}
-
-const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
-  const primaryMedia = highlight.post_media[0];
-  const createdDate = new Date(highlight.created_at);
-  
-  // Use the highlights video controller
-  const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
-  const isActive = activeId === highlight.id;
-
-  // Memoize the onReady callback to prevent infinite re-renders
-  const handleVideoReady = useCallback((el: HTMLVideoElement) => {
-    register(highlight.id, el);
-  }, [register, highlight.id]);
-
-  // For videos, use the HLS URL directly without calling any Cloudflare functions
-  const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
-  
-  // Ensure we have the proper HLS URL format
-  const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : primaryMedia?.media_url;
-
-  const handleVideoClick = () => {
-    console.log('🎥 Video clicked:', highlight.id, 'isActive:', isActive, 'mediaType:', primaryMedia?.media_type);
-    if (primaryMedia?.media_type === 'video') {
-      if (isActive) {
-        console.log('🎥 Pausing video:', highlight.id);
-        pause(highlight.id); // 2nd click pauses same card
-      } else {
-        console.log('🎥 Playing video:', highlight.id);
-        play(highlight.id); // 1st click (or switching) plays
-      }
-    }
-  };
-
-  const handleMuteToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleMute();
-  };
-
-  // Safety check for media
-  if (!primaryMedia) {
-    return (
-      <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-        <div className="relative h-48 bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground">No media</span>
-        </div>
-        <div className="p-4">
-          <div className="flex items-start gap-2 mb-2">
-            <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
-            </div>
-          </div>
-          {highlight.content && (
-            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-              {highlight.content}
-            </p>
-          )}
-          <div className="text-xs text-muted-foreground">
-            {format(createdDate, 'MMM d, yyyy')}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-      <div className="relative h-56">
-        {primaryMedia.media_type === 'image' ? (
-          <img
-            src={primaryMedia.media_url}
-            alt="Golf course moment"
-            className="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        ) : isActive ? (
-          <>
-            <HLSPlayer
-              src={hlsUrl}
-              poster={thumbnailUrl || undefined}
-              playing={isActive}
-              muted={mutedPref}
-              onReady={handleVideoReady}
-            />
-            
-            {/* Clickable layer for video control */}
-            <button
-              aria-label={isActive ? "Pause highlight" : "Play highlight"}
-              onClick={handleVideoClick}
-              className="absolute inset-0 cursor-pointer"
-            />
-            
-            {/* Mute/Unmute Button - Top Right */}
-            <div className="absolute top-3 right-3 z-20">
-              <button
-                onClick={handleMuteToggle}
-                className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 h-5 w-5 md:h-7 md:w-7 flex items-center justify-center hover:bg-white/20 transition-colors"
-                aria-label={mutedPref ? "Unmute video" : "Mute video"}
-              >
-                {mutedPref ? (
-                  <VolumeX className="h-4 w-4 text-white" />
-                ) : (
-                  <Volume2 className="h-4 w-4 text-white" />
-                )}
-              </button>
-            </div>
-          </>
-        ) : (
-          /* Video thumbnail with play overlay */
-          <div className="relative w-full h-full">
-            <img
-              src={thumbnailUrl || primaryMedia.media_url}
-              alt="Video thumbnail"
-              className="w-full h-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-            
-            {/* Play button overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-              </div>
-            </div>
-            
-            {/* Clickable layer for thumbnail */}
-            <button
-              aria-label="Play highlight"
-              onClick={handleVideoClick}
-              className="absolute inset-0 cursor-pointer"
-            />
-          </div>
-        )}
-        
-        {highlight.post_media.length > 1 && (
-          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-            +{highlight.post_media.length - 1} more
-          </div>
-        )}
-      </div>
       
-      <div className="p-4">
-        <div className="flex items-start gap-2 mb-2">
-          <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm truncate">{highlight.golf_course.name}</h4>
-          </div>
-        </div>
-        
-        {highlight.content && (
-          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-            {highlight.content}
-          </p>
-        )}
-        
-        <div className="text-xs text-muted-foreground">
-          {format(createdDate, 'MMM d, yyyy')}
-        </div>
-      </div>
-    </div>
+      {/* PostViewerModal for highlights */}
+      {isOpen && currentPost && (
+        <PostViewerModal
+          isOpen={isOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={allPosts}
+        />
+      )}
+    </HighlightsVideoProvider>
   );
 };
 
