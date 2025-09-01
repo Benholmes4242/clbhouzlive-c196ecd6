@@ -19,6 +19,8 @@ import { useDragScroll } from '@/hooks/useDragScroll';
 import { useSyncRatedHeightVar } from '@/hooks/useSyncRatedHeightVar';
 import { usePlayedCoursesWithRatings } from '@/hooks/usePlayedCoursesWithRatings';
 import HighlightsCarousel from './HighlightsCarousel';
+import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
+import { CarouselItem } from '@/components/ui/CarouselItem';
 
 
 interface CoursesJourneyProps {
@@ -763,23 +765,11 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : filteredCourses.length > 0 ? (
-            <div 
-              ref={carouselRef}
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none'
-              }}
+           ) : filteredCourses.length > 0 ? (
+            <HorizontalCarousel 
+              outerRef={carouselRef}
+              rightPad={windowWidth < 768 ? 10 : 0}
             >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px',
-                  paddingLeft: windowWidth < 768 ? '0px' : '0px', // Remove extra left padding to align with sections below
-                  paddingRight: windowWidth < 768 ? '10px' : '0px'  // Keep right padding for proper spacing
-                }}
-              >
                 {filteredCourses.map((userCourse, index) => {
                    // Calculate responsive width based on exact breakpoints
                    const getCardWidth = () => {
@@ -790,13 +780,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                    };
 
                   return (
-                    <div 
-                      key={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`} 
-                      data-card
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth()
-                      }}
+                    <CarouselItem 
+                      keyProp={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`}
+                      width={getCardWidth()}
+                      className="data-card"
                     >
                       <div className={`w-full ${windowWidth >= 768 ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
                           <CourseCard 
@@ -817,11 +804,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                             mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                          />
                       </div>
-                    </div>
+                    </CarouselItem>
                   );
                 })}
-              </div>
-            </div>
+            </HorizontalCarousel>
           ) : activeFilter ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
@@ -1000,21 +986,8 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : filteredCourses.length > 0 ? (
-              <div 
-                ref={highlightReelRefCallback}
-                className="overflow-x-auto scrollbar-hide"
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
-              >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px'
-                }}
-              >
+           ) : filteredCourses.length > 0 ? (
+              <HorizontalCarousel outerRef={highlightReelRefCallback}>
                  {filteredCourses.map((userCourse, index) => {
                   // Calculate responsive width to match Recently Played cards exactly
                   const getCardWidth = () => {
@@ -1033,13 +1006,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                   }
 
                   return (
-                    <div 
-                      key={userCourse.id} 
-                      data-card
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth()
-                      }}
+                    <CarouselItem 
+                      keyProp={userCourse.id}
+                      width={getCardWidth()}
+                      className="data-card"
                     >
                       <div className="aspect-[4/5] w-full relative group">
                         {/* Static Image Element */}
@@ -1051,11 +1021,10 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
 
                         {/* Course Info Overlay - removed course name and location */}
                       </div>
-                    </div>
+                    </CarouselItem>
                   );
                 })}
-              </div>
-            </div>
+              </HorizontalCarousel>
           ) : activeFilter ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
@@ -1237,21 +1206,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : topRatedCourses.length > 0 ? (
-            <div 
-              ref={topRatedRefCallback}
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none'
-              }}
-            >
-              <div 
-                className="flex"
-                style={{ 
-                  gap: '12px'
-                }}
-              >
+           ) : topRatedCourses.length > 0 ? (
+            <HorizontalCarousel outerRef={topRatedRefCallback}>
                 {topRatedCourses.map((userCourse, index) => {
                   // Calculate responsive width for Top 10 Rated (wide feature cards with specific peek percentages)
                   const getCardWidth = () => {
@@ -1262,12 +1218,9 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                   };
 
                   return (
-                    <div 
-                      key={userCourse.id} 
-                      className="flex-shrink-0"
-                      style={{ 
-                        width: getCardWidth()
-                      }}
+                    <CarouselItem 
+                      keyProp={userCourse.id}
+                      width={getCardWidth()}
                     >
                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full ${windowWidth >= 768 ? 'aspect-[2.5/0.6]' : 'aspect-[2.5/1.2]'}`}>
                             <CourseCard 
@@ -1288,11 +1241,10 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                               badgesOnTop={true}
                             />
                        </div>
-                    </div>
+                    </CarouselItem>
                   );
                 })}
-              </div>
-            </div>
+            </HorizontalCarousel>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
@@ -1542,23 +1494,14 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : gbIrelandCourses.length > 0 ? (
+           ) : gbIrelandCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div 
-                ref={gbIrelandRefCallback}
-                className="flex overflow-x-auto scrollbar-hide"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
-              >
+              <HorizontalCarousel outerRef={gbIrelandRefCallback}>
                 {gbIrelandCourses.map((userCourse, index) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0"
-                    style={{ width: getCardWidth() }}
+                  <CarouselItem 
+                    keyProp={userCourse.id}
+                    width={getCardWidth()}
                   >
                      <div 
                        className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
@@ -1583,9 +1526,9 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                           mobileTextScale="small"
                         />
                     </div>
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
+              </HorizontalCarousel>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -1805,23 +1748,14 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : worldwideCourses.length > 0 ? (
+           ) : worldwideCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div 
-                ref={combinedRef}
-                className="flex overflow-x-auto scrollbar-hide"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
-              >
+              <HorizontalCarousel outerRef={combinedRef}>
                 {worldwideCourses.map((userCourse, index) => (
-                <div 
-                  key={userCourse.id} 
-                  className="flex-shrink-0"
-                  style={{ width: getCardWidth() }}
+                <CarouselItem 
+                  keyProp={userCourse.id}
+                  width={getCardWidth()}
                 >
                      <div 
                        className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
@@ -1846,9 +1780,9 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                           mobileTextScale="small"
                         />
                     </div>
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
+              </HorizontalCarousel>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -2070,23 +2004,14 @@ const USASection: React.FC<USASectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : usaCourses.length > 0 ? (
+           ) : usaCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div 
-                ref={usaRefCallback}
-                className="flex overflow-x-auto scrollbar-hide"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
-              >
+              <HorizontalCarousel outerRef={usaRefCallback}>
                 {usaCourses.map((userCourse, index) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0"
-                    style={{ width: getCardWidth() }}
+                  <CarouselItem 
+                    keyProp={userCourse.id}
+                    width={getCardWidth()}
                   >
                      <div 
                        className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
@@ -2111,9 +2036,9 @@ const USASection: React.FC<USASectionProps> = ({
                           mobileTextScale="small"
                         />
                     </div>
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
+              </HorizontalCarousel>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -2237,23 +2162,14 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                 </span>
               </div>
             </div>
-          ) : europeCourses.length > 0 ? (
+           ) : europeCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div 
-                ref={europeRefCallback}
-                className="flex overflow-x-auto scrollbar-hide"
-                style={{
-                  gap: '12px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
-              >
+              <HorizontalCarousel outerRef={europeRefCallback}>
                 {europeCourses.map((userCourse, index) => (
-                  <div 
-                    key={userCourse.id} 
-                    className="flex-shrink-0"
-                    style={{ width: getCardWidth() }}
+                  <CarouselItem 
+                    keyProp={userCourse.id}
+                    width={getCardWidth()}
                   >
                      <div 
                        className="w-full overflow-hidden rounded-lg relative aspect-[4/5]"
@@ -2278,9 +2194,9 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                            mobileTextScale="small"
                          />
                     </div>
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
+              </HorizontalCarousel>
             </div>
           ) : (
             <div className="text-center py-12">
