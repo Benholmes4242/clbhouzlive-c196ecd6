@@ -23,7 +23,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
-import { X, ExternalLink, Copy } from 'lucide-react';
+import { X, ExternalLink, ChevronRight } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseImageUpload from './golf-courses/CourseImageUpload';
 import CourseReviewsSection from './golf-courses/CourseReviewsSection';
 import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/types';
@@ -71,6 +73,7 @@ const rankOptions = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating, onClose }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useSupabaseSession();
   const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
   
   const [selectedCountry, setSelectedCountry] = useState('');
@@ -79,6 +82,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // State for tracking last saved info
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
+    course?.updated_at ? new Date(course.updated_at) : null
+  );
+  const [lastSavedBy, setLastSavedBy] = useState<string | null>(null);
   
   // New state for Top 100s section
   const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
@@ -262,7 +271,16 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         return result;
       }
     },
-    onSuccess: () => {
+    onSuccess: (savedCourse) => {
+      // Update last saved info
+      setLastSavedAt(new Date(savedCourse.updated_at || Date.now()));
+      setLastSavedBy(
+        user?.user_metadata?.full_name || 
+        user?.user_metadata?.display_name || 
+        user?.email || 
+        'Admin'
+      );
+      
       toast({
         title: "Success",
         description: isCreating ? "Golf course created successfully" : "Golf course updated successfully",
@@ -438,7 +456,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   return (
     <>
       <Dialog open={true} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden p-0">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-0 my-4">
           {/* Sticky Header */}
           <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -447,9 +465,13 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <span>ID: {course.id.slice(0, 8)}...</span>
                   <span>•</span>
-                  <span>Last saved 2m ago</span>
-                  <span>•</span>
-                  <span>by Ben</span>
+                  {lastSavedAt && (
+                    <>
+                      <span>Last saved {formatDistanceToNow(lastSavedAt)} ago</span>
+                      <span>•</span>
+                    </>
+                  )}
+                  <span>by {lastSavedBy || 'Admin'}</span>
                 </div>
               )}
             </div>
@@ -468,7 +490,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             </div>
           </div>
 
-          <div className="flex h-[calc(95vh-80px)]">
+          <div className="flex h-[calc(90vh-80px)]">
             {/* Left Sidebar Navigation */}
             <div className="w-48 border-r bg-muted/20">
               <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="h-full">
@@ -545,14 +567,24 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                           <div className="space-y-4">
                             <h3 className="font-medium">Quick actions</h3>
                             <div className="flex gap-3">
-                              <Button type="button" variant="outline" size="sm" className="flex items-center gap-2">
-                                <ExternalLink className="h-4 w-4" />
-                                Open public page
-                              </Button>
-                              <Button type="button" variant="outline" size="sm" className="flex items-center gap-2">
-                                <Copy className="h-4 w-4" />
-                                Duplicate course
-                              </Button>
+                              {!isCreating && course && (
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="flex items-center gap-2"
+                                  asChild
+                                >
+                                  <a 
+                                    href={`/courses/${course.id}`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                    Open public page
+                                  </a>
+                                </Button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -608,52 +640,33 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             <h3 className="font-medium">Top 100 Rankings</h3>
                             <div className="space-y-3">
                               <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Worldwide</Label>
-                                <Select value={globalRank} onValueChange={setGlobalRank}>
-                                  <SelectTrigger className="text-sm">
-                                    <SelectValue placeholder="Rank (1-100)" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {rankOptions.map((rank) => (
-                                      <SelectItem key={rank} value={rank}>
-                                        {rank}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Regional</Label>
-                                <div className="flex gap-2">
-                                  <Select value={regionalRankingRegion} onValueChange={handleRegionalRankingRegionChange} disabled>
-                                    <SelectTrigger className="flex-1 text-sm">
-                                      <SelectValue placeholder="GB & Ireland" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {regionalTop100Options.map((region) => (
-                                        <SelectItem key={region} value={region}>
-                                          {region}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <Select 
-                                    value={regionalRank} 
-                                    onValueChange={setRegionalRank}
-                                    disabled={!regionalRankingRegion}
-                                  >
-                                    <SelectTrigger className="w-20 text-sm">
-                                      <SelectValue placeholder="Rank" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {rankOptions.map((rank) => (
-                                        <SelectItem key={rank} value={rank}>
-                                          {rank}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                <Label className="text-sm text-muted-foreground">Rankings Overview</Label>
+                                <div className="flex flex-wrap gap-2">
+                                  {globalRank ? (
+                                    <div className="px-3 py-1.5 bg-muted/50 text-muted-foreground rounded-md text-sm">
+                                      #{globalRank} Global
+                                    </div>
+                                  ) : null}
+                                  {regionalRank && regionalRankingRegion ? (
+                                    <div className="px-3 py-1.5 bg-muted/50 text-muted-foreground rounded-md text-sm">
+                                      #{regionalRank} {regionalRankingRegion}
+                                    </div>
+                                  ) : null}
+                                  {!globalRank && !regionalRank && (
+                                    <div className="px-3 py-1.5 bg-muted/30 text-muted-foreground rounded-md text-sm">
+                                      No rankings set
+                                    </div>
+                                  )}
                                 </div>
+                                <Button 
+                                  type="button" 
+                                  variant="link" 
+                                  size="sm" 
+                                  className="p-0 h-auto text-sm"
+                                  onClick={() => setActiveTab('rankings')}
+                                >
+                                  Edit rankings <ChevronRight className="h-3 w-3 ml-1" />
+                                </Button>
                               </div>
                             </div>
                           </div>
