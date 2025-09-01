@@ -66,11 +66,9 @@ export const top100ListMapping: Record<Top100ListKey, string> = {
 };
 
 // Sort options type
-export type SortOptionKey = 'rank-asc' | 'rank-desc' | 'name-asc' | 'name-desc' | 'recent-added';
+export type SortOptionKey = 'name-asc' | 'name-desc' | 'recent-added';
 
 export const sortOptionMapping: Record<SortOptionKey, string> = {
-  'rank-asc': 'Rank: Best to Worst (1-100)',
-  'rank-desc': 'Rank: Worst to Best (100-1)',
   'name-asc': 'Name: A to Z',
   'name-desc': 'Name: Z to A',
   'recent-added': 'Most Recently Added'

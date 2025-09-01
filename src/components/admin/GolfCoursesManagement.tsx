@@ -21,7 +21,7 @@ const GolfCoursesManagement = () => {
     subCountry: null,
     county: null,
     top100List: 'all',
-    sortBy: 'rank-asc'
+    sortBy: 'name-asc'
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
