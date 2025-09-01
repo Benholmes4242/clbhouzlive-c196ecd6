@@ -10,7 +10,6 @@ interface HighQualityImageProps {
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
   onLoad?: () => void;
   onClick?: () => void;
-  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 }
 
 const HighQualityImage: React.FC<HighQualityImageProps> = ({
@@ -21,8 +20,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   height,
   onError,
   onLoad,
-  onClick,
-  objectFit = 'cover'
+  onClick
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(src);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,9 +112,9 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
       <img
         src={optimizedSrc}
         alt={alt}
-        className={`w-full h-full object-${objectFit} rounded-[inherit] transition-opacity duration-200 ${
+        className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200 ${
           isLoading ? 'opacity-0' : 'opacity-100'
-        } ${className}`}
+        }`}
         style={{
           imageRendering: 'auto',
           backfaceVisibility: 'hidden',
