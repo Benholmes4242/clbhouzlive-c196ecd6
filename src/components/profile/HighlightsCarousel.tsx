@@ -1,6 +1,6 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlights';
-import { ChevronLeft, ChevronRight, MapPin, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { format } from 'date-fns';
@@ -8,6 +8,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
+import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -18,12 +19,35 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
   // Combined ref callback that handles both scroll container and drag functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
     scrollContainerRef.current = node;
     dragRefCallback(node);
   }, [dragRefCallback]);
+
+  // Handle scroll to update arrow visibility
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Initial check
+    handleScroll();
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll, highlights]);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -76,22 +100,28 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         
         {highlights.length > 1 && (
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={scrollLeft}
-              className="w-8 h-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={scrollRight}
-              className="w-8 h-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+            {showLeftArrow && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={scrollLeft}
+                className="w-8 h-8 p-0 hover:bg-accent"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            )}
+            {showRightArrow && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={scrollRight}
+                className="w-8 h-8 p-0 hover:bg-accent"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -121,21 +151,34 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Use exclusive video audio for proper audio management
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`highlight-${highlight.id}`);
 
-  const handleVideoClick = () => {
-    const video = videoRef.current;
-    if (!video) return;
+  // Extract video ID and generate thumbnail URL
+  const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
+  const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
 
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-    } else {
-      video.play();
+  const handleVideoClick = () => {
+    if (!showVideoPlayer) {
+      // First click - show video player and start playing
+      setShowVideoPlayer(true);
       setIsPlaying(true);
+      // Video will autoplay due to the autoplay prop
+    } else {
+      // Subsequent clicks - toggle play/pause
+      const video = videoRef.current;
+      if (!video) return;
+
+      if (isPlaying) {
+        video.pause();
+        setIsPlaying(false);
+      } else {
+        video.play();
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -170,15 +213,16 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
   }
 
   return (
-    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative h-48">
+    <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="relative h-56">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
             alt="Golf course moment"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
-        ) : (
+        ) : showVideoPlayer ? (
           <>
             <HLSVideoCard
               ref={videoRef}
@@ -187,7 +231,7 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
               aspectRatio="auto"
               showMuteButton={false}
               showControls={false}
-              autoplay={false}
+              autoplay={true}
               muted={videoIsMuted}
               loop={true}
               onClick={handleVideoClick}
@@ -199,21 +243,50 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight }) => {
             {/* Play button overlay when video is paused */}
             {!isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-12 h-12 flex items-center justify-center">
-                  <Play className="w-6 h-6 text-white ml-0.5" fill="currentColor" />
+                <div className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-16 h-16 flex items-center justify-center">
+                  <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
                 </div>
               </div>
             )}
             
             {/* Mute/Unmute Button - Top Right */}
             <div className="absolute top-3 right-3 z-20">
-              <SoundToggle
-                isMuted={videoIsMuted}
-                onToggle={toggleVideoMute}
-                size="sm"
-              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleVideoMute();
+                }}
+                className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-10 h-10 flex items-center justify-center hover:bg-black/30 transition-colors"
+                aria-label={videoIsMuted ? "Unmute video" : "Mute video"}
+              >
+                {videoIsMuted ? (
+                  <VolumeX className="w-4 h-4 text-white" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-white" />
+                )}
+              </button>
             </div>
           </>
+        ) : (
+          /* Video thumbnail with play overlay */
+          <div
+            className="relative w-full h-full cursor-pointer group"
+            onClick={handleVideoClick}
+          >
+            <img
+              src={thumbnailUrl || primaryMedia.media_url}
+              alt="Video thumbnail"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            
+            {/* Play button overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="rounded-full bg-black/20 backdrop-blur-md border border-white/30 w-16 h-16 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+                <Play className="w-7 h-7 text-white ml-0.5" fill="currentColor" />
+              </div>
+            </div>
+          </div>
         )}
         
         {highlight.post_media.length > 1 && (
