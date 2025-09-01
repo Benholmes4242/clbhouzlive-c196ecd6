@@ -1491,7 +1491,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
   userDisplayName
 }) => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1500,36 +1499,30 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Drag scroll functionality
-  const dragScrollRef = useDragScroll({ 
-    enabled: true,
-    direction: 'horizontal'
-  });
-
   const { data: gbIrelandCourses = [], isLoading: gbIrelandLoading } = usePlayedCoursesWithRatings(userId || '', 'gb_i');
 
   const { isHydrated } = useViewPreference();
 
-  // Keyboard navigation - only setup when gbIrelandCourses is available
-  useEffect(() => {
-    if (gbIrelandCourses.length === 0) return;
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / gbIrelandCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(gbIrelandCourses.length);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gbIrelandCourses.length]);
+  // Combine with swipe gestures
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
+    threshold: 50
+  });
+
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -1538,11 +1531,6 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
     return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
-
-  const combinedRef = useCallback((node: HTMLDivElement | null) => {
-    containerRef.current = node;
-    if (dragScrollRef) dragScrollRef(node);
-  }, [dragScrollRef]);
 
   return (
     <div className="w-full pt-0 pb-2">
@@ -1562,7 +1550,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={combinedRef}
+                ref={handleRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
@@ -1772,7 +1760,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
   userDisplayName
 }) => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -1781,36 +1768,30 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Drag scroll functionality
-  const dragScrollRef = useDragScroll({ 
-    enabled: true,
-    direction: 'horizontal'
-  });
-
   const { data: worldwideCourses = [], isLoading: worldwideLoading } = usePlayedCoursesWithRatings(userId || '', 'worldwide');
 
   const { isHydrated } = useViewPreference();
 
-  // Keyboard navigation - only setup when worldwideCourses is available
-  useEffect(() => {
-    if (worldwideCourses.length === 0) return;
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / worldwideCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(worldwideCourses.length);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [worldwideCourses.length]);
+  // Combine with swipe gestures
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
+    threshold: 50
+  });
+
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -1819,11 +1800,6 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
     return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
-
-  const combinedRef = useCallback((node: HTMLDivElement | null) => {
-    containerRef.current = node;
-    if (dragScrollRef) dragScrollRef(node);
-  }, [dragScrollRef]);
 
   return (
     <div className="w-full pt-0 pb-2">
@@ -2054,7 +2030,6 @@ const USASection: React.FC<USASectionProps> = ({
   userDisplayName
 }) => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -2063,36 +2038,30 @@ const USASection: React.FC<USASectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Drag scroll functionality
-  const dragScrollRef = useDragScroll({ 
-    enabled: true,
-    direction: 'horizontal'
-  });
-
   const { data: usaCourses = [], isLoading: usaLoading } = usePlayedCoursesWithRatings(userId || '', 'usa');
 
   const { isHydrated } = useViewPreference();
 
-  // Keyboard navigation - only setup when usaCourses is available
-  useEffect(() => {
-    if (usaCourses.length === 0) return;
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / usaCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(usaCourses.length);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [usaCourses.length]);
+  // Combine with swipe gestures
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
+    threshold: 50
+  });
+
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -2101,11 +2070,6 @@ const USASection: React.FC<USASectionProps> = ({
     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
     return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
-
-  const combinedRef = useCallback((node: HTMLDivElement | null) => {
-    containerRef.current = node;
-    if (dragScrollRef) dragScrollRef(node);
-  }, [dragScrollRef]);
 
   return (
     <div className="w-full pt-0">
@@ -2124,7 +2088,7 @@ const USASection: React.FC<USASectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={combinedRef}
+                ref={handleRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
@@ -2238,7 +2202,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
   userDisplayName
 }) => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track window width for responsive breakpoints
   useEffect(() => {
@@ -2247,36 +2210,30 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Drag scroll functionality
-  const dragScrollRef = useDragScroll({ 
-    enabled: true,
-    direction: 'horizontal'
-  });
-
   const { data: europeCourses = [], isLoading: europeLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
 
   const { isHydrated } = useViewPreference();
 
-  // Keyboard navigation - only setup when europeCourses is available
-  useEffect(() => {
-    if (europeCourses.length === 0) return;
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const container = containerRef.current;
-        const cardWidth = container.scrollWidth / europeCourses.length;
-        const scrollAmount = e.key === 'ArrowLeft' ? -cardWidth : cardWidth;
-        
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    };
+  // Use carousel navigation with proper item count and combined ref
+  const {
+    carouselRef: combinedRef,
+    canScrollLeft,
+    canScrollRight,
+    scroll
+  } = useCarouselNavigation(europeCourses.length);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [europeCourses.length]);
+  // Combine with swipe gestures
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
+    threshold: 50
+  });
+
+  // Combined ref callback for both carousel and swipe functionality
+  const handleRefCallback = useCallback((node: HTMLDivElement | null) => {
+    combinedRef(node);
+    swipeRef.current = node;
+  }, [combinedRef, swipeRef]);
 
   // Calculate card dimensions - match Recently Played sizing exactly
   const getCardWidth = () => {
@@ -2285,11 +2242,6 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
     if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards
     return `calc(40vw - 5px)`; // Mobile: 2.5 cards visible
   };
-
-  const combinedRef = useCallback((node: HTMLDivElement | null) => {
-    containerRef.current = node;
-    if (dragScrollRef) dragScrollRef(node);
-  }, [dragScrollRef]);
 
   return (
     <div className="w-full pt-0">
@@ -2308,7 +2260,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
             <div className="relative">
               {/* Edge padding for title alignment */}
               <div 
-                ref={combinedRef}
+                ref={handleRefCallback}
                 className="flex overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                 style={{
                   gap: '12px',
