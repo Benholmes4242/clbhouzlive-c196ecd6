@@ -47,7 +47,7 @@ const getRankBadges = (course: GolfCourse, activeFilter?: Top100ListKey | null) 
   const badges = [];
   
   // If a specific Top 100 filter is active, show only that rank prominently
-  if (activeFilter && activeFilter !== 'all') {
+  if (activeFilter) {
     let rank = null;
     let label = '';
     let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';

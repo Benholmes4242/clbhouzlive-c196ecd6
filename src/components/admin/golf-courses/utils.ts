@@ -1,5 +1,5 @@
 
-import { GolfCourse, RegionKey, RegionalFilter } from './types';
+import { GolfCourse, ScopeKey, RegionalFilter } from './types';
 
 export const filterCoursesByRegion = (
   courses: GolfCourse[], 
@@ -10,8 +10,8 @@ export const filterCoursesByRegion = (
   
   let filtered = courses;
 
-  // Filter by Top 100 Lists first (this is the main new filter)
-  if (regionalFilter.top100List && regionalFilter.top100List !== 'all') {
+  // If Top 100 is selected, only apply Top 100 filter and ignore scope
+  if (regionalFilter.top100List) {
     filtered = filtered.filter(course => {
       switch (regionalFilter.top100List) {
         case 'worldwide':
@@ -26,25 +26,22 @@ export const filterCoursesByRegion = (
           return true;
       }
     });
-  }
-
-  // Filter by region
-  if (regionalFilter.region !== 'all') {
-    filtered = filtered.filter(course => {
-      switch (regionalFilter.region) {
-        case 'britain-ireland':
-          return course.country === 'Britain & Ireland';
-        case 'usa':
-          return course.country === 'USA';
-        case 'europe':
-          return course.country === 'Continental Europe';
-        case 'worldwide':
-          // Show courses with global_rank or courses from worldwide regions
-          return course.global_rank !== null || course.country === 'Worldwide';
-        default:
-          return true;
-      }
-    });
+  } else {
+    // Only apply scope filter if no Top 100 is selected
+    if (regionalFilter.scope !== 'all') {
+      filtered = filtered.filter(course => {
+        switch (regionalFilter.scope) {
+          case 'britain-ireland':
+            return course.country === 'Britain & Ireland';
+          case 'usa':
+            return course.country === 'USA';
+          case 'europe':
+            return course.country === 'Continental Europe';
+          default:
+            return true;
+        }
+      });
+    }
   }
 
   // Filter by sub-country (state/country within region)

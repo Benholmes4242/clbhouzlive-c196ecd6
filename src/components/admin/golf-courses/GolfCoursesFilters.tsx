@@ -3,13 +3,13 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import { regionMapping, RegionKey } from './types';
+import { scopeMapping, ScopeKey } from './types';
 
 interface GolfCoursesFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  selectedRegion: RegionKey;
-  onRegionChange: (value: RegionKey) => void;
+  selectedRegion: ScopeKey;
+  onRegionChange: (value: ScopeKey) => void;
 }
 
 const GolfCoursesFilters: React.FC<GolfCoursesFiltersProps> = ({
@@ -36,7 +36,7 @@ const GolfCoursesFilters: React.FC<GolfCoursesFiltersProps> = ({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {Object.entries(regionMapping).map(([value, label]) => (
+          {Object.entries(scopeMapping).map(([value, label]) => (
             <SelectItem key={value} value={value}>
               {label}
             </SelectItem>

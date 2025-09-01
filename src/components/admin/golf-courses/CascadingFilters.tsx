@@ -4,8 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
-  regionMapping, 
-  RegionKey, 
+  scopeMapping, 
+  ScopeKey, 
   RegionalFilter,
   britainIrelandCountries,
   britainIrelandCounties,
@@ -34,52 +34,42 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
   const [availableSubCountries, setAvailableSubCountries] = useState<string[]>([]);
   const [availableCounties, setAvailableCounties] = useState<string[]>([]);
 
-  // Update available sub-countries when region changes
+  // Update available sub-countries when scope changes
   useEffect(() => {
     let subCountries: string[] = [];
     
-    switch (regionalFilter.region) {
-      case 'usa':
-        subCountries = usStates;
-        break;
-      case 'britain-ireland':
-        subCountries = britainIrelandCountries;
-        break;
-      case 'europe':
-        subCountries = continentalEuropeCountries;
-        break;
-      case 'worldwide':
-        subCountries = worldwideCountries;
-        break;
-      default:
-        subCountries = [];
+    // Only show sub-countries if no Top 100 is selected and scope is specific
+    if (!regionalFilter.top100List) {
+      switch (regionalFilter.scope) {
+        case 'usa':
+          subCountries = usStates;
+          break;
+        case 'britain-ireland':
+          subCountries = britainIrelandCountries;
+          break;
+        case 'europe':
+          subCountries = continentalEuropeCountries;
+          break;
+        default:
+          subCountries = [];
+      }
     }
     
     setAvailableSubCountries(subCountries);
     
-    // Reset sub-country and county when region changes
-    if (regionalFilter.region === 'all') {
-      onRegionalFilterChange({
-        region: 'all',
-        subCountry: null,
-        county: null,
-        top100List: regionalFilter.top100List,
-        sortBy: regionalFilter.sortBy
-      });
-    } else {
-      onRegionalFilterChange({
-        ...regionalFilter,
-        subCountry: null,
-        county: null
-      });
-    }
-  }, [regionalFilter.region]);
+    // Reset sub-country and county when scope changes
+    onRegionalFilterChange({
+      ...regionalFilter,
+      subCountry: null,
+      county: null
+    });
+  }, [regionalFilter.scope, regionalFilter.top100List]);
 
   // Update available counties when sub-country changes
   useEffect(() => {
     let counties: string[] = [];
     
-    if (regionalFilter.region === 'britain-ireland' && regionalFilter.subCountry) {
+    if (regionalFilter.scope === 'britain-ireland' && regionalFilter.subCountry && !regionalFilter.top100List) {
       counties = britainIrelandCounties[regionalFilter.subCountry] || [];
     }
     
@@ -92,11 +82,11 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
         county: null
       });
     }
-  }, [regionalFilter.subCountry]);
+  }, [regionalFilter.subCountry, regionalFilter.scope, regionalFilter.top100List]);
 
-  const handleRegionChange = (value: RegionKey) => {
+  const handleScopeChange = (value: ScopeKey) => {
     onRegionalFilterChange({
-      region: value,
+      scope: value,
       subCountry: null,
       county: null,
       top100List: regionalFilter.top100List,
@@ -119,11 +109,25 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
     });
   };
 
-  const handleTop100ListChange = (value: Top100ListKey) => {
-    onRegionalFilterChange({
-      ...regionalFilter,
-      top100List: value
-    });
+  const handleTop100ListChange = (value: string) => {
+    if (value === 'none') {
+      // Clear Top 100 filter
+      onRegionalFilterChange({
+        ...regionalFilter,
+        top100List: null,
+        subCountry: null,
+        county: null
+      });
+    } else {
+      // Set Top 100 filter and clear/disable scope-related filters
+      onRegionalFilterChange({
+        scope: 'all',
+        subCountry: null,
+        county: null,
+        top100List: value as Top100ListKey,
+        sortBy: regionalFilter.sortBy
+      });
+    }
   };
 
   const handleSortChange = (value: SortOptionKey) => {
@@ -135,15 +139,15 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
 
   const clearFilters = () => {
     onRegionalFilterChange({
-      region: 'all',
+      scope: 'all',
       subCountry: null,
       county: null,
-      top100List: 'all',
+      top100List: null,
       sortBy: 'name-asc'
     });
   };
 
-  const hasActiveFilters = regionalFilter.region !== 'all' || regionalFilter.subCountry || regionalFilter.county || (regionalFilter.top100List && regionalFilter.top100List !== 'all') || (regionalFilter.sortBy && regionalFilter.sortBy !== 'name-asc');
+  const hasActiveFilters = regionalFilter.scope !== 'all' || regionalFilter.subCountry || regionalFilter.county || regionalFilter.top100List || (regionalFilter.sortBy && regionalFilter.sortBy !== 'name-asc');
 
   return (
     <div className="space-y-4">
@@ -162,15 +166,36 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
 
       {/* Cascading Dropdowns */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Top 100 Lists Filter */}
+        {/* Scope Filter (merged All Courses + Regions) */}
         <Select 
-          value={regionalFilter.top100List || 'all'} 
-          onValueChange={handleTop100ListChange}
+          value={regionalFilter.scope} 
+          onValueChange={handleScopeChange}
+          disabled={!!regionalFilter.top100List}
         >
-          <SelectTrigger className="w-full sm:w-56 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+          <SelectTrigger className={`w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border ${regionalFilter.top100List ? 'opacity-50' : ''}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
+            {Object.entries(scopeMapping).map(([value, label]) => (
+              <SelectItem key={value} value={value} className="hover:bg-accent">
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Top 100 Courses Filter */}
+        <Select 
+          value={regionalFilter.top100List || 'none'} 
+          onValueChange={handleTop100ListChange}
+        >
+          <SelectTrigger className="w-full sm:w-56 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+            <SelectValue placeholder="Top 100 Courses" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border-border z-50">
+            <SelectItem value="none" className="hover:bg-accent">
+              None Selected
+            </SelectItem>
             {Object.entries(top100ListMapping).map(([value, label]) => (
               <SelectItem key={value} value={value} className="hover:bg-accent">
                 {label}
@@ -196,30 +221,17 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           </SelectContent>
         </Select>
 
-        {/* Primary Region Selector */}
-        <Select value={regionalFilter.region} onValueChange={handleRegionChange}>
-          <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-popover border-border z-50">
-            {Object.entries(regionMapping).map(([value, label]) => (
-              <SelectItem key={value} value={value} className="hover:bg-accent">
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
 
-        {/* Secondary Sub-Country/State Selector */}
-        {availableSubCountries.length > 0 && (
+        {/* Secondary Sub-Country/State Selector - only when no Top 100 selected */}
+        {availableSubCountries.length > 0 && !regionalFilter.top100List && (
           <Select 
             value={regionalFilter.subCountry || ''} 
             onValueChange={handleSubCountryChange}
           >
             <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
               <SelectValue placeholder={
-                regionalFilter.region === 'usa' ? 'Select State' :
-                regionalFilter.region === 'britain-ireland' ? 'Select Country' :
+                regionalFilter.scope === 'usa' ? 'Select State' :
+                regionalFilter.scope === 'britain-ireland' ? 'Select Country' :
                 'Select Country'
               } />
             </SelectTrigger>
@@ -233,8 +245,8 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           </Select>
         )}
 
-        {/* Tertiary County/Region Selector (only for Britain & Ireland) */}
-        {availableCounties.length > 0 && regionalFilter.subCountry && (
+        {/* Tertiary County/Region Selector (only for Britain & Ireland, not with Top 100) */}
+        {availableCounties.length > 0 && regionalFilter.subCountry && !regionalFilter.top100List && (
           <Select 
             value={regionalFilter.county || ''} 
             onValueChange={handleCountyChange}
@@ -270,9 +282,15 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
           <span>Active filters:</span>
-          {regionalFilter.top100List && regionalFilter.top100List !== 'all' && (
-            <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
-              {top100ListMapping[regionalFilter.top100List]}
+          {regionalFilter.top100List && (
+            <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground flex items-center gap-2">
+              Top 100: {top100ListMapping[regionalFilter.top100List]}
+              <button 
+                onClick={() => handleTop100ListChange('none')}
+                className="hover:bg-secondary-foreground/20 rounded p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </span>
           )}
           {regionalFilter.sortBy && regionalFilter.sortBy !== 'name-asc' && (
@@ -280,9 +298,9 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
               {sortOptionMapping[regionalFilter.sortBy]}
             </span>
           )}
-          {regionalFilter.region !== 'all' && (
+          {!regionalFilter.top100List && regionalFilter.scope !== 'all' && (
             <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
-              {regionMapping[regionalFilter.region]}
+              Scope: {scopeMapping[regionalFilter.scope]}
             </span>
           )}
           {regionalFilter.subCountry && (
@@ -295,6 +313,13 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
               {regionalFilter.county}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Top 100 Active Notice */}
+      {regionalFilter.top100List && (
+        <div className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded border-l-4 border-[#b66b41]">
+          Filtering by {top100ListMapping[regionalFilter.top100List]}. Other location filters are disabled.
         </div>
       )}
     </div>

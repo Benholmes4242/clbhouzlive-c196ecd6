@@ -17,10 +17,10 @@ import { GolfCourse, RegionalFilter } from './golf-courses/types';
 const GolfCoursesManagement = () => {
   const { toast } = useToast();
   const [regionalFilter, setRegionalFilter] = useState<RegionalFilter>({
-    region: 'all',
+    scope: 'all',
     subCountry: null,
     county: null,
-    top100List: 'all',
+    top100List: null,
     sortBy: 'name-asc'
   });
   const [searchTerm, setSearchTerm] = useState('');

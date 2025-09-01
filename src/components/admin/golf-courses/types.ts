@@ -35,30 +35,29 @@ export interface GolfCourseEditorProps {
   onClose: () => void;
 }
 
-export type RegionKey = 'all' | 'usa' | 'britain-ireland' | 'europe' | 'worldwide';
+// Scope filter type (merged All Courses + Regions, no Worldwide)
+export type ScopeKey = 'all' | 'usa' | 'britain-ireland' | 'europe';
 
-export const regionMapping: Record<RegionKey, string> = {
-  all: 'All Regions',
+export const scopeMapping: Record<ScopeKey, string> = {
+  all: 'All Courses',
   usa: 'USA',
   'britain-ireland': 'Britain & Ireland',
-  europe: 'Continental Europe',
-  worldwide: 'Worldwide'
+  europe: 'Continental Europe'
 };
 
 // Filter state interface for cascading dropdowns
 export interface RegionalFilter {
-  region: RegionKey;
+  scope: ScopeKey;
   subCountry: string | null;
   county: string | null;
   top100List: Top100ListKey | null;
   sortBy: SortOptionKey | null;
 }
 
-// Top 100 List filter type
-export type Top100ListKey = 'all' | 'worldwide' | 'usa' | 'britain-ireland' | 'europe';
+// Top 100 List filter type (no 'all' option, null means none selected)
+export type Top100ListKey = 'worldwide' | 'usa' | 'britain-ireland' | 'europe';
 
 export const top100ListMapping: Record<Top100ListKey, string> = {
-  all: 'All Courses',
   worldwide: 'Top 100 Worldwide',
   usa: 'Top 100 USA',
   'britain-ireland': 'Top 100 Great Britain & Ireland',
