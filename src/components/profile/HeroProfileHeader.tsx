@@ -666,24 +666,20 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
-          {/* Header Image without overlay - clean photo */}
-          <div 
-            ref={profileCardRef}
-            className="relative w-full overflow-hidden rounded-b-[20px]" 
-            style={{ 
-              height: '55vh', 
-              minHeight: '400px', 
-              maxHeight: '600px' 
-            }}
-          >
+          {/* Header Image with fade gradient overlay */}
+          <div className="relative w-full overflow-hidden" style={{ 
+            height: '46vh', 
+            minHeight: '320px', 
+            maxHeight: '520px' 
+          }}>
             {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-b-[20px]" />
+            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             
             {profile?.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
                 alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300 rounded-b-[20px]"
+                className="w-full h-full object-cover transition-opacity duration-300"
                 style={{ 
                   objectPosition: getMobileCropPosition(profile),
                   objectFit: 'cover'
@@ -697,7 +693,7 @@ const HeroProfileHeader = ({
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-b-[20px]">
+              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
                 <Camera className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium mb-2">No Profile Photo</p>
                 <p className="text-sm text-center px-4">
@@ -705,12 +701,22 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
+            
+            {/* Bottom fade overlay for smooth card overlap */}
+            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
-          {/* User Info on White Background */}
-          <div className="bg-white px-5 pt-6 pb-4">
-            {/* Name & Handle - Left aligned */}
-            <div className="mb-4">
+          {/* Overlapping White Card */}
+          <div 
+            ref={profileCardRef}
+            className="relative mx-3 -mt-4 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
+            style={{
+              borderColor: 'hsl(var(--profile-border-card))',
+              boxShadow: 'var(--profile-shadow-card)'
+            }}
+          >
+            {/* Name & Handle - Centered */}
+            <div className="text-center mb-4">
               <h1 
                 className="text-2xl leading-8 font-bold mb-1.5"
                 style={{ color: 'hsl(var(--profile-text-primary))' }}
@@ -726,8 +732,8 @@ const HeroProfileHeader = ({
             </div>
             
             {/* Home Club & Handicap Row */}
-            <div className="flex gap-4 mb-4">
-              <div className="flex-1">
+            <div className="flex gap-2 mb-4">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-xs leading-4 font-semibold mb-1"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
@@ -741,7 +747,7 @@ const HeroProfileHeader = ({
                   {homeClub}
                 </div>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-center">
                 <div 
                   className="text-xs leading-4 font-semibold mb-1"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
@@ -759,7 +765,7 @@ const HeroProfileHeader = ({
             
             {/* Profile Action Buttons */}
             {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setEditDialogOpen(true)}
                   className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
@@ -798,7 +804,7 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Stats Tiles */}
-          <div className="px-3 mt-0 mb-4">
+          <div className="px-3 mt-4 mb-4">
             <div className="grid grid-cols-4 gap-2">
               {/* Posts */}
               <div 
@@ -891,26 +897,26 @@ const HeroProfileHeader = ({
           </div>
         </div>
       ) : (
-        /* Desktop layout - user info on white background */
+        /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
-          {/* Header Image without overlay - clean photo */}
+          {/* Header Image with fade gradient overlay */}
           <div 
             ref={profileCardRef}
-            className="relative w-full overflow-hidden rounded-b-[20px]" 
+            className="relative w-full overflow-hidden" 
             style={{ 
-              height: '55vh', 
-              minHeight: '400px', 
-              maxHeight: '600px' 
+              height: '48vh', 
+              minHeight: '320px', 
+              maxHeight: '520px' 
             }}
           >
             {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-b-[20px]" />
+            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
             
             {profile?.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
                 alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300 rounded-b-[20px]"
+                className="w-full h-full object-cover transition-opacity duration-300"
                 style={{ 
                   objectPosition: 'center center',
                   objectFit: 'cover'
@@ -924,7 +930,7 @@ const HeroProfileHeader = ({
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-b-[20px]">
+              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
                 <Camera className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium mb-2">No Profile Photo</p>
                 <p className="text-sm text-center px-4">
@@ -932,10 +938,18 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
+            
+            {/* Bottom fade overlay for smooth card overlap */}
+            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
-          {/* User Info on White Background - Desktop */}
-          <div className="bg-white max-w-2xl mx-auto px-8 pt-8 pb-6">
+          {/* Overlapping White Card - Desktop styling */}
+          <div className="relative mx-auto max-w-2xl -mt-6 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
+            style={{
+              borderColor: 'hsl(var(--profile-border-card))',
+              boxShadow: 'var(--profile-shadow-card)'
+            }}
+          >
             {/* Name & Handle - Centered */}
             <div className="text-center mb-6">
               <h1 
@@ -986,7 +1000,7 @@ const HeroProfileHeader = ({
             
             {/* Profile Action Buttons */}
             {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setEditDialogOpen(true)}
                   className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
@@ -1025,7 +1039,7 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Stats Tiles - Desktop */}
-          <div className="max-w-4xl mx-auto px-6 mt-0 mb-6">
+          <div className="max-w-4xl mx-auto px-6 mt-6 mb-6">
             <div className="grid grid-cols-4 gap-4">
               {/* Posts */}
               <div 
