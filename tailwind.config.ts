@@ -215,6 +215,14 @@ export default {
 					'100%': {
 						transform: 'translateX(100%)'
 					}
+				},
+				'slow-spin': {
+					'0%': {
+						transform: 'rotate(0deg)'
+					},
+					'100%': {
+						transform: 'rotate(360deg)'
+					}
 				}
 			},
 			animation: {
@@ -230,7 +238,8 @@ export default {
 				'slide-in-from-left-bounce': 'slide-in-from-left-bounce 350ms cubic-bezier(0.34, 1.56, 0.64, 1)',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
-				'shimmer': 'shimmer 2s infinite'
+				'shimmer': 'shimmer 2s infinite',
+				'slow-spin': 'slow-spin 20s linear infinite'
 			}
 		}
 	},
