@@ -666,20 +666,24 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with fade gradient overlay */}
-          <div className="relative w-full overflow-hidden" style={{ 
-            height: '46vh', 
-            minHeight: '320px', 
-            maxHeight: '520px' 
-          }}>
+          {/* Header Image with user info overlay and rounded bottom corners */}
+          <div 
+            ref={profileCardRef}
+            className="relative w-full overflow-hidden rounded-b-[20px]" 
+            style={{ 
+              height: '55vh', 
+              minHeight: '400px', 
+              maxHeight: '600px' 
+            }}
+          >
             {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+            <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-b-[20px]" />
             
             {profile?.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
                 alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full h-full object-cover transition-opacity duration-300 rounded-b-[20px]"
                 style={{ 
                   objectPosition: getMobileCropPosition(profile),
                   objectFit: 'cover'
@@ -693,7 +697,7 @@ const HeroProfileHeader = ({
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-b-[20px]">
                 <Camera className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium mb-2">No Profile Photo</p>
                 <p className="text-sm text-center px-4">
@@ -702,105 +706,65 @@ const HeroProfileHeader = ({
               </div>
             )}
             
-            {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
-          </div>
-          
-          {/* Overlapping White Card */}
-          <div 
-            ref={profileCardRef}
-            className="relative mx-3 -mt-4 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
-            style={{
-              borderColor: 'hsl(var(--profile-border-card))',
-              boxShadow: 'var(--profile-shadow-card)'
-            }}
-          >
-            {/* Name & Handle - Centered */}
-            <div className="text-center mb-4">
-              <h1 
-                className="text-2xl leading-8 font-bold mb-1.5"
-                style={{ color: 'hsl(var(--profile-text-primary))' }}
-              >
-                {displayName}
-              </h1>
-              <div 
-                className="text-base leading-6 font-medium"
-                style={{ color: 'hsl(var(--profile-text-secondary))' }}
-              >
-                @{username}
-              </div>
-            </div>
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-black/20 rounded-b-[20px]" />
             
-            {/* Home Club & Handicap Row */}
-            <div className="flex gap-2 mb-4">
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-xs leading-4 font-semibold mb-1"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Home Club
-                </div>
-                <div 
-                  className="text-base leading-6 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {homeClub}
+            {/* User Info Directly on Background */}
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+              {/* Name & Handle - Left aligned */}
+              <div className="mb-4">
+                <h1 className="text-2xl leading-8 font-bold mb-1.5 drop-shadow-lg">
+                  {displayName}
+                </h1>
+                <div className="text-base leading-6 font-medium drop-shadow-lg opacity-90">
+                  @{username}
                 </div>
               </div>
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-xs leading-4 font-semibold mb-1"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Handicap
+              
+              {/* Home Club & Handicap Row */}
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                  <div className="text-xs leading-4 font-semibold mb-1 drop-shadow-lg opacity-80">
+                    Home Club
+                  </div>
+                  <div className="text-base leading-6 font-semibold drop-shadow-lg">
+                    {homeClub}
+                  </div>
                 </div>
-                <div 
-                  className="text-base leading-6 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {handicap}
+                <div className="flex-1">
+                  <div className="text-xs leading-4 font-semibold mb-1 drop-shadow-lg opacity-80">
+                    Handicap
+                  </div>
+                  <div className="text-base leading-6 font-semibold drop-shadow-lg">
+                    {handicap}
+                  </div>
                 </div>
               </div>
+              
+              {/* Profile Action Buttons */}
+              {isOwnProfile && (
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => setEditDialogOpen(true)}
+                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Edit<br/>Profile
+                  </button>
+                  <button
+                    onClick={() => setMediaManagerOpen(true)}
+                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Media<br/>Manager
+                  </button>
+                  <button
+                    onClick={() => previewImmersive()}
+                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Immersive<br/>Preview
+                  </button>
+                </div>
+              )}
             </div>
-            
-            {/* Profile Action Buttons */}
-            {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setEditDialogOpen(true)}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Edit<br/>Profile
-                </button>
-                <button
-                  onClick={() => setMediaManagerOpen(true)}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Media<br/>Manager
-                </button>
-                <button
-                  onClick={() => previewImmersive()}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Immersive<br/>Preview
-                </button>
-              </div>
-            )}
           </div>
           
           {/* Stats Tiles */}
@@ -897,26 +861,26 @@ const HeroProfileHeader = ({
           </div>
         </div>
       ) : (
-        /* Desktop layout - updated to match mobile design pattern */
+        /* Desktop layout - user info directly on background */
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with fade gradient overlay */}
+          {/* Header Image with user info overlay and rounded bottom corners */}
           <div 
             ref={profileCardRef}
-            className="relative w-full overflow-hidden" 
+            className="relative w-full overflow-hidden rounded-b-[20px]" 
             style={{ 
-              height: '48vh', 
-              minHeight: '320px', 
-              maxHeight: '520px' 
+              height: '55vh', 
+              minHeight: '400px', 
+              maxHeight: '600px' 
             }}
           >
             {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+            <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-b-[20px]" />
             
             {profile?.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
                 alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full h-full object-cover transition-opacity duration-300 rounded-b-[20px]"
                 style={{ 
                   objectPosition: 'center center',
                   objectFit: 'cover'
@@ -930,7 +894,7 @@ const HeroProfileHeader = ({
                 }}
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-b-[20px]">
                 <Camera className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium mb-2">No Profile Photo</p>
                 <p className="text-sm text-center px-4">
@@ -939,103 +903,65 @@ const HeroProfileHeader = ({
               </div>
             )}
             
-            {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
-          </div>
-          
-          {/* Overlapping White Card - Desktop styling */}
-          <div className="relative mx-auto max-w-2xl -mt-6 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
-            style={{
-              borderColor: 'hsl(var(--profile-border-card))',
-              boxShadow: 'var(--profile-shadow-card)'
-            }}
-          >
-            {/* Name & Handle - Centered */}
-            <div className="text-center mb-6">
-              <h1 
-                className="text-3xl leading-10 font-bold mb-2"
-                style={{ color: 'hsl(var(--profile-text-primary))' }}
-              >
-                {displayName}
-              </h1>
-              <div 
-                className="text-lg leading-7 font-medium"
-                style={{ color: 'hsl(var(--profile-text-secondary))' }}
-              >
-                @{username}
-              </div>
-            </div>
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-black/20 rounded-b-[20px]" />
             
-            {/* Home Club & Handicap Row */}
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-sm leading-5 font-semibold mb-2"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Home Club
-                </div>
-                <div 
-                  className="text-lg leading-7 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {homeClub}
+            {/* User Info Directly on Background - Desktop */}
+            <div className="absolute inset-x-0 bottom-0 max-w-2xl mx-auto p-8 text-white">
+              {/* Name & Handle - Centered */}
+              <div className="text-center mb-6">
+                <h1 className="text-3xl leading-10 font-bold mb-2 drop-shadow-lg">
+                  {displayName}
+                </h1>
+                <div className="text-lg leading-7 font-medium drop-shadow-lg opacity-90">
+                  @{username}
                 </div>
               </div>
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-sm leading-5 font-semibold mb-2"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Handicap
+              
+              {/* Home Club & Handicap Row */}
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1 text-center">
+                  <div className="text-sm leading-5 font-semibold mb-2 drop-shadow-lg opacity-80">
+                    Home Club
+                  </div>
+                  <div className="text-lg leading-7 font-semibold drop-shadow-lg">
+                    {homeClub}
+                  </div>
                 </div>
-                <div 
-                  className="text-lg leading-7 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {handicap}
+                <div className="flex-1 text-center">
+                  <div className="text-sm leading-5 font-semibold mb-2 drop-shadow-lg opacity-80">
+                    Handicap
+                  </div>
+                  <div className="text-lg leading-7 font-semibold drop-shadow-lg">
+                    {handicap}
+                  </div>
                 </div>
               </div>
+              
+              {/* Profile Action Buttons */}
+              {isOwnProfile && (
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setEditDialogOpen(true)}
+                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Edit<br/>Profile
+                  </button>
+                  <button
+                    onClick={() => setMediaManagerOpen(true)}
+                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Media<br/>Manager
+                  </button>
+                  <button
+                    onClick={() => previewImmersive()}
+                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                  >
+                    Immersive<br/>Preview
+                  </button>
+                </div>
+              )}
             </div>
-            
-            {/* Profile Action Buttons */}
-            {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => setEditDialogOpen(true)}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Edit<br/>Profile
-                </button>
-                <button
-                  onClick={() => setMediaManagerOpen(true)}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Media<br/>Manager
-                </button>
-                <button
-                  onClick={() => previewImmersive()}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Immersive<br/>Preview
-                </button>
-              </div>
-            )}
           </div>
           
           {/* Stats Tiles - Desktop */}
