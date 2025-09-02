@@ -68,7 +68,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   if (isLoading) {
   return (
     <div className={`${className}`}>
-      <div className="flex items-center justify-between mb-2 pt-2">
+      <div className="flex items-center justify-between mb-2 pt-0">
         <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
       </div>
       <div className="flex gap-4">
@@ -83,7 +83,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   if (error || !highlights || highlights.length === 0) {
     return (
       <div className={`${className}`}>
-        <div className="flex items-center justify-between mb-2 pt-2">
+        <div className="flex items-center justify-between mb-2 pt-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
         </div>
         <div className="bg-card border border-border rounded-xl p-8 text-center">
@@ -100,7 +100,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   return (
     <HighlightsVideoProvider>
       <div className={`${className}`}>
-        <div className="flex items-center justify-between mb-2 pt-2">
+        <div className="flex items-center justify-between mb-2 pt-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
           
           {highlights.length > 1 && (
@@ -142,13 +142,11 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         >
           {highlights.map((highlight) => (
             <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
-              <div className="w-full aspect-[5/4]">
-                <HighlightCardWithModal 
-                  highlight={highlight}
-                  onOpenModal={openModal}
-                  isLandscape={true}
-                />
-              </div>
+              <HighlightCardWithModal 
+                highlight={highlight}
+                onOpenModal={openModal}
+                isLandscape={true}
+              />
             </div>
           ))}
         </div>
