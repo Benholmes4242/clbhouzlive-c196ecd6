@@ -450,7 +450,6 @@ const HeroProfileHeader = ({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobile, profile?.id, trackScrollDepth]);
-  
   const handleMorphTransition = () => {
     closeImmersive();
     // Smooth scroll to trigger sticky header
@@ -490,22 +489,55 @@ const HeroProfileHeader = ({
   // Animation hook for badges
   const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
 
-  // Form handling state
-  const [editFormData, setEditFormData] = useState({
-    display_name: profile?.display_name || '',
-    username: profile?.username || '',
-    home_club: profile?.home_club || '',
-    bio: profile?.bio || ''
-  });
+  // Profile form hook
+  const {
+    formData,
+    saving,
+    isUsernameSet,
+    handleInputChange,
+    handleHandicapChange,
+    handlePublicToggle,
+    handleTextareaChange,
+    handleSelectChange,
+    handleFileChange,
+    handleSave,
+  } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
+  
+  // Removed scroll event listeners
 
-  // Handle video upload
+
+  // Achievement ring calculation
+  const getAchievementRing = (coursesPlayed: number): AchievementRing => {
+    if (coursesPlayed >= 300) {
+      return { level: 5, title: "🌈 Club Collector", ringClass: "ring-gradient", color: "gradient", courses: 300 };
+    } else if (coursesPlayed >= 200) {
+      return { level: 4, title: "🟢 Clubhouse Elite", ringClass: "ring-green", color: "#32CD32", courses: 200 };
+    } else if (coursesPlayed >= 100) {
+      return { level: 3, title: "💙 Century Club", ringClass: "ring-blue", color: "#1E90FF", courses: 100 };
+    } else if (coursesPlayed >= 50) {
+      return { level: 2, title: "🥈 The 50 Club", ringClass: "ring-silver", color: "#C0C0C0", courses: 50 };
+    } else if (coursesPlayed >= 20) {
+      return { level: 1, title: "🟡 The 20 Club", ringClass: "ring-gold", color: "#FFD700", courses: 20 };
+    } else {
+      return { level: 0, title: "", ringClass: "ring-none", color: "transparent", courses: 0 };
+    }
+  };
+
+  const achievementRing = getAchievementRing(userProgressData.coursesPlayed);
+
   const handleVideoUpload = async (file: File) => {
     try {
       const result = await uploadVideo(file);
+      
+      if (!result.success) {
+        toast.error(result.error || "Failed to upload video");
+        return;
+      }
 
+      // Update profile with video URLs
       const { error } = await supabase
         .from('user_profiles')
-        .update({ 
+        .update({
           profile_video_url: result.videoUrl,
           profile_video_thumbnail_url: result.thumbnailUrl,
           has_profile_video: true,
@@ -518,21 +550,52 @@ const HeroProfileHeader = ({
       }
 
       toast.success("Profile video uploaded successfully!");
+
       onProfileUpdate();
     } catch (error) {
-      console.error('Error uploading video:', error);
-      toast.error("Failed to upload video");
+      console.error('Error updating profile video:', error);
+      toast.error("Failed to save video to profile");
     }
   };
 
-  // Handle profile photo upload
-  const handleProfilePhotoUpload = async (file: File) => {
+  const handleVideoRemove = async () => {
     try {
-      const result = await uploadImage(file);
-
       const { error } = await supabase
         .from('user_profiles')
-        .update({ 
+        .update({
+          profile_video_url: null,
+          profile_video_thumbnail_url: null,
+          has_profile_video: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Profile video removed successfully!");
+
+      onProfileUpdate();
+    } catch (error) {
+      console.error('Error removing profile video:', error);
+      toast.error("Failed to remove video from profile");
+    }
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    try {
+      const result = await uploadImage(file);
+      
+      if (!result.success) {
+        toast.error(result.error || "Failed to upload photo");
+        return;
+      }
+
+      // Update profile with photo URL
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
           profile_photo_url: result.imageUrl,
           updated_at: new Date().toISOString()
         })
@@ -552,6 +615,9 @@ const HeroProfileHeader = ({
       toast.error("Failed to save photo to profile");
     }
   };
+
+
+
 
   // Simple refs for animation (removed complex animation hooks)
   const activityRef = React.useRef<HTMLDivElement>(null);
@@ -599,8 +665,8 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16">
-          {/* Header Image */}
+        <div className="relative -mt-16 bg-white">
+          {/* Header Image with fade gradient overlay */}
           <div className="relative w-full overflow-hidden" style={{ 
             height: '46vh', 
             minHeight: '320px', 
@@ -635,12 +701,19 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
+            
+            {/* Bottom fade overlay for smooth card overlap */}
+            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
-          {/* White Background Section with User Info */}
+          {/* Overlapping White Card */}
           <div 
             ref={profileCardRef}
-            className="bg-white rounded-t-[20px] p-5"
+            className="relative mx-3 -mt-4 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
+            style={{
+              borderColor: 'hsl(var(--profile-border-card))',
+              boxShadow: 'var(--profile-shadow-card)'
+            }}
           >
             {/* Name & Handle - Centered */}
             <div className="text-center mb-4">
@@ -692,7 +765,7 @@ const HeroProfileHeader = ({
             
             {/* Profile Action Buttons */}
             {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setEditDialogOpen(true)}
                   className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
@@ -728,8 +801,10 @@ const HeroProfileHeader = ({
                 </button>
               </div>
             )}
-            
-            {/* Stats Tiles - Mobile */}
+          </div>
+          
+          {/* Stats Tiles */}
+          <div className="px-3 mt-4 mb-4">
             <div className="grid grid-cols-4 gap-2">
               {/* Posts */}
               <div 
@@ -822,9 +897,9 @@ const HeroProfileHeader = ({
           </div>
         </div>
       ) : (
-        /* Desktop layout */
-        <div className="relative -mt-16">
-          {/* Header Image */}
+        /* Desktop layout - updated to match mobile design pattern */
+        <div className="relative -mt-16 bg-white">
+          {/* Header Image with fade gradient overlay */}
           <div 
             ref={profileCardRef}
             className="relative w-full overflow-hidden" 
@@ -863,189 +938,194 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
+            
+            {/* Bottom fade overlay for smooth card overlap */}
+            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
           </div>
           
-          {/* White Background Section with User Info */}
-          <div className="bg-white rounded-t-[20px]">
-            {/* User Info Container */}
-            <div className="mx-auto max-w-2xl p-6">
-              {/* Name & Handle - Centered */}
-              <div className="text-center mb-6">
-                <h1 
-                  className="text-3xl leading-10 font-bold mb-2"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {displayName}
-                </h1>
+          {/* Overlapping White Card - Desktop styling */}
+          <div className="relative mx-auto max-w-2xl -mt-6 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
+            style={{
+              borderColor: 'hsl(var(--profile-border-card))',
+              boxShadow: 'var(--profile-shadow-card)'
+            }}
+          >
+            {/* Name & Handle - Centered */}
+            <div className="text-center mb-6">
+              <h1 
+                className="text-3xl leading-10 font-bold mb-2"
+                style={{ color: 'hsl(var(--profile-text-primary))' }}
+              >
+                {displayName}
+              </h1>
+              <div 
+                className="text-lg leading-7 font-medium"
+                style={{ color: 'hsl(var(--profile-text-secondary))' }}
+              >
+                @{username}
+              </div>
+            </div>
+            
+            {/* Home Club & Handicap Row */}
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1 text-center">
                 <div 
-                  className="text-lg leading-7 font-medium"
+                  className="text-sm leading-5 font-semibold mb-2"
                   style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
-                  @{username}
+                  Home Club
+                </div>
+                <div 
+                  className="text-lg leading-7 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {homeClub}
                 </div>
               </div>
-              
-              {/* Home Club & Handicap Row */}
-              <div className="flex gap-4 mb-6">
-                <div className="flex-1 text-center">
-                  <div 
-                    className="text-sm leading-5 font-semibold mb-2"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Home Club
-                  </div>
-                  <div 
-                    className="text-lg leading-7 font-semibold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    {homeClub}
-                  </div>
+              <div className="flex-1 text-center">
+                <div 
+                  className="text-sm leading-5 font-semibold mb-2"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Handicap
                 </div>
-                <div className="flex-1 text-center">
-                  <div 
-                    className="text-sm leading-5 font-semibold mb-2"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Handicap
-                  </div>
-                  <div 
-                    className="text-lg leading-7 font-semibold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    {handicap}
-                  </div>
+                <div 
+                  className="text-lg leading-7 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {handicap}
                 </div>
               </div>
-              
-              {/* Profile Action Buttons */}
-              {isOwnProfile && (
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  <button
-                    onClick={() => setEditDialogOpen(true)}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                    style={{
-                      borderColor: 'hsl(var(--profile-border-button))',
-                      color: 'hsl(var(--profile-text-primary))',
-                      backgroundColor: 'hsl(var(--profile-card))'
-                    }}
-                  >
-                    Edit<br/>Profile
-                  </button>
-                  <button
-                    onClick={() => setMediaManagerOpen(true)}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                    style={{
-                      borderColor: 'hsl(var(--profile-border-button))',
-                      color: 'hsl(var(--profile-text-primary))',
-                      backgroundColor: 'hsl(var(--profile-card))'
-                    }}
-                  >
-                    Media<br/>Manager
-                  </button>
-                  <button
-                    onClick={() => previewImmersive()}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                    style={{
-                      borderColor: 'hsl(var(--profile-border-button))',
-                      color: 'hsl(var(--profile-text-primary))',
-                      backgroundColor: 'hsl(var(--profile-card))'
-                    }}
-                  >
-                    Immersive<br/>Preview
-                  </button>
-                </div>
-              )}
             </div>
+            
+            {/* Profile Action Buttons */}
+            {isOwnProfile && (
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => setEditDialogOpen(true)}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Edit<br/>Profile
+                </button>
+                <button
+                  onClick={() => setMediaManagerOpen(true)}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Media<br/>Manager
+                </button>
+                <button
+                  onClick={() => previewImmersive()}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Immersive<br/>Preview
+                </button>
+              </div>
+            )}
+          </div>
           
-            {/* Stats Tiles - Desktop */}
-            <div className="max-w-4xl mx-auto px-6 pb-6">
-              <div className="grid grid-cols-4 gap-4">
-                {/* Posts */}
+          {/* Stats Tiles - Desktop */}
+          <div className="max-w-4xl mx-auto px-6 mt-6 mb-6">
+            <div className="grid grid-cols-4 gap-4">
+              {/* Posts */}
+              <div 
+                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
+                style={{
+                  borderColor: 'hsl(var(--profile-border-tile))',
+                  boxShadow: 'var(--profile-shadow-tile)'
+                }}
+              >
                 <div 
-                  className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-tile))',
-                    boxShadow: 'var(--profile-shadow-tile)'
-                  }}
+                  className="text-xl leading-6 font-bold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
-                  <div 
-                    className="text-xl leading-6 font-bold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    {postsCount}
-                  </div>
-                  <div 
-                    className="text-sm leading-5 font-medium"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Posts
-                  </div>
+                  {postsCount}
                 </div>
-                
-                {/* XP */}
                 <div 
-                  className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-tile))',
-                    boxShadow: 'var(--profile-shadow-tile)'
-                  }}
+                  className="text-sm leading-5 font-medium"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
-                  <div 
-                    className="text-xl leading-6 font-bold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    2,500
-                  </div>
-                  <div 
-                    className="text-sm leading-5 font-medium"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Total XP
-                  </div>
+                  Posts
                 </div>
-                
-                {/* Following */}
+              </div>
+              
+              {/* XP */}
+              <div 
+                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
+                style={{
+                  borderColor: 'hsl(var(--profile-border-tile))',
+                  boxShadow: 'var(--profile-shadow-tile)'
+                }}
+              >
                 <div 
-                  className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-tile))',
-                    boxShadow: 'var(--profile-shadow-tile)'
-                  }}
+                  className="text-xl leading-6 font-bold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
                 >
-                  <div 
-                    className="text-xl leading-6 font-bold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    {followingCount}
-                  </div>
-                  <div 
-                    className="text-sm leading-5 font-medium"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Following
-                  </div>
+                  2,500
                 </div>
-                
-                {/* Followers */}
                 <div 
-                  className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-tile))',
-                    boxShadow: 'var(--profile-shadow-tile)'
-                  }}
+                  className="text-sm leading-5 font-medium"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
                 >
-                  <div 
-                    className="text-xl leading-6 font-bold"
-                    style={{ color: 'hsl(var(--profile-text-primary))' }}
-                  >
-                    {followersCount}
-                  </div>
-                  <div 
-                    className="text-sm leading-5 font-medium"
-                    style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                  >
-                    Followers
-                  </div>
+                  Total XP
+                </div>
+              </div>
+              
+              {/* Following */}
+              <div 
+                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
+                style={{
+                  borderColor: 'hsl(var(--profile-border-tile))',
+                  boxShadow: 'var(--profile-shadow-tile)'
+                }}
+              >
+                <div 
+                  className="text-xl leading-6 font-bold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {followingCount}
+                </div>
+                <div 
+                  className="text-sm leading-5 font-medium"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Following
+                </div>
+              </div>
+              
+              {/* Followers */}
+              <div 
+                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
+                style={{
+                  borderColor: 'hsl(var(--profile-border-tile))',
+                  boxShadow: 'var(--profile-shadow-tile)'
+                }}
+              >
+                <div 
+                  className="text-xl leading-6 font-bold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {followersCount}
+                </div>
+                <div 
+                  className="text-sm leading-5 font-medium"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Followers
                 </div>
               </div>
             </div>
@@ -1084,195 +1164,245 @@ const HeroProfileHeader = ({
                 `}
                 style={{
                   color: activeSection === tab.id 
-                    ? 'hsl(var(--profile-accent-primary))'  
+                    ? 'hsl(var(--profile-text-primary))' 
                     : 'hsl(var(--profile-text-secondary))'
                 }}
               >
                 {tab.label}
-                
-                {/* Animated underline */}
-                {activeSection === tab.id && (
-                  <div 
-                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 rounded-full transition-all duration-300 ease-out"
-                    style={{
-                      backgroundColor: 'hsl(var(--profile-accent-primary))',
-                      width: '60%'
-                    }}
-                  />
-                )}
+                {/* Brand accent underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
+                />
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Main Content Section with Slide Transitions */}
-      <div className="relative min-h-[80vh] overflow-hidden">
-        {/* Content Area with Dynamic Class */}
-        <div className={getContentTransitionClass()}>
-          {/* Hero Section - only for achievements and courses */}
-          {(activeSection === 'achievements' || activeSection === 'courses') && (
-            <div className={`${isMobile ? 'py-6 px-4' : 'py-8 px-6'} ${getHeroTransitionClass()}`}>
-              <div className="max-w-4xl mx-auto">
-                {activeSection === 'achievements' && (
-                  <PinnedAchievements 
-                    userId={profile?.id || ''}
-                    isOwnProfile={isOwnProfile}
-                    displayName={profile?.display_name || 'User'}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                  />
-                )}
-                {activeSection === 'courses' && (
-                  <CoursesJourney 
-                    userId={profile?.id || ''}
-                    isOwnProfile={isOwnProfile}
-                    userDisplayName={profile?.display_name}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* Main Content */}
-          <div id="main-content">
-            {getCurrentContent()}
-          </div>
-        </div>
+      {/* Legacy ProfileTabs for content rendering */}
+      <div style={{ display: 'none' }}>
+        <ProfileTabs
+          activeTab={activeSection}
+          onTabChange={handleTabChange}
+          userId={profile?.id || ''}
+          userDisplayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
+          transitionState={transitionState}
+        >
+        {{
+          activity: (
+            <div></div> // Content will be rendered separately below
+          ),
+          courses: (
+            <div></div> // Content will be rendered separately below
+          ),
+          achievements: (
+            <AchievementsPane
+              userId={profile?.id}
+              userDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
+          ),
+          stats: (
+            <div></div> // Content will be rendered separately below
+          )
+        }}
+        </ProfileTabs>
+      </div>
 
-        {/* During transition, show the previous content sliding out */}
-        {transitionState !== 'idle' && (
-          <div className={getContentTransitionClass(true)} style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-            {/* Hero Section - only for achievements and courses */}
-            {(activeSection === 'achievements' || activeSection === 'courses') && (
-              <div className={`${isMobile ? 'py-6 px-4' : 'py-8 px-6'} ${getHeroTransitionClass(true)}`}>
-                <div className="max-w-4xl mx-auto">
-                  {activeSection === 'achievements' && (
-                    <PinnedAchievements 
-                      userId={profile?.id || ''}
-                      isOwnProfile={isOwnProfile}
-                      displayName={profile?.display_name || 'User'}
-                      userHandicap={profile?.eg_handicap_index}
-                      userProfilePhotoUrl={profile?.profile_photo_url}
-                    />
-                  )}
-                  {activeSection === 'courses' && (
-                    <CoursesJourney 
-                      userId={profile?.id || ''}
-                      isOwnProfile={isOwnProfile}
-                      userDisplayName={profile?.display_name}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
+      {/* Hero Section - Achievements or Courses Journey */}
+      <div className="relative">
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing section */}
+            <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving away from current section */
+                activeSection === 'activity' ? (
+                  <div></div> // Achievements moved to dedicated tab
+                ) : activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : (
+                  <div></div> // stats section has no hero content
+                )
+              ) : (
+                /* Moving to current section from right */
+                activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : activeSection === 'stats' ? (
+                  <div></div> // stats section has no hero content
+                ) : (
+                  <div></div> // Achievements moved to dedicated tab
+                )
+              )}
+            </div>
             
-            {/* Main Content */}
-            <div id="main-content-previous">
+            {/* Incoming section */}
+            <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving to next section */
+                activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : activeSection === 'stats' ? (
+                  <div></div> // stats section has no hero content
+                ) : (
+                  <div></div> // Achievements moved to dedicated tab
+                )
+              ) : (
+                /* Moving to previous section */
+                activeSection === 'activity' ? (
+                  <div></div> // Achievements moved to dedicated tab
+                ) : activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : (
+                  <div></div> // stats section has no hero content
+                )
+              )}
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <>
+            {activeSection === 'courses' ? (
+              <CoursesJourney 
+                userId={profile?.id}
+                userDisplayName={profile?.display_name || 'User'}
+                isOwnProfile={isOwnProfile}
+              />
+            ) : activeSection === 'stats' ? (
+              // No hero section for handicap tab - achievements are removed
+              <div></div>
+            ) : (
+              <div></div> // Achievements moved to dedicated tab
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Content sections with slide transitions */}
+      <div className="relative overflow-hidden">
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing content */}
+            <div className={`absolute inset-0 w-full ${getContentTransitionClass(true)}`}>
               {getPreviousContent()}
+            </div>
+            
+            {/* Incoming content */}
+            <div className={`relative w-full ${getContentTransitionClass(false)}`}>
+              {getCurrentContent()}
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <div className={`
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
+            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
+            ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
+            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+          `}>
+            <div className={`
+              ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
+            `}>
+              {getCurrentContent()}
             </div>
           </div>
         )}
       </div>
+      
+      {/* Remove FullscreenMediaModal - handled by individual components */}
 
-      {/* Profile Edit Dialog */}
+      {/* Rest of content sections would continue here... */}
+      
+      {/* Custom Edit Profile Dialog with glass effect trigger */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <form onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              const { error } = await supabase
-                .from('user_profiles')
-                .update({
-                  display_name: editFormData.display_name,
-                  username: editFormData.username,
-                  home_club: editFormData.home_club,
-                  bio: editFormData.bio || null,
-                  updated_at: new Date().toISOString()
-                })
-                .eq('id', user?.id);
-
-              if (error) throw error;
-
-              toast.success("Profile updated successfully!");
-              setEditDialogOpen(false);
-              onProfileUpdate();
-            } catch (error) {
-              console.error('Error updating profile:', error);
-              toast.error("Failed to update profile");
-            }
-          }}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label>Display Name</label>
-                <input 
-                  type="text" 
-                  value={editFormData.display_name}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, display_name: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label>Username</label>
-                <input 
-                  type="text" 
-                  value={editFormData.username}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, username: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label>Home Club</label>
-                <input 
-                  type="text" 
-                  value={editFormData.home_club}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, home_club: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label>Bio</label>
-                <textarea 
-                  value={editFormData.bio}
-                  onChange={(e) => setEditFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md min-h-[80px]"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 pt-6">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setEditDialogOpen(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                className="flex-1"
-              >
-                Save Changes
-              </Button>
-            </div>
-          </form>
+          
+          
+          <ProfileFormFields
+            formData={formData}
+            isUsernameSet={isUsernameSet}
+            userId={user?.id || ''}
+            userType={profile?.user_type}
+            profile={profile}
+            onInputChange={handleInputChange}
+            onTextareaChange={handleTextareaChange}
+            onSelectChange={handleSelectChange}
+            onHandicapChange={handleHandicapChange}
+            onPublicToggle={handlePublicToggle}
+            onFileChange={handleFileChange}
+            onProfileUpdate={onProfileUpdate}
+          />
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
+
+      {/* Compare Progress Modal - Placeholder for now */}
+      {isCompareModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setIsCompareModalOpen(false)}>
+          <div className="bg-white p-4 rounded-lg">
+            <h3>Compare Progress Modal</h3>
+            <button onClick={() => setIsCompareModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
 
       {/* Immersive Profile Modal */}
       <ImmersiveProfileModal
         isOpen={isImmersiveOpen}
-        onClose={handleMorphTransition}
-        mediaItems={mediaItems as any}
+        onClose={closeImmersive}
+        onMorphToHeader={handleMorphTransition}
+        mediaItems={mediaItems.map(item => ({
+          ...item,
+          media_type: item.media_type as 'image' | 'video'
+        }))}
+        userId={profile?.id || ''}
         initialIndex={currentMediaIndex}
         onCurrentIndexChange={setCurrentMediaIndex}
-        userId={profile?.id || ''}
+        uploadMode={isOwnProfile}
+        onUploadComplete={() => refetchMedia()}
       />
 
       {/* Media Manager Modal */}
@@ -1280,7 +1410,10 @@ const HeroProfileHeader = ({
         isOpen={mediaManagerOpen}
         onClose={() => setMediaManagerOpen(false)}
         userId={profile?.id || ''}
-        mediaItems={mediaItems as any}
+        mediaItems={mediaItems.map(item => ({
+          ...item,
+          media_type: item.media_type as 'image' | 'video'
+        }))}
         onMediaUpdate={refetchMedia}
       />
     </SwipeToReturnZone>
