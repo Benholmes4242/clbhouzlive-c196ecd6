@@ -666,7 +666,7 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with user info overlay and rounded bottom corners */}
+          {/* Header Image without overlay - clean photo */}
           <div 
             ref={profileCardRef}
             className="relative w-full overflow-hidden rounded-b-[20px]" 
@@ -705,70 +705,100 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
-            
-            {/* Dark overlay for text readability */}
-            <div className="absolute inset-0 bg-black/20 rounded-b-[20px]" />
-            
-            {/* User Info Directly on Background */}
-            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-              {/* Name & Handle - Left aligned */}
-              <div className="mb-4">
-                <h1 className="text-2xl leading-8 font-bold mb-1.5 drop-shadow-lg">
-                  {displayName}
-                </h1>
-                <div className="text-base leading-6 font-medium drop-shadow-lg opacity-90">
-                  @{username}
-                </div>
+          </div>
+          
+          {/* User Info on White Background */}
+          <div className="bg-white px-5 pt-6 pb-4">
+            {/* Name & Handle - Left aligned */}
+            <div className="mb-4">
+              <h1 
+                className="text-2xl leading-8 font-bold mb-1.5"
+                style={{ color: 'hsl(var(--profile-text-primary))' }}
+              >
+                {displayName}
+              </h1>
+              <div 
+                className="text-base leading-6 font-medium"
+                style={{ color: 'hsl(var(--profile-text-secondary))' }}
+              >
+                @{username}
               </div>
-              
-              {/* Home Club & Handicap Row */}
-              <div className="flex gap-4 mb-4">
-                <div className="flex-1">
-                  <div className="text-xs leading-4 font-semibold mb-1 drop-shadow-lg opacity-80">
-                    Home Club
-                  </div>
-                  <div className="text-base leading-6 font-semibold drop-shadow-lg">
-                    {homeClub}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="text-xs leading-4 font-semibold mb-1 drop-shadow-lg opacity-80">
-                    Handicap
-                  </div>
-                  <div className="text-base leading-6 font-semibold drop-shadow-lg">
-                    {handicap}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Profile Action Buttons */}
-              {isOwnProfile && (
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => setEditDialogOpen(true)}
-                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Edit<br/>Profile
-                  </button>
-                  <button
-                    onClick={() => setMediaManagerOpen(true)}
-                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Media<br/>Manager
-                  </button>
-                  <button
-                    onClick={() => previewImmersive()}
-                    className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Immersive<br/>Preview
-                  </button>
-                </div>
-              )}
             </div>
+            
+            {/* Home Club & Handicap Row */}
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <div 
+                  className="text-xs leading-4 font-semibold mb-1"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Home Club
+                </div>
+                <div 
+                  className="text-base leading-6 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {homeClub}
+                </div>
+              </div>
+              <div className="flex-1">
+                <div 
+                  className="text-xs leading-4 font-semibold mb-1"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Handicap
+                </div>
+                <div 
+                  className="text-base leading-6 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {handicap}
+                </div>
+              </div>
+            </div>
+            
+            {/* Profile Action Buttons */}
+            {isOwnProfile && (
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <button
+                  onClick={() => setEditDialogOpen(true)}
+                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Edit<br/>Profile
+                </button>
+                <button
+                  onClick={() => setMediaManagerOpen(true)}
+                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Media<br/>Manager
+                </button>
+                <button
+                  onClick={() => previewImmersive()}
+                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Immersive<br/>Preview
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Stats Tiles */}
-          <div className="px-3 mt-4 mb-4">
+          <div className="px-3 mt-0 mb-4">
             <div className="grid grid-cols-4 gap-2">
               {/* Posts */}
               <div 
@@ -861,9 +891,9 @@ const HeroProfileHeader = ({
           </div>
         </div>
       ) : (
-        /* Desktop layout - user info directly on background */
+        /* Desktop layout - user info on white background */
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with user info overlay and rounded bottom corners */}
+          {/* Header Image without overlay - clean photo */}
           <div 
             ref={profileCardRef}
             className="relative w-full overflow-hidden rounded-b-[20px]" 
@@ -902,70 +932,100 @@ const HeroProfileHeader = ({
                 </p>
               </div>
             )}
-            
-            {/* Dark overlay for text readability */}
-            <div className="absolute inset-0 bg-black/20 rounded-b-[20px]" />
-            
-            {/* User Info Directly on Background - Desktop */}
-            <div className="absolute inset-x-0 bottom-0 max-w-2xl mx-auto p-8 text-white">
-              {/* Name & Handle - Centered */}
-              <div className="text-center mb-6">
-                <h1 className="text-3xl leading-10 font-bold mb-2 drop-shadow-lg">
-                  {displayName}
-                </h1>
-                <div className="text-lg leading-7 font-medium drop-shadow-lg opacity-90">
-                  @{username}
-                </div>
+          </div>
+          
+          {/* User Info on White Background - Desktop */}
+          <div className="bg-white max-w-2xl mx-auto px-8 pt-8 pb-6">
+            {/* Name & Handle - Centered */}
+            <div className="text-center mb-6">
+              <h1 
+                className="text-3xl leading-10 font-bold mb-2"
+                style={{ color: 'hsl(var(--profile-text-primary))' }}
+              >
+                {displayName}
+              </h1>
+              <div 
+                className="text-lg leading-7 font-medium"
+                style={{ color: 'hsl(var(--profile-text-secondary))' }}
+              >
+                @{username}
               </div>
-              
-              {/* Home Club & Handicap Row */}
-              <div className="flex gap-4 mb-6">
-                <div className="flex-1 text-center">
-                  <div className="text-sm leading-5 font-semibold mb-2 drop-shadow-lg opacity-80">
-                    Home Club
-                  </div>
-                  <div className="text-lg leading-7 font-semibold drop-shadow-lg">
-                    {homeClub}
-                  </div>
-                </div>
-                <div className="flex-1 text-center">
-                  <div className="text-sm leading-5 font-semibold mb-2 drop-shadow-lg opacity-80">
-                    Handicap
-                  </div>
-                  <div className="text-lg leading-7 font-semibold drop-shadow-lg">
-                    {handicap}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Profile Action Buttons */}
-              {isOwnProfile && (
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    onClick={() => setEditDialogOpen(true)}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Edit<br/>Profile
-                  </button>
-                  <button
-                    onClick={() => setMediaManagerOpen(true)}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Media<br/>Manager
-                  </button>
-                  <button
-                    onClick={() => previewImmersive()}
-                    className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-white/30 transition-colors duration-200 text-center bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    Immersive<br/>Preview
-                  </button>
-                </div>
-              )}
             </div>
+            
+            {/* Home Club & Handicap Row */}
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1 text-center">
+                <div 
+                  className="text-sm leading-5 font-semibold mb-2"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Home Club
+                </div>
+                <div 
+                  className="text-lg leading-7 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {homeClub}
+                </div>
+              </div>
+              <div className="flex-1 text-center">
+                <div 
+                  className="text-sm leading-5 font-semibold mb-2"
+                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
+                >
+                  Handicap
+                </div>
+                <div 
+                  className="text-lg leading-7 font-semibold"
+                  style={{ color: 'hsl(var(--profile-text-primary))' }}
+                >
+                  {handicap}
+                </div>
+              </div>
+            </div>
+            
+            {/* Profile Action Buttons */}
+            {isOwnProfile && (
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <button
+                  onClick={() => setEditDialogOpen(true)}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Edit<br/>Profile
+                </button>
+                <button
+                  onClick={() => setMediaManagerOpen(true)}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Media<br/>Manager
+                </button>
+                <button
+                  onClick={() => previewImmersive()}
+                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
+                  style={{
+                    borderColor: 'hsl(var(--profile-border-button))',
+                    color: 'hsl(var(--profile-text-primary))',
+                    backgroundColor: 'hsl(var(--profile-card))'
+                  }}
+                >
+                  Immersive<br/>Preview
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Stats Tiles - Desktop */}
-          <div className="max-w-4xl mx-auto px-6 mt-6 mb-6">
+          <div className="max-w-4xl mx-auto px-6 mt-0 mb-6">
             <div className="grid grid-cols-4 gap-4">
               {/* Posts */}
               <div 
