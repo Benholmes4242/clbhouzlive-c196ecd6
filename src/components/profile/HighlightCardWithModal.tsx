@@ -157,7 +157,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   return (
     <div 
       ref={cardRef}
-      className="group/highlight flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer w-full"
+      className="group/highlight flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer w-full hover:shadow-md transition-shadow duration-200"
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
