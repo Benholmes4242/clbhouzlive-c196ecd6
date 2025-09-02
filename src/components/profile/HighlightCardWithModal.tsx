@@ -216,21 +216,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   autoplay={false}
                   className="w-full h-full object-cover object-center"
                 />
-                
-                {/* Mute/Unmute Button - Top Right */}
-                <div className="absolute top-3 right-3 z-20">
-                  <button
-                    onClick={handleMuteToggle}
-                    className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 sm:h-5 sm:w-5 md:h-7 md:w-7 flex items-center justify-center hover:bg-white/20 transition-colors"
-                    aria-label={mutedPref ? "Unmute video" : "Mute video"}
-                  >
-                    {mutedPref ? (
-                      <VolumeX className="h-4 w-4 text-white" />
-                    ) : (
-                      <Volume2 className="h-4 w-4 text-white" />
-                    )}
-                  </button>
-                </div>
               </>
             ) : !isPreviewing ? (
               /* Video thumbnail with play overlay */
