@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
@@ -7,6 +7,8 @@ import { useHighlightsVideo } from './HighlightsVideoController';
 import { useLongPressPreview } from '@/hooks/useLongPressPreview';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { cn } from '@/lib/utils';
+import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
@@ -20,6 +22,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const globalAudio = useGlobalAudio();
   
   // Use the highlights video controller for carousel playback
   const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
@@ -35,21 +39,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   // Preview control functions
   const startPreview = useCallback(() => {
-    if (primaryMedia?.media_type === 'video' && previewVideoRef.current) {
+    if (primaryMedia?.media_type === 'video') {
+      setIsPreviewing(true);
       // Pause all other videos first
       pauseAllOtherVideos('preview-' + highlight.id);
-      
-      // Start muted preview
-      const video = previewVideoRef.current;
-      video.muted = true;
-      video.play().catch(console.error);
     }
   }, [primaryMedia?.media_type, pauseAllOtherVideos, highlight.id]);
 
   const stopPreview = useCallback(() => {
-    if (previewVideoRef.current) {
-      previewVideoRef.current.pause();
-    }
+    setIsPreviewing(false);
   }, []);
 
   const handleOpenModal = useCallback(() => {
@@ -123,9 +121,19 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     );
   }
 
+  // Calculate responsive width to match Recently Played cards exactly
+  const getCardWidth = () => {
+    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
+    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
+    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
+    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible to match Recently Played
+  };
+
   return (
     <div 
-      className="flex-none w-[40vw] min-w-[160px] max-w-[320px] md:w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
+      className="flex-none bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
+      style={{ width: getCardWidth() }}
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
@@ -137,31 +145,19 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         }
       }}
     >
-      <div className="relative h-40 md:h-56">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
             alt="Golf course moment"
-            className="w-full h-full object-contain bg-black"
+            className="w-full h-full object-cover object-center"
             loading="lazy"
             decoding="async"
           />
         ) : (
           <>
-            {/* Preview video (for hover/long-press) - invisible when not active */}
-            {gestureHandlers.isPreviewActive && (
-              <HLSVideoCard
-                ref={previewVideoRef}
-                hlsUrl={hlsUrl}
-                poster={thumbnailUrl || undefined}
-                muted={true}
-                autoplay={false}
-                className="absolute inset-0 z-10 pointer-events-none"
-              />
-            )}
-            
             {/* Carousel video (for click/tap play) */}
-            {isCarouselActive && !gestureHandlers.isPreviewActive ? (
+            {isCarouselActive && !isPreviewing ? (
               <>
                 <HLSVideoCard
                   ref={carouselVideoRef}
@@ -169,7 +165,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   poster={thumbnailUrl || undefined}
                   muted={mutedPref}
                   autoplay={false}
-                  className="w-full h-full pointer-events-none"
+                  className="w-full h-full object-cover object-center"
                 />
                 
                 {/* Mute/Unmute Button - Top Right */}
@@ -187,13 +183,13 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   </button>
                 </div>
               </>
-            ) : !gestureHandlers.isPreviewActive ? (
+            ) : !isPreviewing ? (
               /* Video thumbnail with play overlay */
               <div className="relative w-full h-full">
                 <img
                   src={thumbnailUrl || primaryMedia.media_url}
                   alt="Video thumbnail"
-                  className="w-full h-full object-contain bg-black"
+                  className="w-full h-full object-cover object-center"
                   loading="lazy"
                   decoding="async"
                 />
@@ -208,31 +204,50 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             ) : null}
           </>
         )}
+
+        {/* Details panel (hidden during preview) */}
+        <div className={cn("absolute inset-x-0 bottom-0 transition-opacity duration-200",
+                          isPreviewing ? "opacity-0 pointer-events-none" : "opacity-100")}>
+          <div className="bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 md:p-4">
+            <div className="flex items-start gap-2 mb-2">
+              <MapPin className="w-3 h-3 md:w-4 md:h-4 text-white/80 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-xs md:text-sm text-white truncate">{highlight.golf_course.name}</h4>
+              </div>
+            </div>
+            
+            {highlight.content && (
+              <p className="text-xs md:text-sm text-white/80 mb-2 line-clamp-2">
+                {highlight.content}
+              </p>
+            )}
+            
+            <div className="text-xs text-white/60">
+              {format(createdDate, 'MMM d, yyyy')}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick preview overlay (covers entire card during long press) */}
+        {isPreviewing && (
+          <div className="absolute inset-0 z-10 rounded-2xl overflow-hidden">
+            <HLSVideoCard
+              ref={previewVideoRef}
+              hlsUrl={hlsUrl}
+              poster={thumbnailUrl || undefined}
+              muted={globalAudio.isGloballyMuted}
+              autoplay={true}
+              className="w-full h-full object-cover object-center"
+              onEnded={stopPreview}
+            />
+          </div>
+        )}
         
-        {highlight.post_media.length > 1 && (
-          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+        {highlight.post_media.length > 1 && !isPreviewing && (
+          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-20">
             +{highlight.post_media.length - 1} more
           </div>
         )}
-      </div>
-      
-      <div className="p-3 md:p-4">
-        <div className="flex items-start gap-2 mb-2">
-          <MapPin className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-xs md:text-sm truncate">{highlight.golf_course.name}</h4>
-          </div>
-        </div>
-        
-        {highlight.content && (
-          <p className="text-xs md:text-sm text-muted-foreground mb-2 line-clamp-2">
-            {highlight.content}
-          </p>
-        )}
-        
-        <div className="text-xs text-muted-foreground">
-          {format(createdDate, 'MMM d, yyyy')}
-        </div>
       </div>
     </div>
   );
