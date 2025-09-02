@@ -1260,7 +1260,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   userDisplayName
 }) => {
   return (
-    <div className="w-full px-4 pt-2 pb-8 mb-0">
+    <div className="w-full px-4 pt-0 pb-8 mb-0">
       <div className="max-w-6xl mx-auto">
         {/* Courses by Region title - matches Top 10 Rated by You style */}
         <div className="flex items-center justify-between mb-0">
