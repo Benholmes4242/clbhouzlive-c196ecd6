@@ -643,8 +643,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1px 2px;
-  gap: 2px;
+  padding: 2px 4px;
+  gap: 4px;
   border-radius: 12px;
   background: rgb(255 255 255 / 0.10);
   backdrop-filter: blur(20px);
