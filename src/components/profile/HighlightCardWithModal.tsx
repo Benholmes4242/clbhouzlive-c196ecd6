@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
@@ -22,7 +22,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isInView, setIsInView] = useState(true);
   const globalAudio = useGlobalAudio();
   
   // Use the highlights video controller for carousel playback
@@ -32,19 +34,63 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   // Use video playback manager for preview control
   const { pauseAllOtherVideos } = useVideoPlaybackManager();
   
+  // Extract Cloudflare Stream ID for crisp thumbnails
+  const extractCloudflareStreamId = (m3u8: string) => {
+    const match = /\/([a-z0-9-]{16,})\/manifest\/video\.m3u8/i.exec(m3u8);
+    return match?.[1] ?? null;
+  };
+
   // For videos, use the HLS URL directly
   const videoId = primaryMedia?.media_type === 'video' ? uidFromNode({ media_url: primaryMedia.media_url }) : null;
-  const thumbnailUrl = videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : null;
+  const streamId = videoId ? extractCloudflareStreamId(`https://videodelivery.net/${videoId}/manifest/video.m3u8`) : null;
+  
+  // Use high-res Cloudflare Stream thumbnail for crisp quality
+  const posterUrl = streamId 
+    ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?height=900`
+    : (videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : primaryMedia?.media_url);
+    
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : primaryMedia?.media_url;
+
+  // Intersection observer to pause preview when out of view
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+        if (!entry.isIntersecting && isPreviewing) {
+          setIsPreviewing(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isPreviewing]);
+
+  // Desktop hover handlers
+  const handleMouseEnter = useCallback(() => {
+    if (window.matchMedia('(hover: hover)').matches && primaryMedia?.media_type === 'video' && isInView) {
+      setIsPreviewing(true);
+      pauseAllOtherVideos('preview-' + highlight.id);
+    }
+  }, [primaryMedia?.media_type, isInView, pauseAllOtherVideos, highlight.id]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (window.matchMedia('(hover: hover)').matches) {
+      setIsPreviewing(false);
+    }
+  }, []);
 
   // Preview control functions
   const startPreview = useCallback(() => {
-    if (primaryMedia?.media_type === 'video') {
+    if (primaryMedia?.media_type === 'video' && isInView) {
       setIsPreviewing(true);
       // Pause all other videos first
       pauseAllOtherVideos('preview-' + highlight.id);
     }
-  }, [primaryMedia?.media_type, pauseAllOtherVideos, highlight.id]);
+  }, [primaryMedia?.media_type, pauseAllOtherVideos, highlight.id, isInView]);
 
   const stopPreview = useCallback(() => {
     setIsPreviewing(false);
@@ -132,12 +178,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   return (
     <div 
+      ref={cardRef}
       className="flex-none bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
       style={{ width: getCardWidth() }}
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
       {...gestureHandlers}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -162,7 +211,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                 <HLSVideoCard
                   ref={carouselVideoRef}
                   hlsUrl={hlsUrl}
-                  poster={thumbnailUrl || undefined}
+                  poster={posterUrl || undefined}
                   muted={mutedPref}
                   autoplay={false}
                   className="w-full h-full object-cover object-center"
@@ -187,7 +236,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
               /* Video thumbnail with play overlay */
               <div className="relative w-full h-full">
                 <img
-                  src={thumbnailUrl || primaryMedia.media_url}
+                  src={posterUrl || primaryMedia.media_url}
                   alt="Video thumbnail"
                   className="w-full h-full object-cover object-center"
                   loading="lazy"
@@ -234,7 +283,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             <HLSVideoCard
               ref={previewVideoRef}
               hlsUrl={hlsUrl}
-              poster={thumbnailUrl || undefined}
+              poster={posterUrl || undefined}
               muted={globalAudio.isGloballyMuted}
               autoplay={true}
               className="w-full h-full object-cover object-center"
