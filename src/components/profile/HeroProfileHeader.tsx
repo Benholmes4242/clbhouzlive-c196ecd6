@@ -490,8 +490,13 @@ const HeroProfileHeader = ({
   // Animation hook for badges
   const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
 
-  // Profile form hook - simplified for now
-  const profileFormHook = useProfileForm(profile, onProfileUpdate);
+  // Form handling state
+  const [editFormData, setEditFormData] = useState({
+    display_name: profile?.display_name || '',
+    username: profile?.username || '',
+    home_club: profile?.home_club || '',
+    bio: profile?.bio || ''
+  });
 
   // Handle video upload
   const handleVideoUpload = async (file: File) => {
@@ -499,7 +504,7 @@ const HeroProfileHeader = ({
       const result = await uploadVideo(file);
 
       const { error } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .update({ 
           profile_video_url: result.videoUrl,
           profile_video_thumbnail_url: result.thumbnailUrl,
@@ -523,10 +528,10 @@ const HeroProfileHeader = ({
   // Handle profile photo upload
   const handleProfilePhotoUpload = async (file: File) => {
     try {
-      const result = await uploadImage(file, `profiles/${user?.id}/profile`);
+      const result = await uploadImage(file);
 
       const { error } = await supabase
-        .from('profiles')
+        .from('user_profiles')
         .update({ 
           profile_photo_url: result.imageUrl,
           updated_at: new Date().toISOString()
@@ -1111,12 +1116,11 @@ const HeroProfileHeader = ({
               <div className="max-w-4xl mx-auto">
                 {activeSection === 'achievements' && (
                   <PinnedAchievements 
-                    achievements={achievements}
-                    userDisplayName={profile?.display_name || 'User'}
+                    userId={profile?.id || ''}
+                    isOwnProfile={isOwnProfile}
+                    displayName={profile?.display_name || 'User'}
                     userHandicap={profile?.eg_handicap_index}
                     userProfilePhotoUrl={profile?.profile_photo_url}
-                    isCurrentUser={isOwnProfile}
-                    onAchievementsPageClick={() => {}}
                   />
                 )}
                 {activeSection === 'courses' && (
@@ -1145,12 +1149,11 @@ const HeroProfileHeader = ({
                 <div className="max-w-4xl mx-auto">
                   {activeSection === 'achievements' && (
                     <PinnedAchievements 
-                      achievements={achievements}
-                      userDisplayName={profile?.display_name || 'User'}
+                      userId={profile?.id || ''}
+                      isOwnProfile={isOwnProfile}
+                      displayName={profile?.display_name || 'User'}
                       userHandicap={profile?.eg_handicap_index}
                       userProfilePhotoUrl={profile?.profile_photo_url}
-                      isCurrentUser={isOwnProfile}
-                      onAchievementsPageClick={() => {}}
                     />
                   )}
                   {activeSection === 'courses' && (
@@ -1178,15 +1181,16 @@ const HeroProfileHeader = ({
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(async (data) => {
+          <form onSubmit={async (e) => {
+            e.preventDefault();
             try {
               const { error } = await supabase
-                .from('profiles')
+                .from('user_profiles')
                 .update({
-                  display_name: data.display_name,
-                  username: data.username,
-                  home_club: data.home_club,
-                  bio: data.bio || null,
+                  display_name: editFormData.display_name,
+                  username: editFormData.username,
+                  home_club: editFormData.home_club,
+                  bio: editFormData.bio || null,
                   updated_at: new Date().toISOString()
                 })
                 .eq('id', user?.id);
@@ -1200,21 +1204,47 @@ const HeroProfileHeader = ({
               console.error('Error updating profile:', error);
               toast.error("Failed to update profile");
             }
-          })}>
-            <ProfileFormFields
-              register={register}
-              errors={errors}
-              setValue={setValue}
-              watch={watch}
-              uploadCroppedPhoto={uploadCroppedPhoto}
-              handleVideoUpload={handleVideoUpload}
-              handleProfilePhotoUpload={handleProfilePhotoUpload}
-              profile={profile}
-              photoUploading={photoUploading}
-              videoUploading={videoUploading}
-              getValues={getValues}
-              reset={reset}
-            />
+          }}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label>Display Name</label>
+                <input 
+                  type="text" 
+                  value={editFormData.display_name}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, display_name: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label>Username</label>
+                <input 
+                  type="text" 
+                  value={editFormData.username}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label>Home Club</label>
+                <input 
+                  type="text" 
+                  value={editFormData.home_club}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, home_club: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label>Bio</label>
+                <textarea 
+                  value={editFormData.bio}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, bio: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md min-h-[80px]"
+                />
+              </div>
+            </div>
             <div className="flex gap-3 pt-6">
               <Button 
                 type="button" 
@@ -1226,7 +1256,6 @@ const HeroProfileHeader = ({
               </Button>
               <Button 
                 type="submit" 
-                disabled={!isValid}
                 className="flex-1"
               >
                 Save Changes
@@ -1240,21 +1269,10 @@ const HeroProfileHeader = ({
       <ImmersiveProfileModal
         isOpen={isImmersiveOpen}
         onClose={handleMorphTransition}
-        mediaItems={mediaItems}
-        currentIndex={currentMediaIndex}
-        onIndexChange={setCurrentMediaIndex}
-        profile={profile}
-        isOwnProfile={isOwnProfile}
-        stats={{
-          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-          posts: postsCount,
-          followers: followersCount,
-          following: followingCount,
-          ratedCoursesCount,
-          averageRating
-        }}
-        onStatClick={handleStatClick}
-        onProfileUpdate={onProfileUpdate}
+        mediaItems={mediaItems as any}
+        initialIndex={currentMediaIndex}
+        onCurrentIndexChange={setCurrentMediaIndex}
+        userId={profile?.id || ''}
       />
 
       {/* Media Manager Modal */}
@@ -1262,10 +1280,7 @@ const HeroProfileHeader = ({
         isOpen={mediaManagerOpen}
         onClose={() => setMediaManagerOpen(false)}
         userId={profile?.id || ''}
-        mediaItems={mediaItems.map(item => ({
-          ...item,
-          media_type: item.media_type as 'image' | 'video'
-        }))}
+        mediaItems={mediaItems as any}
         onMediaUpdate={refetchMedia}
       />
     </SwipeToReturnZone>
