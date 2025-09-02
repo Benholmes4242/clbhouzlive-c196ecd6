@@ -769,7 +769,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             <div
               ref={carouselRef}
               className="
-                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -985,7 +985,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
            ) : filteredCourses.length > 0 ? (
                <div
                  className="
-                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
                    [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                    [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                  "
@@ -1196,7 +1196,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             <div
               ref={topRatedRefCallback}
               className="
-                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -1477,13 +1477,13 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
            ) : gbIrelandCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div
-                ref={gbIrelandRefCallback}
-                className="
-                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
-                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-                "
+               <div
+                 ref={gbIrelandRefCallback}
+                 className="
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
+                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                 "
               >
                 {gbIrelandCourses.map((userCourse, index) => (
                   <div 
@@ -1728,13 +1728,13 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
            ) : worldwideCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div
-                ref={combinedRef}
-                className="
-                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
-                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-                "
+               <div
+                 ref={combinedRef}
+                 className="
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
+                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                 "
               >
                 {worldwideCourses.map((userCourse, index) => (
                 <div 
@@ -1981,13 +1981,13 @@ const USASection: React.FC<USASectionProps> = ({
            ) : usaCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div
-                ref={usaRefCallback}
-                className="
-                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
-                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-                "
+               <div
+                 ref={usaRefCallback}
+                 className="
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
+                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                 "
               >
                 {usaCourses.map((userCourse, index) => (
                   <div 
@@ -2136,13 +2136,13 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
            ) : europeCourses.length > 0 ? (
             <div className="relative">
               {/* Edge padding for title alignment */}
-              <div
-                ref={europeRefCallback}
-                className="
-                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
-                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-                "
+               <div
+                 ref={europeRefCallback}
+                 className="
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6
+                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                 "
               >
                 {europeCourses.map((userCourse, index) => (
                   <div 
