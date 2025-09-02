@@ -209,64 +209,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             ) : null}
           </>
         )}
-
-        {/* Feather gradient above glass panel */}
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-x-0 z-[9]",
-            "bottom-[72px] md:bottom-[88px]",
-            "h-8 md:h-10",
-            "bg-gradient-to-t from-black/40 via-black/20 to-transparent",
-            "transition-opacity duration-300 ease-out",
-            "motion-reduce:transition-none",
-            isPreviewing ? "opacity-0" : "opacity-100 group-hover/highlight:opacity-0"
-          )}
-        />
-
-        {/* Liquid glass bottom panel — FLUSH, no outer gap */}
-        <div className={cn(
-          "absolute inset-x-0 bottom-0 z-10",
-          "bg-white/10 dark:bg-black/30 backdrop-blur-2xl",
-          "border-t border-white/20",
-          "rounded-b-2xl",
-          "px-4 py-3 md:px-5 md:py-4",
-          "transition-opacity duration-300 ease-out",
-          "motion-reduce:transition-none",
-          isPreviewing ? "opacity-0" : "opacity-100 group-hover/highlight:opacity-0"
-        )}>
-          <div className="flex items-start gap-2 mb-1">
-            <MapPin className="w-3 h-3 md:w-4 md:h-4 text-white/80 mt-0.5 flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-xs md:text-sm text-white truncate">{highlight.golf_course.name}</h4>
-            </div>
-          </div>
-          
-          {highlight.content && (
-            <p className="text-xs md:text-sm text-white/80 mb-1 line-clamp-2">
-              {highlight.content}
-            </p>
-          )}
-          
-          <div className="text-xs text-white/60">
-            {format(createdDate, "MMM d, yyyy")}
-          </div>
-        </div>
-
-        {/* Quick preview overlay (covers entire card during long press) */}
-        {isPreviewing && (
-          <div className="absolute inset-0 z-10 rounded-2xl overflow-hidden">
-            <HLSVideoCard
-              ref={previewVideoRef}
-              hlsUrl={hlsUrl}
-              poster={posterUrl || undefined}
-              muted={globalAudio.isGloballyMuted}
-              autoplay={true}
-              showMuteButton={false}
-              className="w-full h-full object-cover object-center"
-              onEnded={stopPreview}
-            />
-          </div>
-        )}
         
         {highlight.post_media.length > 1 && !isPreviewing && (
           <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-20">
