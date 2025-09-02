@@ -157,14 +157,14 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   return (
     <div 
       ref={cardRef}
-      className="group/highlight flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer w-full"
+      className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights"
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
       {...gestureHandlers}
       onClick={handleVideoClick}
     >
-      <div className={cn("relative overflow-hidden rounded-2xl w-full h-full", isLandscape ? "aspect-[5/4]" : "aspect-[3/4]")}>
+      <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}

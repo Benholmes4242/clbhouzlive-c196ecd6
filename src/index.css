@@ -244,6 +244,46 @@
     width: var(--achv-badge-size, 8rem);
     height: var(--achv-badge-size, 8rem);
   }
+
+  /* Card size tokens (sourced from "Top 10 Rated by You") */
+  :root {
+    --card-w-portrait: 17rem;  /* existing Rated width */
+    --card-h-portrait: 24rem;  /* existing Rated height */
+  }
+
+  /* Responsive tokens (match Rated breakpoints exactly) */
+  @media (min-width: 768px) {
+    :root {
+      --card-w-portrait: 18rem;
+      --card-h-portrait: 26rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    :root {
+      --card-w-portrait: 19rem;
+      --card-h-portrait: 28rem;
+    }
+  }
+
+  /* Base card styling (shared) */
+  .card-base {
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Rated by You (portrait) — uses the tokens verbatim */
+  .card-rated {
+    width: var(--card-w-portrait);
+    height: var(--card-h-portrait);
+  }
+
+  /* Highlights (landscape) — exact same size, swapped */
+  .card-highlights {
+    width: var(--card-h-portrait);
+    height: var(--card-w-portrait);
+  }
   
 .container {
   max-width: 1400px;
