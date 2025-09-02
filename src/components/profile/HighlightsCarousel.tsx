@@ -133,7 +133,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
         <div 
           ref={combinedRefCallback}
-          className="flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scale-70 sm:scale-100"
+          className="flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scale-50 sm:scale-100"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
