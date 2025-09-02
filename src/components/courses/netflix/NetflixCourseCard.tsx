@@ -203,38 +203,34 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
                   {rankBadges.map((badge, index) => {
                     const IconComponent = badge.icon;
                     return (
-                      <div 
+                      <span 
                         key={`${badge.type}-${index}`}
-                        className="bg-black/60 backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg flex items-center justify-between border border-white/20 shadow-lg"
+                        className="bg-black/60 backdrop-blur-sm inline-flex items-center gap-1 px-1.5 py-1 rounded-md border border-white/20 shadow-lg text-[11px] font-medium h-6 min-w-0 whitespace-nowrap"
                         style={{
                           background: 'rgba(0, 0, 0, 0.6)',
                           backdropFilter: 'blur(10px)',
                           WebkitBackdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                         }}
                       >
-                        <IconComponent className="w-3 h-3" />
-                        <span className={`${textSizing.badge} font-medium`}>{badge.label}</span>
-                      </div>
+                        <IconComponent className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{badge.label}</span>
+                      </span>
                     );
                   })}
                 </div>
               )}
               
               {/* XP earned */}
-              <div 
-                className="backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg inline-flex items-center justify-between border border-white/20 shadow-lg"
+              <span 
+                className="backdrop-blur-sm inline-flex items-center justify-center px-1.5 py-1 rounded-md border border-white/20 shadow-lg text-[11px] font-semibold h-6 min-w-0 whitespace-nowrap"
                 style={{
                   background: 'rgba(247, 147, 30, 0.9)', // Clbhouz orange
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                 }}
               >
-                <span className={`${textSizing.xp} text-white drop-shadow font-semibold`}>+250 XP</span>
-              </div>
+                <span className="text-white drop-shadow truncate">+250 XP</span>
+              </span>
             </div>
             
             {/* Right side - User rating */}

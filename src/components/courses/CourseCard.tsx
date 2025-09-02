@@ -189,15 +189,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div 
-                            className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
-                            style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                          <span 
+                            className="badge-compact shadow-lg shadow-black/20"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <div className="relative z-10 flex items-center justify-between w-full">
-                              <span className="text-sm font-bold text-white">{userRating}/10</span>
-                            </div>
-                          </div>
+                            <span className="truncate">{userRating}/10</span>
+                          </span>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>
