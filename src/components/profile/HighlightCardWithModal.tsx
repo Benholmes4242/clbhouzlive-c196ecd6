@@ -184,7 +184,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         }
       }}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
+      <div className="relative aspect-video overflow-hidden rounded-2xl">
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
