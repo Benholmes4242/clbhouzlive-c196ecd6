@@ -143,7 +143,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   // Safety check for media
   if (!primaryMedia) {
     return (
-      <div className="flex-none w-80 bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="flex-none w-80 bg-card rounded-xl overflow-hidden shadow-sm">
         <div className="relative h-48 bg-muted flex items-center justify-center">
           <span className="text-muted-foreground">No media</span>
         </div>
@@ -179,7 +179,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   return (
     <div 
       ref={cardRef}
-      className="flex-none bg-card border border-border rounded-xl overflow-hidden shadow-sm cursor-pointer"
+      className="flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer"
       style={{ width: getCardWidth() }}
       role="button"
       tabIndex={0}
