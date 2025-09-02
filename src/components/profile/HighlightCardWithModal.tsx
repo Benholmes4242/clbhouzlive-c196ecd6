@@ -13,11 +13,13 @@ import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
   onOpenModal: (postId: string) => void;
+  isLandscape?: boolean;
 }
 
 const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({ 
   highlight, 
-  onOpenModal 
+  onOpenModal,
+  isLandscape = false
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
@@ -184,7 +186,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         }
       }}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
+      <div className={cn("relative overflow-hidden rounded-2xl", isLandscape ? "aspect-[4/3]" : "aspect-[3/4]")}>
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
