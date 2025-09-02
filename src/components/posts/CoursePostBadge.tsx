@@ -81,11 +81,11 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
 
   return (
     <div 
-      className={`flex items-center cursor-pointer bg-white/10 backdrop-blur-2xl border border-white/20 px-3 py-1 text-white shadow-lg hover:bg-white/20 transition-all duration-300 rounded-lg ${className}`}
+      className={`flex items-center justify-between cursor-pointer bg-white/10 backdrop-blur-2xl border border-white/20 px-1 py-[2px] text-white shadow-lg hover:bg-white/20 transition-all duration-300 rounded-xl min-w-fit gap-1 ${className}`}
       onClick={handleCourseClick}
       style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
     >
-      <span className="text-base font-medium">{displayName}</span>
+      <span className="text-xs font-semibold leading-none whitespace-nowrap">{displayName}</span>
     </div>
   );
 };
