@@ -48,11 +48,11 @@ const CourseHighlightsCarousel: React.FC<CourseHighlightsCarouselProps> = ({
   return (
     <div className="space-y-4">
       {/* Horizontal Scrollable Course Cards */}
-      <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-4">
+      <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-4 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:1rem] sm:[--g:1rem] md:[--g:1rem] lg:[--g:1rem] xl:[--g:1rem]">
         {courseHighlights.map((course, index) => (
           <div
             key={course.id}
-            className={`flex-shrink-0 w-[280px] h-[240px] relative rounded-lg overflow-hidden cursor-pointer transition-transform ${
+            className={`shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] h-[240px] relative rounded-lg overflow-hidden cursor-pointer transition-transform ${
               index === 0 ? 'ring-4 ring-red-500' : ''
             }`}
             onClick={() => setCurrentIndex(index)}

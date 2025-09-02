@@ -61,7 +61,7 @@ const RegionalCoursesList: React.FC<RegionalCoursesListProps> = ({
       
       {/* Carousel for mobile and desktop */}
       <div className="relative">
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:1.5rem] sm:[--g:1.5rem] md:[--g:1.5rem] lg:[--g:1.5rem] xl:[--g:1.5rem]"
              style={{
                scrollbarWidth: 'none',
                msOverflowStyle: 'none',
@@ -73,7 +73,7 @@ const RegionalCoursesList: React.FC<RegionalCoursesListProps> = ({
             return (
               <div 
                 key={course.id}
-                className={`flex-shrink-0 w-36 md:w-80 ${isLast ? 'pr-4' : ''}`}
+                className={`shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] ${isLast ? 'pr-4' : ''}`}
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <CourseCard 

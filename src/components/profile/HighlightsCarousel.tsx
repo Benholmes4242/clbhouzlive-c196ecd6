@@ -133,7 +133,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
         <div 
           ref={combinedRefCallback}
-          className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
+          className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.75rem] sm:[--g:0.75rem] md:[--g:0.75rem] lg:[--g:0.75rem] xl:[--g:0.75rem]"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -141,11 +141,12 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           }}
         >
           {highlights.map((highlight) => (
-            <HighlightCardWithModal 
-              key={highlight.id} 
-              highlight={highlight}
-              onOpenModal={openModal}
-            />
+            <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
+              <HighlightCardWithModal 
+                highlight={highlight}
+                onOpenModal={openModal}
+              />
+            </div>
           ))}
         </div>
       </div>

@@ -167,20 +167,10 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     );
   }
 
-  // Calculate responsive width to match Recently Played cards exactly
-  const getCardWidth = () => {
-    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    if (windowWidth >= 1200) return 'calc(25% - 9px)'; // Desktop: 4 cards, 3 gaps of 12px = 36px / 4 = 9px per card
-    if (windowWidth >= 1024) return 'calc(33.333% - 8px)'; // Laptop: 3 cards, 2 gaps of 12px = 24px / 3 = 8px per card
-    if (windowWidth >= 768) return 'calc(50% - 6px)'; // Tablet: 2 cards, 1 gap of 12px = 12px / 2 = 6px per card
-    return 'calc(40vw - 5px)'; // Mobile: 2.5 cards visible to match Recently Played
-  };
-
   return (
     <div 
       ref={cardRef}
-      className="flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer"
-      style={{ width: getCardWidth() }}
+      className="flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer w-full"
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
