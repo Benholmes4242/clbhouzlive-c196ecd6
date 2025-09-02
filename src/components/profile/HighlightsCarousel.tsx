@@ -140,8 +140,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             cursor: 'default'
           }}
         >
-           {highlights.map((highlight) => (
-            <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] scale-60 sm:scale-100">
+          {highlights.map((highlight) => (
+            <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
               <div className="w-full aspect-[5/4]">
                 <HighlightCardWithModal 
                   highlight={highlight}
