@@ -164,7 +164,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       {...gestureHandlers}
       onClick={handleVideoClick}
     >
-      <div className={cn("relative overflow-hidden rounded-2xl", isLandscape ? "aspect-[4/3]" : "aspect-[3/4]")}>
+      <div className={cn("relative overflow-hidden rounded-2xl w-full h-full", isLandscape ? "aspect-[5/4]" : "aspect-[3/4]")}>
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}

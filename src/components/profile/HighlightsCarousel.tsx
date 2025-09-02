@@ -7,7 +7,6 @@ import { HighlightsVideoProvider } from './HighlightsVideoController';
 import { useHighlightsModal } from '@/hooks/useHighlightsModal';
 import HighlightCardWithModal from './HighlightCardWithModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import './highlights-carousel.css';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -134,7 +133,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
         <div 
           ref={combinedRefCallback}
-          className="highlights-row flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -142,12 +141,14 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           }}
         >
           {highlights.map((highlight) => (
-            <div key={highlight.id} className="highlight-item shrink-0">
-              <HighlightCardWithModal 
-                highlight={highlight}
-                onOpenModal={openModal}
-                isLandscape={true}
-              />
+            <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
+              <div className="w-full aspect-[5/4]">
+                <HighlightCardWithModal 
+                  highlight={highlight}
+                  onOpenModal={openModal}
+                  isLandscape={true}
+                />
+              </div>
             </div>
           ))}
         </div>
