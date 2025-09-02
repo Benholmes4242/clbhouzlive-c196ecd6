@@ -205,7 +205,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
                     return (
                       <div 
                         key={`${badge.type}-${index}`}
-                        className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/20 shadow-lg"
+                        className="bg-black/60 backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg flex items-center justify-between border border-white/20 shadow-lg"
                         style={{
                           background: 'rgba(0, 0, 0, 0.6)',
                           backdropFilter: 'blur(10px)',
@@ -224,7 +224,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
               
               {/* XP earned */}
               <div 
-                className="backdrop-blur-sm px-2 py-1 rounded-lg inline-block border border-white/20 shadow-lg"
+                className="backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg inline-flex items-center justify-between border border-white/20 shadow-lg"
                 style={{
                   background: 'rgba(247, 147, 30, 0.9)', // Clbhouz orange
                   backdropFilter: 'blur(10px)',

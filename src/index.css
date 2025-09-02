@@ -205,6 +205,16 @@
     scrollbar-width: none;         /* Firefox */
   }
 
+  /* Course card badge standardization */
+  .badge-standard-width { 
+    width: 88px; 
+  }
+  @screen md { 
+    .badge-standard-width { 
+      width: 96px; 
+    } 
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
