@@ -128,12 +128,12 @@ const CourseRankBadges = ({
   const getPositioningClasses = () => {
     switch (positioning) {
       case 'bottom-left':
-        return 'absolute bottom-3 left-4 flex flex-row gap-1 z-10';
+        return 'absolute bottom-3 left-4 flex flex-row gap-2 z-10';
       case 'top-right':
-        return 'absolute top-2 right-2 flex flex-row items-center gap-1 z-10';
+        return 'absolute top-2 right-2 flex flex-row items-center gap-1.5 z-10';
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-row items-center gap-1 z-10';
+        return 'absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10';
     }
   };
 
@@ -164,20 +164,23 @@ const CourseRankBadges = ({
       <TooltipProvider>
         {/* Left cluster: Ranking badges only (globe, flags) */}
         {rankingBadgesOnly.length > 0 && (
-          <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+          <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
             {rankingBadgesOnly.map((badge, index) => {
               const tooltipId = `left-${index}`;
               return (
                 <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                   <TooltipTrigger asChild>
-                    <span 
-                      className="badge-compact cursor-pointer shadow-lg shadow-black/20"
-                      onClick={(e) => handleTooltipToggle(tooltipId, e)}
-                      onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
-                    >
-                      <span className="badge-icon">{badge.icon}</span>
-                      <span className="truncate">{badge.rank}</span>
-                    </span>
+                  <div 
+                    className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20 cursor-pointer" 
+                    style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                    onClick={(e) => handleTooltipToggle(tooltipId, e)}
+                    onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
+                  >
+                  <div className="relative z-10 flex items-center justify-between w-full">
+                    {badge.icon}
+                    <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{badge.rank}</span>
+                  </div>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{badge.tooltip}</p>
@@ -190,21 +193,24 @@ const CourseRankBadges = ({
 
         {/* Right cluster: Rating badges (average + user ratings) */}
         {ratingBadgesOnly.length > 0 && (
-          <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
+          <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10">
             {ratingBadgesOnly.map((badge, index) => {
               const tooltipId = `right-${index}`;
               const isUserRating = !badge.icon; // User rating badge has no icon
               return (
                 <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                   <TooltipTrigger asChild>
-                    <span 
-                      className="badge-compact cursor-pointer shadow-lg shadow-black/20"
+                    <div 
+                      className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20 cursor-pointer" 
+                      style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
                       onClick={(e) => handleTooltipToggle(tooltipId, e)}
                       onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
                     >
-                      {badge.icon && <span className="badge-icon">{badge.icon}</span>}
-                      <span className="truncate">{badge.content}</span>
-                    </span>
+                        <div className="relative z-10 flex items-center justify-between w-full">
+                          {badge.icon}
+                          <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white`}>{badge.content}</span>
+                        </div>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{badge.tooltip}</p>
@@ -228,14 +234,17 @@ const CourseRankBadges = ({
             return (
               <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                 <TooltipTrigger asChild>
-                  <span 
-                    className="badge-compact cursor-pointer shadow-lg shadow-black/20"
+                  <div 
+                    className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20 cursor-pointer" 
+                    style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
                     onClick={(e) => handleTooltipToggle(tooltipId, e)}
                     onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
                   >
-                    <span className="badge-icon">{badge.icon}</span>
-                    <span className="truncate">{badge.rank}</span>
-                  </span>
+                    <div className="relative z-10 flex items-center justify-between w-full">
+                      {badge.icon}
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{badge.rank}</span>
+                    </div>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{badge.tooltip}</p>
@@ -248,14 +257,17 @@ const CourseRankBadges = ({
            {playerRatingBadge && (
              <Tooltip open={openTooltips.has('player-rating')}>
                <TooltipTrigger asChild>
-                     <span 
-                       className="badge-compact cursor-pointer shadow-lg shadow-black/20"
-                       onClick={(e) => handleTooltipToggle('player-rating', e)}
-                       onTouchEnd={(e) => handleTooltipToggle('player-rating', e)}
-                     >
-                       <ClubhouseLogo size="sm" />
-                        <span className="truncate">{playerRatingBadge.content}</span>
-                     </span>
+                      <div 
+                        className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20 cursor-pointer" 
+                        style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+                        onClick={(e) => handleTooltipToggle('player-rating', e)}
+                        onTouchEnd={(e) => handleTooltipToggle('player-rating', e)}
+                      >
+                        <div className="relative z-10 flex items-center justify-between w-full">
+                          <ClubhouseLogo size="sm" />
+                           <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{playerRatingBadge.content}</span>
+                        </div>
+                     </div>
                </TooltipTrigger>
                <TooltipContent>
                  <p>{playerRatingBadge.tooltip}</p>
@@ -288,14 +300,17 @@ const CourseRankBadges = ({
         <div className="absolute top-2 left-2">
           <Tooltip open={openTooltips.has('standalone-rating')}>
             <TooltipTrigger asChild>
-               <span 
-                 className="badge-compact cursor-pointer shadow-lg shadow-black/20"
+               <div 
+                 className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20 cursor-pointer" 
+                 style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
                  onClick={(e) => handleTooltipToggle('standalone-rating', e)}
                  onTouchEnd={(e) => handleTooltipToggle('standalone-rating', e)}
                >
-                 <ClubhouseLogo size="sm" />
-                 <span className="truncate">{playerRatingBadge.content}</span>
-               </span>
+                 <div className="relative z-10 flex items-center justify-between w-full">
+                   <ClubhouseLogo size="sm" />
+                   <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-bold text-white flex items-center`}>{playerRatingBadge.content}</span>
+                 </div>
+               </div>
             </TooltipTrigger>
             <TooltipContent>
               <p>{playerRatingBadge.tooltip}</p>
