@@ -476,14 +476,14 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
 
       {/* Highlights From My Journey Section */}
-      <div className="w-full px-4 pt-4 pb-0">
+      <div className="w-full px-4 pt-4 pb-2">
         <div className="max-w-6xl mx-auto">
           <HighlightsCarousel userId={userId} className="mb-0" />
         </div>
       </div>
 
 
-      {/* Courses by Region Section - 16px below Highlights */}
+      {/* Courses by Region Section */}
       <div className="mt-2"> {/* 8px spacing */}
         <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
       </div>
