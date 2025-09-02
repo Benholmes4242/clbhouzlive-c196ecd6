@@ -9,6 +9,7 @@ import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { cn } from '@/lib/utils';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
+import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
@@ -270,6 +271,20 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         {highlight.post_media.length > 1 && !isPreviewing && (
           <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-20">
             +{highlight.post_media.length - 1} more
+          </div>
+        )}
+        
+        {/* Golf Course Badge - Top Right */}
+        {highlight.golf_course && !isPreviewing && (
+          <div className="absolute top-3 right-3 z-20">
+            <CoursePostBadge 
+              course={{
+                id: highlight.golf_course.id,
+                name: highlight.golf_course.name,
+                country: highlight.golf_course.country
+              }}
+              className="text-xs"
+            />
           </div>
         )}
       </div>
