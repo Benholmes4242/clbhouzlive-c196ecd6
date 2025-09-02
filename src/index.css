@@ -644,7 +644,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 2px 4px;
-  gap: 4px;
+  gap: 1px;
   border-radius: 12px;
   background: rgb(255 255 255 / 0.10);
   backdrop-filter: blur(20px);
