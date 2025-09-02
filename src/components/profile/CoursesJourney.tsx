@@ -766,10 +766,10 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               </div>
             </div>
            ) : filteredCourses.length > 0 ? (
-            <div 
+            <div
               ref={carouselRef}
               className="
-                flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -985,7 +985,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
            ) : filteredCourses.length > 0 ? (
                <div
                  className="
-                   flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                   flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                    [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                    [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                  "
@@ -1196,7 +1196,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             <div
               ref={topRatedRefCallback}
               className="
-                flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -1480,7 +1480,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
               <div
                 ref={gbIrelandRefCallback}
                 className="
-                  flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                 "
@@ -1731,7 +1731,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
               <div
                 ref={combinedRef}
                 className="
-                  flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                 "
@@ -1984,7 +1984,7 @@ const USASection: React.FC<USASectionProps> = ({
               <div
                 ref={usaRefCallback}
                 className="
-                  flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                 "
@@ -2139,7 +2139,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
               <div
                 ref={europeRefCallback}
                 className="
-                  flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
+                  flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 px-4 md:px-0
                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                 "

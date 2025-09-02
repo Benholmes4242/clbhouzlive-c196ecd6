@@ -198,6 +198,13 @@
 }
 
 @layer utilities {
+  /* Hide scrollbars across browsers */
+  .no-scrollbar::-webkit-scrollbar { display: none; } /* Chrome/Safari/WebKit */
+  .no-scrollbar { 
+    -ms-overflow-style: none;      /* IE/Edge legacy */
+    scrollbar-width: none;         /* Firefox */
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

@@ -79,7 +79,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {/* Scrollable course cards */}
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]"
+          className="flex overflow-x-auto no-scrollbar px-4 md:px-0 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]"
           style={{
             // momentum + no snap (defends against any global/parent styles)
             WebkitOverflowScrolling: 'touch',
