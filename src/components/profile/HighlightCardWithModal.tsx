@@ -214,6 +214,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   poster={posterUrl || undefined}
                   muted={mutedPref}
                   autoplay={false}
+                  showMuteButton={false}
                   className="w-full h-full object-cover object-center"
                 />
               </>
@@ -271,6 +272,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
               poster={posterUrl || undefined}
               muted={globalAudio.isGloballyMuted}
               autoplay={true}
+              showMuteButton={false}
               className="w-full h-full object-cover object-center"
               onEnded={stopPreview}
             />
