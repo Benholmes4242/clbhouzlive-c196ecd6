@@ -48,94 +48,78 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   
   // Use high-res Cloudflare Stream thumbnail for crisp quality
   const posterUrl = streamId 
-    ? `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?height=900`
-    : (videoId ? generateThumbnailUrl(videoId, { width: 320, height: 192, time: 1 }) : primaryMedia?.media_url);
-    
-  const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : primaryMedia?.media_url;
+    ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
+    : null;
+  
+  const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
+  const carouselVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Intersection observer to pause preview when out of view
+  // Register with video controller
   useEffect(() => {
-    if (!cardRef.current) return;
+    if (primaryMedia?.media_type === 'video') {
+      register(highlight.id, carouselVideoRef.current);
+    }
+  }, [highlight.id, primaryMedia, register]);
 
+  // Intersection observer to manage preview state based on visibility
+  useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting);
-        if (!entry.isIntersecting && isPreviewing) {
-          setIsPreviewing(false);
-        }
-      },
+      ([entry]) => setIsInView(entry.isIntersecting),
       { threshold: 0.1 }
     );
 
-    observer.observe(cardRef.current);
+    if (cardRef.current) observer.observe(cardRef.current);
     return () => observer.disconnect();
-  }, [isPreviewing]);
-
-  // Desktop hover handlers
-  const handleMouseEnter = useCallback(() => {
-    if (window.matchMedia('(hover: hover)').matches && primaryMedia?.media_type === 'video' && isInView) {
-      setIsPreviewing(true);
-      pauseAllOtherVideos('preview-' + highlight.id);
-    }
-  }, [primaryMedia?.media_type, isInView, pauseAllOtherVideos, highlight.id]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (window.matchMedia('(hover: hover)').matches) {
-      setIsPreviewing(false);
-    }
   }, []);
 
-  // Preview control functions
   const startPreview = useCallback(() => {
-    if (primaryMedia?.media_type === 'video' && isInView) {
-      setIsPreviewing(true);
-      // Pause all other videos first
-      pauseAllOtherVideos('preview-' + highlight.id);
-    }
-  }, [primaryMedia?.media_type, pauseAllOtherVideos, highlight.id, isInView]);
+    if (!isInView || primaryMedia?.media_type !== 'video') return;
+    
+    pauseAllOtherVideos(highlight.id);
+    setIsPreviewing(true);
+  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id]);
 
   const stopPreview = useCallback(() => {
     setIsPreviewing(false);
   }, []);
 
-  const handleOpenModal = useCallback(() => {
-    // Stop any preview or carousel video before opening modal
-    stopPreview();
-    if (isCarouselActive) {
-      pause(highlight.id);
+  const handleMouseEnter = useCallback(() => {
+    if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
+      startPreview();
     }
-    onOpenModal(highlight.id);
-  }, [stopPreview, isCarouselActive, pause, highlight.id, onOpenModal]);
+  }, [primaryMedia, isCarouselActive, startPreview]);
 
-  // Setup long press preview gestures
+  const handleMouseLeave = useCallback(() => {
+    if (!isCarouselActive) {
+      stopPreview();
+    }
+  }, [isCarouselActive, stopPreview]);
+
+  const handleOpenModal = useCallback(() => {
+    // Always stop previews and carousel when opening modal
+    stopPreview();
+    pause(highlight.id);
+    onOpenModal(highlight.id);
+  }, [stopPreview, pause, onOpenModal, highlight.id]);
+
+  // Long press gesture handling
   const gestureHandlers = useLongPressPreview({
     onTap: handleOpenModal,
     onPreviewStart: startPreview,
     onPreviewStop: stopPreview,
-    longPressThreshold: 400
+    longPressThreshold: 500
   });
 
-  // Handle carousel video control (when not in preview mode)
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (primaryMedia?.media_type === 'video' && !gestureHandlers.isPreviewActive) {
+    if (primaryMedia?.media_type === 'video') {
       if (isCarouselActive) {
         pause(highlight.id);
       } else {
         play(highlight.id);
       }
     }
-  }, [primaryMedia?.media_type, gestureHandlers.isPreviewActive, isCarouselActive, pause, play, highlight.id]);
-
-  // Memoize the onReady callback for carousel video
-  const carouselVideoRef = useRef<HTMLVideoElement>(null);
-  
-  // Register video when it becomes active
-  React.useEffect(() => {
-    if (isCarouselActive && carouselVideoRef.current) {
-      register(highlight.id, carouselVideoRef.current);
-    }
-  }, [isCarouselActive, register, highlight.id]);
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -177,14 +161,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       tabIndex={0}
       aria-label="Open highlight post"
       {...gestureHandlers}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleOpenModal();
-        }
-      }}
+      onClick={handleVideoClick}
     >
       <div className={cn("relative overflow-hidden rounded-2xl", isLandscape ? "aspect-[4/3]" : "aspect-[3/4]")}>
         {primaryMedia.media_type === 'image' ? (
