@@ -171,7 +171,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     <div 
       ref={cardRef}
       className="group/highlight flex-none bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer w-full"
-      data-preview={isPreviewing ? 'true' : 'false'}
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
@@ -233,16 +232,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
         {/* Feather gradient above glass panel */}
         <div
-          className="
-            pointer-events-none absolute inset-x-0 z-[9]
-            bottom-[72px] md:bottom-[88px]
-            h-8 md:h-10
-            bg-gradient-to-t from-black/40 via-black/20 to-transparent
-            transition-opacity duration-300 ease-out
-            group-hover/highlight:opacity-0
-            data-[preview=true]:opacity-0
-            motion-reduce:transition-none
-          "
+          className={cn(
+            "pointer-events-none absolute inset-x-0 z-[9]",
+            "bottom-[72px] md:bottom-[88px]",
+            "h-8 md:h-10",
+            "bg-gradient-to-t from-black/40 via-black/20 to-transparent",
+            "transition-opacity duration-300 ease-out",
+            "motion-reduce:transition-none",
+            isPreviewing ? "opacity-0" : "opacity-100 group-hover/highlight:opacity-0"
+          )}
         />
 
         {/* Liquid glass bottom panel — FLUSH, no outer gap */}
@@ -253,9 +251,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           "rounded-b-2xl",
           "px-4 py-3 md:px-5 md:py-4",
           "transition-opacity duration-300 ease-out",
-          "group-hover/highlight:opacity-0",
-          "data-[preview=true]:opacity-0",
-          "motion-reduce:transition-none"
+          "motion-reduce:transition-none",
+          isPreviewing ? "opacity-0" : "opacity-100 group-hover/highlight:opacity-0"
         )}>
           <div className="flex items-start gap-2 mb-1">
             <MapPin className="w-3 h-3 md:w-4 md:h-4 text-white/80 mt-0.5 flex-shrink-0" />
