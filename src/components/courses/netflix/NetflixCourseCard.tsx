@@ -163,7 +163,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
 
   return (
     <div 
-      className={`relative group cursor-pointer hover:scale-[1.02] ${className}`}
+      className={`relative group cursor-pointer hover:scale-[1.02] ${className} [--badge-w:72px] md:[--badge-w:76px] lg:[--badge-w:76px]`}
       onClick={onClick}
     >
       {/* Main card container with responsive aspect ratio */}
@@ -203,38 +203,22 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
                   {rankBadges.map((badge, index) => {
                     const IconComponent = badge.icon;
                     return (
-                      <div 
-                        key={`${badge.type}-${index}`}
-                        className="bg-black/60 backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg flex items-center justify-between border border-white/20 shadow-lg"
-                        style={{
-                          background: 'rgba(0, 0, 0, 0.6)',
-                          backdropFilter: 'blur(10px)',
-                          WebkitBackdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.2)',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                        }}
-                      >
-                        <IconComponent className="w-3 h-3" />
-                        <span className={`${textSizing.badge} font-medium`}>{badge.label}</span>
-                      </div>
+                       <div 
+                         key={`${badge.type}-${index}`}
+                         className="glass-badge-tight shadow-lg"
+                       >
+                         <IconComponent className="w-3 h-3" />
+                         <span className="font-medium text-white">{badge.label}</span>
+                       </div>
                     );
                   })}
                 </div>
               )}
               
-              {/* XP earned */}
-              <div 
-                className="backdrop-blur-sm badge-standard-width h-8 md:h-9 px-2 py-1 rounded-lg inline-flex items-center justify-between border border-white/20 shadow-lg"
-                style={{
-                  background: 'rgba(247, 147, 30, 0.9)', // Clbhouz orange
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                <span className={`${textSizing.xp} text-white drop-shadow font-semibold`}>+250 XP</span>
-              </div>
+               {/* XP earned */}
+               <div className="glass-badge-tight shadow-lg bg-[rgba(247,147,30,0.9)]">
+                 <span className="text-white drop-shadow font-semibold">+250 XP</span>
+               </div>
             </div>
             
             {/* Right side - User rating */}

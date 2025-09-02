@@ -634,3 +634,24 @@
 .aurora-theme {
   animation: aurora-glow 4s ease-in-out infinite alternate;
 }
+
+/* Global styles for tightened glass badges */
+.glass-badge-tight {
+  width: var(--badge-w);
+  min-width: var(--badge-w);
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px;
+  gap: 4px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.10);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgb(255 255 255 / 0.20);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
