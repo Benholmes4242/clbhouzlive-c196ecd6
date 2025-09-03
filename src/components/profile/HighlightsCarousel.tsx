@@ -7,6 +7,7 @@ import { HighlightsVideoProvider } from './HighlightsVideoController';
 import { useHighlightsModal } from '@/hooks/useHighlightsModal';
 import HighlightCardWithModal from './HighlightCardWithModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -19,12 +20,32 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [userProfile, setUserProfile] = useState<any>(null);
   
   // FullscreenMediaModal integration
   const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
     highlights: highlights || [],
     userId
   });
+
+  // Fetch user profile data for modal
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!userId) return;
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .eq('id', userId)
+        .single();
+      
+      if (data && !error) {
+        setUserProfile(data);
+      }
+    };
+    
+    fetchUserProfile();
+  }, [userId]);
 
   // Combined ref callback that handles both scroll container and drag functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -165,8 +186,11 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             name: currentHighlight.golf_course.name,
             country: currentHighlight.golf_course.country
           } : undefined}
-          user={{ id: userId, profile_photo_url: null }}
-          displayName="User"
+          user={{
+            id: userId,
+            profile_photo_url: userProfile?.profile_photo_url || null
+          }}
+          displayName={userProfile?.display_name || userProfile?.username || 'User'}
           content={currentHighlight.content}
           postTags={[]}
           canNavigatePosts={highlights.length > 1}
