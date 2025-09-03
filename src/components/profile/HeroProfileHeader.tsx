@@ -772,7 +772,7 @@ const HeroProfileHeader = ({
              </div>
              
               {/* Spacer to avoid clipping - ensure full panel is visible */}
-              <div className="h-16" />
+              <div className="h-24" />
            </section>
            
            {/* Stats - removed negative margin */}
@@ -905,7 +905,7 @@ const HeroProfileHeader = ({
              </div>
              
               {/* Spacer to avoid clipping - ensure full panel is visible */}
-              <div className="h-20" />
+              <div className="h-28" />
            </section>
            
            {/* Stats - removed negative margin */}
