@@ -27,11 +27,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [isInView, setIsInView] = useState(true);
-  
-  // Check if browser supports requestVideoFrameCallback
-  const supportsRVFC = typeof (HTMLVideoElement.prototype as any).requestVideoFrameCallback === "function";
   const globalAudio = useGlobalAudio();
   
   // Use the highlights video controller for carousel playback
@@ -82,43 +78,23 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     
     pauseAllOtherVideos(highlight.id);
     setIsPreviewing(true);
-    
-    const video = previewVideoRef.current;
-    if (!video) return;
-
-    // Ensure attributes for autoplay
-    video.muted = true;
-    (video as any).playsInline = true;
-
-    // Kick load if only metadata present
-    if (video.readyState < 2) {
-      video.load();
-    }
-
-    const onReady = () => setIsVideoReady(true);
-
-    if (supportsRVFC && video.requestVideoFrameCallback) {
-      // Reveal on first painted frame
-      video.requestVideoFrameCallback(() => onReady());
-    } else {
-      video.addEventListener("loadeddata", onReady, { once: true });
-      video.addEventListener("canplay", onReady, { once: true });
-    }
-
-    // Start playback
-    video.play().catch(() => {
-      // Ignore policy interruptions
-    });
-  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id, supportsRVFC]);
+  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id]);
 
   const stopPreview = useCallback(() => {
-    const video = previewVideoRef.current;
-    if (video) {
-      video.pause();
-    }
-    setIsVideoReady(false);
     setIsPreviewing(false);
   }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
+      startPreview();
+    }
+  }, [primaryMedia, isCarouselActive, startPreview]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isCarouselActive) {
+      stopPreview();
+    }
+  }, [isCarouselActive, stopPreview]);
 
   const handleOpenModal = useCallback(() => {
     // Always stop previews and carousel when opening modal
@@ -127,22 +103,13 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     onOpenModal(highlight.id);
   }, [stopPreview, pause, onOpenModal, highlight.id]);
 
-  // Long press gesture handling with proper preview functions
+  // Long press gesture handling
   const gestureHandlers = useLongPressPreview({
     onTap: handleOpenModal,
-    onPreviewStart: () => {
-      if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
-        startPreview();
-      }
-    },
-    onPreviewStop: () => {
-      if (!isCarouselActive) {
-        stopPreview();
-      }
-    },
+    onPreviewStart: startPreview,
+    onPreviewStop: stopPreview,
     longPressThreshold: 500
   });
-
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -194,6 +161,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...gestureHandlers}
       onClick={handleVideoClick}
     >
@@ -221,44 +190,36 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   className="w-full h-full object-cover object-center"
                 />
               </>
+            ) : isPreviewing ? (
+              /* Preview video for hover/long-press */
+              <HLSVideoCard
+                ref={previewVideoRef}
+                hlsUrl={hlsUrl}
+                poster={posterUrl || undefined}
+                muted={true}
+                autoplay={true}
+                loop={true}
+                showMuteButton={false}
+                className="w-full h-full object-cover object-center"
+                externallyManaged={true}
+              />
             ) : (
-              /* Cross-fade preview system with poster and video layers */
+              /* Video thumbnail with play overlay */
               <div className="relative w-full h-full">
-                {/* Poster layer - fades out when video is ready */}
                 <img
                   src={posterUrl || primaryMedia.media_url}
                   alt="Video thumbnail"
-                  className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-150 ${
-                    isPreviewing && isVideoReady ? 'opacity-0' : 'opacity-100'
-                  }`}
+                  className="w-full h-full object-cover object-center"
                   loading="lazy"
                   decoding="async"
-                  draggable={false}
-                />
-
-                {/* Video layer - always mounted, fades in when ready */}
-                <HLSVideoCard
-                  ref={previewVideoRef}
-                  hlsUrl={hlsUrl}
-                  poster={posterUrl || undefined}
-                  muted={true}
-                  autoplay={false}
-                  loop={true}
-                  showMuteButton={false}
-                  className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-150 will-change-opacity ${
-                    isPreviewing && isVideoReady ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  externallyManaged={true}
                 />
                 
-                {/* Play button overlay - only shown when not previewing */}
-                {!isPreviewing && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                      <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
-                    </div>
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                    <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
                   </div>
-                )}
+                </div>
               </div>
             )}
           </>
