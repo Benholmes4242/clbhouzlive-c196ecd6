@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, MapPin, BarChart3 } from 'lucide-react';
+import { Camera, MapPin, BarChart3, MoreVertical } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 import { Button } from '@/components/ui/button';
