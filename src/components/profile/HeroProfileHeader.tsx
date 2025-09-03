@@ -909,7 +909,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Tab Navigation with Underline Animation - Brand accent styling */}
-      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+      <div className="mt-4 sticky top-16 z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
