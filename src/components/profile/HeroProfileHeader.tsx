@@ -718,41 +718,42 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-5 py-4 flex flex-col items-center">
-                 {/* Name + Handle */}
-                 <div className="flex items-start justify-between w-full">
-                   <div className="flex-1 text-center">
-                     <h1 className="text-2xl font-semibold text-gray-900">
-                       {displayName}
-                     </h1>
-                     <p className="mt-1 text-sm text-gray-700">
-                       @{username}
-                     </p>
+               <div className="px-5 py-4 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-4 right-5">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={20} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
                    </div>
-                    {/* Three dots menu */}
-                    {isOwnProfile && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={20} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-2xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-sm text-gray-700">
+                     @{username}
+                   </p>
                  </div>
 
-                {/* Club + Handicap */}
+                {/* Club + Handicap - centered */}
                 <div className="mt-4 w-full max-w-sm mx-auto">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
@@ -855,41 +856,42 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-8 py-6 flex flex-col items-center">
-                 {/* Name + Handle */}
-                 <div className="flex items-start justify-between w-full">
-                   <div className="flex-1 text-center">
-                     <h1 className="text-3xl font-semibold text-gray-900">
-                       {displayName}
-                     </h1>
-                     <p className="mt-1 text-base text-gray-700">
-                       @{username}
-                     </p>
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-6 right-8">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
                    </div>
-                    {/* Three dots menu */}
-                    {isOwnProfile && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={24} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-3xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-base text-gray-700">
+                     @{username}
+                   </p>
                  </div>
 
-                {/* Club + Handicap */}
+                {/* Club + Handicap - centered */}
                 <div className="mt-5 w-full max-w-md mx-auto">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
