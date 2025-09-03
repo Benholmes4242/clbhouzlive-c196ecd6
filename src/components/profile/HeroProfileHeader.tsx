@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -705,28 +705,34 @@ const HeroProfileHeader = ({
                               bg-gradient-to-t from-white via-white/70 to-transparent 
                               pointer-events-none z-[5]" />
 
-              {/* Floating Glass Panel */}
-              <div 
-                ref={profileCardRef}
-                className="
-                  absolute left-1/2 bottom-6 -translate-x-1/2
-                  w-[90%] max-w-[800px]
-                  rounded-2xl border border-white/35
-                  bg-white/35 backdrop-blur-xl
-                  shadow-[0_10px_30px_rgba(0,0,0,0.15)]
-                  z-10
-                "
-              >
-                <div className="px-5 py-4">
-                  {/* Name + Handle */}
-                  <div className="text-center">
-                    <h1 className="text-2xl font-semibold text-gray-900">
-                      {displayName}
-                    </h1>
-                    <p className="mt-1 text-sm text-gray-700">
-                      @{username}
-                    </p>
-                  </div>
+               {/* Floating Glass Panel */}
+               <div 
+                 ref={profileCardRef}
+                 className="
+                   absolute left-1/2 bottom-[-20px] -translate-x-1/2
+                   w-[90%] max-w-[800px]
+                   rounded-2xl border border-white/35
+                   bg-white/35 backdrop-blur-xl
+                   shadow-[0_10px_30px_rgba(0,0,0,0.15)]
+                   z-10
+                 "
+               >
+                 <div className="px-5 py-4">
+                   {/* Name + Handle */}
+                   <div className="flex items-start justify-between">
+                     <div className="flex-1 text-center">
+                       <h1 className="text-2xl font-semibold text-gray-900">
+                         {displayName}
+                       </h1>
+                       <p className="mt-1 text-sm text-gray-700">
+                         @{username}
+                       </p>
+                     </div>
+                     {/* Three dots menu */}
+                     <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                       <MoreVertical size={20} />
+                     </button>
+                   </div>
 
                   {/* Club + Handicap */}
                   <div className="mt-4 grid grid-cols-2 gap-4">
@@ -820,28 +826,34 @@ const HeroProfileHeader = ({
                               bg-gradient-to-t from-white via-white/70 to-transparent 
                               pointer-events-none z-[5]" />
 
-              {/* Floating Glass Panel */}
-              <div 
-                ref={profileCardRef}
-                className="
-                  absolute left-1/2 bottom-8 -translate-x-1/2
-                  w-[80%] max-w-[800px]
-                  rounded-2xl border border-white/35
-                  bg-white/35 backdrop-blur-xl
-                  shadow-[0_10px_30px_rgba(0,0,0,0.15)]
-                  z-10
-                "
-              >
-                <div className="px-8 py-6">
-                  {/* Name + Handle */}
-                  <div className="text-center">
-                    <h1 className="text-3xl font-semibold text-gray-900">
-                      {displayName}
-                    </h1>
-                    <p className="mt-1 text-base text-gray-700">
-                      @{username}
-                    </p>
-                  </div>
+               {/* Floating Glass Panel */}
+               <div 
+                 ref={profileCardRef}
+                 className="
+                   absolute left-1/2 bottom-[-30px] -translate-x-1/2
+                   w-[80%] max-w-[800px]
+                   rounded-2xl border border-white/35
+                   bg-white/35 backdrop-blur-xl
+                   shadow-[0_10px_30px_rgba(0,0,0,0.15)]
+                   z-10
+                 "
+               >
+                 <div className="px-8 py-6">
+                   {/* Name + Handle */}
+                   <div className="flex items-start justify-between">
+                     <div className="flex-1 text-center">
+                       <h1 className="text-3xl font-semibold text-gray-900">
+                         {displayName}
+                       </h1>
+                       <p className="mt-1 text-base text-gray-700">
+                         @{username}
+                       </p>
+                     </div>
+                     {/* Three dots menu */}
+                     <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                       <MoreVertical size={24} />
+                     </button>
+                   </div>
 
                   {/* Club + Handicap */}
                   <div className="mt-5 grid grid-cols-2 gap-4">
