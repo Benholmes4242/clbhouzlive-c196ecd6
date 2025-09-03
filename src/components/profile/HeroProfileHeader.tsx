@@ -484,6 +484,18 @@ const HeroProfileHeader = ({
   const displayName = profile?.display_name || 'User';
   const username = profile?.username || 'user';
   const homeClub = profile?.home_club || 'Home Club';
+  
+  // Function to wrap text with max 2 words per line
+  const wrapHomeClubText = (text: string) => {
+    const words = text.split(' ');
+    const lines = [];
+    for (let i = 0; i < words.length; i += 2) {
+      lines.push(words.slice(i, i + 2).join(' '));
+    }
+    return lines;
+  };
+  
+  const homeClubLines = wrapHomeClubText(homeClub);
   const handicap = profile?.eg_handicap_index?.toString() || '--';
   const postsCount = posts.length; // Use actual posts count
   
@@ -758,9 +770,11 @@ const HeroProfileHeader = ({
                   <div className="grid grid-cols-2 gap-4">
                      <div className="text-center">
                        <div className="text-xs text-gray-700">Home Club</div>
-                       <div className="mt-1 text-base font-medium text-gray-900 break-words hyphens-auto" style={{ wordBreak: 'break-word', hyphens: 'auto' }}>
-                         {homeClub}
-                       </div>
+                        <div className="mt-1 text-base font-medium text-gray-900">
+                          {homeClubLines.map((line, index) => (
+                            <div key={index}>{line}</div>
+                          ))}
+                        </div>
                      </div>
                     <div className="text-center">
                       <div className="text-xs text-gray-700">Handicap</div>
@@ -896,9 +910,11 @@ const HeroProfileHeader = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-sm text-gray-700">Home Club</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {homeClub}
-                      </div>
+                       <div className="mt-1 text-lg font-medium text-gray-900">
+                         {homeClubLines.map((line, index) => (
+                           <div key={index}>{line}</div>
+                         ))}
+                       </div>
                     </div>
                     <div className="text-center">
                       <div className="text-sm text-gray-700">Handicap</div>
