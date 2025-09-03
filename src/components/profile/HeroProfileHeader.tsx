@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
@@ -11,7 +12,6 @@ import UniversalProfileTabs from './UniversalProfileTabs';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ProfileActionsMenu } from './ProfileActionsMenu';
 
 import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -667,421 +667,232 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with fade gradient overlay */}
-          <div className="relative w-full overflow-hidden" style={{ 
-            height: '46vh', 
-            minHeight: '320px', 
-            maxHeight: '520px' 
-          }}>
-            {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-            
-            {profile?.profile_photo_url ? (
-              <img
-                src={profile.profile_photo_url}
-                alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300"
-                style={{ 
-                  objectPosition: getMobileCropPosition(profile),
-                  objectFit: 'cover'
-                }}
-                onLoad={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.previousElementSibling?.remove();
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
-                <Camera className="w-16 h-16 mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">No Profile Photo</p>
-                <p className="text-sm text-center px-4">
-                  {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
-                </p>
+          <section className="relative w-full">
+            <div className="relative h-[46vh] md:h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: getMobileCropPosition(profile),
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient */}
+              <div className="absolute bottom-0 left-0 w-full h-32 
+                              bg-gradient-to-t from-white via-white/70 to-transparent 
+                              pointer-events-none z-[5]" />
+
+              {/* Floating Glass Panel */}
+              <div 
+                ref={profileCardRef}
+                className="
+                  absolute left-1/2 bottom-6 -translate-x-1/2
+                  w-[90%] max-w-[800px]
+                  rounded-2xl border border-white/35
+                  bg-white/35 backdrop-blur-xl
+                  shadow-[0_10px_30px_rgba(0,0,0,0.15)]
+                  z-10
+                "
+              >
+                <div className="px-5 py-4">
+                  {/* Name + Handle */}
+                  <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
+
+                  {/* Club + Handicap */}
+                  <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-700">Home Club</div>
+                      <div className="mt-1 text-base font-medium text-gray-900">
+                        {homeClub}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-700">Handicap</div>
+                      <div className="mt-1 text-base font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  {isOwnProfile && (
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
+                      <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
+                      <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-            
-            {/* Fade gradient overlay */}
-            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/70 to-transparent pointer-events-none z-[5]" />
-          </div>
+            </div>
+          </section>
           
-          {/* Floating Glass Panel */}
-          <div 
-            ref={profileCardRef}
-            className="absolute left-1/2 -translate-x-1/2 w-[90%] rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10 px-5 py-4"
-            style={{ 
-              bottom: '24px'
-            }}
-          >
-            {/* Name + Handle + Owner Kebab */}
-            <div className="text-center mb-4">
-              <div className="flex items-center justify-center gap-2 relative mb-1.5">
-                <h1 className="text-2xl leading-8 font-semibold text-gray-900">
-                  {displayName}
-                </h1>
-                {isOwnProfile && (
-                  <ProfileActionsMenu
-                    onEditProfile={() => setEditDialogOpen(true)}
-                    onMediaManager={() => setMediaManagerOpen(true)}
-                    onImmersivePreview={() => previewImmersive()}
-                  />
-                )}
+          {/* Stats */}
+          <section className="container mx-auto px-4 mt-20">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
+                <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
+                <div className="text-sm text-gray-600">Posts</div>
               </div>
-              <div className="text-base leading-6 font-medium text-gray-700">
-                @{username}
+              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
+                <div className="text-2xl font-semibold text-gray-900">2,500</div>
+                <div className="text-sm text-gray-600">Total XP</div>
+              </div>
+              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
+                <div className="text-2xl font-semibold text-gray-900">{followingCount}</div>
+                <div className="text-sm text-gray-600">Following</div>
+              </div>
+              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
+                <div className="text-2xl font-semibold text-gray-900">{followersCount}</div>
+                <div className="text-sm text-gray-600">Followers</div>
               </div>
             </div>
-            
-            {/* Club + Handicap */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="text-center">
-                <div className="text-xs leading-4 font-semibold mb-1 text-gray-700">
-                  Home Club
-                </div>
-                <div className="text-base leading-6 font-semibold text-gray-900">
-                  {homeClub}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs leading-4 font-semibold mb-1 text-gray-700">
-                  Handicap
-                </div>
-                <div className="text-base leading-6 font-semibold text-gray-900">
-                  {handicap}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Stats Tiles */}
-          <div className="px-3 mt-4 mb-4">
-            <div className="grid grid-cols-4 gap-2">
-              {/* Posts */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-lg leading-5 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {postsCount}
-                </div>
-                <div 
-                  className="text-xs leading-4 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Posts
-                </div>
-              </div>
-              
-              {/* XP */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-lg leading-5 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  2,500
-                </div>
-                <div 
-                  className="text-xs leading-4 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Total XP
-                </div>
-              </div>
-              
-              {/* Following */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-lg leading-5 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {followingCount}
-                </div>
-                <div 
-                  className="text-xs leading-4 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Following
-                </div>
-              </div>
-              
-              {/* Followers */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-2 text-center min-h-[60px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-lg leading-5 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {followersCount}
-                </div>
-                <div 
-                  className="text-xs leading-4 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Followers
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
-          {/* Header Image with fade gradient overlay */}
-          <div 
-            ref={profileCardRef}
-            className="relative w-full overflow-hidden" 
-            style={{ 
-              height: '48vh', 
-              minHeight: '320px', 
-              maxHeight: '520px' 
-            }}
-          >
-            {/* Loading state */}
-            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-            
-            {profile?.profile_photo_url ? (
-              <img
-                src={profile.profile_photo_url}
-                alt={profile?.display_name || 'Profile'}
-                className="w-full h-full object-cover transition-opacity duration-300"
-                style={{ 
-                  objectPosition: 'center center',
-                  objectFit: 'cover'
-                }}
-                onLoad={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.previousElementSibling?.remove();
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
-                <Camera className="w-16 h-16 mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">No Profile Photo</p>
-                <p className="text-sm text-center px-4">
-                  {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
-                </p>
+          <section className="relative w-full">
+            <div className="relative h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: 'center center',
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient */}
+              <div className="absolute bottom-0 left-0 w-full h-32 
+                              bg-gradient-to-t from-white via-white/70 to-transparent 
+                              pointer-events-none z-[5]" />
+
+              {/* Floating Glass Panel */}
+              <div 
+                ref={profileCardRef}
+                className="
+                  absolute left-1/2 bottom-8 -translate-x-1/2
+                  w-[80%] max-w-[800px]
+                  rounded-2xl border border-white/35
+                  bg-white/35 backdrop-blur-xl
+                  shadow-[0_10px_30px_rgba(0,0,0,0.15)]
+                  z-10
+                "
+              >
+                <div className="px-8 py-6">
+                  {/* Name + Handle */}
+                  <div className="text-center">
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-base text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
+
+                  {/* Club + Handicap */}
+                  <div className="mt-5 grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Home Club</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
+                        {homeClub}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Handicap</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  {isOwnProfile && (
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
+                      <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
+                      <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-            
-            {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
-          </div>
+            </div>
+          </section>
           
-          {/* Overlapping White Card - Desktop styling */}
-          <div className="relative mx-auto max-w-2xl -mt-6 bg-white rounded-t-[24px] rounded-b-[20px] p-6 border border-solid"
-            style={{
-              borderColor: 'hsl(var(--profile-border-card))',
-              boxShadow: 'var(--profile-shadow-card)'
-            }}
-          >
-            {/* Name & Handle - Centered */}
-            <div className="text-center mb-6">
-              <h1 
-                className="text-3xl leading-10 font-bold mb-2"
-                style={{ color: 'hsl(var(--profile-text-primary))' }}
-              >
-                {displayName}
-              </h1>
-              <div 
-                className="text-lg leading-7 font-medium"
-                style={{ color: 'hsl(var(--profile-text-secondary))' }}
-              >
-                @{username}
+          {/* Stats */}
+          <section className="container mx-auto px-6 mt-24">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
+                <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
+                <div className="text-base text-gray-600">Posts</div>
+              </div>
+              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
+                <div className="text-3xl font-semibold text-gray-900">2,500</div>
+                <div className="text-base text-gray-600">Total XP</div>
+              </div>
+              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
+                <div className="text-3xl font-semibold text-gray-900">{followingCount}</div>
+                <div className="text-base text-gray-600">Following</div>
+              </div>
+              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
+                <div className="text-3xl font-semibold text-gray-900">{followersCount}</div>
+                <div className="text-base text-gray-600">Followers</div>
               </div>
             </div>
-            
-            {/* Home Club & Handicap Row */}
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-sm leading-5 font-semibold mb-2"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Home Club
-                </div>
-                <div 
-                  className="text-lg leading-7 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {homeClub}
-                </div>
-              </div>
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-sm leading-5 font-semibold mb-2"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Handicap
-                </div>
-                <div 
-                  className="text-lg leading-7 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {handicap}
-                </div>
-              </div>
-            </div>
-            
-            {/* Profile Action Buttons */}
-            {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => setEditDialogOpen(true)}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Edit<br/>Profile
-                </button>
-                <button
-                  onClick={() => setMediaManagerOpen(true)}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Media<br/>Manager
-                </button>
-                <button
-                  onClick={() => previewImmersive()}
-                  className="py-4 px-3 text-base leading-5 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Immersive<br/>Preview
-                </button>
-              </div>
-            )}
-          </div>
-          
-          {/* Stats Tiles - Desktop */}
-          <div className="max-w-4xl mx-auto px-6 mt-6 mb-6">
-            <div className="grid grid-cols-4 gap-4">
-              {/* Posts */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-xl leading-6 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {postsCount}
-                </div>
-                <div 
-                  className="text-sm leading-5 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Posts
-                </div>
-              </div>
-              
-              {/* XP */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-xl leading-6 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  2,500
-                </div>
-                <div 
-                  className="text-sm leading-5 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Total XP
-                </div>
-              </div>
-              
-              {/* Following */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-xl leading-6 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {followingCount}
-                </div>
-                <div 
-                  className="text-sm leading-5 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Following
-                </div>
-              </div>
-              
-              {/* Followers */}
-              <div 
-                className="bg-white rounded-[14px] border border-solid p-4 text-center min-h-[74px] flex flex-col justify-center"
-                style={{
-                  borderColor: 'hsl(var(--profile-border-tile))',
-                  boxShadow: 'var(--profile-shadow-tile)'
-                }}
-              >
-                <div 
-                  className="text-xl leading-6 font-bold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
-                  {followersCount}
-                </div>
-                <div 
-                  className="text-sm leading-5 font-medium"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
-                  Followers
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
       )}
 
