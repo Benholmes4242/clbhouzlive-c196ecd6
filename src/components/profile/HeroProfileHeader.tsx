@@ -708,7 +708,7 @@ const HeroProfileHeader = ({
               <div 
                 ref={profileCardRef}
                 className="
-                  absolute left-1/2 bottom-6 -translate-x-1/2
+                  absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2
                   w-[90%] max-w-[800px]
                   rounded-2xl border border-white/35
                   bg-white/35 backdrop-blur-xl
@@ -757,7 +757,7 @@ const HeroProfileHeader = ({
           </section>
           
           {/* Stats */}
-          <section className="container mx-auto px-4 -mt-2">
+          <section className="container mx-auto px-4 mt-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
                 <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
@@ -823,7 +823,7 @@ const HeroProfileHeader = ({
               <div 
                 ref={profileCardRef}
                 className="
-                  absolute left-1/2 bottom-8 -translate-x-1/2
+                  absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2
                   w-[80%] max-w-[800px]
                   rounded-2xl border border-white/35
                   bg-white/35 backdrop-blur-xl
@@ -872,7 +872,7 @@ const HeroProfileHeader = ({
           </section>
           
           {/* Stats */}
-          <section className="container mx-auto px-6 -mt-1">
+          <section className="container mx-auto px-6 mt-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
                 <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
