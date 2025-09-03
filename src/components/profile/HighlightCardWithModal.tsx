@@ -27,7 +27,11 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [isInView, setIsInView] = useState(true);
+  
+  // Check if browser supports requestVideoFrameCallback
+  const supportsRVFC = typeof (HTMLVideoElement.prototype as any).requestVideoFrameCallback === "function";
   const globalAudio = useGlobalAudio();
   
   // Use the highlights video controller for carousel playback
@@ -78,9 +82,41 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     
     pauseAllOtherVideos(highlight.id);
     setIsPreviewing(true);
-  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id]);
+    
+    const video = previewVideoRef.current;
+    if (!video) return;
+
+    // Ensure attributes for autoplay
+    video.muted = true;
+    (video as any).playsInline = true;
+
+    // Kick load if only metadata present
+    if (video.readyState < 2) {
+      video.load();
+    }
+
+    const onReady = () => setIsVideoReady(true);
+
+    if (supportsRVFC && video.requestVideoFrameCallback) {
+      // Reveal on first painted frame
+      video.requestVideoFrameCallback(() => onReady());
+    } else {
+      video.addEventListener("loadeddata", onReady, { once: true });
+      video.addEventListener("canplay", onReady, { once: true });
+    }
+
+    // Start playback
+    video.play().catch(() => {
+      // Ignore policy interruptions
+    });
+  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id, supportsRVFC]);
 
   const stopPreview = useCallback(() => {
+    const video = previewVideoRef.current;
+    if (video) {
+      video.pause();
+    }
+    setIsVideoReady(false);
     setIsPreviewing(false);
   }, []);
 
@@ -190,36 +226,44 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   className="w-full h-full object-cover object-center"
                 />
               </>
-            ) : isPreviewing ? (
-              /* Preview video for hover/long-press */
-              <HLSVideoCard
-                ref={previewVideoRef}
-                hlsUrl={hlsUrl}
-                poster={posterUrl || undefined}
-                muted={true}
-                autoplay={true}
-                loop={true}
-                showMuteButton={false}
-                className="w-full h-full object-cover object-center"
-                externallyManaged={true}
-              />
             ) : (
-              /* Video thumbnail with play overlay */
+              /* Cross-fade preview system with poster and video layers */
               <div className="relative w-full h-full">
+                {/* Poster layer - fades out when video is ready */}
                 <img
                   src={posterUrl || primaryMedia.media_url}
                   alt="Video thumbnail"
-                  className="w-full h-full object-cover object-center"
+                  className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-150 ${
+                    isPreviewing && isVideoReady ? 'opacity-0' : 'opacity-100'
+                  }`}
                   loading="lazy"
                   decoding="async"
+                  draggable={false}
+                />
+
+                {/* Video layer - always mounted, fades in when ready */}
+                <HLSVideoCard
+                  ref={previewVideoRef}
+                  hlsUrl={hlsUrl}
+                  poster={posterUrl || undefined}
+                  muted={true}
+                  autoplay={false}
+                  loop={true}
+                  showMuteButton={false}
+                  className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-150 will-change-opacity ${
+                    isPreviewing && isVideoReady ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  externallyManaged={true}
                 />
                 
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                    <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
+                {/* Play button overlay - only shown when not previewing */}
+                {!isPreviewing && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                      <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </>
