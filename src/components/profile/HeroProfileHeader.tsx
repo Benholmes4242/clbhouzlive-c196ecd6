@@ -781,6 +781,7 @@ const HeroProfileHeader = ({
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
+          {/* HEADER */}
           <section className="relative w-full">
             <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
@@ -818,61 +819,59 @@ const HeroProfileHeader = ({
               <div className="absolute bottom-0 left-0 w-full h-32 
                               bg-gradient-to-t from-white via-white/70 to-transparent 
                               pointer-events-none z-[5]" />
+            </div>
+          </section>
 
-              {/* Floating Glass Panel */}
-              <div 
-                ref={profileCardRef}
-                className="
-                  absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2
-                  w-[80%] max-w-[800px]
-                  rounded-2xl border border-white/35
-                  bg-white/35 backdrop-blur-xl
-                  shadow-[0_10px_30px_rgba(0,0,0,0.15)]
-                  z-10
-                "
-              >
-                <div className="px-8 py-6">
-                  {/* Name + Handle */}
-                  <div className="text-center">
-                    <h1 className="text-3xl font-semibold text-gray-900">
-                      {displayName}
-                    </h1>
-                    <p className="mt-1 text-base text-gray-700">
-                      @{username}
-                    </p>
-                  </div>
-
-                  {/* Club + Handicap */}
-                  <div className="mt-5 grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Home Club</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {homeClub}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Handicap</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  {isOwnProfile && (
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
-                      <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
-                      <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
-                    </div>
-                  )}
+          {/* FLOATING PANEL (outside header) */}
+          <section className="container mx-auto px-6 -mt-8 relative z-10">
+            <div 
+              ref={profileCardRef}
+              className="mx-auto w-[80%] max-w-[800px]
+                         rounded-2xl border border-white/35
+                         bg-white/35 backdrop-blur-xl
+                         shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+            >
+              <div className="px-8 py-6">
+                {/* Name + Handle */}
+                <div className="text-center">
+                  <h1 className="text-3xl font-semibold text-gray-900">
+                    {displayName}
+                  </h1>
+                  <p className="mt-1 text-base text-gray-700">
+                    @{username}
+                  </p>
                 </div>
+
+                {/* Club + Handicap */}
+                <div className="mt-5 grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-sm text-gray-700">Home Club</div>
+                    <div className="mt-1 text-lg font-medium text-gray-900">
+                      {homeClub}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-700">Handicap</div>
+                    <div className="mt-1 text-lg font-medium text-gray-900">
+                      {handicap}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                {isOwnProfile && (
+                  <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
+                    <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
+                    <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
+                  </div>
+                )}
               </div>
             </div>
           </section>
           
           {/* Stats */}
-          <section className="container mx-auto px-6 mt-10">
+          <section className="container mx-auto px-6 mt-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
                 <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
