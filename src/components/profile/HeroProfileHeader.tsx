@@ -723,14 +723,14 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-32px] md:bottom-[-18px]
+                bottom-[-14px] md:bottom-[-18px]
                 w-[90%] md:w-[80%] max-w-[800px]
                 rounded-2xl border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-5 py-3 flex flex-col items-center relative">
+               <div className="px-5 py-4 flex flex-col items-center relative">
                  {/* Three dots menu - positioned absolutely */}
                  {isOwnProfile && (
                    <div className="absolute top-4 right-5">
@@ -789,11 +789,11 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-20 md:h-16" />
+             <div className="h-12 md:h-16" />
            </section>
            
-            {/* Glass Chips Stats */}
-            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-10 md:mt-7 mb-3 grid grid-cols-4 gap-3">
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 grid grid-cols-4 gap-3">
              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
