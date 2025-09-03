@@ -771,8 +771,8 @@ const HeroProfileHeader = ({
                </div>
              </div>
              
-             {/* Spacer to avoid clipping - equal to panel overlap */}
-             <div className="h-10" />
+              {/* Spacer to avoid clipping - ensure full panel is visible */}
+              <div className="h-16" />
            </section>
            
            {/* Stats - removed negative margin */}
@@ -904,8 +904,8 @@ const HeroProfileHeader = ({
                </div>
              </div>
              
-             {/* Spacer to avoid clipping - equal to panel overlap */}
-             <div className="h-12" />
+              {/* Spacer to avoid clipping - ensure full panel is visible */}
+              <div className="h-20" />
            </section>
            
            {/* Stats - removed negative margin */}
