@@ -28,6 +28,16 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     userId
   });
 
+  // Memoize golf course data to prevent infinite loops
+  const memoizedGolfCourse = useMemo(() => {
+    if (!currentHighlight?.golf_course) return undefined;
+    return {
+      id: currentHighlight.golf_course.id,
+      name: currentHighlight.golf_course.name,
+      country: currentHighlight.golf_course.country
+    };
+  }, [currentHighlight?.golf_course]);
+
   // Fetch user profile data for modal
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -181,13 +191,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           mediaUrl={currentHighlight.post_media?.[0]?.media_url || ''}
           mediaType={currentHighlight.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
           alt={`Highlight at ${currentHighlight.golf_course?.name}`}
-          golfCourse={useMemo(() => 
-            currentHighlight.golf_course ? {
-              id: currentHighlight.golf_course.id,
-              name: currentHighlight.golf_course.name,
-              country: currentHighlight.golf_course.country
-            } : undefined, [currentHighlight.golf_course]
-          )}
+          golfCourse={memoizedGolfCourse}
           user={{
             id: userId,
             profile_photo_url: userProfile?.profile_photo_url || null
