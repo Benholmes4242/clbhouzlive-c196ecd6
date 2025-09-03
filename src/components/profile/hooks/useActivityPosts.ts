@@ -32,14 +32,15 @@ export const useActivityPosts = (userId?: string) => {
           ),
           post_tags (
             id,
-            entity_type,
-            entity_id,
-            name,
-            tagged_entity (
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities (
               id,
               entity_type,
               entity_id,
-              name
+              name,
+              username
             )
           )
         `)
@@ -61,10 +62,7 @@ export const useActivityPosts = (userId?: string) => {
         return;
       }
 
-      // Post tags are now included in the posts query above
-      const postTags = postsData.flatMap(post => 
-        post.post_tags?.map((tag: any) => ({ ...tag, post_id: post.id })) || []
-      );
+      // Post tags are now included in the posts query above as nested data
 
       // Post tags logging removed for performance
 
@@ -87,7 +85,16 @@ export const useActivityPosts = (userId?: string) => {
           return hasContent || hasMedia;
         })
         .map(post => {
-        const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
+        const tags = post.post_tags?.map((tag: any) => ({
+          id: tag.id,
+          post_id: post.id,
+          tagged_entity_id: tag.tagged_entity_id,
+          entity_type: tag.taggable_entities?.entity_type,
+          entity_id: tag.taggable_entities?.entity_id,
+          name: tag.taggable_entities?.name,
+          username: tag.taggable_entities?.username,
+          tagged_entity: tag.taggable_entities
+        })) || [];
         
         // Post processing logging removed for performance
         
