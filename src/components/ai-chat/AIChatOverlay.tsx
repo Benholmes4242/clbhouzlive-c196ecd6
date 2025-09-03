@@ -29,6 +29,7 @@ interface ChatMessageData {
 interface AIChatOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onHistoryStateChange?: (isHistoryOpen: boolean) => void;
 }
 
 const suggestedPrompts = [
@@ -39,7 +40,7 @@ const suggestedPrompts = [
   "Plan me a 5 course USA golf trip"
 ];
 
-const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
+const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange }) => {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -174,6 +175,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Notify parent about history state changes
+  useEffect(() => {
+    if (onHistoryStateChange) {
+      onHistoryStateChange(showHistory);
+    }
+  }, [showHistory, onHistoryStateChange]);
 
   // Ensure fresh start when modal opens
   useEffect(() => {

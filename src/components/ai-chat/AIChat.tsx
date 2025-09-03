@@ -7,6 +7,7 @@ import AIChatOverlay from './AIChatOverlay';
 
 const AIChat: React.FC = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { user, loading } = useSupabaseSession();
   const { hasModalOpen } = useModalDetector();
@@ -68,10 +69,14 @@ const AIChat: React.FC = () => {
 
   return (
     <>
-      <FloatingAIButton onClick={() => setIsOverlayOpen(true)} />
+      <FloatingAIButton 
+        onClick={() => setIsOverlayOpen(true)} 
+        shouldHide={isOverlayOpen || isHistoryOpen}
+      />
       <AIChatOverlay 
         isOpen={isOverlayOpen} 
-        onClose={() => setIsOverlayOpen(false)} 
+        onClose={() => setIsOverlayOpen(false)}
+        onHistoryStateChange={setIsHistoryOpen}
       />
     </>
   );

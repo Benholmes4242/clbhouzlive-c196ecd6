@@ -6,9 +6,10 @@ import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
 interface FloatingAIButtonProps {
   onClick: () => void;
+  shouldHide?: boolean;
 }
 
-const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
+const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide = false }) => {
   const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -38,8 +39,8 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick }) => {
     }
   }, [showOnboarding]);
 
-  // Don't show on clubhouse page
-  if (location.pathname === '/clubhouse' || location.pathname === '/') {
+  // Don't show on clubhouse page or when modals are open
+  if (location.pathname === '/clubhouse' || location.pathname === '/' || shouldHide) {
     return null;
   }
 
