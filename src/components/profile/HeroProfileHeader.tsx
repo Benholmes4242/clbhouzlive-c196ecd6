@@ -700,16 +700,16 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-32 
-                              bg-gradient-to-t from-white via-white/70 to-transparent 
+              {/* Bottom Fade Gradient - reduced height and opacity for better glass effect */}
+              <div className="absolute bottom-0 left-0 w-full h-16 
+                              bg-gradient-to-t from-white via-white/60 to-transparent 
                               pointer-events-none z-[5]" />
 
-               {/* Floating Glass Panel */}
+               {/* Floating Glass Panel - positioned to overlap slightly below photo */}
                <div 
                  ref={profileCardRef}
                  className="
-                   absolute left-1/2 bottom-[-20px] -translate-x-1/2
+                   absolute left-1/2 bottom-[-12px] -translate-x-1/2
                    w-[90%] max-w-[800px]
                    rounded-2xl border border-white/35
                    bg-white/35 backdrop-blur-xl
@@ -759,12 +759,15 @@ const HeroProfileHeader = ({
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-          </section>
-          
-          {/* Stats */}
-          <section className="container mx-auto px-4 mt-20">
+               </div>
+             </div>
+             
+             {/* Spacer to avoid clipping - equal to panel overlap */}
+             <div className="h-10" />
+           </section>
+           
+           {/* Stats - removed negative margin */}
+           <section className="container mx-auto px-4 mt-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
                 <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
@@ -821,16 +824,16 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient */}
-              <div className="absolute bottom-0 left-0 w-full h-32 
-                              bg-gradient-to-t from-white via-white/70 to-transparent 
+              {/* Bottom Fade Gradient - reduced height and opacity for better glass effect */}
+              <div className="absolute bottom-0 left-0 w-full h-20 
+                              bg-gradient-to-t from-white via-white/60 to-transparent 
                               pointer-events-none z-[5]" />
 
-               {/* Floating Glass Panel */}
+               {/* Floating Glass Panel - positioned to overlap slightly below photo */}
                <div 
                  ref={profileCardRef}
                  className="
-                   absolute left-1/2 bottom-[-30px] -translate-x-1/2
+                   absolute left-1/2 bottom-[-16px] -translate-x-1/2
                    w-[80%] max-w-[800px]
                    rounded-2xl border border-white/35
                    bg-white/35 backdrop-blur-xl
@@ -880,12 +883,15 @@ const HeroProfileHeader = ({
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-          </section>
-          
-          {/* Stats */}
-          <section className="container mx-auto px-6 mt-24">
+               </div>
+             </div>
+             
+             {/* Spacer to avoid clipping - equal to panel overlap */}
+             <div className="h-12" />
+           </section>
+           
+           {/* Stats - removed negative margin */}
+           <section className="container mx-auto px-6 mt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
                 <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
