@@ -11,6 +11,7 @@ import UniversalProfileTabs from './UniversalProfileTabs';
 import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ProfileActionsMenu } from './ProfileActionsMenu';
 
 import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
