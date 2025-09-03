@@ -667,7 +667,7 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
-          <section className="relative w-full">
+          <section className="relative w-full overflow-visible">
             <div className="relative h-[46vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
@@ -700,83 +700,83 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient - reduced height and opacity for better glass effect */}
-              <div className="absolute bottom-0 left-0 w-full h-16 
-                              bg-gradient-to-t from-white via-white/60 to-transparent 
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
+            </div>
 
-               {/* Floating Glass Panel - positioned to overlap slightly below photo */}
-               <div 
-                 ref={profileCardRef}
-                 className="
-                   absolute left-1/2 bottom-[-12px] -translate-x-1/2
-                   w-[90%] max-w-[800px]
-                   rounded-2xl border border-white/35
-                   bg-white/35 backdrop-blur-xl
-                   shadow-[0_10px_30px_rgba(0,0,0,0.15)]
-                   z-10
-                 "
-               >
-                 <div className="px-5 py-4">
-                   {/* Name + Handle */}
-                   <div className="flex items-start justify-between">
-                     <div className="flex-1 text-center">
-                       <h1 className="text-2xl font-semibold text-gray-900">
-                         {displayName}
-                       </h1>
-                       <p className="mt-1 text-sm text-gray-700">
-                         @{username}
-                       </p>
-                     </div>
-                      {/* Three dots menu */}
-                      {isOwnProfile && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                              <MoreVertical size={20} />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
-                            <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                              Edit Profile
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                              Media Manager
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => previewImmersive()}>
-                              Immersive Preview
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                   </div>
-
-                  {/* Club + Handicap */}
-                  <div className="mt-4 grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Home Club</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {homeClub}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Handicap</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-[80%] max-w-[800px]
+                rounded-2xl border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+              <div className="px-5 py-4">
+                {/* Name + Handle */}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-700">
+                      @{username}
+                    </p>
                   </div>
-
+                   {/* Three dots menu */}
+                   {isOwnProfile && (
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={20} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   )}
                 </div>
+
+               {/* Club + Handicap */}
+               <div className="mt-4 grid grid-cols-2 gap-4">
+                 <div className="text-center">
+                   <div className="text-xs text-gray-700">Home Club</div>
+                   <div className="mt-1 text-base font-medium text-gray-900">
+                     {homeClub}
+                   </div>
+                 </div>
+                 <div className="text-center">
+                   <div className="text-xs text-gray-700">Handicap</div>
+                   <div className="mt-1 text-base font-medium text-gray-900">
+                     {handicap}
+                   </div>
+                 </div>
                </div>
+
              </div>
+            </div>
              
-             {/* Spacer to avoid clipping - equal to panel overlap */}
-             <div className="h-10" />
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
            </section>
            
-           {/* Stats - removed negative margin */}
-           <section className="container mx-auto px-4 mt-4">
+           {/* Stats */}
+           <section className="container mx-auto px-4 md:px-6 mt-6 md:mt-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
                 <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
@@ -800,7 +800,7 @@ const HeroProfileHeader = ({
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
-          <section className="relative w-full">
+          <section className="relative w-full overflow-visible">
             <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
@@ -833,83 +833,83 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient - reduced height and opacity for better glass effect */}
-              <div className="absolute bottom-0 left-0 w-full h-20 
-                              bg-gradient-to-t from-white via-white/60 to-transparent 
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
+            </div>
 
-               {/* Floating Glass Panel - positioned to overlap slightly below photo */}
-               <div 
-                 ref={profileCardRef}
-                 className="
-                   absolute left-1/2 bottom-[-16px] -translate-x-1/2
-                   w-[80%] max-w-[800px]
-                   rounded-2xl border border-white/35
-                   bg-white/35 backdrop-blur-xl
-                   shadow-[0_10px_30px_rgba(0,0,0,0.15)]
-                   z-10
-                 "
-               >
-                 <div className="px-8 py-6">
-                   {/* Name + Handle */}
-                   <div className="flex items-start justify-between">
-                     <div className="flex-1 text-center">
-                       <h1 className="text-3xl font-semibold text-gray-900">
-                         {displayName}
-                       </h1>
-                       <p className="mt-1 text-base text-gray-700">
-                         @{username}
-                       </p>
-                     </div>
-                      {/* Three dots menu */}
-                      {isOwnProfile && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                              <MoreVertical size={24} />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
-                            <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                              Edit Profile
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                              Media Manager
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => previewImmersive()}>
-                              Immersive Preview
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                   </div>
-
-                  {/* Club + Handicap */}
-                  <div className="mt-5 grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Home Club</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {homeClub}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Handicap</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-[80%] max-w-[800px]
+                rounded-2xl border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+              <div className="px-8 py-6">
+                {/* Name + Handle */}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 text-center">
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-base text-gray-700">
+                      @{username}
+                    </p>
                   </div>
-
+                   {/* Three dots menu */}
+                   {isOwnProfile && (
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   )}
                 </div>
+
+               {/* Club + Handicap */}
+               <div className="mt-5 grid grid-cols-2 gap-4">
+                 <div className="text-center">
+                   <div className="text-sm text-gray-700">Home Club</div>
+                   <div className="mt-1 text-lg font-medium text-gray-900">
+                     {homeClub}
+                   </div>
+                 </div>
+                 <div className="text-center">
+                   <div className="text-sm text-gray-700">Handicap</div>
+                   <div className="mt-1 text-lg font-medium text-gray-900">
+                     {handicap}
+                   </div>
+                 </div>
                </div>
+
              </div>
+            </div>
              
-             {/* Spacer to avoid clipping - equal to panel overlap */}
-             <div className="h-12" />
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
            </section>
            
-           {/* Stats - removed negative margin */}
-           <section className="container mx-auto px-6 mt-6">
+           {/* Stats */}
+           <section className="container mx-auto px-6 mt-6 md:mt-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
                 <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
