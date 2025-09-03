@@ -120,18 +120,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     setIsPreviewing(false);
   }, []);
 
-  const handleMouseEnter = useCallback(() => {
-    if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
-      startPreview();
-    }
-  }, [primaryMedia, isCarouselActive, startPreview]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isCarouselActive) {
-      stopPreview();
-    }
-  }, [isCarouselActive, stopPreview]);
-
   const handleOpenModal = useCallback(() => {
     // Always stop previews and carousel when opening modal
     stopPreview();
@@ -139,13 +127,22 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     onOpenModal(highlight.id);
   }, [stopPreview, pause, onOpenModal, highlight.id]);
 
-  // Long press gesture handling
+  // Long press gesture handling with proper preview functions
   const gestureHandlers = useLongPressPreview({
     onTap: handleOpenModal,
-    onPreviewStart: startPreview,
-    onPreviewStop: stopPreview,
+    onPreviewStart: () => {
+      if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
+        startPreview();
+      }
+    },
+    onPreviewStop: () => {
+      if (!isCarouselActive) {
+        stopPreview();
+      }
+    },
     longPressThreshold: 500
   });
+
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -197,8 +194,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       {...gestureHandlers}
       onClick={handleVideoClick}
     >
