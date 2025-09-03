@@ -730,7 +730,7 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-5 py-3 flex flex-col items-center relative">
+               <div className="px-5 py-2 flex flex-col items-center relative">
                  {/* Three dots menu - positioned absolutely */}
                  {isOwnProfile && (
                    <div className="absolute top-4 right-5">
