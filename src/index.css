@@ -682,7 +682,7 @@
   height: 28px;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 2px 4px;
   gap: 4px;
   border-radius: 12px;
