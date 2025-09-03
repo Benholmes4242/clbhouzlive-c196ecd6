@@ -775,27 +775,29 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-           {/* Stats */}
-           <section className="container mx-auto px-4 md:px-6 mt-6 md:mt-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
-                <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
-                <div className="text-sm text-gray-600">Posts</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
-                <div className="text-2xl font-semibold text-gray-900">2,500</div>
-                <div className="text-sm text-gray-600">Total XP</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
-                <div className="text-2xl font-semibold text-gray-900">{followingCount}</div>
-                <div className="text-sm text-gray-600">Following</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
-                <div className="text-2xl font-semibold text-gray-900">{followersCount}</div>
-                <div className="text-sm text-gray-600">Followers</div>
-              </div>
-            </div>
-          </section>
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 grid grid-cols-4 gap-3">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -908,27 +910,29 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-           {/* Stats */}
-           <section className="container mx-auto px-6 mt-6 md:mt-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
-                <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
-                <div className="text-base text-gray-600">Posts</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
-                <div className="text-3xl font-semibold text-gray-900">2,500</div>
-                <div className="text-base text-gray-600">Total XP</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
-                <div className="text-3xl font-semibold text-gray-900">{followingCount}</div>
-                <div className="text-base text-gray-600">Following</div>
-              </div>
-              <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
-                <div className="text-3xl font-semibold text-gray-900">{followersCount}</div>
-                <div className="text-base text-gray-600">Followers</div>
-              </div>
-            </div>
-          </section>
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 grid grid-cols-4 gap-3">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
