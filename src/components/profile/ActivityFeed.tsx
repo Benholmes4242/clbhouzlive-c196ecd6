@@ -8,7 +8,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Video, Image, MapPin, Trophy } from 'lucide-react';
+import { MoreVertical, Video, Image, MapPin, Trophy } from 'lucide-react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -138,7 +138,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   className="p-2 hover:bg-muted/50 transition-colors"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
-                  <MoreHorizontal className="w-5 h-5 text-foreground" />
+                  <MoreVertical className="w-5 h-5 text-foreground" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
