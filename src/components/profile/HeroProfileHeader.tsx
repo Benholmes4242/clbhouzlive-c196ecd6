@@ -762,46 +762,7 @@ const HeroProfileHeader = ({
                   {handicap}
                 </div>
               </div>
-            </div>
-            
-            {/* Profile Action Buttons */}
-            {isOwnProfile && (
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setEditDialogOpen(true)}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Edit<br/>Profile
-                </button>
-                <button
-                  onClick={() => setMediaManagerOpen(true)}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Media<br/>Manager
-                </button>
-                <button
-                  onClick={() => previewImmersive()}
-                  className="py-3 px-2 text-sm leading-4 font-semibold rounded-xl border border-solid transition-colors duration-200 text-center"
-                  style={{
-                    borderColor: 'hsl(var(--profile-border-button))',
-                    color: 'hsl(var(--profile-text-primary))',
-                    backgroundColor: 'hsl(var(--profile-card))'
-                  }}
-                >
-                  Immersive<br/>Preview
-                </button>
-              </div>
-            )}
+          </div>
           </div>
           
           {/* Stats Tiles */}
