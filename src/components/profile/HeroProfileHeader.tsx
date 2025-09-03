@@ -728,10 +728,27 @@ const HeroProfileHeader = ({
                          @{username}
                        </p>
                      </div>
-                     {/* Three dots menu */}
-                     <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                       <MoreVertical size={20} />
-                     </button>
+                      {/* Three dots menu */}
+                      {isOwnProfile && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                              <MoreVertical size={20} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                            <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                              Edit Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                              Media Manager
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => previewImmersive()}>
+                              Immersive Preview
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                    </div>
 
                   {/* Club + Handicap */}
@@ -750,14 +767,6 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  {isOwnProfile && (
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
-                      <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
-                      <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
-                    </div>
-                  )}
                 </div>
                </div>
              </div>
@@ -852,10 +861,27 @@ const HeroProfileHeader = ({
                          @{username}
                        </p>
                      </div>
-                     {/* Three dots menu */}
-                     <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                       <MoreVertical size={24} />
-                     </button>
+                      {/* Three dots menu */}
+                      {isOwnProfile && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                              <MoreVertical size={24} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                            <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                              Edit Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                              Media Manager
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => previewImmersive()}>
+                              Immersive Preview
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                    </div>
 
                   {/* Club + Handicap */}
@@ -874,14 +900,6 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  {isOwnProfile && (
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <button onClick={() => setEditDialogOpen(true)} className="btn-glass">Edit Profile</button>
-                      <button onClick={() => setMediaManagerOpen(true)} className="btn-glass">Media Manager</button>
-                      <button onClick={() => previewImmersive()} className="btn-glass">Immersive Preview</button>
-                    </div>
-                  )}
                 </div>
                </div>
              </div>
