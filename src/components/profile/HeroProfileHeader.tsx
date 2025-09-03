@@ -703,66 +703,56 @@ const HeroProfileHeader = ({
               </div>
             )}
             
-            {/* Bottom fade overlay for smooth card overlap */}
-            <div className="absolute left-0 right-0 bottom-0 h-[10px] bg-gradient-to-b from-transparent to-white pointer-events-none" />
+            {/* Fade gradient overlay */}
+            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/70 to-transparent pointer-events-none z-[5]" />
           </div>
           
-          {/* Overlapping White Card */}
+          {/* Floating Glass Panel */}
           <div 
             ref={profileCardRef}
-            className="relative mx-3 -mt-4 bg-white rounded-t-[24px] rounded-b-[20px] p-5 border border-solid"
-            style={{
-              borderColor: 'hsl(var(--profile-border-card))',
-              boxShadow: 'var(--profile-shadow-card)'
+            className="absolute left-1/2 -translate-x-1/2 w-[90%] rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10 px-5 py-4"
+            style={{ 
+              bottom: '24px'
             }}
           >
-            {/* Name & Handle - Centered */}
+            {/* Name + Handle + Owner Kebab */}
             <div className="text-center mb-4">
-              <h1 
-                className="text-2xl leading-8 font-bold mb-1.5"
-                style={{ color: 'hsl(var(--profile-text-primary))' }}
-              >
-                {displayName}
-              </h1>
-              <div 
-                className="text-base leading-6 font-medium"
-                style={{ color: 'hsl(var(--profile-text-secondary))' }}
-              >
+              <div className="flex items-center justify-center gap-2 relative mb-1.5">
+                <h1 className="text-2xl leading-8 font-semibold text-gray-900">
+                  {displayName}
+                </h1>
+                {isOwnProfile && (
+                  <ProfileActionsMenu
+                    onEditProfile={() => setEditDialogOpen(true)}
+                    onMediaManager={() => setMediaManagerOpen(true)}
+                    onImmersivePreview={() => previewImmersive()}
+                  />
+                )}
+              </div>
+              <div className="text-base leading-6 font-medium text-gray-700">
                 @{username}
               </div>
             </div>
             
-            {/* Home Club & Handicap Row */}
-            <div className="flex gap-2 mb-4">
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-xs leading-4 font-semibold mb-1"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
+            {/* Club + Handicap */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-center">
+                <div className="text-xs leading-4 font-semibold mb-1 text-gray-700">
                   Home Club
                 </div>
-                <div 
-                  className="text-base leading-6 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
+                <div className="text-base leading-6 font-semibold text-gray-900">
                   {homeClub}
                 </div>
               </div>
-              <div className="flex-1 text-center">
-                <div 
-                  className="text-xs leading-4 font-semibold mb-1"
-                  style={{ color: 'hsl(var(--profile-text-secondary))' }}
-                >
+              <div className="text-center">
+                <div className="text-xs leading-4 font-semibold mb-1 text-gray-700">
                   Handicap
                 </div>
-                <div 
-                  className="text-base leading-6 font-semibold"
-                  style={{ color: 'hsl(var(--profile-text-primary))' }}
-                >
+                <div className="text-base leading-6 font-semibold text-gray-900">
                   {handicap}
                 </div>
               </div>
-          </div>
+            </div>
           </div>
           
           {/* Stats Tiles */}
