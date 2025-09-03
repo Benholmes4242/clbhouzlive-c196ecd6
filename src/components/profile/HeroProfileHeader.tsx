@@ -911,9 +911,7 @@ const HeroProfileHeader = ({
                     <div className="text-center">
                       <div className="text-sm text-gray-700">Home Club</div>
                        <div className="mt-1 text-lg font-medium text-gray-900">
-                         {homeClubLines.map((line, index) => (
-                           <div key={index}>{line}</div>
-                         ))}
+                         {homeClub}
                        </div>
                     </div>
                     <div className="text-center">
