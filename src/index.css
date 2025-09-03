@@ -683,7 +683,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 4px;
+  padding: 3px 4px 1px 4px;
   gap: 4px;
   border-radius: 12px;
   background: rgb(255 255 255 / 0.10);
