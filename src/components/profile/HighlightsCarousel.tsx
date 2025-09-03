@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
 import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlights';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -181,11 +181,13 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           mediaUrl={currentHighlight.post_media?.[0]?.media_url || ''}
           mediaType={currentHighlight.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
           alt={`Highlight at ${currentHighlight.golf_course?.name}`}
-          golfCourse={currentHighlight.golf_course ? {
-            id: currentHighlight.golf_course.id,
-            name: currentHighlight.golf_course.name,
-            country: currentHighlight.golf_course.country
-          } : undefined}
+          golfCourse={useMemo(() => 
+            currentHighlight.golf_course ? {
+              id: currentHighlight.golf_course.id,
+              name: currentHighlight.golf_course.name,
+              country: currentHighlight.golf_course.country
+            } : undefined, [currentHighlight.golf_course]
+          )}
           user={{
             id: userId,
             profile_photo_url: userProfile?.profile_photo_url || null

@@ -756,12 +756,12 @@ const HeroProfileHeader = ({
                 {/* Club + Handicap - centered */}
                 <div className="mt-4 w-full max-w-sm mx-auto">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Home Club</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {homeClub}
-                      </div>
-                    </div>
+                     <div className="text-center">
+                       <div className="text-xs text-gray-700">Home Club</div>
+                       <div className="mt-1 text-base font-medium text-gray-900 break-words hyphens-auto" style={{ wordBreak: 'break-word', hyphens: 'auto' }}>
+                         {homeClub}
+                       </div>
+                     </div>
                     <div className="text-center">
                       <div className="text-xs text-gray-700">Handicap</div>
                       <div className="mt-1 text-base font-medium text-gray-900">

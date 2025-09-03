@@ -40,7 +40,7 @@ export const useHighlightsModal = ({ highlights, userId }: UseHighlightsModalPro
         setIsOpen(true);
       }
     }
-  }, [searchParams, highlights.length, isOpen, currentHighlight?.id]);
+  }, [searchParams, highlights.length, isOpen]);
 
   const openModal = useCallback((postId: string) => {
     const highlight = highlights.find(h => h.id === postId);
