@@ -103,23 +103,33 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
         
         {/* Name and Username to the right of avatar */}
-        <div className="ml-4 flex-1">
-          <h1 className={`
-            font-bold transition-colors duration-300
-            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-            ${isMobile ? 'text-xl' : 'text-2xl'}
-          `}>
-            {displayName}
-          </h1>
-          {username && (
-            <p className={`
-              transition-colors duration-300
-              ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
-              ${isMobile ? 'text-sm' : 'text-base'}
+        <div className="ml-4 flex-1 flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className={`
+              font-bold transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
+              ${isMobile ? 'text-xl' : 'text-2xl'}
             `}>
-              @{username}
-            </p>
-          )}
+              {displayName}
+            </h1>
+            {username && (
+              <p className={`
+                transition-colors duration-300
+                ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
+                ${isMobile ? 'text-sm' : 'text-base'}
+              `}>
+                @{username}
+              </p>
+            )}
+          </div>
+          
+          {/* Three dots menu */}
+          <button className={`
+            p-1 rounded-full transition-colors duration-300 hover:bg-black/10
+            ${glassMode === 'elevated' ? 'text-black/70 hover:text-black' : 'text-white/70 hover:text-white'}
+          `}>
+            <MoreVertical size={20} />
+          </button>
         </div>
       </div>
 
