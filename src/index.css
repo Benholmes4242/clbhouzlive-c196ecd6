@@ -285,15 +285,27 @@
     height: var(--card-w-portrait);
   }
   
-.container {
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: 100%;
-  box-sizing: border-box;
+  .container {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
+
+@layer components {
+  .btn-glass {
+    @apply w-full rounded-xl bg-white/80 text-gray-900
+           border border-white/60
+           shadow-sm hover:shadow md:hover:shadow-md
+           px-4 py-3 text-sm md:text-base font-medium
+           transition-all duration-150;
+    backdrop-filter: blur(8px);
+  }
+  .container { @apply max-w-6xl; }
 }
 
 @media (max-width: 960px) {
