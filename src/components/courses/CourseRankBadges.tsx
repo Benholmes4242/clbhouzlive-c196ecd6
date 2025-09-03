@@ -164,7 +164,7 @@ const CourseRankBadges = ({
       <TooltipProvider>
         {/* Left cluster: Ranking badges only (globe, flags) */}
         {rankingBadgesOnly.length > 0 && (
-          <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 [--badge-w:72px] md:[--badge-w:76px] lg:[--badge-w:76px]">
+          <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px]">
             {rankingBadgesOnly.map((badge, index) => {
               const tooltipId = `left-${index}`;
               return (
@@ -190,7 +190,7 @@ const CourseRankBadges = ({
 
         {/* Right cluster: Rating badges (average + user ratings) */}
         {ratingBadgesOnly.length > 0 && (
-          <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10 [--badge-w:72px] md:[--badge-w:76px] lg:[--badge-w:76px]">
+          <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10 [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px]">
             {ratingBadgesOnly.map((badge, index) => {
               const tooltipId = `right-${index}`;
               const isUserRating = !badge.icon; // User rating badge has no icon
@@ -222,7 +222,7 @@ const CourseRankBadges = ({
     <TooltipProvider>
       {/* Ranking badges with integrated player rating and average rating */}
       {(rankingBadges.length > 0 || playerRatingBadge || averageRatingBadge) && (
-        <div className={`${getPositioningClasses()} [--badge-w:72px] md:[--badge-w:76px] lg:[--badge-w:76px]`}>
+        <div className={`${getPositioningClasses()} [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px]`}>
           {rankingBadges.map((badge, index) => {
             const tooltipId = `main-${index}`;
             return (
@@ -285,7 +285,7 @@ const CourseRankBadges = ({
 
       {/* Player rating badge - standalone when no rankings */}
       {playerRatingBadge && rankingBadges.length === 0 && (
-        <div className="absolute top-2 left-2 [--badge-w:72px] md:[--badge-w:76px] lg:[--badge-w:76px]">
+        <div className="absolute top-2 left-2 [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px]">
           <Tooltip open={openTooltips.has('standalone-rating')}>
             <TooltipTrigger asChild>
                <div 
