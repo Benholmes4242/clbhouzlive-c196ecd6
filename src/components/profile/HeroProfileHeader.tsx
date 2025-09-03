@@ -680,7 +680,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[46vh] md:h-[56vh] w-full overflow-hidden">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
