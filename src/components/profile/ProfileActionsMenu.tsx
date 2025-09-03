@@ -40,25 +40,26 @@ export function ProfileActionsMenu({
         aria-expanded={open}
         aria-label="Profile actions"
         onClick={() => setOpen(v => !v)}
-        className="ml-2 inline-flex items-center justify-center rounded-full p-2
-                   hover:bg-white/60 active:bg-white/70 border border-white/60
-                   bg-white/50 backdrop-blur-md transition"
+        className="ml-2 inline-flex items-center justify-center rounded-full p-1.5
+                   hover:bg-black/10 active:bg-black/15 
+                   transition-colors duration-200"
       >
-        <MoreVertical className="h-5 w-5 text-gray-800" />
+        <MoreVertical className="h-4 w-4 text-current" />
       </button>
 
       {open && (
         <div
           role="menu"
-          className={`absolute mt-2 min-w-[200px] rounded-xl border border-gray-200
-                      bg-white/90 backdrop-blur-md shadow-lg focus:outline-none z-50
+          className={`absolute mt-2 min-w-[200px] rounded-xl border border-gray-200/50
+                      bg-white/95 backdrop-blur-md shadow-xl focus:outline-none z-50
                       ${align === "right" ? "right-0" : "left-0"}`}
         >
           <ul className="py-1">
             <li>
               <button
                 role="menuitem"
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100/70 text-gray-800 
+                          first:rounded-t-xl transition-colors duration-150"
                 onClick={() => { setOpen(false); onEditProfile(); }}
               >
                 Edit Profile
@@ -67,7 +68,8 @@ export function ProfileActionsMenu({
             <li>
               <button
                 role="menuitem"
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100/70 text-gray-800
+                          transition-colors duration-150"
                 onClick={() => { setOpen(false); onOpenMediaManager(); }}
               >
                 Media Manager
@@ -75,8 +77,9 @@ export function ProfileActionsMenu({
             </li>
             <li>
               <button
-                role="menuitem"
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                role="menuitem"  
+                className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100/70 text-gray-800
+                          last:rounded-b-xl transition-colors duration-150"
                 onClick={() => { setOpen(false); onOpenImmersivePreview(); }}
               >
                 Immersive Preview
