@@ -29,6 +29,18 @@ export const useActivityPosts = (userId?: string) => {
             id,
             media_type,
             media_url
+          ),
+          post_tags (
+            id,
+            entity_type,
+            entity_id,
+            name,
+            tagged_entity (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
           )
         `)
         .eq('user_id', userId)
@@ -49,8 +61,10 @@ export const useActivityPosts = (userId?: string) => {
         return;
       }
 
-      // Post tags temporarily disabled due to missing database tables
-      let postTags = [];
+      // Post tags are now included in the posts query above
+      const postTags = postsData.flatMap(post => 
+        post.post_tags?.map((tag: any) => ({ ...tag, post_id: post.id })) || []
+      );
 
       // Post tags logging removed for performance
 
