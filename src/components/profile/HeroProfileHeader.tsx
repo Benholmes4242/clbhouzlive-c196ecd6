@@ -776,7 +776,7 @@ const HeroProfileHeader = ({
            </section>
            
            {/* Glass Chips Stats */}
-           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 grid grid-cols-4 gap-3">
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 grid grid-cols-4 gap-3">
              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
@@ -911,7 +911,7 @@ const HeroProfileHeader = ({
            </section>
            
            {/* Glass Chips Stats */}
-           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 grid grid-cols-4 gap-3">
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 grid grid-cols-4 gap-3">
              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
