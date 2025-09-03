@@ -161,6 +161,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       role="button"
       tabIndex={0}
       aria-label="Open highlight post"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...gestureHandlers}
       onClick={handleVideoClick}
     >
@@ -188,7 +190,20 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   className="w-full h-full object-cover object-center"
                 />
               </>
-            ) : !isPreviewing ? (
+            ) : isPreviewing ? (
+              /* Preview video for hover/long-press */
+              <HLSVideoCard
+                ref={previewVideoRef}
+                hlsUrl={hlsUrl}
+                poster={posterUrl || undefined}
+                muted={true}
+                autoplay={true}
+                loop={true}
+                showMuteButton={false}
+                className="w-full h-full object-cover object-center"
+                externallyManaged={true}
+              />
+            ) : (
               /* Video thumbnail with play overlay */
               <div className="relative w-full h-full">
                 <img
@@ -206,7 +221,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   </div>
                 </div>
               </div>
-            ) : null}
+            )}
           </>
         )}
         
