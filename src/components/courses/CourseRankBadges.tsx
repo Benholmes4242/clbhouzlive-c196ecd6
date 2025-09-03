@@ -42,7 +42,7 @@ const CourseRankBadges = ({
   const [openTooltips, setOpenTooltips] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
 
-  // Mobile tooltip handling
+  // Tooltip handling for both mobile tap and desktop hover
   const handleTooltipToggle = (tooltipId: string, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     setOpenTooltips(prev => {
@@ -55,6 +55,28 @@ const CourseRankBadges = ({
       }
       return newSet;
     });
+  };
+
+  // Desktop hover handlers
+  const handleMouseEnter = (tooltipId: string) => {
+    if (!isMobile) {
+      setOpenTooltips(prev => {
+        const newSet = new Set(prev);
+        newSet.clear(); // Close other tooltips
+        newSet.add(tooltipId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleMouseLeave = (tooltipId: string) => {
+    if (!isMobile) {
+      setOpenTooltips(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tooltipId);
+        return newSet;
+      });
+    }
   };
 
   // Close tooltips when clicking outside
@@ -174,12 +196,14 @@ const CourseRankBadges = ({
                     className="glass-badge-tight shadow-lg cursor-pointer" 
                     onClick={(e) => handleTooltipToggle(tooltipId, e)}
                     onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
+                    onMouseEnter={() => handleMouseEnter(tooltipId)}
+                    onMouseLeave={() => handleMouseLeave(tooltipId)}
                   >
                     {badge.icon}
                     <span className="text-white">{badge.rank}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent side="bottom">
                     <p>{badge.tooltip}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -201,12 +225,14 @@ const CourseRankBadges = ({
                       className="glass-badge-tight shadow-lg cursor-pointer" 
                       onClick={(e) => handleTooltipToggle(tooltipId, e)}
                       onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
+                      onMouseEnter={() => handleMouseEnter(tooltipId)}
+                      onMouseLeave={() => handleMouseLeave(tooltipId)}
                     >
                         {badge.icon}
                         <span className="text-white">{badge.content}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent side="bottom">
                     <p>{badge.tooltip}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -232,12 +258,14 @@ const CourseRankBadges = ({
                     className="glass-badge-tight shadow-lg cursor-pointer" 
                     onClick={(e) => handleTooltipToggle(tooltipId, e)}
                     onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
+                    onMouseEnter={() => handleMouseEnter(tooltipId)}
+                    onMouseLeave={() => handleMouseLeave(tooltipId)}
                   >
                     {badge.icon}
                     <span className="text-white">{badge.rank}</span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side="bottom">
                   <p>{badge.tooltip}</p>
                 </TooltipContent>
               </Tooltip>
@@ -252,12 +280,14 @@ const CourseRankBadges = ({
                         className="glass-badge-tight shadow-lg cursor-pointer" 
                         onClick={(e) => handleTooltipToggle('player-rating', e)}
                         onTouchEnd={(e) => handleTooltipToggle('player-rating', e)}
+                        onMouseEnter={() => handleMouseEnter('player-rating')}
+                        onMouseLeave={() => handleMouseLeave('player-rating')}
                       >
                         <ClubhouseLogo size="sm" />
                         <span className="text-white">{playerRatingBadge.content}</span>
                      </div>
                </TooltipTrigger>
-               <TooltipContent>
+               <TooltipContent side="bottom">
                  <p>{playerRatingBadge.tooltip}</p>
                </TooltipContent>
              </Tooltip>
@@ -267,17 +297,19 @@ const CourseRankBadges = ({
            {showXP && xp && (
              <Tooltip open={openTooltips.has('xp-badge')}>
                <TooltipTrigger asChild>
-                 <div
-                   className="cursor-pointer"
-                   onClick={(e) => handleTooltipToggle('xp-badge', e)}
-                   onTouchEnd={(e) => handleTooltipToggle('xp-badge', e)}
-                 >
-                   <XPBadge xp={xp} size="sm" />
-                 </div>
-               </TooltipTrigger>
-               <TooltipContent>
-                 <p>Experience Points Earned</p>
-               </TooltipContent>
+                  <div
+                    className="cursor-pointer"
+                    onClick={(e) => handleTooltipToggle('xp-badge', e)}
+                    onTouchEnd={(e) => handleTooltipToggle('xp-badge', e)}
+                    onMouseEnter={() => handleMouseEnter('xp-badge')}
+                    onMouseLeave={() => handleMouseLeave('xp-badge')}
+                  >
+                    <XPBadge xp={xp} size="sm" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Experience Points Earned</p>
+                </TooltipContent>
              </Tooltip>
            )}
         </div>
@@ -292,12 +324,14 @@ const CourseRankBadges = ({
                  className="glass-badge-tight shadow-lg cursor-pointer" 
                  onClick={(e) => handleTooltipToggle('standalone-rating', e)}
                  onTouchEnd={(e) => handleTooltipToggle('standalone-rating', e)}
+                 onMouseEnter={() => handleMouseEnter('standalone-rating')}
+                 onMouseLeave={() => handleMouseLeave('standalone-rating')}
                >
                  <ClubhouseLogo size="sm" />
                  <span className="text-white">{playerRatingBadge.content}</span>
                </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent side="bottom">
               <p>{playerRatingBadge.tooltip}</p>
             </TooltipContent>
           </Tooltip>
