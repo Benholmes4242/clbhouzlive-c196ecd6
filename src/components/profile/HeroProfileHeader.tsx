@@ -668,7 +668,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full">
-            <div className="relative h-[52vh] md:h-[62vh] w-full overflow-hidden">
+            <div className="relative h-[46vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -771,8 +771,8 @@ const HeroProfileHeader = ({
                </div>
              </div>
              
-              {/* Spacer to avoid clipping - ensure full panel is visible */}
-              <div className="h-40" />
+             {/* Spacer to avoid clipping - equal to panel overlap */}
+             <div className="h-10" />
            </section>
            
            {/* Stats - removed negative margin */}
@@ -801,7 +801,7 @@ const HeroProfileHeader = ({
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full">
-            <div className="relative h-[62vh] w-full overflow-hidden">
+            <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -904,8 +904,8 @@ const HeroProfileHeader = ({
                </div>
              </div>
              
-              {/* Spacer to avoid clipping - ensure full panel is visible */}
-              <div className="h-44" />
+             {/* Spacer to avoid clipping - equal to panel overlap */}
+             <div className="h-12" />
            </section>
            
            {/* Stats - removed negative margin */}
