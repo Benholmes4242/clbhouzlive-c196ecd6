@@ -3,7 +3,6 @@ import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 import { Button } from '@/components/ui/button';
-import { ProfileActionsMenu } from './ProfileActionsMenu';
 
 interface UserProfile {
   id: string;
@@ -105,36 +104,22 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         
         {/* Name and Username to the right of avatar */}
         <div className="ml-4 flex-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className={`
-                font-bold transition-colors duration-300
-                ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
-                ${isMobile ? 'text-xl' : 'text-2xl'}
-              `}>
-                {displayName}
-              </h1>
-              {username && (
-                <p className={`
-                  transition-colors duration-300
-                  ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
-                  ${isMobile ? 'text-sm' : 'text-base'}
-                `}>
-                  @{username}
-                </p>
-              )}
-            </div>
-            
-            {/* Kebab: only for profile owner */}
-            {isOwnProfile && (
-              <ProfileActionsMenu
-                onEditProfile={onEditProfile || (() => {})}
-                onOpenMediaManager={onMediaManager || (() => {})}
-                onOpenImmersivePreview={onPreviewImmersive || (() => {})}
-                align="right"
-              />
-            )}
-          </div>
+          <h1 className={`
+            font-bold transition-colors duration-300
+            ${glassMode === 'elevated' ? 'text-black' : 'text-white'}
+            ${isMobile ? 'text-xl' : 'text-2xl'}
+          `}>
+            {displayName}
+          </h1>
+          {username && (
+            <p className={`
+              transition-colors duration-300
+              ${glassMode === 'elevated' ? 'text-black/70' : 'text-white/70'}
+              ${isMobile ? 'text-sm' : 'text-base'}
+            `}>
+              @{username}
+            </p>
+          )}
         </div>
       </div>
 
@@ -186,6 +171,37 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         </div>
       </div>
 
+      {/* Action Buttons with gray styling */}
+      {isOwnProfile && (
+        <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+          <Button
+            variant="outline"
+            size={isMobile ? "sm" : "default"}
+            onClick={onEditProfile}
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+          >
+            Edit Profile
+          </Button>
+          <Button
+            variant="outline"
+            size={isMobile ? "sm" : "default"}
+            onClick={onMediaManager}
+            className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+          >
+            {isMobile ? 'Media' : 'Immersive Media'}
+          </Button>
+          {hasImmersiveMedia && (
+            <Button
+              variant="outline"
+              size={isMobile ? "sm" : "default"}
+              onClick={onPreviewImmersive}
+              className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            >
+              Immersive Preview
+            </Button>
+          )}
+        </div>
+      )}
     </div>
     </>
   );
