@@ -757,7 +757,7 @@ const HeroProfileHeader = ({
           </section>
           
           {/* Stats */}
-          <section className="container mx-auto px-4 mt-12">
+          <section className="container mx-auto px-4 mt-20">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="rounded-xl bg-white shadow-md px-4 py-3 text-center">
                 <div className="text-2xl font-semibold text-gray-900">{postsCount}</div>
@@ -872,7 +872,7 @@ const HeroProfileHeader = ({
           </section>
           
           {/* Stats */}
-          <section className="container mx-auto px-6 mt-16">
+          <section className="container mx-auto px-6 mt-24">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl bg-white shadow-md px-5 py-4 text-center">
                 <div className="text-3xl font-semibold text-gray-900">{postsCount}</div>
