@@ -1,4 +1,1 @@
 project_id = "ybxkehyomcakqjvuhnna"
-
-[functions.swing-coach-outreach]
-verify_jwt = true
