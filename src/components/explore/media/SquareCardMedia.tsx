@@ -19,7 +19,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
 }) => {
   // Always use static image for square cards
   const imageUrl = media.media_type === 'video' 
-    ? (media.poster_url || media.thumbnail_url || media.media_url)
+    ? (media.poster_url || media.thumbnail_url || '/placeholder.svg')
     : media.media_url;
 
   return (
