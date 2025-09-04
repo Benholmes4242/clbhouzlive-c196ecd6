@@ -33,52 +33,18 @@ const MUSIC_TRACKS: MusicTrack[] = [
     fullUrl: '',
     genre: '',
     mood: ''
-  },
-  {
-    id: 'chilled-fairways',
-    name: 'Chilled Fairways',
-    duration: 120,
-    previewUrl: '/music/previews/chilled-fairways-preview.mp3',
-    fullUrl: '/music/tracks/chilled-fairways.mp3',
-    genre: 'chill',
-    mood: 'relaxed'
-  },
-  {
-    id: 'epic-tee-shot',
-    name: 'Epic Tee Shot',
-    duration: 95,
-    previewUrl: '/music/previews/epic-tee-shot-preview.mp3',
-    fullUrl: '/music/tracks/epic-tee-shot.mp3',
-    genre: 'cinematic',
-    mood: 'energetic'
-  },
-  {
-    id: 'sunset-rounds',
-    name: 'Sunset Rounds',
-    duration: 110,
-    previewUrl: '/music/previews/sunset-rounds-preview.mp3',
-    fullUrl: '/music/tracks/sunset-rounds.mp3',
-    genre: 'ambient',
-    mood: 'peaceful'
-  },
-  {
-    id: 'victory-putt',
-    name: 'Victory Putt',
-    duration: 85,
-    previewUrl: '/music/previews/victory-putt-preview.mp3',
-    fullUrl: '/music/tracks/victory-putt.mp3',
-    genre: 'upbeat',
-    mood: 'triumphant'
-  },
-  {
-    id: 'morning-links',
-    name: 'Morning Links',
-    duration: 130,
-    previewUrl: '/music/previews/morning-links-preview.mp3',
-    fullUrl: '/music/tracks/morning-links.mp3',
-    genre: 'acoustic',
-    mood: 'fresh'
   }
+  // TODO: Add actual music tracks when audio files are available
+  // Example format:
+  // {
+  //   id: 'track-id',
+  //   name: 'Track Name',
+  //   duration: 120,
+  //   previewUrl: '/music/previews/track-preview.mp3',
+  //   fullUrl: '/music/tracks/track.mp3',
+  //   genre: 'genre',
+  //   mood: 'mood'
+  // }
 ];
 
 const BackgroundMusicSelector: React.FC<BackgroundMusicSelectorProps> = ({
