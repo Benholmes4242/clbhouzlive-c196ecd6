@@ -1039,6 +1039,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 message={message}
                 onSaveToInsights={saveToSwingInsights}
                 onRequestDetail={requestMoreDetail}
+                onAskEcho={(prompt) => {
+                  // Open Echo with the specific prompt
+                  // This would integrate with the main Echo system
+                  console.log('Ask Echo:', prompt);
+                }}
               />
             ))}
 

@@ -135,9 +135,18 @@
   scrollbar-width: none;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  :root {
+    /* Brand colors for Swing Coach */
     --brand-orange: 32 93% 54%;
+    --brand-orange-light: 32 93% 64%;
+    --brand-black: 0 0% 10%;
+    --brand-glass: 0 0% 100% / 0.8;
+    
+    /* Media and achievement tokens */
     --media-loading: 0 0% 0%;
     --media-loading-dark: 0 0% 0%;
     --achv-badge-size: 10rem;

@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Bookmark, MoreHorizontal, User, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { SwingReview } from '@/components/swing-review/SwingReview';
+import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 
 interface ChatMessage {
   id: string;
@@ -14,6 +16,7 @@ interface ChatMessage {
     save_card?: string;
     tags?: string[];
     category?: string;
+    videoUrl?: string;
   };
 }
 
@@ -21,12 +24,14 @@ interface ChatMessageProps {
   message: ChatMessage;
   onSaveToInsights: (message: ChatMessage) => void;
   onRequestDetail: (content: string) => void;
+  onAskEcho?: (prompt: string) => void;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
   message, 
   onSaveToInsights, 
-  onRequestDetail 
+  onRequestDetail,
+  onAskEcho 
 }) => {
   const isUser = message.type === 'user';
   
@@ -37,6 +42,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   // Normalize timestamp safely
   const safeDate = new Date(typeof message.timestamp === 'string' ? message.timestamp : message.timestamp);
   const time = isNaN(safeDate.getTime()) ? '' : safeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Check if this is a swing analysis message and try to parse it
+  const isSwingAnalysis = !isUser && message.metadata?.category === 'swing_analysis' && message.metadata?.videoUrl;
+  let swingAnalysisData = null;
+  
+  if (isSwingAnalysis && message.metadata?.videoUrl) {
+    swingAnalysisData = parseSwingAnalysis(message.content, message.metadata.videoUrl);
+  }
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -56,6 +69,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="prose prose-sm max-w-none dark:prose-invert">
               {isUser ? (
                 <p className="m-0">{message.content}</p>
+              ) : swingAnalysisData ? (
+                <SwingReview
+                  videoUrl={message.metadata!.videoUrl!}
+                  summary={swingAnalysisData.summary}
+                  phases={swingAnalysisData.phases}
+                  priorityFix={swingAnalysisData.priorityFix}
+                  drills={swingAnalysisData.drills}
+                  onSaveToInsights={() => onSaveToInsights(message)}
+                  onAskEcho={onAskEcho}
+                />
               ) : (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -87,8 +110,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             )}
             
-            {/* Action buttons for AI messages */}
-            {!isUser && showSaveOption && message.metadata && (
+            {/* Action buttons for AI messages (only show for non-swing analysis) */}
+            {!isUser && !swingAnalysisData && showSaveOption && message.metadata && (
               <div className="flex gap-2 mt-3">
                 <Button
                   onClick={() => onSaveToInsights(message)}
