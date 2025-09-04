@@ -200,6 +200,60 @@ export type Database = {
         }
         Relationships: []
       }
+      coaches: {
+        Row: {
+          academy: string | null
+          active: boolean | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          price_max: number | null
+          price_min: number | null
+          region: string | null
+          specialties: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          academy?: string | null
+          active?: boolean | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          price_max?: number | null
+          price_min?: number | null
+          region?: string | null
+          specialties?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          academy?: string | null
+          active?: boolean | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          price_max?: number | null
+          price_min?: number | null
+          region?: string | null
+          specialties?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           conversation_type: string
@@ -939,6 +993,78 @@ export type Database = {
           is_active?: boolean | null
           platform?: string
           token?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      swing_coach_outreach: {
+        Row: {
+          city: string | null
+          consented_at: string | null
+          country: string | null
+          created_at: string | null
+          first_name_only: boolean | null
+          focus: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          mask_precise_location: boolean | null
+          price_max: number | null
+          price_min: number | null
+          radius_km: number | null
+          region: string | null
+          share_analysis_text: boolean | null
+          share_video: boolean | null
+          status: string | null
+          swing_analysis_id: string
+          terms_version: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          consented_at?: string | null
+          country?: string | null
+          created_at?: string | null
+          first_name_only?: boolean | null
+          focus?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          mask_precise_location?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          radius_km?: number | null
+          region?: string | null
+          share_analysis_text?: boolean | null
+          share_video?: boolean | null
+          status?: string | null
+          swing_analysis_id: string
+          terms_version?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          consented_at?: string | null
+          country?: string | null
+          created_at?: string | null
+          first_name_only?: boolean | null
+          focus?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          mask_precise_location?: boolean | null
+          price_max?: number | null
+          price_min?: number | null
+          radius_km?: number | null
+          region?: string | null
+          share_analysis_text?: boolean | null
+          share_video?: boolean | null
+          status?: string | null
+          swing_analysis_id?: string
+          terms_version?: string | null
           updated_at?: string | null
           user_id?: string
         }
