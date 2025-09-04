@@ -36,14 +36,8 @@ serve(async (req) => {
     );
   }
 
-  // Temporary guard to verify secret accessibility
-  const _cfId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-  if (!_cfId) {
-    return new Response(
-      JSON.stringify({ error: 'Missing CLOUDFLARE_ACCOUNT_ID' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  }
+  // Log all available environment variables for debugging
+  console.log('🔍 Available env vars:', Object.keys(Deno.env.toObject()).filter(k => k.includes('CLOUDFLARE')));
 
   try {
     console.log('🔄 Processing R2 upload request');
