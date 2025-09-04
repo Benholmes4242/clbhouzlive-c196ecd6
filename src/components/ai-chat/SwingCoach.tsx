@@ -329,7 +329,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       const timeout = setTimeout(() => {
         console.error('Video frame extraction timed out');
         reject(new Error('Video processing timed out'));
-      }, 30000);
+      }, 45000); // Extended timeout for 20 frames
       
       // Enhanced error handling
       video.onerror = (e) => {
@@ -345,40 +345,79 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           duration: video.duration
         });
         
-        // Mobile-optimized canvas size (smaller to prevent memory issues)
-        const maxWidth = window.innerWidth <= 768 ? 640 : 1280;
+        // Mobile-optimized canvas size but keep quality
+        const isMobile = window.innerWidth <= 768;
+        const maxWidth = isMobile ? 800 : 1280; // Increased mobile resolution
         canvas.width = Math.min(video.videoWidth, maxWidth);
         canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
         
         const duration = video.duration;
         
-        // Fewer frames for mobile to prevent memory issues
-        const isMobile = window.innerWidth <= 768;
-        const framePositions = isMobile ? [
-          0.05, // Address
-          0.15, // Takeaway
-          0.25, // Mid backswing
-          0.35, // Top of backswing
-          0.45, // Transition
-          0.55, // Downswing
-          0.65, // Pre-impact
-          0.75, // Impact
-          0.85, // Follow-through
-          0.95  // Finish
-        ] : [
-          0.03, 0.08, 0.13, 0.18, 0.23, 0.28, 0.33, 0.38, 0.43, 0.48,
-          0.53, 0.58, 0.63, 0.68, 0.73, 0.78, 0.83, 0.87, 0.91, 0.95
+        // Keep 20 frames for both mobile and desktop for optimal analysis
+        const framePositions = [
+          0.03, // Initial setup/Address (P1)
+          0.08, // Settled address position
+          0.13, // Takeaway initiation
+          0.18, // Early takeaway
+          0.23, // Mid takeaway (P2)
+          0.28, // Late takeaway
+          0.33, // Transition to backswing
+          0.38, // Early backswing
+          0.43, // Shaft parallel back (P3)
+          0.48, // Three-quarter back
+          0.53, // Near top of backswing
+          0.58, // Top of backswing (P4)
+          0.63, // Transition/Early downswing
+          0.68, // Downswing acceleration
+          0.73, // Mid downswing (P5)
+          0.78, // Approaching impact
+          0.83, // Pre-impact position
+          0.87, // Impact (P6)
+          0.91, // Early release/follow-through (P7)
+          0.95  // Full finish (P8/P9)
         ];
         
         const positions = framePositions.map(pos => pos * duration);
         let frameIndex = 0;
         let seekTimeout: NodeJS.Timeout;
         
-        const captureFrame = () => {
-          if (frameIndex >= positions.length) {
+        // Mobile optimization: Process frames in batches to prevent memory issues
+        const batchSize = isMobile ? 4 : 20; // Process 4 frames at a time on mobile
+        let currentBatch = 0;
+        
+        const processBatch = () => {
+          const batchStart = currentBatch * batchSize;
+          const batchEnd = Math.min(batchStart + batchSize, positions.length);
+          
+          if (batchStart >= positions.length) {
             clearTimeout(timeout);
             console.log(`Successfully extracted ${frames.length} frames`);
             resolve(frames);
+            return;
+          }
+          
+          frameIndex = batchStart;
+          captureFrame();
+        };
+        
+        const captureFrame = () => {
+          const batchStart = currentBatch * batchSize;
+          const batchEnd = Math.min(batchStart + batchSize, positions.length);
+          
+          if (frameIndex >= batchEnd) {
+            // Batch complete, clean up memory and start next batch
+            if (isMobile) {
+              // Force garbage collection on mobile by nullifying references
+              ctx?.clearRect(0, 0, canvas.width, canvas.height);
+              // Small delay to allow memory cleanup
+              setTimeout(() => {
+                currentBatch++;
+                processBatch();
+              }, 200);
+            } else {
+              currentBatch++;
+              processBatch();
+            }
             return;
           }
           
@@ -389,10 +428,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           
           // Backup timeout for seek operation
           seekTimeout = setTimeout(() => {
-            console.warn(`Seek timeout for frame ${frameIndex}, skipping...`);
+            console.warn(`Seek timeout for frame ${frameIndex + 1}, skipping...`);
             frameIndex++;
             captureFrame();
-          }, 3000);
+          }, 4000); // Longer timeout for mobile
           
           video.onseeked = () => {
             clearTimeout(seekTimeout);
@@ -400,24 +439,29 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             if (ctx) {
               try {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                // Lower quality for mobile to reduce memory usage
-                const quality = isMobile ? 0.6 : 0.8;
+                // Optimized quality: slightly lower on mobile but still good
+                const quality = isMobile ? 0.75 : 0.8;
                 const frameData = canvas.toDataURL('image/jpeg', quality);
                 frames.push(frameData);
-                console.log(`Captured frame ${frameIndex + 1}/${positions.length}`);
+                console.log(`Captured frame ${frameIndex + 1}/${positions.length} (Batch ${currentBatch + 1})`);
+                
+                // Clear canvas immediately after capture on mobile
+                if (isMobile) {
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
               } catch (e) {
                 console.error('Canvas draw error:', e);
               }
             }
             
             frameIndex++;
-            // Add small delay between frames for mobile stability
-            setTimeout(captureFrame, isMobile ? 100 : 50);
+            // Slightly longer delay between frames for mobile stability
+            setTimeout(captureFrame, isMobile ? 150 : 50);
           };
         };
         
-        // Start frame capture after a small delay
-        setTimeout(captureFrame, 500);
+        // Start processing first batch
+        setTimeout(processBatch, 500);
       };
       
       // Enhanced data handling for mobile
