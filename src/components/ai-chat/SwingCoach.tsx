@@ -12,6 +12,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
+import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 
 interface SwingAnalysis {
   id: string;
@@ -1046,6 +1047,18 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 }}
               />
             ))}
+
+            {/* Show coach prompt after swing analysis is complete */}
+            {currentAnalysis && (
+              <div className="mt-4">
+                <CoachPrompt
+                  swingAnalysisId={currentAnalysis.id}
+                  onOpen={() => {
+                    console.log('Opening coach finder for analysis:', currentAnalysis.id);
+                  }}
+                />
+              </div>
+            )}
 
             {/* Hide action buttons completely for Swing Coach - they're not needed */}
 
