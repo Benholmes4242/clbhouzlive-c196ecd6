@@ -24,8 +24,6 @@ interface ExploreGridProps {
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
   hideBadges?: boolean;
-  isOwnProfile?: boolean;
-  onPostDelete?: (postId: string) => void;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = memo(({ 
@@ -39,9 +37,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   activeFilter,
   isClubhousePage = false,
   isDiscoverPage = false,
-  hideBadges = false,
-  isOwnProfile = false,
-  onPostDelete
+  hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
@@ -772,8 +768,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isPortrait={true}
-                  isOwnProfile={isOwnProfile}
-                  onPostDelete={onPostDelete}
                 />
               </div>
             );
@@ -786,8 +780,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isFeatured={true}
-                  isOwnProfile={isOwnProfile}
-                  onPostDelete={onPostDelete}
                 />
               </div>
             );
@@ -800,8 +792,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onLike={onLike} 
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
-                  isOwnProfile={isOwnProfile}
-                  onPostDelete={onPostDelete}
                 />
               </div>
             );

@@ -18,23 +18,10 @@ interface ExploreContentCardProps {
     isVideoAutoplaying: (videoId: string) => boolean;
   };
   videoIndex?: number;
-  isOwnProfile?: boolean;
-  onPostDelete?: (postId: string) => void;
 }
 
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ 
-  item, 
-  onLike, 
-  onFollow, 
-  onMediaClick, 
-  isFeatured, 
-  isPortrait, 
-  autoplayManager, 
-  videoIndex, 
-  isOwnProfile = false, 
-  onPostDelete 
-}) => {
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, isPortrait, autoplayManager, videoIndex }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -54,8 +41,6 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({
         isPortrait={isPortrait}
         autoplayManager={autoplayManager}
         videoIndex={videoIndex}
-        isOwnProfile={isOwnProfile}
-        onPostDelete={onPostDelete}
       />
     </div>
   );

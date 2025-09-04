@@ -22,22 +22,9 @@ interface MediaCardProps {
     isVideoAutoplaying: (videoId: string) => boolean;
   };
   videoIndex?: number;
-  isOwnProfile?: boolean;
-  onPostDelete?: (postId: string) => void;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ 
-  item, 
-  onLike, 
-  onFollow, 
-  isFeatured, 
-  isPortrait, 
-  autoplayManager, 
-  videoIndex, 
-  isOwnProfile = false, 
-  onPostDelete,
-  ...props 
-}) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, isPortrait, autoplayManager, videoIndex, ...props }) => {
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -116,9 +103,6 @@ const MediaCard: React.FC<MediaCardProps> = ({
           onLike={handleLike}
           onMaximize={handleMediaClick}
           mediaType={currentMedia.media_type}
-          isOwnProfile={isOwnProfile}
-          onPostDelete={onPostDelete}
-          postId={item.id}
         />
       </div>
 
