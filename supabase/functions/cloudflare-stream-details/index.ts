@@ -19,8 +19,7 @@ serve(async (req) => {
     return (
       Deno.env.get('CLOUDFLARE_ACCOUNT_ID') ??
       Deno.env.get('CF_ACCOUNT_ID') ??
-      Deno.env.get('CLOUDFLARE_ACCOUNT_ID_V2') ?? 
-      'ybxkehyomcakqjvuhnna' // Fallback to project ID
+      Deno.env.get('CLOUDFLARE_ACCOUNT_ID_V2')
     );
   }
 
@@ -57,6 +56,21 @@ serve(async (req) => {
         JSON.stringify({ 
           success: false, 
           error: 'Cloudflare Stream API token not configured' 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    if (!accountId) {
+      console.error('❌ Missing Cloudflare Account ID');
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Cloudflare Account ID not configured' 
         }),
         { 
           status: 500, 
