@@ -7,18 +7,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+console.log('🔍 Starting cloudflare-r2-upload function');
+
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-const cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
-
-if (!cloudflareAccountId || !cloudflareR2Token) {
-  console.error('Missing Cloudflare credentials:', { 
-    hasAccountId: !!cloudflareAccountId,
-    hasR2Token: !!cloudflareR2Token 
-  });
-}
-
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
@@ -27,24 +19,43 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Log available environment variables for debugging
-  console.log('🔍 Environment check:', {
-    hasSupabaseUrl: !!Deno.env.get('SUPABASE_URL'),
-    hasServiceKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    hasAccountId: !!Deno.env.get('CLOUDFLARE_ACCOUNT_ID'),
-    hasR2Token: !!Deno.env.get('CLOUDFLARE_R2_API_TOKEN'),
-    accountIdValue: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')?.substring(0, 8) + '...',
-  });
-
   try {
-    // Check if Cloudflare credentials are available
-    if (!cloudflareAccountId || !cloudflareR2Token) {
-      console.error('Missing Cloudflare credentials:', { 
-        hasAccountId: !!cloudflareAccountId,
-        hasR2Token: !!cloudflareR2Token 
-      });
-      throw new Error('Cloudflare R2 credentials not configured');
+    console.log('🔄 Processing R2 upload request');
+
+    // Get Cloudflare credentials - check all possible environment variable names
+    let cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+    let cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
+
+    // Try alternative names if not found
+    if (!cloudflareR2Token) {
+      cloudflareR2Token = Deno.env.get('CLOUDFLARE_API_TOKEN');
     }
+
+    // Log what we found
+    console.log('🔧 Credential check:', {
+      hasAccountId: !!cloudflareAccountId,
+      hasR2Token: !!cloudflareR2Token,
+      accountIdPreview: cloudflareAccountId?.substring(0, 8) + '...',
+      allCloudflareVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('CLOUDFLARE'))
+    });
+
+    // Check if credentials are available
+    if (!cloudflareAccountId || !cloudflareR2Token) {
+      console.error('❌ Missing Cloudflare credentials:', { 
+        hasAccountId: !!cloudflareAccountId,
+        hasR2Token: !!cloudflareR2Token,
+        allEnvVars: Object.keys(Deno.env.toObject()).slice(0, 20) // First 20 env vars
+      });
+      
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Cloudflare R2 credentials not configured'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -79,7 +90,7 @@ serve(async (req) => {
     const uniqueFileName = `${timestamp}-${randomId}.${fileExtension}`;
     const fullPath = `${user.id}/${bucketType || 'course-media'}/${uniqueFileName}`;
 
-    console.log('Uploading file to R2:', {
+    console.log('📤 Uploading to R2:', {
       fileName: uniqueFileName,
       bucketType,
       fileSize: file.size,
@@ -102,14 +113,18 @@ serve(async (req) => {
 
     if (!uploadResponse.ok) {
       const errorText = await uploadResponse.text();
-      console.error('R2 upload failed:', errorText);
+      console.error('❌ R2 upload failed:', {
+        status: uploadResponse.status,
+        statusText: uploadResponse.statusText,
+        error: errorText
+      });
       throw new Error(`Failed to upload to R2: ${uploadResponse.status} ${errorText}`);
     }
 
     // Construct the public URL
     const publicUrl = `https://media.clbhouz.co.uk/${fullPath}`;
 
-    console.log('File uploaded successfully:', {
+    console.log('✅ File uploaded successfully:', {
       publicUrl,
       fileName: uniqueFileName,
       bucketType,
@@ -126,7 +141,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in cloudflare-r2-upload function:', error);
+    console.error('❌ Error in cloudflare-r2-upload function:', error);
     return new Response(JSON.stringify({ 
       error: error.message,
       success: false
