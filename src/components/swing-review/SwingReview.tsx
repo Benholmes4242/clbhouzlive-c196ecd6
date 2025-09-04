@@ -6,6 +6,8 @@ import { PhaseCard } from './PhaseCard';
 import { DrillCard } from './DrillCard';
 import { ActionBar } from './ActionBar';
 import { KeyframePlayer } from './KeyframePlayer';
+import { CoachPrompt } from './CoachPrompt';
+import { CoachFinderModal } from './CoachFinderModal';
 
 export interface SwingPhase {
   id: string;
@@ -64,6 +66,7 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
 }) => {
   const [selectedPhase, setSelectedPhase] = useState(phases[0]);
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const [isCoachModalOpen, setIsCoachModalOpen] = useState(false);
 
   const handlePhaseSelect = (phase: SwingPhase) => {
     setSelectedPhase(phase);
@@ -102,10 +105,20 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
         </div>
       </div>
 
+      {/* Coach Recommendations */}
+      <CoachPrompt onOpen={() => setIsCoachModalOpen(true)} />
+
       {/* Footer */}
       <ActionBar
         onShare={onShare}
         onAddVoiceNote={onAddVoiceNote}
+      />
+
+      {/* Coach Finder Modal */}
+      <CoachFinderModal
+        isOpen={isCoachModalOpen}
+        onClose={() => setIsCoachModalOpen(false)}
+        swingAnalysisId="temp-analysis-id" // TODO: Pass actual analysis ID
       />
     </div>
   );

@@ -200,6 +200,41 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_service_areas: {
+        Row: {
+          coach_id: string
+          created_at: string | null
+          id: string
+          lat: number
+          lng: number
+          radius_km: number | null
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string | null
+          id?: string
+          lat: number
+          lng: number
+          radius_km?: number | null
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          radius_km?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_service_areas_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coaches: {
         Row: {
           academy: string | null
@@ -1069,6 +1104,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      swing_coach_outreach_targets: {
+        Row: {
+          accepted_at: string | null
+          coach_id: string
+          created_at: string | null
+          declined_at: string | null
+          id: string
+          notified_at: string | null
+          outreach_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          coach_id: string
+          created_at?: string | null
+          declined_at?: string | null
+          id?: string
+          notified_at?: string | null
+          outreach_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          coach_id?: string
+          created_at?: string | null
+          declined_at?: string | null
+          id?: string
+          notified_at?: string | null
+          outreach_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swing_coach_outreach_targets_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coaches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "swing_coach_outreach_targets_outreach_id_fkey"
+            columns: ["outreach_id"]
+            isOneToOne: false
+            referencedRelation: "swing_coach_outreach"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       taggable_entities: {
         Row: {
