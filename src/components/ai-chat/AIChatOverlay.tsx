@@ -516,7 +516,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
           minWidth: '448px',
           maxWidth: '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(72vh, 576px)', // 20% taller on mobile
+          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
