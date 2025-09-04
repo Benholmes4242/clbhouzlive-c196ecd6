@@ -53,7 +53,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className={`relative w-full ${isMobile ? 'px-4' : 'max-w-lg mx-auto'}`}>
+    <div className={`relative w-full ${isMobile ? 'px-4 py-3' : 'max-w-lg mx-auto py-3'}`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
