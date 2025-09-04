@@ -1047,7 +1047,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               />
             ))}
 
-            {currentAnalysis && (
+            {currentAnalysis && currentAnalysis.category !== 'swing_analysis' && (
               <div className="bg-muted/50 rounded-lg p-4">
                 <div className="flex flex-col gap-2">
                   <Button 

@@ -5,6 +5,7 @@ import { Bookmark, MoreHorizontal, User, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { SwingReview } from '@/components/swing-review/SwingReview';
+import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 
 interface ChatMessage {
@@ -40,8 +41,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const isUser = message.type === 'user';
   
   // Use metadata flag for save action instead of brittle string includes
-  const showSaveOption = !!message.metadata?.save_card;
-  const showDetailOption = !isUser && !message.content.includes('Explain fully');
+  const isSwingCoachMessage = message.metadata?.category === 'swing_analysis';
+  const showSaveOption = !!message.metadata?.save_card && !isSwingCoachMessage;
+  const showDetailOption = !isUser && !message.content.includes('Explain fully') && !isSwingCoachMessage;
 
   // Normalize timestamp safely
   const safeDate = new Date(typeof message.timestamp === 'string' ? message.timestamp : message.timestamp);
@@ -74,15 +76,26 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               {isUser ? (
                 <p className="m-0">{message.content}</p>
               ) : swingAnalysisData ? (
-                <SwingReview
-                  videoUrl={message.metadata!.videoUrl!}
-                  summary={swingAnalysisData.summary}
-                  phases={swingAnalysisData.phases}
-                  priorityFix={swingAnalysisData.priorityFix}
-                  drills={swingAnalysisData.drills}
-                  onShare={() => onShare?.(message)}
-                  onAddVoiceNote={() => onAddVoiceNote?.(message)}
-                />
+                <>
+                  <SwingReview
+                    videoUrl={message.metadata!.videoUrl!}
+                    summary={swingAnalysisData.summary}
+                    phases={swingAnalysisData.phases}
+                    priorityFix={swingAnalysisData.priorityFix}
+                    drills={swingAnalysisData.drills}
+                    onShare={() => onShare?.(message)}
+                    onAddVoiceNote={() => onAddVoiceNote?.(message)}
+                  />
+                  <div className="mt-4">
+                    <CoachPrompt
+                      swingAnalysisId={message.id}
+                      onOpen={() => {
+                        // Open coach finder modal - we'll implement this properly
+                        console.log('Open coach finder for analysis:', message.id);
+                      }}
+                    />
+                  </div>
+                </>
               ) : (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}

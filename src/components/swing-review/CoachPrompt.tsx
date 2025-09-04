@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
+import { CoachFinderModal } from './CoachFinderModal';
 
 interface CoachPromptProps {
-  onOpen: () => void;
+  swingAnalysisId: string;
+  onOpen?: () => void;
 }
 
-export const CoachPrompt: React.FC<CoachPromptProps> = ({ onOpen }) => {
+export const CoachPrompt: React.FC<CoachPromptProps> = ({ swingAnalysisId, onOpen }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpen = () => {
+    setIsModalOpen(true);
+    onOpen?.();
+  };
   return (
     <div className="rounded-xl border border-border bg-card/60 backdrop-blur p-4 flex items-center justify-between gap-4">
       <div className="flex-1">
@@ -26,14 +34,20 @@ export const CoachPrompt: React.FC<CoachPromptProps> = ({ onOpen }) => {
           No thanks
         </Button>
         <Button
-          onClick={onOpen}
+          onClick={handleOpen}
           size="sm"
-          className="bg-brand-orange hover:bg-brand-orange-light text-white"
+          className="bg-orange-500 hover:bg-orange-600 text-white"
         >
           <Users className="h-4 w-4 mr-1" />
           Recommend coaches near me
         </Button>
       </div>
+      
+      <CoachFinderModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        swingAnalysisId={swingAnalysisId}
+      />
     </div>
   );
 };
