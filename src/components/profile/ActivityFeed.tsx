@@ -17,6 +17,8 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityPost } from './types/ActivityTypes';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useToast } from '@/hooks/use-toast';
 
 type FilterType = 'all' | 'videos' | 'photos' | 'golf-courses';
 
@@ -41,6 +43,24 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
+  const { deletePost } = usePostDeletion();
+  const { toast } = useToast();
+
+  // Handle post deletion
+  const handlePostDelete = async (postId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmed) return;
+    
+    await deletePost(postId);
+    
+    toast({
+      title: "Post deleted",
+      description: "Your post has been successfully deleted."
+    });
+    
+    // Refresh posts to update the UI
+    fetchUserPosts();
+  };
 
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
@@ -201,6 +221,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           onLoadMore={handleLoadMore}
           isDiscoverPage={true}
           hideBadges={true}
+          isOwnProfile={isOwnProfile}
+          onPostDelete={handlePostDelete}
         />
       )}
 

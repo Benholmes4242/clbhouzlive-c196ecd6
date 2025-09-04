@@ -1,5 +1,6 @@
 import React from 'react';
 import { PiHandsClappingDuotone } from 'react-icons/pi';
+import { Trash2 } from 'lucide-react';
 
 interface User {
   id: string;
@@ -16,6 +17,9 @@ interface MediaOverlaysProps {
   onLike: (e: React.MouseEvent) => void;
   onMaximize: (e: React.MouseEvent) => void;
   mediaType?: 'video' | 'image';
+  isOwnProfile?: boolean;
+  onPostDelete?: (postId: string) => void;
+  postId?: string;
 }
 
 const MediaOverlays: React.FC<MediaOverlaysProps> = ({
@@ -24,8 +28,18 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
   isFeatured,
   onLike,
   onMaximize,
-  mediaType = 'image'
+  mediaType = 'image',
+  isOwnProfile = false,
+  onPostDelete,
+  postId
 }) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (postId && onPostDelete) {
+      onPostDelete(postId);
+    }
+  };
+
   return (
     <>
       {/* Like button overlay - with gradient styling */}
@@ -38,6 +52,18 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
         </button>
       </div>
 
+      {/* Delete button - only show for own profile */}
+      {isOwnProfile && postId && onPostDelete && (
+        <div className="absolute bottom-2 right-2 hidden md:block pointer-events-auto z-20">
+          <button
+            onClick={handleDelete}
+            className="flex items-center justify-center w-9 h-9 bg-gradient-to-b from-red-500/90 to-red-600/90 border border-red-400/50 backdrop-blur-sm rounded-full transition-all duration-200 hover:from-red-600/90 hover:to-red-700/90 active:from-red-700/90 active:to-red-800/90 pointer-events-auto group"
+            aria-label="Delete post"
+          >
+            <Trash2 className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
+      )}
 
       {/* User info overlay - larger for featured cards */}
       {user && (
