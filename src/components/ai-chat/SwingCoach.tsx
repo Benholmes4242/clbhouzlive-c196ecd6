@@ -1047,51 +1047,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               />
             ))}
 
-            {currentAnalysis && currentAnalysis.category !== 'swing_analysis' && (
-              <div className="bg-muted/50 rounded-lg p-4">
-                <div className="flex flex-col gap-2">
-                  <Button 
-                    onClick={saveToSwingInsights}
-                    className="w-full"
-                  >
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Save to Swing Insights
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => requestMoreDetail(analysisText || 'Explain fully in detail')}
-                      className="flex-1"
-                    >
-                      More Detail
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                    >
-                      <Share2 className="h-4 w-4 mr-1" />
-                      Share to Feed
-                    </Button>
-                  </div>
-                  {!currentAnalysis.voiceNote && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setIsAddingVoiceNote(true);
-                        startRecording();
-                      }}
-                      disabled={isRecording || isProcessing}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Voice Note
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Hide action buttons completely for Swing Coach - they're not needed */}
 
             {isAnalyzing && (
               <div className="flex justify-start">
