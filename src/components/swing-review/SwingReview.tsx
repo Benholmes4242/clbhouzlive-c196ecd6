@@ -106,7 +106,10 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
       </div>
 
       {/* Coach Recommendations */}
-      <CoachPrompt onOpen={() => setIsCoachModalOpen(true)} />
+      <CoachPrompt 
+        swingAnalysisId="temp-analysis-id" // TODO: Pass actual analysis ID
+        onOpen={() => setIsCoachModalOpen(true)} 
+      />
 
       {/* Footer */}
       <ActionBar

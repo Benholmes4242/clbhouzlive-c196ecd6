@@ -70,48 +70,61 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
 
   const handleFindCoaches = async () => {
     if (!isFormValid()) return;
-
+    
     setIsLoading(true);
     try {
+      console.log('Finding coaches with form data:', formData);
+      
       // In a real implementation, you'd geocode the location first
-      // For now, we'll use mock coordinates
+      // For now, we'll use mock coordinates based on UK cities
       const mockLat = 51.5074; // London coordinates as example
       const mockLng = -0.1278;
-
+      
+      // Prepare the payload matching the edge function expectations
+      const payload = {
+        swingAnalysisId,
+        lat: mockLat,
+        lng: mockLng,
+        radiusKm: Number(formData.radiusKm || 25),
+        focus: formData.focus || 'Driver',
+        priceMin: formData.priceMin > 0 ? Number(formData.priceMin) : null,
+        priceMax: formData.priceMax < 200 ? Number(formData.priceMax) : null,
+        shareVideo: !!formData.shareVideo,
+        shareAnalysisText: !!formData.shareAnalysisText,
+        firstNameOnly: !!formData.firstNameOnly,
+        maskPreciseLocation: !!formData.maskPreciseLocation,
+        // Add location details for context
+        city: formData.location.split(',')[0]?.trim() || 'London',
+        region: formData.location.split(',')[1]?.trim() || 'Greater London',
+        country: formData.location.split(',')[2]?.trim() || 'United Kingdom'
+      };
+      
+      console.log('Sending payload to swing-coach-outreach:', payload);
+      
+      // Call the swing-coach-outreach edge function
       const { data, error } = await supabase.functions.invoke('swing-coach-outreach', {
-        body: {
-          swingAnalysisId,
-          city: formData.location.split(',')[0]?.trim(),
-          region: formData.location.split(',')[1]?.trim(),
-          country: formData.location.split(',')[2]?.trim() || 'UK',
-          lat: mockLat,
-          lng: mockLng,
-          radiusKm: formData.radiusKm,
-          focus: formData.focus || undefined,
-          priceMin: formData.priceMin > 0 ? formData.priceMin : undefined,
-          priceMax: formData.priceMax < 200 ? formData.priceMax : undefined,
-          shareVideo: formData.shareVideo,
-          shareAnalysisText: formData.shareAnalysisText,
-          firstNameOnly: formData.firstNameOnly,
-          maskPreciseLocation: formData.maskPreciseLocation
-        }
+        body: payload
       });
 
       if (error) {
-        console.error('Coach outreach error:', error);
-        toast.error(error.message || 'Failed to find coaches');
+        console.error('Error finding coaches:', error);
+        toast.error(error.message || 'Failed to find coaches. Please try again.');
         return;
       }
 
-      if (data?.selectedCoaches && data.selectedCoaches.length > 0) {
-        setCoaches(data.selectedCoaches);
+      console.log('Coach outreach response:', data);
+      
+      // Set the coaches from the response and go to results step
+      if (data?.chosen && Array.isArray(data.chosen)) {
+        setCoaches(data.chosen);
         setStep('results');
+        toast.success(`Found ${data.chosen.length} coach${data.chosen.length === 1 ? '' : 'es'} in your area!`);
       } else {
         toast.error('No coaches found in your area. Try expanding your search radius.');
       }
     } catch (error: any) {
       console.error('Error finding coaches:', error);
-      toast.error('Failed to find coaches');
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -201,7 +214,7 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
               <Button 
                 onClick={handleSendRequest}
                 disabled={selectedCoaches.length === 0}
-                className="flex-1 bg-brand-orange hover:bg-brand-orange-light text-white"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
               >
                 Send Request ({selectedCoaches.length}/3)
               </Button>
@@ -371,7 +384,7 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
             <Button 
               onClick={handleFindCoaches}
               disabled={!isFormValid() || isLoading}
-              className="flex-1 bg-brand-orange hover:bg-brand-orange-light text-white"
+              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
             >
               {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Find Coaches
