@@ -73,7 +73,7 @@ export const useOptimisticPostSubmission = () => {
         return;
       }
 
-      // Create the post immediately
+      // Create the post first
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .insert({
@@ -86,6 +86,48 @@ export const useOptimisticPostSubmission = () => {
       if (postError) throw postError;
 
       console.log('Post created successfully:', postData);
+
+      let uploadSuccess = false;
+      
+      try {
+        // Upload media files immediately (not in background) - required for post completion
+        if (mediaFiles.length > 0) {
+          console.log('Uploading media files for post creation...');
+          
+          await startBackgroundUpload({
+            postId: postData.id,
+            mediaFiles,
+            userId: user.id
+          });
+          
+          console.log('Media upload completed successfully');
+          uploadSuccess = true;
+        } else {
+          console.warn('No media files to upload');
+          uploadSuccess = true; // No files to upload is considered success
+        }
+      } catch (uploadError) {
+        console.error('Media upload failed, rolling back post:', uploadError);
+        
+        // Delete the post since media upload failed
+        try {
+          await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postData.id);
+          console.log('Post rolled back successfully');
+        } catch (deleteError) {
+          console.error('Failed to rollback post:', deleteError);
+        }
+        
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload media files. Post not created.",
+          variant: "destructive"
+        });
+        onError?.();
+        return;
+      }
 
       // Handle post tags with proper positions and notifications
       if (selectedTags && selectedTags.length > 0) {
@@ -145,21 +187,8 @@ export const useOptimisticPostSubmission = () => {
         }
       }
 
-      // Start background upload for media files (don't wait for it)
-      if (mediaFiles.length > 0) {
-        console.log('Starting background upload for', mediaFiles.length, 'files');
-        // Don't await - let it run in background
-        startBackgroundUpload({
-          postId: postData.id,
-          mediaFiles,
-          userId: user.id
-        }).catch(uploadError => {
-          console.error('Background upload failed:', uploadError);
-          // Don't fail the whole post submission for upload errors
-        });
-      } else {
-        console.warn('No media files to upload');
-      }
+      // Upload is already complete - media files are uploaded before post creation
+      console.log('Post created with uploaded media files');
 
       // Dispatch success event immediately
       window.dispatchEvent(new CustomEvent('postCompleted', {
