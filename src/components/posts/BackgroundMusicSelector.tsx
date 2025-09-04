@@ -59,23 +59,40 @@ const BackgroundMusicSelector: React.FC<BackgroundMusicSelectorProps> = ({
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
 
-  // Initialize audio elements
+  // Initialize audio elements only for tracks with valid preview URLs
   useEffect(() => {
+    // Clear any existing audio refs first
+    Object.values(audioRefs.current).forEach(audio => {
+      audio.pause();
+      audio.src = '';
+    });
+    audioRefs.current = {};
+
+    // Only create audio elements for tracks that have preview URLs
     MUSIC_TRACKS.forEach(track => {
-      if (track.previewUrl && !audioRefs.current[track.id]) {
-        const audio = new Audio(track.previewUrl);
-        audio.volume = 0.7;
-        audio.loop = true;
-        audioRefs.current[track.id] = audio;
+      if (track.previewUrl && track.previewUrl.trim() !== '' && !audioRefs.current[track.id]) {
+        try {
+          const audio = new Audio(track.previewUrl);
+          audio.volume = 0.7;
+          audio.loop = true;
+          audioRefs.current[track.id] = audio;
+        } catch (error) {
+          console.warn(`Failed to create audio element for ${track.name}:`, error);
+        }
       }
     });
 
     return () => {
       // Cleanup audio elements
       Object.values(audioRefs.current).forEach(audio => {
-        audio.pause();
-        audio.src = '';
+        try {
+          audio.pause();
+          audio.src = '';
+        } catch (error) {
+          console.warn('Error cleaning up audio:', error);
+        }
       });
+      audioRefs.current = {};
     };
   }, []);
 
