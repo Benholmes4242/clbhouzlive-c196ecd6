@@ -1,6 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from '../_shared/cors.ts';
 
+// Runtime verification logging
+console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));
+console.log('🔧 RUNTIME CHECK - Available tokens:', {
+  hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
+  hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
+  hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
+});
+
+// Log the actual values for debugging (first few chars only for security)
+const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+const streamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
+console.log('🔧 DEBUGGING - Account ID exists:', !!accountId, accountId ? `starts with: ${accountId.substring(0, 8)}...` : 'null');
+console.log('🔧 DEBUGGING - Stream Token exists:', !!streamToken, streamToken ? `starts with: ${streamToken.substring(0, 8)}...` : 'null');
+
 interface CloudflareStreamResponse {
   success: boolean;
   result?: {
