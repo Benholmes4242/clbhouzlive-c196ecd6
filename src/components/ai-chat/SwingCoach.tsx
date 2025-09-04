@@ -65,6 +65,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 }) => {
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string>('');
+  const [videoPoster, setVideoPoster] = useState<string>(''); // Add poster for mobile
   const [analysisText, setAnalysisText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
@@ -275,7 +276,47 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     onTranscriptionComplete: handleVoiceNoteComplete
   });
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const generateVideoPoster = async (videoFile: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      
+      video.onloadedmetadata = () => {
+        // Set canvas size for mobile optimization
+        const isMobile = window.innerWidth <= 768;
+        const maxWidth = isMobile ? 600 : 800;
+        canvas.width = Math.min(video.videoWidth, maxWidth);
+        canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
+        
+        // Capture frame at 10% of video duration for better preview
+        video.currentTime = video.duration * 0.1;
+        
+        video.onseeked = () => {
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const posterData = canvas.toDataURL('image/jpeg', 0.8);
+            resolve(posterData);
+          } else {
+            resolve(''); // Fallback
+          }
+        };
+      };
+      
+      video.onerror = () => {
+        console.warn('Could not generate video poster');
+        resolve(''); // Fallback to empty poster
+      };
+      
+      video.src = URL.createObjectURL(videoFile);
+    });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Check file type - Accept video (.mp4, .mov) and image files
@@ -301,12 +342,26 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       setUploadedVideo(file);
       const url = URL.createObjectURL(file);
       setVideoPreview(url);
+      
+      // Generate poster for mobile video thumbnail
+      if (file.type.startsWith('video/')) {
+        try {
+          const poster = await generateVideoPoster(file);
+          setVideoPoster(poster);
+        } catch (error) {
+          console.warn('Failed to generate video poster:', error);
+          setVideoPoster('');
+        }
+      } else {
+        setVideoPoster(''); // Clear poster for images
+      }
     }
   };
 
   const discardVideo = () => {
     setUploadedVideo(null);
     setVideoPreview('');
+    setVideoPoster(''); // Clear poster too
     setAnalysisText('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -938,23 +993,25 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               <div className="bg-muted rounded-lg p-4">
                 <div className="flex flex-col gap-4">
                   <div className="w-full">
-                    <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
-                      {uploadedVideo.type.startsWith('video/') ? (
-                        <video 
-                          src={videoPreview} 
-                          className="absolute inset-0 h-full w-full object-cover"
-                          playsInline
-                          muted
-                          loop
-                        />
-                      ) : (
-                        <img 
-                          src={videoPreview} 
-                          alt="Preview"
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      )}
-                    </div>
+                     <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
+                       {uploadedVideo.type.startsWith('video/') ? (
+                         <video 
+                           src={videoPreview} 
+                           poster={videoPoster} // Add poster for mobile thumbnail
+                           className="absolute inset-0 h-full w-full object-cover"
+                           playsInline
+                           muted
+                           preload="metadata"
+                           controls={false}
+                         />
+                       ) : (
+                         <img 
+                           src={videoPreview} 
+                           alt="Preview"
+                           className="absolute inset-0 h-full w-full object-cover"
+                         />
+                       )}
+                     </div>
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
