@@ -127,6 +127,15 @@ const FullscreenMediaModal = ({
   const userIdFromProp = user?.id || (user as any)?.user_id;
   const isOwnPost = postId && currentUser && userIdFromProp && currentUser.id === userIdFromProp;
   
+  // Debug logging to help identify issues
+  console.log('🔍 FullscreenMediaModal - User ownership check:', {
+    postId,
+    currentUserId: currentUser?.id,
+    userIdFromProp,
+    isOwnPost,
+    userObject: user
+  });
+  
   // Register modal state for Echo detection
   useModalState(isOpen);
 
@@ -580,14 +589,21 @@ const FullscreenMediaModal = ({
                   <MoreHorizontal className="w-8 h-8" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={handleEditPost}>
+              <DropdownMenuContent 
+                align="end" 
+                className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-[1000000]"
+                sideOffset={8}
+              >
+                <DropdownMenuItem 
+                  onClick={handleEditPost}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Post
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={handleDeletePost}
-                  className="text-destructive focus:text-destructive"
+                  className="text-destructive hover:text-destructive focus:text-destructive hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete Post
