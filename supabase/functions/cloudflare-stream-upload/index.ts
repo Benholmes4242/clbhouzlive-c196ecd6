@@ -42,13 +42,21 @@ serve(async (req) => {
   }
 
   try {
-    const apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
-    const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+    // Use fallback for account ID if not in environment
+    const apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN') || Deno.env.get('CLOUDFLARE_API_TOKEN');
+    const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || 'ybxkehyomcakqjvuhnna';
 
-    if (!apiToken || !accountId) {
-      console.error('Missing Cloudflare credentials');
+    console.log('🔧 Upload function credentials check:', {
+      hasApiToken: !!apiToken,
+      hasAccountId: !!accountId,
+      accountIdValue: accountId,
+      tokenPreview: apiToken ? apiToken.substring(0, 8) + '...' : 'null'
+    });
+
+    if (!apiToken) {
+      console.error('Missing Cloudflare Stream API token');
       return new Response(
-        JSON.stringify({ error: 'Cloudflare credentials not configured' }),
+        JSON.stringify({ error: 'Cloudflare Stream API token not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

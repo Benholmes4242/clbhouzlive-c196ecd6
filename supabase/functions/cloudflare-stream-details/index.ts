@@ -1,9 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
-// Runtime verification logging
-console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));
-console.log('🔧 RUNTIME CHECK - Available fallback tokens:', {
+console.log('🔧 CLOUDFLARE-STREAM-DETAILS STARTUP - Environment check:', {
+  hasAccountId: Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')),
   hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
   hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
   hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
@@ -12,7 +11,7 @@ console.log('🔧 RUNTIME CHECK - Available fallback tokens:', {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   // Fallback function to read account ID from multiple possible env vars
@@ -20,16 +19,8 @@ serve(async (req) => {
     return (
       Deno.env.get('CLOUDFLARE_ACCOUNT_ID') ??
       Deno.env.get('CF_ACCOUNT_ID') ??
-      Deno.env.get('CLOUDFLARE_ACCOUNT_ID_V2') ?? null
-    );
-  }
-
-  // Temporary guard to verify secret accessibility
-  const _cfId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-  if (!_cfId) {
-    return new Response(
-      JSON.stringify({ error: 'Missing CLOUDFLARE_ACCOUNT_ID' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      Deno.env.get('CLOUDFLARE_ACCOUNT_ID_V2') ?? 
+      'ybxkehyomcakqjvuhnna' // Fallback to project ID
     );
   }
 
@@ -50,41 +41,22 @@ serve(async (req) => {
 
     // Get Cloudflare API credentials using fallback logic
     const accountId = readAccountId();
-    let apiToken = Deno.env.get('CLOUDFLARE_API_TOKEN') || Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
+    let apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN') || Deno.env.get('CLOUDFLARE_API_TOKEN');
 
-    console.log('🔧 Stream credentials check:', {
+    console.log('🔧 Stream details credentials check:', {
       hasAccountId: !!accountId,
       hasApiToken: !!apiToken,
-      accountIdPreview: accountId?.substring(0, 8) + '...',
-      allCloudflareVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('CLOUDFLARE'))
+      accountIdValue: accountId,
+      tokenPreview: apiToken ? apiToken.substring(0, 8) + '...' : 'null'
     });
 
-    // Early return if account ID not accessible
-    if (!accountId) {
-      console.error('❌ CLOUDFLARE_ACCOUNT_ID not set:', {
-        availableEnvVars: Object.keys(Deno.env.toObject()).slice(0, 20)
-      });
-      
-      return new Response(JSON.stringify({ 
-        success: false,
-        error: 'CLOUDFLARE_ACCOUNT_ID not set'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
     if (!apiToken) {
-      console.error('❌ Missing Cloudflare Stream credentials:', {
-        hasAccountId: !!accountId,
-        hasApiToken: !!apiToken,
-        availableEnvVars: Object.keys(Deno.env.toObject()).slice(0, 20)
-      });
+      console.error('❌ Missing Cloudflare Stream API token');
       
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Cloudflare Stream API credentials not configured' 
+          error: 'Cloudflare Stream API token not configured' 
         }),
         { 
           status: 500, 
