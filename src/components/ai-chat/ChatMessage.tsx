@@ -25,13 +25,17 @@ interface ChatMessageProps {
   onSaveToInsights: (message: ChatMessage) => void;
   onRequestDetail: (content: string) => void;
   onAskEcho?: (prompt: string) => void;
+  onShare?: (message: ChatMessage) => void;
+  onAddVoiceNote?: (message: ChatMessage) => void;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
   message, 
   onSaveToInsights, 
   onRequestDetail,
-  onAskEcho 
+  onAskEcho,
+  onShare,
+  onAddVoiceNote
 }) => {
   const isUser = message.type === 'user';
   
@@ -76,8 +80,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   phases={swingAnalysisData.phases}
                   priorityFix={swingAnalysisData.priorityFix}
                   drills={swingAnalysisData.drills}
-                  onSaveToInsights={() => onSaveToInsights(message)}
-                  onAskEcho={onAskEcho}
+                  onShare={() => onShare?.(message)}
+                  onAddVoiceNote={() => onAddVoiceNote?.(message)}
                 />
               ) : (
                 <ReactMarkdown

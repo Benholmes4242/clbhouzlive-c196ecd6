@@ -50,8 +50,7 @@ export interface SwingReviewProps {
   };
   drills: SwingDrill[];
   onShare?: () => void;
-  onAskEcho?: (prompt: string) => void;
-  onSaveToInsights?: () => void;
+  onAddVoiceNote?: () => void;
 }
 
 export const SwingReview: React.FC<SwingReviewProps> = ({
@@ -61,8 +60,7 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
   priorityFix,
   drills,
   onShare,
-  onAskEcho,
-  onSaveToInsights
+  onAddVoiceNote
 }) => {
   const [selectedPhase, setSelectedPhase] = useState(phases[0]);
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
@@ -107,8 +105,7 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
       {/* Footer */}
       <ActionBar
         onShare={onShare}
-        onAskEcho={() => onAskEcho?.(`Help me fix ${priorityFix.title.toLowerCase()}`)}
-        onSaveToInsights={onSaveToInsights}
+        onAddVoiceNote={onAddVoiceNote}
       />
     </div>
   );

@@ -1,32 +1,18 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, MessageCircle, Bookmark } from 'lucide-react';
+import { Share2, Plus } from 'lucide-react';
 
 interface ActionBarProps {
   onShare?: () => void;
-  onAskEcho?: () => void;
-  onSaveToInsights?: () => void;
+  onAddVoiceNote?: () => void;
 }
 
 export const ActionBar: React.FC<ActionBarProps> = ({
   onShare,
-  onAskEcho,
-  onSaveToInsights
+  onAddVoiceNote
 }) => {
   return (
     <div className="flex gap-2 pt-2 border-t border-border">
-      {onSaveToInsights && (
-        <Button
-          onClick={onSaveToInsights}
-          variant="outline"
-          size="sm"
-          className="flex-1"
-        >
-          <Bookmark className="h-4 w-4 mr-1" />
-          Save to Insights
-        </Button>
-      )}
-      
       {onShare && (
         <Button
           onClick={onShare}
@@ -35,18 +21,19 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           className="flex-1"
         >
           <Share2 className="h-4 w-4 mr-1" />
-          Share with Coach
+          Share My Swing
         </Button>
       )}
       
-      {onAskEcho && (
+      {onAddVoiceNote && (
         <Button
-          onClick={onAskEcho}
+          onClick={onAddVoiceNote}
+          variant="outline"
           size="sm"
-          className="flex-1 bg-brand-orange hover:bg-brand-orange-light text-white"
+          className="flex-1"
         >
-          <MessageCircle className="h-4 w-4 mr-1" />
-          Ask Echo About This
+          <Plus className="h-4 w-4 mr-1" />
+          Add Voice Note
         </Button>
       )}
     </div>
