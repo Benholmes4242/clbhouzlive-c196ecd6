@@ -1,1 +1,4 @@
 project_id = "ybxkehyomcakqjvuhnna"
+
+[functions.cloudflare-r2-upload]
+verify_jwt = true

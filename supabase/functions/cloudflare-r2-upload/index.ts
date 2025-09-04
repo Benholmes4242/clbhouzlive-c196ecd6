@@ -9,8 +9,15 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!;
-const cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN')!;
+const cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+const cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
+
+if (!cloudflareAccountId || !cloudflareR2Token) {
+  console.error('Missing Cloudflare credentials:', { 
+    hasAccountId: !!cloudflareAccountId,
+    hasR2Token: !!cloudflareR2Token 
+  });
+}
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -20,7 +27,24 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Log available environment variables for debugging
+  console.log('🔍 Environment check:', {
+    hasSupabaseUrl: !!Deno.env.get('SUPABASE_URL'),
+    hasServiceKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+    hasAccountId: !!Deno.env.get('CLOUDFLARE_ACCOUNT_ID'),
+    hasR2Token: !!Deno.env.get('CLOUDFLARE_R2_API_TOKEN'),
+    accountIdValue: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')?.substring(0, 8) + '...',
+  });
+
   try {
+    // Check if Cloudflare credentials are available
+    if (!cloudflareAccountId || !cloudflareR2Token) {
+      console.error('Missing Cloudflare credentials:', { 
+        hasAccountId: !!cloudflareAccountId,
+        hasR2Token: !!cloudflareR2Token 
+      });
+      throw new Error('Cloudflare R2 credentials not configured');
+    }
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
