@@ -15,22 +15,18 @@ const AIChat: React.FC = () => {
   const previousLocationRef = useRef(location.pathname);
 
   // Check if we're on an auth page
-  const isAuthPage = location.pathname === '/auth' || location.pathname === '/create-profile';
+  const isAuthPage = location.pathname.startsWith('/auth') || location.pathname.startsWith('/create-profile');
 
   // Check if we're on an immersive profile modal by looking for it in the DOM
   const [isImmersiveModalOpen, setIsImmersiveModalOpen] = useState(false);
 
-  // Poll for immersive modal presence
+  // Use MutationObserver to watch for immersive modal changes
   useEffect(() => {
-    const checkImmersiveModal = () => {
-      const modalExists = document.querySelector('[data-immersive-modal="true"]') !== null;
-      setIsImmersiveModalOpen(modalExists);
-    };
-
-    checkImmersiveModal();
-    const interval = setInterval(checkImmersiveModal, 100);
-
-    return () => clearInterval(interval);
+    const check = () => setIsImmersiveModalOpen(!!document.querySelector('[data-immersive-modal="true"]'));
+    const observer = new MutationObserver(check);
+    observer.observe(document.body, { childList: true, subtree: true });
+    check();
+    return () => observer.disconnect();
   }, []);
 
   // Echo should never render on auth pages, when user is not authenticated, when modals are open, or in immersive modal
@@ -38,29 +34,14 @@ const AIChat: React.FC = () => {
 
   // Handle route changes - destroy Echo before navigation and hide during transition
   useEffect(() => {
-    const currentPath = location.pathname;
-    const previousPath = previousLocationRef.current;
-
-    if (currentPath !== previousPath) {
-      // Route is changing - start transition
+    if (location.pathname !== previousLocationRef.current) {
       setIsTransitioning(true);
-      
-      // Close overlay immediately
-      if (isOverlayOpen) {
-        setIsOverlayOpen(false);
-      }
-      
-      // Update the previous location reference
-      previousLocationRef.current = currentPath;
-      
-      // Wait for page to settle before showing Echo again
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300); // Small delay to ensure page has loaded
-      
-      return () => clearTimeout(timer);
+      if (isOverlayOpen) setIsOverlayOpen(false);
+      previousLocationRef.current = location.pathname;
+      const t = window.setTimeout(() => setIsTransitioning(false), 350);
+      return () => window.clearTimeout(t);
     }
-  }, [location.pathname, isOverlayOpen]);
+  }, [location.key, location.pathname, isOverlayOpen]);
 
   // Don't render Echo at all if conditions aren't met
   if (!shouldRenderEcho) {

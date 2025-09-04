@@ -17,18 +17,23 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [showPulse, setShowPulse] = useState(false);
 
-  // Check for first-time onboarding (only first 3 sessions)
+  // Check for first-time onboarding (only first 3 sessions) - SSR safe
   useEffect(() => {
-    const echoSessionCount = parseInt(localStorage.getItem('echo-session-count') || '0');
-    
-    if (echoSessionCount < 3) {
-      // Increment session count
-      localStorage.setItem('echo-session-count', (echoSessionCount + 1).toString());
-      
-      // Show onboarding for first 3 sessions
-      setTimeout(() => setShowOnboarding(true), 3000);
+    if (typeof window === 'undefined') return;
+    const count = parseInt(localStorage.getItem('echo-session-count') || '0');
+    if (count < 3) {
+      localStorage.setItem('echo-session-count', String(count + 1));
+      const t = setTimeout(() => setShowOnboarding(true), 3000);
+      return () => clearTimeout(t);
     }
   }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') { 
+      e.preventDefault(); 
+      onClick(); 
+    }
+  };
 
 
   // Auto-hide onboarding after 3 seconds
@@ -97,6 +102,10 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
 
       {/* Echo Orb */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Open Echo assistant"
+        onKeyDown={handleKeyDown}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -110,7 +119,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
         }}
         className={`
           cursor-pointer
-          transition-all duration-200 ease-out
+          transition-all duration-200 ease-out motion-reduce:transition-none
           ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
           rounded-full
           bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
@@ -124,7 +133,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
       >
         
         {/* Inner gradient highlight */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60 motion-reduce:opacity-0" />
         
         {/* PiWaveform Icon */}
         <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>

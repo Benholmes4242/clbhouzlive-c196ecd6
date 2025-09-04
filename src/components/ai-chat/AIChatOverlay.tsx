@@ -192,6 +192,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     }
   }, [isOpen]);
 
+  // Keyboard handler for Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { 
+      if (e.key === 'Escape') onClose(); 
+    };
+    if (isOpen) document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {

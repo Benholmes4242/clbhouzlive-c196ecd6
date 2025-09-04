@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bookmark, MoreHorizontal, User, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ChatMessage {
   id: string;
@@ -28,8 +29,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onRequestDetail 
 }) => {
   const isUser = message.type === 'user';
-  const showSaveOption = message.content.includes('Want this saved to Insights?');
+  
+  // Use metadata flag for save action instead of brittle string includes
+  const showSaveOption = !!message.metadata?.save_card;
   const showDetailOption = !isUser && !message.content.includes('Explain fully');
+
+  // Normalize timestamp safely
+  const safeDate = new Date(typeof message.timestamp === 'string' ? message.timestamp : message.timestamp);
+  const time = isNaN(safeDate.getTime()) ? '' : safeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -51,11 +58,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 <p className="m-0">{message.content}</p>
               ) : (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
+                    a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="underline break-words" />,
                     h1: ({ children }) => <h3 className="text-sm font-semibold mb-2 mt-0">{children}</h3>,
                     h2: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
                     h3: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
-                    p: ({ children }) => <p className="text-sm mb-2 last:mb-0">{children}</p>,
+                    p: ({ children }) => <p className="text-sm mb-2 last:mb-0 break-words">{children}</p>,
                     ul: ({ children }) => <ul className="text-sm mb-2 ml-4">{children}</ul>,
                     ol: ({ children }) => <ol className="text-sm mb-2 ml-4">{children}</ol>,
                     li: ({ children }) => <li className="mb-1">{children}</li>,
@@ -96,7 +105,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         </div>
         
         <div className={`text-xs text-muted-foreground mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {time}
         </div>
       </div>
     </div>
