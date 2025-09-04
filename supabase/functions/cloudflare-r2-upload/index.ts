@@ -19,11 +19,29 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Fallback function to read account ID from multiple possible env vars
+  function readAccountId() {
+    return (
+      Deno.env.get('CLOUDFLARE_ACCOUNT_ID') ??
+      Deno.env.get('CF_ACCOUNT_ID') ??
+      Deno.env.get('CLOUDFLARE_ACCOUNT_ID_V2') ?? null
+    );
+  }
+
+  // Temporary guard to verify secret accessibility
+  const _cfId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+  if (!_cfId) {
+    return new Response(
+      JSON.stringify({ error: 'Missing CLOUDFLARE_ACCOUNT_ID' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     console.log('🔄 Processing R2 upload request');
 
-    // Get Cloudflare credentials - check all possible environment variable names
-    let cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+    // Get Cloudflare credentials using fallback logic
+    const cloudflareAccountId = readAccountId();
     let cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
 
     // Try alternative names if not found
@@ -39,8 +57,23 @@ serve(async (req) => {
       allCloudflareVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('CLOUDFLARE'))
     });
 
+    // Early return if account ID not accessible
+    if (!cloudflareAccountId) {
+      console.error('❌ CLOUDFLARE_ACCOUNT_ID not set:', {
+        availableEnvVars: Object.keys(Deno.env.toObject()).slice(0, 20)
+      });
+      
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'CLOUDFLARE_ACCOUNT_ID not set'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Check if credentials are available
-    if (!cloudflareAccountId || !cloudflareR2Token) {
+    if (!cloudflareR2Token) {
       console.error('❌ Missing Cloudflare credentials:', { 
         hasAccountId: !!cloudflareAccountId,
         hasR2Token: !!cloudflareR2Token,
