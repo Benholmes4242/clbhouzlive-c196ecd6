@@ -1,20 +1,26 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { S3Client, PutObjectCommand } from "npm:@aws-sdk/client-s3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
 };
 
 console.log('🔍 Starting cloudflare-r2-upload function');
 
-// Runtime verification logging
-console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));
-console.log('🔧 RUNTIME CHECK - Available fallback tokens:', {
-  hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
-  hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
-  hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
+// Comprehensive runtime verification logging
+const env = (k: string) => (Deno.env.get(k) ? '✓' : '✗');
+console.log('🔧 RUNTIME CHECK', {
+  CLOUDFLARE_ACCOUNT_ID: env('CLOUDFLARE_ACCOUNT_ID'),
+  R2_ACCESS_KEY_ID: env('R2_ACCESS_KEY_ID'),
+  R2_SECRET_ACCESS_KEY: env('R2_SECRET_ACCESS_KEY'),
+  R2_BUCKET: env('R2_BUCKET'),
+  R2_PUBLIC_BASE_URL: env('R2_PUBLIC_BASE_URL'),
+  CLOUDFLARE_R2_API_TOKEN: env('CLOUDFLARE_R2_API_TOKEN'),
+  CLOUDFLARE_API_TOKEN: env('CLOUDFLARE_API_TOKEN'),
 });
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -28,6 +34,14 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     console.log('✅ STEP 1.1: Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Ping endpoint for testing
+  if (req.method === 'GET') {
+    console.log('🏓 PING: Health check endpoint hit');
+    return new Response(JSON.stringify({ ok: true, service: 'cloudflare-r2-upload' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   console.log('📋 STEP 2: Processing POST request for R2 upload');
@@ -46,50 +60,38 @@ serve(async (req) => {
 
   try {
 
-    // Get Cloudflare credentials using fallback logic
-    console.log('🔧 STEP 4: Checking Cloudflare credentials');
-    const cloudflareAccountId = readAccountId();
-    let cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
+    // Get R2 credentials (S3-compatible)
+    console.log('🔧 STEP 4: Checking R2 credentials');
+    const r2AccountId = readAccountId();
+    const r2AccessKeyId = Deno.env.get('R2_ACCESS_KEY_ID');
+    const r2SecretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY');
+    const r2Bucket = Deno.env.get('R2_BUCKET') || 'clbhouz-media';
+    const r2PublicBaseUrl = Deno.env.get('R2_PUBLIC_BASE_URL') || 'https://media.clbhouz.co.uk';
 
-    // Try alternative names if not found
-    if (!cloudflareR2Token) {
-      console.log('⚠️ STEP 4.1: Primary R2 token not found, trying fallback');
-      cloudflareR2Token = Deno.env.get('CLOUDFLARE_API_TOKEN');
-    }
-
-    // Log what we found
-    console.log('🔧 STEP 4.2: Credential check results:', {
-      hasAccountId: !!cloudflareAccountId,
-      hasR2Token: !!cloudflareR2Token,
-      accountIdPreview: cloudflareAccountId?.substring(0, 8) + '...',
-      allCloudflareVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('CLOUDFLARE'))
+    console.log('🔧 STEP 4.2: R2 credential check results:', {
+      hasAccountId: !!r2AccountId,
+      hasAccessKeyId: !!r2AccessKeyId,
+      hasSecretAccessKey: !!r2SecretAccessKey,
+      hasBucket: !!r2Bucket,
+      hasPublicBaseUrl: !!r2PublicBaseUrl,
+      accountIdPreview: r2AccountId?.substring(0, 8) + '...',
+      bucket: r2Bucket,
+      publicBaseUrl: r2PublicBaseUrl
     });
 
-    // Early return if account ID not accessible
-    if (!cloudflareAccountId) {
-      console.error('❌ STEP 4.3: CLOUDFLARE_ACCOUNT_ID not set');
+    // Check for required R2 credentials
+    if (!r2AccountId || !r2AccessKeyId || !r2SecretAccessKey) {
+      console.error('❌ STEP 4.3: Missing required R2 credentials');
       return new Response(JSON.stringify({ 
         success: false,
-        error: 'CLOUDFLARE_ACCOUNT_ID not set'
+        error: 'R2 credentials not configured. Need R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and CLOUDFLARE_ACCOUNT_ID'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Check if credentials are available
-    if (!cloudflareR2Token) {
-      console.error('❌ STEP 4.4: Missing Cloudflare R2 API token');
-      return new Response(JSON.stringify({ 
-        success: false,
-        error: 'Cloudflare R2 credentials not configured'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('✅ STEP 4.5: All Cloudflare credentials found');
+    console.log('✅ STEP 4.4: All R2 credentials found');
 
     // Get the authorization header
     console.log('🔐 STEP 5: Checking authentication');
@@ -131,10 +133,6 @@ serve(async (req) => {
     }
     console.log('✅ STEP 6.2: All required form data present');
 
-    // Map bucket types to actual Cloudflare R2 bucket name
-    // All uploads go to the main media bucket in Cloudflare R2
-    const targetBucket = 'clbhouz-media';
-
     // Generate unique file path with proper organization
     console.log('📁 STEP 7: Generating file path');
     const fileExtension = fileName.split('.').pop();
@@ -150,47 +148,41 @@ serve(async (req) => {
       fileSize: file.size,
       userId: user.id,
       fullPath: fullPath,
-      targetBucket: targetBucket
+      targetBucket: r2Bucket
     });
 
-    // Upload to Cloudflare R2
-    console.log('🚀 STEP 8: Starting R2 upload');
-    const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/${targetBucket}/objects/${fullPath}`;
-    console.log('🚀 STEP 8.1: Upload URL constructed:', uploadUrl);
-    
-    console.log('🚀 STEP 8.2: Making R2 API call');
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${cloudflareR2Token}`,
-        'Content-Type': file.type,
-        'Content-Length': file.size.toString(),
+    // Create S3-compatible client for R2
+    console.log('🚀 STEP 8: Creating S3-compatible R2 client');
+    const s3Client = new S3Client({
+      region: "auto",
+      endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: r2AccessKeyId,
+        secretAccessKey: r2SecretAccessKey,
       },
-      body: file,
+    });
+    console.log('✅ STEP 8.1: S3 client created successfully');
+
+    // Get file content as array buffer
+    console.log('🚀 STEP 8.2: Preparing file content');
+    const fileContent = await file.arrayBuffer();
+    console.log('✅ STEP 8.3: File content prepared, size:', fileContent.byteLength);
+
+    // Upload to R2 using S3 API
+    console.log('🚀 STEP 8.4: Starting R2 upload via S3 API');
+    const putCommand = new PutObjectCommand({
+      Bucket: r2Bucket,
+      Key: fullPath,
+      Body: new Uint8Array(fileContent),
+      ContentType: file.type || 'application/octet-stream',
     });
 
-    console.log('🚀 STEP 8.3: R2 API response received:', {
-      status: uploadResponse.status,
-      statusText: uploadResponse.statusText,
-      ok: uploadResponse.ok
-    });
-
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
-      console.error('❌ STEP 8.4: R2 upload failed:', {
-        status: uploadResponse.status,
-        statusText: uploadResponse.statusText,
-        error: errorText,
-        uploadUrl: uploadUrl
-      });
-      throw new Error(`Failed to upload to R2: ${uploadResponse.status} ${errorText}`);
-    }
-
-    console.log('✅ STEP 8.4: R2 upload successful');
+    const uploadResult = await s3Client.send(putCommand);
+    console.log('✅ STEP 8.5: R2 upload successful:', uploadResult);
 
     // Construct the public URL
     console.log('🔗 STEP 9: Generating public URL');
-    const publicUrl = `https://media.clbhouz.co.uk/${fullPath}`;
+    const publicUrl = `${r2PublicBaseUrl}/${fullPath}`;
 
     console.log('✅ STEP 9.1: Upload process completed successfully:', {
       publicUrl,

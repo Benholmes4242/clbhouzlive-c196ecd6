@@ -1,17 +1,29 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
-console.log('🔧 CLOUDFLARE-STREAM-DETAILS STARTUP - Environment check:', {
-  hasAccountId: Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')),
-  hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
-  hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
-  hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
+// Comprehensive runtime verification logging
+const env = (k: string) => (Deno.env.get(k) ? '✓' : '✗');
+console.log('🔧 CLOUDFLARE-STREAM-DETAILS STARTUP', {
+  CLOUDFLARE_ACCOUNT_ID: env('CLOUDFLARE_ACCOUNT_ID'),
+  CF_ACCOUNT_ID: env('CF_ACCOUNT_ID'),
+  CLOUDFLARE_ACCOUNT_ID_V2: env('CLOUDFLARE_ACCOUNT_ID_V2'),
+  STREAM_API_TOKEN: env('CLOUDFLARE_STREAM_API_TOKEN'),
+  CLOUDFLARE_API_TOKEN: env('CLOUDFLARE_API_TOKEN'),
+  STREAM_CUSTOMER_SUBDOMAIN: env('STREAM_CUSTOMER_SUBDOMAIN'),
 });
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Ping endpoint for testing
+  if (req.method === 'GET') {
+    console.log('🏓 PING: Stream details health check endpoint hit');
+    return new Response(JSON.stringify({ ok: true, service: 'cloudflare-stream-details' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   // Fallback function to read account ID from multiple possible env vars
