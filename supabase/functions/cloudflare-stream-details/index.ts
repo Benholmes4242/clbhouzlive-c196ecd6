@@ -1,6 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
+// Runtime verification logging
+console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));
+console.log('🔧 RUNTIME CHECK - Available fallback tokens:', {
+  hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
+  hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
+  hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
+});
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {

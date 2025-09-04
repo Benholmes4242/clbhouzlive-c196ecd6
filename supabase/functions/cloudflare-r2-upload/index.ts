@@ -9,6 +9,14 @@ const corsHeaders = {
 
 console.log('🔍 Starting cloudflare-r2-upload function');
 
+// Runtime verification logging
+console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));
+console.log('🔧 RUNTIME CHECK - Available fallback tokens:', {
+  hasR2Token: Boolean(Deno.env.get('CLOUDFLARE_R2_API_TOKEN')),
+  hasApiToken: Boolean(Deno.env.get('CLOUDFLARE_API_TOKEN')),
+  hasStreamToken: Boolean(Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN'))
+});
+
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
