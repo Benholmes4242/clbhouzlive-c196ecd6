@@ -65,13 +65,13 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     }
   }, [primaryMedia, isActive, play, pause, highlight.id]);
 
-  // Update local state when card becomes inactive (resets to muted) or when active video changes
+  // Update local state when card becomes inactive (resets to muted)
   useEffect(() => {
     if (!isActive) {
       const currentMuted = getCardMuted(highlight.id);
       setIsCardMuted(currentMuted);
     }
-  }, [isActive, activeId, highlight.id, getCardMuted]);
+  }, [isActive, highlight.id, getCardMuted]);
 
   // Handle mute/unmute toggle for this specific card
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
