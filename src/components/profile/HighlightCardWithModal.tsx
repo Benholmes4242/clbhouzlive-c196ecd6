@@ -143,8 +143,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                 
                 {/* Play button overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                    <Play className="w-3 h-3 md:w-4 md:h-4 text-white ml-0.5" fill="currentColor" />
+                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-4 h-4 md:w-6 md:h-6 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
+                    <Play className="w-2.5 h-2.5 md:w-3.5 md:h-3.5 text-white ml-0.5" fill="currentColor" />
                   </div>
                 </div>
               </div>
@@ -179,13 +179,13 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         {primaryMedia.media_type === 'video' && (
           <button
             onClick={handleMuteToggle}
-            className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
+            className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-7 h-7 flex items-center justify-center hover:bg-white/20 transition-all duration-300"
             aria-label={isCardMuted ? 'Unmute video' : 'Mute video'}
           >
             {isCardMuted ? (
-              <VolumeX className="w-5 h-5 text-white" />
+              <VolumeX className="w-4 h-4 text-white" />
             ) : (
-              <Volume2 className="w-5 h-5 text-white" />
+              <Volume2 className="w-4 h-4 text-white" />
             )}
           </button>
         )}
