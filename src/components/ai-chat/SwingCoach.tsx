@@ -376,17 +376,18 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       const ctx = canvas.getContext('2d');
       const frames: string[] = [];
       
-      // Optimized settings for speed
+      // Mobile-specific settings
       video.muted = true;
       video.playsInline = true;
       video.preload = 'metadata';
       
-      // Reduced timeout for faster processing
+      // Add timeout for mobile devices
       const timeout = setTimeout(() => {
         console.error('Video frame extraction timed out');
         reject(new Error('Video processing timed out'));
-      }, 8000); // Reduced from 45s to 8s
+      }, 45000); // Extended timeout for 20 frames
       
+      // Enhanced error handling
       video.onerror = (e) => {
         clearTimeout(timeout);
         console.error('Video error:', e);
@@ -400,96 +401,132 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           duration: video.duration
         });
         
-        // Optimized canvas size for speed while maintaining quality
+        // Mobile-optimized canvas size but keep quality
         const isMobile = window.innerWidth <= 768;
-        const maxWidth = isMobile ? 512 : 640; // Reduced from 800/1280 to 512/640
+        const maxWidth = isMobile ? 800 : 1280; // Increased mobile resolution
         canvas.width = Math.min(video.videoWidth, maxWidth);
         canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
         
         const duration = video.duration;
         
-        // Optimized to 8 key frames for 5x speed improvement
+        // Keep 20 frames for both mobile and desktop for optimal analysis
         const framePositions = [
-          0.05, // Address position (P1)
-          0.25, // Mid takeaway (P2)
-          0.45, // Shaft parallel back (P3)
-          0.60, // Top of backswing (P4)
-          0.75, // Mid downswing (P5)
+          0.03, // Initial setup/Address (P1)
+          0.08, // Settled address position
+          0.13, // Takeaway initiation
+          0.18, // Early takeaway
+          0.23, // Mid takeaway (P2)
+          0.28, // Late takeaway
+          0.33, // Transition to backswing
+          0.38, // Early backswing
+          0.43, // Shaft parallel back (P3)
+          0.48, // Three-quarter back
+          0.53, // Near top of backswing
+          0.58, // Top of backswing (P4)
+          0.63, // Transition/Early downswing
+          0.68, // Downswing acceleration
+          0.73, // Mid downswing (P5)
+          0.78, // Approaching impact
+          0.83, // Pre-impact position
           0.87, // Impact (P6)
-          0.93, // Early follow-through (P7)
-          0.97  // Finish (P8)
+          0.91, // Early release/follow-through (P7)
+          0.95  // Full finish (P8/P9)
         ];
         
         const positions = framePositions.map(pos => pos * duration);
         let frameIndex = 0;
-        let completedFrames = 0;
+        let seekTimeout: NodeJS.Timeout;
         
-        // Parallel frame extraction for speed
-        const extractFrame = (index: number, position: number) => {
-          return new Promise<void>((resolveFrame) => {
-            const tempVideo = video.cloneNode(true) as HTMLVideoElement;
-            tempVideo.muted = true;
-            tempVideo.playsInline = true;
-            
-            const frameTimeout = setTimeout(() => {
-              console.warn(`Frame ${index + 1} timeout, skipping`);
-              resolveFrame();
-            }, 1500); // Reduced timeout per frame
-            
-            tempVideo.onseeked = () => {
-              clearTimeout(frameTimeout);
-              
-              if (ctx) {
-                try {
-                  ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
-                  const frameData = canvas.toDataURL('image/jpeg', 0.75); // Consistent quality
-                  frames[index] = frameData;
-                  completedFrames++;
-                  
-                  console.log(`Frame ${index + 1}/${positions.length} extracted`);
-                  
-                  if (completedFrames === positions.length) {
-                    clearTimeout(timeout);
-                    console.log(`Successfully extracted ${frames.filter(f => f).length} frames in parallel`);
-                    resolve(frames.filter(f => f)); // Filter out any undefined frames
-                  }
-                  resolveFrame();
-                } catch (error) {
-                  console.warn(`Error extracting frame ${index + 1}:`, error);
-                  resolveFrame();
-                }
-              } else {
-                resolveFrame();
-              }
-            };
-            
-            tempVideo.onerror = () => {
-              clearTimeout(frameTimeout);
-              console.warn(`Error loading frame ${index + 1}`);
-              resolveFrame();
-            };
-            
-            tempVideo.currentTime = position;
-          });
+        // Mobile optimization: Process frames in batches to prevent memory issues
+        const batchSize = isMobile ? 4 : 20; // Process 4 frames at a time on mobile
+        let currentBatch = 0;
+        
+        const processBatch = () => {
+          const batchStart = currentBatch * batchSize;
+          const batchEnd = Math.min(batchStart + batchSize, positions.length);
+          
+          if (batchStart >= positions.length) {
+            clearTimeout(timeout);
+            console.log(`Successfully extracted ${frames.length} frames`);
+            resolve(frames);
+            return;
+          }
+          
+          frameIndex = batchStart;
+          captureFrame();
         };
         
-        // Start parallel extraction
-        positions.forEach((position, index) => {
-          setTimeout(() => extractFrame(index, position), index * 100); // Stagger starts by 100ms
-        });
+        const captureFrame = () => {
+          const batchStart = currentBatch * batchSize;
+          const batchEnd = Math.min(batchStart + batchSize, positions.length);
+          
+          if (frameIndex >= batchEnd) {
+            // Batch complete, clean up memory and start next batch
+            if (isMobile) {
+              // Force garbage collection on mobile by nullifying references
+              ctx?.clearRect(0, 0, canvas.width, canvas.height);
+              // Small delay to allow memory cleanup
+              setTimeout(() => {
+                currentBatch++;
+                processBatch();
+              }, 200);
+            } else {
+              currentBatch++;
+              processBatch();
+            }
+            return;
+          }
+          
+          // Clear any existing seek timeout
+          if (seekTimeout) clearTimeout(seekTimeout);
+          
+          video.currentTime = positions[frameIndex];
+          
+          // Backup timeout for seek operation
+          seekTimeout = setTimeout(() => {
+            console.warn(`Seek timeout for frame ${frameIndex + 1}, skipping...`);
+            frameIndex++;
+            captureFrame();
+          }, 4000); // Longer timeout for mobile
+          
+          video.onseeked = () => {
+            clearTimeout(seekTimeout);
+            
+            if (ctx) {
+              try {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                // Optimized quality: slightly lower on mobile but still good
+                const quality = isMobile ? 0.75 : 0.8;
+                const frameData = canvas.toDataURL('image/jpeg', quality);
+                frames.push(frameData);
+                console.log(`Captured frame ${frameIndex + 1}/${positions.length} (Batch ${currentBatch + 1})`);
+                
+                // Clear canvas immediately after capture on mobile
+                if (isMobile) {
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+              } catch (e) {
+                console.error('Canvas draw error:', e);
+              }
+            }
+            
+            frameIndex++;
+            // Slightly longer delay between frames for mobile stability
+            setTimeout(captureFrame, isMobile ? 150 : 50);
+          };
+        };
         
-        // Set source to start loading
-        video.src = URL.createObjectURL(videoFile);
-        video.load();
+        // Start processing first batch
+        setTimeout(processBatch, 500);
       };
       
-      video.onerror = (e) => {
-        clearTimeout(timeout);
-        console.error('Video error:', e);
-        reject(new Error('Video failed to load'));
+      // Enhanced data handling for mobile
+      video.oncanplay = () => {
+        console.log('Video can play');
       };
       
       video.src = URL.createObjectURL(videoFile);
+      video.load(); // Explicitly load the video
     });
   };
 
