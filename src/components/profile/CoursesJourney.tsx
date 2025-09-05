@@ -137,7 +137,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         <RecentlyPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
 
         {/* Highlights From My Journey Section */}
-        <div className="w-full px-4 pt-4 pb-2">
+        <div className="w-full px-4 pt-4 pb-3">
           <div className="max-w-6xl mx-auto">
             <HighlightsCarousel userId={userId} className="mb-0" />
           </div>
