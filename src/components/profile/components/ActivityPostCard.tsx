@@ -23,6 +23,11 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
   const handleClick = () => {
+    console.log('🚨 ACTIVITY POST CARD CLICKED!', {
+      postId: post.id,
+      hasMedia: hasMedia,
+      mediaCount: post.post_media?.length || 0
+    });
     onClick(post);
   };
 

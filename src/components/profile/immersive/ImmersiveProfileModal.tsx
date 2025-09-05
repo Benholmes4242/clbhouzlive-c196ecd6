@@ -75,6 +75,19 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setLocalMediaItems(mediaItems);
   }, [mediaItems]);
 
+  // DEBUG: Log when ImmersiveProfileModal is rendered
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🚨 IMMERSIVE PROFILE MODAL RENDERED!', {
+        userId,
+        mediaItems: localMediaItems.length,
+        activeIndex,
+        currentItem: currentItem?.id,
+        uploadMode
+      });
+    }
+  }, [isOpen, userId, localMediaItems.length, activeIndex, currentItem?.id, uploadMode]);
+
   // Video preloading for instant playback
   useEffect(() => {
     if (currentItem?.media_type === 'video' && activeIndex < totalItems - 1) {
