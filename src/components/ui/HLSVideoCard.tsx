@@ -48,18 +48,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isMockVideo, setIsMockVideo] = useState(false);
-
-  // Check if this is a mock video URL
-  useEffect(() => {
-    const isMock = hlsUrl && (hlsUrl.includes('mock-video') || hlsUrl.includes('fake-video'));
-    setIsMockVideo(isMock);
-    if (isMock) {
-      setHasError(true);
-    } else {
-      setHasError(false);
-    }
-  }, [hlsUrl]);
 
   // Sync internal muted state with prop changes
   useEffect(() => {
@@ -268,22 +256,10 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       {hasError && (
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
           <div className="text-center text-white p-4">
-            {isMockVideo ? (
-              <>
-                <div className="text-sm opacity-80 mb-2">🔧 Development Mode</div>
-                <div className="text-xs opacity-60">
-                  Video upload successful but using mock URLs.<br />
-                  Real videos will work in production.
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-sm opacity-80 mb-2">⚠️ Video Error</div>
-                <div className="text-xs opacity-60">
-                  Unable to load video source
-                </div>
-              </>
-            )}
+            <div className="text-sm opacity-80 mb-2">⚠️ Video Error</div>
+            <div className="text-xs opacity-60">
+              Unable to load video source
+            </div>
           </div>
         </div>
       )}

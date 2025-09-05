@@ -66,36 +66,82 @@ serve(async (req) => {
 
       console.log(`📤 Uploading video to Cloudflare Stream: ${file.name}, size: ${file.size}`);
 
-      // Since we're having API token issues, let's return a mock response for now
-      // to verify the function structure is working
-      console.log('⚠️ MOCK MODE: Returning fake response until API tokens are configured');
+      const streamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
       
-      // Generate a fake video ID for testing
-      const fakeVideoId = `mock-video-${Date.now()}`;
-      
-      return new Response(
-        JSON.stringify({
-          success: true,
-          videoId: fakeVideoId,
-          thumbnail: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/thumbnails/thumbnail.jpg`,
-          playback: {
-            hls: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/manifest/video.m3u8`,
-            dash: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/manifest/video.mpd`
-          },
-          preview: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/preview`,
-          status: 'ready',
-          urls: {
-            hls: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/manifest/video.m3u8`,
-            dash: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/manifest/video.mpd`,
-            thumbnail: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${fakeVideoId}/thumbnails/thumbnail.jpg`
+      if (!streamToken) {
+        console.error('❌ Missing CLOUDFLARE_STREAM_API_TOKEN');
+        return new Response(
+          JSON.stringify({ error: 'Stream API token not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      try {
+        // Create form data for Cloudflare Stream API
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+        
+        // Add metadata if provided
+        if (metadata.title) {
+          uploadFormData.append('meta', JSON.stringify({ name: metadata.title }));
+        }
+
+        // Upload to Cloudflare Stream
+        const uploadResponse = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${streamToken}`,
+            },
+            body: uploadFormData,
           }
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+        );
+
+        const uploadResult: CloudflareStreamResponse = await uploadResponse.json();
+        console.log('📥 Cloudflare Stream response:', { success: uploadResult.success, errors: uploadResult.errors });
+
+        if (!uploadResult.success || !uploadResult.result) {
+          console.error('❌ Upload failed:', uploadResult.errors);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Upload failed', 
+              details: uploadResult.errors 
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const video = uploadResult.result;
+        console.log('✅ Video uploaded successfully:', video.uid);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            videoId: video.uid,
+            thumbnail: video.thumbnail,
+            playback: video.playback,
+            preview: video.preview,
+            status: video.status.state,
+            urls: {
+              hls: video.playback.hls,
+              dash: video.playback.dash,
+              thumbnail: video.thumbnail
+            }
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (error) {
+        console.error('❌ Error uploading to Cloudflare Stream:', error);
+        return new Response(
+          JSON.stringify({ error: 'Upload failed', details: error.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     if (req.method === 'GET') {
-      // Get video status/details - Mock mode for now
+      // Get video status/details from Cloudflare Stream
       const url = new URL(req.url);
       const videoId = url.searchParams.get('videoId');
 
@@ -106,29 +152,71 @@ serve(async (req) => {
         );
       }
 
-      console.log('⚠️ MOCK MODE: Returning fake video details for ID:', videoId);
+      const streamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
+      
+      if (!streamToken) {
+        console.error('❌ Missing CLOUDFLARE_STREAM_API_TOKEN');
+        return new Response(
+          JSON.stringify({ error: 'Stream API token not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
-      // Return mock video details
-      return new Response(
-        JSON.stringify({
-          success: true,
-          video: {
-            uid: videoId,
-            thumbnail: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`,
-            playback: {
-              hls: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`,
-              dash: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.mpd`
+      try {
+        console.log('📥 Fetching video details for ID:', videoId);
+
+        // Fetch video details from Cloudflare Stream
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${videoId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${streamToken}`,
+              'Content-Type': 'application/json',
             },
-            status: { state: 'ready' }
-          },
-          urls: {
-            hls: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`,
-            dash: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.mpd`,
-            thumbnail: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`
           }
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+        );
+
+        const result: CloudflareStreamResponse = await response.json();
+        console.log('📥 Video details response:', { success: result.success, errors: result.errors });
+
+        if (!result.success || !result.result) {
+          console.error('❌ Failed to fetch video details:', result.errors);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Failed to fetch video details', 
+              details: result.errors 
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const video = result.result;
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            video: {
+              uid: video.uid,
+              thumbnail: video.thumbnail,
+              playback: video.playback,
+              status: video.status
+            },
+            urls: {
+              hls: video.playback.hls,
+              dash: video.playback.dash,
+              thumbnail: video.thumbnail
+            }
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (error) {
+        console.error('❌ Error fetching video details:', error);
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch video details', details: error.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     return new Response(
