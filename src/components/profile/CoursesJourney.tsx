@@ -498,7 +498,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         </div>
 
         {/* Courses by Region Section */}
-        <div className="mt-2"> {/* 8px spacing */}
+        <div className="mt-1.5"> {/* 6px spacing */}
           <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
         </div>
       </div>
@@ -2284,7 +2284,7 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
 
   return (
     <>
-      <div className="w-full pt-2">
+      <div className="w-full pt-1.5">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-0">
             <h4 className="text-xl text-muted-foreground mb-0">Worldwide</h4>
