@@ -1,13 +1,10 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useHighlightsVideo } from './HighlightsVideoController';
-import { useLongPressPreview } from '@/hooks/useLongPressPreview';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
-import { cn } from '@/lib/utils';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
@@ -24,18 +21,12 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
-  const previewVideoRef = useRef<HTMLVideoElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isInView, setIsInView] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const globalAudio = useGlobalAudio();
   
-  // Use the highlights video controller for carousel playback
+  // Use the highlights video controller for playback
   const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
-  const isCarouselActive = activeId === highlight.id;
-
-  // Use video playback manager for preview control
-  const { pauseAllOtherVideos } = useVideoPlaybackManager();
+  const isActive = activeId === highlight.id;
   
   // Extract Cloudflare Stream ID for crisp thumbnails
   const extractCloudflareStreamId = (m3u8: string) => {
@@ -53,77 +44,27 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     : null;
   
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
-  const carouselVideoRef = useRef<HTMLVideoElement>(null);
 
   // Register with video controller
   useEffect(() => {
     if (primaryMedia?.media_type === 'video') {
-      register(highlight.id, carouselVideoRef.current);
+      register(highlight.id, videoRef.current);
     }
   }, [highlight.id, primaryMedia, register]);
 
-  // Intersection observer to manage preview state based on visibility
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-
-    if (cardRef.current) observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const startPreview = useCallback(() => {
-    if (!isInView || primaryMedia?.media_type !== 'video') return;
-    
-    pauseAllOtherVideos(highlight.id);
-    setIsPreviewing(true);
-  }, [isInView, primaryMedia, pauseAllOtherVideos, highlight.id]);
-
-  const stopPreview = useCallback(() => {
-    setIsPreviewing(false);
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    if (primaryMedia?.media_type === 'video' && !isCarouselActive) {
-      startPreview();
-    }
-  }, [primaryMedia, isCarouselActive, startPreview]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isCarouselActive) {
-      stopPreview();
-    }
-  }, [isCarouselActive, stopPreview]);
-
-  const handleOpenModal = useCallback(() => {
-    // Just stop previews - no modal opening
-    stopPreview();
-    pause(highlight.id);
-  }, [stopPreview, pause, highlight.id]);
-
-  // Simple tap gesture for mobile - just play/pause
-  const handleTap = useCallback(() => {
-    if (primaryMedia?.media_type === 'video') {
-      if (isCarouselActive) {
-        pause(highlight.id);
-      } else {
-        play(highlight.id);
-      }
-    }
-  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
-
+  // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (primaryMedia?.media_type === 'video') {
-      if (isCarouselActive) {
+      if (isActive) {
         pause(highlight.id);
       } else {
         play(highlight.id);
       }
     }
-  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
+  }, [primaryMedia, isActive, play, pause, highlight.id]);
 
+  // Handle mute/unmute click
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     toggleMute();
@@ -157,17 +98,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }
 
   return (
-    <div 
-      ref={cardRef}
-      className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights"
-      role="button"
-      tabIndex={0}
-      aria-label="Open highlight post"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleTap}
-    >
-      <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
+    <div className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
+      <div className="relative overflow-hidden rounded-2xl card-base card-highlights" onClick={handleVideoClick}>
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
@@ -178,31 +110,16 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           />
         ) : (
           <>
-            {/* Carousel video (for click/tap play) */}
-            {isCarouselActive && !isPreviewing ? (
-              <>
-                <HLSVideoCard
-                  ref={carouselVideoRef}
-                  hlsUrl={hlsUrl}
-                  poster={posterUrl || undefined}
-                  muted={mutedPref}
-                  autoplay={false}
-                  showMuteButton={false}
-                  className="w-full h-full object-cover object-center"
-                />
-              </>
-            ) : isPreviewing ? (
-              /* Preview video for hover/long-press */
+            {/* Active video */}
+            {isActive ? (
               <HLSVideoCard
-                ref={previewVideoRef}
+                ref={videoRef}
                 hlsUrl={hlsUrl}
                 poster={posterUrl || undefined}
-                muted={true}
-                autoplay={true}
-                loop={true}
+                muted={mutedPref}
+                autoplay={false}
                 showMuteButton={false}
                 className="w-full h-full object-cover object-center"
-                externallyManaged={true}
               />
             ) : (
               /* Video thumbnail with play overlay */
@@ -226,14 +143,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           </>
         )}
         
-        {highlight.post_media.length > 1 && !isPreviewing && (
-          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-20">
-            +{highlight.post_media.length - 1} more
-          </div>
-        )}
-        
         {/* Golf Course Badge - Top Left */}
-        {highlight.golf_course && !isPreviewing && (
+        {highlight.golf_course && (
           <div className="absolute top-3 left-3 z-20">
             <CoursePostBadge 
               course={{
@@ -245,6 +156,31 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             />
           </div>
         )}
+
+        {/* Top Right Controls */}
+        <div className="absolute top-3 right-3 z-30 flex items-center gap-2">
+          {/* Media count indicator */}
+          {highlight.post_media.length > 1 && (
+            <div className="bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+              +{highlight.post_media.length - 1} more
+            </div>
+          )}
+
+          {/* Mute/Unmute Button for videos */}
+          {primaryMedia.media_type === 'video' && (
+            <button
+              onClick={handleMuteToggle}
+              className="rounded-full bg-black/50 backdrop-blur-sm border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-black/70 transition-colors"
+              aria-label={mutedPref ? 'Unmute video' : 'Mute video'}
+            >
+              {mutedPref ? (
+                <VolumeX className="w-4 h-4 text-white" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-white" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
