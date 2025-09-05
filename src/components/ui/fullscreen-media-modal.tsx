@@ -597,6 +597,11 @@ const FullscreenMediaModal = ({
                   size="icon"
                   className="p-2 rounded-full bg-black/60 hover:bg-black/70 text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 transition-all duration-200"
                   title="Post actions"
+                  onClick={() => {
+                    console.log('🚨 THREE DOTS CLICKED!');
+                    console.log('🚨 isOwnPost:', isOwnPost);
+                    console.log('🚨 postId:', postId);
+                  }}
                 >
                   <MoreHorizontal className="w-8 h-8" />
                 </Button>
@@ -607,14 +612,20 @@ const FullscreenMediaModal = ({
                 sideOffset={8}
               >
                 <DropdownMenuItem 
-                  onClick={handleEditPost}
+                  onClick={() => {
+                    console.log('🚨 EDIT CLICKED!');
+                    handleEditPost();
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer focus:bg-black/5 dark:focus:bg-white/10"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit post
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={handleDeletePost}
+                  onClick={() => {
+                    console.log('🚨 DELETE CLICKED!');
+                    handleDeletePost();
+                  }}
                   className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer focus:bg-red-50 dark:focus:bg-red-900/20"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
