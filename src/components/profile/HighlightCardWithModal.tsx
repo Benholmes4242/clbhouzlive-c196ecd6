@@ -166,20 +166,20 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
             </div>
           )}
 
-          {/* Mute/Unmute Button for videos */}
-          {primaryMedia.media_type === 'video' && (
-            <button
-              onClick={handleMuteToggle}
-              className="rounded-full bg-black/50 backdrop-blur-sm border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-black/70 transition-colors"
-              aria-label={mutedPref ? 'Unmute video' : 'Mute video'}
-            >
-              {mutedPref ? (
-                <VolumeX className="w-4 h-4 text-white" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-white" />
-              )}
-            </button>
-          )}
+        {/* Mute/Unmute Button for videos */}
+        {primaryMedia.media_type === 'video' && (
+          <button
+            onClick={handleMuteToggle}
+            className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 w-10 h-10 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
+            aria-label={mutedPref ? 'Unmute video' : 'Mute video'}
+          >
+            {mutedPref ? (
+              <VolumeX className="w-5 h-5 text-white" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-white" />
+            )}
+          </button>
+        )}
         </div>
       </div>
     </div>

@@ -1255,7 +1255,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                showCountryWithFlag={true}
                                hideRankingBadges={true}
                                 mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
-                                mobileFlagSize={windowWidth < 768 ? 'md' : 'sm'}
+                                mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                               />
                               
                               {/* Premium Rank Badge - Top Left */}
