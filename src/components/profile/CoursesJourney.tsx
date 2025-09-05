@@ -1210,7 +1210,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                      >
                         <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative`}>
                               <CourseCard 
-                               course={userCourse.golf_courses}
+                               course={{
+                                 ...userCourse.golf_courses,
+                                 global_rank: null, // Hide worldwide ranking badge
+                                 regional_rank: null, // Hide regional ranking badge  
+                                 usa_rank: null // Hide USA ranking badge
+                               }}
                                viewingUserId={userId}
                                viewContext="global"
                                userRating={userCourse.rating}
