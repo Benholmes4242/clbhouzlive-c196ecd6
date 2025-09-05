@@ -139,16 +139,21 @@ serve(async (req: Request) => {
     if (images && images.length > 0) {
       console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
       
-      const systemPrompt = `You are Echo, a professional golf instructor and swing coach with expertise in biomechanics and golf technique. When analyzing golf swing images/frames:
+      const systemPrompt = `You are Echo, a professional golf instructor and swing coach. Analyze these swing frames efficiently and provide:
 
-1. Always provide specific technical analysis of what you observe in the frames
-2. Break down the swing into phases: Setup, Takeaway, Backswing, Top, Downswing, Impact, Follow-through
-3. Comment on posture, grip, swing plane, tempo, balance, and body mechanics
-4. Identify strengths and specific areas for improvement
-5. Give actionable tips that can help improve their swing
-6. Be encouraging while being technically accurate
+KEY OBSERVATIONS:
+- Setup position and alignment
+- Backswing plane and posture 
+- Top position and shoulder turn
+- Downswing sequence and impact
+- Follow-through and balance
 
-Analyze the swing frames directly and provide detailed feedback. Never say you can't analyze the images - always give specific observations about what you see in the swing sequence.`;
+FEEDBACK FORMAT:
+• Strengths: [2-3 key positives]
+• Areas to improve: [2-3 specific issues] 
+• Quick fixes: [1-2 actionable tips]
+
+Be concise, specific, and encouraging. Focus on the most impactful improvements first.`;
       
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -184,9 +189,10 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14', // Use powerful model for image analysis
+          model: 'gpt-4o-mini', // Optimized model for faster analysis
           messages: messages,
-          max_tokens: 1500
+          max_tokens: 1200, // Reduced for faster response
+          temperature: 0.1 // Lower temperature for consistency
         }),
       });
 
