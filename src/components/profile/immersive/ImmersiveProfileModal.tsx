@@ -566,6 +566,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
+        {/* DEBUG: Red circle to confirm this is the right modal */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-red-500 rounded-full z-50 flex items-center justify-center">
+          <span className="text-white font-bold text-xs">DEBUG</span>
+        </div>
+
         {currentItem.media_type === 'video' ? (
           <EnhancedVideoPlayer
             key={`${currentItem.id}-${activeIndex}`}
