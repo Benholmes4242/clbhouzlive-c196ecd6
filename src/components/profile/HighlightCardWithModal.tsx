@@ -170,7 +170,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         {primaryMedia.media_type === 'video' && (
           <button
             onClick={handleMuteToggle}
-            className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 w-10 h-10 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
+            className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
             aria-label={mutedPref ? 'Unmute video' : 'Mute video'}
           >
             {mutedPref ? (
