@@ -778,7 +778,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             <div
               ref={carouselRef}
               className="
-                 flex overflow-x-auto scrollbar-hide gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                 flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -1183,7 +1183,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             <div
               ref={topRatedRefCallback}
               className="
-                 flex overflow-x-auto scrollbar-hide gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                 flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
