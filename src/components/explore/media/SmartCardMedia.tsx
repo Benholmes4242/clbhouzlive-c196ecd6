@@ -17,17 +17,17 @@ const SmartCardMedia: React.FC<CardMediaProps> = memo((props) => {
 
   switch (cardType) {
     case CardType.SQUARE:
-      return <SquareCardMedia {...props} />;
+      return <SquareCardMedia {...props} shouldAutoplay={false} />;
     
     case CardType.PORTRAIT:
-      return <PortraitCardMedia {...props} />;
+      return <PortraitCardMedia {...props} shouldAutoplay={props.shouldAutoplay ?? true} />;
     
     case CardType.HERO:
-      return <HeroCardMedia {...props} />;
+      return <HeroCardMedia {...props} shouldAutoplay={props.shouldAutoplay ?? true} />;
     
     default:
       // Default to square card behavior
-      return <SquareCardMedia {...props} />;
+      return <SquareCardMedia {...props} shouldAutoplay={false} />;
   }
 });
 
