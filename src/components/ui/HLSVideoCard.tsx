@@ -47,6 +47,19 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   const hlsInstanceRef = useRef<any>(null);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [isMockVideo, setIsMockVideo] = useState(false);
+
+  // Check if this is a mock video URL
+  useEffect(() => {
+    const isMock = hlsUrl && (hlsUrl.includes('mock-video') || hlsUrl.includes('fake-video'));
+    setIsMockVideo(isMock);
+    if (isMock) {
+      setHasError(true);
+    } else {
+      setHasError(false);
+    }
+  }, [hlsUrl]);
 
   // Sync internal muted state with prop changes
   useEffect(() => {
@@ -95,12 +108,26 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       if (canPlayHLSNatively()) {
         video.src = hlsUrl;
         setIsLoaded(true);
+        
+        // Handle native video errors
+        video.onerror = () => {
+          console.error('Video error - failed to load:', hlsUrl);
+          setHasError(true);
+        };
       } else {
         const Hls = await loadHlsJs();
         if (Hls.isSupported()) {
           const hls = new Hls({
             maxBufferLength: 10,
             backBufferLength: 5,
+          });
+          
+          // Handle HLS errors
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            console.error('HLS error:', data);
+            if (data.fatal) {
+              setHasError(true);
+            }
           });
           
           hls.loadSource(hlsUrl);
@@ -111,6 +138,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       }
     } catch (error) {
       console.error('Error loading HLS:', error);
+      setHasError(true);
     }
   };
 
@@ -234,6 +262,30 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         >
           {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </button>
+      )}
+
+      {/* Error overlay */}
+      {hasError && (
+        <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
+          <div className="text-center text-white p-4">
+            {isMockVideo ? (
+              <>
+                <div className="text-sm opacity-80 mb-2">🔧 Development Mode</div>
+                <div className="text-xs opacity-60">
+                  Video upload successful but using mock URLs.<br />
+                  Real videos will work in production.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-sm opacity-80 mb-2">⚠️ Video Error</div>
+                <div className="text-xs opacity-60">
+                  Unable to load video source
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
