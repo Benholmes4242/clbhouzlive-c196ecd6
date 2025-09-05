@@ -800,8 +800,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                             xp={120}
                             showXP={true}
                             hideRankingBadges={true}
-                            mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                            mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                            mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
+                            mobileFlagSize={windowWidth < 768 ? 'md' : 'md'}
                          />
                       </div>
                     </div>
@@ -1254,8 +1254,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                customHeight="h-full"
                                showCountryWithFlag={true}
                                hideRankingBadges={true}
-                               mobileTextScale="small"
-                               mobileFlagSize="md"
+                                mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
+                                mobileFlagSize={windowWidth < 768 ? 'md' : 'sm'}
                               />
                               
                               {/* Premium Rank Badge - Top Left */}
@@ -1554,7 +1554,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
                         />
                     </div>
                   </div>
@@ -1805,7 +1805,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
                         />
                      </div>
                 </div>
@@ -2058,7 +2058,7 @@ const USASection: React.FC<USASectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                          mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
                         />
                      </div>
                   </div>
@@ -2213,7 +2213,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                            currentUserId={userId}
                            profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
                            badgesOnTop={true}
-                           mobileTextScale="small"
+                            mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
                          />
                      </div>
                   </div>
