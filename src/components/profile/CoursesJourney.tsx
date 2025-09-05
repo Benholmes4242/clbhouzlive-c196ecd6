@@ -1504,25 +1504,29 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
                      <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
-                        <CourseCard 
-                          course={{
-                            ...userCourse.golf_courses,
-                            average_rating: userCourse.averageRating
-                          }}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.userRating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          showAverageRating={true}
-                          showRatingOnRight={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          currentUserId={userId}
-                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          badgesOnTop={true}
-                          mobileTextScale="small"
-                        />
+                         <CourseCard 
+                           course={{
+                             ...userCourse.golf_courses,
+                             average_rating: userCourse.averageRating
+                           }}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.userRating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           currentUserId={userId}
+                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                           badgesOnTop={true}
+                           mobileTextScale="small"
+                         />
+                         {/* Top 10 ranking number */}
+                         <div className="absolute top-3 left-3 z-20">
+                           <span className="text-3xl text-white font-bold drop-shadow-lg">
+                             {index + 1}
+                           </span>
+                         </div>
                     </div>
                   </div>
                 ))}
@@ -1755,25 +1759,29 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                   className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                 >
                    <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
-                        <CourseCard 
-                          course={{
-                            ...userCourse.golf_courses,
-                            average_rating: userCourse.averageRating
-                          }}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.userRating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          showAverageRating={true}
-                          showRatingOnRight={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          currentUserId={userId}
-                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          badgesOnTop={true}
-                          mobileTextScale="small"
-                        />
+                         <CourseCard 
+                           course={{
+                             ...userCourse.golf_courses,
+                             average_rating: userCourse.averageRating
+                           }}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.userRating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           currentUserId={userId}
+                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                           badgesOnTop={true}
+                           mobileTextScale="small"
+                         />
+                         {/* Top 10 ranking number */}
+                         <div className="absolute top-3 left-3 z-20">
+                           <span className="text-3xl text-white font-bold drop-shadow-lg">
+                             {index + 1}
+                           </span>
+                         </div>
                      </div>
                 </div>
                 ))}
@@ -2008,25 +2016,29 @@ const USASection: React.FC<USASectionProps> = ({
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
                      <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
-                        <CourseCard 
-                          course={{
-                            ...userCourse.golf_courses,
-                            average_rating: userCourse.averageRating
-                          }}
-                          viewingUserId={userId}
-                          viewContext="global"
-                          userRating={userCourse.userRating}
-                          isReadOnly={!isOwnProfile}
-                          showUserRating={true}
-                          showAverageRating={true}
-                          showRatingOnRight={true}
-                          isFromUserCoursesPage={true}
-                          customHeight="h-full"
-                          currentUserId={userId}
-                          profileOwnerFirstName={isOwnProfile ? "You" : "User"}
-                          badgesOnTop={true}
-                          mobileTextScale="small"
-                        />
+                         <CourseCard 
+                           course={{
+                             ...userCourse.golf_courses,
+                             average_rating: userCourse.averageRating
+                           }}
+                           viewingUserId={userId}
+                           viewContext="global"
+                           userRating={userCourse.userRating}
+                           isReadOnly={!isOwnProfile}
+                           showUserRating={false}
+                           isFromUserCoursesPage={true}
+                           customHeight="h-full"
+                           currentUserId={userId}
+                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
+                           badgesOnTop={true}
+                           mobileTextScale="small"
+                         />
+                         {/* Top 10 ranking number */}
+                         <div className="absolute top-3 left-3 z-20">
+                           <span className="text-3xl text-white font-bold drop-shadow-lg">
+                             {index + 1}
+                           </span>
+                         </div>
                      </div>
                   </div>
                 ))}
@@ -2163,25 +2175,29 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
                      <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
-                         <CourseCard 
-                           course={{
-                             ...userCourse.golf_courses,
-                             average_rating: userCourse.averageRating
-                           }}
-                           viewingUserId={userId}
-                           viewContext="global"
-                           userRating={userCourse.userRating}
-                           isReadOnly={!isOwnProfile}
-                           showUserRating={true}
-                           showAverageRating={true}
-                           showRatingOnRight={true}
-                           isFromUserCoursesPage={true}
-                           customHeight="h-full"
-                           currentUserId={userId}
-                           profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
-                           badgesOnTop={true}
-                           mobileTextScale="small"
-                         />
+                          <CourseCard 
+                            course={{
+                              ...userCourse.golf_courses,
+                              average_rating: userCourse.averageRating
+                            }}
+                            viewingUserId={userId}
+                            viewContext="global"
+                            userRating={userCourse.userRating}
+                            isReadOnly={!isOwnProfile}
+                            showUserRating={false}
+                            isFromUserCoursesPage={true}
+                            customHeight="h-full"
+                            currentUserId={userId}
+                            profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
+                            badgesOnTop={true}
+                            mobileTextScale="small"
+                          />
+                          {/* Top 10 ranking number */}
+                          <div className="absolute top-3 left-3 z-20">
+                            <span className="text-3xl text-white font-bold drop-shadow-lg">
+                              {index + 1}
+                            </span>
+                          </div>
                      </div>
                   </div>
                 ))}
