@@ -490,6 +490,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         <div className="mt-2"> {/* 8px spacing */}
           <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
         </div>
+      </div>
     </div>
   );
 };
