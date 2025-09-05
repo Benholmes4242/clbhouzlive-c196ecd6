@@ -318,7 +318,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                             media_url: item.item.src
                           }}
                           itemTitle={item.item.title}
-                          shouldAutoplay={false}
+                          shouldAutoplay={true}
                           isLoading={itemLoadingStates[item.item.id] ?? true}
                           onImageError={() => {
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
@@ -452,7 +452,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                              media_url: item.item.src
                            }}
                            itemTitle={item.item.title}
-                           shouldAutoplay={false}
+                            shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
                            onImageError={() => {
                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
@@ -489,7 +489,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                              media_url: item.item.src
                            }}
                            itemTitle={item.item.title}
-                           shouldAutoplay={false}
+                            shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
                            onImageError={() => {
                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
@@ -523,7 +523,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                              media_url: item.item.src
                            }}
                            itemTitle={item.item.title}
-                           shouldAutoplay={false}
+                            shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
                            onImageError={() => {
                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
@@ -641,7 +641,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                             media_url: item.item.src
                           }}
                           itemTitle={item.item.title}
-                          shouldAutoplay={false}
+                          shouldAutoplay={true}
                           isLoading={itemLoadingStates[item.item.id] ?? true}
                           onImageError={() => {
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
@@ -716,7 +716,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                             media_url: item.item.src
                           }}
                           itemTitle={item.item.title}
-                          shouldAutoplay={false}
+                          shouldAutoplay={true}
                           isLoading={itemLoadingStates[item.item.id] ?? true}
                           onImageError={() => {
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));

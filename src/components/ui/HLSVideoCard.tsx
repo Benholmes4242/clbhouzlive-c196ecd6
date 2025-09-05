@@ -211,10 +211,14 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     if (video.paused) {
       if (!isLoaded) {
         attachHLS().then(() => {
-          video.play().catch(() => {});
+          video.play().catch(() => {
+            // Autoplay failed, but don't show error overlay if video loads successfully
+          });
         });
       } else {
-        video.play().catch(() => {});
+        video.play().catch(() => {
+          // Autoplay failed, but don't show error overlay if video loads successfully  
+        });
       }
     } else {
       video.pause();
@@ -252,8 +256,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         </button>
       )}
 
-      {/* Error overlay */}
-      {hasError && (
+      {/* Error overlay - only show if video completely failed to load */}
+      {hasError && !isLoaded && (
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
           <div className="text-center text-white p-4">
             <div className="text-sm opacity-80 mb-2">⚠️ Video Error</div>
