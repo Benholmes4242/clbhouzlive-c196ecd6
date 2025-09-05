@@ -10,7 +10,7 @@ type HighlightsVideoContext = {
   activeId: string | null;
   register: (id: string, el: PlayerEl | null) => void;
   play: (id: string) => Promise<void>;
-  pause: (id: string) => void;
+  pause: (id: string, resetToMuted?: boolean) => void;
   setCardMuted: (id: string, muted: boolean) => void;
   getCardMuted: (id: string) => boolean;
 };
@@ -59,13 +59,13 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     return cardMutedStates.current.get(id) ?? true; // Default to muted
   }, []);
 
-  const pause = useCallback((id: string) => {
+  const pause = useCallback((id: string, resetToMuted = false) => {
     const el = playersRef.current.get(id);
     if (el?.pause) {
       el.pause();
     }
-    if (el) {
-      // Reset card to muted when paused
+    if (el && resetToMuted) {
+      // Only reset to muted when switching videos, not on manual pause
       cardMutedStates.current.set(id, true);
       setMuted(el, true);
     }
@@ -76,10 +76,13 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
 
   const play = useCallback(async (id: string) => {
     console.log('🎥 Play called for:', id, 'currentActive:', activeId);
-    // RULE: only one video at a time - pause the previous one
+    // RULE: only one video at a time - pause the previous one and reset to muted
     if (activeId && activeId !== id) {
-      pause(activeId);
+      pause(activeId, true); // Reset previous video to muted when switching
     }
+    
+    // Auto-unmute the new video when starting to play
+    cardMutedStates.current.set(id, false);
     
     // Set active first to trigger HLSPlayer render
     setActiveId(id);
@@ -106,9 +109,8 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     const el = await waitForElement();
     if (!el) return;
     
-    // Use card-specific mute state
-    const cardMuted = getCardMuted(id);
-    setMuted(el, cardMuted);
+    // Auto-unmute the newly playing video
+    setMuted(el, false);
     
     try {
       await el.play?.();
@@ -116,7 +118,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     } catch (error) {
       console.warn('Failed to play video:', error);
     }
-  }, [activeId, pause, getCardMuted]);
+  }, [activeId, pause]);
 
   return (
     <HighlightsVideoContext.Provider 

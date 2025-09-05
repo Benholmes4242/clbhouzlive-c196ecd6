@@ -58,19 +58,17 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     e.stopPropagation();
     if (primaryMedia?.media_type === 'video') {
       if (isActive) {
-        pause(highlight.id);
+        pause(highlight.id, false); // Manual pause - don't reset mute state
       } else {
         play(highlight.id);
       }
     }
   }, [primaryMedia, isActive, play, pause, highlight.id]);
 
-  // Update local state when card becomes inactive (resets to muted)
+  // Update local state when video becomes active/inactive
   useEffect(() => {
-    if (!isActive) {
-      const currentMuted = getCardMuted(highlight.id);
-      setIsCardMuted(currentMuted);
-    }
+    const currentMuted = getCardMuted(highlight.id);
+    setIsCardMuted(currentMuted);
   }, [isActive, highlight.id, getCardMuted]);
 
   // Handle mute/unmute toggle for this specific card
