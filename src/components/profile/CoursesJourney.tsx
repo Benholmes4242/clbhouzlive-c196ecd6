@@ -1209,20 +1209,24 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                    // Define premium styling for top 3
                    const getTopAccentGradient = (position: number) => {
                      switch (position) {
-                       case 0: return 'bg-gradient-to-r from-transparent via-yellow-400 to-transparent'; // Gold
-                       case 1: return 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'; // Silver
-                       case 2: return 'bg-gradient-to-r from-transparent via-amber-600 to-transparent'; // Bronze
+                       case 0: return 'bg-gradient-to-r from-transparent via-yellow-500 to-transparent'; // Gold
+                       case 1: return 'bg-gradient-to-r from-transparent via-gray-400 to-transparent'; // Silver
+                       case 2: return 'bg-gradient-to-r from-transparent via-orange-600 to-transparent'; // Bronze
                        default: return '';
                      }
                    };
 
                    const getRankBadgeGradient = (position: number) => {
                      switch (position) {
-                       case 0: return 'bg-gradient-to-br from-yellow-400 to-yellow-600'; // Gold gradient
-                       case 1: return 'bg-gradient-to-br from-gray-300 to-gray-500'; // Silver gradient
-                       case 2: return 'bg-gradient-to-br from-amber-600 to-amber-800'; // Bronze gradient
+                       case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600'; // Gold metallic
+                       case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500'; // Silver metallic
+                       case 2: return 'bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700'; // Bronze metallic
                        default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
                      }
+                   };
+
+                   const getCardShadow = (position: number) => {
+                     return position < 3 ? 'shadow-xl shadow-black/20' : 'shadow-lg';
                    };
 
                    const isTopThree = index < 3;
@@ -1232,35 +1236,23 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        key={userCourse.id}
                        className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
                      >
-                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg`}>
+                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
                               {/* Top Edge Gradient Accent for Top 3 */}
                               {isTopThree && (
                                 <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
                               )}
                               
                               <CourseCard 
-                               course={{
-                                 ...userCourse.golf_courses,
-                                 global_rank: null, // Hide worldwide ranking badge
-                                 regional_rank: null, // Hide regional ranking badge  
-                                 usa_rank: null // Hide USA ranking badge
-                               }}
+                               course={userCourse.golf_courses}
                                viewingUserId={userId}
                                viewContext="global"
                                userRating={userCourse.rating}
                                isReadOnly={!isOwnProfile}
-                               showUserRating={false}
+                               showUserRating={true}
                                showAverageRating={false}
                                isFromUserCoursesPage={true}
                                customHeight="h-full"
-                               hideRankingBadges={true}
-                               showAIQuote={false}
-                               showRatingOnRight={true}
-                               currentUserId={currentUser?.id}
-                               profileOwnerFirstName={profileOwner?.display_name}
-                               badgesOnTop={true}
-                               mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                               mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                               showCountryWithFlag={true}
                              />
                               
                               {/* Premium Rank Badge - Top Left */}
@@ -1268,12 +1260,12 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                 <div className={`
                                   w-8 h-8 rounded-full flex items-center justify-center
                                   ${getRankBadgeGradient(index)}
-                                  shadow-lg
-                                  ${isTopThree ? 'ring-2 ring-white/20' : ''}
+                                  ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
+                                  ${isTopThree ? 'ring-1 ring-white/20' : ''}
                                 `}>
                                   <span className={`
-                                    text-white font-bold text-sm leading-none
-                                    ${isTopThree ? 'drop-shadow-md' : ''}
+                                    text-white font-medium text-sm leading-none
+                                    ${isTopThree ? 'drop-shadow-sm' : ''}
                                   `}>
                                     {index + 1}
                                   </span>
