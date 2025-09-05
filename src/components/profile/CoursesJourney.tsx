@@ -800,8 +800,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                             xp={120}
                             showXP={true}
                             hideRankingBadges={true}
-                            mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                            mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                             mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
+                             mobileFlagSize={windowWidth < 768 ? 'md' : 'md'}
                          />
                       </div>
                     </div>
@@ -1236,27 +1236,30 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        key={userCourse.id}
                        className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
                      >
-                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
-                              {/* Top Edge Gradient Accent for Top 3 */}
-                              {isTopThree && (
-                                <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
-                              )}
+                         <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+                               {/* Top Edge Gradient Accent for Top 3 */}
+                               {isTopThree && (
+                                 <>
+                                   <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
+                                   <div className={`absolute top-0 right-0 bottom-0 w-1 z-10 ${getTopAccentGradient(index)}`} />
+                                 </>
+                               )}
                               
-                              <CourseCard 
-                               course={userCourse.golf_courses}
-                               viewingUserId={userId}
-                               viewContext="global"
-                               userRating={userCourse.rating}
-                               isReadOnly={!isOwnProfile}
-                               showUserRating={false}
-                               showAverageRating={false}
-                               isFromUserCoursesPage={true}
-                               customHeight="h-full"
-                               showCountryWithFlag={true}
-                               hideRankingBadges={true}
-                               mobileTextScale="small"
-                               mobileFlagSize="md"
-                              />
+                             <CourseCard 
+                              course={userCourse.golf_courses}
+                              viewingUserId={userId}
+                              viewContext="global"
+                              userRating={userCourse.rating}
+                              isReadOnly={!isOwnProfile}
+                              showUserRating={false}
+                              showAverageRating={false}
+                              isFromUserCoursesPage={true}
+                              customHeight="h-full"
+                              showCountryWithFlag={true}
+                              hideRankingBadges={true}
+                              mobileTextScale="small"
+                              mobileFlagSize="md"
+                            />
                               
                               {/* Premium Rank Badge - Top Left */}
                               <div className="absolute top-3 left-3 z-20">
@@ -1554,7 +1557,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                           mobileTextScale="small"
                         />
                     </div>
                   </div>
@@ -1805,7 +1808,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                           mobileTextScale="small"
                         />
                      </div>
                 </div>
@@ -2058,7 +2061,7 @@ const USASection: React.FC<USASectionProps> = ({
                           currentUserId={userId}
                           profileOwnerFirstName={isOwnProfile ? "You" : "User"}
                           badgesOnTop={true}
-                          mobileTextScale="small"
+                           mobileTextScale="small"
                         />
                      </div>
                   </div>
@@ -2213,7 +2216,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                            currentUserId={userId}
                            profileOwnerFirstName={userDisplayName?.split(' ')[0] || 'User'}
                            badgesOnTop={true}
-                           mobileTextScale="small"
+                            mobileTextScale="small"
                          />
                      </div>
                   </div>
