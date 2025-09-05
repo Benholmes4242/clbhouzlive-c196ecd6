@@ -1253,7 +1253,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                isFromUserCoursesPage={true}
                                customHeight="h-full"
                                showCountryWithFlag={true}
-                             />
+                               hideRankingBadges={true}
+                              />
                               
                               {/* Premium Rank Badge - Top Left */}
                               <div className="absolute top-3 left-3 z-20">
