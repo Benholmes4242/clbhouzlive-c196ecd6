@@ -96,20 +96,17 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     }
   }, [isCarouselActive, stopPreview]);
 
-  const handleOpenModal = useCallback(() => {
-    // Always stop previews and carousel when opening modal
-    stopPreview();
-    pause(highlight.id);
-    onOpenModal(highlight.id);
-  }, [stopPreview, pause, onOpenModal, highlight.id]);
 
-  // Long press gesture handling
-  const gestureHandlers = useLongPressPreview({
-    onTap: handleOpenModal,
-    onPreviewStart: startPreview,
-    onPreviewStop: stopPreview,
-    longPressThreshold: 500
-  });
+  // Simple tap handler for play/pause - no long press or modal
+  const handleTap = useCallback(() => {
+    if (primaryMedia?.media_type === 'video') {
+      if (isCarouselActive) {
+        pause(highlight.id);
+      } else {
+        play(highlight.id);
+      }
+    }
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -163,8 +160,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       aria-label="Open highlight post"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...gestureHandlers}
-      onClick={handleVideoClick}
+      onClick={handleTap}
     >
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
         {primaryMedia.media_type === 'image' ? (
