@@ -103,18 +103,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }, [stopPreview, pause, highlight.id]);
 
   // Simple tap gesture for mobile - just play/pause
-  const handleTap = useCallback((e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  const handleTap = useCallback(() => {
     if (primaryMedia?.media_type === 'video') {
       if (isCarouselActive) {
         pause(highlight.id);
       } else {
-        // Pause all other videos before playing this one
-        pauseAllOtherVideos(highlight.id);
         play(highlight.id);
       }
     }
-  }, [primaryMedia, isCarouselActive, play, pause, highlight.id, pauseAllOtherVideos]);
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -122,12 +119,10 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       if (isCarouselActive) {
         pause(highlight.id);
       } else {
-        // Pause all other videos before playing this one
-        pauseAllOtherVideos(highlight.id);
         play(highlight.id);
       }
     }
-  }, [primaryMedia, isCarouselActive, play, pause, highlight.id, pauseAllOtherVideos]);
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -170,7 +165,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       aria-label="Open highlight post"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleVideoClick}
+      onClick={handleTap}
     >
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
         {primaryMedia.media_type === 'image' ? (
@@ -232,7 +227,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         )}
         
         {highlight.post_media.length > 1 && !isPreviewing && (
-          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-30">
+          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs z-20">
             +{highlight.post_media.length - 1} more
           </div>
         )}
@@ -248,23 +243,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
               }}
               className="text-xs"
             />
-          </div>
-        )}
-
-        {/* Mute/Unmute Control - Top Right */}
-        {primaryMedia.media_type === 'video' && !isPreviewing && (
-          <div className="absolute top-3 right-3 z-20">
-            <button
-              onClick={handleMuteToggle}
-              className="rounded-full bg-black/50 backdrop-blur-sm border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-black/70 transition-colors"
-              aria-label={mutedPref ? "Unmute video" : "Mute video"}
-            >
-              {mutedPref ? (
-                <VolumeX className="w-4 h-4 text-white" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-white" />
-              )}
-            </button>
           </div>
         )}
       </div>
