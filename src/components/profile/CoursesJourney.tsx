@@ -1207,23 +1207,23 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             >
                  {topRatedCourses.map((userCourse, index) => {
                    // Define premium styling for top 3
-                   const getTopAccentGradient = (position: number) => {
-                     switch (position) {
-                       case 0: return 'bg-gradient-to-r from-transparent via-yellow-500 to-transparent'; // Gold
-                       case 1: return 'bg-gradient-to-r from-transparent via-gray-400 to-transparent'; // Silver
-                       case 2: return 'bg-gradient-to-r from-transparent via-orange-600 to-transparent'; // Bronze
-                       default: return '';
-                     }
-                   };
+                    const getTopAccentGradient = (position: number) => {
+                      switch (position) {
+                        case 0: return 'bg-gradient-to-r from-transparent via-yellow-500 to-transparent'; // Gold
+                        case 1: return 'bg-gradient-to-r from-transparent via-gray-400 to-transparent'; // Silver
+                        case 2: return 'bg-gradient-to-r from-transparent via-amber-700 to-transparent'; // Bronze
+                        default: return '';
+                      }
+                    };
 
-                   const getRankBadgeGradient = (position: number) => {
-                     switch (position) {
-                       case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600'; // Gold metallic
-                       case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500'; // Silver metallic
-                       case 2: return 'bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700'; // Bronze metallic
-                       default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
-                     }
-                   };
+                    const getRankBadgeGradient = (position: number) => {
+                      switch (position) {
+                        case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600'; // Gold metallic
+                        case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500'; // Silver metallic
+                        case 2: return 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800'; // Bronze metallic
+                        default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
+                      }
+                    };
 
                    const getCardShadow = (position: number) => {
                      return position < 3 ? 'shadow-xl shadow-black/20' : 'shadow-lg';
@@ -1254,6 +1254,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                customHeight="h-full"
                                showCountryWithFlag={true}
                                hideRankingBadges={true}
+                               mobileTextScale="small"
+                               mobileFlagSize="md"
                               />
                               
                               {/* Premium Rank Badge - Top Left */}
