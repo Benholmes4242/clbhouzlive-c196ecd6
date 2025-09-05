@@ -1221,7 +1221,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        case 0: return 'bg-gradient-to-br from-yellow-400 to-yellow-600'; // Gold gradient
                        case 1: return 'bg-gradient-to-br from-gray-300 to-gray-500'; // Silver gradient
                        case 2: return 'bg-gradient-to-br from-amber-600 to-amber-800'; // Bronze gradient
-                       default: return 'bg-gradient-to-br from-gray-600 to-gray-800'; // Default for 4-10
+                       default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
                      }
                    };
 
