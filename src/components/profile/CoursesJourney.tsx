@@ -611,7 +611,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const cardsPerView = getCardsPerView();
 
   // Use section loader for consistent loading states
-  const recentlyPlayedLoader = useSectionLoader(async () => {
+  const recentlyPlayedLoader = useSectionLoader(useCallback(async () => {
     if (!userId) return [];
 
     // Get courses from user_top100_courses table
@@ -700,7 +700,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     
     // Apply sorting here to ensure proper order
     return getSortedUserCourses(rawCourses, 'recent');
-  });
+  }, [userId]));
 
   // Filter and sort courses based on active filter and sort option
   const filteredCourses = useMemo(() => {
@@ -778,7 +778,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             <div
               ref={carouselRef}
               className="
-                 flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                 flex overflow-x-auto scrollbar-hide gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
@@ -1076,7 +1076,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
   }, []);
 
   // Use section loader for consistent loading states
-  const topRatedLoader = useSectionLoader(async () => {
+  const topRatedLoader = useSectionLoader(useCallback(async () => {
     if (!userId) return [];
 
     // Get courses from course_ratings table ordered by rating desc
@@ -1131,7 +1131,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         average_rating: statsMap.get(course.course_id) || null
       }
     }));
-  });
+  }, [userId]));
 
   // Use carousel navigation with proper item count and combined ref
   const {
@@ -1183,7 +1183,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
             <div
               ref={topRatedRefCallback}
               className="
-                 flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                 flex overflow-x-auto scrollbar-hide gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "

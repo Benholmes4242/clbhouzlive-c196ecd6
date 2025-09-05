@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 type SectionState<T> = {
   loading: boolean;
@@ -10,6 +10,9 @@ const MIN_SKELETON_MS = 500;
 export function useSectionLoader<T>(fetcher: () => Promise<T[]>) {
   const [state, setState] = useState<SectionState<T>>({ loading: true, data: [] });
 
+  // Memoize the fetcher to prevent infinite re-renders
+  const memoizedFetcher = useCallback(fetcher, []);
+
   useEffect(() => {
     let mounted = true;
     const start = performance.now();
@@ -17,7 +20,7 @@ export function useSectionLoader<T>(fetcher: () => Promise<T[]>) {
     (async () => {
       setState(s => ({ ...s, loading: true }));
       try {
-        const data = await fetcher();
+        const data = await memoizedFetcher();
         const elapsed = performance.now() - start;
         const delay = Math.max(0, MIN_SKELETON_MS - elapsed);
 
@@ -35,7 +38,7 @@ export function useSectionLoader<T>(fetcher: () => Promise<T[]>) {
     })();
 
     return () => { mounted = false; };
-  }, [fetcher]);
+  }, [memoizedFetcher]);
 
   const hasData = !state.loading && state.data.length > 0;
   const isEmpty = !state.loading && state.data.length === 0;
