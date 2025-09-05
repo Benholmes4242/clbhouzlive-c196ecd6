@@ -651,6 +651,60 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               >
                 <Share className="h-8 w-8 text-white" />
               </button>
+
+              {/* Three dots menu - only show for own posts */}
+              {user && item.user?.id === user.id && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer hover:opacity-100 transition-opacity p-0 h-auto w-auto bg-transparent border-0"
+                      onClick={() => {
+                         console.log('🚨 THREE DOTS CLICKED IN VERTICAL FEED!', {
+                           itemId: item.id,
+                           userId: item.user?.id,
+                           currentUserId: user?.id,
+                           isOwnPost: item.user?.id === user?.id
+                         });
+                      }}
+                    >
+                      <MoreHorizontal className="h-8 w-8 text-white" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-44 rounded-xl shadow-xl border border-white/10 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm z-[1000000] overflow-hidden"
+                    sideOffset={8}
+                  >
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        console.log('🚨 EDIT CLICKED IN VERTICAL FEED!');
+                        // TODO: Implement edit functionality
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer focus:bg-black/5 dark:focus:bg-white/10"
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        console.log('🚨 DELETE CLICKED IN VERTICAL FEED!');
+                        // TODO: Implement delete functionality
+                        const confirmed = window.confirm('Are you sure you want to delete this post?');
+                        if (confirmed) {
+                          console.log('Delete confirmed for post:', item.id);
+                          // Add delete API call here
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer focus:bg-red-50 dark:focus:bg-red-900/20"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete post
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         );
