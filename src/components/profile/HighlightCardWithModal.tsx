@@ -232,9 +232,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           </div>
         )}
         
-        {/* Golf Course Badge - Top Right */}
+        {/* Golf Course Badge - Top Left */}
         {highlight.golf_course && !isPreviewing && (
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-3 left-3 z-20">
             <CoursePostBadge 
               course={{
                 id: highlight.golf_course.id,
