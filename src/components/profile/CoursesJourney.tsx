@@ -1206,13 +1206,38 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
               "
             >
                  {topRatedCourses.map((userCourse, index) => {
+                   // Define premium styling for top 3
+                   const getTopAccentGradient = (position: number) => {
+                     switch (position) {
+                       case 0: return 'bg-gradient-to-r from-transparent via-yellow-400 to-transparent'; // Gold
+                       case 1: return 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'; // Silver
+                       case 2: return 'bg-gradient-to-r from-transparent via-amber-600 to-transparent'; // Bronze
+                       default: return '';
+                     }
+                   };
+
+                   const getRankBadgeGradient = (position: number) => {
+                     switch (position) {
+                       case 0: return 'bg-gradient-to-br from-yellow-400 to-yellow-600'; // Gold gradient
+                       case 1: return 'bg-gradient-to-br from-gray-300 to-gray-500'; // Silver gradient
+                       case 2: return 'bg-gradient-to-br from-amber-600 to-amber-800'; // Bronze gradient
+                       default: return 'bg-gradient-to-br from-gray-600 to-gray-800'; // Default for 4-10
+                     }
+                   };
+
+                   const isTopThree = index < 3;
 
                    return (
                      <div 
                        key={userCourse.id}
                        className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
                      >
-                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative`}>
+                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg`}>
+                              {/* Top Edge Gradient Accent for Top 3 */}
+                              {isTopThree && (
+                                <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
+                              )}
+                              
                               <CourseCard 
                                course={{
                                  ...userCourse.golf_courses,
@@ -1237,9 +1262,22 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
                                mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                              />
-                              {/* Ranking Number - Top Left */}
-                              <div className={`absolute top-3 left-3 z-20 text-white leading-tight drop-shadow-lg ${windowWidth < 768 ? 'text-xl md:text-3xl' : 'text-3xl'}`}>
-                                {index + 1}
+                              
+                              {/* Premium Rank Badge - Top Left */}
+                              <div className="absolute top-3 left-3 z-20">
+                                <div className={`
+                                  w-8 h-8 rounded-full flex items-center justify-center
+                                  ${getRankBadgeGradient(index)}
+                                  shadow-lg
+                                  ${isTopThree ? 'ring-2 ring-white/20' : ''}
+                                `}>
+                                  <span className={`
+                                    text-white font-bold text-sm leading-none
+                                    ${isTopThree ? 'drop-shadow-md' : ''}
+                                  `}>
+                                    {index + 1}
+                                  </span>
+                                </div>
                               </div>
                         </div>
                      </div>
