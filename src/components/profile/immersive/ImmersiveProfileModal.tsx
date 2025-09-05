@@ -248,27 +248,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     }, transitionDuration);
   }, [activeIndex, totalItems, isTransitioning, onCurrentIndexChange, onClose]);
 
-  const handleClose = useCallback(() => {
-    // Enhanced mobile fade-out transition
-    setIsMobileTransitioning(true);
-    const modal = document.getElementById('immersive-modal');
-    if (modal) {
-      const isMobile = window.innerWidth < 768;
-      modal.style.transition = isMobile 
-        ? 'opacity 0.4s ease-out, transform 0.4s ease-out' 
-        : 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-      modal.style.opacity = '0';
-      if (isMobile) {
-        modal.style.transform = 'translateY(20px)';
-      }
-      setTimeout(() => {
-        onClose();
-      }, isMobile ? 400 : 800);
-    } else {
-      onClose();
-    }
-  }, [onClose]);
-
   // Upload functionality
   const handleFileUpload = useCallback(async (file: File) => {
     if (!session?.user?.id) return;
@@ -434,7 +413,28 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     setIsVideoPaused(false);
   }, [activeIndex]);
 
-  // Swipe handlers
+  const handleClose = useCallback(() => {
+    // Enhanced mobile fade-out transition
+    setIsMobileTransitioning(true);
+    const modal = document.getElementById('immersive-modal');
+    if (modal) {
+      const isMobile = window.innerWidth < 768;
+      modal.style.transition = isMobile 
+        ? 'opacity 0.4s ease-out, transform 0.4s ease-out' 
+        : 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      modal.style.opacity = '0';
+      if (isMobile) {
+        modal.style.transform = 'translateY(20px)';
+      }
+      setTimeout(() => {
+        onClose();
+      }, isMobile ? 400 : 800);
+    } else {
+      onClose();
+    }
+  }, [onClose]);
+
+  // Swipe handlers - moved after handleClose definition
   const swipeHandlers = useSwipeable({
     onSwipedDown: handleClose,
     trackMouse: false,
