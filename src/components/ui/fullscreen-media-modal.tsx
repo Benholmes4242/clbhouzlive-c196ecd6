@@ -426,6 +426,11 @@ const FullscreenMediaModal = ({
       >
         {/* Current Media Item - exact same pattern as VerticalMediaFeed */}
         <div className="relative w-full h-full flex items-center justify-center">
+          {/* DEBUG: LARGE Red circle to confirm this is SocialActivity FullscreenMediaModal */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-red-500 rounded-full z-50 flex items-center justify-center">
+            <span className="text-white font-bold text-sm">SOCIAL ACTIVITY</span>
+          </div>
+
           {mediaTypes[currentIndex] === 'image' ? (
             <div className="relative w-full h-full bg-media-loading">
               <img

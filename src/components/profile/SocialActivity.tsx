@@ -171,62 +171,65 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
       {/* FullscreenMediaModal for posts */}
       {selectedPost && (
-        <FullscreenMediaModal
-          isOpen={!!selectedPost}
-          onClose={() => setSelectedPost(null)}
-          mediaUrl={selectedPost.post_media?.[0]?.media_url || ''}
-          mediaType={selectedPost.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
-          alt={`Post media`}
-          golfCourse={(() => {
-            console.log('🔍 SocialActivity - Rendering FullscreenMediaModal:', {
-              selectedPostId: selectedPost.id,
-              mediaUrl: selectedPost.post_media?.[0]?.media_url,
-              mediaType: selectedPost.post_media?.[0]?.media_type,
-              userFromPost: selectedPost.user,
-              postId: selectedPost.id,
-              hasCallbacks: {
-                onPostDeleted: !!handlePostDeleted,
-                onPostEdit: true
+        <>
+          {console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', selectedPost.id)}
+          <FullscreenMediaModal
+            isOpen={!!selectedPost}
+            onClose={() => setSelectedPost(null)}
+            mediaUrl={selectedPost.post_media?.[0]?.media_url || ''}
+            mediaType={selectedPost.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
+            alt={`Post media`}
+            golfCourse={(() => {
+              console.log('🔍 SocialActivity - Rendering FullscreenMediaModal:', {
+                selectedPostId: selectedPost.id,
+                mediaUrl: selectedPost.post_media?.[0]?.media_url,
+                mediaType: selectedPost.post_media?.[0]?.media_type,
+                userFromPost: selectedPost.user,
+                postId: selectedPost.id,
+                hasCallbacks: {
+                  onPostDeleted: !!handlePostDeleted,
+                  onPostEdit: true
+                }
+              });
+              
+              // Extract golf course data from post tags or content
+              const golfCourseTag = selectedPost.post_tags?.find(tag => 
+                tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
+              );
+              
+              if (golfCourseTag) {
+                // Handle both tag formats
+                if (golfCourseTag.entity_type === 'golf_club') {
+                  return {
+                    id: golfCourseTag.entity_id,
+                    name: golfCourseTag.name,
+                    country: ''
+                  };
+                } else if (golfCourseTag.tagged_entity) {
+                  return {
+                    id: golfCourseTag.tagged_entity.entity_id,
+                    name: golfCourseTag.tagged_entity.name,
+                    country: ''
+                  };
+                }
               }
-            });
-            
-            // Extract golf course data from post tags or content
-            const golfCourseTag = selectedPost.post_tags?.find(tag => 
-              tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
-            );
-            
-            if (golfCourseTag) {
-              // Handle both tag formats
-              if (golfCourseTag.entity_type === 'golf_club') {
-                return {
-                  id: golfCourseTag.entity_id,
-                  name: golfCourseTag.name,
-                  country: ''
-                };
-              } else if (golfCourseTag.tagged_entity) {
-                return {
-                  id: golfCourseTag.tagged_entity.entity_id,
-                  name: golfCourseTag.tagged_entity.name,
-                  country: ''
-                };
-              }
-            }
-            
-            // Fallback to content extraction
-            const courseFromContent = extractGolfCourseFromContent(selectedPost.content);
-            return courseFromContent;
-          })()}
-          user={selectedPost.user}
-          displayName={selectedPost.user?.display_name || 'User'}
-          content={selectedPost.content}
-          postTags={selectedPost.post_tags}
-          postId={selectedPost.id}
-          onPostDeleted={handlePostDeleted}
-          onPostEdit={(postId) => {
-            console.log('Edit post:', postId);
-            setSelectedPost(null);
-          }}
-        />
+              
+              // Fallback to content extraction
+              const courseFromContent = extractGolfCourseFromContent(selectedPost.content);
+              return courseFromContent;
+            })()}
+            user={selectedPost.user}
+            displayName={selectedPost.user?.display_name || 'User'}
+            content={selectedPost.content}
+            postTags={selectedPost.post_tags}
+            postId={selectedPost.id}
+            onPostDeleted={handlePostDeleted}
+            onPostEdit={(postId) => {
+              console.log('Edit post:', postId);
+              setSelectedPost(null);
+            }}
+          />
+        </>
       )}
     </div>
   );
