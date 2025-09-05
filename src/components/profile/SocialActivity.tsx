@@ -20,6 +20,15 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   const handlePostClick = (post: ActivityPost) => {
+    console.log('🔍 SocialActivity - Post clicked:', {
+      postId: post.id,
+      hasMedia: !!post.post_media?.length,
+      mediaUrl: post.post_media?.[0]?.media_url,
+      mediaType: post.post_media?.[0]?.media_type,
+      userId: post.user?.id,
+      currentUserId: userId
+    });
+
     // Helper function to extract golf course from post tags or content
     const extractGolfCourse = (postTags: any[], content: string | null) => {
       // First try to extract from post tags
@@ -78,8 +87,18 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     }));
     
     // This function is now simplified - posts handle their own modals
+    console.log('🔍 SocialActivity - Setting selectedPost:', post);
     setSelectedPost(post);
   };
+
+  // Add logging for selectedPost changes
+  React.useEffect(() => {
+    console.log('🔍 SocialActivity - selectedPost changed:', {
+      hasSelectedPost: !!selectedPost,
+      selectedPostId: selectedPost?.id,
+      shouldRenderModal: !!selectedPost
+    });
+  }, [selectedPost]);
 
   const handlePostUpdated = () => {
     fetchUserPosts();
@@ -159,6 +178,18 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           mediaType={selectedPost.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
           alt={`Post media`}
           golfCourse={(() => {
+            console.log('🔍 SocialActivity - Rendering FullscreenMediaModal:', {
+              selectedPostId: selectedPost.id,
+              mediaUrl: selectedPost.post_media?.[0]?.media_url,
+              mediaType: selectedPost.post_media?.[0]?.media_type,
+              userFromPost: selectedPost.user,
+              postId: selectedPost.id,
+              hasCallbacks: {
+                onPostDeleted: !!handlePostDeleted,
+                onPostEdit: true
+              }
+            });
+            
             // Extract golf course data from post tags or content
             const golfCourseTag = selectedPost.post_tags?.find(tag => 
               tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
