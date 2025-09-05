@@ -18,6 +18,8 @@ import RegionalCoursesModal from './RegionalCoursesModal';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { useSyncRatedHeightVar } from '@/hooks/useSyncRatedHeightVar';
 import { usePlayedCoursesWithRatings } from '@/hooks/usePlayedCoursesWithRatings';
+import { useSectionLoader } from '@/hooks/useSectionLoader';
+import SkeletonRow from '@/components/ui/SkeletonRow';
 import HighlightsCarousel from './HighlightsCarousel';
 import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
 import { CarouselItem } from '@/components/ui/CarouselItem';
@@ -589,7 +591,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent'); // Default to recent for "Recently Played"
-  const { viewType, setViewType, isHydrated } = useViewPreference();
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   
   // Track window width for responsive breakpoints
@@ -609,105 +610,101 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   
   const cardsPerView = getCardsPerView();
 
-  // Query to get all played courses (from both tables) for filtering
-  const { data: allPlayedCourses = [] } = useQuery({
-    queryKey: ['recentlyPlayedCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
+  // Use section loader for consistent loading states
+  const recentlyPlayedLoader = useSectionLoader(async () => {
+    if (!userId) return [];
 
-      // Get courses from user_top100_courses table
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
+    // Get courses from user_top100_courses table
+    const { data: top100Data, error: top100Error } = await supabase
+      .from('user_top100_courses')
+      .select(`
+        course_id,
+        played_date,
+        golf_courses (
+          id,
+          name,
+          country,
+          region,
+          sub_country,
+          continent,
+          global_rank,
+          regional_rank,
+          usa_rank,
+          description,
+          thumbnail_image
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('played', true);
 
-      if (top100Error) throw top100Error;
+    if (top100Error) throw top100Error;
 
-      // Get courses from course_ratings table
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId);
+    // Get courses from course_ratings table
+    const { data: ratedData, error: ratedError } = await supabase
+      .from('course_ratings')
+      .select(`
+        course_id,
+        rating,
+        created_at,
+        golf_courses (
+          id,
+          name,
+          country,
+          region,
+          sub_country,
+          continent,
+          global_rank,
+          regional_rank,
+          usa_rank,
+          description,
+          thumbnail_image
+        )
+      `)
+      .eq('user_id', userId);
 
-      if (ratedError) throw ratedError;
+    if (ratedError) throw ratedError;
 
-      // Combine and deduplicate, ensuring consistent structure
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null, // Add rating field for consistency
-          id: `top100-${course.course_id}` // Unique ID for deduplication
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at, // Use rating date as played date
-          id: `rating-${course.course_id}` // Unique ID for deduplication
-        }))
-      ];
+    // Combine and deduplicate, ensuring consistent structure
+    const combinedCourses = [
+      ...(top100Data || []).map(course => ({
+        ...course,
+        rating: null, // Add rating field for consistency
+        id: `top100-${course.course_id}` // Unique ID for deduplication
+      })),
+      ...(ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at, // Use rating date as played date
+        id: `rating-${course.course_id}` // Unique ID for deduplication
+      }))
+    ];
 
-      // Remove duplicates based on course_id, preferring rated courses over top100 courses
-      const uniqueCoursesMap = new Map();
+    // Remove duplicates based on course_id, preferring rated courses over top100 courses
+    const uniqueCoursesMap = new Map();
+    
+    combinedCourses.forEach(course => {
+      const courseId = course.course_id;
+      const existing = uniqueCoursesMap.get(courseId);
       
-      combinedCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
+      if (!existing) {
+        uniqueCoursesMap.set(courseId, course);
+      } else {
+        // Prefer courses with ratings over those without
+        if (course.rating !== null && course.rating !== undefined && 
+            (existing.rating === null || existing.rating === undefined)) {
           uniqueCoursesMap.set(courseId, course);
-        } else {
-          // Prefer courses with ratings over those without
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
         }
-      });
+      }
+    });
 
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      
-      // Apply sorting here to ensure proper order
-      return getSortedUserCourses(rawCourses, 'recent');
-    },
-    enabled: !!userId,
+    const rawCourses = Array.from(uniqueCoursesMap.values());
+    
+    // Apply sorting here to ensure proper order
+    return getSortedUserCourses(rawCourses, 'recent');
   });
 
   // Filter and sort courses based on active filter and sort option
   const filteredCourses = useMemo(() => {
-    let coursesToFilter = allPlayedCourses;
+    let coursesToFilter = recentlyPlayedLoader.data;
     
     // First apply regional filtering if active
     if (activeFilter) {
@@ -734,10 +731,15 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
     const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
     
     return sortedCourses;
-  }, [allPlayedCourses, activeFilter, sortBy]);
+  }, [recentlyPlayedLoader.data, activeFilter, sortBy]);
 
   // Use carousel navigation for touch/swipe and mouse drag scrolling
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(filteredCourses.length);
+
+  // Only render section if loading or has data (hide entirely when empty)
+  if (recentlyPlayedLoader.isEmpty) {
+    return null;
+  }
 
   return (
     <div className="w-full px-4 pt-4 pb-4">
@@ -771,16 +773,8 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
         </div>
         
         <div className="relative">
-          {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
-            </div>
-           ) : filteredCourses.length > 0 ? (
+          {recentlyPlayedLoader.loading && <SkeletonRow count={6} />}
+          {recentlyPlayedLoader.hasData && (
             <div
               ref={carouselRef}
               className="
@@ -819,14 +813,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                   );
                 })}
             </div>
-          ) : activeFilter ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                No courses found in the selected region.
-              </p>
-            </div>
-          ) : (
-            <EmptyTop100State isOwnProfile={isOwnProfile} displayName="" />
           )}
         </div>
       </div>
@@ -1089,69 +1075,63 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Query to get top rated courses by the user
-  const { data: topRatedCourses = [] } = useQuery({
-    queryKey: ['topRatedCourses', userId],
-    queryFn: async () => {
-      if (!userId) return [];
+  // Use section loader for consistent loading states
+  const topRatedLoader = useSectionLoader(async () => {
+    if (!userId) return [];
 
-      // Get courses from course_ratings table ordered by rating desc
-      const { data: ratedData, error: ratedError } = await supabase
-        .from('course_ratings')
-        .select(`
-          course_id,
-          rating,
-          created_at,
-          golf_courses!inner (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .order('rating', { ascending: false })
-        .limit(10);
+    // Get courses from course_ratings table ordered by rating desc
+    const { data: ratedData, error: ratedError } = await supabase
+      .from('course_ratings')
+      .select(`
+        course_id,
+        rating,
+        created_at,
+        golf_courses!inner (
+          id,
+          name,
+          country,
+          region,
+          sub_country,
+          continent,
+          global_rank,
+          regional_rank,
+          usa_rank,
+          description,
+          thumbnail_image
+        )
+      `)
+      .eq('user_id', userId)
+      .order('rating', { ascending: false })
+      .limit(10);
 
-      if (ratedError) throw ratedError;
+    if (ratedError) throw ratedError;
 
-      // Now get the course rating stats separately
-      const courseIds = (ratedData || []).map(course => course.course_id);
-      
-      const { data: statsData, error: statsError } = await supabase
-        .from('course_rating_stats')
-        .select('course_id, average_rating')
-        .in('course_id', courseIds);
+    // Now get the course rating stats separately
+    const courseIds = (ratedData || []).map(course => course.course_id);
+    
+    const { data: statsData, error: statsError } = await supabase
+      .from('course_rating_stats')
+      .select('course_id, average_rating')
+      .in('course_id', courseIds);
 
-      if (statsError) throw statsError;
+    if (statsError) throw statsError;
 
-      // Create a map for quick navigation
-      const statsMap = new Map();
-      (statsData || []).forEach(stat => {
-        statsMap.set(stat.course_id, stat.average_rating);
-      });
+    // Create a map for quick navigation
+    const statsMap = new Map();
+    (statsData || []).forEach(stat => {
+      statsMap.set(stat.course_id, stat.average_rating);
+    });
 
-      return (ratedData || []).map(course => ({
-        ...course,
-        played_date: course.created_at, // Use rating date as played date
-        id: `rating-${course.course_id}`, // Unique ID
-        golf_courses: {
-          ...course.golf_courses,
-          average_rating: statsMap.get(course.course_id) || null
-        }
-      }));
-    },
-    enabled: !!userId,
+    return (ratedData || []).map(course => ({
+      ...course,
+      played_date: course.created_at, // Use rating date as played date
+      id: `rating-${course.course_id}`, // Unique ID
+      golf_courses: {
+        ...course.golf_courses,
+        average_rating: statsMap.get(course.course_id) || null
+      }
+    }));
   });
-
-  const { isHydrated } = useViewPreference();
 
   // Use carousel navigation with proper item count and combined ref
   const {
@@ -1159,7 +1139,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
     canScrollLeft,
     canScrollRight,
     scroll
-  } = useCarouselNavigation(topRatedCourses.length);
+  } = useCarouselNavigation(topRatedLoader.data.length);
 
   // Native touch scrolling only - no programmatic swipe paging
   const topRatedRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -1198,16 +1178,8 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
         </div>
         
         <div className="relative">
-          {!isHydrated ? (
-            <div className="text-center py-8">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-muted-foreground">
-                  Loading preferences...
-                </span>
-              </div>
-            </div>
-           ) : topRatedCourses.length > 0 ? (
+          {topRatedLoader.loading && <SkeletonRow count={6} />}
+          {topRatedLoader.hasData && (
             <div
               ref={topRatedRefCallback}
               className="
@@ -1216,7 +1188,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
             >
-                 {topRatedCourses.map((userCourse, index) => {
+                 {topRatedLoader.data.map((userCourse, index) => {
                    // Define premium styling for top 3
                     const getTopAccentGradient = (position: number) => {
                       switch (position) {
@@ -1290,10 +1262,11 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                    );
                  })}
             </div>
-          ) : (
+          )}
+          {topRatedLoader.isEmpty && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {isOwnProfile ? "You haven't rated any courses yet." : "No rated courses found."}
+                You haven't rated any courses yet.
               </p>
             </div>
           )}
