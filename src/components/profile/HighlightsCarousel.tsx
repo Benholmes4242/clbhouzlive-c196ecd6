@@ -4,10 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { HighlightsVideoProvider } from './HighlightsVideoController';
-import { useHighlightsModal } from '@/hooks/useHighlightsModal';
 import HighlightCardWithModal from './HighlightCardWithModal';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { supabase } from '@/integrations/supabase/client';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -20,42 +17,14 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
   
-  // FullscreenMediaModal integration
-  const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
-    highlights: highlights || [],
-    userId
-  });
+  // Remove fullscreen modal functionality
+  // const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
+  //   highlights: highlights || [],
+  //   userId
+  // });
 
-  // Memoize golf course data to prevent infinite loops
-  const memoizedGolfCourse = useMemo(() => {
-    if (!currentHighlight?.golf_course) return undefined;
-    return {
-      id: currentHighlight.golf_course.id,
-      name: currentHighlight.golf_course.name,
-      country: currentHighlight.golf_course.country
-    };
-  }, [currentHighlight?.golf_course]);
-
-  // Fetch user profile data for modal
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId) return;
-      
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .eq('id', userId)
-        .single();
-      
-      if (data && !error) {
-        setUserProfile(data);
-      }
-    };
-    
-    fetchUserProfile();
-  }, [userId]);
+  // Remove modal-related state and effects
 
   // Combined ref callback that handles both scroll container and drag functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -175,7 +144,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
               <HighlightCardWithModal 
                 highlight={highlight}
-                onOpenModal={openModal}
                 isLandscape={true}
               />
             </div>
@@ -183,51 +151,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         </div>
       </div>
       
-      {/* FullscreenMediaModal for highlights - same full social features as Activity tab */}
-      {isOpen && currentHighlight && (
-        <FullscreenMediaModal
-          isOpen={isOpen}
-          onClose={closeModal}
-          mediaUrl={currentHighlight.post_media?.[0]?.media_url || ''}
-          mediaType={currentHighlight.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
-          alt={`Highlight at ${currentHighlight.golf_course?.name}`}
-          golfCourse={memoizedGolfCourse}
-          user={{
-            id: userId,
-            profile_photo_url: userProfile?.profile_photo_url || null
-          }}
-          displayName={userProfile?.display_name || userProfile?.username || 'User'}
-          content={currentHighlight.content}
-          postTags={[]}
-          canNavigatePosts={highlights.length > 1}
-          canGoNext={highlights.findIndex(h => h.id === currentHighlight.id) < highlights.length - 1}
-          canGoPrevious={highlights.findIndex(h => h.id === currentHighlight.id) > 0}
-          onNextPost={() => {
-            const currentIndex = highlights.findIndex(h => h.id === currentHighlight.id);
-            if (currentIndex < highlights.length - 1) {
-              openModal(highlights[currentIndex + 1].id);
-            }
-          }}
-          onPreviousPost={() => {
-            const currentIndex = highlights.findIndex(h => h.id === currentHighlight.id);
-            if (currentIndex > 0) {
-              openModal(highlights[currentIndex - 1].id);
-            }
-          }}
-          currentPostIndex={highlights.findIndex(h => h.id === currentHighlight.id)}
-          totalPosts={highlights.length}
-          postId={currentHighlight.id}
-          onPostDeleted={() => {
-            // Handle post deletion - could refresh highlights
-            closeModal();
-          }}
-          onPostEdit={(postId) => {
-            // Handle post editing
-            console.log('Edit highlight post:', postId);
-            closeModal();
-          }}
-        />
-      )}
+      {/* Fullscreen modal functionality removed */}
     </HighlightsVideoProvider>
   );
 };

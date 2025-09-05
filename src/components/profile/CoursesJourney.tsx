@@ -1201,37 +1201,41 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
             >
-                {topRatedCourses.map((userCourse, index) => {
+                 {topRatedCourses.map((userCourse, index) => {
 
-                  return (
-                    <div 
-                      key={userCourse.id}
-                      className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
-                    >
-                       <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5]`}>
-                             <CourseCard 
-                              course={userCourse.golf_courses}
-                              viewingUserId={userId}
-                              viewContext="global"
-                              userRating={userCourse.rating}
-                              isReadOnly={!isOwnProfile}
-                              showUserRating={true}
-                              showAverageRating={true}
-                              isFromUserCoursesPage={true}
-                              customHeight="h-full"
-                              hideRankingBadges={true}
-                              showAIQuote={false}
-                              showRatingOnRight={true}
-                              currentUserId={currentUser?.id}
-                              profileOwnerFirstName={profileOwner?.display_name}
-                              badgesOnTop={true}
-                              mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                              mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
-                            />
-                       </div>
-                    </div>
-                  );
-                })}
+                   return (
+                     <div 
+                       key={userCourse.id}
+                       className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
+                     >
+                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative`}>
+                              <CourseCard 
+                               course={userCourse.golf_courses}
+                               viewingUserId={userId}
+                               viewContext="global"
+                               userRating={userCourse.rating}
+                               isReadOnly={!isOwnProfile}
+                               showUserRating={false}
+                               showAverageRating={false}
+                               isFromUserCoursesPage={true}
+                               customHeight="h-full"
+                               hideRankingBadges={true}
+                               showAIQuote={false}
+                               showRatingOnRight={true}
+                               currentUserId={currentUser?.id}
+                               profileOwnerFirstName={profileOwner?.display_name}
+                               badgesOnTop={true}
+                               mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
+                               mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
+                             />
+                             {/* Ranking Number - Top Left */}
+                             <div className="absolute top-3 left-3 z-20 text-white text-lg font-semibold drop-shadow-lg">
+                               {index + 1}
+                             </div>
+                        </div>
+                     </div>
+                   );
+                 })}
             </div>
           ) : (
             <div className="text-center py-12">

@@ -13,7 +13,7 @@ import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
-  onOpenModal: (postId: string) => void;
+  onOpenModal?: (postId: string) => void;
   isLandscape?: boolean;
 }
 
@@ -97,19 +97,21 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }, [isCarouselActive, stopPreview]);
 
   const handleOpenModal = useCallback(() => {
-    // Always stop previews and carousel when opening modal
+    // Just stop previews - no modal opening
     stopPreview();
     pause(highlight.id);
-    onOpenModal(highlight.id);
-  }, [stopPreview, pause, onOpenModal, highlight.id]);
+  }, [stopPreview, pause, highlight.id]);
 
-  // Long press gesture handling
-  const gestureHandlers = useLongPressPreview({
-    onTap: handleOpenModal,
-    onPreviewStart: startPreview,
-    onPreviewStop: stopPreview,
-    longPressThreshold: 500
-  });
+  // Simple tap gesture for mobile - just play/pause
+  const handleTap = useCallback(() => {
+    if (primaryMedia?.media_type === 'video') {
+      if (isCarouselActive) {
+        pause(highlight.id);
+      } else {
+        play(highlight.id);
+      }
+    }
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -163,8 +165,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       aria-label="Open highlight post"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...gestureHandlers}
-      onClick={handleVideoClick}
+      onClick={handleTap}
     >
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
         {primaryMedia.media_type === 'image' ? (
