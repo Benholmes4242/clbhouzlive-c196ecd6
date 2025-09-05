@@ -143,6 +143,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
           </div>
         </div>
 
+        {/* Courses by Region title */}
+        <div className="w-full px-4 pt-3 pb-0">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-0">
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+                Courses by Region
+              </h3>
+            </div>
+          </div>
+        </div>
+
         {/* Progress Rings Section */}
         <div className="relative">
           {/* Desktop: Single row */}
@@ -1308,12 +1319,6 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   return (
     <div className="w-full px-4 pt-0 pb-8 mb-0">
       <div className="max-w-6xl mx-auto">
-        {/* Courses by Region title - matches Top 10 Rated by You style */}
-        <div className="flex items-center justify-between mb-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
-            Courses by Region
-          </h3>
-        </div>
       </div>
       
       {/* Reordered sections: Worldwide, USA, Great Britain & Ireland, Continental Europe */}
