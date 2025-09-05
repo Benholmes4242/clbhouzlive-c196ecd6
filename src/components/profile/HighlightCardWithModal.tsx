@@ -4,7 +4,6 @@ import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useHighlightsVideo } from './HighlightsVideoController';
-import { useLongPressPreview } from '@/hooks/useLongPressPreview';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { cn } from '@/lib/utils';
@@ -97,19 +96,23 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }, [isCarouselActive, stopPreview]);
 
   const handleOpenModal = useCallback(() => {
-    // Always stop previews and carousel when opening modal
-    stopPreview();
-    pause(highlight.id);
-    onOpenModal(highlight.id);
-  }, [stopPreview, pause, onOpenModal, highlight.id]);
+    // For highlights, don't open modal - just toggle play/pause inline
+    if (primaryMedia?.media_type === 'video') {
+      if (isCarouselActive) {
+        pause(highlight.id);
+      } else {
+        play(highlight.id);
+      }
+    }
+  }, [primaryMedia, isCarouselActive, play, pause, highlight.id]);
 
-  // Long press gesture handling
-  const gestureHandlers = useLongPressPreview({
-    onTap: handleOpenModal,
-    onPreviewStart: startPreview,
-    onPreviewStop: stopPreview,
-    longPressThreshold: 500
-  });
+  // Gesture handling - remove long press, keep tap for inline play
+  const gestureHandlers = {
+    onTouchStart: undefined,
+    onTouchEnd: undefined,
+    onTouchCancel: undefined,
+    onClick: handleOpenModal // Tap to play inline
+  };
 
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -163,8 +166,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       aria-label="Open highlight post"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...gestureHandlers}
-      onClick={handleVideoClick}
+      onClick={handleOpenModal}
     >
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights">
         {primaryMedia.media_type === 'image' ? (

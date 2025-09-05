@@ -1201,37 +1201,50 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                 [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
               "
             >
-                {topRatedCourses.map((userCourse, index) => {
-
-                  return (
-                    <div 
-                      key={userCourse.id}
-                      className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
-                    >
-                       <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5]`}>
-                             <CourseCard 
-                              course={userCourse.golf_courses}
-                              viewingUserId={userId}
-                              viewContext="global"
-                              userRating={userCourse.rating}
-                              isReadOnly={!isOwnProfile}
-                              showUserRating={true}
-                              showAverageRating={true}
-                              isFromUserCoursesPage={true}
-                              customHeight="h-full"
-                              hideRankingBadges={true}
-                              showAIQuote={false}
-                              showRatingOnRight={true}
-                              currentUserId={currentUser?.id}
-                              profileOwnerFirstName={profileOwner?.display_name}
-                              badgesOnTop={true}
-                              mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
-                              mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
-                            />
+               {topRatedCourses.map((userCourse, index) => {
+                 const course = userCourse.golf_courses;
+                 const imageUrl = course.thumbnail_image;
+                 const isTop100 = course.global_rank && course.global_rank <= 100;
+                 
+                 return (
+                   <div key={userCourse.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
+                     <div className="aspect-[4/5] w-full relative group">
+                       <img
+                         src={imageUrl}
+                         alt={course.name}
+                         className="w-full h-full object-cover rounded-lg"
+                       />
+                       
+                       {/* Position Number in Top Left - matching course name text style */}
+                       <div className="absolute top-2 left-2 z-20">
+                         <div className="bg-black/40 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center">
+                           <span className="text-white text-base font-medium">
+                             {index + 1}
+                           </span>
+                         </div>
                        </div>
-                    </div>
-                  );
-                })}
+
+                       {/* Course info at bottom */}
+                       <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-b-lg">
+                         <div className="text-white">
+                           <h4 className="font-semibold text-sm line-clamp-2 mb-1 leading-tight">
+                             {course.name}
+                           </h4>
+                           <div className="flex items-center gap-2 text-xs">
+                             <CountryFlag 
+                               country={course.country} 
+                               className="w-3 h-3 rounded-sm" 
+                             />
+                             <span className="text-white/80 truncate">
+                               {course.sub_country || course.country}
+                             </span>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 );
+               })}
             </div>
           ) : (
             <div className="text-center py-12">
