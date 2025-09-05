@@ -1233,10 +1233,10 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                mobileTextScale={windowWidth < 768 ? 'small' : 'normal'}
                                mobileFlagSize={windowWidth < 768 ? 'md' : 'lg'}
                              />
-                             {/* Ranking Number - Top Left */}
-                             <div className="absolute top-3 left-3 z-20 text-white text-lg font-semibold drop-shadow-lg">
-                               {index + 1}
-                             </div>
+                              {/* Ranking Number - Top Left */}
+                              <div className={`absolute top-3 left-3 z-20 text-white leading-tight drop-shadow-lg ${windowWidth < 768 ? 'text-xl md:text-3xl' : 'text-3xl'}`}>
+                                {index + 1}
+                              </div>
                         </div>
                      </div>
                    );
