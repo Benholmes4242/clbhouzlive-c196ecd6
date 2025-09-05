@@ -133,7 +133,14 @@ const FullscreenMediaModal = ({
     currentUserId: currentUser?.id,
     userIdFromProp,
     isOwnPost,
-    userObject: user
+    userObject: user,
+    hasPostManagementProps: !!onPostDeleted && !!onPostEdit
+  });
+
+  // Additional debugging for the three dots button
+  console.log('🔍 Three dots button should render:', {
+    isOwnPost,
+    hasRequiredCallbacks: !!onPostDeleted && !!onPostEdit
   });
   
   // Register modal state for Echo detection
