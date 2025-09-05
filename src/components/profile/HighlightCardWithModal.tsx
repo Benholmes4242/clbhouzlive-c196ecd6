@@ -143,10 +143,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                 
                 {/* Play button overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div 
-                    className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-4 h-4 md:w-6 md:h-6 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300"
-                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                  >
+                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-4 h-4 md:w-6 md:h-6 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
                     <Play className="w-2.5 h-2.5 md:w-3.5 md:h-3.5 text-white ml-0.5" fill="currentColor" />
                   </div>
                 </div>
@@ -183,7 +180,6 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <button
             onClick={handleMuteToggle}
             className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-7 h-7 flex items-center justify-center hover:bg-white/20 transition-all duration-300"
-            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             aria-label={isCardMuted ? 'Unmute video' : 'Mute video'}
           >
             {isCardMuted ? (
