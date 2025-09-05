@@ -147,7 +147,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         <div className="w-full px-4 pt-3 pb-0">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-0">
-              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground mb-0">
                 Courses by Region
               </h3>
             </div>
