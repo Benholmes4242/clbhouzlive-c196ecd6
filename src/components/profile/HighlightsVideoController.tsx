@@ -8,11 +8,11 @@ type PlayerEl = HTMLVideoElement | (HTMLElement & {
 
 type HighlightsVideoContext = {
   activeId: string | null;
-  mutedPref: boolean;
   register: (id: string, el: PlayerEl | null) => void;
   play: (id: string) => Promise<void>;
   pause: (id: string) => void;
-  toggleMute: () => void;
+  setCardMuted: (id: string, muted: boolean) => void;
+  getCardMuted: (id: string) => boolean;
 };
 
 const HighlightsVideoContext = createContext<HighlightsVideoContext | null>(null);
@@ -28,7 +28,7 @@ export const useHighlightsVideo = () => {
 export function HighlightsVideoProvider({ children }: { children: React.ReactNode }) {
   const playersRef = useRef(new Map<string, PlayerEl>());
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [mutedPref, setMutedPref] = useState(true);
+  const cardMutedStates = useRef(new Map<string, boolean>()); // Per-card mute states
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
     console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');
@@ -47,13 +47,27 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     }
   };
 
+  const setCardMuted = useCallback((id: string, muted: boolean) => {
+    cardMutedStates.current.set(id, muted);
+    const el = playersRef.current.get(id);
+    if (el) {
+      setMuted(el, muted);
+    }
+  }, []);
+
+  const getCardMuted = useCallback((id: string) => {
+    return cardMutedStates.current.get(id) ?? true; // Default to muted
+  }, []);
+
   const pause = useCallback((id: string) => {
     const el = playersRef.current.get(id);
     if (el?.pause) {
       el.pause();
     }
     if (el) {
-      setMuted(el, true); // RULE: paused videos revert to muted
+      // Reset card to muted when paused
+      cardMutedStates.current.set(id, true);
+      setMuted(el, true);
     }
     if (activeId === id) {
       setActiveId(null);
@@ -92,8 +106,9 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     const el = await waitForElement();
     if (!el) return;
     
-    // RULE: new video adopts previous card's audio state
-    setMuted(el, mutedPref);
+    // Use card-specific mute state
+    const cardMuted = getCardMuted(id);
+    setMuted(el, cardMuted);
     
     try {
       await el.play?.();
@@ -101,24 +116,11 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     } catch (error) {
       console.warn('Failed to play video:', error);
     }
-  }, [activeId, mutedPref, pause]);
-
-  const toggleMute = useCallback(() => {
-    const next = !mutedPref;
-    setMutedPref(next);
-    
-    // Update currently playing video's mute state
-    if (activeId) {
-      const el = playersRef.current.get(activeId);
-      if (el) {
-        setMuted(el, next);
-      }
-    }
-  }, [mutedPref, activeId]);
+  }, [activeId, pause, getCardMuted]);
 
   return (
     <HighlightsVideoContext.Provider 
-      value={{ activeId, mutedPref, register, play, pause, toggleMute }}
+      value={{ activeId, register, play, pause, setCardMuted, getCardMuted }}
     >
       {children}
     </HighlightsVideoContext.Provider>

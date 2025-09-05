@@ -1,11 +1,10 @@
-import React, { useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useHighlightsVideo } from './HighlightsVideoController';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
-import { useGlobalAudio } from '@/hooks/useGlobalAudio';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
 interface HighlightCardWithModalProps {
@@ -22,11 +21,13 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const globalAudio = useGlobalAudio();
   
   // Use the highlights video controller for playback
-  const { activeId, mutedPref, register, play, pause, toggleMute } = useHighlightsVideo();
+  const { activeId, register, play, pause, setCardMuted, getCardMuted } = useHighlightsVideo();
   const isActive = activeId === highlight.id;
+  
+  // Local state for this card's mute status
+  const [isCardMuted, setIsCardMuted] = useState(() => getCardMuted(highlight.id));
   
   // Extract Cloudflare Stream ID for crisp thumbnails
   const extractCloudflareStreamId = (m3u8: string) => {
@@ -64,11 +65,21 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     }
   }, [primaryMedia, isActive, play, pause, highlight.id]);
 
-  // Handle mute/unmute click
+  // Update local state when card becomes inactive (resets to muted)
+  useEffect(() => {
+    if (!isActive) {
+      const currentMuted = getCardMuted(highlight.id);
+      setIsCardMuted(currentMuted);
+    }
+  }, [isActive, highlight.id, getCardMuted]);
+
+  // Handle mute/unmute toggle for this specific card
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleMute();
-  }, [toggleMute]);
+    const newMuted = !isCardMuted;
+    setIsCardMuted(newMuted);
+    setCardMuted(highlight.id, newMuted);
+  }, [isCardMuted, highlight.id, setCardMuted]);
 
   // Safety check for media
   if (!primaryMedia) {
@@ -112,15 +123,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <>
             {/* Active video */}
             {isActive ? (
-              <HLSVideoCard
-                ref={videoRef}
-                hlsUrl={hlsUrl}
-                poster={posterUrl || undefined}
-                muted={mutedPref}
-                autoplay={false}
-                showMuteButton={false}
-                className="w-full h-full object-cover object-center"
-              />
+                <HLSVideoCard
+                  ref={videoRef}
+                  hlsUrl={hlsUrl}
+                  poster={posterUrl || undefined}
+                  muted={isCardMuted}
+                  autoplay={false}
+                  showMuteButton={false}
+                  className="w-full h-full object-cover object-center"
+                />
             ) : (
               /* Video thumbnail with play overlay */
               <div className="relative w-full h-full">
@@ -171,9 +182,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <button
             onClick={handleMuteToggle}
             className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 w-8 h-8 flex items-center justify-center hover:bg-white/20 transition-all duration-200"
-            aria-label={mutedPref ? 'Unmute video' : 'Mute video'}
+            aria-label={isCardMuted ? 'Unmute video' : 'Mute video'}
           >
-            {mutedPref ? (
+            {isCardMuted ? (
               <VolumeX className="w-5 h-5 text-white" />
             ) : (
               <Volume2 className="w-5 h-5 text-white" />
