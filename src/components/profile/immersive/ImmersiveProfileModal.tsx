@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { VolumeX, Volume2, ChevronDown, Check, Upload } from 'lucide-react';
+import { VolumeX, Volume2, ChevronDown, Check, Upload, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
@@ -9,6 +9,9 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import ImmersiveIdentityDock from './ImmersiveIdentityDock';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface MediaItem {
   id: string;
@@ -66,9 +69,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);
   const { session } = useSupabaseSession();
   const { uploadVideo } = useCloudflareStream();
+  const { toast } = useToast();
   
   const currentItem = localMediaItems[activeIndex];
   const totalItems = localMediaItems.length;
+
+  // Check if this is the current user's profile media
+  const isOwnMedia = session?.user?.id === userId;
 
   // Update local media items when props change
   useEffect(() => {
@@ -124,6 +131,59 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       }
     }
   }, [currentItem, isVideoPaused]);
+
+  // Handle media deletion
+  const handleDeleteMedia = useCallback(async () => {
+    if (!currentItem || !session?.user?.id) return;
+    
+    const confirmed = window.confirm('Are you sure you want to delete this media?');
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('profile_media')
+        .delete()
+        .eq('id', currentItem.id)
+        .eq('user_id', userId); // Ensure user can only delete their own media
+
+      if (error) throw error;
+
+      // Remove from local state
+      const newMediaItems = localMediaItems.filter(item => item.id !== currentItem.id);
+      setLocalMediaItems(newMediaItems);
+
+      // Adjust active index if necessary
+      if (activeIndex >= newMediaItems.length && newMediaItems.length > 0) {
+        setActiveIndex(newMediaItems.length - 1);
+      } else if (newMediaItems.length === 0) {
+        // If no media left, close the modal
+        onClose();
+        return;
+      }
+
+      toast({
+        title: "Media deleted",
+        description: "The media has been successfully deleted.",
+      });
+
+    } catch (error) {
+      console.error('Error deleting media:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete media. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [currentItem, session?.user?.id, userId, localMediaItems, activeIndex, onClose, toast]);
+
+  // Handle edit media (placeholder for future implementation)
+  const handleEditMedia = useCallback(() => {
+    console.log('Edit media:', currentItem?.id);
+    toast({
+      title: "Coming soon",
+      description: "Media editing will be available soon!",
+    });
+  }, [currentItem?.id, toast]);
 
   const logTelemetryEvent = useCallback(async (event: string, data: any = {}) => {
     if (!session?.user?.id) return;
@@ -451,6 +511,58 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           <Volume2 className="w-5 h-5 text-white" />
         )}
       </button>
+
+      {/* Three dots menu - only show for own media */}
+      {isOwnMedia && !currentItem.isUploading && (
+        <div className="absolute top-8 right-16 z-20">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1 cursor-pointer"
+                style={liquidGlassStyle}
+                title="Media actions"
+                onClick={() => {
+                  console.log('🚨 THREE DOTS CLICKED IN IMMERSIVE MODAL!', {
+                    currentItem: currentItem?.id,
+                    isOwnMedia,
+                    mediaType: currentItem?.media_type
+                  });
+                }}
+              >
+                <MoreHorizontal className="w-5 h-5 text-white" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-44 rounded-xl shadow-xl border border-white/10 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm z-[1000000] overflow-hidden"
+              sideOffset={8}
+            >
+              <DropdownMenuItem 
+                onClick={() => {
+                  console.log('🚨 EDIT CLICKED IN IMMERSIVE MODAL!');
+                  handleEditMedia();
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer focus:bg-black/5 dark:focus:bg-white/10"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit media
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  console.log('🚨 DELETE CLICKED IN IMMERSIVE MODAL!');
+                  handleDeleteMedia();
+                }}
+                className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer focus:bg-red-50 dark:focus:bg-red-900/20"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete media
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
 
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
