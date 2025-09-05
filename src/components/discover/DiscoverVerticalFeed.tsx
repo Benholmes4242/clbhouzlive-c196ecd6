@@ -419,10 +419,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] bg-black overflow-hidden">
-      {/* DEBUG: Large red circle to confirm this is DiscoverVerticalFeed */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-red-500 rounded-full z-50 flex items-center justify-center">
-        <span className="text-white font-bold text-lg">DISCOVER FEED</span>
-      </div>
 
       {/* Scrollable Content */}
       <div 
@@ -685,7 +681,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     <DropdownMenuTrigger asChild>
                       <button 
                         className="cursor-pointer hover:opacity-100 transition-opacity"
-                        onClick={() => console.log('🚨 THREE DOTS CLICKED!', { itemId: item.id, userId: item.user?.id, currentUserId: user?.id })}
                       >
                         <MoreHorizontal className="w-8 h-8 text-white" />
                       </button>
