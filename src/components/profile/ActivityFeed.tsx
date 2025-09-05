@@ -42,6 +42,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
+  // DEBUG: Log when ActivityFeed renders
+  console.log('🚨 ACTIVITY FEED RENDERED!', {
+    userId,
+    isOwnProfile,
+    postsCount: posts.length,
+    loading
+  });
+
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
     switch (activeFilter) {
@@ -110,6 +118,11 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }, []);
 
   const handleMediaClick = useCallback((item: ExploreContentItem) => {
+    console.log('🚨 ACTIVITY FEED - MEDIA CLICK!', {
+      itemId: item.id,
+      itemSrc: item.src,
+      itemType: item.type
+    });
     openFeed(item);
   }, [openFeed]);
 
