@@ -68,7 +68,7 @@ export const CourseCardDraggable: React.FC<{
                  style={{
                    clipPath: 'polygon(100% 0, 100% 100%, 0 100%)'
                  }}>
-              <span className="transform rotate-45 translate-x-1 translate-y-1">10</span>
+              <span className="translate-x-1 translate-y-1">10</span>
             </div>
           ) : (
             <Button
