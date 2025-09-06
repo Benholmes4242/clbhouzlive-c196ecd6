@@ -275,28 +275,36 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                          </div>
                        )}
                      </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm truncate">{course.golf_courses?.name}</h3>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{course.golf_courses?.location || course.golf_courses?.country}</span>
-                        {(course.rating || course.userRating) && (
-                          <>
-                            <span>•</span>
-                            <span className="flex items-center gap-1">
-                              ⭐ {course.rating || course.userRating}
-                            </span>
-                          </>
-                        )}
-                        {course.played_date && (
-                          <>
-                            <span>•</span>
-                            <span className="flex items-center gap-1">
-                              ✓ Played
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                     <div className="flex-1 min-w-0">
+                       <h3 className="font-semibold text-sm truncate">{course.golf_courses?.name}</h3>
+                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                         <span>{course.golf_courses?.location || course.golf_courses?.country}</span>
+                         {course.golf_courses?.average_rating && (
+                           <>
+                             <span>•</span>
+                             <span className="flex items-center gap-1">
+                               🏡 {course.golf_courses.average_rating.toFixed(1)}
+                             </span>
+                           </>
+                         )}
+                         {(course.rating || course.userRating) && (
+                           <>
+                             <span>•</span>
+                             <span className="flex items-center gap-1">
+                               ⭐ {course.rating || course.userRating}
+                             </span>
+                           </>
+                         )}
+                         {course.played_date && (
+                           <>
+                             <span>•</span>
+                             <span className="flex items-center gap-1">
+                               ✓ Played
+                             </span>
+                           </>
+                         )}
+                       </div>
+                     </div>
                   </div>
                 );
               }
