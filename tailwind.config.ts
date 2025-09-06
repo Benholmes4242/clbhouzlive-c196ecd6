@@ -226,6 +226,22 @@ export default {
 					'100%': {
 						transform: 'rotate(360deg)'
 					}
+				},
+				'slide-in-from-right-modal': {
+					'0%': {
+						transform: 'translateX(100%)'
+					},
+					'100%': {
+						transform: 'translateX(0)'
+					}
+				},
+				'slide-out-to-right-modal': {
+					'0%': {
+						transform: 'translateX(0)'
+					},
+					'100%': {
+						transform: 'translateX(100%)'
+					}
 				}
 			},
 			animation: {
@@ -242,7 +258,9 @@ export default {
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
 				'shimmer': 'shimmer 2s infinite',
-				'slow-spin': 'slow-spin 20s linear infinite'
+				'slow-spin': 'slow-spin 20s linear infinite',
+				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
+				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out'
 			}
 		}
 	},

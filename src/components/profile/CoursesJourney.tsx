@@ -14,7 +14,7 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import RegionalCoursesModal from './RegionalCoursesModal';
+import EnhancedRegionalCoursesModal from './EnhancedRegionalCoursesModal';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { useSyncRatedHeightVar } from '@/hooks/useSyncRatedHeightVar';
 import { usePlayedCoursesWithRatings } from '@/hooks/usePlayedCoursesWithRatings';
@@ -1427,12 +1427,13 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
       >
         See All
       </Button>
-      <RegionalCoursesModal
+      <EnhancedRegionalCoursesModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         regionName="Great Britain & Ireland"
         courses={gbIrelandCourses}
         isOwnProfile={isOwnProfile}
+        userId={userId}
       />
     </>
   );
@@ -1679,12 +1680,13 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
       >
         See All
       </Button>
-      <RegionalCoursesModal
+      <EnhancedRegionalCoursesModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         regionName="Worldwide"
         courses={worldwideCourses}
         isOwnProfile={isOwnProfile}
+        userId={userId}
       />
     </>
   );
@@ -1932,12 +1934,13 @@ const USANavigation: React.FC<USANavigationProps> = ({
       >
         See All
       </Button>
-      <RegionalCoursesModal
+      <EnhancedRegionalCoursesModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         regionName="USA"
         courses={usaCourses}
         isOwnProfile={isOwnProfile}
+        userId={userId}
       />
     </>
   );
@@ -2084,15 +2087,13 @@ const ContinentalEuropeNavigation: React.FC<ContinentalEuropeNavigationProps> = 
         See All
       </Button>
       
-      <RegionalCoursesModal
+      <EnhancedRegionalCoursesModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         regionName="Continental Europe"
-        courses={europeCourses.map(course => ({
-          ...course.golf_courses,
-          average_rating: course.averageRating
-        }))}
+        courses={europeCourses}
         isOwnProfile={isOwnProfile}
+        userId={userId}
       />
     </>
   );
