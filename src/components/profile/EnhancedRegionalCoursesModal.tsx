@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Grid3X3, List, ChevronDown, X, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import CourseCard from '@/components/courses/CourseCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 interface EnhancedRegionalCoursesModalProps {
   isOpen: boolean;
@@ -121,6 +122,17 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     }
   }, [isOpen, courses]);
 
+  // Scroll lock effect
+  useEffect(() => {
+    if (isOpen) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen]);
+
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses;
@@ -159,174 +171,203 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="fixed inset-y-0 right-0 h-full max-w-full w-full sm:max-w-[920px] p-0 bg-background border-l border-border data-[state=open]:animate-slide-in-from-right-modal data-[state=closed]:animate-slide-out-to-right-modal"
-      >
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border">
-          <DialogHeader className="p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <DialogTitle className="text-xl sm:text-2xl font-bold">
-                  {regionName}
-                </DialogTitle>
-                <span className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs font-medium">
-                  {filteredAndSortedCourses.length}
-                </span>
-              </div>
-              <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Controls Row */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              {/* View Toggle */}
-              <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
-                <Button
-                  variant={view === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setView('grid')}
-                  className="h-8 px-3"
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">Grid</span>
-                </Button>
-                <Button
-                  variant={view === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setView('list')}
-                  className="h-8 px-3"
-                >
-                  <List className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">List</span>
-                </Button>
-              </div>
-
-              {/* Sort Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <span className="text-xs text-muted-foreground mr-2">Sort</span>
-                    {getSortLabel(sortBy)}
-                    <ChevronDown className="h-3 w-3 ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem 
-                    onClick={() => setSortBy('recently-played')}
-                    className={sortBy === 'recently-played' ? 'bg-muted' : ''}
-                  >
-                    Recently Played
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setSortBy('highest-rated')}
-                    className={sortBy === 'highest-rated' ? 'bg-muted' : ''}
-                  >
-                    Highest Rated
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setSortBy('lowest-rated')}
-                    className={sortBy === 'lowest-rated' ? 'bg-muted' : ''}
-                  >
-                    Lowest Rated
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* Search Bar */}
-            <div className="relative mt-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search courses by name, location, or country..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-9"
-              />
-            </div>
-          </DialogHeader>
-        </div>
-        
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {filteredAndSortedCourses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-lg text-muted-foreground">
-                {searchQuery.trim() 
-                  ? `No courses found matching "${searchQuery}".`
-                  : isOwnProfile 
-                    ? `You haven't played any ${regionName} courses yet.` 
-                    : `No ${regionName} courses found.`
-                }
-              </p>
-            </div>
-          ) : (
-            <div className={getGridClasses()}>
-              {filteredAndSortedCourses.map((course, index) => {
-                if (view === 'list') {
-                  // List view - show as compact rows
-                  return (
-                    <div key={course.id || `${course.course_id}-${index}`} className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                        {course.golf_courses?.image_url ? (
-                          <img 
-                            src={course.golf_courses.image_url} 
-                            alt={course.golf_courses?.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-                            <span className="text-xs text-muted-foreground">⛳</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm truncate">{course.golf_courses?.name}</h3>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{course.golf_courses?.location || course.golf_courses?.country}</span>
-                          {(course.rating || course.userRating) && (
-                            <>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                ⭐ {course.rating || course.userRating}
-                              </span>
-                            </>
-                          )}
-                          {course.played_date && (
-                            <>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                ✓ Played
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Grid view - show full cards
-                return (
-                  <div key={course.id || `${course.course_id}-${index}`} className="aspect-[4/5]">
-                    <CourseCard
-                      course={course.golf_courses}
-                      userRating={course.rating || course.userRating}
-                      viewContext="regional"
-                      viewingUserId={userId}
-                      isReadOnly={!isOwnProfile}
-                      customHeight="h-full"
-                      showUserRating={true}
-                      showAverageRating={true}
-                    />
+      {/* Custom overlay with backdrop and centering */}
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay 
+          className={`fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 transition-opacity duration-300 ${
+            isOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={onClose}
+        >
+          {/* Panel container with slide animation */}
+          <DialogPrimitive.Content
+            className={`relative bg-background border border-border rounded-lg shadow-lg max-h-[92vh] w-full max-w-[920px] flex flex-col overflow-hidden transition-transform duration-300 ease-out ${
+              isOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+          >
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-10 bg-background border-b border-border">
+              <DialogHeader className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <DialogTitle id="modal-title" className="text-xl sm:text-2xl font-bold">
+                      {regionName}
+                    </DialogTitle>
+                    <span className="bg-muted text-muted-foreground px-2 py-1 rounded-full text-xs font-medium">
+                      {filteredAndSortedCourses.length}
+                    </span>
                   </div>
-                );
-              })}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={onClose} 
+                    className="h-8 w-8 p-0"
+                    aria-label="Close modal"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Controls Row */}
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  {/* View Toggle */}
+                  <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                    <Button
+                      variant={view === 'grid' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setView('grid')}
+                      className="h-8 px-3"
+                      aria-label="Grid view"
+                    >
+                      <Grid3X3 className="h-4 w-4" />
+                      <span className="ml-1 hidden sm:inline">Grid</span>
+                    </Button>
+                    <Button
+                      variant={view === 'list' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setView('list')}
+                      className="h-8 px-3"
+                      aria-label="List view"
+                    >
+                      <List className="h-4 w-4" />
+                      <span className="ml-1 hidden sm:inline">List</span>
+                    </Button>
+                  </div>
+
+                  {/* Sort Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8">
+                        <span className="text-xs text-muted-foreground mr-2">Sort</span>
+                        {getSortLabel(sortBy)}
+                        <ChevronDown className="h-3 w-3 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem 
+                        onClick={() => setSortBy('recently-played')}
+                        className={sortBy === 'recently-played' ? 'bg-muted' : ''}
+                      >
+                        Recently Played
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setSortBy('highest-rated')}
+                        className={sortBy === 'highest-rated' ? 'bg-muted' : ''}
+                      >
+                        Highest Rated
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setSortBy('lowest-rated')}
+                        className={sortBy === 'lowest-rated' ? 'bg-muted' : ''}
+                      >
+                        Lowest Rated
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative mt-4">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search courses by name, location, or country..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 h-9"
+                  />
+                </div>
+              </DialogHeader>
             </div>
-          )}
-        </div>
-      </DialogContent>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+              <div id="modal-description" className="sr-only">
+                {regionName} courses list with {filteredAndSortedCourses.length} courses
+              </div>
+              
+              {filteredAndSortedCourses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <p className="text-lg text-muted-foreground">
+                    {searchQuery.trim() 
+                      ? `No courses found matching "${searchQuery}".`
+                      : isOwnProfile 
+                        ? `You haven't played any ${regionName} courses yet.` 
+                        : `No ${regionName} courses found.`
+                    }
+                  </p>
+                </div>
+              ) : (
+                <div className={getGridClasses()}>
+                  {filteredAndSortedCourses.map((course, index) => {
+                    if (view === 'list') {
+                      // List view - show as compact rows
+                      return (
+                        <div key={course.id || `${course.course_id}-${index}`} className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                          <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                            {course.golf_courses?.image_url ? (
+                              <img 
+                                src={course.golf_courses.image_url} 
+                                alt={course.golf_courses?.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+                                <span className="text-xs text-muted-foreground">⛳</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm truncate">{course.golf_courses?.name}</h3>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>{course.golf_courses?.location || course.golf_courses?.country}</span>
+                              {(course.rating || course.userRating) && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-1">
+                                    ⭐ {course.rating || course.userRating}
+                                  </span>
+                                </>
+                              )}
+                              {course.played_date && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-1">
+                                    ✓ Played
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Grid view - show full cards
+                    return (
+                      <div key={course.id || `${course.course_id}-${index}`} className="aspect-[4/5]">
+                        <CourseCard
+                          course={course.golf_courses}
+                          userRating={course.rating || course.userRating}
+                          viewContext="regional"
+                          viewingUserId={userId}
+                          isReadOnly={!isOwnProfile}
+                          customHeight="h-full"
+                          showUserRating={true}
+                          showAverageRating={true}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Overlay>
+      </DialogPrimitive.Portal>
     </Dialog>
   );
 };
