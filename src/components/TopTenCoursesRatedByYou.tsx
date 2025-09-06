@@ -4,19 +4,31 @@ import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 
 type Props = {
-  title?: string;        // default: "Top 10 Courses Rated by You"
   onOpenModal?: () => void; // optional CTA to edit
   isOwnProfile?: boolean;
   userId?: string;
+  userDisplayName?: string;
 };
 
 export default function TopTenCoursesRatedByYou({
-  title = "Top 10 Courses Rated by You",
   onOpenModal,
   isOwnProfile,
   userId,
+  userDisplayName,
 }: Props) {
   const { topTen, loading } = useTopTen();
+  
+  // Dynamic title based on profile ownership
+  const getTitle = () => {
+    if (isOwnProfile) {
+      return "Top 10 Courses Rated by You";
+    } else {
+      const firstName = userDisplayName?.split(' ')[0] || 'User';
+      return `Top 10 Courses Rated by ${firstName}`;
+    }
+  };
+  
+  const title = getTitle();
   
   if (loading) {
     return (

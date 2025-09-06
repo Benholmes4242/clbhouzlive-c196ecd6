@@ -136,8 +136,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
         {/* Top 10 Courses Rated by You Section - mirrors Your Top 10 bar */}
         <TopTenCoursesRatedByYou
-          title="Top 10 Courses Rated by You"
           isOwnProfile={isOwnProfile}
+          userDisplayName={userDisplayName}
           onOpenModal={() => setTopTenModalOpen(true)} // Opens worldwide modal
           userId={userId}
         />
