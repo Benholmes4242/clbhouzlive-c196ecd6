@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
+import ClubhouzLoading from '@/components/ClubhouzLoading';
 import SlideInModal from '@/components/ui/SlideInModal';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -341,7 +342,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     <SlideInModal
       open={isOpen}
       onClose={onClose}
-      title={`${regionName} (${filteredAndSortedCourses.length})`}
+      title={regionName}
     >
       {/* Controls Row */}
       <div className="p-4 sm:p-6 border-b border-border">
@@ -429,7 +430,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       <div className="p-4 sm:p-6">
         {coursesLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <ClubhouzLoading />
           </div>
         ) : filteredAndSortedCourses.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
