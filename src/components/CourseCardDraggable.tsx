@@ -66,7 +66,7 @@ export const CourseCardDraggable: React.FC<{
           ) : (
             <>
               <Plus className="w-3 h-3 mr-1" />
-              Top 10
+              add this course to my top 10
             </>
           )}
         </Button>
