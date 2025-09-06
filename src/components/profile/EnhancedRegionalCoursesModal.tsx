@@ -263,9 +263,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                 return (
                   <div key={course.id || `${course.course_id}-${index}`} className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                      <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                       {course.golf_courses?.image_url ? (
+                       {course.golf_courses?.thumbnail_image ? (
                          <img 
-                           src={course.golf_courses.image_url} 
+                           src={course.golf_courses.thumbnail_image} 
                            alt={course.golf_courses?.name}
                            className="w-full h-full object-cover"
                          />
