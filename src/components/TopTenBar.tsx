@@ -132,7 +132,7 @@ const TopTenSlot: React.FC<{
         style={style}
         {...attributes}
         {...listeners}
-        className="relative h-20 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-sm text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer"
+        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-sm text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer"
       >
         {index + 1}
       </li>
@@ -145,13 +145,13 @@ const TopTenSlot: React.FC<{
       style={style}
       {...attributes}
       {...listeners}
-      className="relative h-20 rounded-xl overflow-hidden shadow-sm ring-1 ring-border bg-card flex flex-col cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+      className="relative h-24 rounded-xl overflow-hidden shadow-sm ring-1 ring-border bg-card flex flex-col cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
     >
-      <div className="w-full h-10 shrink-0 bg-muted">
+      <div className="w-full h-12 shrink-0 bg-muted">
         {course.thumbnail_image ? (
-          <img src={course.thumbnail_image} alt="" className="w-full h-10 object-cover" />
+          <img src={course.thumbnail_image} alt="" className="w-full h-12 object-cover" />
         ) : (
-          <div className="w-full h-10 bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+          <div className="w-full h-12 bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
             <div className="w-3 h-3 bg-primary rounded-full"></div>
           </div>
         )}
@@ -182,12 +182,12 @@ const TopTenSlot: React.FC<{
 };
 
 const GhostCard: React.FC<{ course: Course; index: number }> = ({ course, index }) => (
-  <div className="h-20 w-32 rounded-xl shadow-lg bg-card border border-border flex flex-col opacity-90">
-    <div className="w-full h-10 bg-muted">
+  <div className="h-24 w-38 rounded-xl shadow-lg bg-card border border-border flex flex-col opacity-90">
+    <div className="w-full h-12 bg-muted">
       {course.thumbnail_image ? (
-        <img src={course.thumbnail_image} alt="" className="w-full h-10 object-cover" />
+        <img src={course.thumbnail_image} alt="" className="w-full h-12 object-cover" />
       ) : (
-        <div className="w-full h-10 bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+        <div className="w-full h-12 bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
           <div className="w-3 h-3 bg-primary rounded-full"></div>
         </div>
       )}
