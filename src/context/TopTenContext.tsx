@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Course = {
   id: string;
@@ -40,23 +41,38 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- Load from localStorage on mount (API integration ready for future) ---
+  // --- Load from database on mount ---
   useEffect(() => {
-    try {
-      setLoading(true);
-      const ls = localStorage.getItem("topten_v1");
-      if (ls) {
-        const parsed = JSON.parse(ls);
-        if (Array.isArray(parsed) && parsed.length === 10) {
-          setTopTenState(parsed);
+    const loadTopTen = async () => {
+      try {
+        setLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoading(false);
+          return;
         }
+
+        const { data, error } = await supabase
+          .from('user_top_ten_lists')
+          .select('courses')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error("TopTen load error:", error);
+          setError("Failed to load Top 10");
+        } else if (data?.courses) {
+          setTopTenState(data.courses);
+        }
+      } catch (e: any) {
+        setError("Failed to load Top 10");
+        console.error("TopTen load error:", e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e: any) {
-      setError("Failed to load Top 10");
-      console.error("TopTen load error:", e);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    loadTopTen();
   }, []);
 
   // --- Persist (debounced) to localStorage ---
