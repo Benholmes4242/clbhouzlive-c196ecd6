@@ -23,6 +23,7 @@ import SkeletonRow from '@/components/ui/SkeletonRow';
 import HighlightsCarousel from './HighlightsCarousel';
 import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
 import { CarouselItem } from '@/components/ui/CarouselItem';
+import TopTenCoursesRatedByYou from '@/components/TopTenCoursesRatedByYou';
 
 
 interface CoursesJourneyProps {
@@ -42,6 +43,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   const { regionProgress, isLoading } = useTop100CoursesData(userId || '', isOwnProfile);
   const { generateMotivation } = useProgressMotivation(userId, userDisplayName, isOwnProfile);
   const [motivationalMessages, setMotivationalMessages] = useState<{[key: string]: string}>({});
+  const [topTenModalOpen, setTopTenModalOpen] = useState(false);
 
   // Sync the rated card height to CSS variable
   useSyncRatedHeightVar();
@@ -134,6 +136,14 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
         {/* Top 10 Rated by You Section */}
         <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
+
+        {/* Top 10 Courses Rated by You Section - mirrors Your Top 10 bar */}
+        <TopTenCoursesRatedByYou
+          title="Top 10 Courses Rated by You"
+          isOwnProfile={isOwnProfile}
+          onOpenModal={() => setTopTenModalOpen(true)} // Opens worldwide modal
+          userId={userId}
+        />
 
         {/* Recently Played Section - Copy of Courses Played */}
         <RecentlyPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
@@ -503,6 +513,16 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         <div className="mt-1.5"> {/* 6px spacing */}
           <CoursesbyRegionSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
         </div>
+
+        {/* Top 10 Modal - Reusing Worldwide modal for editing Top 10 */}
+        <EnhancedRegionalCoursesModal
+          isOpen={topTenModalOpen}
+          onClose={() => setTopTenModalOpen(false)}
+          regionName="Worldwide"
+          courses={[]} // Will be loaded by the modal
+          isOwnProfile={isOwnProfile}
+          userId={userId}
+        />
       </div>
     </div>
   );
