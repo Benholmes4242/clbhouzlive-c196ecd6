@@ -25,6 +25,7 @@ export const CourseCardDraggable: React.FC<{
   const handleAddToTopTen = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
     
     if (isInTopTen(course.id)) {
       toast.error("Already in your Top 10");
