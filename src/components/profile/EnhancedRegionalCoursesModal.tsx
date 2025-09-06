@@ -169,7 +169,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           {/* View Toggle */}
           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
             <Button
-              variant={view === 'grid' ? 'default' : 'ghost'}
+              variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setView('grid')}
               className="h-8 px-3"
@@ -179,7 +179,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               <span className="ml-1 hidden sm:inline">Grid</span>
             </Button>
             <Button
-              variant={view === 'list' ? 'default' : 'ghost'}
+              variant={view === 'list' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setView('list')}
               className="h-8 px-3"

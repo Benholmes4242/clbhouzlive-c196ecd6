@@ -120,7 +120,7 @@ export default function SlideInModal({
             <button
               ref={closeBtnRef}
               onClick={onClose}
-              className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-0 border-0"
               aria-label="Close modal"
             >
               ✕
