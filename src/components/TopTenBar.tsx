@@ -30,7 +30,9 @@ export const TopTenBar: React.FC = () => {
   console.log("TopTenBar filled courses:", topTen.filter(Boolean));
   const sensors = useSensors(
     useSensor(PointerSensor, { 
-      activationConstraint: { delay: 120, tolerance: 5 } 
+      activationConstraint: { 
+        distance: 8, // Start dragging after moving 8px
+      }
     })
   );
 
