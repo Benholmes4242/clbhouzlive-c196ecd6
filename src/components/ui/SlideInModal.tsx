@@ -34,29 +34,33 @@ export default function SlideInModal({
   useEffect(() => {
     if (open) {
       setMounted(true);
+      setAnimateIn(false); // Ensure we start off-screen
+      
       // lock background scroll
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
 
-      // ensure starting transform is applied before animating (prevents pop-in)
-      const id = requestAnimationFrame(() => setAnimateIn(true));
+      // Wait for next frame to ensure starting position is applied, then animate in
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimateIn(true));
+      });
 
-      // focus handling
+      // focus handling - delay to ensure modal is visible
       const focusTarget =
         (initialFocusRef?.current as HTMLElement) ||
         (closeBtnRef.current as HTMLElement);
-      const focusId = requestAnimationFrame(() => focusTarget?.focus?.());
+      const focusId = setTimeout(() => focusTarget?.focus?.(), 300);
 
       return () => {
         cancelAnimationFrame(id);
-        cancelAnimationFrame(focusId);
+        clearTimeout(focusId);
         document.body.style.overflow = prevOverflow;
       };
     } else if (mounted) {
       // start slide-out
       setAnimateIn(false);
       // unmount after the animation ends
-      const timer = setTimeout(() => setMounted(false), 220); // keep in sync with duration
+      const timer = setTimeout(() => setMounted(false), 220);
       // restore focus to trigger
       const el = triggerRef.current;
       if (el) setTimeout(() => el.focus(), 230);
