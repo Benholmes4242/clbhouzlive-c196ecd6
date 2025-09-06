@@ -357,24 +357,19 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               return (
                 <div key={course.id || `${course.course_id}-${index}`} className="aspect-[4/5] relative">
                   <CourseCard
-                    course={course.golf_courses}
+                    course={{
+                      ...course.golf_courses,
+                      average_rating: communityRatings[course.golf_courses?.id] || course.golf_courses?.average_rating
+                    }}
                     userRating={course.rating || course.userRating}
                     viewContext="regional"
                     viewingUserId={userId}
                     isReadOnly={!isOwnProfile}
                     customHeight="h-full"
                     showUserRating={true}
-                    showAverageRating={false}
+                    showAverageRating={true}
                     badgesOnTop={false}
                   />
-                  
-                  {/* Community rating badge overlay - liquid glass styling */}
-                  {communityRatings[course.golf_courses?.id] && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white px-2.5 py-1.5 rounded-lg text-sm font-medium z-30 shadow-lg">
-                      <ClubhouseLogo size="sm" />
-                      <span>{communityRatings[course.golf_courses.id]}</span>
-                    </div>
-                  )}
                 </div>
               );
             })}
