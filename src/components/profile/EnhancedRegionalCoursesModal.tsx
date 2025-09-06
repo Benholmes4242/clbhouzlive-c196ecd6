@@ -123,23 +123,23 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     queryFn: async () => {
       if (!userId) return [];
       
-      // Get region filter logic
+      // Get region filter logic - only courses in Top 100 lists
       let regionFilter = '';
       switch (regionName) {
         case 'Worldwide':
-          regionFilter = 'or(global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null)';
+          regionFilter = 'global_rank.lte.100';
           break;
         case 'Great Britain & Ireland':
-          regionFilter = 'country.eq.Britain & Ireland';
+          regionFilter = 'and(country.eq.Britain & Ireland,regional_rank.lte.100)';
           break;
         case 'USA':
-          regionFilter = 'country.eq.USA';
+          regionFilter = 'and(country.eq.USA,usa_rank.lte.100)';
           break;
         case 'Continental Europe':
-          regionFilter = 'continent.eq.Europe,country.neq.Britain & Ireland';
+          regionFilter = 'and(continent.eq.Europe,country.neq.Britain & Ireland,regional_rank.lte.100)';
           break;
         default:
-          regionFilter = `region.eq.${regionName}`;
+          regionFilter = `and(region.eq.${regionName},regional_rank.lte.100)`;
       }
 
       // Get all courses for the region
@@ -159,7 +159,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           thumbnail_image
         `)
         .or(regionFilter)
-        .order('regional_rank', { ascending: true, nullsFirst: false });
+        .order('global_rank', { ascending: true, nullsFirst: false })
+        .order('regional_rank', { ascending: true, nullsFirst: false })
+        .order('usa_rank', { ascending: true, nullsFirst: false });
 
       if (coursesError) throw coursesError;
 
