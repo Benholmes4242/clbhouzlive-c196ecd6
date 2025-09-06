@@ -365,13 +365,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     customHeight="h-full"
                     showUserRating={true}
                     showAverageRating={false}
-                    badgesOnTop={true}
+                    badgesOnTop={false}
                   />
                   
-                  {/* Community rating badge overlay - show real data when available */}
+                  {/* Community rating badge overlay - liquid glass styling */}
                   {communityRatings[course.golf_courses?.id] && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium z-30">
-                      <ClubhouseLogo size="xs" />
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white px-2.5 py-1.5 rounded-lg text-sm font-medium z-30 shadow-lg">
+                      <ClubhouseLogo size="sm" />
                       <span>{communityRatings[course.golf_courses.id]}</span>
                     </div>
                   )}
