@@ -5,6 +5,7 @@ import { Grid3X3, List, ChevronDown, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import CourseCard from '@/components/courses/CourseCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useModalState } from '@/hooks/useModalDetector';
 import SlideInModal from '@/components/ui/SlideInModal';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -103,6 +104,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
   const isMobile = useIsMobile();
+  
+  // Register this modal with the modal detector
+  useModalState(isOpen);
 
   // Reset search when modal opens/closes
   useEffect(() => {
@@ -258,19 +262,19 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                 // List view - show as compact rows
                 return (
                   <div key={course.id || `${course.course_id}-${index}`} className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                      {course.golf_courses?.image_url ? (
-                        <img 
-                          src={course.golf_courses.image_url} 
-                          alt={course.golf_courses?.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">⛳</span>
-                        </div>
-                      )}
-                    </div>
+                     <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                       {course.golf_courses?.image_url ? (
+                         <img 
+                           src={course.golf_courses.image_url} 
+                           alt={course.golf_courses?.name}
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                           <div className="w-8 h-8 bg-green-600 rounded-full"></div>
+                         </div>
+                       )}
+                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-sm truncate">{course.golf_courses?.name}</h3>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
