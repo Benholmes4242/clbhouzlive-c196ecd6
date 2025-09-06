@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import CourseCard from '@/components/courses/CourseCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useModalState } from '@/hooks/useModalDetector';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import SlideInModal from '@/components/ui/SlideInModal';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -283,7 +284,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                            <>
                              <span>•</span>
                              <span className="flex items-center gap-1">
-                               🏡 {course.golf_courses.average_rating.toFixed(1)}
+                               <ClubhouseLogo size="xs" />
+                               {course.golf_courses.average_rating.toFixed(1)}
                              </span>
                            </>
                          )}
