@@ -23,15 +23,18 @@ export const CourseCardDraggable: React.FC<{
   };
 
   const handleAddToTopTen = (e: React.MouseEvent) => {
+    console.log("Button clicked!", e.target);
     e.stopPropagation();
     e.preventDefault();
     e.nativeEvent.stopImmediatePropagation();
     
     if (isInTopTen(course.id)) {
+      console.log("Course already in top 10");
       toast.error("Already in your Top 10");
       return;
     }
     
+    console.log("Adding course to top 10:", course.name);
     addCourse(course);
     toast.success(`Added ${course.name} to Top 10`);
   };
@@ -43,10 +46,18 @@ export const CourseCardDraggable: React.FC<{
       <div 
         ref={setNodeRef} 
         style={style} 
-        {...listeners} 
-        {...attributes} 
-        className={`${isDragging ? "cursor-grabbing" : "cursor-grab"} touch-manipulation`}
+        className={`${isDragging ? "cursor-grabbing" : "cursor-grab"} touch-manipulation relative`}
       >
+        {/* Drag area that excludes the button */}
+        <div 
+          {...listeners} 
+          {...attributes}
+          className="absolute inset-0 z-10"
+          style={{ 
+            bottom: showAddButton ? '32px' : '0', // Leave space for button
+            right: showAddButton ? '80px' : '0'   // Leave space for button
+          }}
+        />
         {children}
       </div>
       
@@ -56,10 +67,10 @@ export const CourseCardDraggable: React.FC<{
           variant={inTopTen ? "secondary" : "ghost"}
           disabled={inTopTen}
           onClick={handleAddToTopTen}
-          className={`absolute bottom-2 right-2 h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity ${
+          className={`absolute bottom-2 right-2 h-6 px-2 text-xs transition-opacity z-50 pointer-events-auto ${
             inTopTen 
-              ? "bg-muted/80 text-muted-foreground border-muted" 
-              : "bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40"
+              ? "bg-muted/80 text-muted-foreground border-muted opacity-100" 
+              : "bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40 opacity-0 group-hover:opacity-100"
           }`}
         >
           {inTopTen ? (
