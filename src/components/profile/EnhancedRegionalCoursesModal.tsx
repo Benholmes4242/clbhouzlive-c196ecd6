@@ -315,7 +315,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               return (
                 <div key={course.id || `${course.course_id}-${index}`} className="aspect-[4/5]">
                   <CourseCard
-                    course={course.golf_courses}
+                    course={{
+                      ...course.golf_courses,
+                      average_rating: course.golf_courses?.average_rating || course.average_rating
+                    }}
                     userRating={course.rating || course.userRating}
                     viewContext="regional"
                     viewingUserId={userId}
