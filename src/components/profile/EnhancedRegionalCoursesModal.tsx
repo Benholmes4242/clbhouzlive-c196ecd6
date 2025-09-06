@@ -124,27 +124,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     queryFn: async () => {
       if (!userId) return [];
       
-      // Get region filter logic - only courses in Top 100 lists
-      let regionFilter = '';
-      switch (regionName) {
-        case 'Worldwide':
-          regionFilter = 'global_rank.lte.100';
-          break;
-        case 'Great Britain & Ireland':
-          regionFilter = 'and(country.eq.Britain & Ireland,regional_rank.lte.100)';
-          break;
-        case 'USA':
-          regionFilter = 'and(country.eq.USA,usa_rank.lte.100)';
-          break;
-        case 'Continental Europe':
-          regionFilter = 'and(continent.eq.Europe,country.neq.Britain & Ireland,regional_rank.lte.100)';
-          break;
-        default:
-          regionFilter = `and(region.eq.${regionName},regional_rank.lte.100)`;
-      }
-
       // Get all courses for the region
-      const { data: allCourses, error: coursesError } = await supabase
+      let query = supabase
         .from('golf_courses')
         .select(`
           id,
@@ -158,8 +139,36 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           usa_rank,
           description,
           thumbnail_image
-        `)
-        .or(regionFilter)
+        `);
+
+      // Apply region-specific filters
+      switch (regionName) {
+        case 'Worldwide':
+          query = query.lte('global_rank', 100);
+          break;
+        case 'Great Britain & Ireland':
+          query = query
+            .eq('country', 'Britain & Ireland')
+            .lte('regional_rank', 100);
+          break;
+        case 'USA':
+          query = query
+            .eq('country', 'USA')
+            .lte('usa_rank', 100);
+          break;
+        case 'Continental Europe':
+          query = query
+            .eq('continent', 'Europe')
+            .neq('country', 'Britain & Ireland')
+            .lte('regional_rank', 100);
+          break;
+        default:
+          query = query
+            .eq('region', regionName)
+            .lte('regional_rank', 100);
+      }
+
+      const { data: allCourses, error: coursesError } = await query
         .order('global_rank', { ascending: true, nullsFirst: false })
         .order('regional_rank', { ascending: true, nullsFirst: false })
         .order('usa_rank', { ascending: true, nullsFirst: false });
