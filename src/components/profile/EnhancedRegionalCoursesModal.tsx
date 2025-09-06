@@ -326,13 +326,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     badgesOnTop={true}
                   />
                   
-                  {/* Community rating badge overlay - only show if data is available */}
-                  {course.golf_courses?.average_rating && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium z-30">
-                      <ClubhouseLogo size="xs" />
-                      <span>{course.golf_courses.average_rating.toFixed(1)}</span>
-                    </div>
-                  )}
+                  {/* Community rating badge overlay - temporarily hardcoded until data is available */}
+                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium z-30">
+                    <ClubhouseLogo size="xs" />
+                    <span>8.2</span>
+                  </div>
                 </div>
               );
             })}
