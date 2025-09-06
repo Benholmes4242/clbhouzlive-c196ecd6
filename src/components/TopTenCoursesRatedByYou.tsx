@@ -50,7 +50,9 @@ export default function TopTenCoursesRatedByYou({
   // Set up sensors for drag-and-drop (desktop and mobile)
   const sensors = useSensors(
     useSensor(PointerSensor, { 
-      activationConstraint: { delay: 120, tolerance: 5 } // Enables long press on mobile
+      activationConstraint: { 
+        distance: 8, // Start dragging after moving 8px
+      }
     })
   );
 
