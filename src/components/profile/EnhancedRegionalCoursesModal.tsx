@@ -474,7 +474,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       {/* Scrollable Content */}
       <div className="p-4 sm:p-6">
         {coursesLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-4">
             <ClubhouzLoading />
           </div>
         ) : filteredAndSortedCourses.length === 0 ? (

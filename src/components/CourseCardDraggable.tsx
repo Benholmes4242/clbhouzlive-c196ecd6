@@ -64,11 +64,7 @@ export const CourseCardDraggable: React.FC<{
       {showAddButton && (
         <>
           {inTopTen ? (
-            <div className="absolute bottom-0 right-0 bg-green-600 text-white w-12 h-12 flex items-center justify-center text-[9px] font-medium shadow-sm z-50"
-                 style={{
-                   clipPath: 'polygon(100% 0, 100% 100%, 0 100%)'
-                 }}>
-              <span className="translate-x-1 translate-y-1">10</span>
+            <div className="absolute bottom-0 right-0 bg-green-600 text-white w-8 h-8 flex items-center justify-center text-[9px] font-medium shadow-sm z-50 rounded-tl-lg">
             </div>
           ) : (
             <Button
