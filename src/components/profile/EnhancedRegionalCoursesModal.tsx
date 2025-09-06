@@ -10,6 +10,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import SlideInModal from '@/components/ui/SlideInModal';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -109,6 +110,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [view, setView] = useState<ViewOption>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
+  const [reviewModalCourse, setReviewModalCourse] = useState<any>(null);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
   
@@ -256,10 +258,21 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         });
       
       if (error) throw error;
+      return courseId;
     },
-    onSuccess: () => {
+    onSuccess: (courseId) => {
       queryClient.invalidateQueries({ queryKey: ['allRegionCourses'] });
-      toast.success('Course marked as played!');
+      toast.success('Course marked as played!', {
+        action: {
+          label: 'Add Review',
+          onClick: () => {
+            const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
+            if (course) {
+              setReviewModalCourse(course.golf_courses);
+            }
+          }
+        }
+      });
     },
     onError: () => {
       toast.error('Failed to mark course as played');
@@ -488,13 +501,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     {!course.userPlayed && isOwnProfile && (
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
                           markAsPlayedMutation.mutate({ courseId: course.golf_courses.id });
                         }}
                         disabled={markAsPlayedMutation.isPending}
-                        className="z-20 relative"
+                        className="z-20 relative bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
                       >
                         {markAsPlayedMutation.isPending ? 'Adding...' : 'Mark as Played'}
                       </Button>
@@ -514,12 +527,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                         <div className="absolute bottom-2 left-2 right-2">
                           <Button
                             size="sm"
+                            variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
                               markAsPlayedMutation.mutate({ courseId: course.golf_courses.id });
                             }}
                             disabled={markAsPlayedMutation.isPending}
-                            className="w-full text-xs"
+                            className="w-full text-xs bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
                           >
                             {markAsPlayedMutation.isPending ? 'Adding...' : 'Mark as Played'}
                           </Button>
@@ -542,19 +556,22 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     showAverageRating={true}
                     badgesOnTop={true}
                   />
-
-                  {/* Played indicator */}
-                  {course.userPlayed && (
-                    <div className="absolute bottom-2 left-2 bg-green-600/90 text-white px-2 py-1 rounded text-xs font-medium z-30">
-                      ✓ Played
-                    </div>
-                  )}
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* Review Modal */}
+      {reviewModalCourse && (
+        <PostPlayRatingModal
+          course={reviewModalCourse}
+          isOpen={!!reviewModalCourse}
+          onClose={() => setReviewModalCourse(null)}
+          isEditMode={false}
+        />
+      )}
     </SlideInModal>
   );
 };
