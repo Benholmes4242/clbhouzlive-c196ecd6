@@ -312,6 +312,14 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               }
 
               // Grid view - show full cards
+              // Debug logging
+              console.log('Course data:', {
+                courseName: course.golf_courses?.name,
+                averageRating: course.golf_courses?.average_rating,
+                alternativeRating: course.average_rating,
+                fullCourse: course
+              });
+
               return (
                 <div key={course.id || `${course.course_id}-${index}`} className="aspect-[4/5] relative">
                   <CourseCard
@@ -329,13 +337,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     badgesOnTop={true}
                   />
                   
-                  {/* Debug: Temporary community rating badge overlay */}
-                  {(course.golf_courses?.average_rating || course.average_rating) && (
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold z-50">
-                      <ClubhouseLogo size="xs" />
-                      {(course.golf_courses?.average_rating || course.average_rating)?.toFixed(1)}
-                    </div>
-                  )}
+                  {/* Debug: Always show this badge to test positioning */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold z-50">
+                    TEST {index}
+                  </div>
                 </div>
               );
             })}
