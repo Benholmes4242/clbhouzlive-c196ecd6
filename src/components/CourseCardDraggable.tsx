@@ -52,11 +52,13 @@ export const CourseCardDraggable: React.FC<{
       {showAddButton && (
         <Button
           size="sm"
-          variant={inTopTen ? "secondary" : "default"}
+          variant={inTopTen ? "secondary" : "ghost"}
           disabled={inTopTen}
           onClick={handleAddToTopTen}
-          className={`absolute top-2 right-2 h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity ${
-            inTopTen ? "bg-green-100 text-green-700 border-green-200" : ""
+          className={`absolute bottom-2 right-2 h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity ${
+            inTopTen 
+              ? "bg-muted/80 text-muted-foreground border-muted" 
+              : "bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40"
           }`}
         >
           {inTopTen ? (
