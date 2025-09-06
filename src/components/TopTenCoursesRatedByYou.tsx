@@ -91,7 +91,7 @@ export default function TopTenCoursesRatedByYou({
           </div>
         )}
 
-        <div className="relative">
+        <div className="relative mt-2">
           {/* Match exact row styling from Top 10 Rated by You section */}
           <div className="
             flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
