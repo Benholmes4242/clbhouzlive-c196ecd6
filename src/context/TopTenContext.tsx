@@ -56,13 +56,13 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .from('user_top_ten_lists')
           .select('courses')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
           console.error("TopTen load error:", error);
           setError("Failed to load Top 10");
-        } else if (data?.courses) {
-          setTopTenState(data.courses);
+        } else if (data?.courses && Array.isArray(data.courses)) {
+          setTopTenState(data.courses as (Course | undefined)[]);
         }
       } catch (e: any) {
         setError("Failed to load Top 10");
@@ -75,16 +75,29 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     loadTopTen();
   }, []);
 
-  // --- Persist (debounced) to localStorage ---
+  // --- Persist (debounced) to database ---
   useEffect(() => {
     if (loading) return;
-    const tid = setTimeout(() => {
+    
+    const saveToDatabase = async () => {
       try {
-        localStorage.setItem("topten_v1", JSON.stringify(topTen));
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        await supabase
+          .from('user_top_ten_lists')
+          .upsert({
+            user_id: user.id,
+            courses: topTen
+          }, {
+            onConflict: 'user_id'
+          });
       } catch (e) {
         console.error("Failed to save Top 10:", e);
       }
-    }, 400);
+    };
+
+    const tid = setTimeout(saveToDatabase, 400);
     return () => clearTimeout(tid);
   }, [topTen, loading]);
 

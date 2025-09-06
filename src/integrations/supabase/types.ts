@@ -1655,6 +1655,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_top_ten_lists: {
+        Row: {
+          courses: Json
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          courses?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          courses?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_top100_courses: {
         Row: {
           course_id: string
