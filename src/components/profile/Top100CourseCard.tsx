@@ -127,11 +127,11 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           {/* Content overlay */}
           <div className="absolute inset-0 flex items-center justify-between p-4 z-20">
             <div className="flex-1 text-white">
-              <h3 className="font-semibold text-3xl leading-tight mb-1">
+              <h3 className="font-semibold text-lg md:text-xl leading-tight mb-1">
                 {course.name}
               </h3>
-              <div className="flex items-center text-xl text-white/90">
-                <MapPin className="h-5 w-5 mr-1" />
+              <div className="flex items-center text-sm md:text-base text-white/90">
+                <MapPin className="h-4 w-4 mr-1" />
                 <span>{formatLocation(course)}</span>
               </div>
             </div>
@@ -251,16 +251,16 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         </div>
 
         {/* Course Info */}
-        <div className="p-3">
-          <h3 className="font-semibold text-sm line-clamp-2 leading-tight mb-1">
+        <div className="p-2.5">
+          <h3 className="font-semibold text-xs line-clamp-2 leading-tight mb-1">
             {course.name}
           </h3>
-          <div className="flex items-center text-xs text-muted-foreground mb-2">
-            <MapPin className="h-3 w-3 mr-1" />
+          <div className="flex items-center text-[10px] text-muted-foreground mb-1.5">
+            <MapPin className="h-2.5 w-2.5 mr-1" />
             <span>{formatLocation(course)}</span>
           </div>
           {course.description && (
-            <p className="text-xs text-muted-foreground line-clamp-2">
+            <p className="text-[10px] text-muted-foreground line-clamp-2">
               {formatDescription(course.description)}
             </p>
           )}

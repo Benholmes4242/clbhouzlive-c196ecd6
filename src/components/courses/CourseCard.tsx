@@ -144,14 +144,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
         }>
           {/* XP earned - show above course name for recently played cards */}
           {showXP && xp && !badgesOnTop && (
-            <div className={`${mobileTextScale === 'small' ? 'text-lg md:text-2xl' : 'text-2xl'} text-white/90 leading-tight mb-1 drop-shadow-lg`}>
+            <div className={`${mobileTextScale === 'small' ? 'text-base md:text-lg' : 'text-lg md:text-xl'} text-white/90 leading-tight mb-1 drop-shadow-lg`}>
               {xp} XP
             </div>
           )}
           
           {/* Course Name - positioned at bottom when badgesOnTop is true */}
           <h3 
-            className={`${mobileTextScale === 'small' ? 'text-xl md:text-3xl' : 'text-3xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg ${showXP && !badgesOnTop ? 'line-clamp-2 cursor-pointer' : ''}`}
+            className={`${mobileTextScale === 'small' ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg ${showXP && !badgesOnTop ? 'line-clamp-2 cursor-pointer' : ''}`}
             title={showXP && !badgesOnTop ? course.name : undefined}
           >
             {course.name}
