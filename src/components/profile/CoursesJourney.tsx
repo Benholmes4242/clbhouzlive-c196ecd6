@@ -134,9 +134,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
         {/* Controls Section moved - now appears above depth stack carousel */}
 
-        {/* Top 10 Rated by You Section */}
-        <TopRatedSection userId={userId} isOwnProfile={isOwnProfile} />
-
         {/* Top 10 Courses Rated by You Section - mirrors Your Top 10 bar */}
         <TopTenCoursesRatedByYou
           title="Top 10 Courses Rated by You"
