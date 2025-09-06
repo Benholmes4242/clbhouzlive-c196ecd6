@@ -62,26 +62,26 @@ export const CourseCardDraggable: React.FC<{
       </div>
       
       {showAddButton && (
-        <Button
-          size="sm"
-          variant={inTopTen ? "secondary" : "ghost"}
-          disabled={inTopTen}
-          onClick={handleAddToTopTen}
-          className={`absolute bottom-2 right-2 h-6 px-2 text-xs transition-opacity z-50 pointer-events-auto ${
-            inTopTen 
-              ? "bg-muted/80 text-muted-foreground border-muted opacity-100" 
-              : "bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40 opacity-0 group-hover:opacity-100"
-          }`}
-        >
+        <>
           {inTopTen ? (
-            "✓ Top 10"
+            <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 text-[10px] font-medium shadow-sm z-50"
+                 style={{
+                   clipPath: 'polygon(0 0, 100% 0, 100% 100%, 20% 100%)'
+                 }}>
+              ✓ Top 10
+            </div>
           ) : (
-            <>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleAddToTopTen}
+              className="absolute bottom-2 right-2 h-6 px-2 text-xs transition-opacity z-50 pointer-events-auto bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40 opacity-0 group-hover:opacity-100"
+            >
               <Plus className="w-3 h-3 mr-1" />
               add this course to my top 10
-            </>
+            </Button>
           )}
-        </Button>
+        </>
       )}
     </div>
   );

@@ -160,9 +160,6 @@ const TopTenSlot: React.FC<{
         <div className="text-[10px] font-semibold text-foreground leading-tight">
           {index + 1}. {course.name}
         </div>
-        <div className="text-[9px] text-muted-foreground truncate">
-          {course.sub_country || course.region || course.country}
-        </div>
       </div>
       <button
         onClick={(e) => {
@@ -195,9 +192,6 @@ const GhostCard: React.FC<{ course: Course; index: number }> = ({ course, index 
     <div className="px-2 py-1 flex-1 min-w-0 flex flex-col justify-center">
       <div className="text-[10px] font-semibold text-foreground leading-tight">
         {index + 1}. {course.name}
-      </div>
-      <div className="text-[9px] text-muted-foreground truncate">
-        {course.sub_country || course.region || course.country}
       </div>
     </div>
   </div>
