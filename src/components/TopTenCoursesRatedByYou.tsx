@@ -80,7 +80,7 @@ export default function TopTenCoursesRatedByYou({
         )}
 
         <div className="relative">
-          {/* Match exact row width/gap from Top 10 Rated by You section */}
+          {/* Match exact row styling from Top 10 Rated by You section */}
           <div className="
             flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
             [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
@@ -88,35 +88,62 @@ export default function TopTenCoursesRatedByYou({
           ">
             {topTen.map((course, index) => {
               const rank = index + 1;
+              const isTopThree = index < 3;
+
+              // Helper functions from Top 10 Rated by You section
+              const getTopAccentGradient = (position: number) => {
+                switch (position) {
+                  case 0: return 'bg-gradient-to-r from-transparent via-yellow-500 to-transparent'; // Gold
+                  case 1: return 'bg-gradient-to-r from-transparent via-gray-400 to-transparent'; // Silver
+                  case 2: return 'bg-gradient-to-r from-transparent via-amber-700 to-transparent'; // Bronze
+                  default: return '';
+                }
+              };
+
+              const getRankBadgeGradient = (position: number) => {
+                switch (position) {
+                  case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600'; // Gold metallic
+                  case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500'; // Silver metallic
+                  case 2: return 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800'; // Bronze metallic
+                  default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
+                }
+              };
+
+              const getCardShadow = (position: number) => {
+                return position < 3 ? 'shadow-xl shadow-black/20' : 'shadow-lg';
+              };
 
               if (!course) {
                 // Grey placeholder card matching modal style
                 return (
-                  <div key={`ph-${index}`} className="
-                    flex-shrink-0 
-                    w-[calc((100vw-2rem)/var(--cards)-var(--g))] 
-                    md:w-[calc((100vw-4rem)/var(--cards)-var(--g))] 
-                    lg:w-[calc((1200px-4rem)/var(--cards)-var(--g))]
-                    min-w-0
-                  ">
-                    <div className="relative">
-                      {/* Rank badge with 1-3 medal styling, 4-10 liquid glass */}
-                      <div className={`
-                        absolute -top-2 -left-2 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-10 border border-muted-foreground/30
-                        ${rank <= 3 
-                          ? rank === 1 
-                            ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 border-yellow-500/50' 
-                            : rank === 2 
-                            ? 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900 border-gray-400/50'
-                            : 'bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 border-amber-500/50'
-                          : 'bg-muted/60 backdrop-blur-sm text-muted-foreground border-muted-foreground/30'
-                        }
-                      `}>
-                        {rank}
+                  <div key={`ph-${index}`} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative">
+                    <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+                      {/* Top Edge Gradient Accent for Top 3 placeholders */}
+                      {isTopThree && (
+                        <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
+                      )}
+                      
+                      {/* Rank badge */}
+                      <div className="absolute top-3 left-3 z-20">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center
+                          ${getRankBadgeGradient(index)}
+                          ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
+                          ${isTopThree ? 'ring-1 ring-white/20' : ''}
+                        `}>
+                          <span className={`
+                            text-white font-medium text-sm leading-none
+                            ${isTopThree ? 'drop-shadow-sm' : ''}
+                          `}>
+                            {rank}
+                          </span>
+                        </div>
                       </div>
+
+                      {/* Placeholder content */}
                       <div 
                         className="
-                          h-[var(--card-h-portrait)] rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 
+                          w-full h-full border-2 border-dashed border-muted-foreground/30 bg-muted/20 
                           flex flex-col items-center justify-center text-muted-foreground 
                           hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer group
                         "
@@ -152,42 +179,13 @@ export default function TopTenCoursesRatedByYou({
               }
 
               return (
-                <div key={`course-${course.id}-${index}`} className="
-                  flex-shrink-0 
-                  w-[calc((100vw-2rem)/var(--cards)-var(--g))] 
-                  md:w-[calc((100vw-4rem)/var(--cards)-var(--g))] 
-                  lg:w-[calc((1200px-4rem)/var(--cards)-var(--g))]
-                  min-w-0
-                ">
-                  <div className="relative">
-                    {/* Rank badge with 1-3 medal styling, 4-10 liquid glass */}
-                    <div className={`
-                      absolute -top-2 -left-2 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-10
-                      ${rank <= 3 
-                        ? rank === 1 
-                          ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 border border-yellow-500/50' 
-                          : rank === 2 
-                          ? 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900 border border-gray-400/50'
-                          : 'bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 border border-amber-500/50'
-                        : 'bg-primary/10 backdrop-blur-sm text-primary border border-primary/20'
-                      }
-                    `}>
-                      {rank}
-                    </div>
-                    
-                    {/* Top 3 get accent lines */}
-                    {rank <= 3 && (
-                      <div className={`
-                        absolute top-0 left-0 right-0 h-1 rounded-t-xl z-20
-                        ${rank === 1 
-                          ? 'bg-gradient-to-r from-transparent via-yellow-500 to-transparent' 
-                          : rank === 2 
-                          ? 'bg-gradient-to-r from-transparent via-gray-400 to-transparent'
-                          : 'bg-gradient-to-r from-transparent via-amber-700 to-transparent'
-                        }
-                      `} />
+                <div key={`course-${course.id}-${index}`} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative">
+                  <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+                    {/* Top Edge Gradient Accent for Top 3 */}
+                    {isTopThree && (
+                      <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
                     )}
-
+                    
                     <CourseCard
                       course={{
                         id: course.id,
@@ -202,12 +200,33 @@ export default function TopTenCoursesRatedByYou({
                       }}
                       viewContext="global"
                       viewingUserId={userId}
-                      isReadOnly
-                      customHeight="h-[var(--card-h-portrait)]"
+                      isReadOnly={!isOwnProfile}
                       showUserRating={false}
-                      showAverageRating={true}
-                      badgesOnTop={true}
+                      showAverageRating={false}
+                      isFromUserCoursesPage={true}
+                      customHeight="h-full"
+                      showCountryWithFlag={true}
+                      hideRankingBadges={true}
+                      mobileTextScale="small"
+                      mobileFlagSize="md"
                     />
+                    
+                    {/* Premium Rank Badge - Top Left (matching Top 10 Rated position) */}
+                    <div className="absolute top-3 left-3 z-20">
+                      <div className={`
+                        w-8 h-8 rounded-full flex items-center justify-center
+                        ${getRankBadgeGradient(index)}
+                        ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
+                        ${isTopThree ? 'ring-1 ring-white/20' : ''}
+                      `}>
+                        <span className={`
+                          text-white font-medium text-sm leading-none
+                          ${isTopThree ? 'drop-shadow-sm' : ''}
+                        `}>
+                          {rank}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
