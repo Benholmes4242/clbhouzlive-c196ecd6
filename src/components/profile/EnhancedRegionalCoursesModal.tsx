@@ -7,6 +7,8 @@ import CourseCard from '@/components/courses/CourseCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useModalState } from '@/hooks/useModalDetector';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import SlideInModal from '@/components/ui/SlideInModal';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -108,6 +110,46 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   
   // Register this modal with the modal detector
   useModalState(isOpen);
+
+  // Query to get community ratings for courses
+  const { data: communityRatings = {} } = useQuery({
+    queryKey: ['communityRatings', courses.map(c => c.golf_courses?.id).filter(Boolean)],
+    queryFn: async () => {
+      if (courses.length === 0) return {};
+      
+      const courseIds = courses.map(c => c.golf_courses?.id).filter(Boolean);
+      if (courseIds.length === 0) return {};
+      
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .in('course_id', courseIds);
+
+      if (error) throw error;
+      
+      // Calculate average ratings per course
+      const ratingsByCourse: Record<string, number[]> = {};
+      data?.forEach(rating => {
+        if (!ratingsByCourse[rating.course_id]) {
+          ratingsByCourse[rating.course_id] = [];
+        }
+        ratingsByCourse[rating.course_id].push(rating.rating);
+      });
+
+      // Calculate averages
+      const averages: Record<string, number> = {};
+      Object.entries(ratingsByCourse).forEach(([courseId, ratings]) => {
+        if (ratings.length > 0) {
+          const avg = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+          averages[courseId] = Math.round(avg * 10) / 10; // Round to 1 decimal place
+        }
+      });
+
+      return averages;
+    },
+    enabled: isOpen && courses.length > 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Reset search when modal opens/closes
   useEffect(() => {
@@ -326,11 +368,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     badgesOnTop={true}
                   />
                   
-                  {/* Community rating badge overlay - temporarily hardcoded until data is available */}
-                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium z-30">
-                    <ClubhouseLogo size="xs" />
-                    <span>8.2</span>
-                  </div>
+                  {/* Community rating badge overlay - show real data when available */}
+                  {communityRatings[course.golf_courses?.id] && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium z-30">
+                      <ClubhouseLogo size="xs" />
+                      <span>{communityRatings[course.golf_courses.id]}</span>
+                    </div>
+                  )}
                 </div>
               );
             })}
