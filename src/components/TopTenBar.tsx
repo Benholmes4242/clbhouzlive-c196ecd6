@@ -24,6 +24,10 @@ const slotId = (i: number): SlotId => `slot-${i}`;
 
 export const TopTenBar: React.FC = () => {
   const { topTen, moveCourse, removeCourse, addCourseAtIndex, isInTopTen } = useTopTen();
+  
+  // Debug logging
+  console.log("TopTenBar topTen state:", topTen);
+  console.log("TopTenBar filled courses:", topTen.filter(Boolean));
   const sensors = useSensors(
     useSensor(PointerSensor, { 
       activationConstraint: { delay: 120, tolerance: 5 } 

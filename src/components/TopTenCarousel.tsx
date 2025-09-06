@@ -15,6 +15,10 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
   onOpenModal 
 }) => {
   const { topTen, loading } = useTopTen();
+  
+  // Debug logging
+  console.log("TopTenCarousel topTen state:", topTen);
+  console.log("TopTenCarousel filled courses:", topTen.filter(Boolean));
 
   if (loading) {
     return (
