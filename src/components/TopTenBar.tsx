@@ -169,7 +169,10 @@ const TopTenSlot: React.FC<{
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-[10px] shadow-sm hover:bg-destructive/80 flex items-center justify-center z-10"
+        className="absolute top-0 right-0 bg-destructive text-destructive-foreground w-6 h-4 text-[10px] shadow-sm hover:bg-destructive/80 flex items-center justify-center z-10 clip-path-banner"
+        style={{
+          clipPath: 'polygon(0 0, 100% 0, 100% 100%, 20% 100%)'
+        }}
         aria-label="Remove"
       >
         ✕
