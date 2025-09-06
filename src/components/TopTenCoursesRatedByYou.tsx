@@ -59,16 +59,7 @@ export default function TopTenCoursesRatedByYou({
             )}
           </h3>
           <div className="flex gap-2">
-            {isOwnProfile && onOpenModal && filled > 0 && (
-              <Button 
-                variant="ghost"
-                size="sm"
-                onClick={onOpenModal}
-                className="text-sm underline hover:bg-transparent p-0 h-auto"
-              >
-                Edit
-              </Button>
-            )}
+            {/* Edit button removed */}
           </div>
         </div>
 
@@ -175,8 +166,7 @@ export default function TopTenCoursesRatedByYou({
                         </div>
                         {isOwnProfile && (
                           <div className="text-xs text-center px-4">
-                            <div className="mb-1">Click to add</div>
-                            <div className="opacity-70">Open See All</div>
+                            Add a new course within Courses by Region
                           </div>
                         )}
                         {!isOwnProfile && (
