@@ -305,6 +305,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     customHeight="h-full"
                     showUserRating={true}
                     showAverageRating={true}
+                    badgesOnTop={true}
                   />
                 </div>
               );

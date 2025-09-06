@@ -99,7 +99,10 @@ export default function SlideInModal({
 
       {/* Panel container: keep centered; panel slides from right */}
       <div
-        className={`relative w-[92vw] max-w-[920px] max-h-[92vh] bg-background border border-border rounded-lg shadow-lg overflow-hidden
+        className={`relative 
+          w-full h-screen max-w-none
+          sm:w-[92vw] sm:max-w-[920px] sm:max-h-[98vh] sm:h-auto
+          bg-background border border-border rounded-none sm:rounded-lg shadow-lg overflow-hidden
           transform transition-transform
           ${animateIn ? "translate-x-0" : "translate-x-full"}
         `}
@@ -126,7 +129,7 @@ export default function SlideInModal({
         </div>
 
         {/* Body scrolls; place your content here */}
-        <div className="overflow-auto max-h-[calc(92vh-80px)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="overflow-auto h-[calc(100vh-80px)] sm:max-h-[calc(98vh-80px)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {children}
         </div>
       </div>
