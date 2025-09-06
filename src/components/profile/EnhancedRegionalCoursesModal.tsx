@@ -175,14 +175,22 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       if (coursesError) throw coursesError;
 
-      // Get user's played courses data  
-      const { data: userPlayedData, error: playedError } = await supabase
-        .from('user_top100_courses')
-        .select('course_id, played, created_at')
-        .eq('user_id', userId)
-        .eq('played', true);
+      // Get user's played courses data from BOTH sources (like working carousel)
+      const [userTop100Data, userRatingsData] = await Promise.all([
+        supabase
+          .from('user_top100_courses')
+          .select('course_id, played, created_at')
+          .eq('user_id', userId)
+          .eq('played', true),
+        
+        supabase
+          .from('course_ratings')
+          .select('course_id, created_at')
+          .eq('user_id', userId)
+      ]);
 
-      if (playedError) throw playedError;
+      if (userTop100Data.error) throw userTop100Data.error;
+      if (userRatingsData.error) throw userRatingsData.error;
 
       // Get user's ratings
       const { data: userRatings, error: ratingsError } = await supabase
@@ -192,8 +200,29 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       if (ratingsError) throw ratingsError;
 
+      // Combine played courses from both sources
+      const allPlayedCourseIds = new Set([
+        ...(userTop100Data.data?.map(p => p.course_id) || []),
+        ...(userRatingsData.data?.map(r => r.course_id) || [])
+      ]);
+
       // Create lookup maps
-      const playedMap = new Map(userPlayedData?.map(p => [p.course_id, p]) || []);
+      const playedMap = new Map();
+      // Add from user_top100_courses
+      userTop100Data.data?.forEach(p => {
+        playedMap.set(p.course_id, p);
+      });
+      // Add from course_ratings (if not already present from top100)
+      userRatingsData.data?.forEach(r => {
+        if (!playedMap.has(r.course_id)) {
+          playedMap.set(r.course_id, { 
+            course_id: r.course_id, 
+            played: true, 
+            created_at: r.created_at 
+          });
+        }
+      });
+
       const ratingsMap = new Map(userRatings?.map(r => [r.course_id, r]) || []);
 
       // Combine all data
@@ -204,7 +233,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         return {
           course_id: course.id,
           golf_courses: course,
-          userPlayed: !!playedData,
+          userPlayed: allPlayedCourseIds.has(course.id),
           lastPlayedAt: playedData?.created_at,
           rating: ratingData?.rating,
           created_at: ratingData?.created_at
