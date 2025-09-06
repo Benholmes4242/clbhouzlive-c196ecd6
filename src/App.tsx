@@ -16,6 +16,7 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
+import { TopTenProvider } from '@/context/TopTenContext';
 
 
 // Lazy load all pages for better code splitting and loading screen experience
@@ -84,7 +85,8 @@ const App: React.FC = () => {
               <GlobalAudioProvider>
                 <VideoManagerProvider>
                   <VideoPlaybackManagerProvider>
-                    <AuthWrapper>
+                    <TopTenProvider>
+                      <AuthWrapper>
                     <Suspense fallback={<ClubhouzLoading />}>
                       <Routes>
                         <Route path="/" element={<Clubhouse />} />
@@ -120,6 +122,7 @@ const App: React.FC = () => {
                       </Routes>
                     </Suspense>
                     </AuthWrapper>
+                    </TopTenProvider>
                   </VideoPlaybackManagerProvider>
                 </VideoManagerProvider>
               </GlobalAudioProvider>

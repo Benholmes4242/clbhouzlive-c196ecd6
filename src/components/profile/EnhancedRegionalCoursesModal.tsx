@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import SlideInModal from '@/components/ui/SlideInModal';
+import { TopTenBar } from '@/components/TopTenBar';
+import { CourseCardDraggable } from '@/components/CourseCardDraggable';
 
 interface EnhancedRegionalCoursesModalProps {
   isOpen: boolean;
@@ -456,6 +458,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           />
         </div>
 
+        {/* Top Ten Bar */}
+        <TopTenBar />
+
         {/* Stats */}
         {playedCount > 0 && (
           <div className="mt-3 text-sm text-muted-foreground">
@@ -485,7 +490,22 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               if (view === 'list') {
                 // List view - show as compact rows
                 return (
-                  <div key={course.course_id || `${course.course_id}-${index}`} className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative">
+                  <CourseCardDraggable 
+                    key={course.course_id || `${course.course_id}-${index}`}
+                    course={{
+                      id: course.golf_courses?.id || '',
+                      name: course.golf_courses?.name || '',
+                      country: course.golf_courses?.country || undefined,
+                      sub_country: course.golf_courses?.sub_country || undefined,
+                      region: course.golf_courses?.region || undefined,
+                      thumbnail_image: course.golf_courses?.thumbnail_image || undefined,
+                      global_rank: course.golf_courses?.global_rank,
+                      regional_rank: course.golf_courses?.regional_rank,
+                      usa_rank: course.golf_courses?.usa_rank,
+                    }}
+                    showAddButton={course.userPlayed && isOwnProfile}
+                  >
+                    <div className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative">
                     {/* Lock overlay for unplayed courses */}
                     {!course.userPlayed && (
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/40 to-muted/60 rounded-lg z-10 backdrop-blur-[1px]">
@@ -551,15 +571,31 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                         className="z-20 relative bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
                       >
                         {markAsPlayedMutation.isPending ? 'Adding...' : 'Mark as Played'}
-                      </Button>
-                    )}
-                  </div>
-                );
-              }
+                       </Button>
+                     )}
+                     </div>
+                   </CourseCardDraggable>
+                 );
+               }
 
-              // Grid view - show full cards
-              return (
-                <div key={course.course_id || `${course.course_id}-${index}`} className="aspect-[4/5] relative">
+               // Grid view - show full cards
+               return (
+                <CourseCardDraggable
+                  key={course.course_id || `${course.course_id}-${index}`}
+                  course={{
+                    id: course.golf_courses?.id || '',
+                    name: course.golf_courses?.name || '',
+                    country: course.golf_courses?.country || undefined,
+                    sub_country: course.golf_courses?.sub_country || undefined,
+                    region: course.golf_courses?.region || undefined,
+                    thumbnail_image: course.golf_courses?.thumbnail_image || undefined,
+                    global_rank: course.golf_courses?.global_rank,
+                    regional_rank: course.golf_courses?.regional_rank,
+                    usa_rank: course.golf_courses?.usa_rank,
+                  }}
+                  showAddButton={course.userPlayed && isOwnProfile}
+                >
+                  <div className="aspect-[4/5] relative">
                   {/* Lock overlay for unplayed courses */}
                   {!course.userPlayed && (
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50 rounded-lg z-20 backdrop-blur-[2px]">
@@ -596,8 +632,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     showUserRating={true}
                     showAverageRating={true}
                     badgesOnTop={true}
-                  />
-                </div>
+                    />
+                  </div>
+                </CourseCardDraggable>
               );
             })}
           </div>
