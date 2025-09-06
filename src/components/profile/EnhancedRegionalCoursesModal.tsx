@@ -459,7 +459,9 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         </div>
 
         {/* Top Ten Bar */}
-        <TopTenBar />
+        <div className="mt-4">
+          <TopTenBar />
+        </div>
 
         {/* Stats */}
         {playedCount > 0 && (
