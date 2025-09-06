@@ -1,10 +1,1 @@
 project_id = "ybxkehyomcakqjvuhnna"
-
-[functions.cloudflare-r2-upload]
-verify_jwt = true
-
-[functions.cloudflare-stream-details]
-verify_jwt = false
-
-[functions.cloudflare-stream-upload]
-verify_jwt = true
