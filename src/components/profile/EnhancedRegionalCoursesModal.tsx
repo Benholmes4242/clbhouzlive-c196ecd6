@@ -199,7 +199,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                 <ChevronDown className="h-3 w-3 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent 
+              align="end" 
+              className="w-48 bg-background border border-border shadow-lg z-[1100]"
+              sideOffset={4}
+            >
               <DropdownMenuItem 
                 onClick={() => setSortBy('recently-played')}
                 className={sortBy === 'recently-played' ? 'bg-muted' : ''}
