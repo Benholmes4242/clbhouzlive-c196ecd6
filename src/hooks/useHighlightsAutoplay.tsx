@@ -125,11 +125,17 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
     };
   }, [determineActiveCard, containerRef]);
 
-  // Re-check when cards are registered/unregistered
+  // Re-check when cards are registered/unregistered and set initial active card
   useEffect(() => {
-    const timer = setTimeout(determineActiveCard, 100);
+    const timer = setTimeout(() => {
+      determineActiveCard();
+      // If no card is active and we have cards, activate the first one
+      if (activeCardIndex === null && cardRefs.current.size > 0) {
+        setActiveCardIndex(0);
+      }
+    }, 100);
     return () => clearTimeout(timer);
-  }, [cardRefs.current.size, determineActiveCard]);
+  }, [cardRefs.current.size, determineActiveCard, activeCardIndex]);
 
   return {
     activeCardIndex,
