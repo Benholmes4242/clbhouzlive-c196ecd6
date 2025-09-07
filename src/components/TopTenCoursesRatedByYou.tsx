@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
-import { useTopTen } from "@/context/TopTenContext";
+import { useUserTopTen } from "@/hooks/useUserTopTen";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { InlineTypeahead } from "@/components/InlineTypeahead";
@@ -36,7 +36,7 @@ export default function TopTenCoursesRatedByYou({
   userId,
   userDisplayName,
 }: Props) {
-  const { topTen, loading, moveCourse, addCourseAtIndex } = useTopTen();
+  const { topTen, loading, canEdit, moveCourse, addCourseAtIndex } = useUserTopTen(userId);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -141,7 +141,7 @@ export default function TopTenCoursesRatedByYou({
     if (String(active.id).startsWith("slot-") && String(over.id).startsWith("slot-")) {
       const from = parseInt(String(active.id).replace("slot-", ""), 10);
       const to = parseInt(String(over.id).replace("slot-", ""), 10);
-      if (Number.isFinite(from) && Number.isFinite(to) && from !== to) {
+      if (Number.isFinite(from) && Number.isFinite(to) && from !== to && canEdit) {
         moveCourse(from, to);
       }
     }
@@ -171,7 +171,9 @@ export default function TopTenCoursesRatedByYou({
           </h3>
         </div>
         <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">Loading your top 10...</div>
+          <div className="text-muted-foreground">
+            {userId ? `Loading ${isOwnProfile ? 'your' : userDisplayName?.split(' ')[0] + "'s"} top 10...` : 'Loading top 10...'}
+          </div>
         </div>
       </div>
     );
@@ -250,7 +252,7 @@ export default function TopTenCoursesRatedByYou({
                     index={index} 
                     course={course} 
                     userId={userId}
-                    isOwnProfile={isOwnProfile}
+                    isOwnProfile={canEdit} // Use canEdit instead of isOwnProfile for more accurate control
                     onOpenModal={onOpenModal}
                     onAddCourse={(selectedCourse, slotIndex) => {
                       addCourseAtIndex(selectedCourse, slotIndex);
@@ -297,7 +299,7 @@ const TopTenSlot: React.FC<{
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile || isSearchMode // Disable dragging when in search mode or not own profile
+    disabled: !isOwnProfile // Disable dragging when not owner or in search mode
   });
   
   const style = {
