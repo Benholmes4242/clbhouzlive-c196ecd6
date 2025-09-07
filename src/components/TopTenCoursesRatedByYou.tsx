@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useTopTen } from "@/context/TopTenContext";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
+import { InlineTypeahead } from "@/components/InlineTypeahead";
+import { useSwipeable } from "react-swipeable";
 import {
   DndContext,
   DragEndEvent,
@@ -32,8 +34,9 @@ export default function TopTenCoursesRatedByYou({
   userId,
   userDisplayName,
 }: Props) {
-  const { topTen, loading, moveCourse } = useTopTen();
+  const { topTen, loading, moveCourse, addCourseAtIndex } = useTopTen();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Dynamic title based on profile ownership
   const getTitle = () => {
@@ -81,6 +84,21 @@ export default function TopTenCoursesRatedByYou({
       }
     }
   };
+
+  // Swipe handlers for mobile carousel navigation
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+      }
+    },
+    onSwipedRight: () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+      }
+    },
+    trackMouse: false, // Only track touch events
+  });
   
   if (loading) {
     return (
@@ -125,11 +143,16 @@ export default function TopTenCoursesRatedByYou({
           >
             <SortableContext items={items} strategy={rectSortingStrategy}>
               {/* Match exact row styling from Top 10 Rated by You section */}
-              <div className="
-                flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-              ">
+              <div 
+                ref={scrollContainerRef}
+                {...swipeHandlers}
+                className="
+                  flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                  touch-pan-x
+                "
+              >
                 {topTen.map((course, index) => (
                   <TopTenSlot 
                     key={`slot-${index}`}
@@ -139,6 +162,10 @@ export default function TopTenCoursesRatedByYou({
                     userId={userId}
                     isOwnProfile={isOwnProfile}
                     onOpenModal={onOpenModal}
+                    onAddCourse={(selectedCourse, slotIndex) => {
+                      addCourseAtIndex(selectedCourse, slotIndex);
+                    }}
+                    existingCourses={topTen}
                   />
                 ))}
               </div>
@@ -173,10 +200,14 @@ const TopTenSlot: React.FC<{
   userId?: string;
   isOwnProfile?: boolean;
   onOpenModal?: () => void;
-}> = ({ id, index, course, userId, isOwnProfile, onOpenModal }) => {
+  onAddCourse?: (course: any, index: number) => void;
+  existingCourses?: any[];
+}> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onAddCourse, existingCourses = [] }) => {
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile // Only allow dragging for own profile
+    disabled: !isOwnProfile || isSearchMode // Disable dragging when in search mode
   });
   
   const style = {
@@ -211,15 +242,24 @@ const TopTenSlot: React.FC<{
     return position < 3 ? 'shadow-xl shadow-black/20' : 'shadow-lg';
   };
 
+  const handleAddCourse = (course: any) => {
+    if (onAddCourse) {
+      onAddCourse(course, index);
+      setIsSearchMode(false);
+    }
+  };
+
+  const existingCourseIds = existingCourses.filter(Boolean).map(c => c.id);
+
   if (!course) {
-    // Grey placeholder card
+    // Empty slot with inline search
     return (
       <div 
         ref={setNodeRef}
         style={style}
         className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
       >
-        <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+        <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)} bg-card border border-border`}>
           {/* Top Edge Gradient Accent for Top 3 placeholders */}
           {isTopThree && (
             <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
@@ -242,38 +282,29 @@ const TopTenSlot: React.FC<{
             </div>
           </div>
 
-          {/* Placeholder content */}
-          <div 
-            className="
-              w-full h-full border-2 border-dashed border-muted-foreground/30 bg-muted/20 
-              flex flex-col items-center justify-center text-muted-foreground 
-              hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer group
-            "
-            onClick={onOpenModal}
-            role="button"
-            tabIndex={0}
-            aria-label={`Empty slot ${rank} — add from See All`}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onOpenModal?.();
-              }
-            }}
-          >
-            <div className="text-2xl font-bold mb-2 group-hover:scale-110 transition-transform">
-              {rank}
+          {/* Inline search or placeholder */}
+          {isOwnProfile ? (
+            <div className="w-full h-full pt-12">
+              <InlineTypeahead
+                placeholder="Search courses…"
+                onPick={handleAddCourse}
+                onClose={() => setIsSearchMode(false)}
+                onOpenSearch={() => setIsSearchMode(true)}
+                isSearchMode={isSearchMode}
+                userId={userId}
+                existingCourseIds={existingCourseIds}
+              />
             </div>
-            {isOwnProfile && (
-              <div className="text-xs text-center px-4">
-                Add a new course within Courses by Region
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground pt-12">
+              <div className="text-2xl font-bold mb-2">
+                {rank}
               </div>
-            )}
-            {!isOwnProfile && (
               <div className="text-xs text-center px-4">
                 No course selected
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     );
