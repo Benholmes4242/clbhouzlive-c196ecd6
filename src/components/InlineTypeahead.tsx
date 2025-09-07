@@ -146,7 +146,7 @@ export function InlineTypeahead({
         aria-label="Search courses to add to Top 10"
       >
         <Search className="w-6 h-6 mb-1" />
-        <span className="text-xs">search for a golf course</span>
+        <span className="text-xs">Search for a golf course</span>
       </Button>
     );
   }
