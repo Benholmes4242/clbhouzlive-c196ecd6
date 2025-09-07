@@ -17,7 +17,10 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   const queryClient = useQueryClient();
   const { user: currentUser } = useSupabaseSession();
   const isIndividual = userType === 'individual';
-  const isOwnProfile = currentUser?.id === userId;
+  // Enhanced isOwnProfile check to handle username-based profile access
+  const isOwnProfile = currentUser?.id === userId ||
+                       (currentUser && username && currentUser.user_metadata?.username === username) ||
+                       (currentUser && username === currentUser.email?.split('@')[0]);
 
   console.log('FollowerStats - userId:', userId, 'userType:', userType, 'isOwnProfile:', isOwnProfile);
 

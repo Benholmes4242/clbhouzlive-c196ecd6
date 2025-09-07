@@ -20,7 +20,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   onProfileUpdate
 }) => {
   const { user } = useSupabaseSession();
-  const isOwnProfile = user?.id === profile?.id;
+  // Enhanced isOwnProfile check to handle username-based profile access
+  const isOwnProfile = user?.id === profile?.id ||
+                       (user && profile?.username && user.user_metadata?.username === profile.username) ||
+                       (user && profile?.username === user.email?.split('@')[0]);
 
   console.log('ProfileInfo - profile:', profile, 'userId:', userId, 'profile.id:', profile?.id);
 
