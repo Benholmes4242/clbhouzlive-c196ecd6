@@ -129,14 +129,7 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
   useEffect(() => {
     const timer = setTimeout(determineActiveCard, 100);
     return () => clearTimeout(timer);
-  }, [cardRefs.current.size, determineActiveCard]);
-
-  // Ensure first card is active when container becomes visible
-  useEffect(() => {
-    if (isContainerVisible && activeCardIndex === null && cardRefs.current.size > 0) {
-      setActiveCardIndex(0);
-    }
-  }, [isContainerVisible, activeCardIndex, cardRefs.current.size]);
+  }, [highlights.length, determineActiveCard]);
 
   return {
     activeCardIndex,

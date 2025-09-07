@@ -50,35 +50,25 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
 
-  // Register with video controller - need to register even when element doesn't exist yet
+  // Register with video controller
   useEffect(() => {
     if (primaryMedia?.media_type === 'video') {
       register(highlight.id, videoRef.current);
     }
-    return () => {
-      register(highlight.id, null);
-    };
   }, [highlight.id, primaryMedia, register]);
 
-  // Re-register when video element becomes available
-  useEffect(() => {
-    if (primaryMedia?.media_type === 'video' && isActive && videoRef.current) {
-      register(highlight.id, videoRef.current);
-    }
-  }, [isActive, highlight.id, primaryMedia, register]);
-
-  // Handle autoplay based on visibility - this sets isActive state
+  // Handle autoplay based on visibility
   useEffect(() => {
     if (primaryMedia?.media_type !== 'video') return;
     
-    if (shouldAutoplay) {
-      // This should trigger the video controller to make this card active
+    if (shouldAutoplay && !isActive) {
+      // Start playing this video
       play(highlight.id);
     } else if (!shouldAutoplay && isActive) {
       // Pause this video and reset to muted state
-      pause(highlight.id, true);
+      pause(highlight.id, true); // Reset mute state when pausing due to visibility
     }
-  }, [shouldAutoplay, primaryMedia, play, pause, highlight.id]);
+  }, [shouldAutoplay, isActive, primaryMedia, play, pause, highlight.id]);
 
   // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
