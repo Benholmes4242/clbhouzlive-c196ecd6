@@ -139,14 +139,33 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
       .limit(5);
 
     const suggestions: SearchResult[] = [];
+    const allCourseIds: string[] = [];
 
-    // Add recently played
+    // Collect all course IDs for rating lookup
+    if (recentlyPlayed) {
+      allCourseIds.push(...recentlyPlayed.map(item => item.golf_courses.id));
+    }
+    if (highestRated) {
+      allCourseIds.push(...highestRated.map(item => item.golf_courses.id));
+    }
+
+    // Get all ratings for these courses in one query
+    const { data: allRatings } = await supabase
+      .from('course_ratings')
+      .select('course_id, rating')
+      .eq('user_id', userId)
+      .in('course_id', allCourseIds);
+
+    const ratingsMap = new Map(allRatings?.map(r => [r.course_id, r.rating]) || []);
+
+    // Add recently played with their ratings
     if (recentlyPlayed) {
       recentlyPlayed.forEach(item => {
         const course = item.golf_courses;
         suggestions.push({
           ...course,
-          played: true
+          played: true,
+          rating: ratingsMap.get(course.id)
         });
       });
     }
