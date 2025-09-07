@@ -45,7 +45,6 @@ export default function TopTenCoursesRatedByYou({
   
   // Combined ref callback that handles both swipe and carousel functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
-    console.log('Setting refs for node:', node);
     scrollContainerRef.current = node;
     carouselRef(node);
   }, [carouselRef]);
@@ -53,25 +52,29 @@ export default function TopTenCoursesRatedByYou({
   // Custom scroll function that works with this specific carousel
   const handleScroll = (direction: 'left' | 'right') => {
     const container = scrollContainerRef.current;
-    console.log('Container from scrollContainerRef:', container);
-    console.log('Container from carouselRef via useCarouselNavigation:', typeof carouselRef);
     
     if (container) {
       const scrollDistance = direction === 'left' ? -300 : 300;
-      console.log('Scrolling', direction, 'by', scrollDistance);
-      console.log('Current scrollLeft:', container.scrollLeft);
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      
+      // Force update scroll button states after scrolling
       setTimeout(() => {
-        console.log('New scrollLeft:', container.scrollLeft);
-      }, 100);
+        if (container) {
+          const event = new Event('scroll');
+          container.dispatchEvent(event);
+        }
+      }, 300);
     } else {
-      console.log('No container found for scrolling');
-      // Try to find the element directly
+      // Fallback to direct element selection
       const directContainer = document.querySelector('[data-testid="top-ten-carousel"]');
-      console.log('Direct container:', directContainer);
       if (directContainer) {
         const scrollDistance = direction === 'left' ? -300 : 300;
         directContainer.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+        
+        setTimeout(() => {
+          const event = new Event('scroll');
+          directContainer.dispatchEvent(event);
+        }, 300);
       }
     }
   };
@@ -174,7 +177,6 @@ export default function TopTenCoursesRatedByYou({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('Left arrow clicked');
                   handleScroll('left');
                 }}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0 relative z-20 pointer-events-auto"
@@ -189,7 +191,6 @@ export default function TopTenCoursesRatedByYou({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('Right arrow clicked');
                   handleScroll('right');
                 }}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0 relative z-20 pointer-events-auto"
