@@ -9,6 +9,7 @@ interface UseHighlightsAutoplayProps {
 export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlightsAutoplayProps) => {
   const isMobile = useIsMobile();
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
+  const [isContainerVisible, setIsContainerVisible] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
@@ -71,18 +72,47 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
     }
   }, [isMobile, activeCardIndex, containerRef]);
 
-  // Set up intersection observer for scroll detection
+  // Set up viewport visibility observer for the container
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Use a simple scroll listener instead of intersection observer for more precise control
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isVisible = entry.intersectionRatio > 0.5;
+        setIsContainerVisible(isVisible);
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(container);
+    observerRef.current = observer;
+
+    return () => {
+      observer.disconnect();
+      observerRef.current = null;
+    };
+  }, [containerRef]);
+
+  // Set up scroll listeners for carousel and page
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Handle horizontal scroll within carousel
     const handleScroll = () => {
       determineActiveCard();
     };
 
+    // Handle vertical page scroll
+    const handlePageScroll = () => {
+      // The intersection observer handles container visibility
+      // This just triggers a re-check of active cards
+      determineActiveCard();
+    };
+
     container.addEventListener('scroll', handleScroll);
-    // Also check on resize
+    window.addEventListener('scroll', handlePageScroll);
     window.addEventListener('resize', handleScroll);
     
     // Initial check
@@ -90,6 +120,7 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
 
     return () => {
       container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handlePageScroll);
       window.removeEventListener('resize', handleScroll);
     };
   }, [determineActiveCard, containerRef]);
@@ -103,6 +134,6 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
   return {
     activeCardIndex,
     registerCard,
-    shouldAutoplay: (index: number) => activeCardIndex === index
+    shouldAutoplay: (index: number) => activeCardIndex === index && isContainerVisible
   };
 };
