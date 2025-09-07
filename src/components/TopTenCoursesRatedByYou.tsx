@@ -52,9 +52,17 @@ export default function TopTenCoursesRatedByYou({
   // Custom scroll function that works with this specific carousel
   const handleScroll = (direction: 'left' | 'right') => {
     const container = scrollContainerRef.current;
+    console.log('Container:', container);
     if (container) {
       const scrollDistance = direction === 'left' ? -300 : 300;
+      console.log('Scrolling', direction, 'by', scrollDistance);
+      console.log('Current scrollLeft:', container.scrollLeft);
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      setTimeout(() => {
+        console.log('New scrollLeft:', container.scrollLeft);
+      }, 100);
+    } else {
+      console.log('No container found for scrolling');
     }
   };
   
