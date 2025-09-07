@@ -45,6 +45,7 @@ export default function TopTenCoursesRatedByYou({
   
   // Combined ref callback that handles both swipe and carousel functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
+    console.log('Setting refs for node:', node);
     scrollContainerRef.current = node;
     carouselRef(node);
   }, [carouselRef]);
@@ -52,7 +53,9 @@ export default function TopTenCoursesRatedByYou({
   // Custom scroll function that works with this specific carousel
   const handleScroll = (direction: 'left' | 'right') => {
     const container = scrollContainerRef.current;
-    console.log('Container:', container);
+    console.log('Container from scrollContainerRef:', container);
+    console.log('Container from carouselRef via useCarouselNavigation:', typeof carouselRef);
+    
     if (container) {
       const scrollDistance = direction === 'left' ? -300 : 300;
       console.log('Scrolling', direction, 'by', scrollDistance);
@@ -63,6 +66,13 @@ export default function TopTenCoursesRatedByYou({
       }, 100);
     } else {
       console.log('No container found for scrolling');
+      // Try to find the element directly
+      const directContainer = document.querySelector('[data-testid="top-ten-carousel"]');
+      console.log('Direct container:', directContainer);
+      if (directContainer) {
+        const scrollDistance = direction === 'left' ? -300 : 300;
+        directContainer.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      }
     }
   };
   
@@ -203,6 +213,7 @@ export default function TopTenCoursesRatedByYou({
               <div 
                 ref={combinedRefCallback}
                 {...swipeHandlers}
+                data-testid="top-ten-carousel"
                 className="
                   flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                   [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
