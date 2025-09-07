@@ -41,13 +41,22 @@ export default function TopTenCoursesRatedByYou({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Use carousel navigation for arrow controls
-  const { carouselRef, canScrollLeft, canScrollRight, scroll } = useCarouselNavigation(10);
+  const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(10);
   
   // Combined ref callback that handles both swipe and carousel functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
     scrollContainerRef.current = node;
     carouselRef(node);
   }, [carouselRef]);
+
+  // Custom scroll function that works with this specific carousel
+  const handleScroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollDistance = direction === 'left' ? -300 : 300;
+      container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+    }
+  };
   
   // Dynamic title based on profile ownership
   const getTitle = () => {
@@ -144,7 +153,7 @@ export default function TopTenCoursesRatedByYou({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => scroll('left')}
+                onClick={() => handleScroll('left')}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronLeft className="h-10 w-10" />
@@ -154,7 +163,7 @@ export default function TopTenCoursesRatedByYou({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => scroll('right')}
+                onClick={() => handleScroll('right')}
                 className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
                 <ChevronRight className="h-10 w-10" />
