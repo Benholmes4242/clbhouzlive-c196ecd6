@@ -129,7 +129,7 @@ export const useHighlightsAutoplay = ({ containerRef, highlights }: UseHighlight
   useEffect(() => {
     const timer = setTimeout(determineActiveCard, 100);
     return () => clearTimeout(timer);
-  }, [cardRefs.current.size, determineActiveCard]);
+  }, [highlights.length, determineActiveCard]);
 
   return {
     activeCardIndex,
