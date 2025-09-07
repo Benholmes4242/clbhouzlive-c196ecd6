@@ -501,7 +501,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                       regional_rank: course.golf_courses?.regional_rank,
                       usa_rank: course.golf_courses?.usa_rank,
                     }}
-                    showAddButton={course.userPlayed && isOwnProfile}
+                    showAddButton={false}
                   >
                     <div className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative">
                     {/* Lock overlay for unplayed courses */}
@@ -591,7 +591,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     regional_rank: course.golf_courses?.regional_rank,
                     usa_rank: course.golf_courses?.usa_rank,
                   }}
-                  showAddButton={course.userPlayed && isOwnProfile}
+                  showAddButton={false}
                 >
                   <div className="aspect-[4/5] relative">
                   {/* Lock overlay for unplayed courses */}
