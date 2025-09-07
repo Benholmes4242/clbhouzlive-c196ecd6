@@ -161,6 +161,9 @@ const HeroProfileHeader = ({
   const handleTabChange = (newTab: string) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
+    // Prevent any scroll behavior when switching tabs
+    const currentScrollPosition = window.scrollY;
+    
     // Determine transition direction based on tab order
     const currentIndex = tabs.findIndex(tab => tab.id === activeSection);
     const newIndex = tabs.findIndex(tab => tab.id === newTab);
@@ -169,6 +172,13 @@ const HeroProfileHeader = ({
     // Start transition and immediately change the tab
     startTransition(direction, () => {
       onSectionChange?.(newTab);
+      
+      // Restore scroll position to prevent any jumps
+      setTimeout(() => {
+        if (window.scrollY !== currentScrollPosition) {
+          window.scrollTo(0, currentScrollPosition);
+        }
+      }, 0);
     });
   };
 
@@ -453,14 +463,19 @@ const HeroProfileHeader = ({
   }, [isMobile, profile?.id, trackScrollDepth]);
   const handleMorphTransition = () => {
     closeImmersive();
-    // Smooth scroll to trigger sticky header
-    setTimeout(() => {
-      window.scrollTo({ top: isMobile ? 200 : 300, behavior: 'smooth' });
-    }, 300);
+    // Only scroll if not on activity tab to prevent interference with tab transitions
+    if (activeSection !== 'activity') {
+      setTimeout(() => {
+        window.scrollTo({ top: isMobile ? 200 : 300, behavior: 'smooth' });
+      }, 300);
+    }
   };
 
   // Stats handling
   const handleStatClick = (statType: string) => {
+    // Prevent scroll behavior when switching tabs via stats
+    const currentScrollPosition = window.scrollY;
+    
     switch (statType) {
       case 'handicap':
         onSectionChange?.('stats');
@@ -478,6 +493,13 @@ const HeroProfileHeader = ({
         onSectionChange?.('courses');
         break;
     }
+    
+    // Restore scroll position to prevent jumping
+    setTimeout(() => {
+      if (window.scrollY !== currentScrollPosition) {
+        window.scrollTo(0, currentScrollPosition);
+      }
+    }, 0);
   };
 
   // Derived values
@@ -971,17 +993,21 @@ const HeroProfileHeader = ({
 
       {/* Tab Navigation with Underline Animation - Brand accent styling */}
       <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
-        <div className="relative">
+        <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
                 className={`
                   relative py-4 px-4 text-base font-semibold transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? '' 
-                    : 'hover:opacity-80'
+                    ? 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' 
+                    : 'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                   }
                   flex-1 text-center
                 `}
@@ -1139,12 +1165,16 @@ const HeroProfileHeader = ({
           <>
             {/* Outgoing content */}
             <div className={`absolute inset-0 w-full ${getContentTransitionClass(true)}`}>
-              {getPreviousContent()}
+              <div role="tabpanel" aria-hidden="true">
+                {getPreviousContent()}
+              </div>
             </div>
             
             {/* Incoming content */}
             <div className={`relative w-full ${getContentTransitionClass(false)}`}>
-              {getCurrentContent()}
+              <div role="tabpanel" id={`tabpanel-${activeSection}`} aria-hidden="false">
+                {getCurrentContent()}
+              </div>
             </div>
           </>
         ) : (
@@ -1159,7 +1189,9 @@ const HeroProfileHeader = ({
             <div className={`
               ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
             `}>
-              {getCurrentContent()}
+              <div role="tabpanel" id={`tabpanel-${activeSection}`} aria-labelledby={`tab-${activeSection}`}>
+                {getCurrentContent()}
+              </div>
             </div>
           </div>
         )}

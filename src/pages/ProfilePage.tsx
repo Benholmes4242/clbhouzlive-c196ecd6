@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
@@ -8,7 +8,11 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState('activity');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState(() => {
+    // Initialize from URL params, default to 'activity'
+    return searchParams.get('tab') || 'activity';
+  });
   const queryClient = useQueryClient();
   
   // Only invalidate profile cache on initial page load, not on remounts
@@ -80,6 +84,23 @@ const ProfilePage = () => {
     );
   }
 
+  // Handle section changes with URL sync
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    
+    // Update URL without full page reload
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (section === 'activity') {
+      // Remove tab param for default tab
+      newSearchParams.delete('tab');
+    } else {
+      newSearchParams.set('tab', section);
+    }
+    
+    // Use replace to avoid adding to browser history for each tab change
+    setSearchParams(newSearchParams, { replace: true });
+  };
+
   // Don't render anything if user is not authenticated (will redirect)
   if (!user) {
     return null;
@@ -95,7 +116,7 @@ const ProfilePage = () => {
         isOwnProfile={true} // This is always the user's own profile on this route
         onProfileUpdate={refreshProfile}
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={handleSectionChange}
       />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}

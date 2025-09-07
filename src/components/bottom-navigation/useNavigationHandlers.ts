@@ -31,13 +31,16 @@ export const useNavigationHandlers = () => {
       setActiveTab(tab.id);
       navigate(tab.path);
       
-      setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'smooth'
-        });
-      }, 50);
+      // Only scroll to top when navigating to different pages, not when staying on profile
+      if (tab.path !== '/profile') {
+        setTimeout(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+        }, 50);
+      }
     }
   };
 
