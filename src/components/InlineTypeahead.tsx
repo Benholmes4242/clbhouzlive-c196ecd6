@@ -261,17 +261,11 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter }: ResultRowProps)
               className="w-4 h-3 rounded-sm object-cover"
             />
             <span className="truncate">{course.region}</span>
-            {course.played && (
-              <span className="text-primary">• Played</span>
+            {course.rating && (
+              <span className="text-foreground font-medium">• {course.rating.toFixed(1)}</span>
             )}
           </div>
         </div>
-        
-        {course.rating && (
-          <Badge variant="secondary" className="text-xs">
-            {course.rating.toFixed(1)}
-          </Badge>
-        )}
       </div>
     </div>
   );
