@@ -380,7 +380,7 @@ const TopTenSlot: React.FC<{
           {isOwnProfile ? (
             <div className="w-full h-full pt-12">
               <InlineTypeahead
-                placeholder="Search courses…"
+                placeholder="search for a golf course"
                 onPick={handleAddCourse}
                 onClose={() => setIsSearchMode(false)}
                 onOpenSearch={() => setIsSearchMode(true)}

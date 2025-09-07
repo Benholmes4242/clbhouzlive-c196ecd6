@@ -145,8 +145,8 @@ export function InlineTypeahead({
         className="w-full h-full flex flex-col items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Search courses to add to Top 10"
       >
-        <Search className="w-6 h-6 mb-2" />
-        <span className="text-sm">Search courses</span>
+        <Search className="w-6 h-6 mb-1" />
+        <span className="text-xs">search for a golf course</span>
       </Button>
     );
   }
