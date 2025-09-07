@@ -24,20 +24,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
                        (user && profile?.username === user.email?.split('@')[0]);
   const [activeSection, setActiveSection] = useState('activity');
 
-  // Debug logging for authentication issues
-  console.log('UserProfileContent Debug:', {
-    userId: user?.id,
-    profileId: profile?.id,
-    profileUsername: profile?.username,
-    userMetadataUsername: user?.user_metadata?.username,
-    userEmail: user?.email,
-    isOwnProfile,
-    userIdMatch: user?.id === profile?.id,
-    usernameMatch: user && profile?.username && user.user_metadata?.username === profile.username,
-    emailMatch: user && profile?.username === user.email?.split('@')[0]
-  });
-
-
   if (!profile) {
     return null;
   }

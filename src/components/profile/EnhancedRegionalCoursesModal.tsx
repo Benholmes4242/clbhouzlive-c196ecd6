@@ -110,13 +110,6 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   isOwnProfile = false,
   userId
 }) => {
-  // Debug logging to understand the authentication issue
-  console.log('EnhancedRegionalCoursesModal Debug:', {
-    isOwnProfile,
-    userId,
-    regionName,
-    isOpen
-  });
   const [view, setView] = useState<ViewOption>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');

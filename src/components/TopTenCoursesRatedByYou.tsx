@@ -299,7 +299,7 @@ const TopTenSlot: React.FC<{
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile // Disable dragging when not owner or in search mode
+    disabled: !isOwnProfile || isSearchMode // Re-add isSearchMode check to prevent dragging during search
   });
   
   const style = {
