@@ -259,12 +259,16 @@ const TopTenSlot: React.FC<{
     }
   };
 
-  const getRankBadgeGradient = (position: number) => {
+  const getRankBadgeGradient = (position: number, hasCourse: boolean = false) => {
     switch (position) {
       case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600'; // Gold metallic
       case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500'; // Silver metallic
       case 2: return 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800'; // Bronze metallic
-      default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'; // Liquid glass for 4-10
+      default: 
+        // For positions 4-10, use liquid glass when filled, white background when empty
+        return hasCourse 
+          ? 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30' // Liquid glass for filled slots
+          : 'bg-white border border-gray-200'; // White background for empty slots
     }
   };
 
@@ -299,12 +303,12 @@ const TopTenSlot: React.FC<{
           <div className="absolute top-3 left-3 z-20">
             <div className={`
               w-8 h-8 rounded-full flex items-center justify-center
-              ${getRankBadgeGradient(index)}
+              ${getRankBadgeGradient(index, false)}
               ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
               ${isTopThree ? 'ring-1 ring-white/20' : ''}
             `}>
               <span className={`
-                text-white font-medium text-sm leading-none
+                ${isTopThree ? 'text-white' : 'text-black'} font-medium text-sm leading-none
                 ${isTopThree ? 'drop-shadow-sm' : ''}
               `}>
                 {rank}
@@ -323,6 +327,7 @@ const TopTenSlot: React.FC<{
                 isSearchMode={isSearchMode}
                 userId={userId}
                 existingCourseIds={existingCourseIds}
+                onClickOutside={() => setIsSearchMode(false)}
               />
             </div>
           ) : (
@@ -386,7 +391,7 @@ const TopTenSlot: React.FC<{
         <div className="absolute top-3 left-3 z-20">
           <div className={`
             w-8 h-8 rounded-full flex items-center justify-center
-            ${getRankBadgeGradient(index)}
+            ${getRankBadgeGradient(index, true)}
             ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
             ${isTopThree ? 'ring-1 ring-white/20' : ''}
           `}>
@@ -416,12 +421,15 @@ const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ 
     }
   };
 
-  const getRankBadgeGradient = (position: number) => {
+  const getRankBadgeGradient = (position: number, hasCourse: boolean = false) => {
     switch (position) {
       case 0: return 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600';
       case 1: return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500';
       case 2: return 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800';
-      default: return 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30';
+      default: 
+        return hasCourse 
+          ? 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30'
+          : 'bg-white border border-gray-200';
     }
   };
 
@@ -462,7 +470,7 @@ const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ 
       <div className="absolute top-3 left-3 z-20">
         <div className={`
           w-8 h-8 rounded-full flex items-center justify-center
-          ${getRankBadgeGradient(index)}
+          ${getRankBadgeGradient(index, true)}
           ${isTopThree ? 'shadow-lg shadow-black/25' : 'shadow-md'}
           ${isTopThree ? 'ring-1 ring-white/20' : ''}
         `}>

@@ -26,6 +26,7 @@ interface InlineTypeaheadProps {
   existingCourseIds?: string[];
   onJumpToSlot?: (slotIndex: number) => void;
   onSwapWithSlot?: (slotIndex: number) => void;
+  onClickOutside?: () => void;
 }
 
 export function InlineTypeahead({
@@ -37,13 +38,15 @@ export function InlineTypeahead({
   onOpenSearch,
   existingCourseIds = [],
   onJumpToSlot,
-  onSwapWithSlot
+  onSwapWithSlot,
+  onClickOutside
 }: InlineTypeaheadProps) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { data: searchResults, loading, error } = useCourseSearch(query, {
     debounceMs: 250,
@@ -143,7 +146,7 @@ export function InlineTypeahead({
   }
 
   return (
-    <div className="slot-search h-full flex flex-col" role="group" aria-label="Add course to Top 10">
+    <div ref={containerRef} className="slot-search h-full flex flex-col" role="group" aria-label="Add course to Top 10">
       <div className="p-3 border-b border-border">
         <input
           ref={inputRef}
