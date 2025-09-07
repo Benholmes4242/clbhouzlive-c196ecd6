@@ -260,7 +260,7 @@ function ResultRow({ course, onClick, isFocused, onMouseEnter }: ResultRowProps)
               alt={`${course.country} flag`}
               className="w-4 h-3 rounded-sm object-cover"
             />
-            <span className="truncate">{course.region}</span>
+            <span className="truncate">{course.sub_country || course.region}</span>
             {course.rating && (
               <span className="text-foreground font-medium">• {course.rating.toFixed(1)}</span>
             )}
