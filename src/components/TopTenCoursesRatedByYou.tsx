@@ -115,24 +115,6 @@ export default function TopTenCoursesRatedByYou({
           </div>
         </div>
 
-        {/* Empty state CTA */}
-        {!hasAnyCourses && isOwnProfile && (
-          <div className="mb-4 p-3 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30">
-            <p className="text-sm text-muted-foreground text-center">
-              Open See All to choose your Top 10
-              {onOpenModal && (
-                <Button 
-                  variant="link" 
-                  size="sm" 
-                  onClick={onOpenModal}
-                  className="ml-1 p-0 h-auto text-sm underline"
-                >
-                  Start building your list
-                </Button>
-              )}
-            </p>
-          </div>
-        )}
 
         <div className="relative mt-2">
           <DndContext
