@@ -10,9 +10,11 @@ type HighlightsVideoContext = {
   activeId: string | null;
   register: (id: string, el: PlayerEl | null) => void;
   play: (id: string) => Promise<void>;
-  pause: (id: string, resetToMuted?: boolean) => void;
-  setCardMuted: (id: string, muted: boolean) => void;
-  getCardMuted: (id: string) => boolean;
+  pause: (id: string) => void;
+  carouselAudioPreference: 'muted' | 'unmuted';
+  setCarouselAudioPreference: (preference: 'muted' | 'unmuted') => void;
+  hasUserGesture: boolean;
+  attemptUnmutedPlay: (id: string) => Promise<boolean>;
 };
 
 const HighlightsVideoContext = createContext<HighlightsVideoContext | null>(null);
@@ -28,7 +30,27 @@ export const useHighlightsVideo = () => {
 export function HighlightsVideoProvider({ children }: { children: React.ReactNode }) {
   const playersRef = useRef(new Map<string, PlayerEl>());
   const [activeId, setActiveId] = useState<string | null>(null);
-  const cardMutedStates = useRef(new Map<string, boolean>()); // Per-card mute states
+  
+  // Carousel-level audio preference - default to muted
+  const [carouselAudioPreference, setCarouselAudioPreference] = useState<'muted' | 'unmuted'>(() => {
+    // Try to restore from session storage
+    const stored = sessionStorage.getItem('highlights-carousel-audio-preference');
+    return (stored === 'unmuted') ? 'unmuted' : 'muted';
+  });
+  
+  // Track if user has made a gesture for autoplay policies
+  const [hasUserGesture, setHasUserGesture] = useState(false);
+
+  // Persist preference to session storage
+  const updateCarouselAudioPreference = useCallback((preference: 'muted' | 'unmuted') => {
+    setCarouselAudioPreference(preference);
+    sessionStorage.setItem('highlights-carousel-audio-preference', preference);
+    
+    // Mark that user has made a gesture
+    if (preference === 'unmuted') {
+      setHasUserGesture(true);
+    }
+  }, []);
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
     console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');
@@ -47,38 +69,48 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     }
   };
 
-  const setCardMuted = useCallback((id: string, muted: boolean) => {
-    cardMutedStates.current.set(id, muted);
-    const el = playersRef.current.get(id);
-    if (el) {
-      setMuted(el, muted);
-    }
-  }, []);
-
-  const getCardMuted = useCallback((id: string) => {
-    return cardMutedStates.current.get(id) ?? true; // Default to muted
-  }, []);
-
-  const pause = useCallback((id: string, resetToMuted = false) => {
+  const pause = useCallback((id: string) => {
     const el = playersRef.current.get(id);
     if (el?.pause) {
       el.pause();
-    }
-    if (el && resetToMuted) {
-      // Only reset to muted when switching videos, not on manual pause
-      cardMutedStates.current.set(id, true);
-      setMuted(el, true);
     }
     if (activeId === id) {
       setActiveId(null);
     }
   }, [activeId]);
 
+  // Attempt to play with sound - returns true if successful, false if blocked
+  const attemptUnmutedPlay = useCallback(async (id: string): Promise<boolean> => {
+    const el = playersRef.current.get(id);
+    if (!el) return false;
+
+    try {
+      // Set unmuted and attempt play
+      setMuted(el, false);
+      await el.play?.();
+      console.log('🎥 Successfully started unmuted playback:', id);
+      return true;
+    } catch (error) {
+      console.warn('🎥 Unmuted autoplay blocked by browser:', error);
+      // Fallback to muted play
+      try {
+        setMuted(el, true);
+        await el.play?.();
+        console.log('🎥 Fell back to muted playback:', id);
+        return false;
+      } catch (fallbackError) {
+        console.warn('🎥 Even muted playback failed:', fallbackError);
+        return false;
+      }
+    }
+  }, []);
+
   const play = useCallback(async (id: string) => {
-    console.log('🎥 Play called for:', id, 'currentActive:', activeId);
-    // RULE: only one video at a time - pause the previous one and reset to muted
+    console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'audioPreference:', carouselAudioPreference);
+    
+    // RULE: only one video at a time - pause the previous one
     if (activeId && activeId !== id) {
-      pause(activeId, true); // Reset previous video to muted when switching
+      pause(activeId);
     }
     
     // Set active first to trigger HLSPlayer render
@@ -106,21 +138,38 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     const el = await waitForElement();
     if (!el) return;
     
-    // Keep the current muted state - don't auto-unmute on autoplay
-    const currentMuted = cardMutedStates.current.get(id) ?? true;
-    setMuted(el, currentMuted);
-    
-    try {
-      await el.play?.();
-      console.log('🎥 Successfully started playing:', id);
-    } catch (error) {
-      console.warn('Failed to play video:', error);
+    // Apply carousel-level audio preference
+    if (carouselAudioPreference === 'muted') {
+      // Always start muted when preference is muted
+      setMuted(el, true);
+      try {
+        await el.play?.();
+        console.log('🎥 Successfully started muted playback:', id);
+      } catch (error) {
+        console.warn('🎥 Failed to play video:', error);
+      }
+    } else {
+      // Preference is unmuted - attempt unmuted play
+      const success = await attemptUnmutedPlay(id);
+      if (!success) {
+        // Store that this card needs user gesture to enable sound
+        console.log('🎥 Card needs user gesture for sound:', id);
+      }
     }
-  }, [activeId, pause]);
+  }, [activeId, pause, carouselAudioPreference, attemptUnmutedPlay]);
 
   return (
     <HighlightsVideoContext.Provider 
-      value={{ activeId, register, play, pause, setCardMuted, getCardMuted }}
+      value={{ 
+        activeId, 
+        register, 
+        play, 
+        pause, 
+        carouselAudioPreference,
+        setCarouselAudioPreference: updateCarouselAudioPreference,
+        hasUserGesture,
+        attemptUnmutedPlay
+      }}
     >
       {children}
     </HighlightsVideoContext.Provider>

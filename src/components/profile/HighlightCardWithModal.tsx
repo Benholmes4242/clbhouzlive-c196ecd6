@@ -6,6 +6,7 @@ import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTrans
 import { useHighlightsVideo } from './HighlightsVideoController';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import HighlightsAudioToast from './HighlightsAudioToast';
 
 interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
@@ -27,11 +28,19 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Use the highlights video controller for playback
-  const { activeId, register, play, pause, setCardMuted, getCardMuted } = useHighlightsVideo();
+  const { 
+    activeId, 
+    register, 
+    play, 
+    pause, 
+    carouselAudioPreference, 
+    setCarouselAudioPreference,
+    attemptUnmutedPlay 
+  } = useHighlightsVideo();
   const isActive = activeId === highlight.id;
   
-  // Local state for this card's mute status
-  const [isCardMuted, setIsCardMuted] = useState(() => getCardMuted(highlight.id));
+  // Track if this card needs user gesture for sound
+  const [needsGestureForSound, setNeedsGestureForSound] = useState(false);
   
   // Extract Cloudflare Stream ID for crisp thumbnails
   const extractCloudflareStreamId = (m3u8: string) => {
@@ -63,38 +72,57 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     
     if (shouldAutoplay && !isActive) {
       // Start playing this video
-      play(highlight.id);
+      play(highlight.id).then(() => {
+        // Check if we need to show gesture prompt for unmuted preference
+        if (carouselAudioPreference === 'unmuted') {
+          const videoEl = videoRef.current;
+          if (videoEl && videoEl.muted) {
+            setNeedsGestureForSound(true);
+          }
+        }
+      });
     } else if (!shouldAutoplay && isActive) {
-      // Pause this video and reset to muted state
-      pause(highlight.id, true); // Reset mute state when pausing due to visibility
+      // Pause this video
+      pause(highlight.id);
+      setNeedsGestureForSound(false);
     }
-  }, [shouldAutoplay, isActive, primaryMedia, play, pause, highlight.id]);
+  }, [shouldAutoplay, isActive, primaryMedia, play, pause, highlight.id, carouselAudioPreference]);
 
   // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (primaryMedia?.media_type === 'video') {
       if (isActive) {
-        pause(highlight.id, false); // Manual pause - don't reset mute state
+        pause(highlight.id);
       } else {
         play(highlight.id);
       }
     }
   }, [primaryMedia, isActive, play, pause, highlight.id]);
 
-  // Update local state when video becomes active/inactive
-  useEffect(() => {
-    const currentMuted = getCardMuted(highlight.id);
-    setIsCardMuted(currentMuted);
-  }, [isActive, highlight.id, getCardMuted]);
-
-  // Handle mute/unmute toggle for this specific card
-  const handleMuteToggle = useCallback((e: React.MouseEvent) => {
+  // Handle carousel-level mute/unmute toggle
+  const handleMuteToggle = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newMuted = !isCardMuted;
-    setIsCardMuted(newMuted);
-    setCardMuted(highlight.id, newMuted);
-  }, [isCardMuted, highlight.id, setCardMuted]);
+    
+    const newPreference = carouselAudioPreference === 'muted' ? 'unmuted' : 'muted';
+    setCarouselAudioPreference(newPreference);
+    
+    // If unmuting and this card is active, try to play with sound immediately
+    if (newPreference === 'unmuted' && isActive) {
+      const success = await attemptUnmutedPlay(highlight.id);
+      setNeedsGestureForSound(!success);
+    } else {
+      setNeedsGestureForSound(false);
+    }
+  }, [carouselAudioPreference, setCarouselAudioPreference, isActive, highlight.id, attemptUnmutedPlay]);
+
+  // Handle tap to enable sound when gesture is needed
+  const handleTapForSound = useCallback(async () => {
+    if (isActive && needsGestureForSound) {
+      const success = await attemptUnmutedPlay(highlight.id);
+      setNeedsGestureForSound(!success);
+    }
+  }, [isActive, needsGestureForSound, highlight.id, attemptUnmutedPlay]);
 
   // Safety check for media
   if (!primaryMedia) {
@@ -126,6 +154,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   return (
     <div className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights" onClick={handleVideoClick}>
+        {/* Toast for gesture-needed sound */}
+        <HighlightsAudioToast show={needsGestureForSound} onTap={handleTapForSound} />
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}
@@ -142,7 +172,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   ref={videoRef}
                   hlsUrl={hlsUrl}
                   poster={posterUrl || undefined}
-                  muted={isCardMuted}
+                  muted={carouselAudioPreference === 'muted'}
                   autoplay={false}
                   loop={true}
                   showMuteButton={false}
@@ -198,9 +228,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <button
             onClick={handleMuteToggle}
             className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-7 h-7 flex items-center justify-center hover:bg-white/20 transition-all duration-300"
-            aria-label={isCardMuted ? 'Unmute video' : 'Mute video'}
+            aria-label={carouselAudioPreference === 'muted' ? 'Unmute all highlights' : 'Mute all highlights'}
           >
-            {isCardMuted ? (
+            {carouselAudioPreference === 'muted' ? (
               <VolumeX className="w-4 h-4 text-white" />
             ) : (
               <Volume2 className="w-4 h-4 text-white" />
