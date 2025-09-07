@@ -81,9 +81,6 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
       pause(activeId, true); // Reset previous video to muted when switching
     }
     
-    // Auto-unmute the new video when starting to play
-    cardMutedStates.current.set(id, false);
-    
     // Set active first to trigger HLSPlayer render
     setActiveId(id);
     
@@ -109,8 +106,9 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     const el = await waitForElement();
     if (!el) return;
     
-    // Auto-unmute the newly playing video
-    setMuted(el, false);
+    // Keep the current muted state - don't auto-unmute on autoplay
+    const currentMuted = cardMutedStates.current.get(id) ?? true;
+    setMuted(el, currentMuted);
     
     try {
       await el.play?.();

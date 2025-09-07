@@ -11,12 +11,16 @@ interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
   onOpenModal?: (postId: string) => void;
   isLandscape?: boolean;
+  shouldAutoplay?: boolean;
+  cardIndex?: number;
 }
 
 const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({ 
   highlight, 
   onOpenModal,
-  isLandscape = false
+  isLandscape = false,
+  shouldAutoplay = false,
+  cardIndex = 0
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
@@ -52,6 +56,19 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
       register(highlight.id, videoRef.current);
     }
   }, [highlight.id, primaryMedia, register]);
+
+  // Handle autoplay based on visibility
+  useEffect(() => {
+    if (primaryMedia?.media_type !== 'video') return;
+    
+    if (shouldAutoplay && !isActive) {
+      // Start playing this video
+      play(highlight.id);
+    } else if (!shouldAutoplay && isActive) {
+      // Pause this video and reset to muted state
+      pause(highlight.id, true); // Reset mute state when pausing due to visibility
+    }
+  }, [shouldAutoplay, isActive, primaryMedia, play, pause, highlight.id]);
 
   // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
@@ -127,6 +144,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
                   poster={posterUrl || undefined}
                   muted={isCardMuted}
                   autoplay={false}
+                  loop={true}
                   showMuteButton={false}
                   className="w-full h-full object-cover object-center"
                 />

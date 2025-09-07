@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
 import { HighlightsVideoProvider } from './HighlightsVideoController';
 import HighlightCardWithModal from './HighlightCardWithModal';
+import { useHighlightsAutoplay } from '@/hooks/useHighlightsAutoplay';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -17,6 +18,12 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  
+  // Autoplay management
+  const { activeCardIndex, registerCard, shouldAutoplay } = useHighlightsAutoplay({
+    containerRef: scrollContainerRef,
+    highlights: highlights || []
+  });
   
   // Remove fullscreen modal functionality
   // const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
@@ -140,11 +147,17 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             cursor: 'default'
           }}
         >
-          {highlights.map((highlight) => (
-            <div key={highlight.id} className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]">
+          {highlights.map((highlight, index) => (
+            <div 
+              key={highlight.id} 
+              ref={(el) => registerCard(index, el)}
+              className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
+            >
               <HighlightCardWithModal 
                 highlight={highlight}
                 isLandscape={true}
+                shouldAutoplay={shouldAutoplay(index)}
+                cardIndex={index}
               />
             </div>
           ))}
