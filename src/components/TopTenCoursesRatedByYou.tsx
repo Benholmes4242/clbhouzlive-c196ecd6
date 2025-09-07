@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from "react";
+import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useTopTen } from "@/context/TopTenContext";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
@@ -42,11 +42,21 @@ export default function TopTenCoursesRatedByYou({
   
   // Use carousel navigation for arrow controls
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(10);
+  const [localCanScrollLeft, setLocalCanScrollLeft] = useState(false);
+  const [localCanScrollRight, setLocalCanScrollRight] = useState(true);
   
   // Combined ref callback that handles both swipe and carousel functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
     scrollContainerRef.current = node;
     carouselRef(node);
+    
+    // Check scroll state after component mounts
+    if (node) {
+      setTimeout(() => {
+        setLocalCanScrollLeft(node.scrollLeft > 0);
+        setLocalCanScrollRight(node.scrollLeft < node.scrollWidth - node.clientWidth - 1);
+      }, 100);
+    }
   }, [carouselRef]);
 
   // Custom scroll function that works with this specific carousel
@@ -57,23 +67,23 @@ export default function TopTenCoursesRatedByYou({
       const scrollDistance = direction === 'left' ? -300 : 300;
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
       
-      // Force update scroll button states after scrolling
+      // Update local scroll states after scrolling
       setTimeout(() => {
         if (container) {
-          const event = new Event('scroll');
-          container.dispatchEvent(event);
+          setLocalCanScrollLeft(container.scrollLeft > 0);
+          setLocalCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
         }
       }, 300);
     } else {
       // Fallback to direct element selection
-      const directContainer = document.querySelector('[data-testid="top-ten-carousel"]');
+      const directContainer = document.querySelector('[data-testid="top-ten-carousel"]') as HTMLElement;
       if (directContainer) {
         const scrollDistance = direction === 'left' ? -300 : 300;
         directContainer.scrollBy({ left: scrollDistance, behavior: 'smooth' });
         
         setTimeout(() => {
-          const event = new Event('scroll');
-          directContainer.dispatchEvent(event);
+          setLocalCanScrollLeft(directContainer.scrollLeft > 0);
+          setLocalCanScrollRight(directContainer.scrollLeft < directContainer.scrollWidth - directContainer.clientWidth - 1);
         }, 300);
       }
     }
@@ -90,6 +100,17 @@ export default function TopTenCoursesRatedByYou({
   };
   
   const title = getTitle();
+  
+  // Update scroll states when content changes
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container && topTen.length > 0) {
+      setTimeout(() => {
+        setLocalCanScrollLeft(container.scrollLeft > 0);
+        setLocalCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
+      }, 100);
+    }
+  }, [topTen]);
 
   // Set up sensors for drag-and-drop (desktop and mobile)
   const sensors = useSensors(
@@ -170,7 +191,7 @@ export default function TopTenCoursesRatedByYou({
             )}
           </h3>
           <div className="flex gap-2 relative z-10">
-            {canScrollLeft && (
+            {localCanScrollLeft && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -184,7 +205,7 @@ export default function TopTenCoursesRatedByYou({
                 <ChevronLeft className="h-10 w-10 pointer-events-none" />
               </Button>
             )}
-            {canScrollRight && (
+            {localCanScrollRight && (
               <Button
                 variant="ghost"
                 size="sm"
