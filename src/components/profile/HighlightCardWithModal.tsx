@@ -50,12 +50,15 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
 
-  // Register with video controller
+  // Register with video controller only when video element exists
   useEffect(() => {
-    if (primaryMedia?.media_type === 'video') {
+    if (primaryMedia?.media_type === 'video' && isActive && videoRef.current) {
       register(highlight.id, videoRef.current);
+    } else if (primaryMedia?.media_type === 'video' && !isActive) {
+      // Unregister when not active
+      register(highlight.id, null);
     }
-  }, [highlight.id, primaryMedia, register]);
+  }, [highlight.id, primaryMedia, register, isActive]);
 
   // Handle autoplay based on visibility
   useEffect(() => {
