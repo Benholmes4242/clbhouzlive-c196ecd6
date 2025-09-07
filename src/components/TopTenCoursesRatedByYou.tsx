@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useTopTen } from "@/context/TopTenContext";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { InlineTypeahead } from "@/components/InlineTypeahead";
+import { useSwipeable } from "react-swipeable";
 import {
   DndContext,
   DragEndEvent,
@@ -35,6 +36,7 @@ export default function TopTenCoursesRatedByYou({
 }: Props) {
   const { topTen, loading, moveCourse, addCourseAtIndex } = useTopTen();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Dynamic title based on profile ownership
   const getTitle = () => {
@@ -82,6 +84,21 @@ export default function TopTenCoursesRatedByYou({
       }
     }
   };
+
+  // Swipe handlers for mobile carousel navigation
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+      }
+    },
+    onSwipedRight: () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+      }
+    },
+    trackMouse: false, // Only track touch events
+  });
   
   if (loading) {
     return (
@@ -126,11 +143,16 @@ export default function TopTenCoursesRatedByYou({
           >
             <SortableContext items={items} strategy={rectSortingStrategy}>
               {/* Match exact row styling from Top 10 Rated by You section */}
-              <div className="
-                flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-              ">
+              <div 
+                ref={scrollContainerRef}
+                {...swipeHandlers}
+                className="
+                  flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                  touch-pan-x
+                "
+              >
                 {topTen.map((course, index) => (
                   <TopTenSlot 
                     key={`slot-${index}`}
