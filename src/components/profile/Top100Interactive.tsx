@@ -97,10 +97,10 @@ const Top100Interactive: React.FC<Top100InteractiveProps> = ({
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{region.flag}</span>
-                      <h4 className="font-medium text-sm md:text-base text-foreground">{region.name}</h4>
+                      <h4 className="font-medium text-sm text-foreground">{region.name}</h4>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs md:text-sm bg-background text-foreground border border-border">
+                      <Badge variant="secondary" className="text-xs bg-background text-foreground border border-border">
                         {progress.played}/{progress.total}
                       </Badge>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -109,7 +109,7 @@ const Top100Interactive: React.FC<Top100InteractiveProps> = ({
                   
                   <div className="space-y-2">
                     <Progress value={percentage} className="h-2" />
-                    <div className="flex justify-between text-xs md:text-sm text-muted-foreground">
+                    <div className="flex justify-between text-xs text-muted-foreground">
                       <span>{percentage}% complete</span>
                       <span>{progress.played} played</span>
                     </div>
