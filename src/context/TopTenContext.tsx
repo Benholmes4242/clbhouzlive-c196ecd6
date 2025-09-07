@@ -46,12 +46,15 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const loadTopTen = async () => {
       try {
         setLoading(true);
+        console.log("TopTen: Loading from database...");
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
+          console.log("TopTen: No user found, skipping load");
           setLoading(false);
           return;
         }
 
+        console.log("TopTen: User found, loading top ten for:", user.id);
         const { data, error } = await supabase
           .from('user_top_ten_lists')
           .select('courses')
@@ -62,7 +65,10 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           console.error("TopTen load error:", error);
           setError("Failed to load Top 10");
         } else if (data?.courses && Array.isArray(data.courses)) {
+          console.log("TopTen: Loaded courses from database:", data.courses);
           setTopTenState(data.courses as (Course | undefined)[]);
+        } else {
+          console.log("TopTen: No saved courses found, starting with empty list");
         }
       } catch (e: any) {
         setError("Failed to load Top 10");
@@ -82,9 +88,13 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const saveToDatabase = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.log("TopTen: No user found, skipping save");
+          return;
+        }
 
-        await supabase
+        console.log("TopTen: Saving to database:", { user_id: user.id, courses: topTen });
+        const { data, error } = await supabase
           .from('user_top_ten_lists')
           .upsert({
             user_id: user.id,
@@ -92,8 +102,14 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }, {
             onConflict: 'user_id'
           });
+
+        if (error) {
+          console.error("TopTen: Database save error:", error);
+        } else {
+          console.log("TopTen: Successfully saved to database:", data);
+        }
       } catch (e) {
-        console.error("Failed to save Top 10:", e);
+        console.error("TopTen: Failed to save Top 10:", e);
       }
     };
 
