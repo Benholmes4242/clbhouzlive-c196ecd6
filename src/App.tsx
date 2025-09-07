@@ -19,12 +19,14 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
 
 
-// Lazy load all pages for better code splitting and loading screen experience
+// Direct import for ProfilePage to avoid dynamic import issues
+import ProfilePage from "./pages/ProfilePage";
+
+// Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const Discover = lazy(() => import("./pages/Discover"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
