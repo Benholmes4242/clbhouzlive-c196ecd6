@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
 import { useTopTen } from "@/context/TopTenContext";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { InlineTypeahead } from "@/components/InlineTypeahead";
 import { useSwipeable } from "react-swipeable";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import {
   DndContext,
   DragEndEvent,
@@ -37,6 +39,15 @@ export default function TopTenCoursesRatedByYou({
   const { topTen, loading, moveCourse, addCourseAtIndex } = useTopTen();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Use carousel navigation for arrow controls
+  const { carouselRef, canScrollLeft, canScrollRight, scroll } = useCarouselNavigation(10);
+  
+  // Combined ref callback that handles both swipe and carousel functionality
+  const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
+    scrollContainerRef.current = node;
+    carouselRef(node);
+  }, [carouselRef]);
   
   // Dynamic title based on profile ownership
   const getTitle = () => {
@@ -129,7 +140,26 @@ export default function TopTenCoursesRatedByYou({
             )}
           </h3>
           <div className="flex gap-2">
-            {/* Edit button removed */}
+            {canScrollLeft && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('left')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('right')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronRight className="h-10 w-10" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -144,7 +174,7 @@ export default function TopTenCoursesRatedByYou({
             <SortableContext items={items} strategy={rectSortingStrategy}>
               {/* Match exact row styling from Top 10 Rated by You section */}
               <div 
-                ref={scrollContainerRef}
+                ref={combinedRefCallback}
                 {...swipeHandlers}
                 className="
                   flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
