@@ -161,8 +161,13 @@ const HeroProfileHeader = ({
   const handleTabChange = (newTab: string) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
-    // Prevent any scroll behavior when switching tabs
+    // Prevent any scroll behavior when switching tabs - more robust approach
     const currentScrollPosition = window.scrollY;
+    const preventScroll = (e: Event) => e.preventDefault();
+    
+    // Temporarily disable scrolling during tab transition
+    window.addEventListener('scroll', preventScroll, { passive: false });
+    document.body.style.overscrollBehavior = 'none';
     
     // Determine transition direction based on tab order
     const currentIndex = tabs.findIndex(tab => tab.id === activeSection);
@@ -173,12 +178,19 @@ const HeroProfileHeader = ({
     startTransition(direction, () => {
       onSectionChange?.(newTab);
       
-      // Restore scroll position to prevent any jumps
+      // Re-enable scrolling and restore position after a short delay
       setTimeout(() => {
-        if (window.scrollY !== currentScrollPosition) {
-          window.scrollTo(0, currentScrollPosition);
+        window.removeEventListener('scroll', preventScroll);
+        document.body.style.overscrollBehavior = '';
+        
+        // Force scroll position restoration if it changed
+        if (Math.abs(window.scrollY - currentScrollPosition) > 5) {
+          window.scrollTo({
+            top: currentScrollPosition,
+            behavior: 'instant'
+          });
         }
-      }, 0);
+      }, 50);
     });
   };
 
@@ -1006,8 +1018,8 @@ const HeroProfileHeader = ({
                 className={`
                   relative py-4 px-4 text-base font-semibold transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2' 
-                    : 'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
                   }
                   flex-1 text-center
                 `}
