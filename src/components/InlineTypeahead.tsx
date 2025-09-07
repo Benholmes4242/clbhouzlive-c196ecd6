@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, MapPin } from 'lucide-react';
 import { useCourseSearch, getSuggestions } from '@/hooks/useCourseSearch';
 import { getFlagCode } from '@/utils/countryFlags';
+import { useClickAway } from '@/hooks/useClickAway';
 
 interface Course {
   id: string;
@@ -26,7 +27,6 @@ interface InlineTypeaheadProps {
   existingCourseIds?: string[];
   onJumpToSlot?: (slotIndex: number) => void;
   onSwapWithSlot?: (slotIndex: number) => void;
-  onClickOutside?: () => void;
 }
 
 export function InlineTypeahead({
@@ -38,15 +38,14 @@ export function InlineTypeahead({
   onOpenSearch,
   existingCourseIds = [],
   onJumpToSlot,
-  onSwapWithSlot,
-  onClickOutside
+  onSwapWithSlot
 }: InlineTypeaheadProps) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const { data: searchResults, loading, error } = useCourseSearch(query, {
     debounceMs: 250,
@@ -55,6 +54,13 @@ export function InlineTypeahead({
   });
 
   const items = query.trim().length > 0 ? searchResults : suggestions;
+
+  // Set up click-away functionality
+  useClickAway([rootRef], () => {
+    if (isSearchMode) {
+      onClose();
+    }
+  }, { disabled: !isSearchMode });
 
   // Load suggestions on mount
   useEffect(() => {
@@ -146,7 +152,7 @@ export function InlineTypeahead({
   }
 
   return (
-    <div ref={containerRef} className="slot-search h-full flex flex-col" role="group" aria-label="Add course to Top 10">
+    <div ref={rootRef} className="slot-search h-full flex flex-col" role="group" aria-label="Add course to Top 10">
       <div className="p-3 border-b border-border">
         <input
           ref={inputRef}
@@ -155,15 +161,21 @@ export function InlineTypeahead({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPointerDown={(e) => e.stopPropagation()}
           className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           aria-label="Search courses"
+          aria-expanded={isSearchMode}
+          aria-controls="search-results"
         />
       </div>
 
       <div 
         ref={resultsRef}
+        id="search-results"
         className="flex-1 overflow-y-auto p-1"
         style={{ maxHeight: '220px' }}
+        data-keep-open="true"
+        onPointerDown={(e) => e.stopPropagation()}
       >
         {loading ? (
           <SkeletonList rows={6} />

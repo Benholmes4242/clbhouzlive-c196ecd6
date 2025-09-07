@@ -297,7 +297,7 @@ const TopTenSlot: React.FC<{
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile || isSearchMode // Disable dragging when in search mode
+    disabled: !isOwnProfile || isSearchMode // Disable dragging when in search mode or not own profile
   });
   
   const style = {
@@ -387,7 +387,6 @@ const TopTenSlot: React.FC<{
                 isSearchMode={isSearchMode}
                 userId={userId}
                 existingCourseIds={existingCourseIds}
-                onClickOutside={() => setIsSearchMode(false)}
               />
             </div>
           ) : (
