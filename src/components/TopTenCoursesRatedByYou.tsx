@@ -4,6 +4,8 @@ import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { InlineTypeahead } from "@/components/InlineTypeahead";
 import { useSwipeable } from "react-swipeable";
+import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   DndContext,
   DragEndEvent,
@@ -37,6 +39,7 @@ export default function TopTenCoursesRatedByYou({
   const { topTen, loading, moveCourse, addCourseAtIndex } = useTopTen();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(10);
   
   // Dynamic title based on profile ownership
   const getTitle = () => {
@@ -88,14 +91,10 @@ export default function TopTenCoursesRatedByYou({
   // Swipe handlers for mobile carousel navigation
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-      }
+      scroll('right');
     },
     onSwipedRight: () => {
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-      }
+      scroll('left');
     },
     trackMouse: false, // Only track touch events
   });
@@ -142,9 +141,41 @@ export default function TopTenCoursesRatedByYou({
             onDragEnd={onDragEnd}
           >
             <SortableContext items={items} strategy={rectSortingStrategy}>
+              {/* Carousel container with arrows */}
+              <div className="relative group/row">
+                {/* Left scroll button */}
+                {!isMobile && canScrollLeft && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:scale-110"
+                    style={{
+                      background: 'rgba(247, 147, 30, 0.8)'
+                    }}
+                    onClick={() => scroll('left')}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                )}
+                
+                {/* Right scroll button */}
+                {!isMobile && canScrollRight && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:scale-110"
+                    style={{
+                      background: 'rgba(247, 147, 30, 0.8)'
+                    }}
+                    onClick={() => scroll('right')}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+                )}
+
               {/* Match exact row styling from Top 10 Rated by You section */}
               <div 
-                ref={scrollContainerRef}
+                ref={carouselRef}
                 {...swipeHandlers}
                 className="
                   flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
@@ -152,6 +183,14 @@ export default function TopTenCoursesRatedByYou({
                   [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
                   touch-pan-x
                 "
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehaviorX: 'contain',
+                  scrollSnapType: 'none',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  scrollbarGutter: 'stable both-edges'
+                }}
               >
                 {topTen.map((course, index) => (
                   <TopTenSlot 
@@ -168,6 +207,7 @@ export default function TopTenCoursesRatedByYou({
                     existingCourses={topTen}
                   />
                 ))}
+              </div>
               </div>
             </SortableContext>
 
