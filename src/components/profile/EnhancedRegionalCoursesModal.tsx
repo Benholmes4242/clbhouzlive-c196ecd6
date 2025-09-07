@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import SlideInModal from '@/components/ui/SlideInModal';
-import { TopTenBar } from '@/components/TopTenBar';
+
 import { CourseCardDraggable } from '@/components/CourseCardDraggable';
 
 interface EnhancedRegionalCoursesModalProps {
@@ -458,10 +458,6 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           />
         </div>
 
-        {/* Top Ten Bar */}
-        <div className="mt-4">
-          <TopTenBar />
-        </div>
 
         {/* Stats */}
         {playedCount > 0 && (
