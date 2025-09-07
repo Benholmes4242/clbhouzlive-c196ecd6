@@ -148,25 +148,35 @@ export default function TopTenCoursesRatedByYou({
               <span className="text-sm text-muted-foreground ml-2">({filled}/10)</span>
             )}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex gap-2 relative z-10">
             {canScrollLeft && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleScroll('left')}
-                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Left arrow clicked');
+                  handleScroll('left');
+                }}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0 relative z-20 pointer-events-auto"
               >
-                <ChevronLeft className="h-10 w-10" />
+                <ChevronLeft className="h-10 w-10 pointer-events-none" />
               </Button>
             )}
             {canScrollRight && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleScroll('right')}
-                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Right arrow clicked');
+                  handleScroll('right');
+                }}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0 relative z-20 pointer-events-auto"
               >
-                <ChevronRight className="h-10 w-10" />
+                <ChevronRight className="h-10 w-10 pointer-events-none" />
               </Button>
             )}
           </div>
