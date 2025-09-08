@@ -19,17 +19,21 @@ const ProfileModalRouter: React.FC = () => {
   useEffect(() => {
     if (isClubModal && courseId) {
       setModalKey(prev => prev + 1);
+      isTransitioning.current = false; // Reset transition guard
     }
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    const params = new URLSearchParams(window.location.search);
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    
+    const params = new URLSearchParams(location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
   useEffect(() => {
@@ -40,7 +44,7 @@ const ProfileModalRouter: React.FC = () => {
       
       // Handle escape key
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && !isTransitioning.current) {
           onClose();
         }
       };
@@ -51,9 +55,10 @@ const ProfileModalRouter: React.FC = () => {
         // Cleanup on unmount or state change
         document.body.style.overflow = prevOverflow;
         window.removeEventListener('keydown', handleKeyDown);
+        isTransitioning.current = false;
       };
     }
-  }, [isClubModal]); // Removed onClose from dependencies
+  }, [isClubModal, onClose]);
 
   // Final cleanup handler for AnimatePresence
   const handleExitComplete = useCallback(() => {
@@ -66,11 +71,11 @@ const ProfileModalRouter: React.FC = () => {
       activeElement.blur();
     }
     
+    // Reset transition guard
+    isTransitioning.current = false;
+    
     // Reset modal key for next open
     setModalKey(0);
-    
-    // CRITICAL: Clear any pending video operations that might be retrying
-    window.dispatchEvent(new CustomEvent('cancelVideoOperations'));
   }, []);
 
   return (
@@ -85,28 +90,28 @@ const ProfileModalRouter: React.FC = () => {
           className="fixed inset-0 z-[1000] flex"
         >
           {/* Backdrop - unmounts with modal */}
-          <div
+          <button
+            aria-label="Close modal"
             onClick={onClose}
-            className="absolute inset-0 bg-black/50 cursor-pointer"
+            className="absolute inset-0 bg-black/50 cursor-default"
+            style={{ pointerEvents: "auto" }}
           />
           
           {/* Modal Panel */}
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className={`
-              absolute inset-y-0 right-0 w-full bg-background shadow-2xl
-              ${isMobile 
-                ? 'w-full' 
-                : 'w-[90vw] max-w-[860px] rounded-l-2xl'
-              }
-            `}>
+          <div className={`
+            absolute inset-y-0 right-0 w-full bg-background shadow-2xl
+            ${isMobile 
+              ? 'w-full' 
+              : 'w-[90vw] max-w-[860px] rounded-l-2xl'
+            }
+          `}>
             <div className="h-full overflow-hidden flex flex-col">
               {/* Header */}
               <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
                   onClick={onClose}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none transition-colors"
+                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="Close modal"
                 >
                   ✕

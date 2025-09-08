@@ -119,38 +119,18 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     // Wait for element to be registered (with retry mechanism)
     const waitForElement = () => {
       return new Promise<PlayerEl | null>((resolve) => {
-        let timeoutId: ReturnType<typeof setTimeout>;
-        let cancelled = false;
-        
-        // Listen for cancellation events
-        const handleCancel = () => {
-          cancelled = true;
-          if (timeoutId) clearTimeout(timeoutId);
-          resolve(null);
-        };
-        
-        window.addEventListener('cancelVideoOperations', handleCancel, { once: true });
-        
         const checkElement = (attempts = 0) => {
-          if (cancelled) {
-            resolve(null);
-            return;
-          }
-          
           const el = playersRef.current.get(id);
           if (el) {
             console.log('🎥 Found element for play:', id, 'after', attempts, 'attempts');
-            window.removeEventListener('cancelVideoOperations', handleCancel);
             resolve(el);
           } else if (attempts < 10) {
-            timeoutId = setTimeout(() => checkElement(attempts + 1), 50);
+            setTimeout(() => checkElement(attempts + 1), 50);
           } else {
             console.warn('🎥 Element not found after retries:', id);
-            window.removeEventListener('cancelVideoOperations', handleCancel);
             resolve(null);
           }
         };
-        
         checkElement();
       });
     };
