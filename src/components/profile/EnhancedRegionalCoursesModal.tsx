@@ -383,6 +383,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       open={isOpen}
       onClose={onClose}
       title={regionName}
+      mobileConstrained={isMobile}
     >
       {/* Controls Row */}
       <div className="p-4 sm:p-6 border-b border-border">

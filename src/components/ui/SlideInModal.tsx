@@ -7,6 +7,7 @@ type SlideInModalProps = {
   onClose: () => void;
   children: React.ReactNode;
   initialFocusRef?: React.RefObject<HTMLButtonElement | HTMLDivElement>;
+  mobileConstrained?: boolean;
 };
 
 export default function SlideInModal({
@@ -15,6 +16,7 @@ export default function SlideInModal({
   onClose,
   children,
   initialFocusRef,
+  mobileConstrained = false,
 }: SlideInModalProps) {
   // Mount control so we can animate out before unmounting
   const [mounted, setMounted] = useState(false);
@@ -85,13 +87,19 @@ export default function SlideInModal({
       aria-modal="true"
       role="dialog"
       aria-labelledby="region-modal-title"
-      className="fixed inset-0 z-[1000] flex items-center justify-center"
+      className={`fixed z-[1000] flex items-center justify-center ${
+        mobileConstrained 
+          ? 'top-[72px] bottom-[64px] left-0 right-0' 
+          : 'inset-0'
+      }`}
     >
       {/* Backdrop */}
       <div
         ref={overlayRef}
         onClick={onClose}
-        className={`absolute inset-0 bg-black/50 transition-opacity ${
+        className={`absolute ${
+          mobileConstrained ? 'top-0 bottom-0 left-0 right-0' : 'inset-0'
+        } bg-black/50 transition-opacity ${
           animateIn ? "opacity-100" : "opacity-0"
         }`}
         aria-hidden="true"
@@ -100,9 +108,13 @@ export default function SlideInModal({
       {/* Panel container: keep centered; panel slides from right */}
       <div
         className={`relative 
-          w-full h-screen max-w-none
-          sm:w-[92vw] sm:max-w-[920px] sm:max-h-[98vh] sm:h-auto
-          bg-background border border-border rounded-none sm:rounded-lg shadow-lg overflow-hidden
+          ${mobileConstrained 
+            ? 'w-full h-full max-w-none' 
+            : 'w-full h-screen max-w-none sm:w-[92vw] sm:max-w-[920px] sm:max-h-[98vh] sm:h-auto'
+          }
+          bg-background border border-border ${
+            mobileConstrained ? 'rounded-none' : 'rounded-none sm:rounded-lg'
+          } shadow-lg overflow-hidden
           transform transition-transform
           ${animateIn ? "translate-x-0" : "translate-x-full"}
         `}
@@ -129,7 +141,14 @@ export default function SlideInModal({
         </div>
 
         {/* Body scrolls; place your content here */}
-        <div className="overflow-auto h-[calc(100vh-80px)] sm:max-h-[calc(98vh-80px)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div 
+          className={`overflow-auto ${
+            mobileConstrained 
+              ? 'h-[calc(100%-80px)]' 
+              : 'h-[calc(100vh-80px)] sm:max-h-[calc(98vh-80px)]'
+          }`} 
+          style={{ paddingBottom: mobileConstrained ? '16px' : 'env(safe-area-inset-bottom)' }}
+        >
           {children}
         </div>
       </div>
