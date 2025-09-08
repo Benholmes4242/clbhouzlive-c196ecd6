@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { callEdgeFunctionDebounced } from '@/utils/edgeFunctionHelper';
 
@@ -14,53 +14,52 @@ export const useProgressMotivation = (
   const [motivationCache, setMotivationCache] = useState<MotivationCache>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const generateMotivation = async (
-    region: string,
-    played: number,
-    total: number
-  ): Promise<string> => {
-    const cacheKey = `${region}-${played}-${total}-${userId}`;
-    
-    // Return cached result if available
-    if (motivationCache[cacheKey]) {
-      return motivationCache[cacheKey];
-    }
-
-    setIsLoading(true);
-    
-    try {
-      const debounceKey = `motivation-${region}-${played}-${total}`;
+  const generateMotivation = useCallback(
+    async (region: string, played: number, total: number): Promise<string> => {
+      const cacheKey = `${region}-${played}-${total}-${userId}`;
       
-      const data = await callEdgeFunctionDebounced(
-        'generate-progress-motivation',
-        {
-          region,
-          played,
-          total,
-          userDisplayName,
-          isOwnProfile
-        },
-        debounceKey,
-        1000, // 1 second debounce
-        { timeout: 8000, retries: 1 }
-      );
+      // Return cached result if available
+      if (motivationCache[cacheKey]) {
+        return motivationCache[cacheKey];
+      }
 
-      const message = data?.motivationalMessage || getDefaultMotivation(region, played, total);
+      setIsLoading(true);
       
-      // Cache the result
-      setMotivationCache(prev => ({
-        ...prev,
-        [cacheKey]: message
-      }));
+      try {
+        const debounceKey = `motivation-${region}-${played}-${total}`;
+        
+        const data = await callEdgeFunctionDebounced(
+          'generate-progress-motivation',
+          {
+            region,
+            played,
+            total,
+            userDisplayName,
+            isOwnProfile
+          },
+          debounceKey,
+          1000, // 1 second debounce
+          { timeout: 8000, retries: 1 }
+        );
 
-      return message;
-    } catch (error) {
-      console.error('Error calling motivation function:', error);
-      return getDefaultMotivation(region, played, total);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const message = data?.motivationalMessage || getDefaultMotivation(region, played, total);
+        
+        // Cache the result
+        setMotivationCache(prev => ({
+          ...prev,
+          [cacheKey]: message
+        }));
+
+        return message;
+      } catch (error) {
+        console.error('Error calling motivation function:', error);
+        return getDefaultMotivation(region, played, total);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [userId, userDisplayName, isOwnProfile, motivationCache]
+  );
 
   const getDefaultMotivation = (region: string, played: number, total: number): string => {
     const remaining = total - played;

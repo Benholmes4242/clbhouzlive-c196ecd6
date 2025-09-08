@@ -103,30 +103,55 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   };
 
   // Generate motivational messages for all regions
+  const regions = ['global', 'usa', 'britain-ireland', 'europe'] as const;
+  
+  // Build a stable key of the inputs that actually matter
+  const progressKey = useMemo(() => {
+    const payload = regions.map((r) => {
+      const p = regionProgress?.[r] || { played: 0, total: 0 };
+      return [r, p.played, p.total];
+    });
+    return JSON.stringify(payload);
+  }, [regionProgress]);
+
+  const inFlightRef = useRef(false);
+
   useEffect(() => {
-    const generateAllMotivations = async () => {
-      const regions = ['global', 'usa', 'britain-ireland', 'europe'];
-      const messages: {[key: string]: string} = {};
-      
-      for (const region of regions) {
-        const progress = getProgressData(region);
-        if (progress.total > 0) {
+    if (isLoading) return;           // don't run while loading
+    if (inFlightRef.current) return; // prevent overlap
+
+    const run = async () => {
+      try {
+        inFlightRef.current = true;
+
+        const messages: Record<string, string> = {};
+        for (const region of regions) {
+          const progress = regionProgress?.[region];
+          if (!progress || progress.total <= 0) continue;
+
           try {
-            const message = await generateMotivation(region, progress.played, progress.total);
+            const message = await generateMotivation(
+              region,
+              progress.played,
+              progress.total
+            );
             messages[region] = message;
-          } catch (error) {
-            console.error(`Error generating motivation for ${region}:`, error);
+          } catch (err) {
+            console.error(`Error generating motivation for ${region}:`, err);
           }
         }
+
+        setMotivationalMessages(messages);
+      } finally {
+        inFlightRef.current = false;
       }
-      
-      setMotivationalMessages(messages);
     };
 
     if (regionProgress && Object.keys(regionProgress).length > 0) {
-      generateAllMotivations();
+      run();
     }
-  }, [regionProgress, generateMotivation]);
+    // deps: only re-run when the numeric progress changes, or when the memoized function identity changes
+  }, [progressKey, isLoading, generateMotivation]);
 
   return (
     <div className={`w-full pt-8 ${className}`}>
