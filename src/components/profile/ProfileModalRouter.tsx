@@ -24,15 +24,24 @@ const ProfileModalRouter: React.FC = () => {
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    if (isTransitioning.current) return;
+    console.log('🔴 onClose called, isTransitioning:', isTransitioning.current);
+    if (isTransitioning.current) {
+      console.log('🔴 Already transitioning, ignoring close');
+      return;
+    }
     isTransitioning.current = true;
+    
+    console.log('🔴 Closing modal, current location:', location.pathname, location.search);
     
     const params = new URLSearchParams(location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    const newUrl = `${location.pathname}?${params.toString()}`;
+    console.log('🔴 Navigating to:', newUrl);
+    
+    navigate(newUrl, { replace: true });
   }, [navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
@@ -111,6 +120,8 @@ const ProfileModalRouter: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
                   onClick={(e) => {
+                    console.log('🔴 Close button clicked');
+                    e.preventDefault();
                     e.stopPropagation();
                     onClose();
                   }}
