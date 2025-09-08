@@ -9,19 +9,10 @@ const ProfileModalRouter: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const [modalKey, setModalKey] = useState(0);
   const isTransitioning = useRef(false);
   
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
-
-  // Force remount on each open to ensure smooth animation and prevent state issues
-  useEffect(() => {
-    if (isClubModal && courseId) {
-      setModalKey(prev => prev + 1);
-      isTransitioning.current = false; // Reset transition guard
-    }
-  }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
     if (isTransitioning.current) return;
@@ -33,7 +24,12 @@ const ProfileModalRouter: React.FC = () => {
     params.delete('src');
     
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  }, [navigate, location.pathname, location.search]);
+    
+    // Reset transition guard after navigation
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 50);
+  }, [navigate, location.pathname]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
   useEffect(() => {
@@ -73,38 +69,40 @@ const ProfileModalRouter: React.FC = () => {
     
     // Reset transition guard
     isTransitioning.current = false;
-    
-    // Reset modal key for next open
-    setModalKey(0);
   }, []);
 
   return (
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       {isClubModal && courseId && (
         <motion.div
-          key={`modal-${courseId}-${modalKey}`}
+          key={`modal-${courseId}`}
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
           className="fixed inset-0 z-[1000] flex"
         >
-          {/* Backdrop - unmounts with modal */}
+          {/* Backdrop - blocks all background interaction */}
           <button
             aria-label="Close modal"
             onClick={onClose}
-            className="absolute inset-0 bg-black/50 cursor-default"
-            style={{ pointerEvents: "auto" }}
+            className="fixed inset-0 bg-black/50 cursor-default"
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           />
           
           {/* Modal Panel */}
-          <div className={`
-            absolute inset-y-0 right-0 w-full bg-background shadow-2xl
-            ${isMobile 
-              ? 'w-full' 
-              : 'w-[90vw] max-w-[860px] rounded-l-2xl'
-            }
-          `}>
+          <div 
+            className={`
+              fixed inset-y-0 right-0 bg-background shadow-2xl z-10
+              ${isMobile 
+                ? 'w-full' 
+                : 'w-[90vw] max-w-[860px] rounded-l-2xl'
+              }
+            `}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          >
             <div className="h-full overflow-hidden flex flex-col">
               {/* Header */}
               <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
