@@ -89,8 +89,8 @@ const AnimatedModalRouter: React.FC<AnimatedModalRouterProps> = ({ onExitComplet
           <div className={`relative ${
             isMobile 
               ? 'w-full h-full' 
-              : 'w-full max-w-4xl ml-auto h-full'
-          } bg-background flex flex-col`}>
+              : 'w-full max-w-2xl ml-auto h-full'
+          } bg-background flex flex-col shadow-2xl`}>
             {/* Header */}
             <div className="sticky top-0 z-10 bg-background border-b border-border">
               <div className="flex items-center justify-between px-4 sm:px-6 py-4">

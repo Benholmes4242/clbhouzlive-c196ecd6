@@ -98,7 +98,7 @@ const UserProfilePage = () => {
         <BottomNavigation />
       </div>
 
-      {/* Modal route appears only when backgroundLocation exists and on mobile */}
+      {/* Modal route appears only when backgroundLocation exists */}
       {backgroundLocation && (
         <Routes>
           <Route
