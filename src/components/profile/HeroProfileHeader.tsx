@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -159,7 +159,7 @@ const HeroProfileHeader = ({
     { id: 'stats', label: 'Handicap' }
   ];
 
-  const handleTabChange = (newTab: string) => {
+  const handleTabChange = useCallback((newTab: string) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
     // Prevent any scroll behavior when switching tabs - more robust approach
@@ -193,7 +193,7 @@ const HeroProfileHeader = ({
         }
       }, 50);
     });
-  };
+  }, [activeSection, transitionState, startTransition, onSectionChange, tabs]);
 
   // Get transition classes for hero section (achievements/courses journey)
   const getHeroTransitionClass = (isOutgoing: boolean = false) => {
@@ -296,13 +296,13 @@ const HeroProfileHeader = ({
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-  const [userProgressData, setUserProgressData] = useState(() => ({
+  const [userProgressData, setUserProgressData] = useState({
     coursesPlayed: 0,
     britainIrelandCompleted: 0,
     europeCompleted: 0,
     usaCompleted: 0,
     worldwideCompleted: 0
-  }));
+  });
   
   // Fetch user achievements for current user
   const { achievements } = useUserAchievements();
@@ -485,7 +485,7 @@ const HeroProfileHeader = ({
   };
 
   // Stats handling
-  const handleStatClick = (statType: string) => {
+  const handleStatClick = useCallback((statType: string) => {
     // Prevent scroll behavior when switching tabs via stats
     const currentScrollPosition = window.scrollY;
     
@@ -513,12 +513,12 @@ const HeroProfileHeader = ({
         window.scrollTo(0, currentScrollPosition);
       }
     }, 0);
-  };
+  }, [onSectionChange]);
 
-  // Derived values
-  const displayName = profile?.display_name || 'User';
-  const username = profile?.username || 'user';
-  const homeClub = profile?.home_club || 'Home Club';
+  // Derived values - memoized to prevent unnecessary re-calculations
+  const displayName = useMemo(() => profile?.display_name || 'User', [profile?.display_name]);
+  const username = useMemo(() => profile?.username || 'user', [profile?.username]);
+  const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
   
   // Function to wrap text with max 2 words per line
   const wrapHomeClubText = (text: string) => {
