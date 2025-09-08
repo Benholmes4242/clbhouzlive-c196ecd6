@@ -27,15 +27,14 @@ export const useVideoVisibility = ({
     
     setIsVisible(isNowVisible);
     
-    if (isNowVisible && !hasBeenVisible) {
-      setHasBeenVisible(true);
-    }
-
     const video = videoRef?.current;
     if (!video) return;
 
     if (isNowVisible) {
-      // Video entered view
+      // Video entered view - always mark as having been visible
+      setHasBeenVisible(true);
+      
+      // Set mute state and autoplay
       if (video instanceof HTMLVideoElement) {
         video.muted = globallyMuted;
       }
@@ -55,7 +54,7 @@ export const useVideoVisibility = ({
       }
       onExitView?.();
     }
-  }, [videoRef, shouldAutoplay, globallyMuted, hasBeenVisible, onEnterView, onExitView]);
+  }, [videoRef, shouldAutoplay, globallyMuted, onEnterView, onExitView]);
 
   useEffect(() => {
     const container = containerRef.current;
