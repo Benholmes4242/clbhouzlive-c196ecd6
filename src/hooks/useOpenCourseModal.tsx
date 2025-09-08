@@ -1,11 +1,12 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useIsMobile } from './use-mobile';
 
 export function useOpenCourseModal() {
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   return (courseId: string, source?: string) => {
-    // Use background-route pattern instead of search params
     // Check if we're on a user profile page vs own profile page
     const isUserProfile = location.pathname.includes('/profile/') && location.pathname !== '/profile';
     
@@ -13,13 +14,13 @@ export function useOpenCourseModal() {
       // For other user profiles, maintain the username in the route
       const currentPath = location.pathname;
       navigate(`${currentPath}/course/${courseId}`, { 
-        state: { backgroundLocation: location },
+        state: isMobile ? { backgroundLocation: location } : undefined,
         replace: false 
       });
     } else {
       // For own profile
       navigate(`/profile/course/${courseId}`, { 
-        state: { backgroundLocation: location },
+        state: isMobile ? { backgroundLocation: location } : undefined,
         replace: false 
       });
     }
