@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import SlideInModal from '@/components/ui/SlideInModal';
 import GolfClubView from '@/components/golf-club/GolfClubView';
@@ -9,9 +9,17 @@ const ProfileModalRouter: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
+  const [modalKey, setModalKey] = useState(0);
   
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
+
+  // Force remount on each open to ensure smooth animation
+  useEffect(() => {
+    if (isClubModal && courseId) {
+      setModalKey(prev => prev + 1);
+    }
+  }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
     const params = new URLSearchParams(location.search);
@@ -28,6 +36,7 @@ const ProfileModalRouter: React.FC = () => {
 
   return (
     <SlideInModal 
+      key={`modal-${courseId}-${modalKey}`}
       open={isClubModal} 
       onClose={onClose} 
       title="Golf Club"

@@ -42,9 +42,11 @@ export default function SlideInModal({
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
 
-      // Double requestAnimationFrame ensures starting position is rendered before animation
+      // Triple requestAnimationFrame ensures proper initial positioning on mobile
       const id = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setAnimateIn(true));
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setAnimateIn(true));
+        });
       });
 
       // focus handling - delay to ensure modal is visible

@@ -2465,8 +2465,8 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
         </div>
       ) : null}
 
-      {/* Modal Router for course modals */}
-      <ProfileModalRouter />
+      {/* Modal Router for course modals - only render one instance */}
+      {isOwnProfile && <ProfileModalRouter />}
     </>
   );
 };

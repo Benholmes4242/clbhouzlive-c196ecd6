@@ -58,8 +58,7 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
         <UserCoursesContent username={username} />
       </div>
 
-      {/* Modal Router for course modals */}
-      <ProfileModalRouter />
+      {/* Modal Router handled by parent ProfileModalRouter */}
     </div>
   );
 };
