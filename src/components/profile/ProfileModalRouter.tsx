@@ -15,7 +15,9 @@ const ProfileModalRouter: React.FC = () => {
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
   
-  
+  // Temporary debug to find what's causing render loop
+  console.log('🚨 [ProfileModalRouter] Render - isClubModal:', isClubModal, 'courseId:', courseId);
+  console.trace('🚨 [ProfileModalRouter] Render stack trace');
 
   // Force remount on each open to ensure smooth animation and prevent state issues
   useEffect(() => {

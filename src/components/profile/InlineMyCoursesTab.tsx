@@ -2,7 +2,6 @@
 import React from 'react';
 import HandicapCard from './HandicapCard';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
-import ProfileModalRouter from './ProfileModalRouter';
 
 interface InlineMyCoursesTabProps {
   profile: any;
