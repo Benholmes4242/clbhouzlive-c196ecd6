@@ -158,12 +158,25 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       async (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
+          // Wait for HLS to be ready before attempting play
           await attachHLS();
-          try {
-            await video.play();
-            onPlay?.();
-          } catch (error) {
-            // Autoplay failed, which is expected in some browsers
+          
+          // Add small delay for video readiness on first visit
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          // Retry mechanism for autoplay failures
+          let retries = 3;
+          while (retries > 0) {
+            try {
+              await video.play();
+              onPlay?.();
+              break;
+            } catch (error) {
+              retries--;
+              if (retries > 0) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+            }
           }
         } else {
           video.pause();
