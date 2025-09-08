@@ -68,6 +68,27 @@ export const useVideoVisibility = ({
 
     observer.observe(container);
 
+    // Check if already visible on mount
+    const rect = container.getBoundingClientRect();
+    const isAlreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    
+    if (isAlreadyVisible) {
+      // Directly handle visibility for already visible elements
+      setIsVisible(true);
+      setHasBeenVisible(true);
+      
+      const video = videoRef?.current;
+      if (video) {
+        if (video instanceof HTMLVideoElement) {
+          video.muted = globallyMuted;
+        }
+        if (shouldAutoplay) {
+          video.play?.().catch(console.error);
+        }
+        onEnterView?.();
+      }
+    }
+
     return () => {
       observer.disconnect();
     };
