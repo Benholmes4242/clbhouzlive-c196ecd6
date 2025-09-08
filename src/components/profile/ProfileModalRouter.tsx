@@ -90,10 +90,10 @@ const ProfileModalRouter: React.FC = () => {
           {/* Modal Panel */}
           <div 
             className={`
-              fixed inset-y-0 right-0 bg-background shadow-2xl z-10
+              fixed right-0 bg-background shadow-2xl z-10
               ${isMobile 
-                ? 'w-full' 
-                : 'w-[90vw] max-w-[860px] rounded-l-2xl'
+                ? 'w-full top-0 bottom-16' 
+                : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl'
               }
             `}
             onMouseDown={(e) => e.stopPropagation()}
