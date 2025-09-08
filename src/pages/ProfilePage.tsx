@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Routes, Route } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+import AnimatedModalRouter from '@/components/profile/AnimatedModalRouter';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState(() => {
     // Initialize from URL params, default to 'activity'
     return searchParams.get('tab') || 'activity';
   });
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  
+  // Check if we have a background location (modal is open)
+  const backgroundLocation = (location.state as any)?.backgroundLocation;
   
   // Only invalidate profile cache on initial page load, not on remounts
   useEffect(() => {
@@ -107,23 +113,42 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 relative">
-      {/* Header */}
-      <Header />
-      
-      <HeroProfileHeader 
-        profile={profile}
-        isOwnProfile={true} // This is always the user's own profile on this route
-        onProfileUpdate={refreshProfile}
-        activeSection={activeSection}
-        onSectionChange={handleSectionChange}
-      />
-      
-      {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
-      
-      
-      <BottomNavigation />
-    </div>
+    <>
+      {/* Base route renders against background when modal is open */}
+      <div className="min-h-screen bg-background pb-28 relative">
+        {/* Header */}
+        <Header />
+        
+        <HeroProfileHeader 
+          profile={profile}
+          isOwnProfile={true} // This is always the user's own profile on this route
+          onProfileUpdate={refreshProfile}
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+        />
+        
+        {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
+        
+        <BottomNavigation />
+      </div>
+
+      {/* Modal route appears only when backgroundLocation exists */}
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            path="/profile/course/:id"
+            element={
+              <AnimatedModalRouter 
+                onExitComplete={() => {
+                  // Clean up selected course state after animation
+                  setSelectedCourseId(null);
+                }}
+              />
+            }
+          />
+        </Routes>
+      )}
+    </>
   );
 };
 

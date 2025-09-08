@@ -5,11 +5,23 @@ export function useOpenCourseModal() {
   const location = useLocation();
   
   return (courseId: string, source?: string) => {
-    const params = new URLSearchParams(location.search);
-    params.set('view', 'modal');
-    params.set('club', courseId);
-    if (source) params.set('src', source);
+    // Use background-route pattern instead of search params
+    // Check if we're on a user profile page vs own profile page
+    const isUserProfile = location.pathname.includes('/profile/') && location.pathname !== '/profile';
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: false });
+    if (isUserProfile) {
+      // For other user profiles, maintain the username in the route
+      const currentPath = location.pathname;
+      navigate(`${currentPath}/course/${courseId}`, { 
+        state: { backgroundLocation: location },
+        replace: false 
+      });
+    } else {
+      // For own profile
+      navigate(`/profile/course/${courseId}`, { 
+        state: { backgroundLocation: location },
+        replace: false 
+      });
+    }
   };
 }
