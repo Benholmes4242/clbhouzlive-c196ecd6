@@ -19,29 +19,17 @@ const ProfileModalRouter: React.FC = () => {
   useEffect(() => {
     if (isClubModal && courseId) {
       setModalKey(prev => prev + 1);
-      // Always reset transition guard when modal opens
-      isTransitioning.current = false;
-    } else {
-      // Modal is closing/closed, ensure transition guard is reset
-      isTransitioning.current = false;
     }
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
-    
+    // Simple close without complex transition guards
     const params = new URLSearchParams(location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-    
-    // Reset transition guard after a brief delay to allow navigation to complete
-    setTimeout(() => {
-      isTransitioning.current = false;
-    }, 100);
   }, [navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
@@ -53,7 +41,7 @@ const ProfileModalRouter: React.FC = () => {
       
       // Handle escape key
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isTransitioning.current) {
+        if (e.key === 'Escape') {
           onClose();
         }
       };
@@ -64,7 +52,6 @@ const ProfileModalRouter: React.FC = () => {
         // Cleanup on unmount or state change
         document.body.style.overflow = prevOverflow;
         window.removeEventListener('keydown', handleKeyDown);
-        isTransitioning.current = false;
       };
     }
   }, [isClubModal, onClose]);
@@ -79,9 +66,6 @@ const ProfileModalRouter: React.FC = () => {
     if (activeElement && activeElement.blur) {
       activeElement.blur();
     }
-    
-    // Reset transition guard
-    isTransitioning.current = false;
     
     // Reset modal key for next open
     setModalKey(0);
@@ -99,32 +83,28 @@ const ProfileModalRouter: React.FC = () => {
           className="fixed inset-0 z-[1000] flex"
         >
           {/* Backdrop - unmounts with modal */}
-          <button
-            aria-label="Close modal"
+          <div
             onClick={onClose}
-            className="absolute inset-0 bg-black/50 cursor-default"
-            style={{ pointerEvents: "auto" }}
+            className="absolute inset-0 bg-black/50 cursor-pointer"
           />
           
           {/* Modal Panel */}
-          <div className={`
-            absolute inset-y-0 right-0 w-full bg-background shadow-2xl
-            ${isMobile 
-              ? 'w-full' 
-              : 'w-[90vw] max-w-[860px] rounded-l-2xl'
-            }
-          `}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={`
+              absolute inset-y-0 right-0 w-full bg-background shadow-2xl
+              ${isMobile 
+                ? 'w-full' 
+                : 'w-[90vw] max-w-[860px] rounded-l-2xl'
+              }
+            `}>
             <div className="h-full overflow-hidden flex flex-col">
               {/* Header */}
               <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onClose();
-                  }}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none"
+                  onClick={onClose}
+                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none transition-colors"
                   aria-label="Close modal"
                 >
                   ✕
