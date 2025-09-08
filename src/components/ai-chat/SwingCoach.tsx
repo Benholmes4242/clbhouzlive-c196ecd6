@@ -13,6 +13,7 @@ import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
 import { CoachPromptInline } from '@/components/swing/CoachPromptInline';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface SwingAnalysis {
   id: string;
@@ -90,11 +91,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   
   // Helper functions for Cloudflare Stream URLs
   const getPlaybackUrl = (videoId: string): string => {
-    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+    return generateStreamHlsUrl(videoId);
   };
   
   const getThumbnailUrl = (videoId: string): string => {
-    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+    return generateStreamThumbnailUrl(videoId);
   };
 
   // Load saved analyses from Supabase

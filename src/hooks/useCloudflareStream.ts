@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface CloudflareStreamResponse {
   success: boolean;
@@ -56,13 +57,13 @@ export const useCloudflareStream = () => {
       if (data.result?.uid) {
         // Standard Cloudflare Stream response
         videoId = data.result.uid;
-        videoUrl = data.result.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
-        thumbnailUrl = data.result.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+        videoUrl = data.result.playback?.hls || generateStreamHlsUrl(videoId);
+        thumbnailUrl = data.result.thumbnail || generateStreamThumbnailUrl(videoId);
       } else if (data.videoId) {
         // Direct response format
         videoId = data.videoId;
-        videoUrl = data.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
-        thumbnailUrl = data.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+        videoUrl = data.playback?.hls || generateStreamHlsUrl(videoId);
+        thumbnailUrl = data.thumbnail || generateStreamThumbnailUrl(videoId);
       } else {
         console.error('Invalid Cloudflare Stream response structure:', data);
         throw new Error('Invalid response from Cloudflare Stream');

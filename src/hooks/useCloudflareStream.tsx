@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useToast } from '@/hooks/use-toast';
 
 interface CloudflareStreamUploadResult {
@@ -138,13 +139,12 @@ export const useCloudflareStream = () => {
 
   // Helper to get direct playback URL (HLS)
   const getPlaybackUrl = (videoId: string): string => {
-    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+    return generateStreamHlsUrl(videoId);
   };
 
   // Helper to get thumbnail URL
   const getThumbnailUrl = (videoId: string, options: { width?: number; height?: number; time?: number } = {}): string => {
-    const { width = 1280, height = 720, time = 1 } = options;
-    return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
+    return generateStreamThumbnailUrl(videoId, options);
   };
 
   return {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 interface PostSubmissionData {
   user: any;
@@ -100,7 +101,7 @@ export const usePostSubmission = () => {
                 });
                 
                 if (!streamError && streamData?.success && streamData.videoId) {
-                  const hlsUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamData.videoId}/manifest/video.m3u8`;
+                  const hlsUrl = generateStreamHlsUrl(streamData.videoId);
                   
                   console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
                   

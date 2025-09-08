@@ -8,6 +8,7 @@ import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import SmartCardMedia from './media/SmartCardMedia';
 import { CardType } from './media/CardMediaTypes';
+import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface MediaItem {
   id: string;
@@ -58,7 +59,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
       if (match) {
         const videoId = match[1];
-        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+        return generateStreamThumbnailUrl(videoId);
       }
     }
     // For non-Cloudflare videos, we'll show the video element with preload="metadata" 
