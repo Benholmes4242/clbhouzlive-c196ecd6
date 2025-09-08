@@ -106,7 +106,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   return (
     <div className={`relative ${className}`} onClick={onClick}>
       {isLoading && (
-        <div className="absolute inset-0 bg-muted/30 animate-pulse rounded-[inherit]" />
+        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit]" />
       )}
       
       <img
@@ -132,8 +132,8 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
       />
       
       {hasError && (
-        <div className="absolute inset-0 bg-muted/50 rounded-[inherit] flex items-center justify-center">
-          <div className="text-xs text-muted-foreground opacity-70">Image unavailable</div>
+        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
+          <div className="text-xs text-muted-foreground">Failed to load</div>
         </div>
       )}
     </div>
