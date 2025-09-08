@@ -17,7 +17,7 @@ export default function SlideInModal({
   initialFocusRef,
 }: SlideInModalProps) {
   // Mount control so we can animate out before unmounting
-  const [mounted, setMounted] = useState(open);
+  const [mounted, setMounted] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -34,13 +34,13 @@ export default function SlideInModal({
   useEffect(() => {
     if (open) {
       setMounted(true);
-      setAnimateIn(false); // Ensure we start off-screen
+      setAnimateIn(false); // Always start off-screen for fresh animation
       
       // lock background scroll
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
 
-      // Wait for next frame to ensure starting position is applied, then animate in
+      // Double requestAnimationFrame ensures starting position is rendered before animation
       const id = requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimateIn(true));
       });
@@ -57,11 +57,11 @@ export default function SlideInModal({
         document.body.style.overflow = prevOverflow;
       };
     } else if (mounted) {
-      // start slide-out
+      // start slide-out animation
       setAnimateIn(false);
-      // unmount after the animation ends
+      // unmount after the animation completes
       const timer = setTimeout(() => setMounted(false), 220);
-      // restore focus to trigger
+      // restore focus to trigger element
       const el = triggerRef.current;
       if (el) setTimeout(() => el.focus(), 230);
       return () => clearTimeout(timer);
