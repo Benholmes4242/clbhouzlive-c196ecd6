@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import SoundToggle from '@/components/ui/sound-toggle';
@@ -105,18 +105,28 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   const [mediaLoaded, setMediaLoaded] = useState(false);
   const hasCloudflareThumb = thumbnailUrl !== null;
 
-  // Memoized event handlers to prevent unnecessary re-renders
+  // Use refs to store latest callbacks to avoid stale closures
+  const onImageLoadRef = useRef(onImageLoad);
+  const onImageErrorRef = useRef(onImageError);
+
+  // Update refs when props change
+  useEffect(() => {
+    onImageLoadRef.current = onImageLoad;
+    onImageErrorRef.current = onImageError;
+  }, [onImageLoad, onImageError]);
+
+  // Stable event handlers that don't cause re-renders
   const handleImageLoad = useCallback(() => {
     setImageLoading(false);
     setMediaLoaded(true);
-    onImageLoad();
-  }, [onImageLoad]);
+    onImageLoadRef.current();
+  }, []); // No dependencies to prevent re-creation
 
   const handleImageError = useCallback(() => {
     setImageLoading(false);
     setMediaLoaded(true);
-    onImageError();
-  }, [onImageError]);
+    onImageErrorRef.current();
+  }, []); // No dependencies to prevent re-creation
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
