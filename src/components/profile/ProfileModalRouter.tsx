@@ -20,38 +20,26 @@ const ProfileModalRouter: React.FC = () => {
     if (isClubModal && courseId) {
       setModalKey(prev => prev + 1);
       // Always reset transition guard when modal opens
-      console.log('🔴 Modal opened, resetting transition guard');
       isTransitioning.current = false;
     } else {
       // Modal is closing/closed, ensure transition guard is reset
-      console.log('🔴 Modal closed, resetting transition guard');
       isTransitioning.current = false;
     }
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    console.log('🔴 onClose called, isTransitioning:', isTransitioning.current);
-    if (isTransitioning.current) {
-      console.log('🔴 Already transitioning, ignoring close');
-      return;
-    }
+    if (isTransitioning.current) return;
     isTransitioning.current = true;
-    
-    console.log('🔴 Closing modal, current location:', location.pathname, location.search);
     
     const params = new URLSearchParams(location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
-    const newUrl = `${location.pathname}?${params.toString()}`;
-    console.log('🔴 Navigating to:', newUrl);
-    
-    navigate(newUrl, { replace: true });
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     
     // Reset transition guard after a brief delay to allow navigation to complete
     setTimeout(() => {
-      console.log('🔴 Resetting transition guard after navigation');
       isTransitioning.current = false;
     }, 100);
   }, [navigate, location.pathname, location.search]);
@@ -132,7 +120,6 @@ const ProfileModalRouter: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
                   onClick={(e) => {
-                    console.log('🔴 Close button clicked');
                     e.preventDefault();
                     e.stopPropagation();
                     onClose();
