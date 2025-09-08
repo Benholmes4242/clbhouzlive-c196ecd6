@@ -68,29 +68,35 @@ export const useVideoVisibility = ({
 
     observer.observe(container);
 
-    // Check if already visible on mount
-    const rect = container.getBoundingClientRect();
-    const isAlreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
-    
-    if (isAlreadyVisible) {
-      // Directly handle visibility for already visible elements
-      setIsVisible(true);
-      setHasBeenVisible(true);
+    // Check if already visible on mount - use setTimeout to ensure video element is ready
+    const checkInitialVisibility = () => {
+      const rect = container.getBoundingClientRect();
+      const isAlreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
       
-      const video = videoRef?.current;
-      if (video) {
-        if (video instanceof HTMLVideoElement) {
-          video.muted = globallyMuted;
+      if (isAlreadyVisible) {
+        // Directly handle visibility for already visible elements
+        setIsVisible(true);
+        setHasBeenVisible(true);
+        
+        const video = videoRef?.current;
+        if (video) {
+          if (video instanceof HTMLVideoElement) {
+            video.muted = globallyMuted;
+          }
+          if (shouldAutoplay) {
+            video.play?.().catch(console.error);
+          }
+          onEnterView?.();
         }
-        if (shouldAutoplay) {
-          video.play?.().catch(console.error);
-        }
-        onEnterView?.();
       }
-    }
+    };
+
+    // Small delay to ensure video element is mounted and ready
+    const timeoutId = setTimeout(checkInitialVisibility, 100);
 
     return () => {
       observer.disconnect();
+      clearTimeout(timeoutId);
     };
   }, [handleIntersection, threshold]);
 
