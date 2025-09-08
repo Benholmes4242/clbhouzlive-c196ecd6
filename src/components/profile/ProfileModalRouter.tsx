@@ -77,14 +77,14 @@ const ProfileModalRouter: React.FC = () => {
           exit={{ x: "100%" }}
           transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
           className={`
-            fixed z-[100] flex
+            fixed z-[1000] flex
             ${isMobile 
               ? 'top-0 left-0 right-0 bottom-16' 
               : 'inset-0'
             }
           `}
         >
-          {/* Backdrop - blocks all background interaction except navbar */}
+          {/* Backdrop - blocks all background interaction */}
           <button
             aria-label="Close modal"
             onClick={onClose}
