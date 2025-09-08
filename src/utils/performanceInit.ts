@@ -6,15 +6,22 @@ let performanceCleanupInterval: number;
 export const initializePerformanceMonitoring = () => {
   if (typeof window === 'undefined') return;
 
-  // Only essential monitoring
+  // Only essential monitoring with improved thresholds
   setTimeout(() => {
     if (window.performance?.getEntriesByType) {
       const navigation = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      if (navigation?.loadEventEnd > 3000) {
+      if (navigation?.loadEventEnd > 5000) { // Increased threshold to 5s
         console.warn(`⚠️ Page load time: ${navigation.loadEventEnd}ms`);
+        
+        // Log specific performance metrics for debugging
+        console.log('Performance breakdown:', {
+          domContentLoaded: navigation.domContentLoadedEventEnd,
+          loadComplete: navigation.loadEventEnd,
+          firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 'N/A'
+        });
       }
     }
-  }, 1000);
+  }, 2000); // Increased delay to 2s for more accurate measurement
 
   // Minimal memory monitoring
   performanceCleanupInterval = window.setInterval(() => {

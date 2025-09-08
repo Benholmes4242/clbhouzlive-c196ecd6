@@ -1,0 +1,20 @@
+// Lazy-loaded components for ProfilePage performance optimization
+import { lazy } from 'react';
+
+// Lazy load heavy profile components to improve initial page load
+export const LazyActivityFeed = lazy(() => import('@/components/profile/ActivityFeed'));
+export const LazyCoursesJourney = lazy(() => import('@/components/profile/CoursesJourney'));
+export const LazyAchievementsPane = lazy(() => import('@/components/profile/AchievementsPane'));
+export const LazyHandicapSection = lazy(() => import('@/components/profile/HandicapSection'));
+export const LazyProfileSectionCarousel = lazy(() => import('@/components/profile/ProfileSectionCarousel'));
+export const LazyLatestHighlights = lazy(() => import('@/components/courses/highlights/LatestHighlights'));
+export const LazyImmersiveProfileModal = lazy(() => import('@/components/profile/immersive/ImmersiveProfileModal'));
+export const LazyMediaManagerModal = lazy(() => import('@/components/profile/immersive/MediaManagerModal'));
+export const LazyCompareProgressModal = lazy(() => import('@/components/profile/CompareProgressModal'));
+
+// Loading component for lazy components
+export const ProfileComponentLoader = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
