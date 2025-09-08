@@ -105,7 +105,7 @@ const ProfileModalRouter: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
                   onClick={onClose}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none"
                   aria-label="Close modal"
                 >
                   ✕
