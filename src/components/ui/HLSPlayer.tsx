@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 
 type Props = {
@@ -11,7 +11,11 @@ type Props = {
 
 export default function HLSPlayer({ src, playing, muted, poster, onReady }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const posterRef = useRef<HTMLImageElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isPosterLoaded, setIsPosterLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   console.log('🎥 HLSPlayer render:', { src, playing, muted });
 
@@ -61,6 +65,25 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
     };
   }, [src, onReady]);
 
+  // Handle video ready state
+  const handleVideoReady = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.readyState >= 3) { // HAVE_FUTURE_DATA
+      setIsVideoReady(true);
+    }
+  };
+
+  // Handle video play/pause events
+  const handleVideoPlay = () => {
+    setIsPlaying(true);
+  };
+
+  const handleVideoPause = () => {
+    setIsPlaying(false);
+  };
+
   // react to parent state
   useEffect(() => {
     const v = videoRef.current;
@@ -71,7 +94,7 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !isVideoReady) return;
     console.log('🎥 HLSPlayer playing state change:', playing);
     if (playing) {
       v.play().catch((err) => {
@@ -80,16 +103,39 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
     } else {
       v.pause();
     }
-  }, [playing]);
+  }, [playing, isVideoReady]);
+
+  // Determine poster visibility: show until video is playing
+  const showPoster = !isPlaying && poster && isPosterLoaded;
 
   return (
-    <video
-      ref={videoRef}
-      poster={poster}
-      playsInline
-      preload="none"      // Don't prebuffer inactive cards
-      controls={false}
-      className="w-full h-full object-cover"
-    />
+    <div className="relative w-full h-full">
+      {/* Poster Image - stays visible until video starts playing */}
+      {poster && (
+        <img
+          ref={posterRef}
+          src={poster}
+          alt="Video poster"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+            showPoster ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
+          onLoad={() => setIsPosterLoaded(true)}
+          onError={() => setIsPosterLoaded(false)}
+        />
+      )}
+
+      {/* Video Element */}
+      <video
+        ref={videoRef}
+        playsInline
+        preload="metadata"      // Load enough to show first frame
+        controls={false}
+        className={`w-full h-full object-cover ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        onLoadedData={handleVideoReady}
+        onCanPlay={handleVideoReady}
+        onPlay={handleVideoPlay}
+        onPause={handleVideoPause}
+      />
+    </div>
   );
 }

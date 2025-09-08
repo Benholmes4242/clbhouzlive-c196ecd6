@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
+import FlickerFreeVideoPlayer from '@/components/ui/FlickerFreeVideoPlayer';
 import { uidFromNode, isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
 
 interface EnhancedVideoPlayerProps {
@@ -66,13 +67,11 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   // For Cloudflare Stream URLs, always use HLS
   if (isCloudflareStreamUrl(src) || enableHLS) {
     return (
-      <HLSVideoCard
+      <FlickerFreeHLSPlayer
         hlsUrl={hlsUrl}
         poster={videoPoster}
         className={className}
-        aspectRatio="auto"
         objectFit={objectFit === 'smart' ? 'cover' : objectFit}
-        showControls={controls && !hideControls}
         showMuteButton={false}
         autoplay={autoplay}
         muted={muted}
@@ -81,37 +80,27 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
         onPlay={() => onLoad?.()}
         onPause={() => {}}
         onEnded={onEnded}
+        ref={ref}
       />
     );
   }
 
-  // Fallback to regular video element for non-Cloudflare URLs
+  // Fallback to flicker-free video player for non-Cloudflare URLs
   return (
-    <video
-      ref={videoRef}
+    <FlickerFreeVideoPlayer
+      ref={ref}
       src={src}
-      autoPlay={autoplay}
+      autoplay={autoplay}
       muted={muted}
       loop={loop}
-      controls={controls && !hideControls}
       className={className}
       poster={poster}
-      preload={preloadLevel}
-      playsInline
-      crossOrigin="anonymous"
+      objectFit={objectFit === 'smart' ? 'cover' : objectFit}
+      showMuteButton={false}
       onClick={onClick}
-      onLoadStart={onLoadStart}
-      onLoad={onLoad}
-      onError={onError}
-      onTimeUpdate={onTimeUpdate}
-      onProgress={onProgress}
-      onVolumeChange={onVolumeChange}
-      onSeeking={onSeeking}
-      onSeeked={onSeeked}
+      onPlay={() => onLoad?.()}
+      onPause={() => {}}
       onEnded={onEnded}
-      style={{
-        objectFit: objectFit === 'smart' ? 'cover' : objectFit
-      }}
     />
   );
 });

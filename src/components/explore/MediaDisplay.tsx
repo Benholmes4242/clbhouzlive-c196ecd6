@@ -103,22 +103,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Image loading state
   const [imageLoading, setImageLoading] = useState(true);
   const [mediaLoaded, setMediaLoaded] = useState(false);
-  // Video autoplay transition state
-  const [videoTransitioning, setVideoTransitioning] = useState(false);
-
   const hasCloudflareThumb = thumbnailUrl !== null;
-
-  // Handle smooth transition for autoplay videos
-  React.useEffect(() => {
-    if (shouldAutoplay && media.media_type === 'video') {
-      setVideoTransitioning(true);
-      // Reduced timeout for faster loading
-      const timer = setTimeout(() => setVideoTransitioning(false), 200);
-      return () => clearTimeout(timer);
-    } else {
-      setVideoTransitioning(false);
-    }
-  }, [shouldAutoplay, media.media_type, media.id]);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
@@ -132,21 +117,14 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       {media.media_type === 'video' && !isInvalidSrc ? (
         shouldAutoplay ? (
           <div className="relative w-full h-full">
-            {/* Smooth loading overlay for video transition */}
-            {videoTransitioning && (
-              <div className="absolute inset-0 bg-muted/60 backdrop-blur-sm flex items-center justify-center z-20 transition-opacity duration-300">
-                <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
-              </div>
-            )}
             <EnhancedVideoPlayer
               src={media.media_url}
+              poster={thumbnailUrl || undefined}
               autoplay={shouldAutoplay}
               muted={videoIsMuted} // Use exclusive video audio state
               loop={loop}
               className="w-full h-full pointer-events-none"
-              preloadLevel="metadata"
               enableHLS={true}
-              quality="auto"
             />
             
             {/* Sound Toggle for autoplaying videos */}
