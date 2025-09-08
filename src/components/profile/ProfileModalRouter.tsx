@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import SlideInModal from '@/components/ui/SlideInModal';
 import GolfClubView from '@/components/golf-club/GolfClubView';
@@ -13,14 +13,14 @@ const ProfileModalRouter: React.FC = () => {
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
 
-  const onClose = () => {
+  const onClose = useCallback(() => {
     const params = new URLSearchParams(location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: false });
-  };
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  }, [navigate, location.pathname, location.search]);
 
   if (!isClubModal || !courseId) {
     return null;
