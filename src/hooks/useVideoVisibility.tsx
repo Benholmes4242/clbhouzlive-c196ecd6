@@ -27,6 +27,8 @@ export const useVideoVisibility = ({
     const isNowVisible = entry.isIntersecting;
     const visibilityRatio = entry.intersectionRatio;
     
+    console.log(`[VideoVisibility] Intersection: visible=${isNowVisible}, ratio=${visibilityRatio.toFixed(2)}`);
+    
     setIsVisible(isNowVisible);
     
     const video = videoRef?.current;
@@ -34,6 +36,7 @@ export const useVideoVisibility = ({
 
     // Environment guards
     if (prefersReducedMotion() && shouldAutoplay) {
+      console.log('[VideoVisibility] 🎭 Reduced motion detected - skipping autoplay');
       // Skip autoplay for reduced motion preference
       if (isNowVisible) {
         onEnterView?.();
@@ -46,6 +49,8 @@ export const useVideoVisibility = ({
     // Stricter thresholds for WebViews
     const playThreshold = isInWebView ? 0.5 : 0.5;
     const shouldPlay = isNowVisible && visibilityRatio >= playThreshold;
+    
+    console.log(`[VideoVisibility] Should play: ${shouldPlay} (threshold: ${playThreshold}, WebView: ${isInWebView})`);
 
     if (shouldPlay) {
       // Video entered view with sufficient visibility - mark as having been visible
