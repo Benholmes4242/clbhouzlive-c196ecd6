@@ -44,7 +44,7 @@ export const useProfileForm = (
   onProfileUpdate: () => void,
   onClose: () => void
 ) => {
-  const [formData, setFormData] = useState<ProfileFormData>({
+  const [formData, setFormData] = useState<ProfileFormData>(() => ({
     displayName: profile?.display_name || "",
     username: profile?.username || "",
     homeClub: profile?.home_club || "",
@@ -59,7 +59,7 @@ export const useProfileForm = (
     bio: profile?.bio || "",
     profilePhoto: null,
     headerPhoto: null,
-  });
+  }));
   const [saving, setSaving] = useState(false);
 
   const isUsernameSet = profile?.username && profile.username.trim() !== "";
