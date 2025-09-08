@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
+import { safePlay, isIOS } from '@/utils/safePlay';
 
 interface FlickerFreeHLSPlayerProps {
   hlsUrl: string;
@@ -129,12 +130,10 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     if (!video || !autoplay || !isVideoReady || !isHLSLoaded) return;
 
     const playVideo = async () => {
-      try {
-        await video.play();
+      const success = await safePlay(video);
+      if (success) {
         setIsPlaying(true);
         onPlay?.();
-      } catch (error) {
-        console.warn('Autoplay failed:', error);
       }
     };
 
@@ -147,7 +146,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     if (!video || !externallyManaged || !isHLSLoaded) return;
 
     if (autoplay && !isPlaying) {
-      video.play().catch(console.warn);
+      safePlay(video);
     } else if (!autoplay && isPlaying) {
       video.pause();
     }
@@ -157,6 +156,15 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   const handleVideoReady = () => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Apply iOS nudge on loadeddata before potential autoplay
+    if (isIOS && video.currentTime === 0) {
+      try {
+        video.currentTime = 0.001;
+      } catch {
+        // Ignore errors setting currentTime
+      }
+    }
 
     if (video.readyState >= 3) { // HAVE_FUTURE_DATA
       setIsVideoReady(true);
@@ -183,7 +191,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     if (!video || !isHLSLoaded) return;
 
     if (video.paused) {
-      video.play().catch(console.warn);
+      safePlay(video);
     } else {
       video.pause();
     }
@@ -223,14 +231,18 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
       {/* Video Element */}
       <video
         ref={videoRef}
-        className={`w-full h-full ${
+        className={`feed-card-video w-full h-full ${
           objectFit === 'contain' ? 'object-contain' : 'object-cover'
         } ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        muted
         playsInline
-        muted={isMuted}
+        webkit-playsinline="true"
         loop={loop}
-        controls={false}
         preload="metadata"
+        controls={false}
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
+        poster={poster}
         onLoadedData={handleVideoReady}
         onCanPlay={handleVideoReady}
         onPlay={handleVideoPlay}

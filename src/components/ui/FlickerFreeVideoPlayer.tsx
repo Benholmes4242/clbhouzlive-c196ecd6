@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
+import { safePlay, isIOS } from '@/utils/safePlay';
 
 interface FlickerFreeVideoPlayerProps {
   src: string;
@@ -54,12 +55,10 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
     if (!video || !autoplay || !isVideoReady) return;
 
     const playVideo = async () => {
-      try {
-        await video.play();
+      const success = await safePlay(video);
+      if (success) {
         setIsPlaying(true);
         onPlay?.();
-      } catch (error) {
-        console.warn('Autoplay failed:', error);
       }
     };
 
@@ -70,6 +69,15 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
   const handleVideoReady = () => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Apply iOS nudge on loadeddata before potential autoplay
+    if (isIOS && video.currentTime === 0) {
+      try {
+        video.currentTime = 0.001;
+      } catch {
+        // Ignore errors setting currentTime
+      }
+    }
 
     // Video is ready when it has loaded enough data to play
     if (video.readyState >= 3) { // HAVE_FUTURE_DATA
@@ -92,7 +100,7 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
     if (!video) return;
 
     if (video.paused) {
-      video.play().catch(console.warn);
+      safePlay(video);
     } else {
       video.pause();
     }
@@ -133,16 +141,20 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
       <video
         ref={videoRef}
         src={src}
-        className={`w-full h-full ${
+        className={`feed-card-video w-full h-full ${
           objectFit === 'contain' ? 'object-contain' : 'object-cover'
         } ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        muted
         playsInline
-        muted={isMuted}
+        webkit-playsinline="true"
         loop={loop}
+        preload="metadata"
         controls={false}
-        preload="metadata" // Load enough metadata to show first frame
-        onLoadedData={handleVideoReady} // When enough data is loaded to play
-        onCanPlay={handleVideoReady} // Additional ready state check
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
+        poster={poster}
+        onLoadedData={handleVideoReady}
+        onCanPlay={handleVideoReady}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
         onEnded={onEnded}

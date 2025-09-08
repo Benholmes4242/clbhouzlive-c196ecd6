@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { safePlay, isInWebView, prefersReducedMotion } from '@/utils/safePlay';
 
 interface UseVideoVisibilityOptions {
-  threshold?: number;
+  threshold?: number | number[];
   onEnterView?: () => void;
   onExitView?: () => void;
   videoRef?: React.RefObject<HTMLVideoElement | any>;
@@ -10,7 +11,7 @@ interface UseVideoVisibilityOptions {
 }
 
 export const useVideoVisibility = ({
-  threshold = 0.5,
+  threshold = [0, 0.1, 0.25, 0.5, 0.75, 1],
   onEnterView,
   onExitView,
   videoRef,
@@ -24,54 +25,46 @@ export const useVideoVisibility = ({
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
     const isNowVisible = entry.isIntersecting;
+    const visibilityRatio = entry.intersectionRatio;
     
     setIsVisible(isNowVisible);
     
     const video = videoRef?.current;
     if (!video) return;
 
-    if (isNowVisible) {
-      // Video entered view - always mark as having been visible
+    // Environment guards
+    if (prefersReducedMotion() && shouldAutoplay) {
+      // Skip autoplay for reduced motion preference
+      if (isNowVisible) {
+        onEnterView?.();
+      } else {
+        onExitView?.();
+      }
+      return;
+    }
+
+    // Stricter thresholds for WebViews
+    const playThreshold = isInWebView ? 0.5 : 0.5;
+    const shouldPlay = isNowVisible && visibilityRatio >= playThreshold;
+
+    if (shouldPlay) {
+      // Video entered view with sufficient visibility - mark as having been visible
       setHasBeenVisible(true);
       
-      // Set mute state and autoplay with mobile-optimized approach
+      // Set mute state and attempt autoplay
       if (video instanceof HTMLVideoElement) {
         video.muted = globallyMuted;
         
-        if (shouldAutoplay) {
-          // iOS Safari fix: seek nudge to prevent black first frame
-          if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            video.currentTime = 0.001;
-          }
-          
-          // Wait for video to be ready before playing
-          const attemptPlay = async () => {
-            try {
-              // Ensure video has enough data to play
-              if (video.readyState >= 3) { // HAVE_FUTURE_DATA
-                await video.play();
-                onEnterView?.();
-              } else {
-                // Wait for video to be ready
-                const handleCanPlay = async () => {
-                  video.removeEventListener('canplay', handleCanPlay);
-                  try {
-                    await video.play();
-                    onEnterView?.();
-                  } catch (error) {
-                    console.warn('Mobile autoplay failed after canplay:', error);
-                  }
-                };
-                video.addEventListener('canplay', handleCanPlay, { once: true });
-              }
-            } catch (error) {
-              console.warn('Mobile autoplay failed:', error);
+        if (shouldAutoplay && !video.hasAttribute('data-autoplay-blocked')) {
+          // Use safePlay utility for robust autoplay
+          safePlay(video).then(success => {
+            if (success) {
+              onEnterView?.();
+            } else {
               // Still call onEnterView for UI consistency
               onEnterView?.();
             }
-          };
-          
-          attemptPlay();
+          });
         } else {
           onEnterView?.();
         }
@@ -106,7 +99,7 @@ export const useVideoVisibility = ({
 
     const observer = new IntersectionObserver(handleIntersection, {
       threshold: threshold,
-      rootMargin: '0px'
+      rootMargin: '0px 0px 12% 0px' // Start decoding just before on-screen
     });
 
     observer.observe(container);
@@ -122,24 +115,13 @@ export const useVideoVisibility = ({
         setHasBeenVisible(true);
         
         const video = videoRef?.current;
-        if (video && shouldAutoplay) {
+        if (video && shouldAutoplay && !prefersReducedMotion()) {
           if (video instanceof HTMLVideoElement) {
             video.muted = globallyMuted;
             
-            // iOS Safari fix for initial load
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-              video.currentTime = 0.001;
-            }
-            
-            // Ensure video is ready before playing
-            if (video.readyState >= 3) {
-              video.play?.().catch((error: any) => console.warn('Initial mobile autoplay failed:', error));
-            } else {
-              const handleReady = () => {
-                video.removeEventListener('canplay', handleReady);
-                video.play?.().catch((error: any) => console.warn('Initial mobile autoplay failed after ready:', error));
-              };
-              video.addEventListener('canplay', handleReady, { once: true });
+            // Use safePlay for initial autoplay as well
+            if (!video.hasAttribute('data-autoplay-blocked')) {
+              safePlay(video).catch((error: any) => console.warn('Initial mobile autoplay failed:', error));
             }
           } else {
             video.play?.().catch((error: any) => console.warn('Initial HLS autoplay failed:', error));

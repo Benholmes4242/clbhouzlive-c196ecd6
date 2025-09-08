@@ -44,6 +44,15 @@
 }
 
 @layer base {
+  /* Feed card video styles to reduce flash */
+  .feed-card-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: transparent;
+  }
+
   /* Mobile scroll behavior fixes and safe area support */
   html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
