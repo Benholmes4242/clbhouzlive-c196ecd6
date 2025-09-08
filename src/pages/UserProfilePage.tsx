@@ -98,15 +98,19 @@ const UserProfilePage = () => {
         <BottomNavigation />
       </div>
 
-      {/* Modal route appears only when backgroundLocation exists */}
-      {backgroundLocation && (
-        <Routes>
-          <Route
-            path="/profile/:username/course/:id"
-            element={<AnimatedModalRouter />}
-          />
-        </Routes>
-      )}
+      {/* Modal route appears when backgroundLocation exists OR when accessing course route directly */}
+      <Routes>
+        <Route
+          path="/profile/:username/course/:id"
+          element={
+            backgroundLocation ? (
+              <AnimatedModalRouter />
+            ) : (
+              <AnimatedModalRouter />
+            )
+          }
+        />
+      </Routes>
     </>
   );
 };

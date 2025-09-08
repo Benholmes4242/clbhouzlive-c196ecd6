@@ -132,22 +132,27 @@ const ProfilePage = () => {
         <BottomNavigation />
       </div>
 
-      {/* Modal route appears only when backgroundLocation exists */}
-      {backgroundLocation && (
-        <Routes>
-          <Route
-            path="/profile/course/:id"
-            element={
+      {/* Modal route appears when backgroundLocation exists OR when accessing course route directly */}
+      <Routes>
+        <Route
+          path="/profile/course/:id"
+          element={
+            backgroundLocation ? (
               <AnimatedModalRouter 
                 onExitComplete={() => {
-                  // Clean up selected course state after animation
                   setSelectedCourseId(null);
                 }}
               />
-            }
-          />
-        </Routes>
-      )}
+            ) : (
+              <AnimatedModalRouter 
+                onExitComplete={() => {
+                  setSelectedCourseId(null);
+                }}
+              />
+            )
+          }
+        />
+      </Routes>
     </>
   );
 };

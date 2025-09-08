@@ -95,8 +95,10 @@ const App: React.FC = () => {
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/create-profile" element={<CreateProfile />} />
                         <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/profile/course/:id" element={<ProfilePage />} />
                         <Route path="/profile-test" element={<ProfileTestPage />} />
                         <Route path="/profile/:username" element={<UserProfilePage />} />
+                        <Route path="/profile/:username/course/:id" element={<UserProfilePage />} />
                         <Route path="/settings" element={<Settings />} />
                         {/* Explore route removed - redirects to discover */}
                         <Route path="/clubhouse" element={<Clubhouse />} />
