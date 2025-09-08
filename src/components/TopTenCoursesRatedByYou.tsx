@@ -4,13 +4,18 @@ import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
 import { InlineTypeahead } from "@/components/InlineTypeahead";
 import { useSwipeable } from "react-swipeable";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
+import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DndContext,
   DragEndEvent,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
+  MouseSensor,
   useSensor,
   useSensors,
   closestCenter,
@@ -36,12 +41,15 @@ export default function TopTenCoursesRatedByYou({
   userId,
   userDisplayName,
 }: Props) {
-  const { topTen, loading, canEdit, moveCourse, addCourseAtIndex } = useUserTopTen(userId);
+  const { topTen, loading, canEdit, moveCourse, addCourseAtIndex, removeCourse } = useUserTopTen(userId);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
+  const [courseToRemove, setCourseToRemove] = useState<{ course: any; index: number } | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   // Use carousel navigation for arrow controls
-  const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(10);
+  const { carouselRef, canScrollLeft, canScrollRight, scroll } = useCarouselNavigation(10);
   const [localCanScrollLeft, setLocalCanScrollLeft] = useState(false);
   const [localCanScrollRight, setLocalCanScrollRight] = useState(true);
   
@@ -112,11 +120,19 @@ export default function TopTenCoursesRatedByYou({
     }
   }, [topTen]);
 
-  // Set up sensors for drag-and-drop (desktop and mobile)
+  // Set up sensors for drag-and-drop
   const sensors = useSensors(
-    useSensor(PointerSensor, { 
-      activationConstraint: { 
-        distance: 8, // Start dragging after moving 8px
+    // Desktop - use mouse sensor with immediate activation
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      }
+    }),
+    // Mobile - use touch sensor with long-press activation
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 300, // 300ms long-press
+        tolerance: 10, // 10px movement tolerance
       }
     })
   );
@@ -147,6 +163,26 @@ export default function TopTenCoursesRatedByYou({
     }
   };
 
+  // Handle remove course
+  const handleRemoveCourse = useCallback((course: any, index: number) => {
+    setCourseToRemove({ course, index });
+    setRemoveModalOpen(true);
+  }, []);
+
+  const confirmRemoveCourse = useCallback(async () => {
+    if (!courseToRemove) return;
+    
+    try {
+      removeCourse(courseToRemove.index);
+      toast.success('Removed from your Top 10');
+    } catch (error) {
+      toast.error('Could not remove course. Try again.');
+    } finally {
+      setRemoveModalOpen(false);
+      setCourseToRemove(null);
+    }
+  }, [courseToRemove, removeCourse]);
+
   // Swipe handlers for mobile carousel navigation
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -160,6 +196,7 @@ export default function TopTenCoursesRatedByYou({
       }
     },
     trackMouse: false, // Only track touch events
+    preventScrollOnSwipe: false, // Allow normal scroll behavior
   });
   
   if (loading) {
@@ -257,7 +294,9 @@ export default function TopTenCoursesRatedByYou({
                     onAddCourse={(selectedCourse, slotIndex) => {
                       addCourseAtIndex(selectedCourse, slotIndex);
                     }}
+                    onRemoveCourse={handleRemoveCourse}
                     existingCourses={topTen}
+                    activeIndex={activeIndex}
                   />
                 ))}
               </div>
@@ -280,6 +319,17 @@ export default function TopTenCoursesRatedByYou({
           </div>
         )}
       </div>
+
+      {/* Remove course confirmation modal */}
+      <ConfirmModal
+        isOpen={removeModalOpen}
+        onClose={() => setRemoveModalOpen(false)}
+        onConfirm={confirmRemoveCourse}
+        title="Remove course?"
+        message="Remove this course from your Top 10?"
+        confirmText="Remove"
+        confirmVariant="destructive"
+      />
     </section>
   );
 }
@@ -293,14 +343,24 @@ const TopTenSlot: React.FC<{
   isOwnProfile?: boolean;
   onOpenModal?: () => void;
   onAddCourse?: (course: any, index: number) => void;
+  onRemoveCourse?: (course: any, index: number) => void;
   existingCourses?: any[];
-}> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onAddCourse, existingCourses = [] }) => {
+  activeIndex?: number | null;
+}> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onAddCourse, onRemoveCourse, existingCourses = [], activeIndex }) => {
   const [isSearchMode, setIsSearchMode] = useState(false);
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
     disabled: !isOwnProfile || isSearchMode // Re-add isSearchMode check to prevent dragging during search
   });
+
+  const handleRemoveClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (course && onRemoveCourse) {
+      onRemoveCourse(course, index);
+    }
+  }, [course, index, onRemoveCourse]);
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -416,10 +476,30 @@ const TopTenSlot: React.FC<{
         isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
       }`}
     >
-      <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+      <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)} ${
+        isDragging ? 'scale-[1.02] shadow-lg' : ''
+      }`}>
         {/* Top Edge Gradient Accent for Top 3 */}
         {isTopThree && (
           <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
+        )}
+        
+        {/* Remove ribbon - only show when not dragging and can edit */}
+        {isOwnProfile && !isDragging && (
+          <div className="absolute top-0 right-0 z-30">
+            <div className="relative w-11 h-11">
+              {/* Triangle background */}
+              <div className="absolute top-0 right-0 w-0 h-0 border-l-[44px] border-l-transparent border-t-[44px] border-t-destructive/80" />
+              {/* X icon */}
+              <button
+                onClick={handleRemoveClick}
+                className="absolute top-1 right-1 w-8 h-8 flex items-center justify-center text-white hover:scale-110 transition-transform"
+                aria-label="Remove course from Top 10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         )}
         
         <CourseCard
