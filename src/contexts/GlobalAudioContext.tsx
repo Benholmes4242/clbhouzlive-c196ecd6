@@ -9,7 +9,17 @@ interface GlobalAudioContextType {
   isVideoActive: (videoId: string) => boolean;
 }
 
-const GlobalAudioContext = createContext<GlobalAudioContextType | undefined>(undefined);
+// Provide stable default context to prevent hook order issues
+const defaultContext: GlobalAudioContextType = {
+  isGloballyMuted: true,
+  setGlobalMute: () => {},
+  toggleGlobalMute: () => {},
+  activeVideoId: null,
+  setActiveVideo: () => {},
+  isVideoActive: () => false
+};
+
+const GlobalAudioContext = createContext<GlobalAudioContextType>(defaultContext);
 
 const AUDIO_STATE_KEY = 'globalAudioState';
 
@@ -82,8 +92,6 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 export const useGlobalAudio = () => {
   const context = useContext(GlobalAudioContext);
-  if (context === undefined) {
-    throw new Error('useGlobalAudio must be used within a GlobalAudioProvider');
-  }
+  // Return context directly - it has safe defaults even outside provider
   return context;
 };

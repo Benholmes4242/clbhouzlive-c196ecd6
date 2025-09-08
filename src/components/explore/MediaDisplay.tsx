@@ -52,6 +52,14 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   onMediaClick,
   showFeaturedBadge = true
 }) => {
+  // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
+  // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
+  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
+  
+  // Image loading state
+  const [imageLoading, setImageLoading] = useState(true);
+  const [mediaLoaded, setMediaLoaded] = useState(false);
+
   // Memoized thumbnail URL generation for performance
   const thumbnailUrl = useMemo(() => {
     if (media.media_type !== 'video') return null;
@@ -76,33 +84,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
     typeof media.media_url !== 'string'
   , [media.media_url]);
 
-  // Use smart media logic if enabled (early return to avoid hook order issues)
-  if (useSmartMedia && cardType) {
-    return (
-      <SmartCardMedia
-        media={{
-          ...media,
-          thumbnail_url: thumbnailUrl || undefined,
-          poster_url: thumbnailUrl || undefined
-        }}
-        cardType={cardType}
-        shouldAutoplay={shouldAutoplay}
-        onMediaClick={onMediaClick}
-        className="w-full h-full"
-        showFeaturedBadge={showFeaturedBadge}
-      />
-    );
-  }
-
-  // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
-  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
-  
-  // Fallback image for broken/missing images
-  const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-
-  // Image loading state
-  const [imageLoading, setImageLoading] = useState(true);
-  const [mediaLoaded, setMediaLoaded] = useState(false);
   const hasCloudflareThumb = thumbnailUrl !== null;
 
   // Use refs to store latest callbacks to avoid stale closures
@@ -127,6 +108,28 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
     setMediaLoaded(true);
     onImageErrorRef.current();
   }, []); // No dependencies to prevent re-creation
+
+  // ✅ Now safe to use conditional rendering - all hooks are called above
+  // Use smart media logic if enabled
+  if (useSmartMedia && cardType) {
+    return (
+      <SmartCardMedia
+        media={{
+          ...media,
+          thumbnail_url: thumbnailUrl || undefined,
+          poster_url: thumbnailUrl || undefined
+        }}
+        cardType={cardType}
+        shouldAutoplay={shouldAutoplay}
+        onMediaClick={onMediaClick}
+        className="w-full h-full"
+        showFeaturedBadge={showFeaturedBadge}
+      />
+    );
+  }
+  
+  // Fallback image for broken/missing images
+  const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
