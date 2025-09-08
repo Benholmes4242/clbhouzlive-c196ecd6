@@ -129,24 +129,12 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     if (!video || !autoplay || !isVideoReady || !isHLSLoaded) return;
 
     const playVideo = async () => {
-      // Add delay for first-visit initialization
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      let retries = 3;
-      while (retries > 0) {
-        try {
-          await video.play();
-          setIsPlaying(true);
-          onPlay?.();
-          break;
-        } catch (error) {
-          retries--;
-          if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-          } else {
-            console.warn('Autoplay failed after retries:', error);
-          }
-        }
+      try {
+        await video.play();
+        setIsPlaying(true);
+        onPlay?.();
+      } catch (error) {
+        console.warn('Autoplay failed:', error);
       }
     };
 

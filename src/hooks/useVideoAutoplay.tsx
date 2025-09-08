@@ -11,7 +11,7 @@ interface UseVideoAutoplayOptions {
 export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const {
     enabled = true,
-    threshold = 0.5, // 50% visibility for autoplay as required
+    threshold = 0.7, // 70% visibility for autoplay as requested
     rootMargin = '300px' // Preload when within 300px of viewport
   } = options;
 
@@ -25,20 +25,16 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
     rootMargin
   });
 
-  // Update autoplay state based on visibility with small delay for first visit
+  // Update autoplay state based on visibility - immediate autoplay without delay
   useEffect(() => {
     if (!enabled) {
       setShouldAutoplay(false);
       return;
     }
 
-    // Add small delay for first visit to ensure proper initialization
+    // Immediate autoplay when in view
     if (isInView && !shouldAutoplay) {
-      const timer = setTimeout(() => {
-        setShouldAutoplay(true);
-      }, 100);
-      
-      return () => clearTimeout(timer);
+      setShouldAutoplay(true);
     }
   }, [enabled, isInView, shouldAutoplay]);
 

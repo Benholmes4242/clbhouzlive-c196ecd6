@@ -1,6 +1,6 @@
 import React, { memo, useRef, useEffect, useState } from 'react';
 import { Play } from 'lucide-react';
-import { useOptimizedVideoAutoplay } from '@/hooks/useOptimizedVideoAutoplay';
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import HighQualityImage from '@/components/ui/high-quality-image';
@@ -65,12 +65,12 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
     fetchRealUrls();
   }, [uid]);
   
-  // Use optimized autoplay hook for 50% visibility requirement
-  const { containerRef, isInView } = useOptimizedVideoAutoplay({
-    threshold: 0.5,
+  // Use video visibility hook for autoplay management
+  const { containerRef, isVisible } = useVideoVisibility({
+    threshold: 0.5, // 50% visibility for hero cards (less strict than portrait)
     videoRef,
-    enabled: shouldAutoplay,
-    loop: true
+    shouldAutoplay,
+    globallyMuted: true // Always start muted for hero cards
   });
 
   // If not a video, show fallback image with same sizing
