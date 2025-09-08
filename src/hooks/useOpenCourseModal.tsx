@@ -10,6 +10,7 @@ export function useOpenCourseModal() {
     params.set('club', courseId);
     if (source) params.set('src', source);
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: false });
+    // Use replace: true to prevent navigation stack issues on mobile
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 }

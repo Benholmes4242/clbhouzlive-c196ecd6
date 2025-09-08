@@ -14,7 +14,7 @@ const ProfileModalRouter: React.FC = () => {
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
 
-  // Force remount on each open to ensure smooth animation
+  // Force remount on each open to ensure smooth animation and prevent state issues
   useEffect(() => {
     if (isClubModal && courseId) {
       setModalKey(prev => prev + 1);
@@ -27,7 +27,8 @@ const ProfileModalRouter: React.FC = () => {
     params.delete('club');
     params.delete('src');
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: false });
+    // Use replace: true to avoid navigation stack issues on mobile
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   }, [navigate, location.pathname, location.search]);
 
   if (!isClubModal || !courseId) {
