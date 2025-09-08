@@ -19,7 +19,7 @@ const ProfileModalRouter: React.FC = () => {
     params.delete('club');
     params.delete('src');
     
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    navigate(`${location.pathname}?${params.toString()}`, { replace: false });
   }, [navigate, location.pathname, location.search]);
 
   if (!isClubModal || !courseId) {
