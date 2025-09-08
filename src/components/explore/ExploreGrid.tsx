@@ -634,25 +634,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
                            shouldAutoplay={true}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                           onImageError={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                           }}
+                           onImageLoad={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                           }}
+                           itemId={item.item.id}
+                           currentIndex={0}
+                           loop={true}
+                           cardType={CardType.SQUARE}
+                           useSmartMedia={true}
+                           onMediaClick={() => onMediaClick?.(item.item)}
+                         />
                       </div>
                     </div>
                   );
@@ -672,25 +675,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
-                        <MediaDisplay
-                          media={{
-                            id: portraitItem.item.id,
-                            media_type: portraitItem.item.type as 'video' | 'image',
-                            media_url: portraitItem.item.src
-                          }}
-                          itemTitle={portraitItem.item.title}
-                          shouldAutoplay={true}
-                          isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                          }}
-                          itemId={portraitItem.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
+                         <MediaDisplay
+                           media={{
+                             id: portraitItem.item.id,
+                             media_type: portraitItem.item.type as 'video' | 'image',
+                             media_url: portraitItem.item.src
+                           }}
+                           itemTitle={portraitItem.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
+                           onImageError={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           onImageLoad={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           itemId={portraitItem.item.id}
+                           currentIndex={0}
+                           loop={true}
+                           cardType={CardType.PORTRAIT}
+                           useSmartMedia={true}
+                           onMediaClick={() => onMediaClick?.(portraitItem.item)}
+                         />
                       </div>
                     </div>
                   );
@@ -709,25 +715,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
-                        <MediaDisplay
-                          media={{
-                            id: item.item.id,
-                            media_type: item.item.type as 'video' | 'image',
-                            media_url: item.item.src
-                          }}
-                          itemTitle={item.item.title}
-                          shouldAutoplay={true}
-                          isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          itemId={item.item.id}
-                          currentIndex={0}
-                          loop={true}
-                        />
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                           onImageError={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                           }}
+                           onImageLoad={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                           }}
+                           itemId={item.item.id}
+                           currentIndex={0}
+                           loop={true}
+                           cardType={CardType.SQUARE}
+                           useSmartMedia={true}
+                           onMediaClick={() => onMediaClick?.(item.item)}
+                         />
                       </div>
                     </div>
                   );
