@@ -19,7 +19,13 @@ const ProfileModalRouter: React.FC = () => {
   useEffect(() => {
     if (isClubModal && courseId) {
       setModalKey(prev => prev + 1);
-      isTransitioning.current = false; // Reset transition guard
+      // Always reset transition guard when modal opens
+      console.log('🔴 Modal opened, resetting transition guard');
+      isTransitioning.current = false;
+    } else {
+      // Modal is closing/closed, ensure transition guard is reset
+      console.log('🔴 Modal closed, resetting transition guard');
+      isTransitioning.current = false;
     }
   }, [isClubModal, courseId]);
 
@@ -42,6 +48,12 @@ const ProfileModalRouter: React.FC = () => {
     console.log('🔴 Navigating to:', newUrl);
     
     navigate(newUrl, { replace: true });
+    
+    // Reset transition guard after a brief delay to allow navigation to complete
+    setTimeout(() => {
+      console.log('🔴 Resetting transition guard after navigation');
+      isTransitioning.current = false;
+    }, 100);
   }, [navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
