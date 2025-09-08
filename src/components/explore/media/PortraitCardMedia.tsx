@@ -105,6 +105,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
       {/* Only render video if we have a valid HLS URL */}
       {hlsUrl ? (
         <HLSVideoCard
+          ref={videoRef}
           hlsUrl={hlsUrl}
           poster={poster}
           className="w-full h-full"
