@@ -46,7 +46,7 @@ export function ConfirmModal({
           </AlertDialogCancel>
           <AlertDialogAction 
             onClick={onConfirm}
-            className={confirmVariant === "destructive" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+            className={confirmVariant === "destructive" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : "bg-muted text-muted-foreground hover:bg-muted/80"}
           >
             {confirmText}
           </AlertDialogAction>
