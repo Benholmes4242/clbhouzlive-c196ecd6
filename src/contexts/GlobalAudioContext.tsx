@@ -16,8 +16,10 @@ const defaultContext: GlobalAudioContextType = {
   toggleGlobalMute: () => {},
   activeVideoId: null,
   setActiveVideo: () => {},
-  isVideoActive: () => false
-};
+  isVideoActive: () => false,
+  // Flag to detect when default context is being used
+  __isDefault: true
+} as GlobalAudioContextType & { __isDefault?: boolean };
 
 const GlobalAudioContext = createContext<GlobalAudioContextType>(defaultContext);
 
@@ -92,6 +94,12 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 export const useGlobalAudio = () => {
   const context = useContext(GlobalAudioContext);
+  
+  // Development warning for missing provider
+  if (process.env.NODE_ENV !== 'production' && (context as any)?.__isDefault) {
+    console.warn('⚠️ GlobalAudioContext: useGlobalAudio called without GlobalAudioProvider. Audio features may not work correctly.');
+  }
+  
   // Return context directly - it has safe defaults even outside provider
   return context;
 };
