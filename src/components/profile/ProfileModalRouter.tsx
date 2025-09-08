@@ -110,8 +110,11 @@ const ProfileModalRouter: React.FC = () => {
               <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
-                  onClick={onClose}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none"
                   aria-label="Close modal"
                 >
                   ✕
