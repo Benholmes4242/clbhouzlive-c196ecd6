@@ -67,7 +67,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.5, // 50% visibility for hero cards (less strict than portrait)
+    threshold: 0.1, // Start autoplay as soon as card comes into view
     videoRef,
     shouldAutoplay,
     globallyMuted: true // Always start muted for hero cards
@@ -103,14 +103,16 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       {/* Only render video if we have a valid HLS URL */}
       {hlsUrl ? (
         <HLSVideoCard
+          ref={videoRef}
           hlsUrl={hlsUrl}
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
           muted={videoIsMuted}
           loop={true}
-          autoplay={shouldAutoplay}
+          autoplay={isVisible && shouldAutoplay}
           showMuteButton={false}
+          externallyManaged={true}
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">

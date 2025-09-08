@@ -66,7 +66,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.5, // 50% visibility required for autoplay as per requirements
+    threshold: 0.1, // Start autoplay as soon as card comes into view
     videoRef,
     shouldAutoplay,
     globallyMuted: true // Always start muted for portrait cards

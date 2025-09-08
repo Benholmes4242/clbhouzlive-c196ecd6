@@ -170,7 +170,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
           onPause?.();
         }
       },
-      { threshold: 0.5 } // Changed to 50% as per requirements
+      { threshold: 0.1 } // Changed to start autoplay as soon as video comes into view
     );
 
     observer.observe(container);
