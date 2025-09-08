@@ -183,7 +183,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
           onPause?.();
         }
       },
-      { threshold: 0.6 }
+      { threshold: 0.5 } // 50% visibility threshold as required
     );
 
     observer.observe(container);

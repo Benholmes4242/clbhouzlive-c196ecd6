@@ -11,7 +11,7 @@ interface UseVideoAutoplayOptions {
 export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const {
     enabled = true,
-    threshold = 0.7, // 70% visibility for autoplay as requested
+    threshold = 0.5, // 50% visibility for autoplay as required
     rootMargin = '300px' // Preload when within 300px of viewport
   } = options;
 
