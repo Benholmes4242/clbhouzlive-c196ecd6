@@ -15,7 +15,7 @@ const ProfileModalRouter: React.FC = () => {
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
   
-  console.log('🚨 [ProfileModalRouter] Render - isClubModal:', isClubModal, 'courseId:', courseId);
+  
 
   // Force remount on each open to ensure smooth animation and prevent state issues
   useEffect(() => {
@@ -25,25 +25,12 @@ const ProfileModalRouter: React.FC = () => {
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    console.log('🚨 [ProfileModalRouter] onClose called');
-    console.log('🚨 Current location:', location.pathname, location.search);
+    const params = new URLSearchParams(location.search);
+    params.delete('view');
+    params.delete('club');
+    params.delete('src');
     
-    try {
-      const params = new URLSearchParams(location.search);
-      console.log('🚨 Before delete - params:', params.toString());
-      
-      params.delete('view');
-      params.delete('club');
-      params.delete('src');
-      
-      const newUrl = `${location.pathname}?${params.toString()}`;
-      console.log('🚨 Navigating to:', newUrl);
-      
-      navigate(newUrl, { replace: true });
-      console.log('🚨 Navigation called successfully');
-    } catch (error) {
-      console.error('🚨 Error in onClose:', error);
-    }
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   }, [navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
@@ -83,6 +70,9 @@ const ProfileModalRouter: React.FC = () => {
     
     // Reset modal key for next open
     setModalKey(0);
+    
+    // CRITICAL: Clear any pending video operations that might be retrying
+    window.dispatchEvent(new CustomEvent('cancelVideoOperations'));
   }, []);
 
   return (
@@ -98,11 +88,7 @@ const ProfileModalRouter: React.FC = () => {
         >
           {/* Backdrop - unmounts with modal */}
           <div
-            onClick={(e) => {
-              console.log('🚨 [ProfileModalRouter] Backdrop clicked');
-              e.preventDefault();
-              onClose();
-            }}
+            onClick={onClose}
             className="absolute inset-0 bg-black/50 cursor-pointer"
           />
           
@@ -121,18 +107,7 @@ const ProfileModalRouter: React.FC = () => {
               <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
                 <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
                 <button
-                  onClick={(e) => {
-                    console.log('🚨 [ProfileModalRouter] Close button clicked');
-                    console.log('🚨 Event target:', e.target);
-                    console.log('🚨 Event type:', e.type);
-                    
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('🚨 About to call onClose');
-                    onClose();
-                    console.log('🚨 onClose called, waiting for result');
-                  }}
+                  onClick={onClose}
                   className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none transition-colors"
                   aria-label="Close modal"
                 >
