@@ -328,7 +328,7 @@ export default function TopTenCoursesRatedByYou({
         title="Remove course?"
         message="Remove this course from your Top 10?"
         confirmText="Remove"
-        confirmVariant="destructive"
+        confirmVariant="default"
       />
     </section>
   );
@@ -493,10 +493,10 @@ const TopTenSlot: React.FC<{
               {/* X icon */}
               <button
                 onClick={handleRemoveClick}
-                className="absolute top-1.5 right-1.5 w-8 h-8 flex items-center justify-center text-white hover:scale-110 transition-transform"
+                className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-white hover:scale-110 transition-transform"
                 aria-label="Remove course from Top 10"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             </div>
           </div>
