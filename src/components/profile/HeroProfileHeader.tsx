@@ -113,6 +113,7 @@ const HeroProfileHeader = ({
   activeSection = 'activity',
   onSectionChange
 }: HeroProfileHeaderProps) => {
+  console.log('HeroProfileHeader render with profile:', profile?.id);
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
@@ -295,13 +296,13 @@ const HeroProfileHeader = ({
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-  const [userProgressData, setUserProgressData] = useState({
+  const [userProgressData, setUserProgressData] = useState(() => ({
     coursesPlayed: 0,
     britainIrelandCompleted: 0,
     europeCompleted: 0,
     usaCompleted: 0,
     worldwideCompleted: 0
-  });
+  }));
   
   // Fetch user achievements for current user
   const { achievements } = useUserAchievements();
