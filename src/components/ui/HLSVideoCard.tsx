@@ -170,7 +170,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
           onPause?.();
         }
       },
-      { threshold: 0.6 }
+      { threshold: 0.5 } // Changed to 50% as per requirements
     );
 
     observer.observe(container);

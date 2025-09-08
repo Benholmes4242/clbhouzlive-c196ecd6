@@ -66,7 +66,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   
   // Use video visibility hook for autoplay management
   const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.7, // 70% visibility required for autoplay
+    threshold: 0.5, // 50% visibility required for autoplay as per requirements
     videoRef,
     shouldAutoplay,
     globallyMuted: true // Always start muted for portrait cards
@@ -111,8 +111,9 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
           aspectRatio="auto"
           muted={videoIsMuted}
           loop={true}
-          autoplay={shouldAutoplay}
+          autoplay={isVisible && shouldAutoplay}
           showMuteButton={false}
+          externallyManaged={true}
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">
