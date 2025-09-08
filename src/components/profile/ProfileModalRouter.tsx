@@ -14,10 +14,6 @@ const ProfileModalRouter: React.FC = () => {
   
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
-  
-  // Temporary debug to find what's causing render loop
-  console.log('🚨 [ProfileModalRouter] Render - isClubModal:', isClubModal, 'courseId:', courseId);
-  console.trace('🚨 [ProfileModalRouter] Render stack trace');
 
   // Force remount on each open to ensure smooth animation and prevent state issues
   useEffect(() => {
@@ -27,13 +23,13 @@ const ProfileModalRouter: React.FC = () => {
   }, [isClubModal, courseId]);
 
   const onClose = useCallback(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     params.delete('view');
     params.delete('club');
     params.delete('src');
     
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  }, [navigate, location.pathname, location.search]);
+  }, [navigate, location.pathname]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
   useEffect(() => {
@@ -57,7 +53,7 @@ const ProfileModalRouter: React.FC = () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
     }
-  }, [isClubModal, onClose]);
+  }, [isClubModal]); // Removed onClose from dependencies
 
   // Final cleanup handler for AnimatePresence
   const handleExitComplete = useCallback(() => {
