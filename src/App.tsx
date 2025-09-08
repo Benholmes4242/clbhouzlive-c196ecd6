@@ -17,6 +17,7 @@ import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
+import { UIProvider } from '@/contexts/UIContext';
 
 
 // Direct import for ProfilePage to avoid dynamic import issues
@@ -82,13 +83,14 @@ const App: React.FC = () => {
         <TooltipProvider>
           <SecurityHeaders />
           <SiteAccessControl>
-            <BrowserRouter>
-              <ScrollToTop />
-              <GlobalAudioProvider>
-                <VideoManagerProvider>
-                  <VideoPlaybackManagerProvider>
-                    <TopTenProvider>
-                      <AuthWrapper>
+            <UIProvider>
+              <BrowserRouter>
+                <ScrollToTop />
+                <GlobalAudioProvider>
+                  <VideoManagerProvider>
+                    <VideoPlaybackManagerProvider>
+                      <TopTenProvider>
+                        <AuthWrapper>
                     <Suspense fallback={<ClubhouzLoading />}>
                       <Routes>
                         <Route path="/" element={<Clubhouse />} />
@@ -122,16 +124,17 @@ const App: React.FC = () => {
                         
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </Suspense>
-                    </AuthWrapper>
-                    </TopTenProvider>
-                  </VideoPlaybackManagerProvider>
-                </VideoManagerProvider>
-              </GlobalAudioProvider>
-              <Toaster />
-              <Sonner />
-              <AIChat />
-            </BrowserRouter>
+                      </Suspense>
+                      </AuthWrapper>
+                      </TopTenProvider>
+                    </VideoPlaybackManagerProvider>
+                  </VideoManagerProvider>
+                </GlobalAudioProvider>
+                <Toaster />
+                <Sonner />
+                <AIChat />
+              </BrowserRouter>
+            </UIProvider>
           </SiteAccessControl>
       </TooltipProvider>
     </QueryClientProvider>

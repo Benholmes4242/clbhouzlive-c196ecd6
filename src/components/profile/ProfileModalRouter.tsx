@@ -1,22 +1,24 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUI } from '@/contexts/UIContext';
 
 const ProfileModalRouter: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const isTransitioning = useRef(false);
+  const { modalTransition, beginTransition, endTransition } = useUI();
   
   const isClubModal = searchParams.get('view') === 'modal' && !!searchParams.get('club');
   const courseId = searchParams.get('club') ?? '';
 
   const onClose = useCallback(() => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
+    // Shared guard: prevents double-close / re-entrancy
+    if (modalTransition.inProgress) return;
+    beginTransition('close');
     
     const params = new URLSearchParams(location.search);
     params.delete('view');
@@ -24,12 +26,7 @@ const ProfileModalRouter: React.FC = () => {
     params.delete('src');
     
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-    
-    // Reset transition guard after navigation
-    setTimeout(() => {
-      isTransitioning.current = false;
-    }, 50);
-  }, [navigate, location.pathname]);
+  }, [modalTransition.inProgress, beginTransition, navigate, location.pathname, location.search]);
 
   // Comprehensive cleanup on unmount and whenever modal state changes
   useEffect(() => {
@@ -40,7 +37,7 @@ const ProfileModalRouter: React.FC = () => {
       
       // Handle escape key
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isTransitioning.current) {
+        if (e.key === 'Escape' && !modalTransition.inProgress) {
           onClose();
         }
       };
@@ -51,12 +48,11 @@ const ProfileModalRouter: React.FC = () => {
         // Cleanup on unmount or state change
         document.body.style.overflow = prevOverflow;
         window.removeEventListener('keydown', handleKeyDown);
-        isTransitioning.current = false;
       };
     }
-  }, [isClubModal, onClose]);
+  }, [isClubModal, onClose, modalTransition.inProgress]);
 
-  // Final cleanup handler for AnimatePresence
+  // IMPORTANT: this is the single source of truth for "transition ended"
   const handleExitComplete = useCallback(() => {
     // Ensure body scroll is unlocked
     document.body.style.overflow = '';
@@ -67,9 +63,9 @@ const ProfileModalRouter: React.FC = () => {
       activeElement.blur();
     }
     
-    // Reset transition guard
-    isTransitioning.current = false;
-  }, []);
+    // Reset transition guard - this is the canonical end signal
+    endTransition();
+  }, [endTransition]);
 
   return (
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
