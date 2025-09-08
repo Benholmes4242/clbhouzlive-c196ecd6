@@ -37,8 +37,8 @@ const VideoWithAutoplay: React.FC<{
   isMobile?: boolean;
 }> = React.memo(({ src, muted, className, isMobile: isMobileProp = false }) => {
   const { ref, isInView } = useIntersectionObserver({
-    threshold: 0.8, // Video must be 80% visible to autoplay (more restrictive)
-    rootMargin: '0px' // No margin to prevent multiple videos triggering
+    threshold: 0.5, // Reduced threshold for better first video detection
+    rootMargin: '50px' // Added margin to help detect initial video on load
   });
   
   // Generate HLS URL from source
