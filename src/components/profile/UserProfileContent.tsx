@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -24,6 +24,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
                        (user && profile?.username === user.email?.split('@')[0]);
   const [activeSection, setActiveSection] = useState('activity');
 
+  // Memoize the profile update callback to prevent infinite re-renders
+  const handleProfileUpdate = useCallback(() => {
+    // Profile update will be handled by the HeroProfileHeader component
+  }, []);
+
+  // Memoize the section change handler to prevent infinite re-renders
+  const handleSectionChange = useCallback((section: string) => {
+    setActiveSection(section);
+  }, []);
+
   if (!profile) {
     return null;
   }
@@ -33,11 +43,9 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
       <HeroProfileHeader 
         profile={profile}
         isOwnProfile={isOwnProfile}
-        onProfileUpdate={() => {
-          // Profile update will be handled by the HeroProfileHeader component
-        }}
+        onProfileUpdate={handleProfileUpdate}
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={handleSectionChange}
       />
     </>
   );
