@@ -82,7 +82,13 @@ const ProfileModalRouter: React.FC = () => {
           <button
             aria-label="Close modal"
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 cursor-default"
+            className={`
+              fixed bg-black/50 cursor-default
+              ${isMobile 
+                ? 'top-0 left-0 right-0 bottom-16' 
+                : 'inset-0'
+              }
+            `}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           />
