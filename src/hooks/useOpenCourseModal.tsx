@@ -5,7 +5,6 @@ export function useOpenCourseModal() {
   const location = useLocation();
   
   return (courseId: string, source?: string) => {
-    // Use background-route pattern instead of search params
     // Check if we're on a user profile page vs own profile page
     const isUserProfile = location.pathname.includes('/profile/') && location.pathname !== '/profile';
     
