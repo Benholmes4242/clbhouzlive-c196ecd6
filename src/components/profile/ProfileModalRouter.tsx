@@ -111,18 +111,15 @@ const ProfileModalRouter: React.FC = () => {
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           >
-            <div className="h-full overflow-hidden flex flex-col">
-              {/* Header */}
-              <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border bg-background">
-                <h2 className="text-xl sm:text-2xl font-bold">Golf Club</h2>
-                <button
-                  onClick={onClose}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none"
-                  aria-label="Close modal"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="h-full overflow-hidden flex flex-col relative">
+              {/* Liquid Glass Close Button */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 z-20 h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+                aria-label="Close modal"
+              >
+                <span className="text-white text-lg font-bold">✕</span>
+              </button>
               
               {/* Content */}
               <div className="flex-1 overflow-auto">
