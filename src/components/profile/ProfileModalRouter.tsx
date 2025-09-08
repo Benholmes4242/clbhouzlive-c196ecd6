@@ -84,28 +84,17 @@ const ProfileModalRouter: React.FC = () => {
             }
           `}
         >
-          {/* Backdrop - blocks all background interaction but completely excludes navbar */}
-          <div
-            className={`
-              fixed bg-black/50 pointer-events-none
-              ${isMobile 
-                ? 'top-0 left-0 right-0' 
-                : 'inset-0'
-              }
-            `}
-            style={isMobile ? { bottom: '64px' } : {}}
-          />
+          {/* Backdrop - blocks all background interaction */}
           <button
             aria-label="Close modal"
             onClick={onClose}
             className={`
-              fixed cursor-default pointer-events-auto
+              fixed bg-black/50 cursor-default
               ${isMobile 
-                ? 'top-0 left-0 right-0' 
+                ? 'top-0 left-0 right-0 bottom-16' 
                 : 'inset-0'
               }
             `}
-            style={isMobile ? { bottom: '64px' } : {}}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           />
