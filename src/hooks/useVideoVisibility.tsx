@@ -34,14 +34,58 @@ export const useVideoVisibility = ({
       // Video entered view - always mark as having been visible
       setHasBeenVisible(true);
       
-      // Set mute state and autoplay
+      // Set mute state and autoplay with mobile-optimized approach
       if (video instanceof HTMLVideoElement) {
         video.muted = globallyMuted;
+        
+        if (shouldAutoplay) {
+          // iOS Safari fix: seek nudge to prevent black first frame
+          if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            video.currentTime = 0.001;
+          }
+          
+          // Wait for video to be ready before playing
+          const attemptPlay = async () => {
+            try {
+              // Ensure video has enough data to play
+              if (video.readyState >= 3) { // HAVE_FUTURE_DATA
+                await video.play();
+                onEnterView?.();
+              } else {
+                // Wait for video to be ready
+                const handleCanPlay = async () => {
+                  video.removeEventListener('canplay', handleCanPlay);
+                  try {
+                    await video.play();
+                    onEnterView?.();
+                  } catch (error) {
+                    console.warn('Mobile autoplay failed after canplay:', error);
+                  }
+                };
+                video.addEventListener('canplay', handleCanPlay, { once: true });
+              }
+            } catch (error) {
+              console.warn('Mobile autoplay failed:', error);
+              // Still call onEnterView for UI consistency
+              onEnterView?.();
+            }
+          };
+          
+          attemptPlay();
+        } else {
+          onEnterView?.();
+        }
+      } else {
+        // Non-HTMLVideoElement (HLS players)
+        if (shouldAutoplay) {
+          video.play?.().catch((error: any) => {
+            console.warn('Mobile autoplay failed for HLS:', error);
+            onEnterView?.();
+          });
+        } else {
+          onEnterView?.();
+        }
       }
-      if (shouldAutoplay) {
-        video.play?.().catch(console.error);
-      }
-      onEnterView?.();
     } else {
       // Video exited view - always mute and optionally pause
       if (video instanceof HTMLVideoElement) {
@@ -78,12 +122,27 @@ export const useVideoVisibility = ({
         setHasBeenVisible(true);
         
         const video = videoRef?.current;
-        if (video) {
+        if (video && shouldAutoplay) {
           if (video instanceof HTMLVideoElement) {
             video.muted = globallyMuted;
-          }
-          if (shouldAutoplay) {
-            video.play?.().catch(console.error);
+            
+            // iOS Safari fix for initial load
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+              video.currentTime = 0.001;
+            }
+            
+            // Ensure video is ready before playing
+            if (video.readyState >= 3) {
+              video.play?.().catch((error: any) => console.warn('Initial mobile autoplay failed:', error));
+            } else {
+              const handleReady = () => {
+                video.removeEventListener('canplay', handleReady);
+                video.play?.().catch((error: any) => console.warn('Initial mobile autoplay failed after ready:', error));
+              };
+              video.addEventListener('canplay', handleReady, { once: true });
+            }
+          } else {
+            video.play?.().catch((error: any) => console.warn('Initial HLS autoplay failed:', error));
           }
           onEnterView?.();
         }
