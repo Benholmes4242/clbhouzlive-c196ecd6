@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
 import CourseRankBadges from './CourseRankBadges';
 import CourseCardBackground from './CourseCardBackground';
 import CourseCardAIQuote from './CourseCardAIQuote';
@@ -74,15 +75,27 @@ const CourseCard: React.FC<CourseCardProps> = ({
   badgesOnTop = false
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const openCourseModal = useOpenCourseModal();
   
   // Memory monitoring for this component
   useMemoryMonitor('CourseCard', process.env.NODE_ENV === 'development');
 
+  // Check if we're on a profile page to determine modal vs direct navigation
+  const isProfilePage = location.pathname.includes('/profile');
+
   const handleCardClick = useCallback(() => {
     if (!disableClick) {
-      navigate(`/courses/${course.id}`);
+      if (isProfilePage) {
+        // On profile pages, open in modal
+        const source = isFromUserCoursesPage ? 'user-courses' : 'profile-courses';
+        openCourseModal(course.id, source);
+      } else {
+        // On other pages, navigate directly
+        navigate(`/courses/${course.id}`);
+      }
     }
-  }, [disableClick, navigate, course.id]);
+  }, [disableClick, navigate, course.id, isProfilePage, openCourseModal, isFromUserCoursesPage]);
 
   return (
     <>

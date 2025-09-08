@@ -24,6 +24,7 @@ import HighlightsCarousel from './HighlightsCarousel';
 import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
 import { CarouselItem } from '@/components/ui/CarouselItem';
 import TopTenCoursesRatedByYou from '@/components/TopTenCoursesRatedByYou';
+import ProfileModalRouter from './ProfileModalRouter';
 
 
 interface CoursesJourneyProps {
@@ -2463,6 +2464,9 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
           <p className="text-muted-foreground">Loading...</p>
         </div>
       ) : null}
+
+      {/* Modal Router for course modals */}
+      <ProfileModalRouter />
     </>
   );
 };

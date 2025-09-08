@@ -23,6 +23,7 @@ interface EnhancedRegionalCoursesModalProps {
   courses: any[];
   isOwnProfile?: boolean;
   userId?: string;
+  onCardClick?: (courseId: string, source?: string) => void;
 }
 
 type SortOption = 'recently-played' | 'highest-rated' | 'lowest-rated';
@@ -631,6 +632,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     showUserRating={true}
                     showAverageRating={true}
                     badgesOnTop={true}
+                    disableClick={false}
                     />
                   </div>
                 </CourseCardDraggable>

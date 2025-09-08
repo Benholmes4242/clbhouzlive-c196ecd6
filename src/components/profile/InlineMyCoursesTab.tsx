@@ -2,6 +2,7 @@
 import React from 'react';
 import HandicapCard from './HandicapCard';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import ProfileModalRouter from './ProfileModalRouter';
 
 interface InlineMyCoursesTabProps {
   profile: any;
@@ -56,6 +57,9 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
       <div className="mt-6">
         <UserCoursesContent username={username} />
       </div>
+
+      {/* Modal Router for course modals */}
+      <ProfileModalRouter />
     </div>
   );
 };
