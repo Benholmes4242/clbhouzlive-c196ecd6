@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-avatar', '@radix-ui/react-button'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-avatar', '@radix-ui/react-slot'],
           supabase: ['@supabase/supabase-js'],
           query: ['@tanstack/react-query'],
           icons: ['lucide-react', '@heroicons/react'],

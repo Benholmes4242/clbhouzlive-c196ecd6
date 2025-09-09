@@ -1,5 +1,5 @@
 // Web Vitals collection for performance monitoring
-import { onCLS, onLCP, onINP, onTTFB } from 'web-vitals';
+import { onCLS, onFCP, onLCP, onINP, onTTFB } from 'web-vitals';
 
 export interface WebVitalsMetric {
   name: string;
@@ -10,20 +10,30 @@ export interface WebVitalsMetric {
 }
 
 export const initWebVitals = (sendMetric: (name: string, value: number, metric: WebVitalsMetric) => void) => {
-  onCLS((metric) => {
-    sendMetric('CLS', metric.value, metric);
-  });
-  
-  onLCP((metric) => {
-    sendMetric('LCP', metric.value, metric);
-  });
-  
-  onINP((metric) => {
-    sendMetric('INP', metric.value, metric);
-  });
-  
-  onTTFB((metric) => {
-    sendMetric('TTFB', metric.value, metric);
+  // Lazy-load to avoid blank-screen on early failure
+  import('web-vitals').then(({ onCLS, onFCP, onLCP, onINP, onTTFB }) => {
+    onCLS((metric) => {
+      sendMetric('CLS', metric.value, metric);
+    });
+    
+    onFCP((metric) => {
+      sendMetric('FCP', metric.value, metric);
+    });
+    
+    onLCP((metric) => {
+      sendMetric('LCP', metric.value, metric);
+    });
+    
+    onINP((metric) => {
+      sendMetric('INP', metric.value, metric);
+    });
+    
+    onTTFB((metric) => {
+      sendMetric('TTFB', metric.value, metric);
+    });
+  }).catch(() => {
+    // no-op: metrics collection is non-critical
+    console.warn('Web Vitals failed to load');
   });
 };
 
@@ -46,6 +56,7 @@ export const sendToAnalytics = (name: string, value: number, metric: WebVitalsMe
 const getRating = (name: string, value: number): 'good' | 'needs-improvement' | 'poor' => {
   const thresholds = {
     CLS: [0.1, 0.25],
+    FCP: [1800, 3000], // First Contentful Paint thresholds
     LCP: [2500, 4000],
     INP: [200, 500],
     TTFB: [800, 1800],
