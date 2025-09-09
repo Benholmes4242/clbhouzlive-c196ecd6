@@ -65,13 +65,20 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
     fetchRealUrls();
   }, [uid]);
   
-  // Use video visibility hook for autoplay management
-  const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.1, // Start autoplay as soon as card comes into view
+  // Use video visibility hook for autoplay management with near/play pattern
+  const { containerRef, isVisible, isNear } = useVideoVisibility({
+    threshold: 0.5, // Play when ≥50% visible
+    rootMargin: '300px 0px 300px 0px', // Prebuffer when near
     videoRef,
-    shouldAutoplay,
-    globallyMuted: true // Always start muted for hero cards
+    shouldAutoplay: false, // We'll handle autoplay logic ourselves
+    globallyMuted: true
   });
+
+  // Mobile check for responsive behavior
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches;
+
+  const shouldAttach = isNear; // Attach on both desktop and mobile
+  const shouldAutoPlay = isMobile && isVisible; // Play only on mobile
 
   // If not a video, show fallback image with same sizing
   if (media.media_type !== 'video') {
@@ -108,9 +115,10 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          muted={videoIsMuted}
+          muted={true}
           loop={true}
-          autoplay={isVisible && shouldAutoplay}
+          shouldAttach={shouldAttach}
+          autoplay={shouldAutoPlay}
           showMuteButton={false}
           externallyManaged={true}
         />

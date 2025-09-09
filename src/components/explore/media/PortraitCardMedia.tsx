@@ -64,13 +64,18 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
     fetchRealUrls();
   }, [uid]);
   
-  // Use video visibility hook for autoplay management
-  const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.1, // Start autoplay as soon as card comes into view
+  // Use video visibility hook for autoplay management with near/play pattern
+  const { containerRef, isVisible, isNear } = useVideoVisibility({
+    threshold: 0.5, // Play when ≥50% visible
+    rootMargin: '300px 0px 300px 0px', // Prebuffer when near
     videoRef,
-    shouldAutoplay,
-    globallyMuted: true // Always start muted for portrait cards
+    shouldAutoplay: false, // We'll handle autoplay logic ourselves
+    globallyMuted: true
   });
+
+  // Always allow portrait autoplay on desktop + mobile
+  const shouldAttach = isNear;
+  const shouldAutoPlay = isVisible;
 
   // If not a video, show fallback image
   if (media.media_type !== 'video') {
@@ -110,9 +115,10 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          muted={videoIsMuted}
+          muted={true}
           loop={true}
-          autoplay={isVisible && shouldAutoplay}
+          shouldAttach={shouldAttach}
+          autoplay={shouldAutoPlay}
           showMuteButton={false}
           externallyManaged={true}
         />

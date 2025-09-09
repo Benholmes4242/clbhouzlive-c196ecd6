@@ -20,10 +20,10 @@ const SmartCardMedia: React.FC<CardMediaProps> = memo((props) => {
       return <SquareCardMedia {...props} shouldAutoplay={false} />;
     
     case CardType.PORTRAIT:
-      return <PortraitCardMedia {...props} shouldAutoplay={props.shouldAutoplay ?? true} />;
+      return <PortraitCardMedia {...props} shouldAutoplay={true} />;
     
     case CardType.HERO:
-      return <HeroCardMedia {...props} shouldAutoplay={props.shouldAutoplay ?? true} />;
+      return <HeroCardMedia {...props} shouldAutoplay={true} />;
     
     default:
       // Default to square card behavior

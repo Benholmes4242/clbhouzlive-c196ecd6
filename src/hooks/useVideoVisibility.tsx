@@ -3,6 +3,7 @@ import { safePlay, isInWebView, prefersReducedMotion } from '@/utils/safePlay';
 
 interface UseVideoVisibilityOptions {
   threshold?: number | number[];
+  rootMargin?: string;
   onEnterView?: () => void;
   onExitView?: () => void;
   videoRef?: React.RefObject<HTMLVideoElement | any>;
@@ -12,6 +13,7 @@ interface UseVideoVisibilityOptions {
 
 export const useVideoVisibility = ({
   threshold = [0, 0.1, 0.25, 0.5, 0.75, 1],
+  rootMargin = '0px 0px 12% 0px',
   onEnterView,
   onExitView,
   videoRef,
@@ -104,7 +106,7 @@ export const useVideoVisibility = ({
 
     const observer = new IntersectionObserver(handleIntersection, {
       threshold: threshold,
-      rootMargin: '0px 0px 12% 0px' // Start decoding just before on-screen
+      rootMargin: rootMargin // Use configurable root margin
     });
 
     observer.observe(container);
@@ -158,6 +160,7 @@ export const useVideoVisibility = ({
   return {
     containerRef,
     isVisible,
-    hasBeenVisible
+    hasBeenVisible,
+    isNear: hasBeenVisible // Consider "near" as having been visible (within rootMargin)
   };
 };
