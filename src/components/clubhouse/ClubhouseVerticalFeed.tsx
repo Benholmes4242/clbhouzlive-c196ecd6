@@ -44,14 +44,13 @@ const VideoWithAutoplay: React.FC<{
   const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
   return (
-    <div className={className}>
+    <div className="bg-black flex items-center justify-center w-full h-full">
       {hlsUrl ? (
         <HLSVideoCard
           hlsUrl={hlsUrl}
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          objectFit="contain"
           muted={muted}
           loop={true}
           autoplay={autoplay}

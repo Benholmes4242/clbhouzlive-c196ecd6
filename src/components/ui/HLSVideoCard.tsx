@@ -275,7 +275,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     >
       <video
         ref={videoRef}
-        className={`videoEl w-full h-full block ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+        className={`videoEl w-full h-full object-cover lg:object-contain bg-black ${className}`}
         playsInline
         muted={isMuted}
         loop={loop}
@@ -287,7 +287,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       />
       
       <div
-        className={`thumbOverlay ${overlayHidden ? 'hidden' : ''}`}
+        className={`thumbOverlay absolute inset-0 bg-black bg-center bg-no-repeat bg-cover lg:bg-contain transition-opacity duration-[120ms] ease-out ${overlayHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${poster})` }}
       />
       
