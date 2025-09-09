@@ -120,18 +120,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const queryClient = useQueryClient();
   const { modalTransition, beginTransition, endTransition } = useUI();
   
-  // Create a stable key for the modal that changes when it reopens
-  const [modalKey, setModalKey] = useState(0);
-  
   // Register this modal with the modal detector
   useModalState(isOpen);
-
-  // Update modal key when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setModalKey(prev => prev + 1);
-    }
-  }, [isOpen]);
 
   // Close handler with transition guard
   const handleClose = useCallback(() => {
@@ -433,7 +423,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       {isOpen && (
         <motion.div
-          key={`regional-${regionName}-${modalKey}`}
+          key={`regional-${regionName}`}
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
