@@ -6,7 +6,7 @@ interface HLSVideoCardProps {
   poster?: string;
   className?: string;
   aspectRatio?: string;
-  fit?: 'cover' | 'contain';
+  objectFit?: 'cover' | 'contain';
   showControls?: boolean;
   showMuteButton?: boolean;
   autoplay?: boolean;
@@ -31,7 +31,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   poster,
   className = '',
   aspectRatio = '4/5',
-  fit = 'cover',
+  objectFit = 'cover',
   showControls = false,
   showMuteButton = false,
   autoplay = false,
@@ -267,11 +267,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     onClick?.();
   };
 
-  // Compute fit classes
-  const isCover = fit === 'cover';
-  const videoFitClass = isCover ? 'object-cover' : 'object-contain';
-  const overlayFitClass = isCover ? 'bg-cover' : 'bg-contain';
-
   return (
     <div
       ref={containerRef}
@@ -280,7 +275,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     >
       <video
         ref={videoRef}
-        className={`videoEl w-full h-full ${videoFitClass} bg-black`}
+        className={`videoEl w-full h-full object-cover lg:object-contain bg-black ${className}`}
         playsInline
         muted={isMuted}
         loop={loop}
@@ -292,7 +287,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       />
       
       <div
-        className={`thumbOverlay absolute inset-0 bg-black bg-center bg-no-repeat ${overlayFitClass} transition-opacity duration-[120ms] ease-out ${overlayHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`thumbOverlay absolute inset-0 bg-black bg-center bg-no-repeat bg-cover lg:bg-contain transition-opacity duration-[120ms] ease-out ${overlayHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${poster})` }}
       />
       
