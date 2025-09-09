@@ -12,6 +12,16 @@
   background: #000;
 }
 
+/* Temporary guard for fullscreen letterboxing */
+@media (min-width: 1024px) {
+  .fullscreenVideoStage .videoEl { 
+    object-fit: contain !important; 
+  }
+  .fullscreenVideoStage .thumbOverlay { 
+    background-size: contain !important; 
+  }
+}
+
 .videoEl {
   width: 100%;
   height: 100%;

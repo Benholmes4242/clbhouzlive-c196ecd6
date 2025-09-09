@@ -51,7 +51,7 @@ const VideoWithAutoplay: React.FC<{
         <HLSVideoCard
           hlsUrl={hlsUrl}
           poster={poster}
-          className="w-full h-full"
+          className="w-full h-full fullscreenVideoStage"
           aspectRatio="auto"
           muted={muted}
           loop={true}
