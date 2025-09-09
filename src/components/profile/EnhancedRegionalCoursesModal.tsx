@@ -500,7 +500,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setView('grid')}
-              className="h-11 px-3"
+              className="h-8 px-3"
               aria-label="Grid view"
             >
               <Grid3X3 className="h-4 w-4" />
@@ -509,7 +509,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               variant={view === 'list' ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => setView('list')}
-              className="h-11 px-3"
+              className="h-8 px-3"
               aria-label="List view"
             >
               <List className="h-4 w-4" />
@@ -519,7 +519,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           {/* Right: Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-11">
+              <Button variant="outline" size="sm" className="h-8">
                 <span className="text-xs text-muted-foreground mr-2">Sort</span>
                 {getSortLabel(sortBy)}
                 <ChevronDown className="h-3 w-3 ml-2" />
@@ -552,8 +552,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           </DropdownMenu>
         </div>
 
-        {/* Desktop Layout: Original flex layout */}
-        <div className="hidden md:flex md:flex-col sm:md:flex-row gap-4 items-start md:items-center justify-between">
+        {/* Desktop Layout: Grid/List Toggle and Sort on same row */}
+        <div className="hidden md:flex md:items-center md:justify-between gap-4">
           {/* View Toggle */}
           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
             <Button
