@@ -482,7 +482,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                   </h2>
                   <button
                     onClick={handleClose}
-                    className="absolute top-4 right-4 z-20 focus:outline-none"
+                    className="focus:outline-none"
                     aria-label="Close modal"
                   >
                     <span className="text-black text-xl font-bold">✕</span>
