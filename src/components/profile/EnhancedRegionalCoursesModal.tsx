@@ -492,7 +492,68 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               <div className="flex-1 overflow-auto bg-transparent">
                 {/* Controls Row */}
       <div className="p-4 sm:p-6 border-b border-border">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        {/* Mobile Layout: View Toggle and Sort on same row */}
+        <div className="flex items-center justify-between gap-2 md:hidden">
+          {/* Left: View Toggle */}
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+            <Button
+              variant={view === 'grid' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setView('grid')}
+              className="h-11 px-3"
+              aria-label="Grid view"
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={view === 'list' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setView('list')}
+              className="h-11 px-3"
+              aria-label="List view"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Right: Sort Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-11">
+                <span className="text-xs text-muted-foreground mr-2">Sort</span>
+                {getSortLabel(sortBy)}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-48 bg-background border border-border shadow-lg z-[1100]"
+              sideOffset={4}
+            >
+              <DropdownMenuItem 
+                onClick={() => setSortBy('recently-played')}
+                className={sortBy === 'recently-played' ? 'bg-muted' : ''}
+              >
+                Recently Played
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortBy('highest-rated')}
+                className={sortBy === 'highest-rated' ? 'bg-muted' : ''}
+              >
+                Highest Rated
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortBy('lowest-rated')}
+                className={sortBy === 'lowest-rated' ? 'bg-muted' : ''}
+              >
+                Lowest Rated
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Desktop Layout: Original flex layout */}
+        <div className="hidden md:flex md:flex-col sm:md:flex-row gap-4 items-start md:items-center justify-between">
           {/* View Toggle */}
           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
             <Button
