@@ -5,6 +5,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Video overlay styles for mobile flicker fix */
+.videoContainer {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.videoEl {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.thumbOverlay {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 120ms ease;
+}
+
+.thumbOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Custom subtle bounce animation for achievements */
 @keyframes subtle-bounce {
   0%, 20%, 53%, 80%, 100% {

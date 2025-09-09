@@ -35,22 +35,16 @@ const VideoWithAutoplay: React.FC<{
   muted: boolean;
   className: string;
   isMobile?: boolean;
-}> = React.memo(({ src, muted, className, isMobile: isMobileProp = false }) => {
-  const { ref, isInView } = useIntersectionObserver({
-    threshold: 0.5, // Reduced threshold for better first video detection
-    rootMargin: '50px' // Added margin to help detect initial video on load
-  });
-  
+  shouldAttach?: boolean;
+  autoplay?: boolean;
+}> = React.memo(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false }) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
   const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
   return (
-    <div 
-      ref={ref}
-      className={className}
-    >
+    <div className={className}>
       {hlsUrl ? (
         <HLSVideoCard
           hlsUrl={hlsUrl}
@@ -60,7 +54,8 @@ const VideoWithAutoplay: React.FC<{
           objectFit="contain"
           muted={muted}
           loop={true}
-          autoplay={isInView}
+          autoplay={autoplay}
+          shouldAttach={shouldAttach}
           showMuteButton={false}
           externallyManaged={true}
         />
@@ -96,6 +91,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
   
+  // Two-observer system for prebuffer and autoplay
+  const nearRef = useRef<IntersectionObserver | null>(null);
+  const playRef = useRef<IntersectionObserver | null>(null);
+  const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
+  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  
   // Post reactions
   const { getUserReaction, handleReaction } = usePostReactions();
   const [showReactionTray, setShowReactionTray] = useState(false);
@@ -127,6 +128,36 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     },
     enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id
   });
+
+  // Setup dual intersection observers
+  useEffect(() => {
+    nearRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const id = e.target.getAttribute('data-postid');
+          if (!id) return;
+          setShouldAttachMap((m) => ({ ...m, [id]: e.isIntersecting || e.intersectionRatio > 0 }));
+        });
+      },
+      { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 }
+    );
+
+    playRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const id = e.target.getAttribute('data-postid');
+          if (!id) return;
+          setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.65 }));
+        });
+      },
+      { root: null, threshold: [0.0, 0.65, 1.0] }
+    );
+
+    return () => {
+      nearRef.current?.disconnect();
+      playRef.current?.disconnect();
+    };
+  }, []);
 
   // Notify parent component when current post changes
   useEffect(() => {
@@ -464,9 +495,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
           return (
             <div
-              key={`${item.id}-${index}`}
+              key={item.id}
+              data-postid={item.id}
               ref={(el) => {
-                if (el) itemRefs.current[index] = el;
+                if (el) {
+                  itemRefs.current[index] = el;
+                  nearRef.current?.observe(el);
+                  playRef.current?.observe(el);
+                }
               }}
               className="relative w-full snap-start snap-always"
               style={{ 
@@ -523,6 +559,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     muted={isGloballyMuted}
                     className="w-full h-full"
                     isMobile={isMobile}
+                    shouldAttach={!!shouldAttachMap[item.id]}
+                    autoplay={!!autoplayMap[item.id]}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
@@ -742,12 +780,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           -ms-overflow-style: none !important;
           scroll-snap-type: y mandatory;
           will-change: scroll-position;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          perspective: 1000;
-          -webkit-perspective: 1000;
         }
         .snap-y::-webkit-scrollbar {
           display: none !important;
@@ -757,8 +791,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         .snap-start {
           scroll-snap-align: start;
           scroll-snap-stop: always;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
           will-change: transform;
         }
         @media (max-width: 768px) {

@@ -17,6 +17,7 @@ interface HLSVideoCardProps {
   onClick?: () => void;
   onEnded?: () => void;
   externallyManaged?: boolean; // Disable internal autoplay when externally managed
+  shouldAttach?: boolean; // Prebuffer when near viewport
 }
 
 declare global {
@@ -33,14 +34,15 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   objectFit = 'cover',
   showControls = false,
   showMuteButton = false,
-  autoplay = true,
+  autoplay = false,
   muted = true,
   loop = true,
   onPlay,
   onPause,
   onClick,
   onEnded,
-  externallyManaged = false
+  externallyManaged = false,
+  shouldAttach = false
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -48,6 +50,9 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [attached, setAttached] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [overlayHidden, setOverlayHidden] = useState(false);
 
   // Sync internal muted state with prop changes
   useEffect(() => {
@@ -61,8 +66,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   useImperativeHandle(ref, () => {
     const video = videoRef.current;
     if (video) {
-      // Add attachHLS method to the video element
-      (video as any).attachHLS = attachHLS;
       return video;
     }
     return null;
@@ -87,22 +90,37 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     });
   };
 
-  // Attach HLS source to video
-  const attachHLS = async () => {
-    const video = videoRef.current;
-    if (!video || !hlsUrl || isLoaded) return;
+  // Attach HLS source to video when shouldAttach becomes true
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || attached || !shouldAttach) return;
 
-    try {
-      if (canPlayHLSNatively()) {
-        video.src = hlsUrl;
-        setIsLoaded(true);
-        
-        // Handle native video errors
-        video.onerror = () => {
-          console.error('Video error - failed to load:', hlsUrl);
-          setHasError(true);
-        };
-      } else {
+    // iOS needs both attributes
+    (v as any).setAttribute?.('webkit-playsinline', 'true');
+
+    const canUseNativeHLS = v.canPlayType('application/vnd.apple.mpegurl') !== '';
+    if (canUseNativeHLS) {
+      v.src = hlsUrl;
+      try { v.load?.(); } catch {}
+      setAttached(true);
+      setIsLoaded(true);
+      return;
+    }
+
+    const loadHlsJs = async () => {
+      if (window.Hls) return window.Hls;
+      
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
+        script.onload = () => resolve(window.Hls);
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    };
+
+    const setupHls = async () => {
+      try {
         const Hls = await loadHlsJs();
         if (Hls.isSupported()) {
           const hls = new Hls({
@@ -119,34 +137,65 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
           });
           
           hls.loadSource(hlsUrl);
-          hls.attachMedia(video);
+          hls.attachMedia(v);
+          const onParsed = () => setAttached(true);
+          hls.on(Hls.Events.MANIFEST_PARSED, onParsed);
           hlsInstanceRef.current = hls;
           setIsLoaded(true);
+          
+          return () => {
+            hls.off(Hls.Events.MANIFEST_PARSED, onParsed);
+            hls.destroy();
+          };
         }
+      } catch (error) {
+        console.error('Error loading HLS:', error);
+        setHasError(true);
       }
-    } catch (error) {
-      console.error('Error loading HLS:', error);
-      setHasError(true);
-    }
-  };
+    };
 
-  // Handle autoplay prop changes when externally managed
+    setupHls();
+  }, [hlsUrl, shouldAttach, attached]);
+
+  // Mark "ready" on first decodable frame
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !externallyManaged) return;
+    const v = videoRef.current;
+    if (!v) return;
 
-    if (autoplay) {
-      attachHLS().then(() => {
-        video.play().catch(() => {
-          // Autoplay failed, which is expected in some browsers
-        });
-        onPlay?.();
-      });
+    const onLoadedData = () => setReady(true);
+    const onCanPlay = () => setReady(true);
+
+    v.addEventListener('loadeddata', onLoadedData);
+    v.addEventListener('canplay', onCanPlay);
+    return () => {
+      v.removeEventListener('loadeddata', onLoadedData);
+      v.removeEventListener('canplay', onCanPlay);
+    };
+  }, []);
+
+  // Play only when autoplay && ready && attached, then fade overlay
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    if (autoplay && attached) {
+      const start = async () => {
+        if (!ready) return;
+        try {
+          await v.play();
+          setOverlayHidden(true);
+          onPlay?.();
+        } catch {
+          // ignore autoplay promise errors
+        }
+      };
+      start();
     } else {
-      video.pause();
+      v.pause();
+      if (!ready) setOverlayHidden(false);
       onPause?.();
     }
-  }, [autoplay, externallyManaged, onPlay, onPause]);
+  }, [autoplay, attached, ready, onPlay, onPause]);
 
   // Intersection observer for autoplay - only when NOT externally managed
   useEffect(() => {
@@ -158,7 +207,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       async (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
-          await attachHLS();
           try {
             await video.play();
             onPlay?.();
@@ -209,17 +257,9 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     if (!video) return;
 
     if (video.paused) {
-      if (!isLoaded) {
-        attachHLS().then(() => {
-          video.play().catch(() => {
-            // Autoplay failed, but don't show error overlay if video loads successfully
-          });
-        });
-      } else {
-        video.play().catch(() => {
-          // Autoplay failed, but don't show error overlay if video loads successfully  
-        });
-      }
+      video.play().catch(() => {
+        // Autoplay failed, but don't show error overlay if video loads successfully  
+      });
     } else {
       video.pause();
     }
@@ -230,12 +270,12 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden bg-black ${className}`}
+      className={`videoContainer relative overflow-hidden bg-black ${className}`}
       style={{ aspectRatio }}
     >
       <video
         ref={videoRef}
-        className={`w-full h-full block ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+        className={`videoEl w-full h-full block ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
         playsInline
         muted={isMuted}
         loop={loop}
@@ -244,6 +284,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         preload="metadata"
         onClick={handleVideoClick}
         onEnded={onEnded}
+      />
+      
+      <div
+        className={`thumbOverlay ${overlayHidden ? 'hidden' : ''}`}
+        style={{ backgroundImage: `url(${poster})` }}
       />
       
       {showMuteButton && (
