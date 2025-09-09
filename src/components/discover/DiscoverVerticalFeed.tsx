@@ -59,6 +59,8 @@ const VideoWithAutoplay: React.FC<{
   const hlsUrl = apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
   const poster = apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
+  const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
+
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
       {hlsUrl ? (
@@ -73,6 +75,7 @@ const VideoWithAutoplay: React.FC<{
           autoplay={autoplay}
           externallyManaged={true}
           showMuteButton={false}
+          fit={isDesktop ? 'contain' : 'cover'}
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">

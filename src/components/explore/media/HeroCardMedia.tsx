@@ -121,6 +121,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           autoplay={shouldAutoPlay}
           showMuteButton={false}
           externallyManaged={true}
+          fit="cover"
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">
