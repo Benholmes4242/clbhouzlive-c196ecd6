@@ -38,10 +38,10 @@ const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
-  objectFit?: 'cover' | 'contain';
+  fit?: 'cover' | 'contain';
   shouldAttach: boolean;
   autoplay: boolean;
-}> = React.memo(({ src, muted, className, objectFit = 'cover', shouldAttach, autoplay }) => {
+}> = React.memo(({ src, muted, className, fit = 'cover', shouldAttach, autoplay }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
   
@@ -67,6 +67,7 @@ const VideoWithAutoplay: React.FC<{
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
+          fit={typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches ? 'cover' : 'contain'}
           muted={muted}
           loop={true}
           shouldAttach={shouldAttach}
@@ -558,7 +559,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
                     className="w-full h-full"
-                    objectFit="contain"
+                    fit={isMobile ? 'cover' : 'contain'}
                     shouldAttach={!!shouldAttach[item.id]}
                     autoplay={!!autoplay[item.id]}
                   />

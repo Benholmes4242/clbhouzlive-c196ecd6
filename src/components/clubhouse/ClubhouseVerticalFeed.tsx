@@ -51,6 +51,7 @@ const VideoWithAutoplay: React.FC<{
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
+          fit={typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches ? 'cover' : 'contain'}
           muted={muted}
           loop={true}
           autoplay={autoplay}
