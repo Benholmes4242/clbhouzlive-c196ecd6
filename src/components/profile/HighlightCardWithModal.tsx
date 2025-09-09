@@ -3,7 +3,7 @@ import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import { useHighlightsVideo } from './HighlightsVideoController';
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
@@ -12,32 +12,23 @@ interface HighlightCardWithModalProps {
   highlight: Top100Highlight;
   onOpenModal?: (postId: string) => void;
   isLandscape?: boolean;
-  shouldAutoplay?: boolean;
   cardIndex?: number;
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
 }
 
 const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({ 
   highlight, 
   onOpenModal,
   isLandscape = false,
-  shouldAutoplay = false,
-  cardIndex = 0
+  cardIndex = 0,
+  scrollContainerRef
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Use the highlights video controller for playback
-  const { 
-    activeId, 
-    register, 
-    play, 
-    pause, 
-    carouselAudioPreference, 
-    setCarouselAudioPreference,
-    attemptUnmutedPlay 
-  } = useHighlightsVideo();
-  const isActive = activeId === highlight.id;
+  // State for audio preference (muted by default for grid autoplay)
+  const [isMuted, setIsMuted] = useState(true);
   
   
   // Extract Cloudflare Stream ID for crisp thumbnails
@@ -57,50 +48,33 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   
   const hlsUrl = videoId ? `https://videodelivery.net/${videoId}/manifest/video.m3u8` : null;
 
-  // Register with video controller
-  useEffect(() => {
-    if (primaryMedia?.media_type === 'video') {
-      register(highlight.id, videoRef.current);
-    }
-  }, [highlight.id, primaryMedia, register]);
-
-  // Handle autoplay based on visibility
-  useEffect(() => {
-    if (primaryMedia?.media_type !== 'video') return;
-    
-    if (shouldAutoplay && !isActive) {
-      // Start playing this video
-      play(highlight.id);
-    } else if (!shouldAutoplay && isActive) {
-      // Pause this video
-      pause(highlight.id);
-    }
-  }, [shouldAutoplay, isActive, primaryMedia, play, pause, highlight.id, carouselAudioPreference]);
+  // Use grid-style video visibility for autoplay
+  const { containerRef, isVisible, isNear } = useVideoVisibility({
+    threshold: 0.6, // Slightly stricter for carousel
+    rootMargin: '0px 50px', // Prebuffer when 50px away horizontally
+    videoRef,
+    shouldAutoplay: true,
+    globallyMuted: isMuted
+  });
 
   // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (primaryMedia?.media_type === 'video') {
-      if (isActive) {
-        pause(highlight.id);
+    if (primaryMedia?.media_type === 'video' && videoRef.current) {
+      const video = videoRef.current;
+      if (video.paused) {
+        video.play();
       } else {
-        play(highlight.id);
+        video.pause();
       }
     }
-  }, [primaryMedia, isActive, play, pause, highlight.id]);
+  }, [primaryMedia]);
 
-  // Handle carousel-level mute/unmute toggle
-  const handleMuteToggle = useCallback(async (e: React.MouseEvent) => {
+  // Handle mute/unmute toggle
+  const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    const newPreference = carouselAudioPreference === 'muted' ? 'unmuted' : 'muted';
-    setCarouselAudioPreference(newPreference);
-    
-    // If unmuting and this card is active, try to play with sound immediately
-    if (newPreference === 'unmuted' && isActive) {
-      await attemptUnmutedPlay(highlight.id);
-    }
-  }, [carouselAudioPreference, setCarouselAudioPreference, isActive, highlight.id, attemptUnmutedPlay]);
+    setIsMuted(!isMuted);
+  }, [isMuted]);
 
 
   // Safety check for media
@@ -131,7 +105,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }
 
   return (
-    <div className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
+    <div ref={containerRef} className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
       <div className="relative overflow-hidden rounded-2xl card-base card-highlights" onClick={handleVideoClick}>
         {primaryMedia.media_type === 'image' ? (
           <img
@@ -143,37 +117,20 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           />
         ) : (
           <>
-            {/* Active video */}
-            {isActive ? (
-                <HLSVideoCard
-                  ref={videoRef}
-                  hlsUrl={hlsUrl}
-                  poster={posterUrl || undefined}
-                  muted={carouselAudioPreference === 'muted'}
-                  autoplay={false}
-                  loop={true}
-                  showMuteButton={false}
-                  className="w-full h-full object-cover object-center"
-                />
-            ) : (
-              /* Video thumbnail with play overlay */
-              <div className="relative w-full h-full">
-                <img
-                  src={posterUrl || primaryMedia.media_url}
-                  alt="Video thumbnail"
-                  className="w-full h-full object-cover object-center"
-                  loading="lazy"
-                  decoding="async"
-                />
-                
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-4 h-4 md:w-6 md:h-6 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
-                    <Play className="w-2.5 h-2.5 md:w-3.5 md:h-3.5 text-white ml-0.5" fill="currentColor" />
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Grid-style video with visibility-based autoplay */}
+            <HLSVideoCard
+              ref={videoRef}
+              hlsUrl={hlsUrl}
+              poster={posterUrl || undefined}
+              shouldAttach={isNear}
+              autoplay={isVisible}
+              muted={isMuted}
+              loop={true}
+              externallyManaged={true}
+              showMuteButton={false}
+              fit="cover"
+              className="w-full h-full"
+            />
           </>
         )}
         
@@ -205,9 +162,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
           <button
             onClick={handleMuteToggle}
             className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 shadow-lg w-7 h-7 flex items-center justify-center hover:bg-white/20 transition-all duration-300"
-            aria-label={carouselAudioPreference === 'muted' ? 'Unmute all highlights' : 'Mute all highlights'}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
-            {carouselAudioPreference === 'muted' ? (
+            {isMuted ? (
               <VolumeX className="w-4 h-4 text-white" />
             ) : (
               <Volume2 className="w-4 h-4 text-white" />

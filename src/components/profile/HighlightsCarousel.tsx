@@ -3,9 +3,7 @@ import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlight
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDragScroll } from '@/hooks/useDragScroll';
-import { HighlightsVideoProvider } from './HighlightsVideoController';
 import HighlightCardWithModal from './HighlightCardWithModal';
-import { useHighlightsAutoplay } from '@/hooks/useHighlightsAutoplay';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -18,20 +16,6 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-  
-  // Autoplay management
-  const { activeCardIndex, registerCard, shouldAutoplay } = useHighlightsAutoplay({
-    containerRef: scrollContainerRef,
-    highlights: highlights || []
-  });
-  
-  // Remove fullscreen modal functionality
-  // const { isOpen, currentHighlight, openModal, closeModal } = useHighlightsModal({
-  //   highlights: highlights || [],
-  //   userId
-  // });
-
-  // Remove modal-related state and effects
 
   // Combined ref callback that handles both scroll container and drag functionality
   const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -105,8 +89,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   }
 
   return (
-    <HighlightsVideoProvider>
-      <div className={`${className}`}>
+    <div className={`${className}`}>
         <div className="flex items-center justify-between mb-2 pt-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
           
@@ -147,25 +130,21 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
             cursor: 'default'
           }}
         >
-          {highlights.map((highlight, index) => (
+           {highlights.map((highlight, index) => (
             <div 
               key={highlight.id} 
-              ref={(el) => registerCard(index, el)}
               className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
             >
               <HighlightCardWithModal 
                 highlight={highlight}
                 isLandscape={true}
-                shouldAutoplay={shouldAutoplay(index)}
                 cardIndex={index}
+                scrollContainerRef={scrollContainerRef}
               />
             </div>
           ))}
         </div>
       </div>
-      
-      {/* Fullscreen modal functionality removed */}
-    </HighlightsVideoProvider>
   );
 };
 
