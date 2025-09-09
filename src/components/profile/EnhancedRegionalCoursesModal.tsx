@@ -473,7 +473,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           >
             <div className="h-full overflow-hidden flex flex-col relative">
               {/* Header with title and close button */}
-              <div className="sticky top-0 z-10 bg-background border-b border-border">
+              <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-tl-2xl">
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4">
                   <h2 className="text-xl sm:text-2xl font-bold">
                     {regionName}
@@ -489,7 +489,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               </div>
               
               {/* Content */}
-              <div className="flex-1 overflow-auto">
+              <div className="flex-1 overflow-auto bg-transparent">
                 {/* Controls Row */}
       <div className="p-4 sm:p-6 border-b border-border">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
