@@ -568,7 +568,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className={`w-full h-full ${isMobile ? 'object-cover' : 'object-contain'}`}
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';
