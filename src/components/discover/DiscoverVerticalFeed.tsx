@@ -33,23 +33,17 @@ interface DiscoverVerticalFeedProps {
   initialItem?: ExploreContentItem;
 }
 
-// VideoWithAutoplay component moved outside to prevent recreation on re-renders
+// VideoWithAutoplay component with observer-controlled playback
 const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
   objectFit?: 'cover' | 'contain';
-}> = React.memo(({ src, muted, className, objectFit = 'cover' }) => {
-  const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  shouldAttach: boolean;
+  autoplay: boolean;
+}> = React.memo(({ src, muted, className, objectFit = 'cover', shouldAttach, autoplay }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const intersectionRef = useRef<HTMLVideoElement | HTMLIFrameElement | null>(null);
-  const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
-  const { isGloballyMuted } = useGlobalAudio();
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
   // Extract video ID and fetch from API
   const uid = uidFromNode({ src });
@@ -75,7 +69,9 @@ const VideoWithAutoplay: React.FC<{
           aspectRatio="auto"
           muted={muted}
           loop={true}
-          autoplay={true}
+          shouldAttach={shouldAttach}
+          autoplay={autoplay}
+          externallyManaged={true}
           showMuteButton={false}
         />
       ) : (
@@ -109,12 +105,46 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [currentMediaIndices, setCurrentMediaIndices] = useState<{ [postId: string]: number }>({});
+  const [shouldAttach, setShouldAttach] = useState<Record<string, boolean>>({});
+  const [autoplay, setAutoplay] = useState<Record<string, boolean>>({});
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
+  const nearObserverRef = useRef<IntersectionObserver | null>(null);
+  const playObserverRef = useRef<IntersectionObserver | null>(null);
   const queryClient = useQueryClient();
 
   // Register modal state for Echo detection
   useModalState(isOpen);
+
+  // Two-observer pattern for seamless autoplay
+  useEffect(() => {
+    nearObserverRef.current = new IntersectionObserver((entries) => {
+      setShouldAttach((prev) => {
+        const next = { ...prev };
+        for (const e of entries) {
+          const id = e.target.getAttribute('data-postid') || '';
+          if (id) next[id] = e.isIntersecting || e.intersectionRatio > 0;
+        }
+        return next;
+      });
+    }, { root: null, rootMargin: '300px 0px', threshold: 0 });
+
+    playObserverRef.current = new IntersectionObserver((entries) => {
+      setAutoplay((prev) => {
+        const next = { ...prev };
+        for (const e of entries) {
+          const id = e.target.getAttribute('data-postid') || '';
+          if (id) next[id] = e.intersectionRatio >= 0.65;
+        }
+        return next;
+      });
+    }, { root: null, threshold: [0, 0.65, 1] });
+
+    return () => {
+      nearObserverRef.current?.disconnect();
+      playObserverRef.current?.disconnect();
+    };
+  }, []);
 
   // Hide header when modal opens, show when closed
   useEffect(() => {
@@ -479,9 +509,14 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
           return (
             <div 
-              key={`${item.id}-${index}`}
+              key={item.id}
+              data-postid={item.id}
               ref={(el) => {
-                if (el) itemRefs.current[index] = el;
+                if (el) {
+                  itemRefs.current[index] = el;
+                  nearObserverRef.current?.observe(el);
+                  playObserverRef.current?.observe(el);
+                }
               }}
               className="relative w-full snap-start snap-always flex items-center justify-center"
               style={{ 
@@ -524,6 +559,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     muted={isGloballyMuted}
                     className="w-full h-full"
                     objectFit="contain"
+                    shouldAttach={!!shouldAttach[item.id]}
+                    autoplay={!!autoplay[item.id]}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
