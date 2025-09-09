@@ -120,8 +120,18 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const queryClient = useQueryClient();
   const { modalTransition, beginTransition, endTransition } = useUI();
   
+  // Create a stable key for the modal that changes when it reopens
+  const [modalKey, setModalKey] = useState(0);
+  
   // Register this modal with the modal detector
   useModalState(isOpen);
+
+  // Update modal key when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setModalKey(prev => prev + 1);
+    }
+  }, [isOpen]);
 
   // Close handler with transition guard
   const handleClose = useCallback(() => {
@@ -139,15 +149,27 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     endTransition();
   }, [endTransition]);
 
-  // Scroll lock management
+  // Scroll lock management and ESC key handling
   useEffect(() => {
     if (!isOpen) return;
+    
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    
+    // Handle escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !modalTransition.inProgress) {
+        handleClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
     return () => {
       document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, modalTransition.inProgress, handleClose]);
 
   // Query to get ALL courses for the region (both played and unplayed)
   const { data: allRegionCourses = [], isLoading: coursesLoading } = useQuery({
@@ -411,7 +433,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       {isOpen && (
         <motion.div
-          key={`regional-${regionName}-${Date.now()}`}
+          key={`regional-${regionName}-${modalKey}`}
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
