@@ -115,10 +115,10 @@ const ProfileModalRouter: React.FC = () => {
               {/* Liquid Glass Close Button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-20 h-9 w-9 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+                className="absolute top-4 right-4 z-20 h-9 w-9 rounded-lg flex items-center justify-center bg-white hover:bg-gray-100 transition-all duration-200 focus:outline-none border border-gray-200"
                 aria-label="Close modal"
               >
-                <span className="text-white text-lg font-bold">✕</span>
+                <span className="text-black text-lg font-bold">✕</span>
               </button>
               
               {/* Content */}
