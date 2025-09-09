@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from 'react';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Grid3X3, List, ChevronDown, Search, Lock } from 'lucide-react';
@@ -116,6 +116,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
   const [reviewModalCourse, setReviewModalCourse] = useState<any>(null);
+  const [entered, setEntered] = useState(false);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
   const { modalTransition, beginTransition, endTransition } = useUI();
@@ -285,7 +286,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       return combinedCourses;
     },
-    enabled: isOpen && !!userId,
+    enabled: isOpen && entered && !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
@@ -325,7 +326,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       return averages;
     },
-    enabled: isOpen && allRegionCourses.length > 0,
+    enabled: isOpen && entered && allRegionCourses.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -372,19 +373,24 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
   // Check if user has any played courses to determine default sort
   useEffect(() => {
-    if (isOpen && allRegionCourses.length > 0) {
+    if (isOpen && entered && allRegionCourses.length > 0) {
       const hasPlayedCourses = allRegionCourses.some(course => course.userPlayed);
       setSortBy(hasPlayedCourses ? 'recently-played' : 'highest-rated');
     }
-  }, [isOpen, allRegionCourses]);
+  }, [isOpen, entered, allRegionCourses]);
 
+  // Defer expensive computations until after entrance
+  const effectiveSearch = useDeferredValue(searchQuery);
+  
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
+    if (!entered) return []; // Cheap placeholder during animation
+    
     let filtered = allRegionCourses;
 
     // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (effectiveSearch.trim()) {
+      const query = effectiveSearch.toLowerCase();
       filtered = allRegionCourses.filter(course => 
         course.golf_courses?.name?.toLowerCase().includes(query) ||
         course.golf_courses?.sub_country?.toLowerCase().includes(query) ||
@@ -394,7 +400,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     }
 
     return sortCourses(filtered, sortBy);
-  }, [allRegionCourses, searchQuery, sortBy]);
+  }, [entered, allRegionCourses, effectiveSearch, sortBy]);
 
   const getSortLabel = (option: SortOption) => {
     switch (option) {
@@ -428,6 +434,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+          onAnimationStart={() => setEntered(false)}
+          onAnimationComplete={() => setEntered(true)}
           className={`
             fixed z-[1000] flex
             ${isMobile 
@@ -567,7 +575,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       
       {/* Scrollable Content */}
       <div className="p-4 sm:p-6">
-        {coursesLoading ? (
+        {!entered ? (
+          <div className="p-4 space-y-3">
+            <div className="h-5 w-1/3 bg-muted animate-pulse rounded" />
+            <div className="h-24 w-full bg-muted animate-pulse rounded" />
+            <div className="h-24 w-full bg-muted animate-pulse rounded" />
+          </div>
+        ) : coursesLoading ? (
           <div className="flex items-center justify-center py-2">
             <ClubhouzLoading />
           </div>
