@@ -19,7 +19,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600&display=swap"
+          as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600&display=swap">
+    </noscript>
     <link rel="icon" href="https://iiil.io/FRnqBFp.png" type="image/png" />
     <link rel="apple-touch-icon" href="https://iiil.io/FRnqBFp.png" />
   </head>
@@ -27,5 +31,24 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register service worker for caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[SW] Registered successfully');
+              
+              // Clean cache periodically
+              setInterval(() => {
+                registration.active?.postMessage({ type: 'CLEAN_CACHE' });
+              }, 60 * 60 * 1000); // Every hour
+            })
+            .catch((error) => {
+              console.log('[SW] Registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

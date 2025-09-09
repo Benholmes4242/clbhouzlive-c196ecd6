@@ -5,14 +5,26 @@ import App from './App.tsx'
 import './index.css'
 import './styles/superellipse.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
+import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 
 const container = document.getElementById("root");
 if (!container) {
   throw new Error("Root element not found");
 }
 
-// Initialize minimal performance monitoring
+// Mobile viewport height fix
+const setViewportHeight = () => {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+};
+
+window.addEventListener('resize', setViewportHeight);
+setViewportHeight();
+
+// Initialize performance monitoring
 initializePerformanceMonitoring();
+initWebVitals(sendToAnalytics);
+initPerformanceObserver();
 
 const root = createRoot(container);
 

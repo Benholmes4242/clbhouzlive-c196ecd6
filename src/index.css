@@ -91,40 +91,45 @@
     background: transparent;
   }
 
-  /* Mobile scroll behavior fixes and safe area support */
+  /* Enhanced viewport and scroll behavior for mobile */
+  :root {
+    --vh: 1vh; /* Will be set by JS for accurate mobile viewport */
+  }
+
   html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
 
   /* Ensure no smooth scrolling on carousel containers */
   .no-smooth {
     scroll-behavior: auto !important;
   }
-    height: -webkit-fill-available; /* iOS viewport fix */
   }
   
   body {
     scroll-behavior: auto;
     overscroll-behavior: none; /* Prevent bounce scrolling on iOS */
     position: relative;
-    min-height: 100vh;
-    min-height: -webkit-fill-available; /* iOS viewport fix */
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     /* Extend background behind status bar on mobile */
     @media (max-width: 768px) {
-      min-height: 100vh;
-      min-height: calc(100vh + env(safe-area-inset-top));
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       padding-top: env(safe-area-inset-top);
     }
   }
 
   #root {
     background-color: white !important;
-    min-height: 100vh;
-    min-height: -webkit-fill-available; /* iOS viewport fix */
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     /* Ensure root extends behind status bar on mobile */
     @media (max-width: 768px) {
-      min-height: 100vh;
-      min-height: calc(100vh + env(safe-area-inset-top));
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
     }
   }
 

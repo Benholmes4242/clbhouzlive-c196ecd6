@@ -48,8 +48,8 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: !!userId,
-    staleTime: 0, // No caching - always fetch fresh data
-    gcTime: 0, // Don't keep in cache
+    staleTime: 5 * 60 * 1000, // 5 minutes cache for better performance
+    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
   });
 
   // Get following count
@@ -76,8 +76,8 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: !!userId,
-    staleTime: 0, // No caching - always fetch fresh data
-    gcTime: 0, // Don't keep in cache
+    staleTime: 5 * 60 * 1000, // 5 minutes cache for better performance
+    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
   });
 
   // Get friends count - REMOVED (feature deprecated)

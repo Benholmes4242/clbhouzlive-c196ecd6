@@ -78,11 +78,13 @@
     "react-swipeable": "^7.0.2",
     "recharts": "^2.12.7",
     "remark-gfm": "^4.0.1",
+    "rollup-plugin-visualizer": "^6.0.3",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
     "vaul": "^0.9.3",
+    "web-vitals": "^5.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

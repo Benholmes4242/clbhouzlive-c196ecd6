@@ -18,6 +18,7 @@ import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
+import { FLAGS } from '@/config/flags';
 
 
 // Direct import for ProfilePage to avoid dynamic import issues
@@ -54,7 +55,15 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
+    queries: FLAGS.perfTuning ? {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes cache for better performance
+      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      networkMode: 'online',
+    } : {
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 0, // Always fetch fresh data
