@@ -115,7 +115,6 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          fit="cover"
           muted={true}
           loop={true}
           shouldAttach={shouldAttach}

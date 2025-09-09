@@ -38,10 +38,10 @@ const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
-  fit?: 'cover' | 'contain';
+  objectFit?: 'cover' | 'contain';
   shouldAttach: boolean;
   autoplay: boolean;
-}> = React.memo(({ src, muted, className, fit = 'cover', shouldAttach, autoplay }) => {
+}> = React.memo(({ src, muted, className, objectFit = 'cover', shouldAttach, autoplay }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
   
@@ -67,7 +67,6 @@ const VideoWithAutoplay: React.FC<{
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          fit={typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches ? 'cover' : 'contain'}
           muted={muted}
           loop={true}
           shouldAttach={shouldAttach}
@@ -559,7 +558,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
                     className="w-full h-full"
-                    fit={isMobile ? 'cover' : 'contain'}
+                    objectFit="contain"
                     shouldAttach={!!shouldAttach[item.id]}
                     autoplay={!!autoplay[item.id]}
                   />
@@ -568,7 +567,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className={`w-full h-full ${isMobile ? 'object-cover' : 'object-contain'}`}
+                      className="w-full h-full object-contain"
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';

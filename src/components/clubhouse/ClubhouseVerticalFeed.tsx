@@ -51,7 +51,6 @@ const VideoWithAutoplay: React.FC<{
           poster={poster}
           className="w-full h-full"
           aspectRatio="auto"
-          fit={typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches ? 'cover' : 'contain'}
           muted={muted}
           loop={true}
           autoplay={autoplay}
@@ -567,7 +566,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className={`w-full h-full ${isMobile ? 'object-cover' : 'object-contain'}`}
+                      className="w-full h-full object-contain"
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
