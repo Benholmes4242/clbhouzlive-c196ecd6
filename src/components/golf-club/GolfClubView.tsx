@@ -13,7 +13,6 @@ import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseLeaderboardTab from '@/components/courses/course-detail/CourseLeaderboardTab';
 import CoursePlayedButton from '@/components/courses/CoursePlayedButton';
 import AddToPlayedModal from '@/components/courses/AddToPlayedModal';
-import CourseModalV2 from '@/features/courseModalV2';
 
 interface GolfClubViewProps {
   courseId: string;
@@ -123,23 +122,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       </div>
     );
   }
-
-  // --- CourseModalV2 toggle (modal-only) -------------------------------
-  // If you don't have a flag helper, set `useV2 = true` temporarily to verify.
-  const useV2 = true; // Force true for now - add useFeature('courseModalV2') when ready
-
-  // Render V2 only when this component is inside the slide-in modal.
-  if (isInModal && useV2) {
-    // Ensure we have an id for the new component.
-    const cid = course?.id;
-    if (!cid) {
-      // Fallback to legacy UI if id isn't ready yet.
-      // (Or return a skeleton to keep behaviors consistent)
-    } else {
-      return <CourseModalV2 courseId={cid} />;
-    }
-  }
-  // ---------------------------------------------------------------------
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
