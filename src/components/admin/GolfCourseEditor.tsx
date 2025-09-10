@@ -53,10 +53,12 @@ const subCountryOptions: Record<string, string[]> = {
     'Wisconsin', 'Wyoming', 'District of Columbia'
   ],
   'Continental Europe': [
-    'Austria', 'Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
-    'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 
-    'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Slovenia', 'Spain', 
-    'Sweden', 'Switzerland', 'Turkey', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
+    'Andorra', 'Austria', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 
+    'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Faroe Islands', 'Finland', 'France', 
+    'Germany', 'Greece', 'Greenland', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 
+    'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 'Norway', 'Poland', 
+    'Portugal', 'Romania', 'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 
+    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
   ]
 };
 
