@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Course {
@@ -89,9 +90,9 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
 
   // Mock community score data - in real app this would come from rating breakdown
   const communityScores = {
-    fun: 8.5,
-    playability: 8.2,
-    design: 7.8
+    courseDesign: 8.5,
+    courseCondition: 8.8,
+    facilities: 7.2
   };
 
   const getScorePercentage = (score: number) => (score / 10) * 100;
@@ -102,7 +103,8 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
       <div className="bg-card rounded-lg border p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold">Community Score</h3>
-          <div className="text-right">
+          <div className="flex items-center gap-2">
+            <ClubhouseLogo size="sm" />
             <div className="text-3xl font-bold">
               {ratingStats?.average_rating || 0}/10
             </div>
@@ -112,36 +114,36 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Fun</span>
+              <span className="text-sm font-medium">Course Design</span>
             </div>
             <div className="w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.fun)}%` }}
+                style={{ width: `${getScorePercentage(communityScores.courseDesign)}%` }}
               />
             </div>
           </div>
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Playability</span>
+              <span className="text-sm font-medium">Course Condition</span>
             </div>
             <div className="w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.playability)}%` }}
+                style={{ width: `${getScorePercentage(communityScores.courseCondition)}%` }}
               />
             </div>
           </div>
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Design</span>
+              <span className="text-sm font-medium">Facilities</span>
             </div>
             <div className="w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.design)}%` }}
+                style={{ width: `${getScorePercentage(communityScores.facilities)}%` }}
               />
             </div>
           </div>
@@ -206,10 +208,10 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
             onClick={handleWebsiteClick}
             className={`w-full flex items-center justify-center gap-2 ${
               isMobile 
-                ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
+                ? 'bg-muted hover:bg-muted/80 text-foreground border' 
                 : 'bg-muted hover:bg-muted/80 text-foreground border'
             }`}
-            variant={isMobile ? 'default' : 'outline'}
+            variant="outline"
           >
             <ExternalLink className="h-4 w-4" />
             Visit Website
