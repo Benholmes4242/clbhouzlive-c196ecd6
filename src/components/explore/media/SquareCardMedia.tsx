@@ -35,7 +35,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Video play icon in bottom right for video sources */}
       {media.media_type === 'video' && (
-        <div className="absolute bottom-3 right-3 z-20">
+        <div className="absolute bottom-1 right-1 z-20">
           <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 flex items-center justify-center">
             <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="currentColor" />
           </div>
