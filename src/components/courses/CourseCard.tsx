@@ -24,6 +24,7 @@ interface Course {
   longitude?: number | null;
   website_url?: string | null;
   average_rating?: number | null;
+  total_reviews?: number | null;
 }
 
 interface CourseCardProps {
@@ -126,6 +127,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             showUserRating={showUserRating}
             averageRating={course.average_rating}
             showAverageRating={showAverageRating}
+            totalReviews={course.total_reviews}
             splitBadges={true}
             xp={xp}
             showXP={showXP}
@@ -143,6 +145,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               showUserRating={showUserRating}
               averageRating={course.average_rating}
               showAverageRating={showAverageRating}
+              totalReviews={course.total_reviews}
               positioning="top-left"
               xp={xp}
               showXP={showXP}
@@ -194,6 +197,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                      showUserRating={false}
                      averageRating={course.average_rating}
                      showAverageRating={true}
+                     totalReviews={course.total_reviews}
                      showXP={false}
                    />
                  </div>

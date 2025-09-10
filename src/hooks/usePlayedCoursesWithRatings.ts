@@ -19,7 +19,7 @@ type RawPlayedRow = {
     usa_rank: number | null;
     description: string | null;
     thumbnail_image: string | null;
-    course_rating_stats?: { average_rating: number | null }[];
+    course_rating_stats?: { average_rating: number | null; total_reviews: number | null }[];
   } | null;
 };
 
@@ -76,7 +76,7 @@ async function fetchPlayedWithAverages(userId: string) {
         usa_rank,
         description,
         thumbnail_image,
-        course_rating_stats(average_rating)
+        course_rating_stats(average_rating, total_reviews)
       )
     `)
     .eq("user_id", userId)
@@ -102,7 +102,7 @@ async function fetchPlayedWithAverages(userId: string) {
         usa_rank,
         description,
         thumbnail_image,
-        course_rating_stats(average_rating)
+        course_rating_stats(average_rating, total_reviews)
       )
     `)
     .eq("user_id", userId);
@@ -194,6 +194,7 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
           country: (gc.country ?? '').toLowerCase(),
           continent: (gc.continent ?? '').toLowerCase(),
           averageRating: Number(gc.course_rating_stats?.[0]?.average_rating ?? NaN),
+          totalReviews: gc.course_rating_stats?.[0]?.total_reviews || null,
           userRating: Number(userRatingData?.rating ?? NaN),
           globalRank: gc.global_rank,
           regionRank: gc.regional_rank,
