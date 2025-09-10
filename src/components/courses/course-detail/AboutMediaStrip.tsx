@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
+import { CardType } from '@/components/explore/media/CardMediaTypes';
+import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
 
 interface MediaItem {
   id: string;
@@ -26,7 +29,7 @@ interface AboutMediaStripProps {
 }
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
-  const [items, setItems] = useState<MediaItem[]>([]);
+  const [items, setItems] = useState<ExploreContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +43,10 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           console.error('Error fetching media:', error);
           setItems([]);
         } else {
-          setItems(data?.edges?.slice(0, 3) || []);
+          // Use edges array and adapt to ExploreContentItem format
+          const rawMedia = data?.edges?.slice(0, 3) || [];
+          const adaptedItems = adaptClubMediaArrayToExploreItems(rawMedia);
+          setItems(adaptedItems);
         }
       } catch (error) {
         console.error('Error fetching media:', error);
@@ -55,14 +61,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     }
   }, [clubId]);
 
-  // Ensure exactly 3 slots
-  const filledItems = [...items];
-  while (filledItems.length < 3) {
-    filledItems.push({ 
-      id: `placeholder-${filledItems.length}`, 
-      placeholder: true 
-    } as any);
-  }
+  // Ensure exactly 3 slots with placeholders
+  const displayItems = Array.from({ length: 3 }, (_, i) => items[i] || null);
 
   if (loading) {
     return (
@@ -97,24 +97,27 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {filledItems.map((item) =>
-          item.placeholder ? (
-            <div
-              key={item.id}
-              className="aspect-[4/3] bg-muted rounded-xl"
-            />
-          ) : (
+        {displayItems.map((item, index) =>
+          item ? (
             <div
               key={item.id}
               className="aspect-[4/3] rounded-xl overflow-hidden pointer-events-none"
             >
-              <img
-                src={item.thumbnailUrl || item.url}
-                alt=""
-                className="w-full h-full object-cover"
-                draggable={false}
+              <SquareCardMedia
+                media={{
+                  id: item.id,
+                  media_type: item.type as 'video' | 'image',
+                  media_url: item.media?.[0]?.media_url || item.src
+                }}
+                cardType={CardType.SQUARE}
+                className="w-full h-full"
               />
             </div>
+          ) : (
+            <div
+              key={`placeholder-${index}`}
+              className="aspect-[4/3] bg-muted rounded-xl"
+            />
           )
         )}
       </div>

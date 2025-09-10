@@ -121,11 +121,11 @@ const ProfileModalRouter: React.FC = () => {
                 <span className="text-white text-base font-bold leading-none">✕</span>
               </button>
               
-              {/* Portal target for lightbox */}
-              <div id="modal-portal" />
+              {/* Portal target for lightbox modals - positioned with proper z-index */}
+              <div id="modal-portal" className="relative z-[1001]" />
               
               {/* Content */}
-              <div className="flex-1 overflow-auto">
+              <div className="flex-1 overflow-auto relative">
                 <GolfClubView courseId={courseId} isInModal={true} />
               </div>
             </div>
