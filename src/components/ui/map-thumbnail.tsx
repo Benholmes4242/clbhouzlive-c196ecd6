@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/ui/dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,14 +27,14 @@ const MapThumbnail = ({
   longitude,
   className = ''
 }: MapThumbnailProps) => {
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+  const [coords, setCoords] = React.useState<{ lat: number; lng: number } | null>(
     latitude && longitude ? { lat: latitude, lng: longitude } : null
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [showLargeMap, setShowLargeMap] = useState(false);
-  const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
-  const [largeMapImageUrl, setLargeMapImageUrl] = useState<string | null>(null);
-  const [portalEl, setPortalEl] = useState<HTMLElement | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [showLargeMap, setShowLargeMap] = React.useState(false);
+  const [mapImageUrl, setMapImageUrl] = React.useState<string | null>(null);
+  const [largeMapImageUrl, setLargeMapImageUrl] = React.useState<string | null>(null);
+  const [portalEl, setPortalEl] = React.useState<HTMLElement | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -112,7 +111,7 @@ const MapThumbnail = ({
   };
 
   // Generate map image URLs when coordinates are available
-  useEffect(() => {
+  React.useEffect(() => {
     const generateMapUrls = async () => {
       if (coords) {
         const thumbnailSize = isMobile ? '280x180' : '320x220';
@@ -132,12 +131,12 @@ const MapThumbnail = ({
   }, [coords, isMobile]);
 
   // Find the portal element inside ProfileModalRouter
-  useEffect(() => {
+  React.useEffect(() => {
     setPortalEl(document.getElementById('modal-portal'));
   }, []);
 
   // Attempt to geocode on mount if no coordinates
-  useEffect(() => {
+  React.useEffect(() => {
     if (!coords && !isLoading) {
       geocodeClub();
     }
@@ -217,18 +216,18 @@ const MapThumbnail = ({
       </div>
 
       {/* Large Map Modal for Desktop */}
-      <Dialog open={showLargeMap} onOpenChange={setShowLargeMap}>
+      <DialogPrimitive.Root open={showLargeMap} onOpenChange={setShowLargeMap}>
         {portalEl && (
           <DialogPrimitive.Portal container={portalEl}>
             <DialogPrimitive.Overlay
-              className="fixed inset-0 z-[1001] bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+              className="fixed inset-0 z-[1001] bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out"
               onClick={() => setShowLargeMap(false)}
             />
             <DialogPrimitive.Content
-              className="fixed left-1/2 top-1/2 z-[1002] grid w-full max-w-4xl max-h-[80vh] -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg outline-none"
+              className="fixed left-1/2 top-1/2 z-[1002] grid w-full max-w-4xl max-h-[80vh] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-background shadow-2xl outline-none"
             >
               {/* Header */}
-              <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+              <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
                 <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
                   <MapPin className="h-5 w-5" />
                   {clubName} Location
@@ -236,7 +235,7 @@ const MapThumbnail = ({
               </div>
               
               {/* Content */}
-              <div className="relative">
+              <div className="relative p-6">
                 {largeMapImageUrl && (
                   <img
                     src={largeMapImageUrl}
@@ -247,7 +246,7 @@ const MapThumbnail = ({
                 )}
                 <Button
                   onClick={handleLargeMapClick}
-                  className="absolute bottom-4 right-4 bg-background/90 hover:bg-background text-foreground border"
+                  className="absolute bottom-10 right-10 bg-background/90 hover:bg-background text-foreground border"
                   size="sm"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
@@ -256,14 +255,17 @@ const MapThumbnail = ({
               </div>
               
               {/* Close button */}
-              <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <span className="text-lg font-bold">✕</span>
-                <span className="sr-only">Close</span>
-              </DialogPrimitive.Close>
+              <button
+                aria-label="Close"
+                className="absolute right-3 top-3"
+                onClick={() => setShowLargeMap(false)}
+              >
+                ✕
+              </button>
             </DialogPrimitive.Content>
           </DialogPrimitive.Portal>
         )}
-      </Dialog>
+      </DialogPrimitive.Root>
     </>
   );
 };
