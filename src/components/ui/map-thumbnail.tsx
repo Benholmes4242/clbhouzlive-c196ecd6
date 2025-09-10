@@ -277,7 +277,7 @@ const MapThumbnail = ({
       >
         <div className="p-3 md:p-4 flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-0 pt-2 pb-2">
+          <div className="flex items-center justify-between px-0 pt-4 pb-2">
             <h2 className="text-sm md:text-base font-semibold leading-none tracking-tight flex items-center gap-2">
               <MapPin className="h-4 w-4 md:h-5 md:w-5" />
               {clubName} Location
@@ -304,7 +304,7 @@ const MapThumbnail = ({
           </div>
 
           {/* Actions */}
-          <div className="grid grid-cols-2 gap-2 px-0 pt-2 pb-2">
+          <div className="grid grid-cols-2 gap-2 px-0 pt-2 pb-4">
             <Button
               variant="outline"
               onClick={handleLargeMapClick}
