@@ -30,35 +30,35 @@ import CourseImageUpload from './golf-courses/CourseImageUpload';
 import CourseReviewsSection from './golf-courses/CourseReviewsSection';
 import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/types';
 
-// Define the primary countries that have regional Top 100 lists
+// Define the primary countries that have regional Top 100 lists (sorted alphabetically)
 const primaryCountryOptions = [
   'Britain & Ireland',
-  'USA', 
-  'Continental Europe'
+  'Continental Europe',
+  'USA'
 ];
 
-// Map primary countries to their sub-countries
+// Map primary countries to their sub-countries (all sorted alphabetically)
 const subCountryOptions: Record<string, string[]> = {
   'Britain & Ireland': [
-    'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'
+    'England', 'Ireland', 'Isle of Man', 'Northern Ireland', 'Scotland', 'Wales'
   ],
   'USA': [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
-    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 
-    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
-    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 
-    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
-    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
+    'Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 
+    'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 
+    'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 
+    'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 
+    'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
     'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 
-    'Wisconsin', 'Wyoming', 'District of Columbia'
+    'Wisconsin', 'Wyoming'
   ],
   'Continental Europe': [
     'Andorra', 'Austria', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 
-    'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Faroe Islands', 'Finland', 'France', 
-    'Germany', 'Greece', 'Greenland', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 
-    'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 'Norway', 'Poland', 
-    'Portugal', 'Romania', 'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 
-    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
+    'Cyprus', 'Czech Republic', 'Denmark', 'England', 'Estonia', 'Faroe Islands', 'Finland', 
+    'France', 'Germany', 'Greece', 'Greenland', 'Hungary', 'Iceland', 'Ireland', 'Italy', 
+    'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 
+    'Northern Ireland', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'Scotland', 
+    'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'Wales'
   ]
 };
 
