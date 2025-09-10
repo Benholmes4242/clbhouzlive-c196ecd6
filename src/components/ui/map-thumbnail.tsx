@@ -2,6 +2,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SlideOver } from '@/components/ui/slide-over';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -264,78 +265,73 @@ const MapThumbnail = ({
         </div>
       </div>
 
-      {/* Large Map Modal for Desktop */}
-      {showLargeMap && portalEl &&
-        createPortal(
-          <div 
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Location map"
-            tabIndex={-1}
-            className="fixed inset-0 z-[1200]"
-            onKeyDown={onKeyDown}
+      {/* Large Map Modal - Slides in from right using SlideOver */}
+      <SlideOver
+        open={showLargeMap}
+        onClose={() => setShowLargeMap(false)}
+        width="w-full max-w-4xl"
+        zIndex="z-[1200]"
+        heightClass="max-h-[80vh] my-auto"
+        ariaLabel="Location map"
+        portalTarget="modal-portal"
+      >
+        <div className="h-full overflow-hidden flex flex-col">
+          {/* Close button */}
+          <button
+            onClick={() => setShowLargeMap(false)}
+            className="absolute top-4 right-4 z-20 h-8 w-8 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+            aria-label="Close modal"
           >
-            <div
-              className="absolute inset-0 bg-black/60"
-              onClick={() => setShowLargeMap(false)}
-            />
-            <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-              <div 
-                className="relative w-full max-w-4xl max-h-[80vh] rounded-2xl bg-background shadow-2xl pointer-events-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Header */}
-                <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
-                  <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    {clubName} Location
-                  </h2>
-                </div>
+            <span className="text-white text-base font-bold leading-none flex items-center justify-center w-full h-full">✕</span>
+          </button>
+          
+          {/* Header */}
+          <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
+            <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              {clubName} Location
+            </h2>
+          </div>
 
-                {/* Content */}
-                <div className="p-6 pt-4">
-                  <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
-                    {largeMapImageUrl ? (
-                      <img
-                        src={largeMapImageUrl}
-                        alt={`Large map of ${clubName}`}
-                        className="w-full h-full object-cover rounded-lg cursor-pointer"
-                        onClick={handleLargeMapClick}
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-muted-foreground">Loading map...</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                    <Button
-                      variant="outline"
-                      onClick={handleLargeMapClick}
-                      className="flex-1 flex items-center justify-center gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open in Maps
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowLargeMap(false)}
-                      className="flex-1"
-                    >
-                      Close
-                    </Button>
-                  </div>
+          {/* Content */}
+          <div className="flex-1 overflow-auto p-6 pt-4">
+            <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
+              {largeMapImageUrl ? (
+                <img
+                  src={largeMapImageUrl}
+                  alt={`Large map of ${clubName}`}
+                  className="w-full h-full object-cover rounded-lg cursor-pointer"
+                  onClick={handleLargeMapClick}
+                />
+              ) : (
+                <div className="text-center">
+                  <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-muted-foreground">Loading map...</p>
                 </div>
-              </div>
+              )}
             </div>
-          </div>,
-          portalEl
-        )
-      }
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={handleLargeMapClick}
+                className="flex-1 flex items-center justify-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open in Maps
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowLargeMap(false)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      </SlideOver>
     </>
   );
 };
