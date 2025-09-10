@@ -92,12 +92,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   // Mock community score data - in real app this would come from rating breakdown
   const communityScores = {
-    courseDesign: 8.5,
+    courseDesign: 8.4,
     courseCondition: 8.8,
-    facilities: 7.2
+    facilities: 7.7
   };
 
   const getScorePercentage = (score: number) => (score / 10) * 100;
+  
+  const formatScore = (score: number) => {
+    return score % 1 === 0 ? score.toString() : score.toFixed(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -123,11 +127,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Course Design</span>
             </div>
-            <div className="w-full bg-muted h-2 rounded-full">
+            <div className="relative w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
                 style={{ width: `${getScorePercentage(communityScores.courseDesign)}%` }}
               />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                style={{ 
+                  left: `${Math.min(getScorePercentage(communityScores.courseDesign), 85)}%`,
+                  transform: 'translateY(-50%) translateX(-50%)'
+                }}
+              >
+                {formatScore(communityScores.courseDesign)}/10
+              </div>
             </div>
           </div>
           
@@ -135,11 +148,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Course Condition</span>
             </div>
-            <div className="w-full bg-muted h-2 rounded-full">
+            <div className="relative w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
                 style={{ width: `${getScorePercentage(communityScores.courseCondition)}%` }}
               />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                style={{ 
+                  left: `${Math.min(getScorePercentage(communityScores.courseCondition), 85)}%`,
+                  transform: 'translateY(-50%) translateX(-50%)'
+                }}
+              >
+                {formatScore(communityScores.courseCondition)}/10
+              </div>
             </div>
           </div>
           
@@ -147,11 +169,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Facilities</span>
             </div>
-            <div className="w-full bg-muted h-2 rounded-full">
+            <div className="relative w-full bg-muted h-2 rounded-full">
               <div 
                 className="bg-foreground h-2 rounded-full transition-all duration-300"
                 style={{ width: `${getScorePercentage(communityScores.facilities)}%` }}
               />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                style={{ 
+                  left: `${Math.min(getScorePercentage(communityScores.facilities), 85)}%`,
+                  transform: 'translateY(-50%) translateX(-50%)'
+                }}
+              >
+                {formatScore(communityScores.facilities)}/10
+              </div>
             </div>
           </div>
         </div>
