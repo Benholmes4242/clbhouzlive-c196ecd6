@@ -234,7 +234,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       </div>
 
       {/* Sticky Tab Navigation */}
-      <div className={isInModal ? "bg-background border-b" : "sticky top-0 z-40 bg-background border-b"}>
+      <div className={isInModal ? "bg-background" : "sticky top-0 z-40 bg-background"}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 h-12">
             <TabsTrigger value="about" className="text-base">About</TabsTrigger>
