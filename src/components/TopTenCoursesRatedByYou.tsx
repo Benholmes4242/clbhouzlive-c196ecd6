@@ -488,14 +488,12 @@ const TopTenSlot: React.FC<{
         {isOwnProfile && !isDragging && (
           <div className="absolute top-0 right-0 z-30">
             <div className="relative w-11 h-11">
-              {/* Liquid glass triangle background */}
-              <div className="absolute top-0 right-0 w-11 h-11 overflow-hidden">
-                <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30 transform rotate-45 translate-x-3 -translate-y-3" />
-              </div>
+              {/* Liquid glass rounded corner banner */}
+              <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30 rounded-bl-2xl" />
               {/* X icon */}
               <button
                 onClick={handleRemoveClick}
-                className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-black hover:scale-110 transition-transform z-10"
+                className="absolute top-1 right-1 w-8 h-8 flex items-center justify-center text-black hover:scale-110 transition-transform z-10"
                 aria-label="Remove course from Top 10"
               >
                 <X className="w-3 h-3" />
