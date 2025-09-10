@@ -215,43 +215,34 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div className="bg-card rounded-lg border p-6">
           <h3 className="text-xl font-semibold mb-4">Location</h3>
           
-          {/* Stack on mobile; 2-col on md+ */}
-          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[1fr_auto]">
-            {/* Left: labels */}
-            <div className="space-y-3 order-1">
-              {course.region && (
-                <div>
-                  <div className="text-sm text-muted-foreground">Region</div>
-                  <div className="font-medium">{course.region}</div>
-                </div>
-              )}
-              {course.sub_country && (
-                <div>
-                  <div className="text-sm text-muted-foreground">Country</div>
-                  <div className="font-medium">{course.sub_country}</div>
-                </div>
-              )}
-            </div>
+          {/* Row with Country left, Region right */}
+          <div className="flex justify-between items-start mb-4">
+            {course.sub_country && (
+              <div>
+                <div className="text-sm text-muted-foreground">Country</div>
+                <div className="font-medium">{course.sub_country}</div>
+              </div>
+            )}
+            {course.region && (
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground">Region</div>
+                <div className="font-medium">{course.region}</div>
+              </div>
+            )}
+          </div>
 
-            {/* Right on md+, full-width under on mobile */}
-            <div className="order-2 md:justify-self-end">
-              <MapThumbnail
-                clubId={course.id}
-                clubName={course.name}
-                region={course.region}
-                country={course.country}
-                subCountry={course.sub_country}
-                latitude={course.latitude}
-                longitude={course.longitude}
-                className="
-                  w-full                 
-                  h-44                   
-                  sm:h-52                
-                  md:w-[320px] md:h-[200px]
-                  lg:w-[360px] lg:h-[220px]
-                "
-              />
-            </div>
+          {/* Map - full width below */}
+          <div className="w-full">
+            <MapThumbnail
+              clubId={course.id}
+              clubName={course.name}
+              region={course.region}
+              country={course.country}
+              subCountry={course.sub_country}
+              latitude={course.latitude}
+              longitude={course.longitude}
+              className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-lg"
+            />
           </div>
         </div>
 
