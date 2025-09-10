@@ -104,7 +104,7 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold">Community Score</h3>
           <div className="flex items-center gap-2">
-            <ClubhouseLogo size="sm" />
+            <ClubhouseLogo size="md" />
             <div className="text-3xl font-bold">
               {ratingStats?.average_rating || 0}/10
             </div>
