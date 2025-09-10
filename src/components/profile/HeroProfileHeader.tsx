@@ -1005,7 +1005,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Tab Navigation with Underline Animation - Brand accent styling */}
-      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
