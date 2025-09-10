@@ -107,7 +107,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     <div className="space-y-6">
       {/* Community Score Section */}
       <div className="bg-card rounded-lg border p-6">
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold">Community Score</h3>
             <div className="flex items-center gap-2">
