@@ -275,23 +275,23 @@ const MapThumbnail = ({
         ariaLabel="Location map"
         portalTarget="modal-portal"
       >
-        <div className="h-full overflow-hidden flex flex-col p-2">
+        <div className="p-3 md:p-4">
           {/* Header */}
-          <div className="flex flex-col space-y-1.5 text-center sm:text-left p-4 pb-2">
-            <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
+          <div className="flex items-center justify-between px-0 py-2">
+            <h2 className="text-sm md:text-base font-semibold leading-none tracking-tight flex items-center gap-2">
+              <MapPin className="h-4 w-4 md:h-5 md:w-5" />
               {clubName} Location
             </h2>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-auto px-4 pb-4">
-            <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
+          {/* Map: no inner padding, just rounded mask */}
+          <div className="mt-2 rounded-xl overflow-hidden border bg-muted/10">
+            <div className="block w-full h-[56vh] md:h-[54vh] bg-muted rounded-lg flex items-center justify-center">
               {largeMapImageUrl ? (
                 <img
                   src={largeMapImageUrl}
                   alt={`Large map of ${clubName}`}
-                  className="w-full h-full object-cover rounded-lg cursor-pointer"
+                  className="w-full h-full object-cover cursor-pointer"
                   onClick={handleLargeMapClick}
                 />
               ) : (
@@ -301,25 +301,25 @@ const MapThumbnail = ({
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-4">
-              <Button
-                variant="outline"
-                onClick={handleLargeMapClick}
-                className="flex-1 flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Open in Maps
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowLargeMap(false)}
-                className="flex-1"
-              >
-                Close
-              </Button>
-            </div>
+          {/* Actions: minimal spacing */}
+          <div className="grid grid-cols-2 gap-2 px-0 pt-3 pb-2">
+            <Button
+              variant="outline"
+              onClick={handleLargeMapClick}
+              className="h-9 rounded-md border flex items-center justify-center gap-2"
+            >
+              <ExternalLink className="h-3 w-3 md:h-4 md:w-4" />
+              Open in Maps
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowLargeMap(false)}
+              className="h-9 rounded-md border"
+            >
+              Close
+            </Button>
           </div>
         </div>
       </SlideOver>
