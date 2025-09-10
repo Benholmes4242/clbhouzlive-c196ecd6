@@ -151,6 +151,7 @@ serve(async (req) => {
         sourceId: item.posts.id,
         type: item.media_type as 'image' | 'video',
         url: item.media_url,
+        thumbnailUrl: item.media_url, // Use media_url as thumbnail for now
         createdAt: item.created_at,
         author: {
           id: item.posts.user_id,
@@ -170,6 +171,7 @@ serve(async (req) => {
         sourceId: item.course_ratings.id,
         type: item.media_type as 'image' | 'video',
         url: item.media_url,
+        thumbnailUrl: item.media_url, // Use media_url as thumbnail for now
         createdAt: item.created_at,
         author: {
           id: item.course_ratings.user_id,
@@ -181,12 +183,23 @@ serve(async (req) => {
     })
 
     // Combine and sort by creation date
-    const allMedia = [...transformedPostMedia, ...transformedReviewMedia]
+    const edges = [...transformedPostMedia, ...transformedReviewMedia]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit)
 
+    const hasMore = (transformedPostMedia.length + transformedReviewMedia.length) > limit
+    const nextCursor = edges.length > 0 ? edges[edges.length - 1].createdAt : null
+
     return new Response(
-      JSON.stringify({ media: allMedia }),
+      JSON.stringify({
+        // New canonical key expected by the UI:
+        edges,
+        
+        // Back-compat alias (can remove later once UI is confirmed):
+        media: edges,
+        
+        pageInfo: { hasMore, nextCursor }
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
