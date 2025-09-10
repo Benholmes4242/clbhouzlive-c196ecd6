@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MapThumbnailProps {
   clubId: string;
@@ -34,6 +35,7 @@ const MapThumbnail = ({
   const [showLargeMap, setShowLargeMap] = useState(false);
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [largeMapImageUrl, setLargeMapImageUrl] = useState<string | null>(null);
+  const [portalEl, setPortalEl] = useState<HTMLElement | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -129,6 +131,11 @@ const MapThumbnail = ({
     generateMapUrls();
   }, [coords, isMobile]);
 
+  // Find the portal element inside ProfileModalRouter
+  useEffect(() => {
+    setPortalEl(document.getElementById('modal-portal'));
+  }, []);
+
   // Attempt to geocode on mount if no coordinates
   useEffect(() => {
     if (!coords && !isLoading) {
@@ -211,32 +218,51 @@ const MapThumbnail = ({
 
       {/* Large Map Modal for Desktop */}
       <Dialog open={showLargeMap} onOpenChange={setShowLargeMap}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              {clubName} Location
-            </DialogTitle>
-          </DialogHeader>
-          <div className="relative">
-            {largeMapImageUrl && (
-              <img
-                src={largeMapImageUrl}
-                alt={`Detailed map of ${clubName} location`}
-                className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={handleLargeMapClick}
-              />
-            )}
-            <Button
-              onClick={handleLargeMapClick}
-              className="absolute bottom-4 right-4 bg-background/90 hover:bg-background text-foreground border"
-              size="sm"
+        {portalEl && (
+          <DialogPrimitive.Portal container={portalEl}>
+            <DialogPrimitive.Overlay
+              className="fixed inset-0 z-[1001] bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+              onClick={() => setShowLargeMap(false)}
+            />
+            <DialogPrimitive.Content
+              className="fixed left-1/2 top-1/2 z-[1002] grid w-full max-w-4xl max-h-[80vh] -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg outline-none"
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Maps
-            </Button>
-          </div>
-        </DialogContent>
+              {/* Header */}
+              <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+                <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  {clubName} Location
+                </h2>
+              </div>
+              
+              {/* Content */}
+              <div className="relative">
+                {largeMapImageUrl && (
+                  <img
+                    src={largeMapImageUrl}
+                    alt={`Detailed map of ${clubName} location`}
+                    className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={handleLargeMapClick}
+                  />
+                )}
+                <Button
+                  onClick={handleLargeMapClick}
+                  className="absolute bottom-4 right-4 bg-background/90 hover:bg-background text-foreground border"
+                  size="sm"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in Maps
+                </Button>
+              </div>
+              
+              {/* Close button */}
+              <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <span className="text-lg font-bold">✕</span>
+                <span className="sr-only">Close</span>
+              </DialogPrimitive.Close>
+            </DialogPrimitive.Content>
+          </DialogPrimitive.Portal>
+        )}
       </Dialog>
     </>
   );
