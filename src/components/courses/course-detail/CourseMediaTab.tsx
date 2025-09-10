@@ -11,14 +11,20 @@ interface CourseMediaTabProps {
 
 interface MediaItem {
   id: string;
-  media_url: string;
-  media_type: 'image' | 'video';
-  file_name?: string;
-  user_id?: string;
-  username?: string;
-  display_name?: string;
-  profile_photo_url?: string;
-  created_at: string;
+  source: 'post' | 'review';
+  sourceId: string;
+  type: 'image' | 'video';
+  url: string;
+  thumbnailUrl?: string;
+  width?: number;
+  height?: number;
+  createdAt: string;
+  author: {
+    id: string;
+    displayName: string;
+    username?: string;
+    avatarUrl?: string;
+  };
 }
 
 const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
@@ -28,55 +34,12 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
   const { data: mediaItems, isLoading } = useQuery({
     queryKey: ['course-media', courseId],
     queryFn: async () => {
-      // Get media from course reviews
-      const { data: reviewMedia, error: reviewError } = await supabase
-        .from('course_review_media')
-        .select(`
-          id,
-          media_url,
-          media_type,
-          file_name,
-          created_at,
-          review_id,
-          course_ratings!inner (
-            user_id,
-            course_id
-          )
-        `)
-        .eq('course_ratings.course_id', courseId)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.functions.invoke('get-club-media', {
+        body: { clubId: courseId, limit: 30 }
+      });
 
-      if (reviewError) throw reviewError;
-
-      // Get user profiles for the media
-      const userIds = [...new Set(reviewMedia?.map(item => item.course_ratings.user_id) || [])];
-      
-      if (userIds.length === 0) return [];
-
-      const { data: profiles, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .in('id', userIds);
-
-      if (profileError) throw profileError;
-
-      // Combine data
-      const mediaWithProfiles = reviewMedia?.map(item => {
-        const profile = profiles?.find(p => p.id === item.course_ratings.user_id);
-        return {
-          id: item.id,
-          media_url: item.media_url,
-          media_type: item.media_type,
-          file_name: item.file_name,
-          created_at: item.created_at,
-          user_id: item.course_ratings.user_id,
-          username: profile?.username,
-          display_name: profile?.display_name,
-          profile_photo_url: profile?.profile_photo_url,
-        };
-      }) || [];
-
-      return mediaWithProfiles as MediaItem[];
+      if (error) throw error;
+      return data?.media || [];
     },
     enabled: !!courseId,
   });
@@ -87,11 +50,11 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
   };
 
   const getUserDisplayName = (media: MediaItem) => {
-    return media.display_name || media.username || 'Anonymous';
+    return media.author.displayName;
   };
 
   const getUserInitials = (media: MediaItem) => {
-    const name = getUserDisplayName(media);
+    const name = media.author.displayName;
     if (name === 'Anonymous') return 'A';
     
     const parts = name.split(' ');
@@ -118,7 +81,7 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
           <ImageIcon className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="text-xl font-semibold mb-2">No media yet</h3>
-        <p className="text-muted-foreground">Share photos and videos of this course in your reviews!</p>
+        <p className="text-muted-foreground">Share photos and videos of this course in your posts or reviews!</p>
       </div>
     );
   }
@@ -132,16 +95,16 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
             className="relative aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow"
             onClick={() => openMediaViewer(media, index)}
           >
-            {media.media_type === 'image' ? (
+            {media.type === 'image' ? (
               <img
-                src={media.media_url}
-                alt={media.file_name || 'Course media'}
+                src={media.url}
+                alt={'Course media'}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
               <div className="w-full h-full bg-media-loading animate-pulse flex items-center justify-center">
                 <video
-                  src={media.media_url}
+                  src={media.url}
                   className="w-full h-full object-cover"
                   muted
                 />
@@ -157,21 +120,21 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
               <div className="flex items-center gap-2">
                 <OptimizedAvatar
-                  src={media.profile_photo_url}
+                  src={media.author.avatarUrl}
                   alt={getUserDisplayName(media)}
                   size={24}
                   className="w-6 h-6"
                   fallback={getUserInitials(media)}
                 />
                 <span className="text-white text-sm font-medium truncate">
-                  @{media.username || 'user'}
+                  @{media.author.username || 'user'}
                 </span>
               </div>
             </div>
 
             {/* Media type indicator */}
             <div className="absolute top-2 right-2">
-              {media.media_type === 'video' ? (
+              {media.type === 'video' ? (
                 <div className="bg-black/50 rounded-full p-1">
                   <Play className="h-4 w-4 text-white fill-white" />
                 </div>
@@ -190,15 +153,15 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
         <DialogContent className="max-w-4xl max-h-[90vh] p-0">
           {selectedMedia && (
             <div className="relative">
-              {selectedMedia.media_type === 'image' ? (
+              {selectedMedia.type === 'image' ? (
                 <img
-                  src={selectedMedia.media_url}
-                  alt={selectedMedia.file_name || 'Course media'}
+                  src={selectedMedia.url}
+                  alt={'Course media'}
                   className="w-full h-auto max-h-[80vh] object-contain"
                 />
               ) : (
                 <video
-                  src={selectedMedia.media_url}
+                  src={selectedMedia.url}
                   controls
                   className="w-full h-auto max-h-[80vh]"
                   autoPlay
@@ -209,7 +172,7 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
               <div className="absolute bottom-4 left-4 bg-black/80 rounded-lg p-3 text-white">
                 <div className="flex items-center gap-3">
                   <OptimizedAvatar
-                    src={selectedMedia.profile_photo_url}
+                    src={selectedMedia.author.avatarUrl}
                     alt={getUserDisplayName(selectedMedia)}
                     size={32}
                     className="w-8 h-8"
@@ -217,7 +180,7 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
                   />
                   <div>
                     <p className="font-medium">{getUserDisplayName(selectedMedia)}</p>
-                    <p className="text-sm opacity-80">@{selectedMedia.username || 'user'}</p>
+                    <p className="text-sm opacity-80">@{selectedMedia.author.username || 'user'}</p>
                   </div>
                 </div>
               </div>
