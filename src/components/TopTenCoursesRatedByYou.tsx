@@ -493,10 +493,10 @@ const TopTenSlot: React.FC<{
               {/* X icon */}
               <button
                 onClick={handleRemoveClick}
-                className="absolute top-0.5 right-0.5 w-6 h-6 flex items-center justify-center text-white hover:scale-110 transition-transform z-10"
+                className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center text-white hover:scale-110 transition-transform z-10"
                 aria-label="Remove course from Top 10"
               >
-                <X className="w-3 h-3" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
