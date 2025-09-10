@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
@@ -31,14 +32,33 @@ serve(async (req) => {
   }
 
   try {
+    // Use service role key for server-side operations
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { auth: { persistSession: false } }
     )
 
-    const url = new URL(req.url)
-    const clubId = url.searchParams.get('clubId')
-    const limit = parseInt(url.searchParams.get('limit') ?? '30')
+    // Read params from GET or POST
+    let clubId: string | null = null
+    let limit = 30
+
+    if (req.method === 'GET') {
+      const url = new URL(req.url)
+      clubId = url.searchParams.get('clubId')
+      limit = parseInt(url.searchParams.get('limit') ?? '30')
+    } else if (req.method === 'POST') {
+      const body = await req.json().catch(() => ({}))
+      clubId = body.clubId || null
+      limit = parseInt(String(body.limit ?? 30))
+    } else {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    console.log(`get-club-media: ${req.method} request for clubId: ${clubId}, limit: ${limit}`)
 
     if (!clubId) {
       return new Response(
