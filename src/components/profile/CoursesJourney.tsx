@@ -1632,7 +1632,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image,
-            course_rating_stats(average_rating, total_reviews)
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId)
@@ -1885,7 +1885,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image,
-            course_rating_stats(average_rating, total_reviews)
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId)
@@ -1912,7 +1912,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
             usa_rank,
             description,
             thumbnail_image,
-            course_rating_stats(average_rating, total_reviews)
+            course_rating_stats(average_rating)
           )
         `)
         .eq('user_id', userId);
@@ -1926,7 +1926,6 @@ const USANavigation: React.FC<USANavigationProps> = ({
           rating: null,
           id: `top100-${course.course_id}`,
           averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
-          totalReviews: course.golf_courses?.course_rating_stats?.[0]?.total_reviews || null,
           userRating: null
         })),
         ...(ratedData || []).map(course => ({
@@ -1934,7 +1933,6 @@ const USANavigation: React.FC<USANavigationProps> = ({
           played_date: course.created_at,
           id: `rating-${course.course_id}`,
           averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
-          totalReviews: course.golf_courses?.course_rating_stats?.[0]?.total_reviews || null,
           userRating: course.rating
         }))
       ];

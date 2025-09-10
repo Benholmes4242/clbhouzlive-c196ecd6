@@ -18,7 +18,6 @@ interface CourseRankBadgesProps {
   showUserRating?: boolean;
   averageRating?: number | null;
   showAverageRating?: boolean;
-  totalReviews?: number | null;
   positioning?: 'top-left' | 'bottom-left' | 'top-right';
   xp?: number;
   showXP?: boolean;
@@ -35,7 +34,6 @@ const CourseRankBadges = ({
   showUserRating = false,
   averageRating,
   showAverageRating = false,
-  totalReviews,
   positioning = 'top-left',
   xp,
   showXP = false,
@@ -145,9 +143,7 @@ const CourseRankBadges = ({
   // Average course rating badge (clbhouzrating)
   const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
     content: `${averageRating.toFixed(1)}`,
-    tooltip: totalReviews !== null && totalReviews !== undefined 
-      ? `Clbhouz Community Rating (${totalReviews} review${totalReviews === 1 ? '' : 's'})`
-      : "Clbhouz Community Rating"
+    tooltip: "Clbhouz Community Rating"
   } : null;
 
   // Determine positioning classes
@@ -175,9 +171,7 @@ const CourseRankBadges = ({
       // Add average rating badge first
       ...(showAverageRating && averageRating ? [{
         content: `${averageRating.toFixed(1)}`,
-        tooltip: totalReviews !== null && totalReviews !== undefined 
-          ? `Clbhouz Community Rating (${totalReviews} review${totalReviews === 1 ? '' : 's'})`
-          : "Clbhouz Community Rating",
+        tooltip: "Clbhouz Community Rating",
         icon: <ClubhouseLogo size="sm" />
       }] : []),
       // Add user rating badge
