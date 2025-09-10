@@ -7,6 +7,7 @@ import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
+import MapThumbnail from '@/components/ui/map-thumbnail';
 
 interface Course {
   id: string;
@@ -213,19 +214,33 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* Location Section */}
         <div className="bg-card rounded-lg border p-6">
           <h3 className="text-xl font-semibold mb-4">Location</h3>
-          <div className="space-y-3">
-            {course.region && (
-              <div>
-                <div className="text-sm text-muted-foreground">Region</div>
-                <div className="font-medium">{course.region}</div>
-              </div>
-            )}
-            {course.sub_country && (
-              <div>
-                <div className="text-sm text-muted-foreground">Country</div>
-                <div className="font-medium">{course.sub_country}</div>
-              </div>
-            )}
+          <div className="flex gap-4">
+            <div className="flex-1 space-y-3">
+              {course.region && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Region</div>
+                  <div className="font-medium">{course.region}</div>
+                </div>
+              )}
+              {course.sub_country && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Country</div>
+                  <div className="font-medium">{course.sub_country}</div>
+                </div>
+              )}
+            </div>
+            <div className="flex-shrink-0">
+              <MapThumbnail
+                clubId={course.id}
+                clubName={course.name}
+                region={course.region}
+                country={course.country}
+                subCountry={course.sub_country}
+                latitude={course.latitude}
+                longitude={course.longitude}
+                className="w-32 h-20"
+              />
+            </div>
           </div>
         </div>
 
