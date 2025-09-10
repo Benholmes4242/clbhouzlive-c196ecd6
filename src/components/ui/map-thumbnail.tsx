@@ -304,7 +304,7 @@ const MapThumbnail = ({
           </div>
 
           {/* Actions: minimal spacing */}
-          <div className="grid grid-cols-2 gap-2 px-0 pt-3 pb-4">
+          <div className="grid grid-cols-2 gap-2 px-0 pt-3 pb-0">
             <Button
               variant="outline"
               onClick={handleLargeMapClick}
