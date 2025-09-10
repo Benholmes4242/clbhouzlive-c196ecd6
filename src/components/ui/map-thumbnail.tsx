@@ -291,7 +291,7 @@ const MapThumbnail = ({
                 </div>
 
                 {/* Content */}
-                <div className="p-6 pt-0">
+                <div className="p-6 pt-4">
                   <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
                     {largeMapImageUrl ? (
                       <img
@@ -311,6 +311,7 @@ const MapThumbnail = ({
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 mt-4">
                     <Button
+                      variant="outline"
                       onClick={handleLargeMapClick}
                       className="flex-1 flex items-center justify-center gap-2"
                     >
