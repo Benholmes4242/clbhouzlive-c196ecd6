@@ -73,25 +73,41 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   const streamThumb = (uid: string) =>
     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`;
 
-  // Build media objects for SquareCardMedia
-  const mediaTiles = items.slice(0, 3).map((item) => {
-    if (item.type === 'video') {
-      const uid = extractStreamUidFromHls(item.src);
-      const thumb = item.media?.[0]?.media_url || (uid ? streamThumb(uid) : undefined);
+  // Build media objects for SquareCardMedia with proper image URLs
+  const mediaTiles = (items ?? []).slice(0, 3).map((item) => {
+    const src = item.src ?? '';
+    const isVideo = item.type === 'video';
+
+    if (isVideo) {
+      // PRIORITY (videos): item.thumbnailUrl (if it's an image) → thumbnail from UID → fallback
+      const uid = extractStreamUidFromHls(src);
+      const derivedThumb = uid ? streamThumb(uid) : undefined;
+
+      // If API thumbnailUrl contains ".m3u8", ignore it
+      const apiThumb =
+        typeof item.media?.[0]?.media_url === 'string' && !item.media[0].media_url.endsWith('.m3u8')
+          ? item.media[0].media_url
+          : undefined;
+
+      const thumb = apiThumb || derivedThumb;
+
       return {
         id: item.id,
         media_type: 'video' as const,
-        media_url: thumb || '',
+        // SquareCardMedia uses poster/thumbnail to render an <img>; give it an image URL (never .m3u8)
+        media_url: thumb ?? '/placeholder.svg',
         thumbnail_url: thumb,
         poster_url: thumb,
       };
     }
-    // image
+
+    // Images (R2): use the image URL for both fields
+    const img = item.media?.[0]?.media_url || src;
     return {
       id: item.id,
       media_type: 'image' as const,
-      media_url: item.src,
-      thumbnail_url: item.media?.[0]?.media_url || item.src,
+      media_url: img || '/placeholder.svg',
+      thumbnail_url: img || undefined,
     };
   });
 
@@ -131,25 +147,29 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {displayItems.map((item, index) =>
-          item ? (
-            <div
-              key={item.id}
-              className="aspect-[4/3] rounded-xl overflow-hidden pointer-events-none"
+        {Array.from({ length: 3 }).map((_, i) => {
+          const media = mediaTiles[i];
+          return media ? (
+            <button
+              key={media.id}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSeeAllClick();
+              }}
+              className="rounded-xl overflow-hidden w-full aspect-[4/3] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02]"
+              aria-label="Open Media tab"
             >
               <SquareCardMedia
-                media={item}
+                media={media}
                 cardType={CardType.SQUARE}
                 className="w-full h-full"
               />
-            </div>
+            </button>
           ) : (
-            <div
-              key={`placeholder-${index}`}
-              className="aspect-[4/3] bg-muted rounded-xl"
-            />
-          )
-        )}
+            <div key={`ph-${i}`} className="rounded-xl bg-muted aspect-[4/3]" />
+          );
+        })}
       </div>
     </div>
   );

@@ -142,16 +142,45 @@ serve(async (req) => {
       }
     }
 
+    // Helper to extract Stream UID from HLS URL
+    const extractStreamUidFromHls = (hls: string): string | null => {
+      try {
+        const url = new URL(hls)
+        const parts = url.pathname.split('/').filter(Boolean)
+        return parts[0] || null
+      } catch {
+        return null
+      }
+    }
+
+    // Helper to generate safe thumbnail URL
+    const getSafeThumbnailUrl = (mediaUrl: string, mediaType: string): string => {
+      const isVideo = mediaType === 'video'
+      
+      if (isVideo) {
+        // For videos, extract UID and generate thumbnail URL
+        const uid = extractStreamUidFromHls(mediaUrl)
+        return uid 
+          ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`
+          : mediaUrl // fallback to original if can't extract UID
+      } else {
+        // For images, use the R2 URL directly
+        return mediaUrl
+      }
+    }
+
     // Transform post media
     const transformedPostMedia: MediaItem[] = (postMedia || []).map(item => {
       const profile = profiles.find(p => p.id === item.posts.user_id)
+      const safeThumbnail = getSafeThumbnailUrl(item.media_url, item.media_type)
+      
       return {
         id: item.id,
         source: 'post' as const,
         sourceId: item.posts.id,
         type: item.media_type as 'image' | 'video',
         url: item.media_url,
-        thumbnailUrl: item.media_url, // Use media_url as thumbnail for now
+        thumbnailUrl: safeThumbnail,
         createdAt: item.created_at,
         author: {
           id: item.posts.user_id,
@@ -165,13 +194,15 @@ serve(async (req) => {
     // Transform review media
     const transformedReviewMedia: MediaItem[] = (reviewMedia || []).map(item => {
       const profile = profiles.find(p => p.id === item.course_ratings.user_id)
+      const safeThumbnail = getSafeThumbnailUrl(item.media_url, item.media_type)
+      
       return {
         id: item.id,
         source: 'review' as const,
         sourceId: item.course_ratings.id,
         type: item.media_type as 'image' | 'video',
         url: item.media_url,
-        thumbnailUrl: item.media_url, // Use media_url as thumbnail for now
+        thumbnailUrl: safeThumbnail,
         createdAt: item.created_at,
         author: {
           id: item.course_ratings.user_id,
