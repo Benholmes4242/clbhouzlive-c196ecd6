@@ -280,8 +280,11 @@ const MapThumbnail = ({
               className="absolute inset-0 bg-black/60"
               onClick={() => setShowLargeMap(false)}
             />
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <div className="relative w-full max-w-4xl max-h-[80vh] rounded-2xl bg-background shadow-2xl">
+            <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+              <div 
+                className="relative w-full max-w-4xl max-h-[80vh] rounded-2xl bg-background shadow-2xl pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {/* Header */}
                 <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
                   <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
