@@ -135,7 +135,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.courseDesign)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.courseDesign), 85)}%`,
                   transform: 'translateY(-50%) translateX(-50%)'
@@ -156,7 +156,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.courseCondition)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.courseCondition), 85)}%`,
                   transform: 'translateY(-50%) translateX(-50%)'
@@ -177,7 +177,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.facilities)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-2 py-0.5 text-xs font-medium shadow-sm"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.facilities), 85)}%`,
                   transform: 'translateY(-50%) translateX(-50%)'
