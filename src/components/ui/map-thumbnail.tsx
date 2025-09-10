@@ -269,24 +269,15 @@ const MapThumbnail = ({
       <SlideOver
         open={showLargeMap}
         onClose={() => setShowLargeMap(false)}
-        width="w-full max-w-4xl"
+        width="w-[90vw] max-w-[860px]"
         zIndex="z-[1200]"
         heightClass="max-h-[80vh] my-auto"
         ariaLabel="Location map"
         portalTarget="modal-portal"
       >
-        <div className="h-full overflow-hidden flex flex-col">
-          {/* Close button */}
-          <button
-            onClick={() => setShowLargeMap(false)}
-            className="absolute top-4 right-4 z-20 h-8 w-8 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
-            aria-label="Close modal"
-          >
-            <span className="text-white text-base font-bold leading-none flex items-center justify-center w-full h-full">✕</span>
-          </button>
-          
+        <div className="h-full overflow-hidden flex flex-col p-2">
           {/* Header */}
-          <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
+          <div className="flex flex-col space-y-1.5 text-center sm:text-left p-4 pb-2">
             <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
               <MapPin className="h-5 w-5" />
               {clubName} Location
@@ -294,7 +285,7 @@ const MapThumbnail = ({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto p-6 pt-4">
+          <div className="flex-1 overflow-auto px-4 pb-4">
             <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
               {largeMapImageUrl ? (
                 <img
