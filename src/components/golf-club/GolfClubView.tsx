@@ -163,27 +163,27 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           {/* Ranking badges */}
           <div className="flex gap-2 flex-wrap">
             {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <div className="glass-badge-tight shadow-lg">
                 <Earth className="h-4 w-4 text-white" />
-                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+                <span className="text-sm font-bold text-white">{course.global_rank}</span>
               </div>
             )}
             {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="Britain & Ireland" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
               </div>
             )}
             {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="USA" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+                <span className="text-sm font-bold text-white">{course.usa_rank}</span>
               </div>
             )}
             {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="Continental Europe" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
               </div>
             )}
           </div>
