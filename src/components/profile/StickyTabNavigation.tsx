@@ -56,11 +56,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
 
   return (
     <div 
-      className={`transition-all duration-500 ease-in-out ${
-        isSticky 
-          ? 'fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm' 
-          : 'relative bg-transparent'
-      }`}
+      className="relative bg-transparent transition-all duration-500 ease-in-out border-b border-border/50"
     >
       <div className={`max-w-6xl mx-auto ${isMobile ? 'px-4 py-2' : 'px-6 py-3'}`}>
         <div className="relative">
