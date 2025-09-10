@@ -48,6 +48,7 @@ import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 import AdaptiveGlassHeader from './AdaptiveGlassHeader';
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
+import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -1284,6 +1285,9 @@ const HeroProfileHeader = ({
         }))}
         onMediaUpdate={refetchMedia}
       />
+
+      {/* ProfileModalRouter - Available to all profile visitors for course viewing */}
+      <ProfileModalRouter />
     </SwipeToReturnZone>
   );
 };
