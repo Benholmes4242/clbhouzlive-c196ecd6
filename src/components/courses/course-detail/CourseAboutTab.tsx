@@ -117,7 +117,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               </div>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end mr-3">
             <div className="text-sm text-muted-foreground text-center">
               {ratingStats?.total_ratings || 0} {ratingStats?.total_ratings === 1 ? 'review' : 'reviews'}
             </div>
