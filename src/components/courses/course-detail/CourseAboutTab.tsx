@@ -107,17 +107,19 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     <div className="space-y-6">
       {/* Community Score Section */}
       <div className="bg-card rounded-lg border p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold">Community Score</h3>
-          <div className="flex items-center gap-2">
-            <ClubhouseLogo size="lg" />
-            <div className="flex flex-col items-center gap-1">
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold">Community Score</h3>
+            <div className="flex items-center gap-2">
+              <ClubhouseLogo size="lg" />
               <div className="text-3xl font-bold">
                 {ratingStats?.average_rating || 0}/10
               </div>
-              <div className="text-sm text-muted-foreground text-center">
-                {ratingStats?.total_ratings || 0} {ratingStats?.total_ratings === 1 ? 'review' : 'reviews'}
-              </div>
+            </div>
+          </div>
+          <div className="flex justify-end mt-1">
+            <div className="text-sm text-muted-foreground text-center">
+              {ratingStats?.total_ratings || 0} {ratingStats?.total_ratings === 1 ? 'review' : 'reviews'}
             </div>
           </div>
         </div>
