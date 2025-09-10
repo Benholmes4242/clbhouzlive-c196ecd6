@@ -489,11 +489,11 @@ const TopTenSlot: React.FC<{
           <div className="absolute top-0 right-0 z-30">
             <div className="relative w-11 h-11">
               {/* Triangle background */}
-              <div className="absolute top-0 right-0 w-0 h-0 border-l-[44px] border-l-transparent border-t-[44px] border-t-destructive/80" />
+              <div className="absolute top-0 right-0 w-0 h-0 border-l-[44px] border-l-transparent border-t-[44px] border-t-gray-400/60" />
               {/* X icon */}
               <button
                 onClick={handleRemoveClick}
-                className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-white hover:scale-110 transition-transform"
+                className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-black hover:scale-110 transition-transform"
                 aria-label="Remove course from Top 10"
               >
                 <X className="w-3 h-3" />
