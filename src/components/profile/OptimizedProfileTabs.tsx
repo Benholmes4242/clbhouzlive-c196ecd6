@@ -133,7 +133,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
   return (
     <div className="bg-background min-h-screen">
       {/* Tabs Navigation */}
-      <div className="bg-background border-b border-border sticky top-0 z-40">
+      <div className="bg-background border-b border-border relative z-40">
         <div className="container mx-auto px-4 md:px-0">
           <div className="flex gap-8 overflow-x-auto scrollbar-hide py-4">
             {tabs.map((tab) => (
