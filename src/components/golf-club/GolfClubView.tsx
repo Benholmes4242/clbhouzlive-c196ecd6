@@ -15,9 +15,10 @@ import CourseLeaderboardTab from '@/components/courses/course-detail/CourseLeade
 interface GolfClubViewProps {
   courseId: string;
   isInModal?: boolean;
+  onClose?: () => void;
 }
 
-const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false }) => {
+const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
 
@@ -88,6 +89,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
       {/* Hero Banner */}
       <div className="course-hero-container relative overflow-hidden">
+        {/* Close button for modal - positioned over hero image */}
+        {isInModal && onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 md:top-4 md:right-4 z-20 h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+            aria-label="Close modal"
+          >
+            <span className="text-white text-base font-bold leading-none flex items-center justify-center w-full h-full">✕</span>
+          </button>
+        )}
+        
         <img
           src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
           srcSet={course.thumbnail_image ? `

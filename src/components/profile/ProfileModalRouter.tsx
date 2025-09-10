@@ -112,21 +112,12 @@ const ProfileModalRouter: React.FC = () => {
             onTouchStart={(e) => e.stopPropagation()}
           >
             <div className="h-full overflow-hidden flex flex-col relative">
-              {/* Liquid Glass Close Button */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 z-20 h-8 w-8 rounded-full flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
-                aria-label="Close modal"
-              >
-                <span className="text-white text-base font-bold leading-none flex items-center justify-center w-full h-full">✕</span>
-              </button>
-              
               {/* Portal target for lightbox modals - positioned with proper z-index */}
               <div id="modal-portal" className="relative z-[1001]" />
               
               {/* Content */}
               <div className="flex-1 overflow-auto relative">
-                <GolfClubView courseId={courseId} isInModal={true} />
+                <GolfClubView courseId={courseId} isInModal={true} onClose={onClose} />
               </div>
             </div>
           </div>
