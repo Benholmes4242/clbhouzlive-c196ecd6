@@ -1,20 +1,25 @@
 
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentLogo } = useAppLogo();
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
   };
 
+  // Only sticky on clubhouse page, fixed everywhere else
+  const isClubhousePage = location.pathname === '/clubhouse';
+  const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
+
   return (
-    <header className="sticky top-0 z-[60]">
+    <header className={headerClasses}>
       <div className="container mx-auto px-4 md:px-0 max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
         <div className="flex items-center justify-between h-16 max-w-full">
           {/* Logo - Enlarged and optimized positioning */}
