@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { createPortal } from "react-dom";
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -135,6 +135,16 @@ const MapThumbnail = ({
     setPortalEl(document.getElementById('modal-portal'));
   }, []);
 
+  // Close on ESC for accessibility
+  React.useEffect(() => {
+    if (!showLargeMap) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowLargeMap(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showLargeMap]);
+
   // Attempt to geocode on mount if no coordinates
   React.useEffect(() => {
     if (!coords && !isLoading) {
@@ -216,56 +226,73 @@ const MapThumbnail = ({
       </div>
 
       {/* Large Map Modal for Desktop */}
-      <DialogPrimitive.Root open={showLargeMap} onOpenChange={setShowLargeMap}>
-        {portalEl && (
-          <DialogPrimitive.Portal container={portalEl}>
-            <DialogPrimitive.Overlay
-              className="fixed inset-0 z-[1001] bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out"
+      {showLargeMap && portalEl &&
+        createPortal(
+          <div className="fixed inset-0 z-[1200]" role="dialog" aria-modal="true">
+            <div
+              className="absolute inset-0 bg-black/60"
               onClick={() => setShowLargeMap(false)}
             />
-            <DialogPrimitive.Content
-              className="fixed left-1/2 top-1/2 z-[1002] grid w-full max-w-4xl max-h-[80vh] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-background shadow-2xl outline-none"
-            >
-              {/* Header */}
-              <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
-                <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  {clubName} Location
-                </h2>
-              </div>
-              
-              {/* Content */}
-              <div className="relative p-6">
-                {largeMapImageUrl && (
-                  <img
-                    src={largeMapImageUrl}
-                    alt={`Detailed map of ${clubName} location`}
-                    className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    onClick={handleLargeMapClick}
-                  />
-                )}
-                <Button
-                  onClick={handleLargeMapClick}
-                  className="absolute bottom-10 right-10 bg-background/90 hover:bg-background text-foreground border"
-                  size="sm"
+            <div className="absolute inset-0 flex items-center justify-center p-4">
+              <div className="relative w-full max-w-4xl max-h-[80vh] rounded-2xl bg-background shadow-2xl">
+                {/* Header */}
+                <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
+                  <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    {clubName} Location
+                  </h2>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 pt-0">
+                  <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
+                    {largeMapImageUrl ? (
+                      <img
+                        src={largeMapImageUrl}
+                        alt={`Large map of ${clubName}`}
+                        className="w-full h-full object-cover rounded-lg cursor-pointer"
+                        onClick={handleLargeMapClick}
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-muted-foreground">Loading map...</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                    <Button
+                      onClick={handleLargeMapClick}
+                      className="flex-1 flex items-center justify-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open in Maps
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowLargeMap(false)}
+                      className="flex-1"
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+
+                <button
+                  aria-label="Close"
+                  className="absolute right-3 top-3"
+                  onClick={() => setShowLargeMap(false)}
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Open in Maps
-                </Button>
+                  ✕
+                </button>
               </div>
-              
-              {/* Close button */}
-              <button
-                aria-label="Close"
-                className="absolute right-3 top-3"
-                onClick={() => setShowLargeMap(false)}
-              >
-                ✕
-              </button>
-            </DialogPrimitive.Content>
-          </DialogPrimitive.Portal>
-        )}
-      </DialogPrimitive.Root>
+            </div>
+          </div>,
+          portalEl
+        )
+      }
     </>
   );
 };
