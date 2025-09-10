@@ -214,8 +214,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* Location Section */}
         <div className="bg-card rounded-lg border p-6">
           <h3 className="text-xl font-semibold mb-4">Location</h3>
-          <div className="flex gap-4">
-            <div className="flex-1 space-y-3">
+          
+          {/* Stack on mobile; 2-col on md+ */}
+          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[1fr_auto]">
+            {/* Left: labels */}
+            <div className="space-y-3 order-1">
               {course.region && (
                 <div>
                   <div className="text-sm text-muted-foreground">Region</div>
@@ -229,7 +232,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </div>
               )}
             </div>
-            <div className="flex-shrink-0">
+
+            {/* Right on md+, full-width under on mobile */}
+            <div className="order-2 md:justify-self-end">
               <MapThumbnail
                 clubId={course.id}
                 clubName={course.name}
@@ -238,7 +243,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 subCountry={course.sub_country}
                 latitude={course.latitude}
                 longitude={course.longitude}
-                className="w-32 h-20"
+                className="
+                  w-full                 
+                  h-44                   
+                  sm:h-52                
+                  md:w-[320px] md:h-[200px]
+                  lg:w-[360px] lg:h-[220px]
+                "
               />
             </div>
           </div>
