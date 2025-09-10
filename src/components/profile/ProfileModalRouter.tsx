@@ -35,9 +35,12 @@ const ProfileModalRouter: React.FC = () => {
     <SlideOver
       isOpen={isClubModal && !!courseId}
       onClose={onClose}
+      width="w-full md:w-[560px] lg:w-[640px]"
       zIndex={1000}
+      heightClass="max-h-[78vh] h-auto mt-6 mb-6 rounded-2xl"
       closeOnBackdrop={!modalTransition.inProgress}
       closeOnEscape={!modalTransition.inProgress}
+      ariaLabel="course details"
     >
       <div className="h-full overflow-hidden flex flex-col relative">
         {/* Liquid Glass Close Button */}

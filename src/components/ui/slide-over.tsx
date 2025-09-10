@@ -1,27 +1,33 @@
 import React, { useCallback, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SlideOverProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  width?: string;
   zIndex?: number;
+  heightClass?: string;
   className?: string;
   closeOnBackdrop?: boolean;
   closeOnEscape?: boolean;
   lockBodyScroll?: boolean;
+  ariaLabel?: string;
 }
 
 export const SlideOver: React.FC<SlideOverProps> = ({
   isOpen,
   onClose,
   children,
+  width = "w-full md:w-[560px] lg:w-[640px]",
   zIndex = 1000,
+  heightClass = "max-h-[78vh] h-auto mt-6 mb-6 rounded-2xl",
   className = '',
   closeOnBackdrop = true,
   closeOnEscape = true,
-  lockBodyScroll = true
+  lockBodyScroll = true,
+  ariaLabel = "panel"
 }) => {
   const isMobile = useIsMobile();
 
@@ -68,58 +74,44 @@ export const SlideOver: React.FC<SlideOverProps> = ({
     }
   };
 
-  return (
-    <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
-      {isOpen && (
-        <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
-          className={`
-            fixed flex
-            ${isMobile 
-              ? 'top-0 left-0 right-0 bottom-16' 
-              : 'inset-0'
-            }
-          `}
-          style={{ zIndex }}
+  return createPortal(
+    <div 
+      className={`fixed inset-0 ${isOpen ? "" : "pointer-events-none"}`} 
+      style={{ zIndex }}
+      aria-hidden={!isOpen}
+    >
+      {/* Backdrop */}
+      <div
+        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}
+        onClick={handleBackdropClick}
+      />
+
+      {/* Right-aligned container */}
+      <div className="absolute inset-x-0 top-0 bottom-0 flex items-start justify-end px-4 md:px-6">
+        {/* Panel */}
+        <aside
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel}
+          className={[
+            "relative bg-background shadow-2xl border-l md:border rounded-none md:rounded-2xl",
+            "transition-transform duration-300 ease-out",
+            width,
+            heightClass,
+            isOpen ? "translate-x-0" : "translate-x-full",
+            className
+          ].join(" ")}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
-          {/* Backdrop */}
-          <button
-            aria-label="Close modal"
-            onClick={handleBackdropClick}
-            className={`
-              fixed bg-black/50 cursor-default
-              ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-16' 
-                : 'inset-0'
-              }
-            `}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-          />
-          
-          {/* Modal Panel */}
-          <div 
-            className={`
-              fixed right-0 bg-background shadow-2xl z-10
-              ${isMobile 
-                ? 'w-full top-0 bottom-16' 
-                : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl'
-              }
-              ${className}
-            `}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-          >
+          {/* Make the inside scroll if content is tall */}
+          <div className="max-h-[inherit] overflow-auto">
             {children}
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </aside>
+      </div>
+    </div>,
+    document.body
   );
 };
 

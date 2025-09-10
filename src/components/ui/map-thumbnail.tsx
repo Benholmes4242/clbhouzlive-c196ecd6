@@ -229,21 +229,24 @@ const MapThumbnail = ({
       <SlideOver
         isOpen={showLargeMap}
         onClose={() => setShowLargeMap(false)}
+        width="w-full md:w-[560px] lg:w-[640px]"
         zIndex={1200}
-        className="max-w-4xl"
+        heightClass="max-h-[78vh] h-auto mt-6 mb-6 rounded-2xl"
+        ariaLabel="map panel"
       >
-        <div className="h-full overflow-hidden flex flex-col relative">
+        <div className="flex flex-col">
           {/* Header */}
-          <div className="flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0">
-            <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h3 className="text-base font-semibold flex items-center gap-2">
               <MapPin className="h-5 w-5" />
               {clubName} Location
-            </h2>
+            </h3>
+            <button onClick={() => setShowLargeMap(false)} aria-label="Close">✕</button>
           </div>
 
           {/* Content */}
-          <div className="p-6 pt-4">
-            <div className="w-full h-[60vh] bg-muted rounded-lg flex items-center justify-center">
+          <div className="p-4">
+            <div className="w-full h-[50vh] bg-muted rounded-lg flex items-center justify-center">
               {largeMapImageUrl ? (
                 <img
                   src={largeMapImageUrl}
@@ -260,11 +263,11 @@ const MapThumbnail = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+            <div className="grid grid-cols-2 gap-3 mt-4">
               <Button
                 variant="outline"
                 onClick={handleLargeMapClick}
-                className="flex-1 flex items-center justify-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
                 Open in Maps
@@ -272,7 +275,6 @@ const MapThumbnail = ({
               <Button
                 variant="outline"
                 onClick={() => setShowLargeMap(false)}
-                className="flex-1"
               >
                 Close
               </Button>
