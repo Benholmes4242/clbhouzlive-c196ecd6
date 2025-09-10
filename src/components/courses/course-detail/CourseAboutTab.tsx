@@ -157,7 +157,7 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-2 text-primary hover:underline font-medium"
+                className="block mt-2 text-muted-foreground hover:text-foreground font-medium"
               >
                 {showFullDescription ? 'Show less' : 'Read more'}
               </button>
