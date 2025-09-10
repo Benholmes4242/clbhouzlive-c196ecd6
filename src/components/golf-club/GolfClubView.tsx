@@ -131,25 +131,25 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             {course.global_rank && (
               <div className="glass-badge-tight shadow-lg">
                 <Earth className="h-5 w-5 text-white" />
-                <span className="text-sm font-bold text-white -translate-y-0.5">{course.global_rank}</span>
+                <span className="text-sm font-bold text-white">{course.global_rank}</span>
               </div>
             )}
             {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
               <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="Britain & Ireland" size="md" />
-                <span className="text-sm font-bold text-white -translate-y-0.5">{course.regional_rank}</span>
+                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
               </div>
             )}
             {(course.country === 'USA' && course.usa_rank) && (
               <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="USA" size="md" />
-                <span className="text-sm font-bold text-white -translate-y-0.5">{course.usa_rank}</span>
+                <span className="text-sm font-bold text-white">{course.usa_rank}</span>
               </div>
             )}
             {(course.country === 'Continental Europe' && course.regional_rank) && (
               <div className="glass-badge-tight shadow-lg">
                 <CountryFlag country="Continental Europe" size="md" />
-                <span className="text-sm font-bold text-white -translate-y-0.5">{course.regional_rank}</span>
+                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
               </div>
             )}
           </div>
