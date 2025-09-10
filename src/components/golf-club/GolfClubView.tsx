@@ -173,7 +173,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <div className="course-hero-wrapper p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
-            <CourseAboutTab course={course} />
+            <CourseAboutTab course={course} onTabChange={setActiveTab} />
           </TabsContent>
           
           <TabsContent value="reviews" className="mt-0">

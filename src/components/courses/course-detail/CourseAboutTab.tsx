@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
+import AboutMediaStrip from './AboutMediaStrip';
 
 interface Course {
   id: string;
@@ -27,6 +28,7 @@ interface Course {
 
 interface CourseAboutTabProps {
   course: Course;
+  onTabChange?: (tab: string) => void;
 }
 
 const formatDescription = (description: string) => {
@@ -40,7 +42,7 @@ const formatDescription = (description: string) => {
     ));
 };
 
-const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
+const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const isMobile = useIsMobile();
 
@@ -191,13 +193,10 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
 
         {/* Media Section */}
         <div className="bg-card rounded-lg border p-6">
-          <h3 className="text-xl font-semibold mb-4">Media</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {/* Placeholder media thumbnails */}
-            <div className="aspect-square bg-muted rounded"></div>
-            <div className="aspect-square bg-muted rounded"></div>
-            <div className="aspect-square bg-muted rounded"></div>
-          </div>
+          <AboutMediaStrip 
+            clubId={course.id} 
+            onSeeAllClick={() => onTabChange?.('media')}
+          />
         </div>
       </div>
 

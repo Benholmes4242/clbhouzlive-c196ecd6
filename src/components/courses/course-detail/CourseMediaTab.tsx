@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, Image as ImageIcon } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Play, Image as ImageIcon, X } from 'lucide-react';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface CourseMediaTabProps {
   courseId: string;
+  portalTarget?: HTMLElement | null;
 }
 
 interface MediaItem {
@@ -27,7 +28,7 @@ interface MediaItem {
   };
 }
 
-const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
+const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -39,12 +40,13 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
       });
 
       if (error) throw error;
-      return data?.media || [];
+      return data?.edges || [];
     },
     enabled: !!courseId,
   });
 
-  const openMediaViewer = (media: MediaItem, index: number) => {
+  const openMediaViewer = (media: MediaItem, index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedMedia(media);
     setSelectedIndex(index);
   };
@@ -86,37 +88,99 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
     );
   }
 
+  const renderLightbox = () => {
+    if (!selectedMedia) return null;
+
+    const lightboxContent = (
+      <div className="fixed inset-0 z-[1001] bg-black/85 flex items-center justify-center p-4">
+        <div className="relative max-w-[90vw] max-h-[90vh] bg-black rounded-lg overflow-hidden">
+          {/* Close button */}
+          <button
+            onClick={() => setSelectedMedia(null)}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+            aria-label="Close lightbox"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          {/* Media content */}
+          {selectedMedia.type === 'image' ? (
+            <img
+              src={selectedMedia.url}
+              alt="Course media"
+              className="max-w-full max-h-full object-contain"
+            />
+          ) : (
+            <video
+              key={selectedMedia.url}
+              src={selectedMedia.url}
+              poster={selectedMedia.thumbnailUrl}
+              controls
+              playsInline
+              preload="metadata"
+              className="max-w-full max-h-full"
+            />
+          )}
+
+          {/* User info overlay */}
+          <div className="absolute bottom-4 left-4 bg-black/80 rounded-lg p-3 text-white">
+            <div className="flex items-center gap-3">
+              <OptimizedAvatar
+                src={selectedMedia.author.avatarUrl}
+                alt={getUserDisplayName(selectedMedia)}
+                size={32}
+                className="w-8 h-8"
+                fallback={getUserInitials(selectedMedia)}
+              />
+              <div>
+                <p className="font-medium">{getUserDisplayName(selectedMedia)}</p>
+                <p className="text-sm opacity-80">@{selectedMedia.author.username || 'user'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Backdrop click to close */}
+        <div 
+          className="absolute inset-0 -z-10"
+          onClick={() => setSelectedMedia(null)}
+        />
+      </div>
+    );
+
+    // Use portal if target is provided, otherwise render normally
+    return portalTarget ? createPortal(lightboxContent, portalTarget) : lightboxContent;
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {mediaItems.map((media, index) => (
-          <div
+          <button
             key={media.id}
-            className="relative aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow"
-            onClick={() => openMediaViewer(media, index)}
+            type="button"
+            className="relative aspect-[4/5] bg-muted rounded-xl overflow-hidden group hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-primary"
+            onClick={(e) => openMediaViewer(media, index, e)}
+            aria-label={media.type === 'video' ? 'Play video' : 'View image'}
           >
-            {media.type === 'image' ? (
-              <img
-                src={media.url}
-                alt={'Course media'}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <div className="w-full h-full bg-media-loading animate-pulse flex items-center justify-center">
-                <video
-                  src={media.url}
-                  className="w-full h-full object-cover"
-                  muted
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-black/50 rounded-full p-3">
-                    <Play className="h-8 w-8 text-white fill-white" />
-                  </div>
+            {/* Always show thumbnail/image for both types */}
+            <img
+              src={media.thumbnailUrl || media.url}
+              alt="Course media"
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+
+            {/* Video play icon overlay */}
+            {media.type === 'video' && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-black/50 backdrop-blur-sm rounded-full p-3">
+                  <Play className="h-8 w-8 text-white fill-white" />
                 </div>
               </div>
             )}
 
-            {/* Overlay with user info */}
+            {/* User info overlay */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
               <div className="flex items-center gap-2">
                 <OptimizedAvatar
@@ -135,59 +199,21 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
             {/* Media type indicator */}
             <div className="absolute top-2 right-2">
               {media.type === 'video' ? (
-                <div className="bg-black/50 rounded-full p-1">
+                <div className="bg-black/50 backdrop-blur-sm rounded-full p-1">
                   <Play className="h-4 w-4 text-white fill-white" />
                 </div>
               ) : (
-                <div className="bg-black/50 rounded-full p-1">
+                <div className="bg-black/50 backdrop-blur-sm rounded-full p-1">
                   <ImageIcon className="h-4 w-4 text-white" />
                 </div>
               )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Media Viewer Modal */}
-      <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-          {selectedMedia && (
-            <div className="relative">
-              {selectedMedia.type === 'image' ? (
-                <img
-                  src={selectedMedia.url}
-                  alt={'Course media'}
-                  className="w-full h-auto max-h-[80vh] object-contain"
-                />
-              ) : (
-                <video
-                  src={selectedMedia.url}
-                  controls
-                  className="w-full h-auto max-h-[80vh]"
-                  autoPlay
-                />
-              )}
-              
-              {/* User info overlay */}
-              <div className="absolute bottom-4 left-4 bg-black/80 rounded-lg p-3 text-white">
-                <div className="flex items-center gap-3">
-                  <OptimizedAvatar
-                    src={selectedMedia.author.avatarUrl}
-                    alt={getUserDisplayName(selectedMedia)}
-                    size={32}
-                    className="w-8 h-8"
-                    fallback={getUserInitials(selectedMedia)}
-                  />
-                  <div>
-                    <p className="font-medium">{getUserDisplayName(selectedMedia)}</p>
-                    <p className="text-sm opacity-80">@{selectedMedia.author.username || 'user'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Lightbox */}
+      {renderLightbox()}
     </>
   );
 };
