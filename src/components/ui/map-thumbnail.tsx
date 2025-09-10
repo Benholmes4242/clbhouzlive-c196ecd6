@@ -327,14 +327,6 @@ const MapThumbnail = ({
                     </Button>
                   </div>
                 </div>
-
-                <button
-                  aria-label="Close"
-                  className="absolute right-3 top-3"
-                  onClick={() => setShowLargeMap(false)}
-                >
-                  ✕
-                </button>
               </div>
             </div>
           </div>,
