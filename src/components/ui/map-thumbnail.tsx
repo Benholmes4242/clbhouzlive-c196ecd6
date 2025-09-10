@@ -35,6 +35,8 @@ const MapThumbnail = ({
   const [mapImageUrl, setMapImageUrl] = React.useState<string | null>(null);
   const [largeMapImageUrl, setLargeMapImageUrl] = React.useState<string | null>(null);
   const [portalEl, setPortalEl] = React.useState<HTMLElement | null>(null);
+  const lastFocusedRef = React.useRef<HTMLElement | null>(null);
+  const dialogRef = React.useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -145,12 +147,49 @@ const MapThumbnail = ({
     return () => window.removeEventListener("keydown", onKey);
   }, [showLargeMap]);
 
+  // Lock page scroll while modal is open
+  React.useEffect(() => {
+    if (!showLargeMap) return;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = overflow; };
+  }, [showLargeMap]);
+
+  // Send focus into the modal & restore on close
+  React.useEffect(() => {
+    if (showLargeMap) {
+      lastFocusedRef.current = document.activeElement as HTMLElement;
+      // focus first focusable in modal, or the dialog
+      setTimeout(() => dialogRef.current?.focus(), 0);
+    } else {
+      lastFocusedRef.current?.focus?.();
+    }
+  }, [showLargeMap]);
+
   // Attempt to geocode on mount if no coordinates
   React.useEffect(() => {
     if (!coords && !isLoading) {
       geocodeClub();
     }
   }, [clubId]);
+
+  // Simple focus containment
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== "Tab") return;
+    const root = dialogRef.current;
+    if (!root) return;
+    const focusables = root.querySelectorAll<HTMLElement>(
+      'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables.length) { e.preventDefault(); return; }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  };
 
   const handleThumbnailClick = () => {
     if (!coords) return;
@@ -228,7 +267,15 @@ const MapThumbnail = ({
       {/* Large Map Modal for Desktop */}
       {showLargeMap && portalEl &&
         createPortal(
-          <div className="fixed inset-0 z-[1200]" role="dialog" aria-modal="true">
+          <div 
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Location map"
+            tabIndex={-1}
+            className="fixed inset-0 z-[1200]"
+            onKeyDown={onKeyDown}
+          >
             <div
               className="absolute inset-0 bg-black/60"
               onClick={() => setShowLargeMap(false)}
