@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,7 +32,6 @@ interface MediaItem {
 }
 
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
-  const [exploreItems, setExploreItems] = useState<ExploreContentItem[]>([]);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
 
@@ -42,7 +41,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     setModalPortalTarget(target);
   }, []);
 
-  const { data: mediaItems, isLoading } = useQuery({
+  const { data: mediaResp, isLoading } = useQuery({
     queryKey: ['course-media', courseId],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('get-club-media', {
@@ -50,16 +49,16 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
       });
 
       if (error) throw error;
-      
-      // Transform raw media to ExploreContentItem format
-      const rawMedia = data?.edges || [];
-      const adaptedItems = adaptClubMediaArrayToExploreItems(rawMedia);
-      setExploreItems(adaptedItems);
-      
-      return rawMedia;
+      return data?.edges ?? [];
     },
     enabled: !!courseId,
   });
+
+  // Use memo so remounts don't flash empty
+  const exploreItems = useMemo(
+    () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
+    [mediaResp]
+  );
 
   const handleMediaClick = (item: ExploreContentItem) => {
     const index = exploreItems.findIndex(media => media.id === item.id);

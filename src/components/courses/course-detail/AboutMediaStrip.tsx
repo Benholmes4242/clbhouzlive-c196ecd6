@@ -61,8 +61,42 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     }
   }, [clubId]);
 
+  // Helper to extract Stream UID from HLS URL
+  const extractStreamUidFromHls = (hls: string) => {
+    try {
+      const u = new URL(hls);
+      const parts = u.pathname.split('/').filter(Boolean);
+      return parts[0] || null;
+    } catch { return null; }
+  };
+
+  const streamThumb = (uid: string) =>
+    `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`;
+
+  // Build media objects for SquareCardMedia
+  const mediaTiles = items.slice(0, 3).map((item) => {
+    if (item.type === 'video') {
+      const uid = extractStreamUidFromHls(item.src);
+      const thumb = item.media?.[0]?.media_url || (uid ? streamThumb(uid) : undefined);
+      return {
+        id: item.id,
+        media_type: 'video' as const,
+        media_url: thumb || '',
+        thumbnail_url: thumb,
+        poster_url: thumb,
+      };
+    }
+    // image
+    return {
+      id: item.id,
+      media_type: 'image' as const,
+      media_url: item.src,
+      thumbnail_url: item.media?.[0]?.media_url || item.src,
+    };
+  });
+
   // Ensure exactly 3 slots with placeholders
-  const displayItems = Array.from({ length: 3 }, (_, i) => items[i] || null);
+  const displayItems = Array.from({ length: 3 }, (_, i) => mediaTiles[i] || null);
 
   if (loading) {
     return (
@@ -104,11 +138,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               className="aspect-[4/3] rounded-xl overflow-hidden pointer-events-none"
             >
               <SquareCardMedia
-                media={{
-                  id: item.id,
-                  media_type: item.type as 'video' | 'image',
-                  media_url: item.media?.[0]?.media_url || item.src
-                }}
+                media={item}
                 cardType={CardType.SQUARE}
                 className="w-full h-full"
               />
