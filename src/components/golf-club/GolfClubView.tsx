@@ -11,8 +11,6 @@ import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseLeaderboardTab from '@/components/courses/course-detail/CourseLeaderboardTab';
-import CoursePlayedButton from '@/components/courses/CoursePlayedButton';
-import AddToPlayedModal from '@/components/courses/AddToPlayedModal';
 
 interface GolfClubViewProps {
   courseId: string;
@@ -22,8 +20,6 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false }) => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
-  const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
-  const [isPlayed, setIsPlayed] = useState(false);
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
@@ -42,29 +38,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     enabled: !!courseId,
   });
 
-  // Check if user has played this course
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', courseId, user?.id],
-    queryFn: async () => {
-      if (!user?.id || !courseId) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', courseId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(user?.id && courseId),
-  });
-
-  // Update played state when userCourse data changes
-  React.useEffect(() => {
-    setIsPlayed(!!userCourse?.played);
-  }, [userCourse]);
 
   const { data: ratingStats } = useQuery({
     queryKey: ['course-rating-stats', courseId],
@@ -96,13 +69,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   });
 
 
-  const handleAddToPlayed = () => {
-    setShowAddToPlayedModal(true);
-  };
-
-  const handlePlayedSuccess = () => {
-    setIsPlayed(true);
-  };
 
   if (courseLoading || !course) {
     return (
@@ -161,7 +127,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           </p>
           
           {/* Ranking badges */}
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap [--badge-w:52px] md:[--badge-w:56px] lg:[--badge-w:56px]">
             {course.global_rank && (
               <div className="glass-badge-tight shadow-lg">
                 <Earth className="h-4 w-4 text-white" />
@@ -188,14 +154,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             )}
           </div>
         </div>
-
-        {/* Add to Played Button - Bottom Right */}
-        {user && (
-          <CoursePlayedButton 
-            isPlayed={isPlayed}
-            onAddToPlayed={handleAddToPlayed}
-          />
-        )}
       </div>
 
 
@@ -232,13 +190,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </Tabs>
       </div>
 
-      {/* Add to Played Modal */}
-      <AddToPlayedModal
-        course={course}
-        isOpen={showAddToPlayedModal}
-        onClose={() => setShowAddToPlayedModal(false)}
-        onSuccess={handlePlayedSuccess}
-      />
     </div>
   );
 };
