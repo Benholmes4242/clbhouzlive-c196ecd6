@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ExternalLink, Earth } from 'lucide-react';
+import { Earth } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CountryFlag from '@/components/ui/country-flag';
@@ -95,11 +95,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     enabled: !!courseId,
   });
 
-  const handleWebsiteClick = () => {
-    if (course?.website_url) {
-      window.open(course.website_url, '_blank');
-    }
-  };
 
   const handleAddToPlayed = () => {
     setShowAddToPlayedModal(true);
@@ -203,35 +198,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         )}
       </div>
 
-      {/* Rating and Website Section */}
-      <div className="bg-background py-4">
-        <div className="course-hero-wrapper">
-          <div className="flex items-center justify-between w-full">
-            {/* Community Vote Score - Left */}
-            <div className="flex items-center gap-2">
-              <ClubhouseLogo size="md" showTooltip />
-              <span className="text-xl font-semibold text-foreground">
-                {ratingStats?.average_rating || 0}/10
-              </span>
-              <span className="text-muted-foreground">
-                ({ratingStats?.total_ratings || 0} votes)
-              </span>
-            </div>
-            
-            {/* Visit Website Button - Right */}
-            {course.website_url && (
-              <Button
-                variant="outline"
-                onClick={handleWebsiteClick}
-                className="flex items-center gap-2 rounded-full px-4 py-2 ml-auto"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* Sticky Tab Navigation */}
       <div className={isInModal ? "bg-background" : "sticky top-0 z-40 bg-background"}>

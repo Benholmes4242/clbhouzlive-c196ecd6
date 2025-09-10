@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ExternalLink } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Course {
   id: string;
@@ -35,60 +40,180 @@ const formatDescription = (description: string) => {
 };
 
 const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Fetch rating stats for community score
+  const { data: ratingStats } = useQuery({
+    queryKey: ['course-rating-stats', course.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('rating, review')
+        .eq('course_id', course.id);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        return { average_rating: 0, total_ratings: 0 };
+      }
+
+      const totalRatings = data.length;
+      const averageRating = data.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
+
+      return {
+        average_rating: Math.round(averageRating * 10) / 10,
+        total_ratings: totalRatings
+      };
+    },
+    enabled: !!course.id,
+  });
+
+  const handleWebsiteClick = () => {
+    if (course.website_url) {
+      window.open(course.website_url, '_blank');
+    }
+  };
+
+  // Truncate description for preview
+  const truncateDescription = (text: string, wordLimit: number) => {
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
+
+  const shouldShowReadMore = course.description && course.description.split(' ').length > 50;
+  const displayDescription = course.description && !showFullDescription && shouldShowReadMore
+    ? truncateDescription(course.description, 50)
+    : course.description;
+
+  // Mock community score data - in real app this would come from rating breakdown
+  const communityScores = {
+    fun: 8.5,
+    playability: 8.2,
+    design: 7.8
+  };
+
+  const getScorePercentage = (score: number) => (score / 10) * 100;
+
   return (
-    <div className="space-y-8">
-
-      {/* Description */}
-      {course.description && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">About This Course</h2>
-          <p className="text-muted-foreground leading-relaxed text-lg">
-            {formatDescription(course.description)}
-          </p>
-        </div>
-      )}
-
-      {/* Location Details */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Location</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Country:</span>
-              <span className="font-medium">{course.country}</span>
+    <div className="space-y-6">
+      {/* Community Score Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold">Community Score</h3>
+          <div className="text-right">
+            <div className="text-3xl font-bold">
+              {ratingStats?.average_rating || 0}/10
             </div>
-            {course.region && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Region:</span>
-                <span className="font-medium">{course.region}</span>
-              </div>
-            )}
-            {course.sub_country && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Area:</span>
-                <span className="font-medium">{course.sub_country}</span>
-              </div>
-            )}
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Fun</span>
+            </div>
+            <div className="w-full bg-muted h-2 rounded-full">
+              <div 
+                className="bg-foreground h-2 rounded-full transition-all duration-300"
+                style={{ width: `${getScorePercentage(communityScores.fun)}%` }}
+              />
+            </div>
           </div>
           
-          {(course.latitude && course.longitude) && (
-            <div className="bg-muted rounded-lg p-4">
-              <h3 className="font-medium mb-2">Coordinates</h3>
-              <p className="text-sm text-muted-foreground">
-                {course.latitude.toFixed(6)}, {course.longitude.toFixed(6)}
-              </p>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Playability</span>
             </div>
-          )}
+            <div className="w-full bg-muted h-2 rounded-full">
+              <div 
+                className="bg-foreground h-2 rounded-full transition-all duration-300"
+                style={{ width: `${getScorePercentage(communityScores.playability)}%` }}
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Design</span>
+            </div>
+            <div className="w-full bg-muted h-2 rounded-full">
+              <div 
+                className="bg-foreground h-2 rounded-full transition-all duration-300"
+                style={{ width: `${getScorePercentage(communityScores.design)}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Map placeholder - could be enhanced with actual map */}
-      {(course.latitude && course.longitude) && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Location Map</h2>
-          <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-            <p className="text-muted-foreground">Map view coming soon</p>
+      {/* About Section */}
+      {course.description && (
+        <div className="bg-card rounded-lg border p-6">
+          <h3 className="text-xl font-semibold mb-4">About</h3>
+          <div className="text-muted-foreground leading-relaxed">
+            {formatDescription(displayDescription)}
+            {shouldShowReadMore && (
+              <button
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="block mt-2 text-primary hover:underline font-medium"
+              >
+                {showFullDescription ? 'Show less' : 'Read more'}
+              </button>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Location and Media sections - side by side on desktop, stacked on mobile */}
+      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        {/* Location Section */}
+        <div className="bg-card rounded-lg border p-6">
+          <h3 className="text-xl font-semibold mb-4">Location</h3>
+          <div className="space-y-3">
+            {course.region && (
+              <div>
+                <div className="text-sm text-muted-foreground">Region</div>
+                <div className="font-medium">{course.region}</div>
+              </div>
+            )}
+            {course.sub_country && (
+              <div>
+                <div className="text-sm text-muted-foreground">Country</div>
+                <div className="font-medium">{course.sub_country}</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Media Section */}
+        <div className="bg-card rounded-lg border p-6">
+          <h3 className="text-xl font-semibold mb-4">Media</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {/* Placeholder media thumbnails */}
+            <div className="aspect-square bg-muted rounded"></div>
+            <div className="aspect-square bg-muted rounded"></div>
+            <div className="aspect-square bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Visit Website Button */}
+      {course.website_url && (
+        <div className={`${isMobile ? 'fixed bottom-4 left-4 right-4 z-50' : 'mt-6'}`}>
+          <Button
+            onClick={handleWebsiteClick}
+            className={`w-full flex items-center justify-center gap-2 ${
+              isMobile 
+                ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
+                : 'bg-muted hover:bg-muted/80 text-foreground border'
+            }`}
+            variant={isMobile ? 'default' : 'outline'}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Visit Website
+          </Button>
         </div>
       )}
     </div>
