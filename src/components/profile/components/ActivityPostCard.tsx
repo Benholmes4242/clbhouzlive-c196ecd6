@@ -1,15 +1,15 @@
 
 import React, { useState } from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
-
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-// Play icon already imported from lucide-react above
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { MediaItem } from '@/types/media';
 
 interface ActivityPostCardProps {
   post: ActivityPost;
@@ -34,20 +34,6 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
   const handleCourseTagClick = (courseName: string) => {
     // TODO: Navigate to course-specific feed
     console.log('Navigate to course feed:', courseName);
-  };
-
-  // Generate thumbnail URL for Cloudflare Stream videos
-  const getVideoThumbnail = (videoUrl: string) => {
-    if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
-      // Extract video ID and customer domain from Cloudflare Stream URL
-      const match = videoUrl.match(/(https:\/\/customer-[a-f0-9]+\.cloudflarestream\.com)\/([a-f0-9]+)\/manifest\/video\.m3u8/);
-      if (match) {
-        const customerDomain = match[1];
-        const videoId = match[2];
-        return `${customerDomain}/${videoId}/thumbnails/thumbnail.jpg`;
-      }
-    }
-    return null;
   };
 
   // Find course tags from post tags
@@ -89,40 +75,19 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 onClick={handleClick}
               />
             ) : (
-              // Show thumbnail for non-autoplay videos
+              // Show proper poster for non-autoplay videos
               <div className="relative w-full h-full">
                 <HighQualityImage
-                  src={getVideoThumbnail(currentMedia.media_url) || currentMedia.media_url}
+                  src={getStreamPoster(currentMedia.media_url, '1s') || '/placeholder.svg'}
                   alt="Video thumbnail"
-                  className="w-full h-full"
+                  className="w-full h-full object-cover"
                   width={300}
                   height={300}
                   onError={(e) => {
-                    // Fallback for thumbnail generation issues
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const container = target.parentElement;
-                    if (container && !container.querySelector('.video-placeholder')) {
-                      container.classList.add('flex', 'items-center', 'justify-center', 'bg-gray-200');
-                      
-                      const placeholder = document.createElement('div');
-                      placeholder.className = 'flex flex-col items-center justify-center text-gray-500 video-placeholder';
-                      
-                      const filmIcon = document.createElement('div');
-                      filmIcon.innerHTML = '🎬';
-                      filmIcon.className = 'text-2xl mb-1';
-                      
-                      const span = document.createElement('span');
-                      span.className = 'text-xs';
-                      span.textContent = 'Video';
-                      
-                      placeholder.appendChild(filmIcon);
-                      placeholder.appendChild(span);
-                      container.appendChild(placeholder);
-                    }
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
                   }}
                 />
-                {/* Film icon for videos */}
+                {/* Play icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
                   <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 flex items-center justify-center">
                     <Play className="w-3 h-3 text-white ml-0.5" fill="currentColor" />

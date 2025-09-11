@@ -7,6 +7,8 @@ import ActivityPostCard from './components/ActivityPostCard';
 import BadgeCarousel from '../badges/BadgeCarousel';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { MediaItem } from '@/types/media';
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
   userId,
@@ -170,28 +172,44 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       )}
 
       {/* FullscreenMediaModal for posts */}
-      {selectedPost && (
-        <>
-          {console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', selectedPost.id)}
+      {selectedPost && (() => {
+        // Transform post_media to MediaItem[] with proper poster URLs
+        const mediaItems: MediaItem[] = (selectedPost.post_media || []).map(media => {
+          if (media.media_type === 'video') {
+            const streamId = getStreamIdFromUrl(media.media_url);
+            return {
+              id: media.id,
+              type: 'video' as const,
+              url: media.media_url,
+              streamId,
+              posterUrl: getStreamPoster(media.media_url, '1s') ?? undefined,
+              alt: 'Video'
+            };
+          }
+          return {
+            id: media.id,
+            type: 'image' as const,
+            url: media.media_url,
+            alt: 'Photo'
+          };
+        });
+
+        console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', {
+          postId: selectedPost.id,
+          mediaCount: mediaItems.length,
+          mediaUrls: mediaItems.map(m => m.url),
+          mediaTypes: mediaItems.map(m => m.type)
+        });
+
+        return (
           <FullscreenMediaModal
             isOpen={!!selectedPost}
             onClose={() => setSelectedPost(null)}
-            mediaUrl={selectedPost.post_media?.[0]?.media_url || ''}
-            mediaType={selectedPost.post_media?.[0]?.media_type as 'image' | 'video' || 'image'}
+            mediaUrl={mediaItems.map(m => m.url)}
+            mediaType={mediaItems.map(m => m.type)}
+            initialIndex={0}
             alt={`Post media`}
             golfCourse={(() => {
-              console.log('🔍 SocialActivity - Rendering FullscreenMediaModal:', {
-                selectedPostId: selectedPost.id,
-                mediaUrl: selectedPost.post_media?.[0]?.media_url,
-                mediaType: selectedPost.post_media?.[0]?.media_type,
-                userFromPost: selectedPost.user,
-                postId: selectedPost.id,
-                hasCallbacks: {
-                  onPostDeleted: !!handlePostDeleted,
-                  onPostEdit: true
-                }
-              });
-              
               // Extract golf course data from post tags or content
               const golfCourseTag = selectedPost.post_tags?.find(tag => 
                 tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
@@ -215,8 +233,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
               }
               
               // Fallback to content extraction
-              const courseFromContent = extractGolfCourseFromContent(selectedPost.content);
-              return courseFromContent;
+              return extractGolfCourseFromContent(selectedPost.content);
             })()}
             user={selectedPost.user}
             displayName={selectedPost.user?.display_name || 'User'}
@@ -229,8 +246,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
               setSelectedPost(null);
             }}
           />
-        </>
-      )}
+        );
+      })()}
     </div>
   );
 };

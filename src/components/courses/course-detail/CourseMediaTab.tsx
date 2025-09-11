@@ -8,6 +8,8 @@ import { Image as ImageIcon } from 'lucide-react';
 // MediaGrid imports
 import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { MediaItem as NewMediaItem } from '@/components/media-grid';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { MediaItem as StandardMediaItem } from '@/types/media';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -97,9 +99,30 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const renderFullscreenModal = () => {
     if (selectedMediaIndex === null || !exploreItems[selectedMediaIndex]) return null;
 
+    // Transform exploreItems to StandardMediaItem[] with proper poster URLs
+    const standardizedMediaItems: StandardMediaItem[] = exploreItems.map(item => {
+      if (item.type === 'video') {
+        const streamId = getStreamIdFromUrl(item.src);
+        return {
+          id: item.id,
+          type: 'video' as const,
+          url: item.src,
+          streamId,
+          posterUrl: getStreamPoster(item.src, '1s') ?? undefined,
+          alt: item.title || 'Video'
+        };
+      }
+      return {
+        id: item.id,
+        type: 'image' as const,
+        url: item.src,
+        alt: item.title || 'Photo'
+      };
+    });
+
     const currentItem = exploreItems[selectedMediaIndex];
-    const mediaUrls = exploreItems.map(item => item.src);
-    const mediaTypes = exploreItems.map(item => item.type === 'video' ? 'video' : 'image') as ('image' | 'video')[];
+    const mediaUrls = standardizedMediaItems.map(item => item.url);
+    const mediaTypes = standardizedMediaItems.map(item => item.type);
 
     const modalContent = (
       <FullscreenMediaModal
