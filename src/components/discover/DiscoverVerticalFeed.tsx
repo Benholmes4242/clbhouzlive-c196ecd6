@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { useModalState } from '@/hooks/useModalDetector';
-import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -563,15 +563,14 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 const diffX = startX - endX;
                 const diffY = startY - endY;
                 
-                // Handle media navigation with vertical swipes when multiple media exists
-                if (hasMultipleMedia && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                // Only handle horizontal swipes (ignore vertical scrolling)
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
                   e.preventDefault();
-                  e.stopPropagation();
-                  if (diffY > 0) {
-                    // Swiped up - next media item
+                  if (diffX > 0 && hasMultipleMedia) {
+                    // Swiped left - next media
                     handleNextMedia(item.id, mediaItems.length);
-                  } else if (diffY < 0) {
-                    // Swiped down - previous media item
+                  } else if (diffX < 0 && hasMultipleMedia) {
+                    // Swiped right - previous media
                     handlePrevMedia(item.id, mediaItems.length);
                   }
                 }
@@ -649,6 +648,26 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   />
                 )}
                 
+                {/* Navigation arrows for multiple media */}
+                {hasMultipleMedia && (
+                  <>
+                    {/* Left Arrow */}
+                    <button
+                      onClick={(e) => handlePrevMedia(item.id, mediaItems.length, e)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                    >
+                      <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                    </button>
+
+                    {/* Right Arrow */}
+                    <button
+                      onClick={(e) => handleNextMedia(item.id, mediaItems.length, e)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                    >
+                      <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                    </button>
+                  </>
+                )}
                 
                 {/* Media navigation dots for multiple media */}
                 {hasMultipleMedia && (
