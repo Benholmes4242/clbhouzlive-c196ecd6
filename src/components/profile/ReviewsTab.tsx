@@ -3,18 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
-import { Play } from 'lucide-react';
-import MediaLightbox from "@/components/ui/MediaLightbox";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from "@/lib/utils";
-
-type MediaItem = {
-  id: string;
-  type: 'image' | 'video';
-  url: string;
-  alt?: string;
-};
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import ReviewMediaThumb from './ReviewMediaThumb';
+import { MediaItem } from '@/types/media';
 
 type Review = {
   id: string;
@@ -26,7 +20,7 @@ type Review = {
   unhelpfulCount?: number;
   userVote?: 'helpful' | 'unhelpful' | 'none';
   isYourReview?: boolean;
-  media?: MediaItem[];         // Optional media array
+  media?: MediaItem[];         // Updated to use MediaItem type
 };
 
 type ReviewsTabProps = {
@@ -106,14 +100,14 @@ function ReviewCard({ review }: { review: Review }) {
   const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
-  const [lightboxOpen, setLightboxOpen] = React.useState(false);
-  const [lightboxIndex, setLightboxIndex] = React.useState(0);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [startIndex, setStartIndex] = React.useState(0);
 
   const MAX_THUMBS = 3;
 
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
+  const openModal = (index: number) => {
+    setStartIndex(index);
+    setIsModalOpen(true);
   };
 
   // Vote handling logic
@@ -222,47 +216,18 @@ function ReviewCard({ review }: { review: Review }) {
         {review.media && review.media.length > 0 && (
           <div className="mt-3 flex gap-3 overflow-x-auto pb-1 no-scrollbar">
             {review.media.slice(0, MAX_THUMBS).map((mediaItem, mediaIndex) => (
-              <button
+              <ReviewMediaThumb
                 key={mediaItem.id}
-                onClick={() => openLightbox(mediaIndex)}
-                className="relative shrink-0 group"
-                aria-label={mediaItem.type === 'video' ? 'Open video' : 'Open image'}
-              >
-                <div className="h-28 w-44 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 bg-muted">
-                  {mediaItem.type === 'image' ? (
-                    <img
-                      src={mediaItem.url}
-                      alt={mediaItem.alt || ''}
-                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="relative h-full w-full">
-                      <video
-                        src={mediaItem.url}
-                        className="h-full w-full object-cover"
-                        muted
-                        playsInline
-                        preload="metadata"
-                        poster={`${mediaItem.url}#t=0.1`}
-                      />
-                      {/* Play icon overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 group-hover:bg-black/70 group-hover:scale-110">
-                          <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </button>
+                item={mediaItem}
+                onClick={() => openModal(mediaIndex)}
+              />
             ))}
 
             {/* +X more tile */}
             {review.media.length > MAX_THUMBS && (
               <button
-                onClick={() => openLightbox(MAX_THUMBS)}
-                className="relative h-28 w-24 shrink-0 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/70 transition-colors duration-200"
+                onClick={() => openModal(MAX_THUMBS)}
+                className="relative h-28 w-24 shrink-0 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/70 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 aria-label={`Open ${review.media.length - MAX_THUMBS} more items`}
               >
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -319,12 +284,14 @@ function ReviewCard({ review }: { review: Review }) {
         </div>
       </CardContent>
 
-      {/* Lightbox */}
-      {lightboxOpen && review.media && review.media.length > 0 && (
-        <MediaLightbox
-          items={review.media}
-          startIndex={lightboxIndex}
-          onClose={() => setLightboxOpen(false)}
+      {/* Fullscreen Media Modal */}
+      {isModalOpen && review.media && review.media.length > 0 && (
+        <FullscreenMediaModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          mediaUrl={review.media.map(m => m.url)}
+          mediaType={review.media.map(m => m.type)}
+          initialIndex={startIndex}
         />
       )}
     </Card>

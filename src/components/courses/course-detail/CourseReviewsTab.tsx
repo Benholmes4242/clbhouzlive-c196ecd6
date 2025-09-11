@@ -5,6 +5,8 @@ import { Star } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import ReviewsTab from '@/components/profile/ReviewsTab';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { MediaItem } from '@/types/media';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -20,14 +22,10 @@ interface ReviewData {
   display_name?: string | null;
   username?: string | null;
   profile_photo_url?: string | null;
-  media?: Array<{
-    id: string;
-    media_url: string;
-    media_type: 'image' | 'video';
-    file_name?: string;
-  }>;
-  likes_count?: number;
-  user_liked?: boolean;
+  media?: MediaItem[];
+  helpful_count?: number;
+  unhelpful_count?: number;
+  user_vote?: string;
 }
 
 const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
@@ -112,12 +110,25 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
           display_name: profile?.display_name,
           username: profile?.username,
           profile_photo_url: profile?.profile_photo_url,
-          media: reviewMedia.map(m => ({
-            id: m.id,
-            media_url: m.media_url,
-            media_type: m.media_type as 'image' | 'video',
-            file_name: m.file_name
-          })),
+          media: reviewMedia.map(m => {
+            if (m.media_type === 'video') {
+              const streamId = getStreamIdFromUrl(m.media_url);
+              return {
+                id: m.id,
+                type: 'video' as const,
+                url: m.media_url,
+                streamId,
+                posterUrl: getStreamPoster(m.media_url, '1s') ?? undefined,
+                alt: m.file_name ?? 'Video',
+              };
+            }
+            return { 
+              id: m.id, 
+              type: 'image' as const, 
+              url: m.media_url, 
+              alt: m.file_name ?? 'Photo' 
+            };
+          }) as MediaItem[],
           helpful_count: rating.helpful_count || 0,
           unhelpful_count: rating.unhelpful_count || 0,
           user_vote: userVote?.value === 1 ? 'helpful' : userVote?.value === -1 ? 'unhelpful' : 'none'
@@ -125,7 +136,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
       });
 
       return {
-        reviews: reviewsWithProfiles as ReviewData[],
+        reviews: reviewsWithProfiles,
         stats: {
           average: averageRating,
           total: totalRatings
@@ -162,12 +173,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
     unhelpfulCount: (review as any).unhelpful_count || 0,
     userVote: (review as any).user_vote || 'none',
     isYourReview: isUserReview(review),
-    media: review.media?.map(m => ({
-      id: m.id,
-      type: m.media_type,
-      url: m.media_url,
-      alt: m.file_name || ''
-    })) || []
+    media: review.media || []
   })) || [];
 
   if (isLoading) {
