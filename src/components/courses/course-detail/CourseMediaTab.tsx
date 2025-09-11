@@ -2,12 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import ExploreGrid from '@/components/explore/ExploreGrid';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
-import { Play, Image as ImageIcon, X } from 'lucide-react';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
-// New MediaGrid imports
+import { Image as ImageIcon } from 'lucide-react';
+// MediaGrid imports
 import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { MediaItem as NewMediaItem } from '@/components/media-grid';
 
@@ -37,7 +35,6 @@ interface MediaItem {
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
-  const [useNewMediaGrid, setUseNewMediaGrid] = useState(true); // Toggle for A/B testing
 
   // Get portal target for fullscreen modal
   useEffect(() => {
@@ -70,17 +67,9 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     [exploreItems]
   );
 
-  const handleMediaClick = (item: ExploreContentItem | NewMediaItem) => {
+  const handleMediaClick = (item: NewMediaItem) => {
     const index = exploreItems.findIndex(media => media.id === item.id);
     setSelectedMediaIndex(index);
-  };
-
-  const handleLike = () => {
-    // Club media doesn't have likes - empty function for ExploreGrid compatibility
-  };
-
-  const handleFollow = () => {
-    // Club media doesn't have follows - empty function for ExploreGrid compatibility
   };
 
   if (isLoading) {
@@ -133,42 +122,17 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Toggle for testing - can be removed in production */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <button
-          onClick={() => setUseNewMediaGrid(!useNewMediaGrid)}
-          className="underline hover:text-foreground"
-        >
-          {useNewMediaGrid ? 'Switch to ExploreGrid' : 'Switch to MediaGrid'}
-        </button>
-        <span>({useNewMediaGrid ? 'New MediaGrid' : 'Original ExploreGrid'})</span>
-      </div>
-
-      {useNewMediaGrid ? (
-        /* New MediaGrid with modalMedia preset */
-        <MediaGrid
-          items={mediaItems}
-          config={{
-            ...GRID_PRESETS.modalMedia,
-            interactions: {
-              onMediaClick: handleMediaClick
-            }
-          }}
-          isLoading={isLoading}
-        />
-      ) : (
-        /* Original ExploreGrid for comparison */
-        <ExploreGrid
-          content={exploreItems}
-          onLike={handleLike}
-          onFollow={handleFollow}
-          onMediaClick={handleMediaClick}
-          isLoading={false}
-          hasMore={false}
-          onLoadMore={() => {}}
-          hideBadges={true}
-        />
-      )}
+      {/* MediaGrid with modalMedia preset */}
+      <MediaGrid
+        items={mediaItems}
+        config={{
+          ...GRID_PRESETS.modalMedia,
+          interactions: {
+            onMediaClick: handleMediaClick
+          }
+        }}
+        isLoading={isLoading}
+      />
 
       {/* Fullscreen Modal */}
       {renderFullscreenModal()}
