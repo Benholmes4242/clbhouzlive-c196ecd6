@@ -62,7 +62,7 @@ export const GRID_PRESETS: Record<string, MediaGridConfig> = {
   modalMedia: {
     layout: 'modal',
     columns: { mobile: 2, tablet: 3, desktop: 4 },
-    spacing: 'normal',
+    spacing: 'tight',
     aspectRatio: 'square',
     features: {
       heroCards: false,
