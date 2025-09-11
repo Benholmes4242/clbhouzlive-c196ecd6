@@ -106,7 +106,6 @@ function ReviewCard({ review }: { review: Review }) {
   const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
-  const [clamped, setClamped] = React.useState(true);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
 
@@ -217,17 +216,7 @@ function ReviewCard({ review }: { review: Review }) {
         </div>
 
         {/* Body */}
-        <div className="mt-3 text-base leading-relaxed">
-          <p className={clamped ? "line-clamp-3" : ""}>{review.text}</p>
-          {needsClamp(review.text) && (
-            <button
-              className="mt-1 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
-              onClick={() => setClamped((v) => !v)}
-            >
-              {clamped ? "Read more" : "Show less"}
-            </button>
-          )}
-        </div>
+        <ReviewText text={review.text} />
 
         {/* Media Strip */}
         {review.media && review.media.length > 0 && (
@@ -386,7 +375,10 @@ function sentimentFromAvg(avg: number) {
 }
 
 function needsClamp(text: string) {
-  return text && text.length > 180;
+  // More accurate check: count words and estimated lines
+  // Rough estimate: ~12-15 words per line on average
+  const wordCount = text.trim().split(/\s+/).length;
+  return wordCount > 50; // Approximately 4 lines worth of text
 }
 
 function toLocale(n: number) {
@@ -400,6 +392,32 @@ function getInitials(name: string) {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+}
+
+/* ---------- Review Text Component ---------- */
+
+function ReviewText({ text }: { text: string }) {
+  const [expanded, setExpanded] = React.useState(false);
+  
+  // Check if text needs truncation
+  const needsTruncation = needsClamp(text);
+
+  return (
+    <div className="mt-3 text-base leading-relaxed">
+      <p className={expanded ? "" : "line-clamp-4"}>
+        {text}
+      </p>
+      
+      {needsTruncation && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-2 text-sm font-medium text-primary hover:underline underline-offset-4 transition-colors"
+        >
+          {expanded ? "Show less" : "Read more"}
+        </button>
+      )}
+    </div>
+  );
 }
 
 /* ---------- Mock usage (safe to remove when wired) ---------- */
