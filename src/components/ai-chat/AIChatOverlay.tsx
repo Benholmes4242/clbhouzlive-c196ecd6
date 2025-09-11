@@ -511,9 +511,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <div 
             className="w-full flex flex-col overflow-hidden animate-scale-in"
             style={{
-              width: '448px',
-              minWidth: '448px',
-              maxWidth: '448px',
+              width: window.innerWidth <= 768 ? MODAL_PANEL_SIZES.mobileWidth : MODAL_PANEL_SIZES.desktopWidth,
+              maxWidth: MODAL_PANEL_SIZES.desktopMaxWidth,
               height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)',
               background: 'rgba(246, 247, 246, 0.85)',
               backdropFilter: 'blur(20px)',

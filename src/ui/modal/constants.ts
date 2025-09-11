@@ -38,9 +38,9 @@ export const MODAL_ANIMATION = {
 } as const;
 
 export const MODAL_Z_INDEX = {
-  container: 'z-[1000]',     // Main modal container
-  panel: 'z-10',             // Panel within container
-  portal: 'z-[1001]',        // Portal for nested content
+  container: 9998,           // Main modal container - higher to prevent background bleed
+  panel: 9999,               // Panel within container
+  portal: 10000,             // Portal for nested content
 } as const;
 
 export const MODAL_OVERLAY = {
