@@ -7,8 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from "@/lib/utils";
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
+import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import ReviewMediaThumb from './ReviewMediaThumb';
 import { MediaItem } from '@/types/media';
+import { ExploreContentItem } from '@/components/explore/types';
+import { FLAGS } from '@/config/flags';
 
 type Review = {
   id: string;
@@ -28,6 +32,7 @@ type ReviewsTabProps = {
   totalReviews: number;        // e.g. 124
   sentimentLabel?: string;     // e.g. "Very Positive"
   reviews: Review[];
+  onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
 };
 
 export default function ReviewsTab({
@@ -94,7 +99,15 @@ function SummaryBar({
 
 /* ---------- Review Card ---------- */
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ 
+  review, 
+  reviewIndex, 
+  onThumbClick 
+}: { 
+  review: Review; 
+  reviewIndex?: number;
+  onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
+}) {
   const { user } = useSupabaseSession();
   const [helpful, setHelpful] = React.useState(review.helpfulCount);
   const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
@@ -106,8 +119,12 @@ function ReviewCard({ review }: { review: Review }) {
   const MAX_THUMBS = 3;
 
   const openModal = (index: number) => {
-    setStartIndex(index);
-    setIsModalOpen(true);
+    if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA && onThumbClick && reviewIndex !== undefined) {
+      onThumbClick(reviewIndex, index);
+    } else {
+      setStartIndex(index);
+      setIsModalOpen(true);
+    }
   };
 
   // Vote handling logic
@@ -284,8 +301,8 @@ function ReviewCard({ review }: { review: Review }) {
         </div>
       </CardContent>
 
-      {/* Fullscreen Media Modal */}
-      {isModalOpen && review.media && review.media.length > 0 && (
+      {/* Fullscreen Media Modal (only when not using vertical feed) */}
+      {!FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA && isModalOpen && review.media && review.media.length > 0 && (
         <FullscreenMediaModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

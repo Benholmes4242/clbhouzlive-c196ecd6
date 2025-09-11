@@ -31,6 +31,7 @@ interface DiscoverVerticalFeedProps {
   isLoadingMore: boolean;
   onScroll?: (scrollDirection: 'up' | 'down') => void;
   initialItem?: ExploreContentItem;
+  initialMediaIndex?: number;
 }
 
 // VideoWithAutoplay component with observer-controlled playback
@@ -97,7 +98,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   hasMore,
   isLoadingMore,
   onScroll,
-  initialItem
+  initialItem,
+  initialMediaIndex = 0
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -175,6 +177,15 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       const index = posts.findIndex(post => post.id === initialItem.id);
       if (index !== -1) {
         setCurrentIndex(index);
+        
+        // Set initial media index for the initial item if provided
+        if (initialMediaIndex > 0) {
+          setCurrentMediaIndices(prev => ({
+            ...prev,
+            [initialItem.id]: initialMediaIndex
+          }));
+        }
+        
         // Scroll to the correct item
         if (scrollViewRef.current) {
           const element = scrollViewRef.current;
@@ -183,7 +194,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
         }
       }
     }
-  }, [isOpen, initialItem, posts]);
+  }, [isOpen, initialItem, posts, initialMediaIndex]);
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({

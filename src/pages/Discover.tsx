@@ -15,8 +15,8 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
-  // Feature flag to toggle between FullscreenMediaModal and DiscoverVerticalFeed
-  const USE_MODAL_DISCOVER = true; // set false to revert to DiscoverVerticalFeed
+  // Use vertical feed for consistency with Activity tab
+  const USE_MODAL_DISCOVER = false; // using DiscoverVerticalFeed for consistency
   
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,9 +37,11 @@ const Discover = () => {
   
   const { 
     isOpen: isFeedOpen, 
+    posts: feedPosts,
     initialItem, 
     openFeed, 
-    closeFeed 
+    closeFeed,
+    setPosts
   } = useVerticalMediaFeed();
 
 
@@ -64,7 +66,8 @@ const Discover = () => {
         setModalOpen(true);
       }
     } else {
-      // Use old vertical feed
+      // Use vertical feed - set posts and open feed
+      setPosts(uniqueContent);
       openFeed(item);
     }
   };
@@ -219,12 +222,12 @@ const Discover = () => {
             // Optional: Add user info if available from posts
           />
         ) : (
-          // Old DiscoverVerticalFeed approach
+          // DiscoverVerticalFeed approach
           initialItem && (
             <DiscoverVerticalFeed
               isOpen={isFeedOpen}
               onClose={closeFeed}
-              posts={uniqueContent}
+              posts={feedPosts}
               onLike={handleLike}
               onLoadMore={loadMore}
               hasMore={hasMore}

@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
+import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
 import { Image as ImageIcon } from 'lucide-react';
 // MediaGrid imports
@@ -10,6 +12,7 @@ import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/comp
 import type { MediaItem as NewMediaItem } from '@/components/media-grid';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
+import { FLAGS } from '@/config/flags';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -39,6 +42,16 @@ interface LocalMediaItem {
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
+
+  // Vertical feed for consistent UX
+  const { 
+    isOpen: isFeedOpen, 
+    posts: feedPosts,
+    initialItem, 
+    openFeed, 
+    closeFeed,
+    setPosts
+  } = useVerticalMediaFeed();
 
   // Get portal target for fullscreen modal
   useEffect(() => {
@@ -72,8 +85,24 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   );
 
   const handleMediaClick = (item: NewMediaItem) => {
-    const index = exploreItems.findIndex(media => media.id === item.id);
-    setSelectedMediaIndex(index);
+    if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA) {
+      const index = exploreItems.findIndex(media => media.id === item.id);
+      if (index !== -1) {
+        setPosts(exploreItems);
+        openFeed(exploreItems[index]);
+      }
+    } else {
+      const index = exploreItems.findIndex(media => media.id === item.id);
+      setSelectedMediaIndex(index);
+    }
+  };
+
+  const handleLike = (contentId: string) => {
+    // Handle like functionality for vertical feed
+  };
+
+  const handleLoadMore = () => {
+    // Handle load more for vertical feed if needed
   };
 
   if (isLoading) {
@@ -159,8 +188,23 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         isLoading={isLoading}
       />
 
-      {/* Fullscreen Modal */}
-      {renderFullscreenModal()}
+      {/* Conditional Modal/Feed based on feature flag */}
+      {FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA ? (
+        initialItem && (
+          <DiscoverVerticalFeed
+            isOpen={isFeedOpen}
+            onClose={closeFeed}
+            posts={feedPosts}
+            onLike={handleLike}
+            onLoadMore={handleLoadMore}
+            hasMore={false}
+            isLoadingMore={false}
+            initialItem={initialItem}
+          />
+        )
+      ) : (
+        renderFullscreenModal()
+      )}
     </div>
   );
 };
