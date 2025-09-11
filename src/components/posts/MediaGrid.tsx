@@ -26,7 +26,7 @@ const MediaGrid = ({
         <div className="grid grid-cols-3 gap-1 p-1">
           {previewUrls.map((url, index) => (
             <div 
-              key={index}
+              key={`media-${index}-${url.slice(-20)}`}
               className="aspect-square relative cursor-pointer"
               onClick={() => onImageClick(index)}
             >
