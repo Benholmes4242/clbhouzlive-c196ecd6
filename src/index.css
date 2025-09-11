@@ -550,23 +550,25 @@
   position: relative;
 }
 
-/* Hero Image Container with Responsive Aspect Ratios */
-.course-hero-container {
-  aspect-ratio: 16 / 9;
-  min-height: 24rem; /* 384px */
-  max-height: 32rem; /* 512px */
+/* Fixed Hero Section - Stable across tab switches */
+.course-hero-fixed {
   position: relative;
+  width: 100%;
+  height: 24rem; /* Fixed height for mobile */
   overflow: hidden;
   display: block;
-  width: 100%;
   border-bottom-left-radius: 0 !important;
 }
 
-/* Course Hero Image with Fade-in Animation */
-.course-hero-image {
+/* Fixed Hero Image - Absolute positioning for stability */
+.course-hero-image-fixed {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  display: block;
+  object-fit: cover;
+  object-position: center;
   border-radius: 8px;
   opacity: 0;
   transition: opacity 0.3s ease-in;
@@ -575,10 +577,9 @@
   image-rendering: optimize-contrast;
   backface-visibility: hidden;
   transform: translateZ(0);
-  will-change: transform, opacity;
 }
 
-.course-hero-image.loaded {
+.course-hero-image-fixed.loaded {
   opacity: 1;
 }
 
@@ -589,30 +590,26 @@
     padding-right: 0;
   }
   
-  .course-hero-container {
-    aspect-ratio: 4 / 3;
-    min-height: 20rem;
-    max-height: 24rem;
+  .course-hero-fixed {
+    height: 20rem;
   }
   
-  .course-hero-image {
+  .course-hero-image-fixed {
     border-radius: 0;
   }
 }
 
 /* Tablet optimization */
 @media (min-width: 769px) and (max-width: 1023px) {
-  .course-hero-container {
-    aspect-ratio: 16 / 9;
-    max-height: 28rem;
+  .course-hero-fixed {
+    height: 28rem;
   }
 }
 
 /* Desktop optimization for hero images */
 @media (min-width: 1024px) {
-  .course-hero-container {
-    aspect-ratio: 21 / 9; /* Wider cinematic ratio for desktop */
-    max-height: 32rem; /* 512px */
+  .course-hero-fixed {
+    height: 32rem; /* Fixed 512px height */
   }
 }
 
