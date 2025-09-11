@@ -94,7 +94,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 w-10 h-10 rounded-lg flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
             aria-label="Go back"
           >
             <IoMdArrowBack className="h-5 w-5 text-white" />
