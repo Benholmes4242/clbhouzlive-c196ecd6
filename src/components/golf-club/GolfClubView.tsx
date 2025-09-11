@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
-import CourseLeaderboardTab from '@/components/courses/course-detail/CourseLeaderboardTab';
+
 
 interface GolfClubViewProps {
   courseId: string;
@@ -172,11 +172,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Liquid Glass Tab Navigation - overlaid on hero */}
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-12 backdrop-blur-md bg-white/10 border-t border-white/20 rounded-none">
+            <TabsList className="grid w-full grid-cols-3 h-12 backdrop-blur-md bg-white/10 border-t border-white/20 rounded-none">
               <TabsTrigger value="about" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">About</TabsTrigger>
               <TabsTrigger value="reviews" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Reviews</TabsTrigger>
               <TabsTrigger value="media" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Media</TabsTrigger>
-              <TabsTrigger value="leaderboard" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Leaderboard</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -197,9 +196,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             <CourseMediaTab courseId={course.id} />
           </TabsContent>
           
-          <TabsContent value="leaderboard" className="mt-0">
-            <CourseLeaderboardTab courseId={course.id} />
-          </TabsContent>
         </Tabs>
       </div>
 
