@@ -9,6 +9,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 
 import { MediaItem } from '@/types/media';
+import { getStreamPoster } from '@/utils/stream';
 
 interface LocalMediaItem {
   id: string;
@@ -91,6 +92,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           const result = await uploadVideo(file);
           if (result.success && result.videoUrl) {
             newItems.push({
+              id: crypto?.randomUUID?.() ?? `temp-${Date.now()}-${newItems.length}`,
               media_type: 'video' as const,
               media_url: result.videoUrl,
               thumbnail_url: result.thumbnailUrl,
@@ -104,6 +106,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           const result = await uploadImage(file);
           if (result.success && result.imageUrl) {
             newItems.push({
+              id: crypto?.randomUUID?.() ?? `temp-${Date.now()}-${newItems.length}`,
               media_type: 'image' as const,
               media_url: result.imageUrl,
               duration: 3000, // 3 seconds for images
@@ -114,13 +117,8 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
         }
       }
 
-      // Add temporary IDs and update local state
-      const itemsWithTempIds = newItems.map((item, index) => ({
-        ...item,
-        id: `temp_${Date.now()}_${index}`,
-      })) as MediaItem[];
-
-      setItems(prev => [...prev, ...itemsWithTempIds]);
+      // Update local state with new items (already have IDs)
+      setItems(prev => [...prev, ...newItems]);
       toast.success(`Added ${newItems.length} item(s). Remember to save your changes.`);
 
     } catch (error: any) {
