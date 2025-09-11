@@ -141,7 +141,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           </p>
           
           {/* Ranking badges */}
-          <div className="flex gap-2 flex-wrap [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px]">
+          <div className="flex gap-2 flex-wrap [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px] mb-3">
             {course.global_rank && (
               <div className="glass-badge-tight shadow-lg">
                 <Earth className="h-5 w-5 text-white" />
