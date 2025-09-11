@@ -61,7 +61,7 @@ export interface GridLayoutItem {
 export const GRID_PRESETS: Record<string, MediaGridConfig> = {
   modalMedia: {
     layout: 'modal',
-    columns: { mobile: 2, tablet: 3, desktop: 4 },
+    columns: { mobile: 3, tablet: 3, desktop: 4 },
     spacing: 'tight',
     aspectRatio: 'square',
     features: {
