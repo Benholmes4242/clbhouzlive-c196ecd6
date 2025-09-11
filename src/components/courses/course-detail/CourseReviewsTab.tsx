@@ -128,7 +128,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
               url: m.media_url, 
               alt: m.file_name ?? 'Photo' 
             };
-          }) as MediaItem[],
+          }),
           helpful_count: rating.helpful_count || 0,
           unhelpful_count: rating.unhelpful_count || 0,
           user_vote: userVote?.value === 1 ? 'helpful' : userVote?.value === -1 ? 'unhelpful' : 'none'

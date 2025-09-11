@@ -15,8 +15,8 @@ export interface ExtendedMediaItem extends BaseMediaItem {
   };
 }
 
-// Export both for compatibility
-export type MediaItem = ExtendedMediaItem;
+// Use the shared MediaItem type
+export type { MediaItem } from '@/types/media';
 
 export interface MediaGridConfig {
   layout: 'discover' | 'profile' | 'modal';

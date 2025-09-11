@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const posterUrl = `https://videodelivery.net/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
+      const posterUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
       
       const { error: updateError } = await supabaseClient
         .from('post_media')
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const posterUrl = `https://videodelivery.net/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
+      const posterUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?time=1s`;
       
       const { error: updateError } = await supabaseClient
         .from('course_review_media')
