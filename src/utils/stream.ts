@@ -1,5 +1,14 @@
 /**
  * Utilities for handling Cloudflare Stream video URLs and poster generation
+ * 
+ * @example
+ * // Extract stream ID from manifest URL
+ * const streamId = getStreamIdFromUrl('https://customer-4ah4gni80ytefpck.cloudflarestream.com/abc123/manifest/video.m3u8');
+ * // Returns: 'abc123'
+ * 
+ * // Generate poster URL from stream URL or ID
+ * const posterUrl = getStreamPoster('https://customer-4ah4gni80ytefpck.cloudflarestream.com/abc123/manifest/video.m3u8', '2s');
+ * // Returns: 'https://customer-4ah4gni80ytefpck.cloudflarestream.com/abc123/thumbnails/thumbnail.jpg?time=2s'
  */
 
 /**
