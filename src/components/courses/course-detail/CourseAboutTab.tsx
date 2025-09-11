@@ -255,16 +255,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       </div>
 
-      {/* Visit Website Button */}
+      {/* Mobile: Visit Website Button inline after Media section */}
       {course.website_url && (
-        <div className={`${isMobile ? 'fixed bottom-4 left-4 right-4 z-50' : 'mt-6'}`}>
+        <div className="block md:hidden mt-6">
           <Button
             onClick={handleWebsiteClick}
-            className={`w-full flex items-center justify-center gap-2 ${
-              isMobile 
-                ? 'bg-muted hover:bg-muted/80 text-foreground border' 
-                : 'bg-muted hover:bg-muted/80 text-foreground border'
-            }`}
+            className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border h-11 rounded-xl"
+            variant="outline"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Visit Website
+          </Button>
+        </div>
+      )}
+
+      {/* Desktop: Visit Website Button at bottom */}
+      {course.website_url && (
+        <div className="hidden md:block mt-6">
+          <Button
+            onClick={handleWebsiteClick}
+            className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border"
             variant="outline"
           >
             <ExternalLink className="h-4 w-4" />
