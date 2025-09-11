@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
 import Hls from 'hls.js';
+// Import shared modal constants for consistency with ProfileModalRouter
+import { MODAL_PANEL_SIZES, MODAL_ANIMATION, MODAL_Z_INDEX, MODAL_OVERLAY, MODAL_BEHAVIOUR } from '@/ui/modal/constants';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -760,9 +762,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     <div 
       className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
       style={{ 
-        zIndex: 9999
+        zIndex: 9999 // Keep Echo's current z-index (differs from ProfileModalRouter's z-[1000])
       }}
       onClick={(e) => {
+        // Using MODAL_BEHAVIOUR.closeOnOverlay pattern from ProfileModalRouter
         if (e.target === e.currentTarget) {
           onClose();
         }

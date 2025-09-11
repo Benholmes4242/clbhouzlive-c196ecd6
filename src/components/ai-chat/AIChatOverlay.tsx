@@ -17,6 +17,8 @@ import { useConversationSession } from '@/hooks/useConversationSession';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
+// Import shared modal constants for consistency with ProfileModalRouter
+import { MODAL_PANEL_SIZES, MODAL_ANIMATION, MODAL_Z_INDEX, MODAL_OVERLAY, MODAL_BEHAVIOUR } from '@/ui/modal/constants';
 
 interface ChatMessageData {
   id: string;
@@ -499,7 +501,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     <div 
       className="fixed inset-0 flex items-center justify-center p-4"
       style={{ 
-        zIndex: 9999,
+        zIndex: 9999, // Keep Echo's higher z-index for now
         backgroundColor: 'rgba(0, 0, 0, 0.35)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)'
