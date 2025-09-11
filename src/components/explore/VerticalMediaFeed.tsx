@@ -508,14 +508,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
                  {currentMedia.media_type === 'video' ? (
                   <div className="relative w-full h-full bg-media-loading">
-                    <EnhancedVideoPlayer
-                      src={currentMedia.media_url}
-                      autoplay={index === currentIndex}
-                      muted={isGloballyMuted}
-                      loop={true}
-                      className="w-full h-full"
-                      enableHLS={true}
-                    />
+                     <EnhancedVideoPlayer
+                       src={currentMedia.media_url}
+                       autoplay={index === currentIndex}
+                       muted={isGloballyMuted}
+                       loop={true}
+                       className="w-full h-full"
+                       enableHLS={true}
+                       objectFit="contain"
+                     />
                   </div>
                 ) : (
                   <div className="relative w-full h-full bg-media-loading">

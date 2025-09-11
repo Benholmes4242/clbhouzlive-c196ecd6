@@ -45,7 +45,7 @@ const VideoWithAutoplay: React.FC<{
   objectFit?: 'cover' | 'contain';
   shouldAttach: boolean;
   autoplay: boolean;
-}> = React.memo(({ src, muted, className, objectFit = 'cover', shouldAttach, autoplay }) => {
+}> = React.memo(({ src, muted, className, objectFit = 'contain', shouldAttach, autoplay }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
   
