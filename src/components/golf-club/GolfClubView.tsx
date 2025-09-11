@@ -116,6 +116,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           alt={course.name}
           loading="eager"
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
+          style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
@@ -180,8 +181,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Tab Content - Separated from hero section */}
-      <div className="course-hero-wrapper p-6">
+      {/* Tab Content */}
+      <div className="course-hero-wrapper p-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />
@@ -194,6 +195,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           <TabsContent value="media" className="mt-0">
             <CourseMediaTab courseId={course.id} />
           </TabsContent>
+          
         </Tabs>
       </div>
 
