@@ -7,6 +7,9 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
 import { Play, Image as ImageIcon, X } from 'lucide-react';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+// New MediaGrid imports
+import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
+import type { MediaItem as NewMediaItem } from '@/components/media-grid';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -34,6 +37,7 @@ interface MediaItem {
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
+  const [useNewMediaGrid, setUseNewMediaGrid] = useState(true); // Toggle for A/B testing
 
   // Get portal target for fullscreen modal
   useEffect(() => {
@@ -60,7 +64,13 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     [mediaResp]
   );
 
-  const handleMediaClick = (item: ExploreContentItem) => {
+  // Adapt for new MediaGrid
+  const mediaItems = useMemo(
+    () => adaptExploreContentToMediaItems(exploreItems),
+    [exploreItems]
+  );
+
+  const handleMediaClick = (item: ExploreContentItem | NewMediaItem) => {
     const index = exploreItems.findIndex(media => media.id === item.id);
     setSelectedMediaIndex(index);
   };
@@ -123,18 +133,42 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Toggle for testing - can be removed in production */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <button
+          onClick={() => setUseNewMediaGrid(!useNewMediaGrid)}
+          className="underline hover:text-foreground"
+        >
+          {useNewMediaGrid ? 'Switch to ExploreGrid' : 'Switch to MediaGrid'}
+        </button>
+        <span>({useNewMediaGrid ? 'New MediaGrid' : 'Original ExploreGrid'})</span>
+      </div>
 
-      {/* Reuse ExploreGrid for consistent behavior */}
-      <ExploreGrid
-        content={exploreItems}
-        onLike={handleLike}
-        onFollow={handleFollow}
-        onMediaClick={handleMediaClick}
-        isLoading={false}
-        hasMore={false}
-        onLoadMore={() => {}}
-        hideBadges={true}
-      />
+      {useNewMediaGrid ? (
+        /* New MediaGrid with modalMedia preset */
+        <MediaGrid
+          items={mediaItems}
+          config={{
+            ...GRID_PRESETS.modalMedia,
+            interactions: {
+              onMediaClick: handleMediaClick
+            }
+          }}
+          isLoading={isLoading}
+        />
+      ) : (
+        /* Original ExploreGrid for comparison */
+        <ExploreGrid
+          content={exploreItems}
+          onLike={handleLike}
+          onFollow={handleFollow}
+          onMediaClick={handleMediaClick}
+          isLoading={false}
+          hasMore={false}
+          onLoadMore={() => {}}
+          hideBadges={true}
+        />
+      )}
 
       {/* Fullscreen Modal */}
       {renderFullscreenModal()}
