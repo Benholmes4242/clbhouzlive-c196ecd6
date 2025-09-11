@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { MediaItem } from '@/types/media';
 
@@ -33,12 +34,16 @@ interface AboutMediaStripProps {
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const [items, setItems] = useState<ExploreContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
+  
+  // Responsive limits: 9 on desktop, 3 on mobile
+  const maxItems = isMobile ? 3 : 9;
 
   useEffect(() => {
     const fetchMedia = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('get-club-media', {
-          body: { clubId, limit: 6 }
+          body: { clubId, limit: maxItems }
         });
 
         if (error) {
@@ -46,7 +51,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           setItems([]);
         } else {
           // Use edges array and adapt to ExploreContentItem format
-          const rawMedia = data?.edges?.slice(0, 3) || [];
+          const rawMedia = data?.edges?.slice(0, maxItems) || [];
           const adaptedItems = adaptClubMediaArrayToExploreItems(rawMedia);
           setItems(adaptedItems);
         }
@@ -61,7 +66,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     if (clubId) {
       fetchMedia();
     }
-  }, [clubId]);
+  }, [clubId, maxItems]);
 
   // Helper to extract Stream UID from HLS URL
   const extractStreamUidFromHls = (hls: string) => {
@@ -76,7 +81,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg`;
 
   // Build media objects for SquareCardMedia with proper image URLs
-  const mediaTiles = (items ?? []).slice(0, 3).map((item) => {
+  const mediaTiles = (items ?? []).slice(0, maxItems).map((item) => {
     const src = item.src ?? '';
     const isVideo = item.type === 'video';
 
@@ -113,8 +118,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     };
   });
 
-  // Ensure exactly 3 slots with placeholders
-  const displayItems = Array.from({ length: 3 }, (_, i) => mediaTiles[i] || null);
+  // Ensure slots with placeholders up to maxItems
+  const displayItems = Array.from({ length: maxItems }, (_, i) => mediaTiles[i] || null);
 
   if (loading) {
     return (
@@ -123,8 +128,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           <h3 className="text-xl font-semibold">Media</h3>
           <div className="w-12 h-4 bg-muted rounded animate-pulse" />
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
+        <div className={`grid gap-3 ${isMobile ? 'grid-cols-3' : 'grid-cols-3'}`}>
+          {Array.from({ length: maxItems }).map((_, i) => (
             <div key={i} className="aspect-[4/3] bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
@@ -148,8 +153,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {Array.from({ length: 3 }).map((_, i) => {
+      <div className={`grid gap-3 ${isMobile ? 'grid-cols-3' : 'grid-cols-3'}`}>
+        {Array.from({ length: maxItems }).map((_, i) => {
           const media = mediaTiles[i];
           return media ? (
             <button
