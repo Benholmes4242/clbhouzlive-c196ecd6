@@ -258,7 +258,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     const isVideo = file.type.startsWith('video/');
     
     // Create temporary media item
-    const tempMediaItem: MediaItem = {
+    const tempMediaItem: LocalMediaItem = {
       id: tempId,
       media_type: isVideo ? 'video' : 'image',
       media_url: URL.createObjectURL(file),
@@ -325,7 +325,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         if (error) throw error;
 
         // Update with final data
-        const finalMediaItem: MediaItem = {
+        const finalMediaItem: LocalMediaItem = {
           id: data.id,
           media_type: data.media_type as 'image' | 'video',
           media_url: data.media_url,

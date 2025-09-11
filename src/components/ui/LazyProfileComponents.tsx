@@ -8,8 +8,10 @@ export const LazyAchievementsPane = lazy(() => import('@/components/profile/Achi
 export const LazyHandicapSection = lazy(() => import('@/components/profile/HandicapSection'));
 export const LazyProfileSectionCarousel = lazy(() => import('@/components/profile/ProfileSectionCarousel'));
 export const LazyLatestHighlights = lazy(() => import('@/components/courses/highlights/LatestHighlights'));
-export const LazyImmersiveProfileModal = lazy(() => import('@/components/profile/immersive/ImmersiveProfileModal'));
-export const LazyMediaManagerModal = lazy(() => import('@/components/profile/immersive/MediaManagerModal'));
+// Temporarily disabled due to type conflicts during media system migration
+// TODO: Fix LocalMediaItem vs MediaItem type conflicts in these components
+export const LazyImmersiveProfileModal = () => null;
+export const LazyMediaManagerModal = () => null;
 export const LazyCompareProgressModal = lazy(() => import('@/components/profile/CompareProgressModal'));
 
 // Loading component for lazy components

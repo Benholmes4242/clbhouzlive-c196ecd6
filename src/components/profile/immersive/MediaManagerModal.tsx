@@ -68,7 +68,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
     setUploading(true);
 
     try {
-      const newItems: Partial<MediaItem>[] = [];
+      const newItems: LocalMediaItem[] = [];
 
       for (const file of Array.from(files)) {
         if (file.type.startsWith('video/')) {
@@ -91,7 +91,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           const result = await uploadVideo(file);
           if (result.success && result.videoUrl) {
             newItems.push({
-              media_type: 'video',
+              media_type: 'video' as const,
               media_url: result.videoUrl,
               thumbnail_url: result.thumbnailUrl,
               duration: Math.round(Math.min(video.duration * 1000, 20000)), // Convert to ms, cap at 20s, ensure integer
@@ -104,7 +104,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           const result = await uploadImage(file);
           if (result.success && result.imageUrl) {
             newItems.push({
-              media_type: 'image',
+              media_type: 'image' as const,
               media_url: result.imageUrl,
               duration: 3000, // 3 seconds for images
               display_order: items.length + newItems.length,
