@@ -967,7 +967,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               Get instant feedback and drills from Swing Coach.
             </p>
             
-            <div className="text-left w-full px-4">
+            <div className="text-left max-w-sm mx-auto">
               <p className="text-sm font-medium mb-3">Best results:</p>
               <ul className="text-sm space-y-1 text-muted-foreground">
                 <li>• Face-on or down-the-line, full body, good lighting</li>
@@ -1061,7 +1061,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
             {isAnalyzing && (
               <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3 w-full">
+                <div className="bg-muted rounded-lg p-3 max-w-[80%]">
                   <SwingAnalysisLoader isAnalyzing={isAnalyzing} />
                 </div>
               </div>
