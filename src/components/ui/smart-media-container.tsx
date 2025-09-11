@@ -4,13 +4,11 @@ import EnhancedVideoPlayer from './enhanced-video-player';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
-interface MediaItem {
-  id: string;
-  type: 'image' | 'video';
-  url: string;
+import { MediaItem as BaseMediaItem } from '@/types/media';
+
+interface MediaItem extends BaseMediaItem {
   poster?: string;
   aspectRatio?: number;
-  alt?: string;
 }
 
 interface SmartMediaContainerProps {

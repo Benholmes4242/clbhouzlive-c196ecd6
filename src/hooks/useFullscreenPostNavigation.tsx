@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface MediaItem {
-  url: string;
-  type: 'image' | 'video';
-  alt?: string;
+import { MediaItem as BaseMediaItem } from '@/types/media';
+
+interface MediaItem extends BaseMediaItem {
   golfCourse?: {
     id: string;
     name: string;

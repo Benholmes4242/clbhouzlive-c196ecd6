@@ -19,9 +19,23 @@
 export function getStreamIdFromUrl(url: string): string | null {
   if (!url) return null;
   
-  // Match pattern: cloudflarestream.com/<STREAM_ID>/
-  const match = url.match(/cloudflarestream\.com\/([^/]+)\//i);
-  return match?.[1] ?? null;
+  // Match various Cloudflare Stream URL patterns
+  const patterns = [
+    /\/([a-f0-9]{32})\/manifest\/video\.m3u8/i,
+    /\/([a-f0-9]{32})\/thumbnails\//i,
+    /videodelivery\.net\/([a-f0-9]{32})/i,
+    /customer-[^.]+\.cloudflarestream\.com\/([a-f0-9]{32})/i,
+    /cloudflarestream\.com\/([^/]+)\//i  // Keep existing pattern for backward compatibility
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  return null;
 }
 
 /**

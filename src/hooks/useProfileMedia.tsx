@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface MediaItem {
-  id: string;
-  media_type: string;
-  media_url: string;
-  thumbnail_url?: string;
+import { PostMediaItem } from '@/types/media';
+
+interface MediaItem extends PostMediaItem {
   duration: number;
   display_order: number;
   header_extended_url?: string;

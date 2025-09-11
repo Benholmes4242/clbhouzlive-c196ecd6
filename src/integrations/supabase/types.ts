@@ -449,7 +449,9 @@ export type Database = {
           id: string
           media_type: string
           media_url: string
+          poster_url: string | null
           review_id: string
+          stream_id: string | null
         }
         Insert: {
           created_at?: string
@@ -458,7 +460,9 @@ export type Database = {
           id?: string
           media_type: string
           media_url: string
+          poster_url?: string | null
           review_id: string
+          stream_id?: string | null
         }
         Update: {
           created_at?: string
@@ -467,7 +471,9 @@ export type Database = {
           id?: string
           media_type?: string
           media_url?: string
+          poster_url?: string | null
           review_id?: string
+          stream_id?: string | null
         }
         Relationships: [
           {
@@ -751,6 +757,8 @@ export type Database = {
           media_type: string
           media_url: string
           post_id: string
+          poster_url: string | null
+          stream_id: string | null
         }
         Insert: {
           created_at?: string
@@ -758,6 +766,8 @@ export type Database = {
           media_type: string
           media_url: string
           post_id: string
+          poster_url?: string | null
+          stream_id?: string | null
         }
         Update: {
           created_at?: string
@@ -765,6 +775,8 @@ export type Database = {
           media_type?: string
           media_url?: string
           post_id?: string
+          poster_url?: string | null
+          stream_id?: string | null
         }
         Relationships: [
           {

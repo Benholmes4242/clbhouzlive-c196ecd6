@@ -20,6 +20,8 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { usePinchZoom } from '@/hooks/usePinchZoom';
+import { FLAGS } from '@/config/flags';
 
 
 interface DiscoverVerticalFeedProps {
@@ -90,6 +92,55 @@ const VideoWithAutoplay: React.FC<{
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
+// ImageWithPinchZoom component for image media with pinch-zoom support
+const ImageWithPinchZoom: React.FC<{
+  src: string;
+  alt?: string;
+  currentMediaIndex: number;
+  scale: number;
+  onSwipeDisabled: (disabled: boolean) => void;
+}> = ({ src, alt, currentMediaIndex, scale, onSwipeDisabled }) => {
+  const { ref, style, onTouchStart, onTouchMove, onTouchEnd, reset, scale: currentScale } = usePinchZoom();
+
+  // Disable swipe when zoomed
+  useEffect(() => {
+    onSwipeDisabled(currentScale > 1);
+  }, [currentScale, onSwipeDisabled]);
+
+  return (
+    <div className="relative w-full h-full bg-black">
+      <div
+        ref={ref}
+        style={FLAGS.USE_PINCH_ZOOM ? style : undefined}
+        onTouchStart={FLAGS.USE_PINCH_ZOOM ? onTouchStart : undefined}
+        onTouchMove={FLAGS.USE_PINCH_ZOOM ? onTouchMove : undefined}
+        onTouchEnd={FLAGS.USE_PINCH_ZOOM ? onTouchEnd : undefined}
+        className="flex items-center justify-center w-full h-full"
+      >
+        <img
+          src={src}
+          alt={alt}
+          className="max-h-[80vh] max-w-[90vw] object-contain select-none"
+          draggable={false}
+          loading="eager"
+          onError={(e) => {
+            e.currentTarget.src = '/placeholder.svg';
+          }}
+        />
+        {FLAGS.USE_PINCH_ZOOM && currentScale > 1 && (
+          <button
+            onClick={reset}
+            className="absolute bottom-4 right-4 rounded bg-black/50 text-white px-2 py-1 text-xs z-50"
+            aria-label="Reset zoom"
+          >
+            Reset zoom
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   isOpen,
   onClose,
@@ -113,6 +164,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [currentMediaIndices, setCurrentMediaIndices] = useState<{ [postId: string]: number }>({});
   const [shouldAttach, setShouldAttach] = useState<Record<string, boolean>>({});
   const [autoplay, setAutoplay] = useState<Record<string, boolean>>({});
+  const [swipeDisabled, setSwipeDisabled] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const nearObserverRef = useRef<IntersectionObserver | null>(null);
@@ -504,7 +556,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 startY = e.touches[0].clientY;
               },
               onTouchEnd: (e: any) => {
-                if (!startX || !startY) return;
+                if (!startX || !startY || swipeDisabled) return;
                 
                 const endX = e.changedTouches[0].clientX;
                 const endY = e.changedTouches[0].clientY;
@@ -587,17 +639,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     autoplay={!!autoplay[item.id]}
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-black">
-                    <img
-                      src={currentMedia.media_url}
-                      alt={item.title}
-                      className="w-full h-full object-contain"
-                      loading="eager" // Always load media to prevent grey placeholders
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                  </div>
+                  <ImageWithPinchZoom
+                    src={currentMedia.media_url}
+                    alt={item.title}
+                    currentMediaIndex={currentMediaIndex}
+                    scale={1} // This will be managed internally by the component
+                    onSwipeDisabled={setSwipeDisabled}
+                  />
                 )}
                 
                 {/* Navigation arrows for multiple media */}

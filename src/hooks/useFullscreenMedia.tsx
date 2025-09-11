@@ -1,10 +1,9 @@
 
 import { useState } from 'react';
 
-interface MediaItem {
-  url: string;
-  type: 'image' | 'video';
-  alt?: string;
+import { MediaItem as BaseMediaItem } from '@/types/media';
+
+interface MediaItem extends BaseMediaItem {
   golfCourse?: {
     id: string;
     name: string;
@@ -42,6 +41,7 @@ export const useFullscreenMedia = () => {
     const mediaTypes = Array.isArray(type) ? type : [type];
     
     setCurrentMedia({ 
+      id: `media-${Date.now()}`,
       url: mediaUrls[initialIndex], 
       type: mediaTypes[initialIndex], 
       alt, 

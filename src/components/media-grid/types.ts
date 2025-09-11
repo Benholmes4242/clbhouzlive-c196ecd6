@@ -1,9 +1,7 @@
-export interface MediaItem {
-  id: string;
-  type: 'video' | 'image';
-  src: string;
+import { MediaItem as BaseMediaItem } from '@/types/media';
+
+export interface MediaItem extends BaseMediaItem {
   title?: string;
-  alt?: string;
   user?: {
     id: string;
     name: string;
