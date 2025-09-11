@@ -31,7 +31,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   poster,
   className = '',
   aspectRatio = '4/5',
-  fit = 'cover',
+  fit = 'contain',
   showControls = false,
   showMuteButton = false,
   autoplay = false,

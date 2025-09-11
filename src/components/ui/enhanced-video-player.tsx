@@ -40,7 +40,7 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
   className = "",
   poster = "",
   preloadLevel = "metadata",
-  objectFit = "cover",
+  objectFit = "contain",
   enableHLS = true, // Default to true for HLS support
   hideControls = false,
   onLoadStart,

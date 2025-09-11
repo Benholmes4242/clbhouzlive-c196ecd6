@@ -172,7 +172,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                <HighQualityImage
                  src={thumbnailUrl}
                  alt={itemTitle || 'Video thumbnail'}
-                 className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   onLoad={handleImageLoad}
                   onError={handleImageError}
                  width={1200}
@@ -182,7 +182,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
               <video
                 src={media.media_url}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 preload="metadata"
                 muted
                 onLoadedMetadata={handleImageLoad}
@@ -205,7 +205,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
            <HighQualityImage
              src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
              alt={itemTitle || 'Content'}
-             className="w-full h-full object-cover"
+             className="w-full h-full object-contain"
               onLoad={handleImageLoad}
               onError={handleImageError}
              width={1200}

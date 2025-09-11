@@ -24,7 +24,7 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
   muted = true,
   loop = false,
   className = '',
-  objectFit = 'cover',
+  objectFit = 'contain',
   showMuteButton = false,
   onPlay,
   onPause,

@@ -31,7 +31,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   muted = true,
   loop = false,
   className = '',
-  objectFit = 'cover',
+  objectFit = 'contain',
   showMuteButton = false,
   onPlay,
   onPause,

@@ -478,6 +478,7 @@ const FullscreenMediaModal = ({
                 loop={true}
                 autoplay={true}
                 enableHLS={true}
+                objectFit="contain"
               />
             </div>
           )}

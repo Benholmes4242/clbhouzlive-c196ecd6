@@ -59,7 +59,7 @@ const VideoWithAutoplay: React.FC<{
           shouldAttach={shouldAttach}
           showMuteButton={false}
           externallyManaged={true}
-          fit={isDesktop ? 'contain' : 'cover'}
+          fit="contain"
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">
