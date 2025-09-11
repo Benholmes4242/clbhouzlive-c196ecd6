@@ -88,7 +88,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
-      {/* Hero Banner */}
+      {/* Extended Hero Banner - continues behind tabs */}
       <div className="course-hero-container relative overflow-hidden">
         {/* Back button for modal - positioned over hero image */}
         {isInModal && onClose && (
@@ -116,6 +116,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           alt={course.name}
           loading="eager"
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
+          style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
@@ -133,7 +134,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
         {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-6 left-6 text-white z-10">
+        <div className="absolute bottom-14 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
@@ -167,23 +168,22 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             )}
           </div>
         </div>
-      </div>
 
-
-      {/* Sticky Tab Navigation */}
-      <div className={isInModal ? "bg-background" : "sticky top-0 z-40 bg-background"}>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-12">
-            <TabsTrigger value="about" className="text-base">About</TabsTrigger>
-            <TabsTrigger value="reviews" className="text-base">Reviews</TabsTrigger>
-            <TabsTrigger value="media" className="text-base">Media</TabsTrigger>
-            <TabsTrigger value="leaderboard" className="text-base">Leaderboard</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Liquid Glass Tab Navigation - overlaid on hero */}
+        <div className="absolute bottom-0 left-0 right-0 z-30">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-4 h-12 backdrop-blur-md bg-white/10 border-t border-white/20 rounded-none">
+              <TabsTrigger value="about" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Reviews</TabsTrigger>
+              <TabsTrigger value="media" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Media</TabsTrigger>
+              <TabsTrigger value="leaderboard" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Leaderboard</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       {/* Tab Content */}
-      <div className="course-hero-wrapper p-6">
+      <div className="course-hero-wrapper p-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />
