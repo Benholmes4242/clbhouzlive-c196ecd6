@@ -87,6 +87,7 @@ function SummaryBar({
 
 function ReviewCard({ review }: { review: Review }) {
   const [helpful, setHelpful] = React.useState(review.helpfulCount);
+  const [unhelpful, setUnhelpful] = React.useState(0);
   const [clamped, setClamped] = React.useState(true);
 
   return (
@@ -143,6 +144,18 @@ function ReviewCard({ review }: { review: Review }) {
             <span aria-hidden className="text-base">👍</span>
             <span>Helpful</span>
             <span className="tabular-nums">({helpful})</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 rounded-md border px-2 py-1 flex items-center gap-1"
+            aria-pressed="false"
+            onClick={() => setUnhelpful((n) => n + 1)} // TODO: wire to API
+          >
+            <span aria-hidden className="text-base">👎</span>
+            <span>Unhelpful</span>
+            <span className="tabular-nums">({unhelpful})</span>
           </Button>
 
           {/* Future: comments + overflow menu */}

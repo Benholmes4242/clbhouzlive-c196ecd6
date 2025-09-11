@@ -137,7 +137,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute bottom-14 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
-            {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
+            {[course.region, course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
           
           {/* Ranking badges */}
