@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
 import Hls from 'hls.js';
+import { motion } from 'framer-motion';
 // Import shared modal constants for consistency with ProfileModalRouter
 import { MODAL_PANEL_SIZES, MODAL_ANIMATION, MODAL_Z_INDEX, MODAL_OVERLAY, MODAL_BEHAVIOUR } from '@/ui/modal/constants';
+import { panelVariants, overlayVariants, transition } from '@/ui/modal/variants';
+import { FLAGS } from '@/config/flags';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -758,43 +761,68 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   if (!isOpen) return null;
 
-  return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
-      style={{ 
-        zIndex: 9999 // Keep Echo's current z-index (differs from ProfileModalRouter's z-[1000])
-      }}
-      onClick={(e) => {
-        // Using MODAL_BEHAVIOUR.closeOnOverlay pattern from ProfileModalRouter
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
-    >
-      <div
-        className="w-full flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
-          minWidth: '448px',
-          maxWidth: '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
+  // Feature flag check for new behavior
+  if (!FLAGS.ECHO_MODAL_USE_PROFILE_BEHAVIOUR) {
+    // Legacy centered modal behavior
+    return (
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
+        style={{ 
+          zIndex: 9999
         }}
-        onWheel={(e) => {
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onScroll={(e) => e.stopPropagation()}
+      >
+        <div
+          className="w-full flex flex-col overflow-hidden animate-scale-in"
+          style={{
+            width: '448px',
+            minWidth: '448px',
+            maxWidth: '448px',
+            height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)',
+            background: 'rgba(246, 247, 246, 0.85)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: `
+              0 0 0 1px rgba(255, 255, 255, 0.08),
+              0 8px 32px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.08)
+            `
+          }}
+          onWheel={(e) => {
+            const target = e.currentTarget;
+            const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+            
+            if (scrollableElement) {
+              const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+              const isAtTop = scrollTop === 0;
+              const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+              
+              if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                e.preventDefault();
+              }
+            }
+            
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          {/* Legacy content */}
+        </div>
+      </div>
+    );
+  }
+
+  // New ProfileModalRouter-matching behavior - rendered inside panel
+  return (
           
           if (scrollableElement) {
             const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
