@@ -88,8 +88,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
-      {/* Fixed Hero Section - Photo + Tabs */}
-      <div className="course-hero-fixed">
+      {/* Extended Hero Banner - continues behind tabs */}
+      <div className="course-hero-container relative overflow-hidden">
         {/* Back button for modal - positioned over hero image */}
         {isInModal && onClose && (
           <button
@@ -115,7 +115,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           sizes="(max-width: 768px) 100vw, 1200px"
           alt={course.name}
           loading="eager"
-          className="course-hero-image-fixed"
+          className="course-hero-image w-full h-full object-cover !rounded-bl-none"
+          style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
@@ -180,20 +181,21 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Dynamic Tab Content - Only this section changes */}
-      <div className="bg-background">
+      {/* Tab Content */}
+      <div className="course-hero-wrapper p-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="about" className="mt-0 p-6">
+          <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />
           </TabsContent>
           
-          <TabsContent value="reviews" className="mt-0 p-6">
+          <TabsContent value="reviews" className="mt-0">
             <CourseReviewsTab courseId={course.id} courseName={course.name} />
           </TabsContent>
           
-          <TabsContent value="media" className="mt-0 p-6">
+          <TabsContent value="media" className="mt-0">
             <CourseMediaTab courseId={course.id} />
           </TabsContent>
+          
         </Tabs>
       </div>
 
