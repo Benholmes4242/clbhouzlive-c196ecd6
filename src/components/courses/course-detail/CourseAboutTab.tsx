@@ -136,17 +136,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.courseDesign)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-sm font-medium shadow-lg shadow-primary/20 overflow-hidden"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.courseDesign), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)',
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  background: 'linear-gradient(135deg, rgba(var(--primary-hsl), 0.3) 0%, rgba(var(--primary-hsl), 0.3) 100%)',
-                  border: '1px solid rgba(var(--primary-hsl), 0.4)'
+                  transform: 'translateY(-50%) translateX(-50%)'
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-                <span className="relative z-10 text-white font-bold">{formatScore(communityScores.courseDesign)}/10</span>
+                {formatScore(communityScores.courseDesign)}/10
               </div>
             </div>
           </div>
@@ -161,17 +157,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.courseCondition)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-sm font-medium shadow-lg shadow-primary/20 overflow-hidden"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.courseCondition), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)',
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  background: 'linear-gradient(135deg, rgba(var(--primary-hsl), 0.3) 0%, rgba(var(--primary-hsl), 0.3) 100%)',
-                  border: '1px solid rgba(var(--primary-hsl), 0.4)'
+                  transform: 'translateY(-50%) translateX(-50%)'
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-                <span className="relative z-10 text-white font-bold">{formatScore(communityScores.courseCondition)}/10</span>
+                {formatScore(communityScores.courseCondition)}/10
               </div>
             </div>
           </div>
@@ -186,17 +178,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 style={{ width: `${getScorePercentage(communityScores.facilities)}%` }}
               />
               <div 
-                className="absolute top-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-sm font-medium shadow-lg shadow-primary/20 overflow-hidden"
+                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
                 style={{ 
                   left: `${Math.min(getScorePercentage(communityScores.facilities), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)',
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  background: 'linear-gradient(135deg, rgba(var(--primary-hsl), 0.3) 0%, rgba(var(--primary-hsl), 0.3) 100%)',
-                  border: '1px solid rgba(var(--primary-hsl), 0.4)'
+                  transform: 'translateY(-50%) translateX(-50%)'
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-                <span className="relative z-10 text-white font-bold">{formatScore(communityScores.facilities)}/10</span>
+                {formatScore(communityScores.facilities)}/10
               </div>
             </div>
           </div>
