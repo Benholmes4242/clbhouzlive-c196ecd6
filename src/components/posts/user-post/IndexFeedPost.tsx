@@ -289,7 +289,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         }}
         mediaUrl={currentMedia?.mediaUrls || []}
         mediaType={currentMedia?.mediaTypes || []}
-        alt={currentMedia?.alt}
+        alt={currentMedia?.items?.[currentMedia?.initialIndex ?? 0]?.alt}
         golfCourse={golfCourse || undefined}
         user={currentMedia?.user}
         displayName={currentMedia?.displayName}

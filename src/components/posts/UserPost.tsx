@@ -106,9 +106,9 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
       <FullscreenMediaModal
         isOpen={isFullscreenOpen}
         onClose={closeMedia}
-        mediaUrl={currentMedia?.mediaUrls || currentMedia?.url || ''}
-        mediaType={currentMedia?.mediaTypes || currentMedia?.type || 'image'}
-        alt={currentMedia?.alt}
+        mediaUrl={currentMedia?.mediaUrls || []}
+        mediaType={currentMedia?.mediaTypes || []}
+        alt={currentMedia?.items?.[currentMedia?.initialIndex ?? 0]?.alt}
         golfCourse={currentMedia?.golfCourse}
         user={currentMedia?.user}
         displayName={currentMedia?.displayName}

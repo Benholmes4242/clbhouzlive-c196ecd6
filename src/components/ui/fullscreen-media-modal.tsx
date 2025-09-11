@@ -33,7 +33,8 @@ interface FullscreenMediaModalProps {
   };
   user?: {
     id: string;
-    profile_photo_url: string | null;
+    displayName?: string;
+    profile_photo_url?: string | null;
   };
   displayName?: string;
   content?: string | null;

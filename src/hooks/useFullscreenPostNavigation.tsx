@@ -133,7 +133,7 @@ export const useFullscreenPostNavigation = () => {
     type: 'image' | 'video' | ('image' | 'video')[], 
     alt?: string, 
     golfCourse?: { id: string; name: string; country: string; },
-    user?: { id: string; profile_photo_url: string | null; },
+    user?: { id: string; displayName?: string; profile_photo_url?: string | null; },
     displayName?: string,
     content?: string | null,
     postTags?: any[],
@@ -145,19 +145,23 @@ export const useFullscreenPostNavigation = () => {
   ) => {
     // Handle both single and multiple media
     const mediaUrls = Array.isArray(url) ? url : [url];
-    const mediaTypes = Array.isArray(type) ? type : [type];
+    const mediaTypes = (Array.isArray(type) ? type : [type]) as ('image' | 'video')[];
+    const items: MediaItem[] = mediaUrls.map((u, i) => ({
+      id: `media-${Date.now()}-${i}`,
+      type: mediaTypes[i] || 'image',
+      url: u,
+      alt
+    }));
     
     setCurrentMedia({ 
-      url: mediaUrls[initialIndex], 
-      type: mediaTypes[initialIndex], 
-      alt, 
-      golfCourse, 
-      user, 
-      displayName, 
-      content, 
-      postTags,
+      items,
       mediaUrls,
       mediaTypes,
+      user,
+      displayName,
+      content,
+      postTags,
+      golfCourse,
       initialIndex,
       videoPosition,
       videoMuted

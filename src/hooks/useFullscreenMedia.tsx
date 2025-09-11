@@ -12,7 +12,7 @@ export const useFullscreenMedia = () => {
     type: 'image' | 'video' | ('image' | 'video')[], 
     alt?: string, 
     golfCourse?: { id: string; name: string; country: string; },
-    user?: { id: string; profile_photo_url: string | null; },
+    user?: { id: string; displayName?: string; profile_photo_url?: string | null; },
     displayName?: string,
     content?: string | null,
     postTags?: any[],

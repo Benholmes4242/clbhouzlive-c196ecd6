@@ -4,12 +4,7 @@ import EnhancedVideoPlayer from './enhanced-video-player';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
-import type { MediaItem } from '@/types/media';
-
-interface ExtendedMediaItem extends MediaItem {
-  poster?: string;
-  aspectRatio?: number;
-}
+import type { ExtendedMediaItem } from '@/types/media';
 
 interface SmartMediaContainerProps {
   media: ExtendedMediaItem[];
@@ -73,7 +68,7 @@ const SmartMediaContainer: React.FC<SmartMediaContainerProps> = ({
     }
   };
 
-  const handleMediaClick = (mediaItem: MediaItem, index: number) => {
+  const handleMediaClick = (mediaItem: ExtendedMediaItem, index: number) => {
     onMediaClick?.(mediaItem, index);
   };
 
@@ -95,7 +90,7 @@ const SmartMediaContainer: React.FC<SmartMediaContainerProps> = ({
           loadedMedia.has(currentIndex) ? (
             <EnhancedVideoPlayer
               src={currentMedia.url}
-              poster={currentMedia.poster}
+              poster={currentMedia.poster ?? currentMedia.posterUrl ?? undefined}
               autoplay={autoplay && isInView}
               muted={true}
               loop={true}
