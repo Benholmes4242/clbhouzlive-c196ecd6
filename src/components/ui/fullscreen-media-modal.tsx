@@ -278,6 +278,32 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen]);
 
+  // Handle keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowRight') {
+        if (hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
+          setCurrentIndex(prev => prev + 1);
+        } else if (canNavigatePosts && onNextPost) {
+          onNextPost();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (hasMultipleMedia && currentIndex > 0) {
+          setCurrentIndex(prev => prev - 1);
+        } else if (canNavigatePosts && onPreviousPost) {
+          onPreviousPost();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose]);
+
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
     if (isOpen) {

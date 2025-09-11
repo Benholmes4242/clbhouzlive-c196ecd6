@@ -16,7 +16,9 @@ interface CourseMediaTabProps {
   portalTarget?: HTMLElement | null;
 }
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   source: 'post' | 'review';
   sourceId: string;

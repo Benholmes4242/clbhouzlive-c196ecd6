@@ -5,14 +5,16 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
 }
 
 interface MediaContainerProps {
-  media: MediaItem[];
+  media: LocalMediaItem[];
   currentIndex: number;
   isHovered: boolean;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;

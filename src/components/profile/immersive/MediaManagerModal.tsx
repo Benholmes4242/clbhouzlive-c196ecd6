@@ -8,7 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
@@ -25,7 +27,7 @@ interface MediaManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
-  mediaItems: MediaItem[];
+  mediaItems: LocalMediaItem[];
   onMediaUpdate: () => void;
 }
 
@@ -36,7 +38,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
   mediaItems,
   onMediaUpdate
 }) => {
-  const [items, setItems] = useState<MediaItem[]>(mediaItems);
+  const [items, setItems] = useState<LocalMediaItem[]>(mediaItems);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -10,14 +10,16 @@ import SmartCardMedia from './media/SmartCardMedia';
 import { CardType } from './media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   media_type: 'video' | 'image';
   media_url: string;
 }
 
 interface MediaDisplayProps {
-  media: MediaItem;
+  media: LocalMediaItem;
   itemTitle?: string;
   shouldAutoplay: boolean;
   isLoading: boolean;

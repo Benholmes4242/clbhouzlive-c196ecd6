@@ -4,7 +4,9 @@ import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   source: 'post' | 'review';
   sourceId: string;

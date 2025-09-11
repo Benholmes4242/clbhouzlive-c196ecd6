@@ -1,7 +1,9 @@
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   media_type: string;
   media_url: string;
@@ -9,7 +11,7 @@ interface MediaItem {
 }
 
 interface ResponsiveImmersiveHeaderProps {
-  mediaItems: MediaItem[];
+  mediaItems: LocalMediaItem[];
   isCollapsed?: boolean;
 }
 

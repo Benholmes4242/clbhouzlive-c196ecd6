@@ -13,7 +13,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
-interface MediaItem {
+import { MediaItem } from '@/types/media';
+
+interface LocalMediaItem {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
@@ -35,12 +37,12 @@ interface ImmersiveProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onMorphToHeader?: () => void;
-  mediaItems: MediaItem[];
+  mediaItems: LocalMediaItem[];
   initialIndex?: number;
   userId: string;
   onCurrentIndexChange?: (index: number) => void;
   uploadMode?: boolean;
-  onUploadComplete?: (mediaItem: MediaItem) => void;
+  onUploadComplete?: (mediaItem: LocalMediaItem) => void;
 }
 
 const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
@@ -58,7 +60,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [sessionId] = useState(() => `immersive_session_${Date.now()}`);
-  const [localMediaItems, setLocalMediaItems] = useState<MediaItem[]>(mediaItems);
+  const [localMediaItems, setLocalMediaItems] = useState<LocalMediaItem[]>(mediaItems);
   const [isVideoPaused, setIsVideoPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
