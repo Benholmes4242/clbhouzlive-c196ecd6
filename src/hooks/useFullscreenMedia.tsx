@@ -1,29 +1,11 @@
 
 import { useState } from 'react';
 
-import type { MediaItem } from '@/types/media';
-
-interface ExtendedMediaItem extends MediaItem {
-  golfCourse?: {
-    id: string;
-    name: string;
-    country: string;
-  };
-  user?: {
-    id: string;
-    profile_photo_url: string | null;
-  };
-  displayName?: string;
-  content?: string | null;
-  postTags?: any[];
-  mediaUrls?: string[];
-  mediaTypes?: ('image' | 'video')[];
-  initialIndex?: number;
-}
+import type { MediaItem, PostMediaContext } from '@/types/media';
 
 export const useFullscreenMedia = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
+  const [currentMedia, setCurrentMedia] = useState<PostMediaContext | null>(null);
 
   const openMedia = (
     url: string | string[], 
@@ -38,20 +20,24 @@ export const useFullscreenMedia = () => {
   ) => {
     // Handle both single and multiple media
     const mediaUrls = Array.isArray(url) ? url : [url];
-    const mediaTypes = Array.isArray(type) ? type : [type];
+    const mediaTypes = (Array.isArray(type) ? type : [type]) as ('image' | 'video')[];
+
+    const items: MediaItem[] = mediaUrls.map((u, i) => ({
+      id: `media-${Date.now()}-${i}`,
+      type: mediaTypes[i] || 'image',
+      url: u,
+      alt
+    }));
     
     setCurrentMedia({ 
-      id: `media-${Date.now()}`,
-      url: mediaUrls[initialIndex], 
-      type: mediaTypes[initialIndex], 
-      alt, 
+      items,
+      mediaUrls,
+      mediaTypes,
       golfCourse, 
-      user, 
+      user,
       displayName, 
       content, 
       postTags,
-      mediaUrls,
-      mediaTypes,
       initialIndex
     });
     setIsOpen(true);

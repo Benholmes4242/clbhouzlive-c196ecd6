@@ -12,13 +12,13 @@ interface ExtendedMediaItem extends MediaItem {
 }
 
 interface SmartMediaContainerProps {
-  media: MediaItem[];
+  media: ExtendedMediaItem[];
   className?: string;
   autoplay?: boolean;
   priority?: boolean;
   enableCarousel?: boolean;
   onMediaChange?: (index: number) => void;
-  onMediaClick?: (media: MediaItem, index: number) => void;
+  onMediaClick?: (media: ExtendedMediaItem, index: number) => void;
   lazyThreshold?: number;
   quality?: number;
 }

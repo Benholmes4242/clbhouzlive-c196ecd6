@@ -236,9 +236,9 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       <FullscreenMediaModal
         isOpen={isOpen}
         onClose={closeMedia}
-        mediaUrl={currentMedia?.url || ''}
-        mediaType={currentMedia?.type || 'image'}
-        alt={currentMedia?.alt}
+        mediaUrl={currentMedia ? (currentMedia.mediaUrls || currentMedia.items?.map(i => i.url) || '') : ''}
+        mediaType={currentMedia ? (currentMedia.mediaTypes || currentMedia.items?.map(i => i.type) || 'image') : 'image'}
+        alt={currentMedia ? currentMedia.items?.[currentMedia.initialIndex ?? 0]?.alt : undefined}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-import type { MediaItem } from '@/types/media';
+import type { MediaItem, PostMediaContext, MediaKind } from '@/types/media';
 
 interface ExtendedMediaItem extends MediaItem {
   golfCourse?: {
@@ -44,7 +44,7 @@ interface PostData {
 
 export const useFullscreenPostNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
+  const [currentMedia, setCurrentMedia] = useState<PostMediaContext | null>(null);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
@@ -104,21 +104,25 @@ export const useFullscreenPostNavigation = () => {
     }
   }, []);
 
-  // Convert post to media item
-  const postToMediaItem = useCallback((post: PostData, mediaIndex: number = 0): MediaItem => {
+  // Convert post to media context
+  const postToMediaItem = useCallback((post: PostData, mediaIndex: number = 0): PostMediaContext => {
     const mediaUrls = post.post_media.map(m => m.media_url);
     const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
+    const items: MediaItem[] = mediaUrls.map((u, i) => ({
+      id: `${post.id}-media-${i}`,
+      type: mediaTypes[i] || 'image',
+      url: u,
+      alt: 'Post content'
+    }));
     
     return {
-      url: mediaUrls[mediaIndex],
-      type: mediaTypes[mediaIndex],
-      alt: 'Post content',
-      user: post.user,
-      displayName: post.user.display_name || post.user.username || 'User',
-      content: post.content,
-      postTags: post.post_tags,
+      items,
       mediaUrls,
       mediaTypes,
+      displayName: post.user.display_name || post.user.username || 'User',
+      user: { id: post.user.id, profile_photo_url: post.user.profile_photo_url },
+      content: post.content,
+      postTags: post.post_tags,
       initialIndex: mediaIndex
     };
   }, []);
