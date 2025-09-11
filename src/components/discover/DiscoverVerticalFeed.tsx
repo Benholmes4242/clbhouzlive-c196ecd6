@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { createPortal } from 'react-dom';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { useModalState } from '@/hooks/useModalDetector';
 import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -120,6 +121,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   // Register modal state for Echo detection
   useModalState(isOpen);
+
+  // Lock body scroll when feed is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
 
   // Two-observer pattern for seamless autoplay
   useEffect(() => {
@@ -458,12 +469,11 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   if (!isOpen) return null;
 
   if (posts.length === 0) {
-    return <ClubhouzLoading />;
+    return createPortal(<ClubhouzLoading />, document.body);
   }
 
-  return (
-    <div className="fixed inset-0 z-[70] bg-black overflow-hidden">
-
+  const content = (
+    <div className="fixed inset-0 z-[1000] bg-black overflow-hidden">
       {/* Scrollable Content */}
       <div 
         ref={scrollViewRef}
@@ -796,6 +806,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       `}</style>
     </div>
   );
+
+  return createPortal(content, document.body);
 };
 
 export default DiscoverVerticalFeed;
