@@ -79,7 +79,7 @@ const ProfileModalRouter: React.FC = () => {
           className={`
             fixed z-[1000] flex
             ${isMobile 
-              ? 'top-0 left-0 right-0 bottom-16' 
+              ? 'top-0 left-0 right-0 bottom-0' 
               : 'inset-0'
             }
           `}
@@ -91,7 +91,7 @@ const ProfileModalRouter: React.FC = () => {
             className={`
               fixed bg-black/50 cursor-default
               ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-16' 
+                ? 'top-0 left-0 right-0 bottom-0' 
                 : 'inset-0'
               }
             `}
@@ -104,7 +104,7 @@ const ProfileModalRouter: React.FC = () => {
             className={`
               fixed right-0 bg-background shadow-2xl z-10
               ${isMobile 
-                ? 'w-full top-0 bottom-16' 
+                ? 'w-full top-0 bottom-0' 
                 : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl'
               }
             `}
