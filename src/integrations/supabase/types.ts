@@ -398,30 +398,36 @@ export type Database = {
         Row: {
           course_id: string
           created_at: string
+          helpful_count: number | null
           id: string
           rating: number
           review: string | null
           review_date: string | null
+          unhelpful_count: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           course_id: string
           created_at?: string
+          helpful_count?: number | null
           id?: string
           rating: number
           review?: string | null
           review_date?: string | null
+          unhelpful_count?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           course_id?: string
           created_at?: string
+          helpful_count?: number | null
           id?: string
           rating?: number
           review?: string | null
           review_date?: string | null
+          unhelpful_count?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -1030,6 +1036,33 @@ export type Database = {
           token?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      review_votes: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
         }
         Relationships: []
       }
@@ -1895,6 +1928,10 @@ export type Database = {
       }
       populate_taggable_entities: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      recalculate_review_vote_counts: {
+        Args: { review_id_param: string }
         Returns: undefined
       }
       send_push_notification: {

@@ -5,6 +5,9 @@ import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
 import { Play } from 'lucide-react';
 import MediaLightbox from "@/components/ui/MediaLightbox";
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { cn } from "@/lib/utils";
 
 type MediaItem = {
   id: string;
@@ -20,6 +23,8 @@ type Review = {
   dateISO: string;             // e.g. "2025-07-03"
   text: string;
   helpfulCount: number;
+  unhelpfulCount?: number;
+  userVote?: 'helpful' | 'unhelpful' | 'none';
   isYourReview?: boolean;
   media?: MediaItem[];         // Optional media array
 };
@@ -96,8 +101,11 @@ function SummaryBar({
 /* ---------- Review Card ---------- */
 
 function ReviewCard({ review }: { review: Review }) {
+  const { user } = useSupabaseSession();
   const [helpful, setHelpful] = React.useState(review.helpfulCount);
-  const [unhelpful, setUnhelpful] = React.useState(0);
+  const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
+  const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
+  const [pending, setPending] = React.useState(false);
   const [clamped, setClamped] = React.useState(true);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
@@ -109,6 +117,76 @@ function ReviewCard({ review }: { review: Review }) {
     setLightboxOpen(true);
   };
 
+  // Vote handling logic
+  const sendVote = async (nextVote: 'helpful' | 'unhelpful' | 'none') => {
+    if (!user) {
+      // TODO: Open auth modal - for now just return
+      console.log('User not authenticated, should open login modal');
+      return;
+    }
+
+    setPending(true);
+    const prev = { userVote, helpful, unhelpful };
+
+    // Optimistic update
+    const applyVote = (from: typeof userVote, to: typeof userVote) => {
+      let h = helpful, u = unhelpful;
+      if (from === 'helpful') h--;
+      if (from === 'unhelpful') u--;
+      if (to === 'helpful') h++;
+      if (to === 'unhelpful') u++;
+      setHelpful(h);
+      setUnhelpful(u);
+      setUserVote(to);
+    };
+
+    applyVote(userVote, nextVote);
+
+    try {
+      const response = await fetch(`https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/review-vote/${review.id}/vote`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          value: nextVote === 'none' ? 'none' : nextVote 
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Response handled above
+
+      // Trust server response
+      setHelpful(data.helpfulCount);
+      setUnhelpful(data.unhelpfulCount);
+      setUserVote(data.userVote);
+    } catch (error) {
+      console.error('Error voting:', error);
+      // Rollback on failure
+      setHelpful(prev.helpful);
+      setUnhelpful(prev.unhelpful);
+      setUserVote(prev.userVote);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const onHelpful = () => {
+    if (pending) return;
+    sendVote(userVote === 'helpful' ? 'none' : 'helpful');
+  };
+
+  const onUnhelpful = () => {
+    if (pending) return;
+    sendVote(userVote === 'unhelpful' ? 'none' : 'unhelpful');
+  };
+
   return (
     <Card className="rounded-xl border bg-background shadow-sm">
       <CardContent className="p-4 md:p-5">
@@ -118,8 +196,8 @@ function ReviewCard({ review }: { review: Review }) {
             <OptimizedAvatar
               src={review.user.avatarUrl}
               alt={`${review.user.name} avatar`}
-              size={40}
-              className="h-10 w-10 rounded-full object-cover"
+              size={48}
+              className="h-12 w-12 rounded-full object-cover ring-1 ring-black/5"
               fallback={getInitials(review.user.name)}
             />
             <div className="min-w-0">
@@ -213,9 +291,13 @@ function ReviewCard({ review }: { review: Review }) {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 rounded-md border px-2 py-1 flex items-center gap-1"
-            aria-pressed="false"
-            onClick={() => setHelpful((n) => n + 1)} // TODO: wire to API
+            className={cn(
+              "h-8 rounded-md border px-2 py-1 flex items-center gap-1 transition-colors",
+              userVote === 'helpful' && "bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-700 dark:text-green-400"
+            )}
+            aria-pressed={userVote === 'helpful'}
+            disabled={pending}
+            onClick={onHelpful}
           >
             <span aria-hidden className="text-base">👍</span>
             <span>Helpful</span>
@@ -225,9 +307,13 @@ function ReviewCard({ review }: { review: Review }) {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 rounded-md border px-2 py-1 flex items-center gap-1"
-            aria-pressed="false"
-            onClick={() => setUnhelpful((n) => n + 1)} // TODO: wire to API
+            className={cn(
+              "h-8 rounded-md border px-2 py-1 flex items-center gap-1 transition-colors",
+              userVote === 'unhelpful' && "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400"
+            )}
+            aria-pressed={userVote === 'unhelpful'}
+            disabled={pending}
+            onClick={onUnhelpful}
           >
             <span aria-hidden className="text-base">👎</span>
             <span>Unhelpful</span>

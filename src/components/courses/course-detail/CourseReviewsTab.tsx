@@ -41,7 +41,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
       // First get the ratings with reviews
       const { data: ratingsData, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select('id, rating, review, review_date, user_id')
+        .select('id, rating, review, review_date, user_id, helpful_count, unhelpful_count')
         .eq('course_id', courseId)
         .not('review', 'is', null)
         .not('review', 'eq', '')
@@ -76,6 +76,17 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
         mediaData = reviewMedia || [];
       }
 
+      // Get current user's votes for these reviews
+      let userVotes: any[] = [];
+      if (user?.id && ratingIds.length > 0) {
+        const { data: votesData } = await supabase
+          .from('review_votes')
+          .select('review_id, value')
+          .eq('user_id', user.id)
+          .in('review_id', ratingIds);
+        userVotes = votesData || [];
+      }
+
       // Get overall course stats for the summary
       const { data: courseStats, error: statsError } = await supabase
         .from('course_ratings')
@@ -95,6 +106,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
       const reviewsWithProfiles = ratingsData.map(rating => {
         const profile = profilesData?.find(p => p.id === rating.user_id);
         const reviewMedia = mediaData.filter(m => m.review_id === rating.id);
+        const userVote = userVotes.find(vote => vote.review_id === rating.id);
         return {
           ...rating,
           display_name: profile?.display_name,
@@ -106,8 +118,9 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
             media_type: m.media_type as 'image' | 'video',
             file_name: m.file_name
           })),
-          likes_count: Math.floor(Math.random() * 10), // Placeholder
-          user_liked: false // Placeholder
+          helpful_count: rating.helpful_count || 0,
+          unhelpful_count: rating.unhelpful_count || 0,
+          user_vote: userVote?.value === 1 ? 'helpful' : userVote?.value === -1 ? 'unhelpful' : 'none'
         };
       });
 
@@ -145,7 +158,9 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
     rating10: review.rating,
     dateISO: review.review_date,
     text: review.review || '',
-    helpfulCount: review.likes_count || 0,
+    helpfulCount: (review as any).helpful_count || 0,
+    unhelpfulCount: (review as any).unhelpful_count || 0,
+    userVote: (review as any).user_vote || 'none',
     isYourReview: isUserReview(review),
     media: review.media?.map(m => ({
       id: m.id,
