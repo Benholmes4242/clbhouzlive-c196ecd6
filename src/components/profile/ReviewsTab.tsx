@@ -3,6 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
+import { Play } from 'lucide-react';
+import MediaLightbox from "@/components/ui/MediaLightbox";
+
+type MediaItem = {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  alt?: string;
+};
 
 type Review = {
   id: string;
@@ -12,6 +21,7 @@ type Review = {
   text: string;
   helpfulCount: number;
   isYourReview?: boolean;
+  media?: MediaItem[];         // Optional media array
 };
 
 type ReviewsTabProps = {
@@ -89,6 +99,15 @@ function ReviewCard({ review }: { review: Review }) {
   const [helpful, setHelpful] = React.useState(review.helpfulCount);
   const [unhelpful, setUnhelpful] = React.useState(0);
   const [clamped, setClamped] = React.useState(true);
+  const [lightboxOpen, setLightboxOpen] = React.useState(false);
+  const [lightboxIndex, setLightboxIndex] = React.useState(0);
+
+  const MAX_THUMBS = 3;
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
   return (
     <Card className="rounded-xl border bg-background shadow-sm">
@@ -132,6 +151,63 @@ function ReviewCard({ review }: { review: Review }) {
           )}
         </div>
 
+        {/* Media Strip */}
+        {review.media && review.media.length > 0 && (
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+            {review.media.slice(0, MAX_THUMBS).map((mediaItem, mediaIndex) => (
+              <button
+                key={mediaItem.id}
+                onClick={() => openLightbox(mediaIndex)}
+                className="relative shrink-0 group"
+                aria-label={mediaItem.type === 'video' ? 'Open video' : 'Open image'}
+              >
+                <div className="h-28 w-44 rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 bg-muted">
+                  {mediaItem.type === 'image' ? (
+                    <img
+                      src={mediaItem.url}
+                      alt={mediaItem.alt || ''}
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="relative h-full w-full">
+                      <video
+                        src={mediaItem.url}
+                        className="h-full w-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                        poster={`${mediaItem.url}#t=0.1`}
+                      />
+                      {/* Play icon overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-200 group-hover:bg-black/70 group-hover:scale-110">
+                          <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+
+            {/* +X more tile */}
+            {review.media.length > MAX_THUMBS && (
+              <button
+                onClick={() => openLightbox(MAX_THUMBS)}
+                className="relative h-28 w-24 shrink-0 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:bg-muted/70 transition-colors duration-200"
+                aria-label={`Open ${review.media.length - MAX_THUMBS} more items`}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-medium">
+                    +{review.media.length - MAX_THUMBS}
+                  </span>
+                </div>
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Footer actions */}
         <div className="mt-3 flex items-center gap-4 text-sm">
           <Button
@@ -167,6 +243,15 @@ function ReviewCard({ review }: { review: Review }) {
           </Button> */}
         </div>
       </CardContent>
+
+      {/* Lightbox */}
+      {lightboxOpen && review.media && review.media.length > 0 && (
+        <MediaLightbox
+          items={review.media}
+          startIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </Card>
   );
 }

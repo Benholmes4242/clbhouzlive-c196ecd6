@@ -62,6 +62,20 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
 
       if (profilesError) throw profilesError;
 
+      // Get review media for the ratings
+      const ratingIds = ratingsData.map(rating => rating.id);
+      let mediaData: any[] = [];
+      
+      if (ratingIds.length > 0) {
+        const { data: reviewMedia, error: mediaError } = await supabase
+          .from('course_review_media')
+          .select('id, review_id, media_url, media_type, file_name')
+          .in('review_id', ratingIds);
+        
+        if (mediaError) throw mediaError;
+        mediaData = reviewMedia || [];
+      }
+
       // Get overall course stats for the summary
       const { data: courseStats, error: statsError } = await supabase
         .from('course_ratings')
@@ -80,11 +94,18 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
       // Combine the data
       const reviewsWithProfiles = ratingsData.map(rating => {
         const profile = profilesData?.find(p => p.id === rating.user_id);
+        const reviewMedia = mediaData.filter(m => m.review_id === rating.id);
         return {
           ...rating,
           display_name: profile?.display_name,
           username: profile?.username,
           profile_photo_url: profile?.profile_photo_url,
+          media: reviewMedia.map(m => ({
+            id: m.id,
+            media_url: m.media_url,
+            media_type: m.media_type as 'image' | 'video',
+            file_name: m.file_name
+          })),
           likes_count: Math.floor(Math.random() * 10), // Placeholder
           user_liked: false // Placeholder
         };
@@ -125,7 +146,13 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
     dateISO: review.review_date,
     text: review.review || '',
     helpfulCount: review.likes_count || 0,
-    isYourReview: isUserReview(review)
+    isYourReview: isUserReview(review),
+    media: review.media?.map(m => ({
+      id: m.id,
+      type: m.media_type,
+      url: m.media_url,
+      alt: m.file_name || ''
+    })) || []
   })) || [];
 
   if (isLoading) {
