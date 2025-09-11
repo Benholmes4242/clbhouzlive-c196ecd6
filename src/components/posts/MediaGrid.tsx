@@ -24,9 +24,11 @@ const MediaGrid = ({
     return (
       <>
         <div className="grid grid-cols-3 gap-1 p-1">
-          {previewUrls.map((url, index) => (
+          {previewUrls.map((url, index) => {
+            const safeKey = `media-${index}-${btoa(url).slice(-16)}`;
+            return (
             <div 
-              key={`media-${index}-${url.slice(-20)}`}
+              key={safeKey}
               className="aspect-square relative cursor-pointer"
               onClick={() => onImageClick(index)}
             >
@@ -52,7 +54,8 @@ const MediaGrid = ({
                 <div className="absolute inset-0 bg-blue-500/20 border-2 border-blue-500" />
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
         
         {/* Select button for multiple files */}
