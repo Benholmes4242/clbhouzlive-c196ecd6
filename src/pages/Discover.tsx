@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -6,13 +6,21 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsers from '@/components/discover/SuggestedUsers';
 import TrendingNow from '@/components/discover/TrendingNow';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { MediaItem } from '@/types/media';
 
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
+  // Feature flag to toggle between FullscreenMediaModal and DiscoverVerticalFeed
+  const USE_MODAL_DISCOVER = true; // set false to revert to DiscoverVerticalFeed
+  
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStartIndex, setModalStartIndex] = useState(0);
   
   // Get content for the active filter (for the tabs section)
   const { 
@@ -46,7 +54,19 @@ const Discover = () => {
   };
 
   const handleMediaClick = (item: any) => {
-    openFeed(item);
+    if (USE_MODAL_DISCOVER) {
+      // Find the index of the clicked item in our flattened media array
+      const clickedIndex = mediaItems.findIndex(mediaItem => 
+        mediaItem.url === item.src || mediaItem.id === item.id
+      );
+      if (clickedIndex !== -1) {
+        setModalStartIndex(clickedIndex);
+        setModalOpen(true);
+      }
+    } else {
+      // Use old vertical feed
+      openFeed(item);
+    }
   };
 
   const handleUserFollow = (userId: string) => {
@@ -108,6 +128,38 @@ const Discover = () => {
     index === self.findIndex(t => t.src === item.src)
   );
 
+  // Transform content to MediaItem[] for FullscreenMediaModal
+  const mediaItems: MediaItem[] = useMemo(() => {
+    return uniqueContent.flatMap((post, postIndex) => {
+      // Handle posts with media array vs single media
+      const mediaArray = post.media && post.media.length > 0 ? post.media : [{ 
+        id: `${post.id}-single`, 
+        media_type: post.type, 
+        media_url: post.src 
+      }];
+      
+      return mediaArray.map((media, mediaIndex) => {
+        if (media.media_type === 'video') {
+          const streamId = getStreamIdFromUrl(media.media_url);
+          return {
+            id: `${post.id}-${mediaIndex}`,
+            type: 'video' as const,
+            url: media.media_url,
+            streamId,
+            posterUrl: getStreamPoster(media.media_url, '1s') ?? undefined,
+            alt: post.title || 'Video'
+          };
+        }
+        return {
+          id: `${post.id}-${mediaIndex}`,
+          type: 'image' as const,
+          url: media.media_url,
+          alt: post.title || 'Photo'
+        };
+      });
+    });
+  }, [uniqueContent]);
+
 
   return (
       <div className="min-h-screen bg-white">
@@ -155,18 +207,31 @@ const Discover = () => {
         
         <BottomNavigation />
 
-        {/* Discover Vertical Feed */}
-        {initialItem && (
-          <DiscoverVerticalFeed
-            isOpen={isFeedOpen}
-            onClose={closeFeed}
-            posts={uniqueContent}
-            onLike={handleLike}
-            onLoadMore={loadMore}
-            hasMore={hasMore}
-            isLoadingMore={loading}
-            initialItem={initialItem}
+        {/* Conditional Modal/Feed based on feature flag */}
+        {USE_MODAL_DISCOVER ? (
+          // New FullscreenMediaModal approach
+          <FullscreenMediaModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            mediaUrl={mediaItems.map(item => item.url)}
+            mediaType={mediaItems.map(item => item.type)}
+            initialIndex={modalStartIndex}
+            // Optional: Add user info if available from posts
           />
+        ) : (
+          // Old DiscoverVerticalFeed approach
+          initialItem && (
+            <DiscoverVerticalFeed
+              isOpen={isFeedOpen}
+              onClose={closeFeed}
+              posts={uniqueContent}
+              onLike={handleLike}
+              onLoadMore={loadMore}
+              hasMore={hasMore}
+              isLoadingMore={loading}
+              initialItem={initialItem}
+            />
+          )
         )}
 
 

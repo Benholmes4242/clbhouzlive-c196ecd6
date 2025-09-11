@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
+import { getStreamPoster } from '@/utils/stream';
 
 /**
  * Square Card Media Component
@@ -17,9 +18,9 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
   onMediaClick,
   className = ''
 }) => {
-  // Always use static image for square cards
+  // Always use static image for square cards - use consistent poster generation
   const imageUrl = media.media_type === 'video' 
-    ? (media.poster_url || media.thumbnail_url || '/placeholder.svg')
+    ? (media.poster_url || getStreamPoster(media.media_url, '1s') || '/placeholder.svg')
     : media.media_url;
 
   return (
