@@ -550,7 +550,56 @@
   position: relative;
 }
 
-/* Hero Image Container with Responsive Aspect Ratios */
+/* NEW: stable hero with fixed heights */
+.course-hero-stable {
+  position: relative;
+  width: 100%;
+  /* Fixed heights by breakpoint */
+  height: 24rem;    /* mobile default */
+  overflow: hidden;
+}
+
+/* md ≥ 768px */
+@media (min-width: 768px) {
+  .course-hero-stable { height: 28rem; }
+}
+
+/* lg ≥ 1024px */
+@media (min-width: 1024px) {
+  .course-hero-stable { height: 32rem; }
+}
+
+/* Image is absolute; no calc() sizing */
+.course-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;              /* stable cover behavior */
+  object-position: 50% 40%;       /* slight upward bias; adjust if needed */
+  opacity: 0;
+  transition: opacity .3s ease-in;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: optimize-contrast;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+.course-hero-img.loaded {
+  opacity: 1;
+}
+
+/* Optional: gradient overlay kept absolute too */
+.course-hero-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to top, rgba(0,0,0,.6), transparent 35%, transparent);
+}
+
+/* LEGACY: Keep old aspect-ratio rules for other pages that might use them */
 .course-hero-container {
   aspect-ratio: 16 / 9;
   min-height: 24rem; /* 384px */

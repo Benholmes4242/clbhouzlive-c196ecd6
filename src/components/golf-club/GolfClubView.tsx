@@ -88,8 +88,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   return (
     <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
-      {/* Extended Hero Banner - continues behind tabs */}
-      <div className="course-hero-container relative overflow-hidden">
+      {/* Extended Hero Banner - stable fixed height */}
+      <div className="course-hero-stable">
         {/* Back button for modal - positioned over hero image */}
         {isInModal && onClose && (
           <button
@@ -104,34 +104,32 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <img
           src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
           srcSet={course.thumbnail_image ? `
-            ${course.thumbnail_image}?w=768&h=384&fit=crop 768w,
-            ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
-            ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
+            ${course.thumbnail_image}?w=768&h=432&fit=crop 768w,
+            ${course.thumbnail_image}?w=1200&h=675&fit=crop 1200w,
+            ${course.thumbnail_image}?w=1920&h=1080&fit=crop 1920w
           ` : `
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=432&fit=crop 768w,
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=675&fit=crop 1200w,
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=1080&fit=crop 1920w
           `}
           sizes="(max-width: 768px) 100vw, 1200px"
           alt={course.name}
           loading="eager"
-          className="course-hero-image w-full h-full object-cover !rounded-bl-none"
-          style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
+          className="course-hero-img"
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
           onError={(e) => {
             e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
             e.currentTarget.srcset = `
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=432&fit=crop 768w,
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=675&fit=crop 1200w,
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=1080&fit=crop 1920w
             `;
           }}
         />
         
-        {/* Gradient overlay for better text visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="course-hero-overlay" />
         
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-14 left-6 text-white z-10">
