@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-import { PostMediaItem } from '@/types/media';
+import type { DbMediaRow } from '@/types/media';
 
-interface MediaItem extends PostMediaItem {
+interface ProfileMediaItem extends DbMediaRow {
   duration: number;
   display_order: number;
   header_extended_url?: string;
@@ -15,7 +15,7 @@ interface MediaItem extends PostMediaItem {
 }
 
 export const useProfileMedia = (userId: string) => {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<ProfileMediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,7 @@ export const useProfileMedia = (userId: string) => {
 
       if (error) throw error;
 
-      setMediaItems(data || []);
+      setMediaItems(data?.map(item => ({...item, media_type: item.media_type as 'image' | 'video'})) || []);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching profile media:', err);

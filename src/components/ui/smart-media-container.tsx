@@ -4,9 +4,9 @@ import EnhancedVideoPlayer from './enhanced-video-player';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
-import { MediaItem as BaseMediaItem } from '@/types/media';
+import type { MediaItem } from '@/types/media';
 
-interface MediaItem extends BaseMediaItem {
+interface ExtendedMediaItem extends MediaItem {
   poster?: string;
   aspectRatio?: number;
 }

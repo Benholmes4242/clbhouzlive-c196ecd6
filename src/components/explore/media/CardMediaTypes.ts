@@ -1,5 +1,5 @@
 // Media type definitions for different card layouts
-import { MediaItem } from '@/types/media';
+import type { MediaItem, DbMediaRow } from '@/types/media';
 
 export enum CardType {
   SQUARE = 'square',
@@ -7,12 +7,9 @@ export enum CardType {
   HERO = 'hero'
 }
 
-// Extended interface for card-specific props
-export interface CardMediaItem extends MediaItem {
-  media_type: 'video' | 'image'; // Database field
-  media_url: string;             // Database field
+// Extended interface for card-specific props - use DbMediaRow for database operations
+export interface CardMediaItem extends DbMediaRow {
   thumbnail_url?: string;
-  poster_url?: string;
 }
 
 export interface CardMediaProps {

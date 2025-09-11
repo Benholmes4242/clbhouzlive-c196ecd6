@@ -1,6 +1,6 @@
-import { MediaItem as BaseMediaItem } from '@/types/media';
+import type { MediaItem as BaseMediaItem } from '@/types/media';
 
-export interface MediaItem extends BaseMediaItem {
+export interface ExtendedMediaItem extends BaseMediaItem {
   title?: string;
   user?: {
     id: string;
@@ -14,6 +14,9 @@ export interface MediaItem extends BaseMediaItem {
     country: string;
   };
 }
+
+// Export both for compatibility
+export type MediaItem = ExtendedMediaItem;
 
 export interface MediaGridConfig {
   layout: 'discover' | 'profile' | 'modal';
@@ -42,7 +45,7 @@ export interface MediaGridConfig {
   
   // Behavior
   interactions?: {
-    onMediaClick?: (item: MediaItem) => void;
+    onMediaClick?: (item: ExtendedMediaItem) => void;
     onLike?: (id: string) => void;
     onFollow?: (id: string) => void;
   };
@@ -50,7 +53,7 @@ export interface MediaGridConfig {
 
 export interface GridLayoutItem {
   key: string;
-  item: MediaItem;
+  item: ExtendedMediaItem;
   className: string;
   style?: React.CSSProperties;
 }

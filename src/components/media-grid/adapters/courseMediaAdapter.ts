@@ -1,11 +1,11 @@
-import { MediaItem } from '../types';
+import { ExtendedMediaItem } from '../types';
 
 // Adapter for course media from ExploreContentItem format
-export const adaptExploreContentToMediaItems = (exploreItems: any[]): MediaItem[] => {
+export const adaptExploreContentToMediaItems = (exploreItems: any[]): ExtendedMediaItem[] => {
   return exploreItems.map(item => ({
     id: item.id,
     type: item.type as 'video' | 'image',
-    src: item.src,
+    url: item.src,
     title: item.title,
     alt: item.title || '',
     user: item.user ? {
@@ -23,11 +23,11 @@ export const adaptExploreContentToMediaItems = (exploreItems: any[]): MediaItem[
 };
 
 // Adapter for raw course review media
-export const adaptCourseReviewMedia = (courseMedia: any[]): MediaItem[] => {
+export const adaptCourseReviewMedia = (courseMedia: any[]): ExtendedMediaItem[] => {
   return courseMedia.map(media => ({
     id: media.id,
     type: media.media_type as 'video' | 'image',
-    src: media.media_url,
+    url: media.media_url,
     title: media.file_name || '',
     alt: media.file_name || 'Course media'
   }));

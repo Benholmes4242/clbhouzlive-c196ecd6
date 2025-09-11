@@ -9,7 +9,7 @@ import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/ada
 import { Image as ImageIcon } from 'lucide-react';
 // MediaGrid imports
 import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
-import type { MediaItem as NewMediaItem } from '@/components/media-grid';
+import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
 import { FLAGS } from '@/config/flags';

@@ -1,10 +1,10 @@
 import React, { memo } from 'react';
-import { MediaItem, MediaGridConfig } from './types';
+import { ExtendedMediaItem, MediaGridConfig } from './types';
 import MediaDisplay from './MediaDisplay';
 import { useMediaGrid } from './hooks/useMediaGrid';
 
 interface MediaGridProps {
-  items: MediaItem[];
+  items: ExtendedMediaItem[];
   config: MediaGridConfig;
   isLoading?: boolean;
 }
@@ -22,7 +22,7 @@ const MediaGrid: React.FC<MediaGridProps> = memo(({
     handleImageError
   } = useMediaGrid(items, config);
 
-  const handleMediaClick = (item: MediaItem) => {
+  const handleMediaClick = (item: ExtendedMediaItem) => {
     config.interactions?.onMediaClick?.(item);
   };
 
@@ -67,7 +67,7 @@ const MediaGrid: React.FC<MediaGridProps> = memo(({
               media={{
                 id: layoutItem.item.id,
                 media_type: layoutItem.item.type as 'video' | 'image',
-                media_url: layoutItem.item.src
+                media_url: layoutItem.item.url
               }}
               itemTitle={layoutItem.item.title}
               shouldAutoplay={config.features.autoplay}
