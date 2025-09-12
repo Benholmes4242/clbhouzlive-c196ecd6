@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
-import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
+import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
 
 interface PostSubmissionHandlerProps {
   isComposerOpen: boolean;
