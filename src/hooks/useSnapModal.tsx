@@ -1,5 +1,5 @@
-
 import { useState, useRef } from 'react';
+import { normalizeFilesToMediaItems, revokeMediaItemUrls } from '@/lib/mediaUtils';
 
 interface TaggableEntity {
   id: string;
@@ -16,12 +16,52 @@ interface GolfCourse {
   region?: string;
 }
 
+// Types for composer media items
+export type ComposerMediaType = "image" | "video";
+
+export interface ComposerMediaItem {
+  id: string;
+  type: ComposerMediaType;
+  file: File;
+  previewUrl: string; // blob URL
+  duration?: number;  // optional for video
+}
+
+type SnapState = {
+  isSnapModalOpen: boolean;
+  isComposerOpen: boolean;
+  mediaItems: ComposerMediaItem[];  // NEW - replaces selectedFile
+  caption: string;
+  selectedCourse: GolfCourse | null;
+  visibility: "public" | "private";
+  
+  // Legacy support for single file (backward compatibility)
+  selectedFile: File | null;
+  previewUrl: string;
+  
+  // Other state
+  isSubmitting: boolean;
+  showSuggestions: boolean;
+  mentionSuggestions: TaggableEntity[];
+  selectedTags: TaggableEntity[];
+  cursorPosition: number;
+  showToast: boolean;
+  toastMessage: string;
+  captionInputRef: React.RefObject<HTMLDivElement>;
+};
+
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
   const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
+  
+  // New multi-media state
+  const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
+  
+  // Legacy single file state for backward compatibility
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  
   const [caption, setCaption] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -31,6 +71,7 @@ export const useSnapModal = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
 
   const openSnapModal = () => {
     console.log('Opening snap modal');
@@ -42,42 +83,72 @@ export const useSnapModal = () => {
     setIsSnapModalOpen(false);
   };
 
-  const openComposer = (file: File) => {
-    console.log('OpenComposer called with file:', file.name, file.type);
+  // Legacy single file opener (backward compatibility)
+  const openComposer = async (file: File) => {
+    console.log('OpenComposer called with single file:', file.name, file.type);
+    await openComposerWithFiles([file]);
+  };
+
+  // NEW: Multi-file opener
+  const openComposerWithFiles = async (files: File[]): Promise<void> => {
+    console.log('OpenComposerWithFiles called with files:', files.length);
     
     // Close snap modal first
     setIsSnapModalOpen(false);
     
     // Clean previous state
+    cleanupPreviousMedia();
+    
+    try {
+      // Normalize files to media items
+      const items = await normalizeFilesToMediaItems(files);
+      setMediaItems(items);
+      
+      // Set legacy state for first file (backward compatibility)
+      if (items.length > 0) {
+        setSelectedFile(items[0].file);
+        setPreviewUrl(items[0].previewUrl);
+      }
+      
+      // Open composer with a small delay to ensure snap modal is closed
+      setTimeout(() => {
+        console.log('Opening composer modal now with', items.length, 'items');
+        setIsComposerOpen(true);
+      }, 100);
+    } catch (error) {
+      console.error('Failed to process files for composer:', error);
+    }
+  };
+
+  const cleanupPreviousMedia = () => {
+    // Revoke previous media URLs to prevent memory leaks
+    if (mediaItems.length > 0) {
+      revokeMediaItemUrls(mediaItems);
+    }
+    
+    // Clean legacy preview URL
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
-    
-    // Set new file and preview
-    setSelectedFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    
-    // Open composer with a small delay to ensure snap modal is closed
-    setTimeout(() => {
-      console.log('Opening composer modal now');
-      setIsComposerOpen(true);
-    }, 100);
   };
 
   const closeComposer = () => {
     console.log('Closing composer');
     setIsComposerOpen(false);
+    
+    // Clean up media
+    cleanupPreviousMedia();
+    
+    // Reset state
+    setMediaItems([]);
     setSelectedFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
     setPreviewUrl('');
     setCaption('');
     setSelectedTags([]);
     setSelectedCourse(null);
     setShowSuggestions(false);
     setIsSubmitting(false);
+    setVisibility("public");
   };
 
   const showConfirmationToast = (message: string) => {
@@ -91,13 +162,23 @@ export const useSnapModal = () => {
   };
 
   return {
+    // Core state
     captionInputRef,
     isSnapModalOpen,
     isComposerOpen,
-    selectedFile,
-    previewUrl,
+    mediaItems,
     caption,
     setCaption,
+    selectedCourse,
+    setSelectedCourse,
+    visibility,
+    setVisibility,
+    
+    // Legacy state (backward compatibility)
+    selectedFile,
+    previewUrl,
+    
+    // UI state
     isSubmitting,
     setIsSubmitting,
     showSuggestions,
@@ -110,11 +191,12 @@ export const useSnapModal = () => {
     setCursorPosition,
     showToast,
     toastMessage,
-    selectedCourse,
-    setSelectedCourse,
+    
+    // Actions
     openSnapModal,
     closeSnapModal,
     openComposer,
+    openComposerWithFiles, // NEW
     closeComposer,
     showConfirmationToast,
     hideToast

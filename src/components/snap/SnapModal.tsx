@@ -1,8 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { loadRecentMedia } from '@/lib/recentMediaCache';
+import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 
 interface SnapModalProps {
   isOpen: boolean;
@@ -22,16 +23,46 @@ const SnapModal = ({
   const isMobile = useIsMobile();
   const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
   const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
+  
+  const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
-  // Mock thumbnails for demonstration - replace with real gallery access
+  // Golf placeholder assets
+  const placeholders = {
+    photos: [
+      "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=75&fit=crop&crop=center",
+    ],
+    videos: [
+      "https://images.unsplash.com/photo-1593111774240-d529f12cf4c1?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100&h=75&fit=crop&crop=center",
+    ],
+  };
+
+  // Load thumbnails from cache or use placeholders
   useEffect(() => {
-    setPhotoThumbs(['/placeholder.svg', '/placeholder.svg']);
-    setVideoThumbs(['/placeholder.svg', '/placeholder.svg', '/placeholder.svg']);
+    (async () => {
+      const cached = await loadRecentMedia();
+      setPhotoThumbs(cached.photos.length ? cached.photos.slice(0, 3) : placeholders.photos);
+      setVideoThumbs(cached.videos.length ? cached.videos.slice(0, 3) : placeholders.videos);
+    })();
   }, []);
 
   const Thumbnail = ({ src }: { src?: string }) => (
     <div className="h-12 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-neutral-700/50 to-neutral-800/50 backdrop-blur-sm">
-      {src && <img src={src} alt="" className="h-full w-full object-cover opacity-60" />}
+      {src && (
+        <img 
+          src={src} 
+          alt="" 
+          className="h-full w-full object-cover opacity-60"
+          onError={(e) => {
+            // Fallback to placeholder if thumbnail fails to load
+            const target = e.target as HTMLImageElement;
+            target.src = '/placeholder.svg';
+          }}
+        />
+      )}
     </div>
   );
 
@@ -84,7 +115,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[480px] bg-white/20 backdrop-blur-2xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -104,6 +135,25 @@ const SnapModal = ({
               </div>
 
               <div className="px-4 pb-5 space-y-3">
+                {/* Tell Your Story Card - NOW AT TOP */}
+                <motion.button
+                  onClick={() => {
+                    onClose(); // Close modal first
+                    setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-md ring-1 ring-amber-400/20 rounded-2xl border border-amber-400/20 hover:bg-gradient-to-r hover:from-amber-500/30 hover:to-orange-500/30 transition-all duration-200"
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/30 to-orange-500/30 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-amber-300" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
+                    <span className="text-sm text-amber-200/80">Mix photos & videos in one go</span>
+                  </div>
+                </motion.button>
+
                 {/* Media Options */}
                 {cardOptions.map(({ key, label, description, icon: Icon, onClick, thumbs }) => (
                   <motion.button
@@ -131,25 +181,6 @@ const SnapModal = ({
                     </div>
                   </motion.button>
                 ))}
-
-                {/* Tell Your Story Card */}
-                <motion.button
-                  onClick={() => {
-                    // TODO: Hook up to multi-select flow
-                    console.log('Tell Your Story clicked - implement multi-select flow');
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-amber-400" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/70">Mix photos & videos in one go</span>
-                  </div>
-                </motion.button>
               </div>
             </motion.div>
           </div>

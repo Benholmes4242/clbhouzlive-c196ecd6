@@ -23,7 +23,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     captionInputRef,
     isSnapModalOpen,
     isComposerOpen,
-    selectedFile,
+    mediaItems,
+    selectedFile, // Keep for backward compatibility
     caption,
     setCaption,
     isSubmitting,
@@ -84,7 +85,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
 
       <PostSubmissionHandler
         isComposerOpen={isComposerOpen}
-        selectedFiles={[]}
+        mediaItems={mediaItems}
         selectedFile={selectedFile}
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +19,7 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { FLAGS } from '@/config/flags';
+import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 
 
 // Direct import for ProfilePage to avoid dynamic import issues
@@ -85,6 +86,11 @@ const App: React.FC = () => {
   
   // Monitor global memory usage
   useGlobalMemoryMonitor(60000); // Check every minute
+  
+  // Initialize recent media listener for SnapModal thumbnails
+  useEffect(() => {
+    initRecentMediaListener();
+  }, []);
   
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
