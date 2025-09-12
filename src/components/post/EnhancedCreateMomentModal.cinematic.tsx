@@ -204,7 +204,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   "
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[15px] text-white/70">Add a caption</label>
+                    <label className="block text-[15px] text-white">Add a caption</label>
                     <button
                       onClick={handleAICaption}
                       disabled={aiLoading || files.length === 0}
