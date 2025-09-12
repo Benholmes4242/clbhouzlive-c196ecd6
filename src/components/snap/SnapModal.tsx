@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
+import { useUserMedia, type MediaThumb } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
+import { resolveThumbUrl } from '@/lib/resolveThumb';
 
 interface SnapModalProps {
   isOpen: boolean;
@@ -23,20 +24,21 @@ const SnapModal = ({
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
-  const { data: userMedia, isLoading, error } = useSnapModalUserMedia(user?.id);
-  
-  const [captureeThumbs, setCaptureeThumbs] = useState<string[]>([]);
-  const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
-  const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
+  const { data: media = [], isLoading } = useUserMedia(user?.id, 0, user?.id);
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
-  // Loading skeleton component
-  const SkeletonThumb = ({ className = "" }: { className?: string }) => (
-    <div className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 animate-pulse ${className}`} />
-  );
+  // Split media into categories, memoized to prevent flicker
+  const { recent, photos, videos } = useMemo(() => {
+    const sorted = [...media].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    return {
+      recent: sorted.slice(0, 6),
+      photos: sorted.filter(m => m.type?.startsWith("image")).slice(0, 6),
+      videos: sorted.filter(m => m.type?.startsWith("video")).slice(0, 6),
+    };
+  }, [media]);
 
-  // Golf course photo library - using curated golf images
+  // Golf course photo library - fallback placeholders
   const placeholders = {
     capture: [
       "/lovable-uploads/ca1d3591-53f0-454e-bd54-e6fe955f0b7d.png", // Ryder Cup golfer in red
@@ -54,127 +56,89 @@ const SnapModal = ({
     ],
   };
 
-  // Load thumbnails from database or use golf course placeholders
-  useEffect(() => {
-    if (isLoading) {
-      // Show loading skeletons during fetch
-      return;
-    }
-    
-    if (error) {
-      // On error, fall back to placeholders
-      setCaptureeThumbs(placeholders.capture);
-      setPhotoThumbs(placeholders.photos);
-      setVideoThumbs(placeholders.videos);
-      return;
-    }
-    
-    const photos = userMedia?.photos ?? [];
-    const videos = userMedia?.videos ?? [];
-    
-    // Use user's media if available, otherwise show placeholders
-    setCaptureeThumbs(photos.length ? photos.slice(0, 2) : placeholders.capture);
-    setPhotoThumbs(photos.length ? photos.slice(0, 3) : placeholders.photos);
-    setVideoThumbs(videos.length ? videos.slice(0, 3) : placeholders.videos);
-  }, [isLoading, error, userMedia]);
+  // Loading skeleton component
+  const SkeletonRow = () => (
+    <div className="flex items-center gap-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="h-12 w-20 animate-pulse rounded-md bg-white/10" />
+      ))}
+    </div>
+  );
 
-  // Reusable thumbnail components
-  type StripVariant = "videos" | "photos" | "capture";
+  // Thumbnail grid component that handles video thumbnails properly
+  function ThumbGrid({ items, fallbacks }: { items: MediaThumb[]; fallbacks: string[] }) {
+    // Use real media if available, otherwise fallback to placeholders
+    const displayItems = items.length > 0 ? items : fallbacks.map((url, i) => ({
+      postId: `fallback-${i}`,
+      url,
+      thumbUrl: url,
+      posterUrl: url,
+      type: 'image',
+      createdAt: new Date().toISOString(),
+      streamId: null,
+      width: null,
+      height: null
+    }));
 
-  function Thumb({ src, className = "", style }: { src?: string; className?: string; style?: React.CSSProperties }) {
     return (
-      <div
-        className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
-        style={style}
-      >
-        {src && (
-          <img 
-            src={src} 
-            alt="" 
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              // Fallback to golf course photo if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              const isVideoThumb = videoThumbs.includes(src || '');
-              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
-              target.src = fallbackImages[0]; // Use first golf course image as fallback
-            }}
-          />
-        )}
+      <div className="flex items-center gap-2 overflow-hidden w-44">
+        {displayItems.slice(0, 3).map((m, index) => {
+          const src = resolveThumbUrl(m);
+          return (
+            <div
+              key={m.postId + src}
+              className="relative h-12 w-20 overflow-hidden rounded-md bg-white/10 ring-1 ring-white/10 flex-shrink-0"
+            >
+              <img
+                src={src}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.onerror = null;
+                  // Use the appropriate fallback based on index
+                  img.src = fallbacks[index] || fallbacks[0];
+                }}
+              />
+              {m.type?.startsWith("video") && (
+                <span className="pointer-events-none absolute bottom-1 right-1 rounded px-1 text-[10px] bg-black/60 text-white">
+                  ▶
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   }
 
-  /**
-   * Keeps all rows the same total width using flex weights.
-   * videos: [1,1,1]   (3 equal rects)
-   * photos: [1,2]     (square + 2x wide rect)
-   * capture:[1.5,1.5] (two equal rects, same total width as 3)
-   */
-  function ThumbStrip({
-    variant,
-    thumbs = [],
-  }: {
-    variant: StripVariant;
-    thumbs?: string[];
-  }) {
-    return (
-      <div className="flex items-stretch gap-2 h-12 w-44">{/* Longer fixed width for all strips */}
-        {variant === "videos" && (
-          <>
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[2]} />
-          </>
-        )}
-
-        {variant === "photos" && (
-          <>
-            {/* square counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
-            {/* extra long rectangle counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[1]} />
-          </>
-        )}
-
-        {variant === "capture" && (
-          <>
-            {/* two equal rectangles, each 1.5 units so total = 3 */}
-            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[0]} />
-            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[1]} />
-          </>
-        )}
-      </div>
-    );
-  }
-
+  // Card options with real data
   const cardOptions = [
-    ...(isMobile ? [{
-      key: "capture",
-      label: "Capture",
-      description: "Take photo or video",
+    {
+      key: 'capture',
+      label: 'Capture',
+      description: '',
       icon: Camera,
       onClick: onCameraClick,
-      variant: "capture" as StripVariant,
-      thumbs: captureeThumbs, // Use dedicated capture thumbs
-    }] : []),
-    {
-      key: "photos",
-      label: "Photos",
-      description: "Select from gallery",
-      icon: Image,
-      onClick: onImageClick,
-      variant: "photos" as StripVariant,
-      thumbs: photoThumbs.slice(0, 2), // Only need 2 for square + wide layout
+      component: isLoading ? <SkeletonRow /> : <ThumbGrid items={recent} fallbacks={placeholders.capture} />
     },
     {
-      key: "videos",
-      label: "Videos", 
-      description: "Select from gallery",
+      key: 'photos',
+      label: 'Photos',
+      description: '',
+      icon: Image,
+      onClick: onImageClick,
+      component: isLoading ? <SkeletonRow /> : <ThumbGrid items={photos} fallbacks={placeholders.photos} />
+    },
+    {
+      key: 'videos',
+      label: 'Videos',
+      description: '',
       icon: Video,
       onClick: onVideoClick,
-      variant: "videos" as StripVariant,
-      thumbs: videoThumbs.slice(0, 3), // Need 3 for equal rectangles
+      component: isLoading ? <SkeletonRow /> : <ThumbGrid items={videos} fallbacks={placeholders.videos} />
     },
   ];
 
@@ -182,11 +146,11 @@ const SnapModal = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[9998] flex items-end justify-center"
         >
           {/* Backdrop */}
           <div 
@@ -194,93 +158,80 @@ const SnapModal = ({
             onClick={onClose}
           />
           
-          {/* Panel */}
-          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h2 className="text-xl font-semibold">Create a Moment</h2>
-                <button 
-                  onClick={onClose} 
-                  aria-label="Close" 
-                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+          {/* Modal Content */}
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ 
+              type: "spring", 
+              damping: 25, 
+              stiffness: 300,
+              duration: 0.4 
+            }}
+            className="relative w-full max-w-lg mx-4 mb-4 bg-neutral-900/90 backdrop-blur-md rounded-t-3xl border-t border-white/10 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
+              <h2 className="text-lg font-semibold text-white">Create a Moment</h2>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center text-white/70 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-              <div className="px-4 pb-5 space-y-3">
-                {/* Media Options */}
-                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
-                  <motion.button
-                    key={key}
-                    onClick={onClick}
-                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <div className="text-[17px] font-medium text-white">{label}</div>
-                        {/* Show empty state message if no user media and not loading */}
-                        {!isLoading && !error && userMedia?.photos.length === 0 && userMedia?.videos.length === 0 && key === 'photos' && (
-                          <div className="text-xs text-white/50">No posts yet - start creating!</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* New ThumbStrip Component */}
-                    <ThumbStrip variant={variant} thumbs={thumbs} />
-                  </motion.button>
-                ))}
-
-                {/* Error state with retry */}
-                {error && (
-                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
-                    <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
-                    <button 
-                      onClick={() => window.location.reload()} 
-                      className="text-xs text-red-400 hover:text-red-300 underline"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                )}
-
-                {/* Tell Your Story Card - AT BOTTOM */}
+            <div className="px-4 pb-5 space-y-3">
+              {/* Media Options */}
+              {cardOptions.map(({ key, label, icon: Icon, onClick, component }) => (
                 <motion.button
-                  onClick={() => {
-                    onClose(); // Close modal first
-                    setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  key={key}
+                  onClick={onClick}
+                  className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-amber-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-[17px] font-medium text-white">{label}</div>
+                      {/* Show empty state message if no user media and not loading */}
+                      {!isLoading && media.length === 0 && key === 'photos' && (
+                        <div className="text-xs text-white/50">No posts yet - start creating!</div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/70">Mix photos & videos in one go</span>
-                  </div>
+
+                  {/* Thumbnail Component */}
+                  {component}
                 </motion.button>
-              </div>
-            </motion.div>
-          </div>
+              ))}
+
+              {/* Tell Your Story Card - AT BOTTOM */}
+              <motion.button
+                onClick={() => {
+                  onClose(); // Close modal first
+                  setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
+                }}
+                className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-amber-400" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[17px] font-medium text-white">Tell Your Story</span>
+                  <span className="text-sm text-white/70">Mix photos & videos in one go</span>
+                </div>
+              </motion.button>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
