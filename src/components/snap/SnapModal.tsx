@@ -102,16 +102,16 @@ const SnapModal = ({
 
         {variant === "photos" && (
           <>
-            {/* wider square counts as 1.5 units */}
-            <Thumb className="flex-[1.5_0_0] aspect-square" src={thumbs[0]} />
-            {/* wide rect counts as 1.5 units */}
-            <Thumb className="flex-[1.5_0_0] aspect-[4/3]" src={thumbs[1]} />
+            {/* square counts as 1 unit */}
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
+            {/* extra long rectangle counts as 2 units */}
+            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[1]} />
           </>
         )}
 
         {variant === "capture" && (
           <>
-            {/* two equal wide rects, each 1.5 units so total = 3 */}
+            {/* two equal rectangles, each 1.5 units so total = 3 */}
             <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[0]} />
             <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[1]} />
           </>
