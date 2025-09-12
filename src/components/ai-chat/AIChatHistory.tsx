@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
 import Hls from 'hls.js';
 
@@ -15,6 +15,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useModalState } from '@/hooks/useModalDetector';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useUI } from '@/contexts/UIContext';
 
 // HLS Video Player Component
 const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -401,6 +405,51 @@ const ErrorState: React.FC<{
 );
 
 const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation }) => {
+  const [entered, setEntered] = useState(false);
+  const isMobile = useIsMobile();
+  const { modalTransition, beginTransition, endTransition } = useUI();
+  
+  // Register this modal with the modal detector
+  useModalState(isOpen);
+
+  // Close handler with transition guard
+  const handleClose = useCallback(() => {
+    if (modalTransition.inProgress) return;
+    beginTransition('close');
+    onClose();
+  }, [modalTransition.inProgress, beginTransition, onClose]);
+
+  // Exit complete handler
+  const handleExitComplete = useCallback(() => {
+    const activeElement = document.activeElement as HTMLElement;
+    if (activeElement && activeElement.blur) {
+      activeElement.blur();
+    }
+    endTransition();
+  }, [endTransition]);
+
+  // Scroll lock management and ESC key handling
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    // Handle escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !modalTransition.inProgress) {
+        handleClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, modalTransition.inProgress, handleClose]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -754,100 +803,154 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     analysis.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!isOpen) return null;
-
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden"
-      style={{ 
-        zIndex: 9999
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
-    >
-      <div
-        className="w-full flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
-          minWidth: '448px',
-          maxWidth: '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
-        }}
-        onWheel={(e) => {
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
-          
-          if (scrollableElement) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
-            const isAtTop = scrollTop === 0;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-              e.preventDefault();
+    <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+      {isOpen && (
+        <motion.div
+          key="ai-chat-history"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+          onAnimationStart={() => setEntered(false)}
+          onAnimationComplete={() => setEntered(true)}
+          className={`
+            fixed z-[1000] flex
+            ${isMobile 
+              ? 'top-0 left-0 right-0 bottom-0' 
+              : 'inset-0'
             }
-          }
-          
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div 
-          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-          style={{
-            height: window.innerWidth <= 768 ? '56px' : '64px',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-          }}
+          `}
         >
-          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search history..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.5)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)'
-                }}
-                aria-label="Search chat history, caddie logs, and swing analyses"
-              />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-white/20 rounded-full"
-              aria-label="Close history modal"
+          {/* Backdrop - blocks all background interaction */}
+          <button
+            aria-label="Close modal"
+            onClick={handleClose}
+            className="fixed cursor-default inset-0 bg-white/10 backdrop-blur-xl"
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          />
+          
+          {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
+          {isMobile && (
+            <div
+              className="absolute left-0 top-0 bottom-0 z-20"
+              style={{ width: 'max(40px, env(safe-area-inset-left))' }}
+              aria-hidden="true"
+              data-testid="echo-gutter"
+              onClick={handleClose}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+            />
+          )}
+          
+          <div 
+            className={`
+              fixed right-0 bg-background z-10
+              ${isMobile 
+                ? 'w-[calc(100vw-max(40px,env(safe-area-inset-left)))] top-0 bottom-0 shadow-lg pl-[1px]' 
+                : 'inset-y-0 w-[90vw] max-w-[448px] rounded-l-2xl shadow-2xl'
+              }
+            `}
+            style={isMobile ? { height: '100dvh' } : undefined}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          >
+            <div 
+              className="h-full flex flex-col overflow-hidden"
+              style={{
+                background: 'rgba(246, 247, 246, 0.85)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderRadius: isMobile ? '0' : '24px 0 0 24px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: `
+                  0 0 0 1px rgba(255, 255, 255, 0.08),
+                  0 8px 32px rgba(0, 0, 0, 0.12),
+                  0 2px 8px rgba(0, 0, 0, 0.08)
+                `
+              }}
+              onWheel={(e) => {
+                const target = e.currentTarget;
+                const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+                
+                if (scrollableElement) {
+                  const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+                  const isAtTop = scrollTop === 0;
+                  const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+                  
+                  if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                    e.preventDefault();
+                  }
+                }
+                
+                e.stopPropagation();
+              }}
+              onTouchMove={(e) => e.stopPropagation()}
             >
-              <X className="h-4 w-4 text-gray-900" />
-            </Button>
-          </div>
-        </div>
+              {/* Header with title and close button */}
+              <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-tl-2xl">
+                <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search history..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.5)',
+                          backdropFilter: 'blur(8px)',
+                          WebkitBackdropFilter: 'blur(8px)'
+                        }}
+                        aria-label="Search chat history, caddie logs, and swing analyses"
+                      />
+                    </div>
+                    <button
+                      onClick={handleClose}
+                      className="focus:outline-none"
+                      aria-label="Close modal"
+                    >
+                      <span className="text-black text-xl font-bold">✕</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 py-2 flex-shrink-0">
+              {/* Content */}
+              <div className="flex-1 overflow-auto bg-transparent">
+                {/* Tabs */}
+                <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
+                  <div className="px-4 sm:px-6 pt-4 pb-0">
+                    <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg p-1">
+                      <TabsTrigger 
+                        value="chat" 
+                        className="text-xs font-medium data-[state=active]:bg-white/90 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm transition-all rounded-md"
+                        onClick={() => setActiveTab('chat')}
+                      >
+                        <MessageCircle className="h-3 w-3 mr-1" />
+                        Chat
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="insights" 
+                        className="text-xs font-medium data-[state=active]:bg-white/90 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm transition-all rounded-md"
+                        onClick={() => setActiveTab('insights')}
+                      >
+                        <Mic className="h-3 w-3 mr-1" />
+                        Insights
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="swing-coach" 
+                        className="text-xs font-medium data-[state=active]:bg-white/90 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm transition-all rounded-md"
+                        onClick={() => setActiveTab('swing-coach')}
+                      >
+                        <BarChart3 className="h-3 w-3 mr-1" />
+                        Swing
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
             <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm">
               <TabsTrigger value="chat" className="data-[state=active]:bg-white/80">
                 Chat
@@ -1279,8 +1382,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </TabsContent>
           </div>
         </Tabs>
-      </div>
-    </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
