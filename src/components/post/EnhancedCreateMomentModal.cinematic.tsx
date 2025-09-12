@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
@@ -42,6 +42,10 @@ export default function EnhancedCreateMomentModalCinematic({
   const { toast } = useToast();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  
+  // Caption card height tracking for dots positioning
+  const captionRef = useRef<HTMLDivElement | null>(null);
+  const [captionH, setCaptionH] = useState(56); // sensible default
 
   // Media carousel state
   const media = useMemo(() => (initialFiles || []).slice(0, 5), [initialFiles]);
@@ -95,6 +99,18 @@ export default function EnhancedCreateMomentModalCinematic({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [canSlide]);
+
+  // Track caption card height for dot positioning
+  useLayoutEffect(() => {
+    if (!captionRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        setCaptionH(Math.ceil(e.contentRect.height));
+      }
+    });
+    ro.observe(captionRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   // AI Caption Generation
   const handleAICaption = async () => {
@@ -188,13 +204,15 @@ export default function EnhancedCreateMomentModalCinematic({
                   onNext={nextMedia}
                   onClose={close}
                   canSlide={canSlide}
-                  theme={theme} 
+                  theme={theme}
+                  captionHeight={captionH}
                 />
                 
                 {/* Caption card overlaps image bottom */}
                 <div
+                  ref={captionRef}
                   className="
-                    absolute left-4 right-4 -bottom-6
+                    absolute left-4 right-4 -bottom-8
                     z-20
                     rounded-2xl
                     bg-black/55 backdrop-blur
@@ -227,10 +245,10 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-10" />
+              <div className="h-12" />
 
-              {/* Floating cards below */}
-              <div className="space-y-3 px-4">
+              {/* Floating cards below with consistent 12px gaps */}
+              <div className="flex flex-col space-y-3 px-4 pb-3">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
@@ -321,7 +339,8 @@ function MediaCarousel({
   onNext, 
   onClose,
   canSlide,
-  theme 
+  theme,
+  captionHeight
 }: { 
   media: File[]; 
   currentIndex: number;
@@ -332,6 +351,7 @@ function MediaCarousel({
   onClose: () => void;
   canSlide: boolean;
   theme?: "dark" | "light";
+  captionHeight: number;
 }) {
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
@@ -405,16 +425,18 @@ function MediaCarousel({
         </>
       )}
 
-      {/* Media Dots Indicator (only if >1 media) */}
+      {/* Media Dots Indicator (only if >1 media) - positioned relative to caption */}
       {canSlide && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+        <div
+          className="absolute left-1/2 -translate-x-1/2 flex gap-2 z-20"
+          style={{ bottom: captionHeight + 12 }}
+        >
           {media.map((_, i) => (
             <span
               key={i}
               className={`
-                h-2.5 w-2.5 rounded-full transition-colors
-                ${i === currentIndex ? "bg-white" : "bg-white/40"}
-                ring-1 ring-white/30
+                h-2.5 w-2.5 rounded-full ring-1 ring-white/30 transition-colors
+                ${i === currentIndex ? "bg-black" : "bg-black/40"}
               `}
             />
           ))}
@@ -428,7 +450,7 @@ function MediaCarousel({
         aria-label="Close"
         className="
           absolute top-3 right-3
-          h-10 w-10 rounded-full
+          h-8 w-8 rounded-full
           bg-white/12 backdrop-blur-md
           border border-white/15
           shadow-[0_8px_24px_rgba(0,0,0,0.35)]
@@ -436,7 +458,7 @@ function MediaCarousel({
           hover:bg-white/18 active:scale-[0.98] transition
         "
       >
-        <X className="h-5 w-5 text-white" />
+        <X className="h-4 w-4 text-white" />
       </button>
       
       {/* Gradients for overlay effect */}
