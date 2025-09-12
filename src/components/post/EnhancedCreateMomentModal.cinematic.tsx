@@ -259,7 +259,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
                       aria-label="Select music"
                     >
-                      🎵
+                      <span className="text-orange-500 text-xl">🎵</span>
                     </button>
                   </div>
                 </div>

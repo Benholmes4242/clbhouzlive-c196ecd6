@@ -89,9 +89,8 @@ const CourseTagInput = ({
   return (
     <div className="space-y-2">
       <div className="relative">
-        {/* Enhanced Input Field with Centered Map Pin Icon */}
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">📍</span>
+        {/* Enhanced Input Field with external map pin */}
+        <div className="flex items-center gap-3">
           <input
             ref={inputRef}
             type="text"
@@ -100,11 +99,17 @@ const CourseTagInput = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="w-full pl-10 pr-3 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
+            className="flex-1 px-4 pr-3 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
             disabled={!!selectedCourse}
           />
+          <button
+            className="h-11 w-11 rounded-xl bg-white/12 backdrop-blur-md border border-white/15 flex items-center justify-center hover:bg-white/18 transition-colors"
+            aria-label="Select location"
+          >
+            <span className="text-[18px]">📍</span>
+          </button>
           {isLoading && searchQuery.length >= 2 && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
               <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
             </div>
           )}
