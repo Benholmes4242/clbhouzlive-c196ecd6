@@ -5,6 +5,7 @@ import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useModalContext } from '@/contexts/ModalContext';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
@@ -42,8 +43,14 @@ export default function EnhancedCreateMomentModalCinematic({
 }: Props) {
   const isDark = theme === "dark";
   const { toast } = useToast();
+  const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+
+  // Update modal context when create moment modal opens/closes
+  useEffect(() => {
+    setCreateMomentModalOpen(isOpen);
+  }, [isOpen, setCreateMomentModalOpen]);
 
   // Media carousel state
   const media = useMemo(() => (initialFiles || []).slice(0, 5), [initialFiles]);

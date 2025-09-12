@@ -18,6 +18,7 @@ import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
+import { ModalProvider } from '@/contexts/ModalContext';
 import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 
@@ -98,7 +99,8 @@ const App: React.FC = () => {
         <TooltipProvider>
           <SecurityHeaders />
           <SiteAccessControl>
-            <UIProvider>
+            <ModalProvider>
+              <UIProvider>
               <BrowserRouter>
                 <ScrollToTop />
                 <GlobalAudioProvider>
@@ -149,7 +151,8 @@ const App: React.FC = () => {
                 <Sonner />
                 <AIChat />
               </BrowserRouter>
-            </UIProvider>
+              </UIProvider>
+            </ModalProvider>
           </SiteAccessControl>
       </TooltipProvider>
     </QueryClientProvider>

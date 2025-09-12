@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
+import { useModalContext } from '@/contexts/ModalContext';
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
 import { useAppLogo } from '@/hooks/useAppLogo';
@@ -9,6 +10,12 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentLogo } = useAppLogo();
+  const { shouldHideHeader } = useModalContext();
+
+  // Hide header when modals are active
+  if (shouldHideHeader) {
+    return null;
+  }
 
   const handleLogoClick = () => {
     navigate('/clubhouse');

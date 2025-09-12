@@ -5,6 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
+import { useModalContext } from '@/contexts/ModalContext';
 
 interface SnapModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const SnapModal = ({
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
+  const { setSnapModalOpen } = useModalContext();
   const { data: userMedia, isLoading, error } = useSnapModalUserMedia(user?.id);
   
   const [captureeThumbs, setCaptureeThumbs] = useState<string[]>([]);
@@ -30,6 +32,11 @@ const SnapModal = ({
   const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
+
+  // Update modal context when snap modal opens/closes
+  useEffect(() => {
+    setSnapModalOpen(isOpen);
+  }, [isOpen, setSnapModalOpen]);
 
   // Loading skeleton component
   const SkeletonThumb = ({ className = "" }: { className?: string }) => (
