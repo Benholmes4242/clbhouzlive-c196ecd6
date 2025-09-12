@@ -76,7 +76,7 @@ const SnapModal = ({
     setCaptureeThumbs(photos.length ? photos.slice(0, 2) : placeholders.capture);
     setPhotoThumbs(photos.length ? photos.slice(0, 3) : placeholders.photos);
     setVideoThumbs(videos.length ? videos.slice(0, 3) : placeholders.videos);
-  }, [isLoading, error, userMedia?.photos?.length, userMedia?.videos?.length]);
+  }, [isLoading, error, userMedia]);
 
   // Reusable thumbnail components
   type StripVariant = "videos" | "photos" | "capture";

@@ -9,7 +9,6 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
-const MEDIA_HEIGHT_SCALE = 0.9; // 10% height reduction
 
 // Stars loading component
 const StarsLoading = () => (
@@ -104,9 +103,7 @@ export default function EnhancedCreateMomentModalCinematic({
       const wrapperH = el.clientHeight;
       const captionH = cap.clientHeight;
       // media area should be wrapper height minus caption height + small overlap
-      const target = wrapperH - (captionH - CAPTION_OVERLAP_PX);
-      // Scale down by 20% with a minimum height for mobile
-      const h = Math.max(220, Math.round(target * MEDIA_HEIGHT_SCALE));
+      const h = Math.max(120, wrapperH - (captionH - CAPTION_OVERLAP_PX));
       setMediaHeight(h);
     };
 
@@ -269,10 +266,10 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-4" />
+              <div className="h-10" />
 
               {/* Floating cards below with 12px rhythm */}
-              <div className="space-y-3 px-4 pb-2">
+              <div className="space-y-3 px-4 pb-3">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
