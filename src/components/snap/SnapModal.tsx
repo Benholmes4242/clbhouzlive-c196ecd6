@@ -26,17 +26,17 @@ const SnapModal = ({
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
-  // Golf course photo library - using reliable placeholder service
+  // Golf course photo library - using curated golf images
   const placeholders = {
     photos: [
-      "https://picsum.photos/100/75?random=1", // Temp - will replace with golf assets
-      "https://picsum.photos/100/75?random=2", 
-      "https://picsum.photos/100/75?random=3",
+      "/lovable-uploads/a264f967-bfa0-4088-b28d-53715731d53e.png", // Golf course with sand bunker
+      "/lovable-uploads/f0f3cc35-8698-4814-b600-9453b36f463f.png", // Golfer teeing off scenic view
+      "/lovable-uploads/60940add-d75e-49e0-adf8-1d1db7f19682.png", // Golf clubs and equipment
     ],
     videos: [
-      "https://picsum.photos/100/75?random=4", // Temp - will replace with golf assets
-      "https://picsum.photos/100/75?random=5",
-      "https://picsum.photos/100/75?random=6",
+      "/lovable-uploads/a264f967-bfa0-4088-b28d-53715731d53e.png", // Golf course with sand bunker
+      "/lovable-uploads/f0f3cc35-8698-4814-b600-9453b36f463f.png", // Golfer teeing off scenic view
+      "/lovable-uploads/60940add-d75e-49e0-adf8-1d1db7f19682.png", // Golf clubs and equipment
     ],
   };
 
