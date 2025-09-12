@@ -772,16 +772,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence mode="wait" initial={false} onExitComplete={() => console.log('AIChatHistory exit complete')}>
-      {isOpen && (
-        <SlideOver 
-          open={isOpen} 
-          onClose={onClose} 
-          ariaLabel="AI Chat History" 
-          backdrop="transparent" 
-          zIndex="z-[1200]" 
-          lockScroll={false}
-        >
+    <SlideOver 
+      open={isOpen} 
+      onClose={onClose} 
+      ariaLabel="AI Chat History" 
+      backdrop="transparent" 
+      zIndex="z-[1200]" 
+      lockScroll={false}
+    >
           <div
             key="ai-chat-history-panel"
             className="h-full flex flex-col"
@@ -1247,8 +1245,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </div>
           </div>
         </SlideOver>
-      )}
-    </AnimatePresence>
   );
 };
 
