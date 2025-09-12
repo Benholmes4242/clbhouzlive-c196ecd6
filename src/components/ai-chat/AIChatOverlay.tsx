@@ -464,198 +464,193 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           opacity: !showHistory ? 1 : 0
         }}
       >
-      <div 
-        className="w-full flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
-          minWidth: '448px',
-          maxWidth: '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
-        }}
-        onWheel={(e) => {
-          // Allow scrolling within the modal, but prevent it from bubbling up
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
-          
-          if (scrollableElement) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
-            const isAtTop = scrollTop === 0;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            // Only prevent default if we're trying to scroll past boundaries
-            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-              e.preventDefault();
-            }
-          }
-          
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => e.stopPropagation()}
-      >
-        {/* Header - Fixed at top */}
         <div 
-          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          className="w-full h-full flex flex-col overflow-hidden animate-scale-in"
           style={{
-            height: window.innerWidth <= 768 ? '56px' : '64px',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+            width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
+            minWidth: '448px',
+            maxWidth: '448px',
+            height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
+            background: 'rgba(246, 247, 246, 0.85)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: `
+              0 0 0 1px rgba(255, 255, 255, 0.08),
+              0 8px 32px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.08)
+            `
           }}
+          onWheel={(e) => {
+            // Allow scrolling within the modal, but prevent it from bubbling up
+            const target = e.currentTarget;
+            const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
+            
+            if (scrollableElement) {
+              const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+              const isAtTop = scrollTop === 0;
+              const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+              
+              // Only prevent default if we're trying to scroll past boundaries
+              if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                e.preventDefault();
+              }
+            }
+            
+            e.stopPropagation();
+          }}
+          onTouchMove={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center gap-3">
-            <EchoAvatar 
-              state={getAvatarState()} 
-              size={window.innerWidth <= 768 ? 28 : 32} 
-            />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
-              <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
+          {/* Header - Fixed at top */}
+          <div 
+            className="shrink-0 sticky top-0 z-[1] border-b border-black/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur flex items-center justify-between px-6 py-4"
+            style={{
+              height: window.innerWidth <= 768 ? '56px' : '64px',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <EchoAvatar 
+                state={getAvatarState()} 
+                size={window.innerWidth <= 768 ? 28 : 32} 
+              />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
+                <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHistory(true)}
+                className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+              >
+                <History className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClose}
+                className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHistory(true)}
-              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
-            >
-              <History className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Tabs - Fixed header */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
-              <TabsTrigger 
-                value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-              >
-                Chat
-              </TabsTrigger>
-              <TabsTrigger 
-                value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-              >
-                Caddie Logs
-              </TabsTrigger>
-              <TabsTrigger 
-                value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
-              >
-                Swing Coach
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          {/* Body - Expands to fill; scrolls */}
+          <div className="flex-1 min-h-0 overflow-auto overscroll-contain">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+              <div className="shrink-0 px-6 pt-3 pb-0">
+                <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+                  <TabsTrigger 
+                    value="chat" 
+                    className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  >
+                    Chat
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="logs"
+                    className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  >
+                    Caddie Logs
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="swing-coach"
+                    className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                  >
+                    Swing Coach
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-          {/* Single scrollable content area */}
-          <ScrollArea 
-            className="flex-1 min-h-0"
-            style={{ overscrollBehavior: 'contain' }}
-            ref={chatAutoScroll.scrollAreaRef}
-          >
-            <TabsContent value="chat" className="h-full m-0">
-              <div className="h-full min-h-0">
-                <div className="px-6 py-5">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-muted-foreground">
-                      <p className="mb-6">
-                        I'm your personal tour caddie.<br />
-                        Ask me anything, anytime, I've got you.
-                      </p>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">Try asking:</p>
-                        {suggestedPrompts.map((prompt, index) => (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSuggestedPrompt(prompt)}
-                            className="mx-1 mb-2 text-xs"
-                          >
-                            {prompt}
-                          </Button>
-                        ))}
+              <div className="flex-1 min-h-0 overflow-auto">
+                <TabsContent value="chat" className="h-full m-0">
+                  <div className="px-6 py-5">
+                    {messages.length === 0 ? (
+                      <div className="text-center text-muted-foreground">
+                        <p className="mb-6">
+                          I'm your personal tour caddie.<br />
+                          Ask me anything, anytime, I've got you.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Try asking:</p>
+                          {suggestedPrompts.map((prompt, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSuggestedPrompt(prompt)}
+                              className="mx-1 mb-2 text-xs"
+                            >
+                              {prompt}
+                            </Button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <ChatMessageComponent
-                          key={message.id}
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                        />
-                      ))}
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                              <span className="text-sm">Echo is thinking...</span>
+                    ) : (
+                      <div className="space-y-4">
+                        {messages.map((message) => (
+                          <ChatMessageComponent
+                            key={message.id}
+                            message={message}
+                            onSaveToInsights={saveToInsights}
+                            onRequestDetail={requestMoreDetail}
+                          />
+                        ))}
+                        {isLoading && (
+                          <div className="flex justify-start">
+                            <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                              <div className="flex items-center gap-2">
+                                <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                                <span className="text-sm">Echo is thinking...</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="logs" className="h-full m-0">
+                  <CaddieLogs 
+                    onClose={() => setActiveTab('chat')}
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    userLocation={userLocation}
+                    requestLocation={requestLocation}
+                  />
+                </TabsContent>
+
+                <TabsContent value="swing-coach" className="h-full m-0">
+                  <SwingCoach 
+                    onClose={() => setActiveTab('chat')}
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    analysisText={swingCoachAnalysisText}
+                    onAnalysisTextChange={setSwingCoachAnalysisText}
+                  />
+                </TabsContent>
               </div>
-            </TabsContent>
-
-            <TabsContent value="logs" className="h-full m-0">
-              <CaddieLogs 
-                onClose={() => setActiveTab('chat')}
-                isRecording={isRecording}
-                isProcessing={isProcessing}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                userLocation={userLocation}
-                requestLocation={requestLocation}
-              />
-            </TabsContent>
-
-            <TabsContent value="swing-coach" className="h-full m-0">
-              <SwingCoach 
-                onClose={() => setActiveTab('chat')}
-                isRecording={isRecording}
-                isProcessing={isProcessing}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                analysisText={swingCoachAnalysisText}
-                onAnalysisTextChange={setSwingCoachAnalysisText}
-              />
-            </TabsContent>
-          </ScrollArea>
-        </Tabs>
-        
-        {/* Shared composer/footer - Fixed at bottom */}
-        <div 
-          className="flex-shrink-0"
-          style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
-          }}
-        >
+            </Tabs>
+          </div>
+          
+          {/* Footer / composer - Fixed at bottom */}
+          <div 
+            className="shrink-0 border-t border-black/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur"
+            style={{
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
+            }}
+          >
           {activeTab === 'chat' && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-2">
