@@ -69,14 +69,14 @@ export default function EnhancedCreateMomentModalCinematic({
         >
           {/* backdrop */}
           <div 
-            className={`absolute inset-0 ${panel} backdrop-blur-xl`} 
+            className={`absolute inset-0 bg-white/10 backdrop-blur-xl`} 
             onClick={onClose} 
           />
 
           {/* shell */}
           <div className="absolute inset-0 flex items-center justify-center p-4">
             <motion.div
-              className="w-full max-w-[520px] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[520px] bg-white/20 backdrop-blur-2xl ring-1 ring-white/20 rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)] border border-white/10"
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0, scale: 0.98 }}
@@ -89,8 +89,8 @@ export default function EnhancedCreateMomentModalCinematic({
               {/* Floating cards */}
               <div className="space-y-3 p-4 -mt-6">
                 {/* Caption */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                  <label className={`block text-[15px] mb-1 ${subtl}`}>Add a caption</label>
+                <div className={`rounded-2xl px-4 py-3 bg-white/15 backdrop-blur-md ring-1 ring-white/20 border border-white/10 text-white`}>
+                  <label className={`block text-[15px] mb-1 text-white/70`}>Add a caption</label>
                   <div className="flex items-start gap-2">
                     <textarea
                       className="w-full bg-transparent outline-none resize-none placeholder-opacity-50"
@@ -113,7 +113,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 </div>
 
                 {/* Course */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                <div className={`rounded-2xl px-4 py-3 bg-white/15 backdrop-blur-md ring-1 ring-white/20 border border-white/10 text-white`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
                       <div className="text-[15px] mb-1">Tag a golf course</div>
@@ -128,7 +128,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         // TODO: GPS location helper
                         console.log("GPS location helper clicked");
                       }}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
+                      className={`hover:bg-white/10 px-3 py-2 rounded-lg transition-colors`}
                       aria-label="Use my location"
                     >
                       📍
@@ -137,11 +137,11 @@ export default function EnhancedCreateMomentModalCinematic({
                 </div>
 
                 {/* Music */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                <div className={`rounded-2xl px-4 py-3 bg-white/15 backdrop-blur-md ring-1 ring-white/20 border border-white/10 text-white`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
                       <div className="text-[15px] mb-1">Background music</div>
-                      <div className={`${subtl} text-sm`}>
+                      <div className={`text-white/70 text-sm`}>
                         Popular golf tracks today
                       </div>
                     </div>
@@ -150,7 +150,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         // TODO: Background music selector
                         console.log("Music selector clicked");
                       }}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
+                      className={`hover:bg-white/10 px-3 py-2 rounded-lg transition-colors`}
                       aria-label="Select music"
                     >
                       🎵
@@ -159,7 +159,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 </div>
 
                 {/* Visibility segmented */}
-                <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                <div className={`rounded-2xl px-2 py-2 bg-white/15 backdrop-blur-md ring-1 ring-white/20 border border-white/10 text-white`}>
                   <Segmented
                     value="public"
                     onChange={(value) => console.log("Visibility changed:", value)}
