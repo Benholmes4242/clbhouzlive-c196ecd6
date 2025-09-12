@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
@@ -42,19 +42,11 @@ export default function EnhancedCreateMomentModalCinematic({
   const { toast } = useToast();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
-  
-  // Caption card height tracking for dots positioning
-  const captionRef = useRef<HTMLDivElement | null>(null);
-  const [captionH, setCaptionH] = useState(56); // sensible default
 
   // Media carousel state
   const media = useMemo(() => (initialFiles || []).slice(0, 5), [initialFiles]);
   const [mediaIndex, setMediaIndex] = useState(0);
   const canSlide = media.length > 1;
-  
-  // Auto-fit media display logic
-  const mediaBoxRef = useRef<HTMLDivElement | null>(null);
-  const [useContain, setUseContain] = useState(false);
   
   // Touch handlers for swipe
   const startX = useRef<number | null>(null);
@@ -103,41 +95,6 @@ export default function EnhancedCreateMomentModalCinematic({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [canSlide]);
-
-  // Track caption card height for dot positioning
-  useLayoutEffect(() => {
-    if (!captionRef.current) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        setCaptionH(Math.ceil(e.contentRect.height));
-      }
-    });
-    ro.observe(captionRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-  // Auto-fit media logic
-  useEffect(() => {
-    const el = mediaBoxRef.current;
-    const m = media[mediaIndex];
-    if (!el || !m) return;
-
-    const boxW = el.clientWidth;
-    const boxH = el.clientHeight;
-    const boxAR = boxW / boxH;
-
-    if (m.type.startsWith("image")) {
-      const img = new Image();
-      img.onload = () => {
-        const mediaAR = img.naturalWidth / img.naturalHeight;
-        setUseContain(Math.abs(mediaAR - boxAR) > 0.15);
-      };
-      img.src = URL.createObjectURL(m);
-    } else {
-      // videos — default to contain since cropping feels worse
-      setUseContain(true);
-    }
-  }, [mediaIndex, media]);
 
   // AI Caption Generation
   const handleAICaption = async () => {
@@ -231,17 +188,13 @@ export default function EnhancedCreateMomentModalCinematic({
                   onNext={nextMedia}
                   onClose={close}
                   canSlide={canSlide}
-                  theme={theme}
-                  captionHeight={captionH}
-                  mediaBoxRef={mediaBoxRef}
-                  useContain={useContain}
+                  theme={theme} 
                 />
                 
                 {/* Caption card overlaps image bottom */}
                 <div
-                  ref={captionRef}
                   className="
-                    absolute left-4 right-4
+                    absolute left-4 right-4 -bottom-6
                     z-20
                     rounded-2xl
                     bg-black/55 backdrop-blur
@@ -249,7 +202,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     border border-white/10
                     px-4 py-3
                   "
-                  style={{ bottom: -(captionH - 16) }}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-[15px] text-white/70">Add a caption</label>
@@ -275,10 +227,10 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div style={{ height: (captionH - 16) + 12 }} />
+              <div className="h-10" />
 
-              {/* Floating cards below with consistent 12px gaps */}
-              <div className="flex flex-col space-y-3 px-4 pb-3">
+              {/* Floating cards below */}
+              <div className="space-y-3 px-4">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
@@ -369,10 +321,7 @@ function MediaCarousel({
   onNext, 
   onClose,
   canSlide,
-  theme,
-  captionHeight,
-  mediaBoxRef,
-  useContain = false
+  theme 
 }: { 
   media: File[]; 
   currentIndex: number;
@@ -383,9 +332,6 @@ function MediaCarousel({
   onClose: () => void;
   canSlide: boolean;
   theme?: "dark" | "light";
-  captionHeight: number;
-  mediaBoxRef?: React.RefObject<HTMLDivElement>;
-  useContain?: boolean;
 }) {
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
@@ -398,11 +344,9 @@ function MediaCarousel({
   const currentFile = media[currentIndex];
   const previewUrl = URL.createObjectURL(currentFile);
   const isVideo = currentFile.type.startsWith('video/');
-  const fitClass = useContain ? "h-full w-full object-contain bg-black/60" : "h-full w-full object-cover";
 
   return (
     <div 
-      ref={mediaBoxRef}
       className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -412,7 +356,7 @@ function MediaCarousel({
         <video 
           key={`v-${currentIndex}`}
           src={previewUrl} 
-          className={fitClass}
+          className="h-full w-full object-cover" 
           muted 
           playsInline
         />
@@ -421,7 +365,7 @@ function MediaCarousel({
           key={`i-${currentIndex}`}
           src={previewUrl} 
           alt="" 
-          className={fitClass}
+          className="h-full w-full object-cover"
           draggable={false}
         />
       )}
@@ -461,18 +405,16 @@ function MediaCarousel({
         </>
       )}
 
-      {/* Media Dots Indicator (only if >1 media) - positioned relative to caption */}
+      {/* Media Dots Indicator (only if >1 media) */}
       {canSlide && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 flex gap-2 z-20"
-          style={{ bottom: captionHeight + 12 }}
-        >
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
           {media.map((_, i) => (
             <span
               key={i}
               className={`
-                h-2.5 w-2.5 rounded-full ring-1 ring-white/30 transition-colors
-                ${i === currentIndex ? "bg-black" : "bg-black/40"}
+                h-2.5 w-2.5 rounded-full transition-colors
+                ${i === currentIndex ? "bg-white" : "bg-white/40"}
+                ring-1 ring-white/30
               `}
             />
           ))}
@@ -486,7 +428,7 @@ function MediaCarousel({
         aria-label="Close"
         className="
           absolute top-3 right-3
-          h-8 w-8 rounded-full
+          h-10 w-10 rounded-full
           bg-white/12 backdrop-blur-md
           border border-white/15
           shadow-[0_8px_24px_rgba(0,0,0,0.35)]
@@ -494,7 +436,7 @@ function MediaCarousel({
           hover:bg-white/18 active:scale-[0.98] transition
         "
       >
-        <X className="h-4 w-4 text-white" />
+        <X className="h-5 w-5 text-white" />
       </button>
       
       {/* Gradients for overlay effect */}
