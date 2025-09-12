@@ -29,8 +29,8 @@ const SnapModal = ({
   // Golf course photo library - using curated golf images
   const placeholders = {
     photos: [
-      "/lovable-uploads/a264f967-bfa0-4088-b28d-53715731d53e.png", // Golf course with sand bunker
-      "/lovable-uploads/f0f3cc35-8698-4814-b600-9453b36f463f.png", // Golfer teeing off scenic view
+      "/lovable-uploads/57ecae87-4439-4ee7-a189-6922ecd457ec.png", // Golfer on elevated tee with scenic valley view
+      "/lovable-uploads/83676b62-ac84-42e1-89ae-bf311dfb0af0.png", // Tournament golf scene with crowd
       "/lovable-uploads/60940add-d75e-49e0-adf8-1d1db7f19682.png", // Golf clubs and equipment
     ],
     videos: [
