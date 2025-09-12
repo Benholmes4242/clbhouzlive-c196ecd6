@@ -32,21 +32,6 @@ interface SlideOverProps {
    * @default null (renders to document.body)
    */
   portalTarget?: string;
-  /**
-   * Backdrop style for layered modals
-   * @default "blurred"
-   */
-  backdrop?: "blurred" | "transparent" | "none";
-  /**
-   * Root z-index for stacking
-   * @default 50
-   */
-  zIndexRoot?: number;
-  /**
-   * Whether to lock body scroll
-   * @default true
-   */
-  lockScroll?: boolean;
 }
 
 /**
@@ -68,10 +53,7 @@ export function SlideOver({
   zIndex = "z-[1000]",
   heightClass = "",
   ariaLabel = "panel",
-  portalTarget,
-  backdrop = "blurred",
-  zIndexRoot = 50,
-  lockScroll = true
+  portalTarget
 }: SlideOverProps) {
   const isMobile = useIsMobile();
   const lastFocusedRef = useRef<HTMLElement | null>(null);
@@ -92,7 +74,7 @@ export function SlideOver({
 
   // Body scroll lock when modal is open
   useEffect(() => {
-    if (open && lockScroll) {
+    if (open) {
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       
@@ -100,7 +82,7 @@ export function SlideOver({
         document.body.style.overflow = prevOverflow;
       };
     }
-  }, [open, lockScroll]);
+  }, [open]);
 
   // Focus management
   const handleExitComplete = useCallback(() => {
@@ -129,24 +111,28 @@ export function SlideOver({
   const slideOverContent = (
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       {open && (
-        <div
-          className="fixed inset-0"
-          style={{ zIndex: zIndexRoot }}
+        <motion.div
+          key="slide-over"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+          className={`
+            fixed flex ${zIndex}
+            ${isMobile 
+              ? 'top-0 left-0 right-0 bottom-0' 
+              : 'inset-0'
+            }
+          `}
         >
           {/* Backdrop - blocks all background interaction */}
-          {backdrop !== "none" && (
-            <button
-              aria-label="Close"
-              onClick={onClose}
-              className={`fixed inset-0 cursor-default ${
-                backdrop === "blurred" 
-                  ? "bg-white/10 backdrop-blur-xl" 
-                  : "bg-transparent"
-              }`}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-            />
-          )}
+          <button
+            aria-label="Close Echo"
+            onClick={onClose}
+            className="fixed cursor-default inset-0 bg-white/10 backdrop-blur-xl"
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          />
           
           {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
           {isMobile && (
@@ -167,10 +153,10 @@ export function SlideOver({
             aria-modal="true"
             aria-label={ariaLabel}
             className={`
-              relative z-10 h-full ml-auto bg-background
+              fixed bg-background z-10
               ${isMobile 
-                ? `w-[calc(100vw-max(40px,env(safe-area-inset-left)))] shadow-lg pl-[1px] ${heightClass}` 
-                : `sm:w-[90vw] sm:max-w-[860px] inset-y-0 right-0 rounded-l-2xl shadow-2xl ${heightClass}`
+                ? `w-[calc(100vw-max(40px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
+                : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
               }
             `}
             style={isMobile ? { height: '100dvh' } : undefined}
@@ -179,7 +165,7 @@ export function SlideOver({
           >
             {children}
           </div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
