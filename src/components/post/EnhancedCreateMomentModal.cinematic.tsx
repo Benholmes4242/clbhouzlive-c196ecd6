@@ -227,7 +227,7 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-8" />
+              <div className="h-10" />
 
               {/* Floating cards below with 12px rhythm */}
               <div className="space-y-3 px-4 pb-3">
@@ -336,7 +336,7 @@ function MediaCarousel({
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
   if (!media?.length) {
-    return <div className={`h-[36vh] md:h-[38vh] ${fallback} flex items-center justify-center rounded-2xl`}>
+    return <div className={`h-[46vh] md:h-[48vh] ${fallback} flex items-center justify-center rounded-2xl`}>
       <span className="text-white/50 text-sm">No media selected</span>
     </div>;
   }
@@ -347,7 +347,7 @@ function MediaCarousel({
 
   return (
     <div 
-      className="relative w-full h-[36vh] md:h-[38vh] overflow-hidden rounded-2xl bg-black"
+      className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
