@@ -448,26 +448,34 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           <button
             aria-label="Close modal"
             onClick={handleClose}
-            className={`
-              fixed cursor-default
-              ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-16 bg-black/50' 
-                : 'inset-0 bg-white/10 backdrop-blur-xl'
-              }
-            `}
+            className="fixed cursor-default inset-0 bg-white/10 backdrop-blur-xl"
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           />
           
+          {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
+          {isMobile && (
+            <div
+              className="absolute left-0 top-0 bottom-16 z-20"
+              style={{ width: 'max(40px, env(safe-area-inset-left))' }}
+              aria-hidden="true"
+              data-testid="echo-gutter"
+              onClick={handleClose}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+            />
+          )}
+          
           {/* Modal Panel */}
           <div 
             className={`
-              fixed right-0 bg-background shadow-2xl z-10
+              fixed right-0 bg-background z-10
               ${isMobile 
-                ? 'w-full top-0 bottom-16' 
-                : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl'
+                ? 'w-[calc(100vw-max(40px,env(safe-area-inset-left)))] top-0 bottom-16 shadow-lg pl-[1px]' 
+                : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl shadow-2xl'
               }
             `}
+            style={isMobile ? { height: 'calc(100dvh - 64px)' } : undefined}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           >
