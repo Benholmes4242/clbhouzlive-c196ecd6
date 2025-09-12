@@ -487,7 +487,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     {regionName}
                   </h2>
                   {filteredAndSortedCourses.length > 0 && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 text-xs text-muted-foreground">
+                    <div className="absolute left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground">
                       {playedCount} of {filteredAndSortedCourses.length} courses played
                     </div>
                   )}
