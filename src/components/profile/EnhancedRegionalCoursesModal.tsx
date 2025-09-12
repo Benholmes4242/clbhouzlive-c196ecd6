@@ -483,16 +483,14 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               {/* Header with title and close button */}
               <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-tl-2xl">
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4">
-                  <div className="flex flex-col">
-                    <h2 className="text-xl sm:text-2xl font-bold">
-                      {regionName}
-                    </h2>
-                    {filteredAndSortedCourses.length > 0 && (
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {playedCount} of {filteredAndSortedCourses.length} courses played
-                      </div>
-                    )}
-                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold">
+                    {regionName}
+                  </h2>
+                  {filteredAndSortedCourses.length > 0 && (
+                    <div className="absolute left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground">
+                      {playedCount} of {filteredAndSortedCourses.length} courses played
+                    </div>
+                  )}
                   <button
                     onClick={handleClose}
                     className="focus:outline-none"
