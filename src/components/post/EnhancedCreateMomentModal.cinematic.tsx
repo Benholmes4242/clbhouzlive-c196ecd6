@@ -370,7 +370,9 @@ function MediaCarousel({
   onClose,
   canSlide,
   theme,
-  captionHeight
+  captionHeight,
+  mediaBoxRef,
+  useContain = false
 }: { 
   media: File[]; 
   currentIndex: number;
@@ -382,6 +384,8 @@ function MediaCarousel({
   canSlide: boolean;
   theme?: "dark" | "light";
   captionHeight: number;
+  mediaBoxRef?: React.RefObject<HTMLDivElement>;
+  useContain?: boolean;
 }) {
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
@@ -394,9 +398,11 @@ function MediaCarousel({
   const currentFile = media[currentIndex];
   const previewUrl = URL.createObjectURL(currentFile);
   const isVideo = currentFile.type.startsWith('video/');
+  const fitClass = useContain ? "h-full w-full object-contain bg-black/60" : "h-full w-full object-cover";
 
   return (
     <div 
+      ref={mediaBoxRef}
       className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -406,7 +412,7 @@ function MediaCarousel({
         <video 
           key={`v-${currentIndex}`}
           src={previewUrl} 
-          className="h-full w-full object-cover" 
+          className={fitClass}
           muted 
           playsInline
         />
@@ -415,7 +421,7 @@ function MediaCarousel({
           key={`i-${currentIndex}`}
           src={previewUrl} 
           alt="" 
-          className="h-full w-full object-cover"
+          className={fitClass}
           draggable={false}
         />
       )}
