@@ -300,6 +300,10 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         items={mediaItems}
         config={{
           ...GRID_PRESETS.modalMedia,
+          features: {
+            ...GRID_PRESETS.modalMedia.features,
+            autoplay: false // Disable autoplay to show play icons instead of mute buttons
+          },
           interactions: {
             onMediaClick: handleMediaClick
           }
