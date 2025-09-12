@@ -502,11 +502,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <div className="flex items-center gap-3">
             <EchoAvatar 
               state={getAvatarState()} 
-              size={window.innerWidth <= 768 ? 32 : 36} 
+              size={window.innerWidth <= 768 ? 40 : 44} 
             />
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
-              <p className="text-xs text-gray-600 opacity-80">I'm your personal caddie</p>
+              <h2 className="text-xl font-semibold text-gray-900">Echo</h2>
+              <p className="text-sm text-gray-600 opacity-80">I'm your personal caddie</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
