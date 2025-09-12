@@ -439,7 +439,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           className={`
             fixed z-[1000] flex
             ${isMobile 
-              ? 'top-0 left-0 right-0 bottom-16' 
+              ? 'top-0 left-0 right-0 bottom-0' 
               : 'inset-0'
             }
           `}
@@ -456,7 +456,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
           {isMobile && (
             <div
-              className="absolute left-0 top-0 bottom-16 z-20"
+              className="absolute left-0 top-0 bottom-0 z-20"
               style={{ width: 'max(40px, env(safe-area-inset-left))' }}
               aria-hidden="true"
               data-testid="echo-gutter"
@@ -471,11 +471,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             className={`
               fixed right-0 bg-background z-10
               ${isMobile 
-                ? 'w-[calc(100vw-max(40px,env(safe-area-inset-left)))] top-0 bottom-16 shadow-lg pl-[1px]' 
+                ? 'w-[calc(100vw-max(40px,env(safe-area-inset-left)))] top-0 bottom-0 shadow-lg pl-[1px]' 
                 : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl shadow-2xl'
               }
             `}
-            style={isMobile ? { height: 'calc(100dvh - 64px)' } : undefined}
+            style={isMobile ? { height: '100dvh' } : undefined}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           >
