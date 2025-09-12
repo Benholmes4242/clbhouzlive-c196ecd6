@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
+import EchoAvatar from './EchoAvatar';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -776,13 +777,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           className="fixed inset-0 flex items-center justify-end overflow-hidden"
           style={{ 
             zIndex: 9999,
-            backgroundColor: 'rgba(0, 0, 0, 0.24)',
+            background: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            paddingLeft: window.innerWidth <= 768 ? '16px' : '0px',
-            paddingRight: '0px',
-            paddingTop: '0px',
-            paddingBottom: '0px'
+            WebkitBackdropFilter: 'blur(16px)'
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -803,7 +800,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           stiffness: 300,
           mass: 0.8
         }}
-        className="w-full sm:w-[90vw] sm:max-w-[860px] h-full flex flex-col overflow-hidden"
+        className="fixed inset-y-0 right-0 w-full sm:w-[90vw] sm:max-w-[860px] flex flex-col overflow-hidden"
         style={{
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
@@ -843,7 +840,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
           }}
         >
-          <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+          <div className="flex items-center gap-3">
+            <EchoAvatar 
+              state="idle"
+              size={window.innerWidth <= 768 ? 40 : 44} 
+            />
+            <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
+          </div>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
