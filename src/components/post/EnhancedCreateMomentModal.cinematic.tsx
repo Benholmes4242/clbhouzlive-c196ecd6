@@ -245,7 +245,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     rounded-2xl
                     bg-black/55 backdrop-blur
                     shadow-[0_10px_30px_rgba(0,0,0,0.35)]
-                    border border-white/10
+                    ring-1 ring-white/10
                     px-4 py-3
                   "
                 >
