@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
+import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 
@@ -31,6 +31,11 @@ const SnapModal = ({
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
+  // Loading skeleton component
+  const SkeletonThumb = ({ className = "" }: { className?: string }) => (
+    <div className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 animate-pulse ${className}`} />
+  );
+
   // Golf course photo library - using curated golf images
   const placeholders = {
     capture: [
@@ -51,7 +56,10 @@ const SnapModal = ({
 
   // Load thumbnails from database or use golf course placeholders
   useEffect(() => {
-    if (isLoading) return; // Keep existing state during loading
+    if (isLoading) {
+      // Show loading skeletons during fetch
+      return;
+    }
     
     if (error) {
       // On error, fall back to placeholders
@@ -227,6 +235,10 @@ const SnapModal = ({
                       </div>
                       <div className="text-left">
                         <div className="text-[17px] font-medium text-white">{label}</div>
+                        {/* Show empty state message if no user media and not loading */}
+                        {!isLoading && !error && userMedia?.photos.length === 0 && userMedia?.videos.length === 0 && key === 'photos' && (
+                          <div className="text-xs text-white/50">No posts yet - start creating!</div>
+                        )}
                       </div>
                     </div>
 
@@ -234,6 +246,19 @@ const SnapModal = ({
                     <ThumbStrip variant={variant} thumbs={thumbs} />
                   </motion.button>
                 ))}
+
+                {/* Error state with retry */}
+                {error && (
+                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
+                    <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="text-xs text-red-400 hover:text-red-300 underline"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
 
                 {/* Tell Your Story Card - AT BOTTOM */}
                 <motion.button

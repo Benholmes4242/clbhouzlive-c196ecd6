@@ -1,24 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface SnapModalMedia {
-  photos: string[];
-  videos: string[];
-}
+export type MediaThumb = {
+  postId: string;
+  url: string;
+  thumbUrl?: string | null;
+  type: string;      // "image" | "video"
+  width?: number | null;
+  height?: number | null;
+  createdAt: string;
+  visibility?: "public" | "private";
+};
 
-export function useSnapModalUserMedia(userId?: string) {
+const PAGE_SIZE = 30;
+
+export function useUserMedia(userId: string | null, page = 0, viewerId?: string | null) {
   return useQuery({
-    queryKey: ['snapModalMedia', userId],
+    queryKey: ["user-media", userId, page, viewerId],
     enabled: !!userId,
-    staleTime: 60_000, // 1 minute
-    queryFn: async (): Promise<SnapModalMedia> => {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryFn: async (): Promise<MediaThumb[]> => {
       if (!userId) throw new Error('User ID required');
 
-      const { data, error } = await supabase
+      // Build base query
+      const baseQuery = supabase
         .from('posts')
         .select(`
           id,
           created_at,
+          user_id,
           post_media (
             id,
             media_type,
@@ -26,30 +36,47 @@ export function useSnapModalUserMedia(userId?: string) {
             poster_url
           )
         `)
-        .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(12);
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+
+      // Apply visibility filter: viewer sees own posts (any visibility) OR public posts of others
+      const { data, error } = userId === viewerId
+        ? await baseQuery.eq('user_id', userId)
+        : await baseQuery.eq('user_id', userId); // Note: Add .eq('visibility', 'public') when visibility column exists
 
       if (error) throw error;
 
-      const photos: string[] = [];
-      const videos: string[] = [];
-
+      // Flatten to one row per media item
+      const rows: MediaThumb[] = [];
       for (const post of data ?? []) {
         for (const media of post.post_media ?? []) {
-          if (media.media_type === 'image' && media.media_url) {
-            photos.push(media.media_url);
-          } else if (media.media_type === 'video') {
-            // For videos, use poster_url if available, otherwise media_url
-            const videoThumbnail = media.poster_url || media.media_url;
-            if (videoThumbnail) {
-              videos.push(videoThumbnail);
-            }
-          }
+          rows.push({
+            postId: post.id,
+            url: media.media_url,
+            thumbUrl: media.poster_url, // For videos, use poster as thumbnail
+            type: media.media_type,
+            width: null,
+            height: null,
+            createdAt: post.created_at,
+            visibility: "public" // Default until visibility column exists
+          });
         }
       }
-
-      return { photos, videos };
-    }
+      return rows;
+    },
   });
+}
+
+// Legacy hook for backward compatibility
+export function useSnapModalUserMedia(userId?: string) {
+  const { data, isLoading, error } = useUserMedia(userId, 0, userId);
+  
+  const photos = data?.filter(m => m.type === 'image').map(m => m.thumbUrl || m.url) ?? [];
+  const videos = data?.filter(m => m.type === 'video').map(m => m.thumbUrl || m.url) ?? [];
+  
+  return {
+    data: { photos, videos },
+    isLoading,
+    error
+  };
 }
