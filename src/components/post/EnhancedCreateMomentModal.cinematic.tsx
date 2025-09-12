@@ -194,7 +194,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Caption card overlaps image bottom */}
                 <div
                   className="
-                    absolute left-4 right-4 -bottom-12
+                    absolute left-4 right-4 -bottom-6
                     z-20
                     rounded-2xl
                     bg-black/55 backdrop-blur
@@ -227,7 +227,7 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-12" />
+              <div className="h-8" />
 
               {/* Floating cards below with 12px rhythm */}
               <div className="space-y-3 px-4 pb-3">
