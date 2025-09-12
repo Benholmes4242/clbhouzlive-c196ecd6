@@ -636,7 +636,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
         {/* Stats */}
         {filteredAndSortedCourses.length > 0 && (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 mb-4 flex items-center justify-center">
             <div className="text-sm text-muted-foreground">
               {playedCount} of {filteredAndSortedCourses.length} courses played
             </div>
