@@ -94,9 +94,9 @@ const SnapModal = ({
       <div className="flex items-stretch gap-2 h-12">
         {variant === "videos" && (
           <>
-            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[0]} />
-            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[1]} />
-            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[2]} />
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[2]} />
           </>
         )}
 
