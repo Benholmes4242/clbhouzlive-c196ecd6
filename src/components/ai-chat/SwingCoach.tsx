@@ -957,7 +957,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         className="h-full"
         style={{ overscrollBehavior: 'contain' }}
       >
-        <div className="px-6 py-5">
+        <div className="px-6 py-0">
         {messages.length === 0 && !uploadedVideo ? (
           <div className="text-center text-muted-foreground">
             <h3 className="text-lg font-medium mb-2">
