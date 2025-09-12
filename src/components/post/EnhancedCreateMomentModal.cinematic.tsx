@@ -52,6 +52,10 @@ export default function EnhancedCreateMomentModalCinematic({
   const [mediaIndex, setMediaIndex] = useState(0);
   const canSlide = media.length > 1;
   
+  // Auto-fit media display logic
+  const mediaBoxRef = useRef<HTMLDivElement | null>(null);
+  const [useContain, setUseContain] = useState(false);
+  
   // Touch handlers for swipe
   const startX = useRef<number | null>(null);
 
@@ -111,6 +115,29 @@ export default function EnhancedCreateMomentModalCinematic({
     ro.observe(captionRef.current);
     return () => ro.disconnect();
   }, []);
+
+  // Auto-fit media logic
+  useEffect(() => {
+    const el = mediaBoxRef.current;
+    const m = media[mediaIndex];
+    if (!el || !m) return;
+
+    const boxW = el.clientWidth;
+    const boxH = el.clientHeight;
+    const boxAR = boxW / boxH;
+
+    if (m.type.startsWith("image")) {
+      const img = new Image();
+      img.onload = () => {
+        const mediaAR = img.naturalWidth / img.naturalHeight;
+        setUseContain(Math.abs(mediaAR - boxAR) > 0.15);
+      };
+      img.src = URL.createObjectURL(m);
+    } else {
+      // videos — default to contain since cropping feels worse
+      setUseContain(true);
+    }
+  }, [mediaIndex, media]);
 
   // AI Caption Generation
   const handleAICaption = async () => {
@@ -206,13 +233,15 @@ export default function EnhancedCreateMomentModalCinematic({
                   canSlide={canSlide}
                   theme={theme}
                   captionHeight={captionH}
+                  mediaBoxRef={mediaBoxRef}
+                  useContain={useContain}
                 />
                 
                 {/* Caption card overlaps image bottom */}
                 <div
                   ref={captionRef}
                   className="
-                    absolute left-4 right-4 -bottom-8
+                    absolute left-4 right-4
                     z-20
                     rounded-2xl
                     bg-black/55 backdrop-blur
@@ -220,6 +249,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     border border-white/10
                     px-4 py-3
                   "
+                  style={{ bottom: -(captionH - 16) }}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-[15px] text-white/70">Add a caption</label>
@@ -245,7 +275,7 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-12" />
+              <div style={{ height: (captionH - 16) + 12 }} />
 
               {/* Floating cards below with consistent 12px gaps */}
               <div className="flex flex-col space-y-3 px-4 pb-3">
