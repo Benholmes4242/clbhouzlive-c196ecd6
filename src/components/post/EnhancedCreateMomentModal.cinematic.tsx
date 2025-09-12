@@ -377,7 +377,7 @@ function MediaCarousel({
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
   if (!media?.length) {
-    return <div className={`${className || 'h-[46vh] md:h-[48vh]'} ${fallback} flex items-center justify-center rounded-2xl`}>
+    return <div className={`${className || 'h-[36vh] md:h-[38vh]'} ${fallback} flex items-center justify-center rounded-2xl`}>
       <span className="text-white/50 text-sm">No media selected</span>
     </div>;
   }
@@ -388,7 +388,7 @@ function MediaCarousel({
 
   return (
     <div 
-      className={`relative w-full overflow-hidden rounded-2xl bg-black ${className || 'h-[46vh] md:h-[48vh]'}`}
+      className={`relative w-full overflow-hidden rounded-2xl bg-black ${className || 'h-[36vh] md:h-[38vh]'}`}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
