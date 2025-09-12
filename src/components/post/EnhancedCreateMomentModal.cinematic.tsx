@@ -266,7 +266,7 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-3" />
+              <div className="h-6" />
 
               {/* Floating cards below with 12px rhythm */}
               <div className="space-y-3 px-4 pb-3">
