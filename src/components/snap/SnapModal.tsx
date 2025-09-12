@@ -115,7 +115,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-white/20 backdrop-blur-2xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -135,25 +135,6 @@ const SnapModal = ({
               </div>
 
               <div className="px-4 pb-5 space-y-3">
-                {/* Tell Your Story Card - NOW AT TOP */}
-                <motion.button
-                  onClick={() => {
-                    onClose(); // Close modal first
-                    setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-md ring-1 ring-amber-400/20 rounded-2xl border border-amber-400/20 hover:bg-gradient-to-r hover:from-amber-500/30 hover:to-orange-500/30 transition-all duration-200"
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/30 to-orange-500/30 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-amber-300" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
-                    <span className="text-sm text-amber-200/80">Mix photos & videos in one go</span>
-                  </div>
-                </motion.button>
-
                 {/* Media Options */}
                 {cardOptions.map(({ key, label, description, icon: Icon, onClick, thumbs }) => (
                   <motion.button
@@ -181,6 +162,25 @@ const SnapModal = ({
                     </div>
                   </motion.button>
                 ))}
+
+                {/* Tell Your Story Card - AT BOTTOM */}
+                <motion.button
+                  onClick={() => {
+                    onClose(); // Close modal first
+                    setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
+                    <span className="text-sm text-white/70">Mix photos & videos in one go</span>
+                  </div>
+                </motion.button>
               </div>
             </motion.div>
           </div>
