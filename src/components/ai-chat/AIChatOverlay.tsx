@@ -555,28 +555,32 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 </div>
               </TabsContent>
 
-              <TabsContent value="logs" className="h-full m-0">
-                <CaddieLogs 
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  userLocation={userLocation}
-                  requestLocation={requestLocation}
-                />
+              <TabsContent value="logs" className="h-full flex flex-col m-0">
+                <div className="flex-1 min-h-0 overflow-auto">
+                  <CaddieLogs 
+                    onClose={() => setActiveTab('chat')}
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    userLocation={userLocation}
+                    requestLocation={requestLocation}
+                  />
+                </div>
               </TabsContent>
 
-              <TabsContent value="swing-coach" className="h-full m-0">
-                <SwingCoach 
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  analysisText={swingCoachAnalysisText}
-                  onAnalysisTextChange={setSwingCoachAnalysisText}
-                />
+              <TabsContent value="swing-coach" className="h-full flex flex-col m-0">
+                <div className="flex-1 min-h-0 overflow-auto">
+                  <SwingCoach 
+                    onClose={() => setActiveTab('chat')}
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    analysisText={swingCoachAnalysisText}
+                    onAnalysisTextChange={setSwingCoachAnalysisText}
+                  />
+                </div>
               </TabsContent>
             </div>
           </Tabs>
