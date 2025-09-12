@@ -1,7 +1,7 @@
 
-import React from 'react';
-import { Camera, Image, Video } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SnapModalProps {
@@ -20,81 +20,141 @@ const SnapModal = ({
   onVideoClick 
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
+  const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
+  const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
+
+  // Mock thumbnails for demonstration - replace with real gallery access
+  useEffect(() => {
+    setPhotoThumbs(['/placeholder.svg', '/placeholder.svg']);
+    setVideoThumbs(['/placeholder.svg', '/placeholder.svg', '/placeholder.svg']);
+  }, []);
+
+  const Thumbnail = ({ src }: { src?: string }) => (
+    <div className="h-12 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-neutral-700/50 to-neutral-800/50 backdrop-blur-sm">
+      {src && <img src={src} alt="" className="h-full w-full object-cover opacity-60" />}
+    </div>
+  );
+
+  const cardOptions = [
+    ...(isMobile ? [{
+      key: "capture",
+      label: "Capture",
+      description: "Take photo or video",
+      icon: Camera,
+      onClick: onCameraClick,
+      thumbs: photoThumbs.slice(0, 2),
+    }] : []),
+    {
+      key: "photos",
+      label: "Photos",
+      description: "Select from gallery",
+      icon: Image,
+      onClick: onImageClick,
+      thumbs: photoThumbs,
+    },
+    {
+      key: "videos",
+      label: "Videos", 
+      description: "Select from gallery",
+      icon: Video,
+      onClick: onVideoClick,
+      thumbs: videoThumbs,
+    },
+  ];
 
   return (
-    <div className={`fixed inset-0 z-50 ${isOpen ? 'block' : 'hidden'}`}>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className="bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] w-full max-w-[420px] md:max-w-[480px] py-6 px-5">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-center flex-1">Create a Moment</h2>
-            <button
-              onClick={onClose}
-              className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Close modal"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
           
-          {/* Options */}
-          <div className="space-y-6">
-            {isMobile && (
-              <Button
-                onClick={onCameraClick}
-                className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
-                variant="outline"
-              >
-                <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                  <Camera className="h-6 w-6 text-[#b66b41]" />
-                </div>
-                <div className="text-left">
-                  <div className="font-semibold text-base">Capture Photo or Video</div>
-                  <div className="text-sm text-gray-500">Use your device camera</div>
-                </div>
-              </Button>
-            )}
-            
-            <Button
-              onClick={onVideoClick}
-              className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
-              variant="outline"
+          {/* Panel */}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Create a Moment"
+              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              initial={{ y: 20, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
             >
-              <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                <Video className="h-6 w-6 text-[#b66b41]" />
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pt-5 pb-3">
+                <h2 className="text-xl font-semibold">Create a Moment</h2>
+                <button 
+                  onClick={onClose} 
+                  aria-label="Close" 
+                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/10 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <div className="text-left">
-                <div className="font-semibold text-base">Post a Video</div>
-                <div className="text-sm text-gray-500">Select from gallery</div>
+
+              <div className="px-4 pb-5 space-y-3">
+                {/* Media Options */}
+                {cardOptions.map(({ key, label, description, icon: Icon, onClick, thumbs }) => (
+                  <motion.button
+                    key={key}
+                    onClick={onClick}
+                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[17px] font-medium text-white">{label}</div>
+                        <div className="text-sm text-white/70">{description}</div>
+                      </div>
+                    </div>
+
+                    {/* Thumbnails */}
+                    <div className="flex gap-2">
+                      {thumbs.slice(0, 3).map((src, i) => (
+                        <Thumbnail key={i} src={src} />
+                      ))}
+                    </div>
+                  </motion.button>
+                ))}
+
+                {/* Tell Your Story Card */}
+                <motion.button
+                  onClick={() => {
+                    // TODO: Hook up to multi-select flow
+                    console.log('Tell Your Story clicked - implement multi-select flow');
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
+                    <span className="text-sm text-white/70">Mix photos & videos in one go</span>
+                  </div>
+                </motion.button>
               </div>
-            </Button>
-            
-            <Button
-              onClick={onImageClick}
-              className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
-              variant="outline"
-            >
-              <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                <Image className="h-6 w-6 text-[#b66b41]" />
-              </div>
-              <div className="text-left">
-                <div className="font-semibold text-base">Post a Photo</div>
-                <div className="text-sm text-gray-500">Select from gallery</div>
-              </div>
-            </Button>
+            </motion.div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
