@@ -26,17 +26,17 @@ const SnapModal = ({
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
-  // Golf course photo library - curated golf-specific placeholders
+  // Golf course photo library - using reliable placeholder service
   const placeholders = {
     photos: [
-      "https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=100&h=75&fit=crop&crop=center", // Golf course putting green
-      "https://images.unsplash.com/photo-1617654112329-b97d93ee09ad?w=100&h=75&fit=crop&crop=center", // Golf ball and club
-      "https://images.unsplash.com/photo-1500932334442-8761ee4810a7?w=100&h=75&fit=crop&crop=center", // Golf course landscape
+      "https://picsum.photos/100/75?random=1", // Temp - will replace with golf assets
+      "https://picsum.photos/100/75?random=2", 
+      "https://picsum.photos/100/75?random=3",
     ],
     videos: [
-      "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?w=100&h=75&fit=crop&crop=center", // Golf tee shot
-      "https://images.unsplash.com/photo-1596727147080-4e5e32bd5b0b?w=100&h=75&fit=crop&crop=center", // Golf swing follow through
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=75&fit=crop&crop=center", // Golf course flag
+      "https://picsum.photos/100/75?random=4", // Temp - will replace with golf assets
+      "https://picsum.photos/100/75?random=5",
+      "https://picsum.photos/100/75?random=6",
     ],
   };
 
