@@ -84,6 +84,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isButtonShaking, setIsButtonShaking] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [aiLoading, setAiLoading] = useState(false);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
   const isMobile = useIsMobile();
   const previouslyOpenRef = useRef(false);
 
@@ -121,12 +123,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         setSelectedTags([...initialTags]);
         setFiles([...initialFiles]);
         setIsPrivate(initialIsPrivate);
+        setVisibility(initialIsPrivate ? "private" : "public");
         setModalMode('upload'); // Skip selection for edit mode
       } else {
         setCaption('');
         setSelectedTags([]);
         setFiles([...initialFiles]);
         setIsPrivate(false); // Default to public
+        setVisibility("public");
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
         setModalMode(mode);
       }
@@ -189,7 +193,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         files,
         tags: selectedTags,
         course: selectedCourse,
-        isPrivate,
+        isPrivate: visibility === "private",
         backgroundMusic
       });
       
@@ -210,11 +214,49 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     }
   };
 
+  // AI Caption Generation
+  const handleAICaption = async () => {
+    try {
+      setAiLoading(true);
+      const first = files?.[0];
+      if (!first) return;
+
+      const body = {
+        type: first.type.startsWith('video') ? "video" : "image",
+        previewUrl: URL.createObjectURL(first),
+        captionContext: caption || "",
+      };
+
+      const response = await fetch("/functions/v1/ai-caption-generator", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      
+      const data = await response.json();
+      if (data?.caption) {
+        setCaption(data.caption);
+      } else {
+        throw new Error(data.error || 'Failed to generate caption');
+      }
+    } catch (error) {
+      console.error('AI caption error:', error);
+      toast({
+        title: "Caption Generation Failed",
+        description: "Please try writing a caption manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleCancel = () => {
     setCaption('');
     setFiles([]);
     setSelectedTags([]);
     setIsPrivate(false);
+    setVisibility("public");
     setModalMode('selection');
     onClose();
   };
@@ -596,29 +638,32 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     Cancel
                   </Button>
                   
-                  {/* Enhanced Post Button with animations */}
+                  {/* Enhanced Post Button with Echo Gradient */}
                   <div className="relative">
-                    <Button
+                    <button
                       onClick={handleSubmit}
                       disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
                       aria-label="Post your moment"
-                      className={`
-                        px-6 py-3 text-sm font-medium rounded-xl
-                        bg-gray-400 hover:bg-gray-500 text-white
-                        transition-all duration-200 ease-out
-                        hover:scale-105 active:scale-95
-                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
-                        focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
-                        ${isButtonShaking ? 'animate-shake' : ''}
-                        ${isSubmitting ? 'animate-pulse' : ''}
-                      `}
-                      style={{
-                        background: isSubmitting ? '#9ca3af' : undefined,
-                        minWidth: '140px' // Prevent button width changes
+                      className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 ease-out hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      style={{ 
+                        background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+                        minWidth: '140px'
                       }}
                     >
+                      {/* Shimmer animation while submitting */}
+                      {isSubmitting && (
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
+                            animation: 'shimmer 1.1s ease linear infinite',
+                            backgroundSize: '200% 100%'
+                          }}
+                        />
+                      )}
+                      
                       {isSubmitting ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin" />
                           <span>{editMode ? 'Updating...' : 'Posting...'}</span>
                         </div>
@@ -630,7 +675,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                           }
                         </span>
                       )}
-                    </Button>
+                    </button>
                     
                     {/* Error message display */}
                     {submitError && (

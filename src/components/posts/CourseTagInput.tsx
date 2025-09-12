@@ -89,11 +89,9 @@ const CourseTagInput = ({
   return (
     <div className="space-y-2">
       <div className="relative">
-        {/* Enhanced Input Field with Map Pin Icon */}
+        {/* Enhanced Input Field with Centered Map Pin Icon */}
         <div className="relative">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
-            <MapPin className="h-4 w-4" />
-          </div>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">📍</span>
           <input
             ref={inputRef}
             type="text"
@@ -102,7 +100,7 @@ const CourseTagInput = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:outline-none focus:ring-0 focus:border-gray-200 focus:shadow-none hover:border-gray-200 active:border-gray-200 transition-none bg-white"
+            className="w-full pl-10 pr-3 h-11 rounded-xl bg-white/90 text-neutral-900 placeholder:text-neutral-500 outline-none"
             disabled={!!selectedCourse}
           />
           {isLoading && searchQuery.length >= 2 && (
@@ -112,9 +110,9 @@ const CourseTagInput = ({
           )}
         </div>
 
-        {/* Enhanced Suggestions Dropdown */}
+        {/* Enhanced Suggestions Dropdown with high z-index */}
         {showSuggestions && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50 mt-2">
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto z-[9999] mt-2">
             {suggestions.length > 0 ? (
               <div className="py-2">
                 {suggestions.map((course, index) => (
