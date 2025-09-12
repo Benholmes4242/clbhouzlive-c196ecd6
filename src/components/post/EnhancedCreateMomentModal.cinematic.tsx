@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
+
+const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
 // Stars loading component
 const StarsLoading = () => (
@@ -51,6 +53,11 @@ export default function EnhancedCreateMomentModalCinematic({
   // Touch handlers for swipe
   const startX = useRef<number | null>(null);
 
+  // Dynamic height measurement for overlap
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const captionRef = useRef<HTMLDivElement>(null);
+  const [mediaHeight, setMediaHeight] = useState<number | undefined>(undefined);
+
   const {
     caption,
     setCaption,
@@ -84,6 +91,28 @@ export default function EnhancedCreateMomentModalCinematic({
     }
     startX.current = null;
   };
+
+  // Measure and set media height so it ends just beneath the caption,
+  // leaving only a small CAPTION_OVERLAP_PX overlap.
+  useLayoutEffect(() => {
+    const el = wrapperRef.current;
+    const cap = captionRef.current;
+    if (!el || !cap) return;
+
+    const measure = () => {
+      const wrapperH = el.clientHeight;
+      const captionH = cap.clientHeight;
+      // media area should be wrapper height minus caption height + small overlap
+      const h = Math.max(120, wrapperH - (captionH - CAPTION_OVERLAP_PX));
+      setMediaHeight(h);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    ro.observe(cap);
+    return () => ro.disconnect();
+  }, []);
 
   // Keyboard handlers
   useEffect(() => {
@@ -170,15 +199,19 @@ export default function EnhancedCreateMomentModalCinematic({
           {/* shell */}
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
             <motion.div
-              className="w-full max-w-[520px] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              ref={wrapperRef}
+              className="w-full max-w-[520px] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)] flex flex-col h-full"
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Media + Overlapping Caption */}
-              <div className="relative">
+              {/* MEDIA */}
+              <div
+                className="relative w-full overflow-hidden rounded-2xl"
+                style={mediaHeight ? { height: `${mediaHeight}px` } : undefined}
+              >
                 <MediaCarousel 
                   media={media} 
                   currentIndex={mediaIndex}
@@ -188,14 +221,20 @@ export default function EnhancedCreateMomentModalCinematic({
                   onNext={nextMedia}
                   onClose={close}
                   canSlide={canSlide}
-                  theme={theme} 
+                  theme={theme}
+                  className="h-full w-full"
                 />
+              </div>
                 
-                {/* Caption card overlaps image bottom */}
+              {/* CAPTION CARD */}
+              <div
+                ref={captionRef}
+                className="relative z-10"
+                style={{ marginTop: `-${CAPTION_OVERLAP_PX}px` }}
+              >
                 <div
                   className="
-                    absolute left-4 right-4 -bottom-6
-                    z-20
+                    mx-4
                     rounded-2xl
                     bg-black/55 backdrop-blur
                     shadow-[0_10px_30px_rgba(0,0,0,0.35)]
@@ -321,7 +360,8 @@ function MediaCarousel({
   onNext, 
   onClose,
   canSlide,
-  theme 
+  theme,
+  className 
 }: { 
   media: File[]; 
   currentIndex: number;
@@ -332,11 +372,12 @@ function MediaCarousel({
   onClose: () => void;
   canSlide: boolean;
   theme?: "dark" | "light";
+  className?: string;
 }) {
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
   if (!media?.length) {
-    return <div className={`h-[46vh] md:h-[48vh] ${fallback} flex items-center justify-center rounded-2xl`}>
+    return <div className={`${className || 'h-[46vh] md:h-[48vh]'} ${fallback} flex items-center justify-center rounded-2xl`}>
       <span className="text-white/50 text-sm">No media selected</span>
     </div>;
   }
@@ -347,7 +388,7 @@ function MediaCarousel({
 
   return (
     <div 
-      className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
+      className={`relative w-full overflow-hidden rounded-2xl bg-black ${className || 'h-[46vh] md:h-[48vh]'}`}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
