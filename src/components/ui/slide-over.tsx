@@ -146,10 +146,10 @@ export function SlideOver({
             aria-modal="true"
             aria-label={ariaLabel}
             className={`
-              fixed right-0 bg-background shadow-2xl z-10
+              fixed bg-background shadow-xl z-10
               ${isMobile 
-                ? `w-full top-0 bottom-0 ${heightClass}` 
-                : `inset-y-0 ${width} rounded-l-2xl ${heightClass}`
+                ? `w-[calc(100vw-max(16px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 ${heightClass}` 
+                : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
               }
             `}
             onMouseDown={(e) => e.stopPropagation()}
