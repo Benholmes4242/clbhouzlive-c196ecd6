@@ -178,17 +178,17 @@ const Discover = () => {
           </div>
 
 
+          {/* Suggested Users */}
+          <div className="md:container md:mx-auto md:px-0">
+            <SuggestedUsers onUserFollow={handleUserFollow} />
+          </div>
+
           {/* Trending Now Section */}
           <div>
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
             />
-          </div>
-
-          {/* Suggested Users */}
-          <div className="md:container md:mx-auto md:px-0">
-            <SuggestedUsers onUserFollow={handleUserFollow} />
           </div>
 
 

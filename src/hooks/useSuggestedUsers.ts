@@ -10,6 +10,7 @@ interface SuggestedUser {
   followersCount: number;
   isVerified?: boolean;
   isReal: boolean; // To distinguish real vs mock users
+  lastPortraitVideo?: string; // URL of their last uploaded portrait video
 }
 
 export const useSuggestedUsers = () => {
@@ -32,7 +33,8 @@ export const useSuggestedUsers = () => {
           display_name,
           username,
           profile_photo_url,
-          bio
+          bio,
+          profile_video_url
         `)
         .neq('id', user.id) // Exclude current user
         .eq('is_public', true)
@@ -79,7 +81,8 @@ export const useSuggestedUsers = () => {
         bio: user.bio || '',
         followersCount: user.followers_count || 0,
         isVerified: false,
-        isReal: true
+        isReal: true,
+        lastPortraitVideo: user.profile_video_url
       }));
 
       // Mock users to fill out suggestions if needed
@@ -92,7 +95,8 @@ export const useSuggestedUsers = () => {
           bio: 'Weekend warrior golfer',
           followersCount: 1240,
           isVerified: false,
-          isReal: false
+          isReal: false,
+          lastPortraitVideo: undefined
         },
         {
           id: 'mock-2',

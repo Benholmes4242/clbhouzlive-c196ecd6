@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
 import { supabase } from '@/integrations/supabase/client';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 
 interface SuggestedUsersProps {
   onUserFollow: (userId: string) => void;
@@ -64,6 +65,13 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
     return count.toString();
   };
 
+  // Golf placeholder images for users without videos
+  const golfPlaceholders = [
+    'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=600&fit=crop&crop=center',
+    'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&h=600&fit=crop&crop=center',
+    'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=600&fit=crop&crop=center'
+  ];
+
   // Filter out already followed users
   const availableUsers = users.filter(user => !followedUsers.has(user.id));
 
@@ -77,12 +85,13 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
           <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
             {/* Loading skeletons */}
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center animate-pulse">
-                <div className="w-14 h-14 bg-gray-200 rounded-full mx-auto mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
+              <div key={i} className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 animate-pulse">
+                <div className="w-full h-32 bg-gray-200 rounded-t-xl mb-2"></div>
+                <div className="px-2 pb-2">
+                  <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-gray-200 rounded"></div>
+                </div>
               </div>
             ))}
           </div>
@@ -103,56 +112,66 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
           <h3 className="text-base font-semibold text-gray-900">Suggested for you</h3>
         </div>
 
-        {/* Horizontal Scrollable User Cards */}
+        {/* Horizontal Scrollable Video Cards */}
         <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
-          {availableUsers.map((user) => (
+          {availableUsers.map((user, index) => (
             <div
               key={user.id}
-              className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center"
+              className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 overflow-hidden relative"
             >
-              {/* Profile Image */}
-              <div className="relative mb-1">
-                <img
-                  src={user.profileImage}
-                  alt={user.displayName}
-                  className="w-14 h-14 rounded-full mx-auto object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=100&h=100&fit=crop&crop=face';
-                  }}
-                />
+              {/* Video/Image Content */}
+              <div className="w-full h-32 relative bg-gray-100">
+                {user.lastPortraitVideo ? (
+                  <EnhancedVideoPlayer
+                    src={user.lastPortraitVideo}
+                    autoplay={true}
+                    muted={true}
+                    loop={true}
+                    className="w-full h-full object-cover"
+                    objectFit="cover"
+                    hideControls={true}
+                  />
+                ) : (
+                  <img
+                    src={golfPlaceholders[index % golfPlaceholders.length]}
+                    alt="Golf content"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                
+                {/* Verified badge overlay */}
                 {user.isVerified && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                     <Check className="w-3 h-3 text-white" />
                   </div>
                 )}
               </div>
 
               {/* User Info */}
-              <div className="mb-1">
-                <h4 className="text-sm font-semibold text-gray-900 truncate mb-0.5">
-                  {user.displayName}
-                </h4>
-                <p className="text-sm text-gray-500 truncate mb-1">
-                  {user.username}
-                </p>
-                <span className="text-sm text-gray-400">
-                  {formatFollowers(user.followersCount)} followers
-                </span>
-              </div>
+              <div className="p-2 flex flex-col justify-between h-16">
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-900 truncate leading-tight">
+                    {user.displayName}
+                  </h4>
+                  <p className="text-xs text-gray-500 truncate">
+                    {user.username}
+                  </p>
+                </div>
 
-              {/* Follow Button */}
-              <button
-                onClick={() => handleFollow(user.id)}
-                disabled={followingInProgress.has(user.id)}
-                className={cn(
-                  "text-black text-sm font-medium transition-colors duration-150",
-                  followingInProgress.has(user.id) 
-                    ? "text-gray-400 cursor-not-allowed" 
-                    : "hover:text-gray-700"
-                )}
-              >
-                {followingInProgress.has(user.id) ? 'Following...' : 'Follow'}
-              </button>
+                {/* Follow Button */}
+                <button
+                  onClick={() => handleFollow(user.id)}
+                  disabled={followingInProgress.has(user.id)}
+                  className={cn(
+                    "w-full py-1 px-2 text-xs font-medium rounded-md transition-colors duration-150",
+                    followingInProgress.has(user.id) 
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                      : "bg-black text-white hover:bg-gray-800"
+                  )}
+                >
+                  {followingInProgress.has(user.id) ? 'Following...' : 'Follow'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
