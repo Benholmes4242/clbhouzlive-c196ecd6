@@ -336,7 +336,7 @@ function MediaCarousel({
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
   if (!media?.length) {
-    return <div className={`h-[46vh] md:h-[48vh] ${fallback} flex items-center justify-center rounded-2xl`}>
+    return <div className={`h-[36vh] md:h-[38vh] ${fallback} flex items-center justify-center rounded-2xl`}>
       <span className="text-white/50 text-sm">No media selected</span>
     </div>;
   }
@@ -347,7 +347,7 @@ function MediaCarousel({
 
   return (
     <div 
-      className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
+      className="relative w-full h-[36vh] md:h-[38vh] overflow-hidden rounded-2xl bg-black"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -428,7 +428,7 @@ function MediaCarousel({
         aria-label="Close"
         className="
           absolute top-3 right-3
-          h-10 w-10 rounded-full
+          h-6 w-6 rounded-full
           bg-white/12 backdrop-blur-md
           border border-white/15
           shadow-[0_8px_24px_rgba(0,0,0,0.35)]
@@ -436,7 +436,7 @@ function MediaCarousel({
           hover:bg-white/18 active:scale-[0.98] transition
         "
       >
-        <X className="h-5 w-5 text-white" />
+        <X className="h-3 w-3 text-white" />
       </button>
       
       {/* Gradients for overlay effect */}
