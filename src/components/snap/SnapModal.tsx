@@ -50,24 +50,75 @@ const SnapModal = ({
     })();
   }, []);
 
-  const Thumbnail = ({ src }: { src?: string }) => (
-    <div className="h-12 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-neutral-700/50 to-neutral-800/50 backdrop-blur-sm">
-      {src && (
-        <img 
-          src={src} 
-          alt="" 
-          className="h-full w-full object-cover opacity-60"
-          onError={(e) => {
-            // Fallback to golf course photo if thumbnail fails to load
-            const target = e.target as HTMLImageElement;
-            const isVideoThumb = videoThumbs.includes(src || '');
-            const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
-            target.src = fallbackImages[0]; // Use first golf course image as fallback
-          }}
-        />
-      )}
-    </div>
-  );
+  // Reusable thumbnail components
+  type StripVariant = "videos" | "photos" | "capture";
+
+  function Thumb({ src, className = "", style }: { src?: string; className?: string; style?: React.CSSProperties }) {
+    return (
+      <div
+        className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
+        style={style}
+      >
+        {src && (
+          <img 
+            src={src} 
+            alt="" 
+            className="h-full w-full object-cover"
+            onError={(e) => {
+              // Fallback to golf course photo if thumbnail fails to load
+              const target = e.target as HTMLImageElement;
+              const isVideoThumb = videoThumbs.includes(src || '');
+              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
+              target.src = fallbackImages[0]; // Use first golf course image as fallback
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+
+  /**
+   * Keeps all rows the same total width using flex weights.
+   * videos: [1,1,1]   (3 equal rects)
+   * photos: [1,2]     (square + 2x wide rect)
+   * capture:[1.5,1.5] (two equal rects, same total width as 3)
+   */
+  function ThumbStrip({
+    variant,
+    thumbs = [],
+  }: {
+    variant: StripVariant;
+    thumbs?: string[];
+  }) {
+    return (
+      <div className="flex items-stretch gap-2 h-12">
+        {variant === "videos" && (
+          <>
+            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[0]} />
+            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[1]} />
+            <Thumb className="flex-[1_0_0] aspect-[4/3]" src={thumbs[2]} />
+          </>
+        )}
+
+        {variant === "photos" && (
+          <>
+            {/* square counts as 1 unit */}
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
+            {/* wide rect counts as 2 units */}
+            <Thumb className="flex-[2_0_0] aspect-[4/3]" src={thumbs[1]} />
+          </>
+        )}
+
+        {variant === "capture" && (
+          <>
+            {/* two equal wide rects, each 1.5 units so total = 3 */}
+            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[0]} />
+            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[1]} />
+          </>
+        )}
+      </div>
+    );
+  }
 
   const cardOptions = [
     ...(isMobile ? [{
@@ -76,7 +127,8 @@ const SnapModal = ({
       description: "Take photo or video",
       icon: Camera,
       onClick: onCameraClick,
-      thumbs: photoThumbs.slice(0, 2),
+      variant: "capture" as StripVariant,
+      thumbs: photoThumbs.slice(0, 2), // Reuse photo thumbs for capture
     }] : []),
     {
       key: "photos",
@@ -84,7 +136,8 @@ const SnapModal = ({
       description: "Select from gallery",
       icon: Image,
       onClick: onImageClick,
-      thumbs: photoThumbs,
+      variant: "photos" as StripVariant,
+      thumbs: photoThumbs.slice(0, 2), // Only need 2 for square + wide layout
     },
     {
       key: "videos",
@@ -92,7 +145,8 @@ const SnapModal = ({
       description: "Select from gallery",
       icon: Video,
       onClick: onVideoClick,
-      thumbs: videoThumbs,
+      variant: "videos" as StripVariant,
+      thumbs: videoThumbs.slice(0, 3), // Need 3 for equal rectangles
     },
   ];
 
@@ -139,7 +193,7 @@ const SnapModal = ({
 
               <div className="px-4 pb-5 space-y-3">
                 {/* Media Options */}
-                {cardOptions.map(({ key, label, description, icon: Icon, onClick, thumbs }) => (
+                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
                   <motion.button
                     key={key}
                     onClick={onClick}
@@ -157,12 +211,8 @@ const SnapModal = ({
                       </div>
                     </div>
 
-                    {/* Thumbnails */}
-                    <div className="flex gap-2">
-                      {thumbs.slice(0, 3).map((src, i) => (
-                        <Thumbnail key={i} src={src} />
-                      ))}
-                    </div>
+                    {/* New ThumbStrip Component */}
+                    <ThumbStrip variant={variant} thumbs={thumbs} />
                   </motion.button>
                 ))}
 
