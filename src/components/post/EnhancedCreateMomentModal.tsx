@@ -383,7 +383,10 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
           />
           
           {/* Modal */}
-          <div className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in">
+          <div 
+            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               {modalMode === 'upload' && (
