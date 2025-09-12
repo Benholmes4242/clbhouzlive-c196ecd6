@@ -782,12 +782,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           zIndex="z-[1200]" 
           lockScroll={false}
         >
-          <motion.div
+          <div
             key="ai-chat-history-panel"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.22, ease: "easeInOut" }}
             className="h-full flex flex-col"
           >
             {/* Header */}
@@ -1249,7 +1245,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           </div>
               </Tabs>
             </div>
-          </motion.div>
+          </div>
         </SlideOver>
       )}
     </AnimatePresence>
