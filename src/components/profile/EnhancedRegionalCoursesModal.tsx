@@ -646,8 +646,6 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             className="pl-10"
           />
         </div>
-
-
       </div>
       
       {/* Scrollable Content */}
