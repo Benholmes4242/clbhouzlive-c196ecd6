@@ -21,6 +21,7 @@ const SnapModal = ({
   onVideoClick 
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
+  const [captureeThumbs, setCaptureeThumbs] = useState<string[]>([]);
   const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
   const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
   
@@ -28,6 +29,10 @@ const SnapModal = ({
 
   // Golf course photo library - using curated golf images
   const placeholders = {
+    capture: [
+      "/lovable-uploads/ca1d3591-53f0-454e-bd54-e6fe955f0b7d.png", // Ryder Cup golfer in red
+      "/lovable-uploads/49cccb8e-2ee7-4d91-8d5e-04104eea1899.png", // Golfer swinging with city skyline
+    ],
     photos: [
       "/lovable-uploads/57ecae87-4439-4ee7-a189-6922ecd457ec.png", // Golfer on elevated tee with scenic valley view
       "/lovable-uploads/83676b62-ac84-42e1-89ae-bf311dfb0af0.png", // Tournament golf scene with crowd
@@ -45,6 +50,7 @@ const SnapModal = ({
     (async () => {
       const cached = await loadRecentMedia();
       // Only use user's own media if they exist, otherwise always show golf course photos
+      setCaptureeThumbs(cached.photos.length ? cached.photos.slice(0, 2) : placeholders.capture);
       setPhotoThumbs(cached.photos.length ? cached.photos.slice(0, 3) : placeholders.photos);
       setVideoThumbs(cached.videos.length ? cached.videos.slice(0, 3) : placeholders.videos);
     })();
@@ -128,7 +134,7 @@ const SnapModal = ({
       icon: Camera,
       onClick: onCameraClick,
       variant: "capture" as StripVariant,
-      thumbs: photoThumbs.slice(0, 2), // Reuse photo thumbs for capture
+      thumbs: captureeThumbs, // Use dedicated capture thumbs
     }] : []),
     {
       key: "photos",
