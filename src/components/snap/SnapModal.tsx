@@ -30,8 +30,8 @@ const SnapModal = ({
   }, []);
 
   const Thumbnail = ({ src }: { src?: string }) => (
-    <div className="h-12 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-neutral-700/50 to-neutral-800/50 backdrop-blur-sm">
-      {src && <img src={src} alt="" className="h-full w-full object-cover opacity-60" />}
+    <div className="h-12 w-16 overflow-hidden rounded-lg bg-white/20 border border-white/30 backdrop-blur-sm">
+      {src && <img src={src} alt="" className="h-full w-full object-cover opacity-80" />}
     </div>
   );
 
@@ -74,7 +74,7 @@ const SnapModal = ({
         >
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-white/10 backdrop-blur-xl"
             onClick={onClose}
           />
           
@@ -84,7 +84,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[480px] bg-white/20 backdrop-blur-2xl border border-white/30 text-white rounded-3xl shadow-[0_20px_80px_rgba(255,255,255,0.1)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -109,7 +109,7 @@ const SnapModal = ({
                   <motion.button
                     key={key}
                     onClick={onClick}
-                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl hover:bg-white/15 transition-colors"
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
@@ -138,7 +138,7 @@ const SnapModal = ({
                     // TODO: Hook up to multi-select flow
                     console.log('Tell Your Story clicked - implement multi-select flow');
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl hover:bg-white/15 transition-colors"
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
