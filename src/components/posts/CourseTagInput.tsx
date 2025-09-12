@@ -102,12 +102,12 @@ const CourseTagInput = ({
             className="flex-1 px-4 pr-3 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
             disabled={!!selectedCourse}
           />
-          <button
-            className="h-11 w-11 rounded-xl bg-white/12 backdrop-blur-md border border-white/15 flex items-center justify-center hover:bg-white/18 transition-colors"
-            aria-label="Select location"
+          <div
+            className="h-11 w-11 rounded-xl bg-white/12 backdrop-blur-md flex items-center justify-center"
+            aria-label="Location indicator"
           >
             <span className="text-[18px]">📍</span>
-          </button>
+          </div>
           {isLoading && searchQuery.length >= 2 && (
             <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
               <Loader2 className="h-4 w-4 animate-spin text-gray-400" />

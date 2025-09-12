@@ -194,7 +194,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Caption card overlaps image bottom */}
                 <div
                   className="
-                    absolute left-4 right-4 -bottom-4
+                    absolute left-4 right-4 -bottom-2
                     z-20
                     rounded-2xl
                     bg-black/55 backdrop-blur
@@ -227,7 +227,7 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-7" />
+              <div className="h-2" />
 
               {/* Floating cards below with 12px rhythm */}
               <div className="space-y-3 px-4 pb-3">
@@ -251,16 +251,12 @@ export default function EnhancedCreateMomentModalCinematic({
                         Popular golf tracks today
                       </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        // TODO: Background music selector
-                        console.log("Music selector clicked");
-                      }}
+                    <div
                       className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
-                      aria-label="Select music"
+                      aria-label="Music indicator"
                     >
-                      <span className="text-orange-500 text-xl">🎵</span>
-                    </button>
+                      🧡
+                    </div>
                   </div>
                 </div>
 
