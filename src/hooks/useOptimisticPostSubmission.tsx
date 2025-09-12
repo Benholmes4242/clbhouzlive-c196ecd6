@@ -52,7 +52,7 @@ export const useOptimisticPostSubmission = () => {
         userId: user.id,
         content,
         mediaFilesCount: mediaFiles.length,
-        tagsCount: selectedTags.length,
+        tagsCount: (selectedTags?.length ?? 0),
         courseInfo,
         fileDetails: mediaFiles.map(f => ({ 
           name: f.name, 
@@ -130,7 +130,8 @@ export const useOptimisticPostSubmission = () => {
       }
 
       // Handle post tags with proper positions and notifications
-      if (selectedTags && selectedTags.length > 0) {
+      const tagCount = selectedTags?.length ?? 0;
+      if (tagCount > 0) {
         try {
           await handlePostTags(postData.id, selectedTags, user.id, content || '');
           console.log('Post tags and notifications created successfully');
