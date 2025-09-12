@@ -486,11 +486,6 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                   <h2 className="text-xl sm:text-2xl font-bold">
                     {regionName}
                   </h2>
-                  {filteredAndSortedCourses.length > 0 && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground">
-                      {playedCount} of {filteredAndSortedCourses.length} courses played
-                    </div>
-                  )}
                   <button
                     onClick={handleClose}
                     className="focus:outline-none"
@@ -505,7 +500,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               <div className="flex-1 overflow-auto bg-transparent">
                 {/* Controls Row */}
       <div className="p-4 sm:p-6 border-b border-border">
-        {/* Mobile Layout: View Toggle and Sort on same row */}
+        {/* Mobile Layout: View Toggle, Stats, and Sort */}
         <div className="flex items-center justify-between gap-2 md:hidden">
           {/* Left: View Toggle */}
           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
@@ -528,6 +523,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               <List className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Center: Stats */}
+          {filteredAndSortedCourses.length > 0 && (
+            <div className="text-sm text-muted-foreground">
+              {playedCount} of {filteredAndSortedCourses.length} courses played
+            </div>
+          )}
 
           {/* Right: Sort Dropdown */}
           <DropdownMenu>
@@ -565,7 +567,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           </DropdownMenu>
         </div>
 
-        {/* Desktop Layout: Grid/List Toggle and Sort on same row */}
+        {/* Desktop Layout: View Toggle, Stats, and Sort */}
         <div className="hidden md:flex md:items-center md:justify-between gap-4">
           {/* View Toggle */}
           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
@@ -590,6 +592,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               <span className="ml-1 hidden sm:inline">List</span>
             </Button>
           </div>
+
+          {/* Center: Stats */}
+          {filteredAndSortedCourses.length > 0 && (
+            <div className="text-sm text-muted-foreground">
+              {playedCount} of {filteredAndSortedCourses.length} courses played
+            </div>
+          )}
 
           {/* Sort Dropdown */}
           <DropdownMenu>
