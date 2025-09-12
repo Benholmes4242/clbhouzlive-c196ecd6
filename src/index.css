@@ -498,6 +498,21 @@
 }
 
 @keyframes slide-in-from-left {
+
+/* Star loading animations */
+@keyframes twinkle1 { 0%,100%{opacity:.25; transform:translateY(0)} 50%{opacity:1; transform:translateY(-1px)} }
+@keyframes twinkle2 { 0%,100%{opacity:.25; transform:translateY(0)} 50%{opacity:1; transform:translateY(-2px)} }
+@keyframes twinkle3 { 0%,100%{opacity:.25; transform:translateY(0)} 50%{opacity:1; transform:translateY(-1px)} }
+
+.animate-star1 { animation: twinkle1 900ms ease-in-out infinite; }
+.animate-star2 { animation: twinkle2 900ms ease-in-out infinite 150ms; }
+.animate-star3 { animation: twinkle3 900ms ease-in-out infinite 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-star1, .animate-star2, .animate-star3 { animation: none; opacity: 1; }
+}
+
+@keyframes slide-in-from-left {
   0% {
     transform: translateX(-100%);
     opacity: 0;

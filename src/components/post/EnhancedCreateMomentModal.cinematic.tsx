@@ -7,6 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
+// Stars loading component
+const StarsLoading = () => (
+  <span className="inline-flex items-center gap-1" aria-live="polite" aria-busy="true">
+    <span className="animate-star1">✨</span>
+    <span className="animate-star2">✨</span>
+    <span className="animate-star3">✨</span>
+  </span>
+);
+
 type Props = { 
   theme?: "dark" | "light";
   isOpen: boolean;
@@ -125,27 +134,36 @@ export default function EnhancedCreateMomentModalCinematic({
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Taller Media Header - 58vh */}
-              <MediaPreview items={files} theme={theme} />
-
-              {/* Floating cards (reduce overlap) */}
-              <div className="space-y-3 p-4 -mt-4">
-                {/* Caption with AI Assistant */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+              {/* Media + Overlapping Caption */}
+              <div className="relative">
+                <MediaPreview items={files} theme={theme} />
+                
+                {/* Caption card overlaps image bottom */}
+                <div
+                  className="
+                    absolute left-4 right-4 -bottom-6
+                    z-20
+                    rounded-2xl
+                    bg-black/55 backdrop-blur
+                    shadow-[0_10px_30px_rgba(0,0,0,0.35)]
+                    border border-white/10
+                    px-4 py-3
+                  "
+                >
                   <div className="flex items-center justify-between mb-1">
-                    <label className={`block text-[15px] ${subtl}`}>Add a caption</label>
+                    <label className="block text-[15px] text-white/70">Add a caption</label>
                     <button
                       onClick={handleAICaption}
                       disabled={aiLoading || files.length === 0}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-2 py-1 rounded-lg shrink-0 transition-colors text-xs disabled:opacity-50`}
+                      className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-xs disabled:opacity-50 text-white"
                       aria-label="Write a caption for me"
                     >
-                      {aiLoading ? "..." : "✨ Write a caption for me"}
+                      {aiLoading ? <StarsLoading /> : <>✨ Write a caption for me</>}
                     </button>
                   </div>
                   <div className="flex items-start gap-2">
                     <textarea
-                      className="w-full bg-transparent outline-none resize-none placeholder-opacity-50"
+                      className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white"
                       rows={2}
                       placeholder="Write a caption…"
                       value={caption}
@@ -153,29 +171,22 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Spacer to prevent collision with overlapped caption */}
+              <div className="h-10" />
+
+              {/* Floating cards below */}
+              <div className="space-y-3 px-4">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="text-[15px] mb-1">Tag a golf course</div>
-                      <CourseTagInput
-                        selectedCourse={course}
-                        onCourseSelect={onCourseSelect || setSelectedCourse}
-                        placeholder="Start typing to find a course..."
-                      />
-                    </div>
-                    <button
-                      onClick={() => {
-                        // TODO: GPS location helper
-                        console.log("GPS location helper clicked");
-                      }}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
-                      aria-label="Use my location"
-                    >
-                      📍
-                    </button>
-                  </div>
+                  <div className="text-[15px] mb-1">Tag a golf course</div>
+                  <CourseTagInput
+                    selectedCourse={course}
+                    onCourseSelect={onCourseSelect || setSelectedCourse}
+                    placeholder="Start typing to find a course..."
+                  />
                 </div>
 
                 {/* Music */}
@@ -213,7 +224,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 </div>
 
                 {/* CTA with Echo Gradient */}
-                <div className="pt-2" />
+                <div className="pt-2 px-4" />
                 <button
                   onClick={handlePost}
                   disabled={!canPost}
@@ -263,7 +274,7 @@ function MediaPreview({ items, theme }: { items: File[]; theme?: "dark" | "light
   const isVideo = firstFile.type.startsWith('video/');
 
   return (
-    <div className="relative h-[58vh] max-h-[720px] min-h-[360px] bg-black">
+    <div className="relative w-full h-[46vh] md:h-[48vh] max-h-[720px] min-h-[360px] bg-black overflow-hidden rounded-2xl">
       {isVideo ? (
         <video 
           src={previewUrl} 
