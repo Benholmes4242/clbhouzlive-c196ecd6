@@ -6,6 +6,7 @@ import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import EnhancedRichTextInput from '../posts/EnhancedRichTextInput';
+import { supabase } from '@/integrations/supabase/client';
 
 import BackgroundMusicSelector from '../posts/BackgroundMusicSelector';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
@@ -171,6 +172,42 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setShowSuggestions(false);
   };
 
+  // AI Caption Generation
+  const handleAICaption = async () => {
+    try {
+      setAiLoading(true);
+      const first = files?.[0];
+      if (!first) return;
+
+      const body = {
+        type: first.type.startsWith('video') ? "video" : "image",
+        previewUrl: URL.createObjectURL(first),
+        captionContext: caption || "",
+      };
+
+      const { data, error } = await supabase.functions.invoke('ai-caption-generator', {
+        body
+      });
+      
+      if (error) throw error;
+      
+      if (data?.caption) {
+        setCaption(data.caption);
+      } else {
+        throw new Error('Failed to generate caption');
+      }
+    } catch (error) {
+      console.error('AI caption error:', error);
+      toast({
+        title: "Caption Generation Failed",
+        description: "Please try writing a caption manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     // Validate form first
     if (!validateForm()) {
@@ -211,43 +248,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         description: errorMessage,
         variant: "destructive"
       });
-    }
-  };
-
-  // AI Caption Generation
-  const handleAICaption = async () => {
-    try {
-      setAiLoading(true);
-      const first = files?.[0];
-      if (!first) return;
-
-      const body = {
-        type: first.type.startsWith('video') ? "video" : "image",
-        previewUrl: URL.createObjectURL(first),
-        captionContext: caption || "",
-      };
-
-      const response = await fetch("/functions/v1/ai-caption-generator", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      
-      const data = await response.json();
-      if (data?.caption) {
-        setCaption(data.caption);
-      } else {
-        throw new Error(data.error || 'Failed to generate caption');
-      }
-    } catch (error) {
-      console.error('AI caption error:', error);
-      toast({
-        title: "Caption Generation Failed",
-        description: "Please try writing a caption manually.",
-        variant: "destructive"
-      });
-    } finally {
-      setAiLoading(false);
     }
   };
 
@@ -481,8 +481,33 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               /* Upload View - Reorganized with better hierarchy and spacing */
               <div className="space-y-6">
 
-                {/* 1. Selected Media Preview */}
+                {/* 1. Selected Media Preview - Taller Header */}
                 <div className="mb-6">
+                  {/* Media Header Container - Taller and Better Proportions */}
+                  <div className="relative h-[58vh] max-h-[720px] min-h-[360px] bg-black rounded-xl overflow-hidden mb-4">
+                    {files.length > 0 && (
+                      <>
+                        {files[0].type.startsWith('video') ? (
+                          <video 
+                            src={URL.createObjectURL(files[0])} 
+                            className="h-full w-full object-cover" 
+                            muted 
+                            loop 
+                            autoPlay 
+                          />
+                        ) : (
+                          <img 
+                            src={URL.createObjectURL(files[0])} 
+                            alt="" 
+                            className="h-full w-full object-cover" 
+                          />
+                        )}
+                        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+                      </>
+                    )}
+                  </div>
+                  
                   <EnhancedMediaUpload
                     onFilesChange={setFiles}
                     maxFiles={10}
@@ -505,15 +530,28 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   )}
                 </div>
 
+                {/* Floating card stack wrapper (reduce overlap) */}
+                <div className="space-y-3 p-4 -mt-4">
+
                 {/* Divider Line */}
                 <div className="border-t border-gray-100 -mx-6" />
 
-                {/* 2. Caption Field - with proper spacing and label */}
+                {/* 2. Caption Field - with AI assistant and proper spacing */}
                 <div className="space-y-4 pt-6">
                   <div className="space-y-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Add a caption
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Add a caption
+                      </label>
+                      <button
+                        onClick={handleAICaption}
+                        disabled={aiLoading || files.length === 0}
+                        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        aria-label="Write a caption for me"
+                      >
+                        {aiLoading ? "..." : "✨ Write a caption for me"}
+                      </button>
+                    </div>
                     <div className="relative">
                       <EnhancedRichTextInput
                         value={caption}
@@ -549,14 +587,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   )}
                 </div>
 
-                {/* 3. Golf Course Field - with proper spacing */}
+                {/* 3. Golf Course Field - with centered pin and proper z-index */}
                 {onCourseSelect && (
-                  <div className="space-y-4 pt-6">
+                  <div className="space-y-4 pt-6 relative z-[300]">
                     <label className="block text-sm font-medium text-gray-700">
                       Tag a golf course
                       <span className="text-gray-400 text-xs ml-1">(Optional)</span>
                     </label>
-                    <div className="max-w-full">
+                    <div className="max-w-full overflow-visible">
                       <CourseTagInput
                         selectedCourse={selectedCourse || null}
                         onCourseSelect={onCourseSelect}
@@ -573,7 +611,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   hasVideo={files.some(file => file.type.startsWith('video/'))}
                 />
 
-                {/* 4. Post Visibility Toggle */}
+                {/* 4. Post Visibility Toggle - Wired Segmented Control */}
                 <div className="space-y-4 pt-6">
                   <label className="block text-sm font-medium text-gray-700">
                     Post Visibility
@@ -583,14 +621,17 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     <div className="flex bg-gray-100 rounded-xl p-1 w-full">
                       <button
                         type="button"
-                        onClick={() => setIsPrivate(false)}
+                        onClick={() => {
+                          setVisibility("public");
+                          setIsPrivate(false);
+                        }}
                         className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          !isPrivate
+                          visibility === "public"
                             ? 'text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-800'
                         }`}
                         style={{
-                          backgroundColor: !isPrivate ? '#9ca3af' : 'transparent'
+                          backgroundColor: visibility === "public" ? '#9ca3af' : 'transparent'
                         }}
                         disabled={isSubmitting}
                       >
@@ -598,14 +639,17 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setIsPrivate(true)}
+                        onClick={() => {
+                          setVisibility("private");
+                          setIsPrivate(true);
+                        }}
                         className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          isPrivate
+                          visibility === "private"
                             ? 'text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-800'
                         }`}
                         style={{
-                          backgroundColor: isPrivate ? '#9ca3af' : 'transparent'
+                          backgroundColor: visibility === "private" ? '#9ca3af' : 'transparent'
                         }}
                         disabled={isSubmitting}
                       >
@@ -615,14 +659,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     
                     {/* Subtext */}
                     <p className="text-xs text-gray-500">
-                      {isPrivate 
+                      {visibility === "private"
                         ? "Private posts are visible only to you." 
                         : "Public posts are visible on feed and profile."
                       }
                     </p>
                   </div>
                 </div>
-
 
                 {/* Divider Line before buttons */}
                 <div className="border-t border-gray-100 -mx-6 mt-8" />
@@ -646,7 +689,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       aria-label="Post your moment"
                       className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 ease-out hover:scale-105 active:scale-95 disabled:hover:scale-100"
                       style={{ 
-                        background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
                         minWidth: '140px'
                       }}
                     >
@@ -686,6 +729,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       </div>
                     )}
                   </div>
+                </div>
                 </div>
               </div>
             )}
