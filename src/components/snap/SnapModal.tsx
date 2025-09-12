@@ -79,7 +79,7 @@ const SnapModal = ({
           />
           
           {/* Panel */}
-          <div className="absolute inset-0 flex items-center justify-center p-4">
+          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
             <motion.div
               role="dialog"
               aria-modal="true"
