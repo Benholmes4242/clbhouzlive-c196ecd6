@@ -34,9 +34,9 @@ const SnapModal = ({
       "/lovable-uploads/60940add-d75e-49e0-adf8-1d1db7f19682.png", // Golf clubs and equipment
     ],
     videos: [
-      "/lovable-uploads/a264f967-bfa0-4088-b28d-53715731d53e.png", // Golf course with sand bunker
-      "/lovable-uploads/f0f3cc35-8698-4814-b600-9453b36f463f.png", // Golfer teeing off scenic view
-      "/lovable-uploads/60940add-d75e-49e0-adf8-1d1db7f19682.png", // Golf clubs and equipment
+      "/lovable-uploads/17825b5e-e41f-4799-83bc-1b91f4584f36.png", // Golf course with water feature and bridge
+      "/lovable-uploads/5517711b-bade-4a0e-9595-3712f17ebb28.png", // Golfer hitting from sand bunker
+      "/lovable-uploads/627f9763-275f-4f08-b82e-bf2d39284f75.png", // Golfer mid-swing action shot
     ],
   };
 
