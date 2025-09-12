@@ -76,7 +76,7 @@ const SnapModal = ({
     setCaptureeThumbs(photos.length ? photos.slice(0, 2) : placeholders.capture);
     setPhotoThumbs(photos.length ? photos.slice(0, 3) : placeholders.photos);
     setVideoThumbs(videos.length ? videos.slice(0, 3) : placeholders.videos);
-  }, [isLoading, error, userMedia?.photos, userMedia?.videos]);
+  }, [isLoading, error, userMedia]);
 
   // Reusable thumbnail components
   type StripVariant = "videos" | "photos" | "capture";
@@ -119,7 +119,7 @@ const SnapModal = ({
     thumbs?: string[];
   }) {
     return (
-      <div className="flex items-stretch gap-2 h-10 w-44">{/* Longer fixed width for all strips */}
+      <div className="flex items-stretch gap-2 h-12 w-44">{/* Longer fixed width for all strips */}
         {variant === "videos" && (
           <>
             <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
