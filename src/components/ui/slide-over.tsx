@@ -138,7 +138,7 @@ export function SlideOver({
           {isMobile && (
             <div
               className="absolute left-0 top-0 bottom-0 z-20"
-              style={{ width: 'max(24px, env(safe-area-inset-left))' }}
+              style={{ width: 'max(40px, env(safe-area-inset-left))' }}
               aria-hidden="true"
               data-testid="echo-gutter"
               onClick={onClose}
@@ -155,7 +155,7 @@ export function SlideOver({
             className={`
               fixed bg-background z-10
               ${isMobile 
-                ? `w-[calc(100vw-max(24px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
+                ? `w-[calc(100vw-max(40px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
                 : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
               }
             `}
