@@ -268,7 +268,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="end" 
-            className="bg-background border border-border z-50"
+            className="bg-background border border-border"
           >
             <DropdownMenuItem 
               onClick={() => setActiveFilter('all')}
