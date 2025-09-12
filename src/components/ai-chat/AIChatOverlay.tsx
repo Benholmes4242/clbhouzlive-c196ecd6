@@ -525,7 +525,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         </div>
 
         {/* Divider between header and tabs */}
-        <div className="border-t border-gray-300/40 mx-6" />
+        <div className="border-t border-white/20" />
 
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
