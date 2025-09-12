@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Search, Edit, Trash2, MapPin, Calendar, Mic, MicOff, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { channelManager } from '@/utils/supabaseChannelManager';
-import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface CaddieLog {
   id: string;
@@ -47,12 +45,8 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Auto-scroll for logs
-  const logsAutoScroll = useAutoScroll({
-    dependencies: [logs],
-    enabled: true,
-    direction: 'top' // Latest logs are at the top (ordered by created_at desc)
-  });
+  // Auto-scroll is now managed by parent AIChatOverlay
+  // Remove local auto-scroll since parent provides the ScrollArea and ref
 
   useEffect(() => {
     fetchLogs();
@@ -243,11 +237,6 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
 
   return (
     <div className="h-full min-h-0">
-      <ScrollArea 
-        ref={logsAutoScroll.scrollAreaRef}
-        className="h-full"
-        style={{ overscrollBehavior: 'contain' }}
-      >
         <div className="px-6 py-5 space-y-4">
         <p className="text-center text-muted-foreground">
           Your personal yardage book starts here.<br />
@@ -378,7 +367,6 @@ const CaddieLogs: React.FC<CaddieLogsProps> = ({
           </div>
         </div>
         </div>
-      </ScrollArea>
     </div>
   );
 };

@@ -76,6 +76,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     direction: 'bottom' // Chat messages are added at the bottom
   });
 
+  // Auto-scroll for caddie logs (shared with CaddieLogs component)
+  const logsAutoScroll = useAutoScroll({
+    dependencies: [], // CaddieLogs will manage its own dependencies
+    enabled: true,
+    direction: 'top' // Latest logs are at the top
+  });
+
   async function handleVoiceNote(transcribedText: string) {
     try {
       // Get current location for the note
@@ -557,72 +564,79 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsList>
           </div>
 
-          {/* Single scrollable content area */}
-          <ScrollArea 
-            className="flex-1 min-h-0"
-            style={{ overscrollBehavior: 'contain' }}
-            ref={chatAutoScroll.scrollAreaRef}
-          >
+          {/* Per-tab scrollable content areas */}
             <TabsContent value="chat" className="h-full m-0">
-              <div className="h-full min-h-0">
-                <div className="px-6 py-5">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-muted-foreground">
-                      <p className="mb-6">
-                        I'm your personal tour caddie.<br />
-                        Ask me anything, anytime, I've got you.
-                      </p>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">Try asking:</p>
-                        {suggestedPrompts.map((prompt, index) => (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSuggestedPrompt(prompt)}
-                            className="mx-1 mb-2 text-xs"
-                          >
-                            {prompt}
-                          </Button>
-                        ))}
+              <ScrollArea 
+                ref={chatAutoScroll.scrollAreaRef}
+                className="h-full min-h-0"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="h-full min-h-0">
+                  <div className="px-6 py-5">
+                    {messages.length === 0 ? (
+                      <div className="text-center text-muted-foreground">
+                        <p className="mb-6">
+                          I'm your personal tour caddie.<br />
+                          Ask me anything, anytime, I've got you.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Try asking:</p>
+                          {suggestedPrompts.map((prompt, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSuggestedPrompt(prompt)}
+                              className="mx-1 mb-2 text-xs"
+                            >
+                              {prompt}
+                            </Button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <ChatMessageComponent
-                          key={message.id}
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                        />
-                      ))}
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                              <span className="text-sm">Echo is thinking...</span>
+                    ) : (
+                      <div className="space-y-4">
+                        {messages.map((message) => (
+                          <ChatMessageComponent
+                            key={message.id}
+                            message={message}
+                            onSaveToInsights={saveToInsights}
+                            onRequestDetail={requestMoreDetail}
+                          />
+                        ))}
+                        {isLoading && (
+                          <div className="flex justify-start">
+                            <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                              <div className="flex items-center gap-2">
+                                <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                                <span className="text-sm">Echo is thinking...</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
 
             <TabsContent value="logs" className="h-full m-0">
-              <CaddieLogs 
-                onClose={() => setActiveTab('chat')}
-                isRecording={isRecording}
-                isProcessing={isProcessing}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                userLocation={userLocation}
-                requestLocation={requestLocation}
-              />
+              <ScrollArea 
+                ref={logsAutoScroll.scrollAreaRef}
+                className="h-full min-h-0"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <CaddieLogs 
+                  onClose={() => setActiveTab('chat')}
+                  isRecording={isRecording}
+                  isProcessing={isProcessing}
+                  startRecording={startRecording}
+                  stopRecording={stopRecording}
+                  userLocation={userLocation}
+                  requestLocation={requestLocation}
+                />
+              </ScrollArea>
             </TabsContent>
 
             <TabsContent value="swing-coach" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
@@ -638,7 +652,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 />
               </div>
             </TabsContent>
-          </ScrollArea>
         </Tabs>
         
         {/* Shared composer/footer - Fixed at bottom */}
