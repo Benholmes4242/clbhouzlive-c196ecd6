@@ -168,7 +168,7 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center p-4">
+          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
             <motion.div
               className="w-full max-w-[520px] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
