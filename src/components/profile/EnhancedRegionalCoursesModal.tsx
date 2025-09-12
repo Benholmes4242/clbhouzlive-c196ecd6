@@ -449,10 +449,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             aria-label="Close modal"
             onClick={handleClose}
             className={`
-              fixed bg-black/50 cursor-default
+              fixed cursor-default
               ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-16' 
-                : 'inset-0'
+                ? 'top-0 left-0 right-0 bottom-16 bg-black/50' 
+                : 'inset-0 bg-white/10 backdrop-blur-xl'
               }
             `}
             onMouseDown={(e) => e.stopPropagation()}
