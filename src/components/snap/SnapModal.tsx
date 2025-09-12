@@ -74,7 +74,7 @@ const SnapModal = ({
         >
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-white/10 backdrop-blur-xl"
+            className="absolute inset-0 bg-dark/30 backdrop-blur-xl"
             onClick={onClose}
           />
           
