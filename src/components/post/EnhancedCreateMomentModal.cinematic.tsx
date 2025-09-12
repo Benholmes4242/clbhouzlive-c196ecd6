@@ -9,6 +9,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
+const MEDIA_HEIGHT_SCALE = 0.8; // 20% height reduction
 
 // Stars loading component
 const StarsLoading = () => (
@@ -103,7 +104,9 @@ export default function EnhancedCreateMomentModalCinematic({
       const wrapperH = el.clientHeight;
       const captionH = cap.clientHeight;
       // media area should be wrapper height minus caption height + small overlap
-      const h = Math.max(120, wrapperH - (captionH - CAPTION_OVERLAP_PX));
+      const target = wrapperH - (captionH - CAPTION_OVERLAP_PX);
+      // Scale down by 20% with a minimum height for mobile
+      const h = Math.max(220, Math.round(target * MEDIA_HEIGHT_SCALE));
       setMediaHeight(h);
     };
 
