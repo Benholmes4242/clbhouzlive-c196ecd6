@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
+import { SlideOver } from '@/components/ui/slide-over';
 
 // HLS Video Player Component
 const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -771,112 +772,43 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait" initial={false}>
       {isOpen && (
-        <div 
-          className="fixed inset-0 flex items-center justify-end overflow-hidden"
-          style={{ 
-            zIndex: 9999,
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)'
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              onClose();
-            }
-          }}
-          onWheel={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onScroll={(e) => e.stopPropagation()}
-        >
+        <SlideOver open={isOpen} onClose={onClose} ariaLabel="AI Chat History">
           <motion.div
-        initial={{ x: '100%', opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '100%', opacity: 0 }}
-        transition={{
-          type: 'spring',
-          damping: 30,
-          stiffness: 300,
-          mass: 0.8
-        }}
-        className="fixed inset-y-0 right-0 w-full sm:w-[90vw] sm:max-w-[860px] flex flex-col overflow-hidden"
-        style={{
-          background: 'rgba(246, 247, 246, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
-        }}
-        onWheel={(e) => {
-          const target = e.currentTarget;
-          const scrollableElement = target.querySelector('[data-radix-scroll-area-viewport]');
-          
-          if (scrollableElement) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
-            const isAtTop = scrollTop === 0;
-            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-            
-            if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-              e.preventDefault();
-            }
-          }
-          
-          e.stopPropagation();
-        }}
-        onTouchMove={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div 
-          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-          style={{
-            height: window.innerWidth <= 768 ? '56px' : '64px',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <EchoAvatar 
-              state="idle"
-              size={window.innerWidth <= 768 ? 40 : 44} 
-            />
-            <h2 className="text-lg font-semibold text-gray-900">Echo History</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search history..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-48 bg-white/50 backdrop-blur-sm border border-white/30 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-160 placeholder:text-gray-500/70 rounded-lg"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.5)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)'
-                }}
-                aria-label="Search chat history, caddie logs, and swing analyses"
-              />
+            key="ai-chat-history-panel"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.22, ease: "easeInOut" }}
+            className="h-full flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-border">
+              <div className="flex items-center gap-3">
+                <EchoAvatar 
+                  state="idle"
+                  size={window.innerWidth <= 768 ? 40 : 44} 
+                />
+                <h2 className="text-lg font-semibold text-foreground">Echo History</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search history..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 w-48"
+                    aria-label="Search chat history, caddie logs, and swing analyses"
+                  />
+                </div>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-white/20 rounded-full"
-              aria-label="Close history modal"
-            >
-              <X className="h-4 w-4 text-gray-900" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col">
+              {/* Tabs + TabPanels */}
+              <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
           <div className="px-6 py-2 flex-shrink-0">
             <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm">
               <TabsTrigger value="chat" className="data-[state=active]:bg-white/80">
@@ -1308,9 +1240,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </ScrollArea>
             </TabsContent>
           </div>
-        </Tabs>
+              </Tabs>
+            </div>
           </motion.div>
-        </div>
+        </SlideOver>
       )}
     </AnimatePresence>
   );
