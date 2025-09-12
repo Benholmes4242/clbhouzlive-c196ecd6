@@ -26,24 +26,25 @@ const SnapModal = ({
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
-  // Golf placeholder assets
+  // Golf course photo library - curated golf-specific placeholders
   const placeholders = {
     photos: [
-      "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=100&h=75&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=100&h=75&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1593111774240-d529f12cf4c1?w=100&h=75&fit=crop&crop=center", // Golf course green
+      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=100&h=75&fit=crop&crop=center", // Golf course fairway
+      "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100&h=75&fit=crop&crop=center", // Golf hole flag
     ],
     videos: [
-      "https://images.unsplash.com/photo-1593111774240-d529f12cf4c1?w=100&h=75&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=100&h=75&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100&h=75&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=100&h=75&fit=crop&crop=center", // Golf swing motion
+      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=100&h=75&fit=crop&crop=center", // Golf ball on tee
+      "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=75&fit=crop&crop=center", // Golf course aerial
     ],
   };
 
-  // Load thumbnails from cache or use placeholders
+  // Load thumbnails from cache or use golf course placeholders
   useEffect(() => {
     (async () => {
       const cached = await loadRecentMedia();
+      // Only use user's own media if they exist, otherwise always show golf course photos
       setPhotoThumbs(cached.photos.length ? cached.photos.slice(0, 3) : placeholders.photos);
       setVideoThumbs(cached.videos.length ? cached.videos.slice(0, 3) : placeholders.videos);
     })();
@@ -57,9 +58,11 @@ const SnapModal = ({
           alt="" 
           className="h-full w-full object-cover opacity-60"
           onError={(e) => {
-            // Fallback to placeholder if thumbnail fails to load
+            // Fallback to golf course photo if thumbnail fails to load
             const target = e.target as HTMLImageElement;
-            target.src = '/placeholder.svg';
+            const isVideoThumb = videoThumbs.includes(src || '');
+            const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
+            target.src = fallbackImages[0]; // Use first golf course image as fallback
           }}
         />
       )}
