@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 interface ModalContextType {
   isSnapModalOpen: boolean;
@@ -28,13 +28,13 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const shouldHideHeader = isSnapModalOpen || isCreateMomentModalOpen;
 
-  const setSnapModalOpen = (open: boolean) => {
+  const setSnapModalOpen = useCallback((open: boolean) => {
     setIsSnapModalOpen(open);
-  };
+  }, []);
 
-  const setCreateMomentModalOpen = (open: boolean) => {
+  const setCreateMomentModalOpen = useCallback((open: boolean) => {
     setIsCreateMomentModalOpen(open);
-  };
+  }, []);
 
   return (
     <ModalContext.Provider

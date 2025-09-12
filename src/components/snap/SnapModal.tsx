@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -25,11 +25,7 @@ const SnapModal = ({
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
-  const { data: userMedia, isLoading, error } = useSnapModalUserMedia(user?.id);
-  
-  const [captureeThumbs, setCaptureeThumbs] = useState<string[]>([]);
-  const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
-  const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
+  const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
   
   const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
 
@@ -61,29 +57,29 @@ const SnapModal = ({
     ],
   };
 
-  // Load thumbnails from database or use golf course placeholders
-  useEffect(() => {
-    if (isLoading) {
-      // Show loading skeletons during fetch
-      return;
-    }
-    
-    if (error) {
-      // On error, fall back to placeholders
-      setCaptureeThumbs(placeholders.capture);
-      setPhotoThumbs(placeholders.photos);
-      setVideoThumbs(placeholders.videos);
-      return;
-    }
-    
-    const photos = userMedia?.photos ?? [];
-    const videos = userMedia?.videos ?? [];
-    
-    // Use user's media if available, otherwise show placeholders
-    setCaptureeThumbs(photos.length ? photos.slice(0, 2) : placeholders.capture);
-    setPhotoThumbs(photos.length ? photos.slice(0, 3) : placeholders.photos);
-    setVideoThumbs(videos.length ? videos.slice(0, 3) : placeholders.videos);
-  }, [isLoading, error, userMedia]);
+  // Derive stable thumbnail arrays using useMemo
+  const captureThumbs = useMemo(() => {
+    if (isLoading) return placeholders.capture;
+    if (error) return placeholders.capture;
+    return photos.length ? photos.slice(0, 2).map(p => p.thumbUrl || p.url) : placeholders.capture;
+  }, [isLoading, error, photos]);
+
+  const photoThumbs = useMemo(() => {
+    if (isLoading) return placeholders.photos;
+    if (error) return placeholders.photos;
+    return photos.length ? photos.slice(0, 3).map(p => p.thumbUrl || p.url) : placeholders.photos;
+  }, [isLoading, error, photos]);
+
+  const videoThumbs = useMemo(() => {
+    if (isLoading) return placeholders.videos;
+    if (error) return placeholders.videos;
+    const list = videos.map(v => ({
+      ...v,
+      // Prefer thumbUrl for <img>; fall back to url only if it's actually an image
+      displaySrc: v.thumbUrl || v.url,
+    }));
+    return list.length ? list.slice(0, 3).map(v => v.displaySrc) : placeholders.videos;
+  }, [isLoading, error, videos]);
 
   // Reusable thumbnail components
   type StripVariant = "videos" | "photos" | "capture";
@@ -99,6 +95,7 @@ const SnapModal = ({
             src={src} 
             alt="" 
             className="h-full w-full object-cover"
+            loading="lazy"
             onError={(e) => {
               // Fallback to golf course photo if thumbnail fails to load
               const target = e.target as HTMLImageElement;
@@ -163,7 +160,7 @@ const SnapModal = ({
       icon: Camera,
       onClick: onCameraClick,
       variant: "capture" as StripVariant,
-      thumbs: captureeThumbs, // Use dedicated capture thumbs
+      thumbs: captureThumbs,
     }] : []),
     {
       key: "photos",
@@ -243,7 +240,7 @@ const SnapModal = ({
                       <div className="text-left">
                         <div className="text-[17px] font-medium text-white">{label}</div>
                         {/* Show empty state message if no user media and not loading */}
-                        {!isLoading && !error && userMedia?.photos.length === 0 && userMedia?.videos.length === 0 && key === 'photos' && (
+                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'photos' && (
                           <div className="text-xs text-white/50">No posts yet - start creating!</div>
                         )}
                       </div>
