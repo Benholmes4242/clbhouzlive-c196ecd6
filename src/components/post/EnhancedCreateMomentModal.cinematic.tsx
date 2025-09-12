@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
@@ -27,6 +29,9 @@ export default function EnhancedCreateMomentModalCinematic({
   onCourseSelect
 }: Props) {
   const isDark = theme === "dark";
+  const { toast } = useToast();
+  const [aiLoading, setAiLoading] = useState(false);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
 
   const {
     caption,
@@ -41,6 +46,42 @@ export default function EnhancedCreateMomentModalCinematic({
 
   const canPost = useMemo(() => files?.length > 0 && !isSubmitting, [files, isSubmitting]);
 
+  // AI Caption Generation
+  const handleAICaption = async () => {
+    try {
+      setAiLoading(true);
+      const first = files?.[0];
+      if (!first) return;
+
+      const body = {
+        type: first.type.startsWith('video') ? "video" : "image",
+        previewUrl: URL.createObjectURL(first),
+        captionContext: caption || "",
+      };
+
+      const { data, error } = await supabase.functions.invoke('ai-caption-generator', {
+        body
+      });
+      
+      if (error) throw error;
+      
+      if (data?.caption) {
+        setCaption(data.caption);
+      } else {
+        throw new Error('Failed to generate caption');
+      }
+    } catch (error) {
+      console.error('AI caption error:', error);
+      toast({
+        title: "Caption Generation Failed",
+        description: "Please try writing a caption manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handlePost = async () => {
     if (!canPost) return;
     
@@ -48,7 +89,8 @@ export default function EnhancedCreateMomentModalCinematic({
       caption,
       files,
       selectedCourse: course,
-      visibility: "public", // Default for now
+      visibility,
+      isPrivate: visibility === "private",
       backgroundMusic: null // Default for now
     });
   };
@@ -83,14 +125,24 @@ export default function EnhancedCreateMomentModalCinematic({
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Edge-to-edge media header */}
+              {/* Taller Media Header - 58vh */}
               <MediaPreview items={files} theme={theme} />
 
-              {/* Floating cards */}
-              <div className="space-y-3 p-4 -mt-6">
-                {/* Caption */}
+              {/* Floating cards (reduce overlap) */}
+              <div className="space-y-3 p-4 -mt-4">
+                {/* Caption with AI Assistant */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                  <label className={`block text-[15px] mb-1 ${subtl}`}>Add a caption</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className={`block text-[15px] ${subtl}`}>Add a caption</label>
+                    <button
+                      onClick={handleAICaption}
+                      disabled={aiLoading || files.length === 0}
+                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-2 py-1 rounded-lg shrink-0 transition-colors text-xs disabled:opacity-50`}
+                      aria-label="Write a caption for me"
+                    >
+                      {aiLoading ? "..." : "✨ Write a caption for me"}
+                    </button>
+                  </div>
                   <div className="flex items-start gap-2">
                     <textarea
                       className="w-full bg-transparent outline-none resize-none placeholder-opacity-50"
@@ -99,21 +151,11 @@ export default function EnhancedCreateMomentModalCinematic({
                       value={caption}
                       onChange={(e) => setCaption(e.target.value)}
                     />
-                    <button
-                      onClick={() => {
-                        // TODO: call AI caption helper
-                        console.log("AI caption helper clicked");
-                      }}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg shrink-0 transition-colors`}
-                      aria-label="Write a caption for me"
-                    >
-                      ✨
-                    </button>
                   </div>
                 </div>
 
-                {/* Course */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                {/* Course with High Z-Index */}
+                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
                       <div className="text-[15px] mb-1">Tag a golf course</div>
@@ -158,11 +200,11 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 </div>
 
-                {/* Visibility segmented */}
+                {/* Visibility segmented - Wired to state */}
                 <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
                   <Segmented
-                    value="public"
-                    onChange={(value) => console.log("Visibility changed:", value)}
+                    value={visibility}
+                    onChange={(value) => setVisibility(value as "public" | "private")}
                     options={[
                       { value: "public", label: "Public" },
                       { value: "private", label: "Private Archive" },
@@ -170,13 +212,17 @@ export default function EnhancedCreateMomentModalCinematic({
                   />
                 </div>
 
-                {/* CTA */}
+                {/* CTA with Echo Gradient */}
                 <div className="pt-2" />
                 <button
                   onClick={handlePost}
                   disabled={!canPost}
-                  className="relative w-full h-12 rounded-2xl text-white bg-gradient-to-r from-emerald-600 to-lime-600 disabled:opacity-50 overflow-hidden transition-all duration-200 hover:from-emerald-500 hover:to-lime-500 disabled:hover:from-emerald-600 disabled:hover:to-lime-600"
+                  className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                  style={{ 
+                    background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
+                  }}
                 >
+                  {/* Shimmer animation while submitting */}
                   {isSubmitting && (
                     <motion.div
                       className="absolute inset-0"
@@ -217,7 +263,7 @@ function MediaPreview({ items, theme }: { items: File[]; theme?: "dark" | "light
   const isVideo = firstFile.type.startsWith('video/');
 
   return (
-    <div className="relative h-56 bg-black">
+    <div className="relative h-[58vh] max-h-[720px] min-h-[360px] bg-black">
       {isVideo ? (
         <video 
           src={previewUrl} 
