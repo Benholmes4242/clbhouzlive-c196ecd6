@@ -29,14 +29,14 @@ const SnapModal = ({
   // Golf course photo library - curated golf-specific placeholders
   const placeholders = {
     photos: [
-      "https://images.unsplash.com/photo-1593111774240-d529f12cf4c1?w=100&h=75&fit=crop&crop=center", // Golf course green
-      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=100&h=75&fit=crop&crop=center", // Golf course fairway
-      "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100&h=75&fit=crop&crop=center", // Golf hole flag
+      "https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=100&h=75&fit=crop&crop=center", // Golf course putting green
+      "https://images.unsplash.com/photo-1617654112329-b97d93ee09ad?w=100&h=75&fit=crop&crop=center", // Golf ball and club
+      "https://images.unsplash.com/photo-1500932334442-8761ee4810a7?w=100&h=75&fit=crop&crop=center", // Golf course landscape
     ],
     videos: [
-      "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=100&h=75&fit=crop&crop=center", // Golf swing motion
-      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=100&h=75&fit=crop&crop=center", // Golf ball on tee
-      "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=75&fit=crop&crop=center", // Golf course aerial
+      "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?w=100&h=75&fit=crop&crop=center", // Golf tee shot
+      "https://images.unsplash.com/photo-1596727147080-4e5e32bd5b0b?w=100&h=75&fit=crop&crop=center", // Golf swing follow through
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=75&fit=crop&crop=center", // Golf course flag
     ],
   };
 
