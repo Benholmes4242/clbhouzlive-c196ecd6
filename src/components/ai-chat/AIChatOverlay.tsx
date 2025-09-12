@@ -456,27 +456,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   };
 
   return (
-    <AnimatePresence
-      mode="wait"
-      initial={false}
-      onExitComplete={handleExitComplete}
+    <SlideOver
+      open={isOpen}
+      onClose={handleClose}
+      width="w-full sm:w-[90vw] sm:max-w-[860px]"
+      zIndex="z-[1000]"
+      ariaLabel="Echo AI chat interface"
     >
-      {isOpen && (
-        <SlideOver
-          open={true}
-          onClose={handleClose}
-          width="w-full sm:w-[90vw] sm:max-w-[860px]"
-          zIndex="z-[1000]"
-          ariaLabel="Echo AI chat interface"
-        >
-          <motion.div
-            key="echo-slide"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
-            style={{ height: "100%", display: "flex", flexDirection: "column" }}
-          >
       <div 
         className="w-full h-full flex flex-col overflow-hidden"
         style={{
@@ -822,10 +808,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           )}
         </div>
       </div>
-          </motion.div>
         </SlideOver>
-      )}
-    </AnimatePresence>
   );
 };
 
