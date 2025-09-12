@@ -459,28 +459,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       ariaLabel="Echo AI chat interface"
     >
       <div 
-        className="transition-opacity duration-300 ease-in-out animate-scale-in"
+        className="w-full h-full flex flex-col overflow-hidden"
         style={{
-          opacity: !showHistory ? 1 : 0
-        }}
-      >
-      <div 
-        className="w-full flex flex-col overflow-hidden animate-scale-in"
-        style={{
-          width: '448px', // Fixed width equivalent to max-w-md (28rem = 448px)
-          minWidth: '448px',
-          maxWidth: '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)', // 20% taller on mobile, 20% bigger on desktop
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 8px 32px rgba(0, 0, 0, 0.12),
-            0 2px 8px rgba(0, 0, 0, 0.08)
-          `
         }}
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
@@ -814,7 +797,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </div>
           )}
         </div>
-      </div>
       </div>
     </SlideOver>
   );
