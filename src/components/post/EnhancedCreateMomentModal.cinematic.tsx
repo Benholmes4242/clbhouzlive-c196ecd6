@@ -9,7 +9,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
-const MEDIA_HEIGHT_SCALE = 1.08; // 20% increase then 10% reduction = 8% net increase
+const MEDIA_HEIGHT_SCALE = 0.9; // 10% height reduction
 
 // Stars loading component
 const StarsLoading = () => (
