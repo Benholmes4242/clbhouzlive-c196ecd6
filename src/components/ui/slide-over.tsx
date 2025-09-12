@@ -129,13 +129,7 @@ export function SlideOver({
           <button
             aria-label="Close Echo"
             onClick={onClose}
-            className={`
-              fixed cursor-default
-              ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-0 bg-black/50' 
-                : 'inset-0 bg-white/10 backdrop-blur-xl'
-              }
-            `}
+            className="fixed cursor-default inset-0 bg-white/10 backdrop-blur-xl"
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           />
@@ -144,7 +138,7 @@ export function SlideOver({
           {isMobile && (
             <div
               className="absolute left-0 top-0 bottom-0 z-20"
-              style={{ width: 'max(16px, env(safe-area-inset-left))' }}
+              style={{ width: 'max(24px, env(safe-area-inset-left))' }}
               aria-hidden="true"
               data-testid="echo-gutter"
               onClick={onClose}
@@ -161,7 +155,7 @@ export function SlideOver({
             className={`
               fixed bg-background z-10
               ${isMobile 
-                ? `w-[calc(100vw-max(16px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
+                ? `w-[calc(100vw-max(24px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
                 : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
               }
             `}
