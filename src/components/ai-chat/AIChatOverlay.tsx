@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SlideOver } from '@/components/ui/slide-over';
 import ChatMessageComponent from './ChatMessage';
 import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
@@ -192,60 +193,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     }
   }, [isOpen]);
 
-  // Keyboard handler for Escape key
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { 
-      if (e.key === 'Escape') onClose(); 
-    };
-    if (isOpen) document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
-
-  // Prevent body scroll when modal is open
+  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      // Lock body scroll - ensure it stays locked regardless of showHistory state
-      const originalStyle = window.getComputedStyle(document.body).overflow;
-      const originalPosition = window.getComputedStyle(document.body).position;
-      const originalTop = window.getComputedStyle(document.body).top;
-      const originalLeft = window.getComputedStyle(document.body).left;
-      const originalRight = window.getComputedStyle(document.body).right;
-      const originalBottom = window.getComputedStyle(document.body).bottom;
-      
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = '0';
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.bottom = '0';
-      
-      // Prevent scroll events on window
-      const preventScroll = (e: WheelEvent | TouchEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-      };
-      
-      // Add event listeners for all scroll types
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('scroll', preventScroll, { passive: false });
-      
-      return () => {
-        // Restore original styles
-        document.body.style.overflow = originalStyle;
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.left = originalLeft;
-        document.body.style.right = originalRight;
-        document.body.style.bottom = originalBottom;
-        
-        // Remove event listeners
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('touchmove', preventScroll);
-        document.removeEventListener('scroll', preventScroll);
-      };
+      setMessages([]);
+      setInputValue('');
+      setActiveTab('chat');
     }
-  }, [isOpen]); // Only depend on isOpen, not showHistory
+  }, [isOpen]);
 
   const requestLocation = () => {
     if (navigator.geolocation) {
@@ -496,22 +451,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   };
 
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ 
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.35)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)'
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          handleClose();
-        }
-      }}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
+    <SlideOver
+      open={isOpen}
+      onClose={handleClose}
+      width="w-full sm:w-[90vw] sm:max-w-[860px]"
+      zIndex="z-[1000]"
+      ariaLabel="Echo AI chat interface"
     >
       <div 
         className="transition-opacity duration-300 ease-in-out animate-scale-in"
@@ -871,7 +816,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         </div>
       </div>
       </div>
-    </div>
+    </SlideOver>
   );
 };
 
