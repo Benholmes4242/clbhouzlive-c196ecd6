@@ -651,7 +651,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
       </div>
       
       {/* Scrollable Content */}
-      <div className="p-4 sm:p-6">
+      <div className="pt-4 px-4 sm:px-6">
         {!entered ? (
           <div className="p-4 space-y-3">
             <div className="h-5 w-1/3 bg-muted animate-pulse rounded" />
