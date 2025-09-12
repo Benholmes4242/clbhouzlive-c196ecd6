@@ -1,9 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { MediaThumb } from '@/lib/resolveThumb';
 
-// Re-export for convenience
-export type { MediaThumb } from '@/lib/resolveThumb';
+export type MediaThumb = {
+  postId: string;
+  url: string;
+  thumbUrl?: string | null;
+  type: string;      // "image" | "video"
+  width?: number | null;
+  height?: number | null;
+  createdAt: string;
+  visibility?: "public" | "private";
+};
 
 const PAGE_SIZE = 30;
 
@@ -47,12 +54,11 @@ export function useUserMedia(userId: string | null, page = 0, viewerId?: string 
             postId: post.id,
             url: media.media_url,
             thumbUrl: media.poster_url, // For videos, use poster as thumbnail
-            posterUrl: media.poster_url,
             type: media.media_type,
             width: null,
             height: null,
             createdAt: post.created_at,
-            streamId: null
+            visibility: "public" // Default until visibility column exists
           });
         }
       }
