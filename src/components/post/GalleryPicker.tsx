@@ -142,48 +142,37 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     />
   );
 
-  // Single centered cinematic modal wrapper
+  // Single slide-down container for both mobile and desktop
   return (
-    <div
-      className={`fixed inset-0 z-[1100] transition-opacity duration-200 ${
-        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    <div 
+      ref={pickerRef}
+      className={`fixed left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-out ${
+        isOpen 
+          ? 'bottom-20 opacity-100 translate-y-0' 
+          : 'bottom-16 opacity-0 translate-y-2 pointer-events-none'
       }`}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
-
-      {/* Centered Panel */}
-      <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div
-          ref={pickerRef}
-          className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-        >
-          <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-            <h3 className="text-xl font-semibold">
-              {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
-            </h3>
-            <button
-              onClick={handleClose}
-              aria-label="Close"
-              className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/10 transition-colors"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="px-4 pb-5">
-            <PickerContent
-              isMultiSelectMode={isMultiSelectMode}
-              isMobile={isMobile}
-              onCameraClick={handleCameraClick}
-              onPhotoClick={handlePhotoClick}
-              onVideoClick={handleVideoClick}
-              multiSelectPreview={multiSelectPreview}
-            />
-          </div>
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 relative overflow-hidden min-w-[280px] max-w-[320px]">
+        {/* Top accent bar */}
+        <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277]" />
+        
+        <div className="px-3 pt-3 pb-2">
+          <h3 className="text-center text-sm font-semibold mb-2">
+            {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
+          </h3>
+          
+          <PickerContent
+            isMultiSelectMode={isMultiSelectMode}
+            isMobile={isMobile}
+            onCameraClick={handleCameraClick}
+            onPhotoClick={handlePhotoClick}
+            onVideoClick={handleVideoClick}
+            multiSelectPreview={multiSelectPreview}
+          />
         </div>
+        
+        {/* Bottom accent bar */}
+        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277]" />
       </div>
     </div>
   );
