@@ -127,7 +127,7 @@ export function SlideOver({
         >
           {/* Backdrop - blocks all background interaction */}
           <button
-            aria-label="Close panel"
+            aria-label="Close Echo"
             onClick={onClose}
             className={`
               fixed cursor-default
@@ -140,18 +140,32 @@ export function SlideOver({
             onTouchStart={(e) => e.stopPropagation()}
           />
           
+          {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
+          {isMobile && (
+            <div
+              className="absolute left-0 top-0 bottom-0 z-20"
+              style={{ width: 'max(16px, env(safe-area-inset-left))' }}
+              aria-hidden="true"
+              data-testid="echo-gutter"
+              onClick={onClose}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+            />
+          )}
+          
           {/* Modal Panel */}
           <div 
             role="dialog"
             aria-modal="true"
             aria-label={ariaLabel}
             className={`
-              fixed bg-background shadow-xl z-10
+              fixed bg-background z-10
               ${isMobile 
-                ? `w-[calc(100vw-max(16px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 ${heightClass}` 
+                ? `w-[calc(100vw-max(16px,env(safe-area-inset-left)))] ml-auto right-0 top-0 bottom-0 shadow-lg pl-[1px] ${heightClass}` 
                 : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
               }
             `}
+            style={isMobile ? { height: '100dvh' } : undefined}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
           >
