@@ -772,7 +772,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait" initial={false} onExitComplete={() => console.log('AIChatHistory exit complete')}>
       {isOpen && (
         <SlideOver 
           open={isOpen} 
