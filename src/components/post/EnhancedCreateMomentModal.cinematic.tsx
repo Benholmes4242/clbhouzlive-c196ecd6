@@ -11,9 +11,9 @@ import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector"
 // Stars loading component
 const StarsLoading = () => (
   <span className="inline-flex items-center gap-1" aria-live="polite" aria-busy="true">
-    <span className="animate-star1">✨</span>
-    <span className="animate-star2">✨</span>
-    <span className="animate-star3">✨</span>
+    <span className="animate-star1 text-lg">✨</span>
+    <span className="animate-star2 text-lg">✨</span>
+    <span className="animate-star3 text-lg">✨</span>
   </span>
 );
 
@@ -208,10 +208,10 @@ export default function EnhancedCreateMomentModalCinematic({
                     <button
                       onClick={handleAICaption}
                       disabled={aiLoading || files.length === 0}
-                      className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-xs disabled:opacity-50 text-white"
+                      className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-sm disabled:opacity-50 text-white"
                       aria-label="Write a caption for me"
                     >
-                      {aiLoading ? <StarsLoading /> : <>✨ Write a caption for me</>}
+                      {aiLoading ? <StarsLoading /> : <><span className="text-lg">✨</span> Write a caption for me</>}
                     </button>
                   </div>
                   <div className="flex items-start gap-2">
@@ -227,10 +227,10 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-10" />
+              <div className="h-12" />
 
-              {/* Floating cards below */}
-              <div className="space-y-3 px-4">
+              {/* Floating cards below with 12px rhythm */}
+              <div className="space-y-3 px-4 pb-3">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
