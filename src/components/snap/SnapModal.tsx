@@ -84,7 +84,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-white/20 backdrop-blur-2xl border border-white/30 text-white rounded-3xl shadow-[0_20px_80px_rgba(255,255,255,0.1)]"
+              className="w-full max-w-[480px] bg-dark/20 backdrop-blur-2xl border border-white/30 text-white rounded-3xl shadow-[0_20px_80px_rgba(255,255,255,0.1)]"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
