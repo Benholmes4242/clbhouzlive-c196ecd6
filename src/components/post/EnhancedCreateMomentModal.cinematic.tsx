@@ -277,7 +277,6 @@ export default function EnhancedCreateMomentModalCinematic({
                 </div>
 
                 {/* CTA with Echo Gradient */}
-                <div className="pt-2 px-4" />
                 <button
                   onClick={handlePost}
                   disabled={!canPost}
