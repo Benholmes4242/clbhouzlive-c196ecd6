@@ -499,7 +499,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               {/* Content */}
               <div className="flex-1 overflow-auto bg-transparent">
                 {/* Controls Row */}
-      <div className="p-4 sm:p-6 border-b border-border">
+      <div className="p-4 sm:p-6">
         {/* Mobile Layout: View Toggle, Stats, and Sort */}
         <div className="flex items-center justify-between gap-2 md:hidden">
           {/* Left: View Toggle */}
