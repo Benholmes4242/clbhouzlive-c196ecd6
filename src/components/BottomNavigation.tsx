@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useModalState } from '@/hooks/useModalDetector';
 import SnapModal from '@/components/snap/SnapModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
@@ -37,6 +38,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     showConfirmationToast,
     hideToast
   } = useSnapModal();
+
+  // Register modal states with the modal detector
+  useModalState(isSnapModalOpen);
+  useModalState(isComposerOpen);
 
   // State for tags handled in CreateMomentModal
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
