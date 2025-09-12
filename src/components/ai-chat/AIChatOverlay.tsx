@@ -404,46 +404,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     console.log('Echo exit animation completed');
   }, []);
 
-  if (showHistory) {
-    return (
-      <div 
-        className="fixed inset-0"
-        style={{ zIndex: 50 }}
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onScroll={(e) => e.stopPropagation()}
-      >
-        <div 
-          className="transition-opacity duration-300 ease-in-out"
-          style={{
-            opacity: showHistory ? 1 : 0
-          }}
-        >
-          <AIChatHistory 
-            isOpen={showHistory} 
-            onClose={() => setShowHistory(false)}
-            onSelectMessage={(message) => {
-              setShowHistory(false);
-              sendMessage(message);
-            }}
-            onNewConversation={() => {
-              conversationSession.startNewConversationManually();
-              setMessages([]);
-              setShowHistory(false);
-            }}
-          />
-        </div>
-
-        {/* Echo Protection Dialog */}
-        <EchoProtection
-          isOpen={isProtectionOpen}
-          onClose={handleProtectionClose}
-          onSuccess={handleProtectionSuccess}
-          operation={pendingOperation}
-        />
-      </div>
-    );
-  }
 
   // Determine avatar state based on recording/processing state
   const getAvatarState = () => {
@@ -453,13 +413,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   };
 
   return (
-    <SlideOver
-      open={isOpen}
-      onClose={handleClose}
-      width="w-full sm:w-[90vw] sm:max-w-[860px]"
-      zIndex="z-[1100]"
-      ariaLabel="Echo AI chat interface"
-    >
+    <>
+      <SlideOver
+        open={isOpen}
+        onClose={handleClose}
+        width="w-full sm:w-[90vw] sm:max-w-[860px]"
+        zIndex="z-[1100]"
+        ariaLabel="Echo AI chat interface"
+      >
       <div 
         className="w-full h-full flex flex-col overflow-hidden"
         style={{
@@ -812,7 +773,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         </div>
       </div>
         </SlideOver>
-  );
+        <AIChatHistory 
+          isOpen={showHistory} 
+          onClose={() => setShowHistory(false)}
+          onSelectMessage={(message) => {
+            setShowHistory(false);
+            sendMessage(message);
+          }}
+          onNewConversation={() => {
+            conversationSession.startNewConversationManually();
+            setMessages([]);
+            setShowHistory(false);
+          }}
+        />
+      </>
+    );
 };
 
 export default AIChatOverlay;
