@@ -22,7 +22,7 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
 
   return (
     <div 
-      className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] border border-white/10 shadow-lg overflow-hidden"
+      className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] shadow-lg overflow-hidden"
       style={{ width: size, height: size }}
     >
       <PiWaveform 
