@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSnapModal } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,14 @@ export default function EnhancedCreateMomentModalCinematic({
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
 
+  // Media carousel state
+  const media = useMemo(() => (initialFiles || []).slice(0, 5), [initialFiles]);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const canSlide = media.length > 1;
+  
+  // Touch handlers for swipe
+  const startX = useRef<number | null>(null);
+
   const {
     caption,
     setCaption,
@@ -54,6 +63,38 @@ export default function EnhancedCreateMomentModalCinematic({
   const course = selectedCourse || snapCourse;
 
   const canPost = useMemo(() => files?.length > 0 && !isSubmitting, [files, isSubmitting]);
+
+  // Close handler
+  const close = () => onClose?.();
+
+  // Carousel navigation
+  const prevMedia = () => setMediaIndex((i) => (i - 1 + media.length) % media.length);
+  const nextMedia = () => setMediaIndex((i) => (i + 1) % media.length);
+
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (startX.current == null) return;
+    const delta = e.changedTouches[0].clientX - startX.current;
+    if (Math.abs(delta) > 40) {
+      delta < 0 ? nextMedia() : prevMedia();
+    }
+    startX.current = null;
+  };
+
+  // Keyboard handlers
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      if (canSlide && e.key === "ArrowLeft") prevMedia();
+      if (canSlide && e.key === "ArrowRight") nextMedia();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [canSlide]);
 
   // AI Caption Generation
   const handleAICaption = async () => {
@@ -118,10 +159,12 @@ export default function EnhancedCreateMomentModalCinematic({
           exit={{ opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop */}
+          {/* backdrop with click-to-close */}
           <div 
             className={`absolute inset-0 ${panel} backdrop-blur-xl`} 
-            onClick={onClose} 
+            onClick={close}
+            role="dialog"
+            aria-modal="true"
           />
 
           {/* shell */}
@@ -136,7 +179,17 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               {/* Media + Overlapping Caption */}
               <div className="relative">
-                <MediaPreview items={files} theme={theme} />
+                <MediaCarousel 
+                  media={media} 
+                  currentIndex={mediaIndex}
+                  onTouchStart={onTouchStart}
+                  onTouchEnd={onTouchEnd}
+                  onPrevious={prevMedia}
+                  onNext={nextMedia}
+                  onClose={close}
+                  canSlide={canSlide}
+                  theme={theme} 
+                />
                 
                 {/* Caption card overlaps image bottom */}
                 <div
@@ -259,24 +312,50 @@ export default function EnhancedCreateMomentModalCinematic({
   );
 }
 
-/* Simple preview; swap with your carousel if available */
-function MediaPreview({ items, theme }: { items: File[]; theme?: "dark" | "light" }) {
+/* Media Carousel Component */
+function MediaCarousel({ 
+  media, 
+  currentIndex, 
+  onTouchStart, 
+  onTouchEnd, 
+  onPrevious, 
+  onNext, 
+  onClose,
+  canSlide,
+  theme 
+}: { 
+  media: File[]; 
+  currentIndex: number;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  onClose: () => void;
+  canSlide: boolean;
+  theme?: "dark" | "light";
+}) {
   const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
   
-  if (!items?.length) {
-    return <div className={`h-56 ${fallback} flex items-center justify-center`}>
+  if (!media?.length) {
+    return <div className={`h-[46vh] md:h-[48vh] ${fallback} flex items-center justify-center rounded-2xl`}>
       <span className="text-white/50 text-sm">No media selected</span>
     </div>;
   }
 
-  const firstFile = items[0];
-  const previewUrl = URL.createObjectURL(firstFile);
-  const isVideo = firstFile.type.startsWith('video/');
+  const currentFile = media[currentIndex];
+  const previewUrl = URL.createObjectURL(currentFile);
+  const isVideo = currentFile.type.startsWith('video/');
 
   return (
-    <div className="relative w-full h-[46vh] md:h-[48vh] max-h-[720px] min-h-[360px] bg-black overflow-hidden rounded-2xl">
+    <div 
+      className="relative w-full h-[46vh] md:h-[48vh] overflow-hidden rounded-2xl bg-black"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Current Media */}
       {isVideo ? (
         <video 
+          key={`v-${currentIndex}`}
           src={previewUrl} 
           className="h-full w-full object-cover" 
           muted 
@@ -284,22 +363,86 @@ function MediaPreview({ items, theme }: { items: File[]; theme?: "dark" | "light
         />
       ) : (
         <img 
+          key={`i-${currentIndex}`}
           src={previewUrl} 
           alt="" 
-          className="h-full w-full object-cover" 
+          className="h-full w-full object-cover"
+          draggable={false}
         />
       )}
-      
-      {/* Media count indicator */}
-      {items.length > 1 && (
-        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
-          1 / {items.length}
+
+      {/* Navigation Arrows (only if >1 media) */}
+      {canSlide && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous"
+            onClick={onPrevious}
+            className="
+              absolute left-3 top-1/2 -translate-y-1/2
+              h-10 w-10 rounded-full
+              bg-white/12 backdrop-blur-md border border-white/15
+              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
+            "
+          >
+            <ChevronLeft className="h-5 w-5 text-white" />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Next"
+            onClick={onNext}
+            className="
+              absolute right-3 top-1/2 -translate-y-1/2
+              h-10 w-10 rounded-full
+              bg-white/12 backdrop-blur-md border border-white/15
+              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
+            "
+          >
+            <ChevronRight className="h-5 w-5 text-white" />
+          </button>
+        </>
+      )}
+
+      {/* Media Dots Indicator (only if >1 media) */}
+      {canSlide && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+          {media.map((_, i) => (
+            <span
+              key={i}
+              className={`
+                h-2.5 w-2.5 rounded-full transition-colors
+                ${i === currentIndex ? "bg-white" : "bg-white/40"}
+                ring-1 ring-white/30
+              `}
+            />
+          ))}
         </div>
       )}
+
+      {/* Close Button */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="
+          absolute top-3 right-3
+          h-10 w-10 rounded-full
+          bg-white/12 backdrop-blur-md
+          border border-white/15
+          shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+          flex items-center justify-center
+          hover:bg-white/18 active:scale-[0.98] transition
+        "
+      >
+        <X className="h-5 w-5 text-white" />
+      </button>
       
       {/* Gradients for overlay effect */}
-      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
     </div>
   );
 }
