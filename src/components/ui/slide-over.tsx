@@ -120,7 +120,7 @@ export function SlideOver({
           className={`
             fixed flex ${zIndex}
             ${isMobile 
-              ? 'top-0 left-0 right-0 bottom-0' 
+              ? 'top-0 left-0 right-0 bottom-16' 
               : 'inset-0'
             }
           `}
@@ -132,7 +132,7 @@ export function SlideOver({
             className={`
               fixed bg-black/50 cursor-default
               ${isMobile 
-                ? 'top-0 left-0 right-0 bottom-0' 
+                ? 'top-0 left-0 right-0 bottom-16' 
                 : 'inset-0'
               }
             `}
@@ -148,7 +148,7 @@ export function SlideOver({
             className={`
               fixed right-0 bg-background shadow-2xl z-10
               ${isMobile 
-                ? `w-full top-0 bottom-0 ${heightClass}` 
+                ? `w-full top-0 bottom-16 ${heightClass}` 
                 : `inset-y-0 ${width} rounded-l-2xl ${heightClass}`
               }
             `}
