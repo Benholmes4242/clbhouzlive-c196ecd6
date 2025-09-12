@@ -773,16 +773,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     <AnimatePresence>
       {isOpen && (
         <div 
-          className="fixed inset-0 flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 flex items-center justify-end overflow-hidden"
           style={{ 
             zIndex: 9999,
             backgroundColor: 'rgba(0, 0, 0, 0.24)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            paddingLeft: window.innerWidth <= 768 ? '16px' : '16px',
-            paddingRight: '16px',
-            paddingTop: '16px',
-            paddingBottom: '16px'
+            paddingLeft: window.innerWidth <= 768 ? '16px' : '0px',
+            paddingRight: '0px',
+            paddingTop: '0px',
+            paddingBottom: '0px'
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -803,12 +803,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           stiffness: 300,
           mass: 0.8
         }}
-        className="w-full flex flex-col overflow-hidden"
+        className="w-full sm:w-[90vw] sm:max-w-[860px] h-full flex flex-col overflow-hidden"
         style={{
-          width: window.innerWidth <= 768 ? 'calc(100% - 32px)' : '448px',
-          minWidth: window.innerWidth <= 768 ? 'calc(100% - 32px)' : '448px',
-          maxWidth: window.innerWidth <= 768 ? 'calc(100% - 32px)' : '448px',
-          height: window.innerWidth <= 768 ? 'min(86.4vh, 691px)' : 'min(86.4vh, 692px)',
           background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
