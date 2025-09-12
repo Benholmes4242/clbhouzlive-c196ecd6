@@ -635,9 +635,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
 
         {/* Stats */}
-        {playedCount > 0 && (
-          <div className="mt-3 text-sm text-muted-foreground">
-            {playedCount} played • {unplayedCount} not played yet
+        {filteredAndSortedCourses.length > 0 && (
+          <div className="mt-4 flex justify-center">
+            <div className="text-sm text-muted-foreground">
+              {playedCount} of {filteredAndSortedCourses.length} courses played
+            </div>
           </div>
         )}
       </div>
