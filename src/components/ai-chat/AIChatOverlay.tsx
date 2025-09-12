@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import { useConversationSession } from '@/hooks/useConversationSession';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface ChatMessageData {
   id: string;
@@ -390,7 +391,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   };
 
 
-  if (!isOpen) return null;
+  // Handle exit animation cleanup
+  const handleExitComplete = useCallback(() => {
+    // Cleanup that previously depended on immediate unmount
+    console.log('Echo exit animation completed');
+  }, []);
 
   if (showHistory) {
     return (
@@ -451,13 +456,27 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   };
 
   return (
-    <SlideOver
-      open={isOpen}
-      onClose={handleClose}
-      width="w-full sm:w-[90vw] sm:max-w-[860px]"
-      zIndex="z-[1000]"
-      ariaLabel="Echo AI chat interface"
+    <AnimatePresence
+      mode="wait"
+      initial={false}
+      onExitComplete={handleExitComplete}
     >
+      {isOpen && (
+        <SlideOver
+          open={true}
+          onClose={handleClose}
+          width="w-full sm:w-[90vw] sm:max-w-[860px]"
+          zIndex="z-[1000]"
+          ariaLabel="Echo AI chat interface"
+        >
+          <motion.div
+            key="echo-slide"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+          >
       <div 
         className="w-full h-full flex flex-col overflow-hidden"
         style={{
@@ -803,7 +822,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           )}
         </div>
       </div>
-    </SlideOver>
+          </motion.div>
+        </SlideOver>
+      )}
+    </AnimatePresence>
   );
 };
 
