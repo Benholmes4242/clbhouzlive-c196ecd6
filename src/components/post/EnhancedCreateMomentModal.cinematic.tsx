@@ -9,7 +9,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
-const MEDIA_HEIGHT_SCALE = 1.2; // 20% height increase
+const MEDIA_HEIGHT_SCALE = 1.08; // 20% increase then 10% reduction = 8% net increase
 
 // Stars loading component
 const StarsLoading = () => (
@@ -269,10 +269,10 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
 
               {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-3" />
+              <div className="h-4" />
 
               {/* Floating cards below with 12px rhythm */}
-              <div className="space-y-3 px-4 pb-3">
+              <div className="space-y-3 px-4 pb-2">
 
                 {/* Course with High Z-Index */}
                 <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
