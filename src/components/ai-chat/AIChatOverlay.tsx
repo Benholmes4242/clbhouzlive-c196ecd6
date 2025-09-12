@@ -541,23 +541,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <div className="px-6 pt-3 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm border border-white/20">
+          <div className="px-6 pt-4 pb-2 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 h-10 bg-white/40 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm">
               <TabsTrigger 
                 value="chat" 
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
               >
                 Chat
               </TabsTrigger>
               <TabsTrigger 
                 value="logs"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
               >
                 Caddie Logs
               </TabsTrigger>
               <TabsTrigger 
                 value="swing-coach"
-                className="transition-all duration-160 data-[state=active]:bg-white/60 data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
               >
                 Swing Coach
               </TabsTrigger>
