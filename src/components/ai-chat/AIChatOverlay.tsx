@@ -407,13 +407,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   if (showHistory) {
     return (
       <div 
-        className="fixed inset-0 flex items-center justify-center p-4"
-        style={{ zIndex: 9999 }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setShowHistory(false);
-          }
-        }}
+        className="fixed inset-0"
+        style={{ zIndex: 50 }}
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
         onScroll={(e) => e.stopPropagation()}
