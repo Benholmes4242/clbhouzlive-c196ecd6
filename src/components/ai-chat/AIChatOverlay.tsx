@@ -497,11 +497,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <div className="flex items-center gap-3">
             <EchoAvatar 
               state={getAvatarState()} 
-              size={window.innerWidth <= 768 ? 28 : 32} 
+              size={window.innerWidth <= 768 ? 32 : 36} 
             />
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Echo</h2>
-              <p className="text-xs text-gray-600 opacity-80">Your personal caddie</p>
+              <p className="text-xs text-gray-600 opacity-80">I'm your personal caddie</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -523,6 +523,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </Button>
           </div>
         </div>
+
+        {/* Divider between header and tabs */}
+        <div className="border-t border-white/20" />
 
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
@@ -617,16 +620,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               />
             </TabsContent>
 
-            <TabsContent value="swing-coach" className="h-full m-0">
-              <SwingCoach 
-                onClose={() => setActiveTab('chat')}
-                isRecording={isRecording}
-                isProcessing={isProcessing}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                analysisText={swingCoachAnalysisText}
-                onAnalysisTextChange={setSwingCoachAnalysisText}
-              />
+            <TabsContent value="swing-coach" className="h-full m-0 flex items-center justify-center">
+              <div className="w-full max-w-md mx-auto">
+                <SwingCoach 
+                  onClose={() => setActiveTab('chat')}
+                  isRecording={isRecording}
+                  isProcessing={isProcessing}
+                  startRecording={startRecording}
+                  stopRecording={stopRecording}
+                  analysisText={swingCoachAnalysisText}
+                  onAnalysisTextChange={setSwingCoachAnalysisText}
+                />
+              </div>
             </TabsContent>
           </ScrollArea>
         </Tabs>
