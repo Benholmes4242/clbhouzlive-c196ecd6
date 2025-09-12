@@ -774,7 +774,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   return (
     <AnimatePresence mode="wait" initial={false}>
       {isOpen && (
-        <SlideOver open={isOpen} onClose={onClose} ariaLabel="AI Chat History">
+        <SlideOver open={isOpen} onClose={onClose} ariaLabel="AI Chat History" backdrop="transparent" zIndex="z-[10000]" lockScroll={false}>
           <motion.div
             key="ai-chat-history-panel"
             initial={{ x: "100%" }}

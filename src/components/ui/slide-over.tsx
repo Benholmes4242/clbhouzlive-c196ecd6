@@ -32,6 +32,16 @@ interface SlideOverProps {
    * @default null (renders to document.body)
    */
   portalTarget?: string;
+  /**
+   * Backdrop style variant
+   * @default "blurred"
+   */
+  backdrop?: 'blurred' | 'transparent' | 'none';
+  /**
+   * Whether to lock body scroll while open
+   * @default true
+   */
+  lockScroll?: boolean;
 }
 
 /**
@@ -53,7 +63,9 @@ export function SlideOver({
   zIndex = "z-[1000]",
   heightClass = "",
   ariaLabel = "panel",
-  portalTarget
+  portalTarget,
+  backdrop = "blurred",
+  lockScroll = true
 }: SlideOverProps) {
   const isMobile = useIsMobile();
   const lastFocusedRef = useRef<HTMLElement | null>(null);
@@ -74,7 +86,7 @@ export function SlideOver({
 
   // Body scroll lock when modal is open
   useEffect(() => {
-    if (open) {
+    if (open && lockScroll) {
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       
@@ -82,7 +94,7 @@ export function SlideOver({
         document.body.style.overflow = prevOverflow;
       };
     }
-  }, [open]);
+  }, [open, lockScroll]);
 
   // Focus management
   const handleExitComplete = useCallback(() => {
@@ -126,13 +138,15 @@ export function SlideOver({
           `}
         >
           {/* Backdrop - blocks all background interaction */}
-          <button
-            aria-label="Close Echo"
-            onClick={onClose}
-            className="fixed cursor-default inset-0 bg-white/10 backdrop-blur-xl"
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-          />
+          {backdrop !== 'none' && (
+            <button
+              aria-label="Close Echo"
+              onClick={onClose}
+              className={`fixed cursor-default inset-0 ${backdrop === 'blurred' ? 'bg-white/10 backdrop-blur-xl' : 'bg-transparent'}`}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+            />
+          )}
           
           {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
           {isMobile && (
