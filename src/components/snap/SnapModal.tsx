@@ -119,7 +119,7 @@ const SnapModal = ({
     thumbs?: string[];
   }) {
     return (
-      <div className="flex items-stretch gap-2 h-12 w-44">{/* Longer fixed width for all strips */}
+      <div className="flex items-stretch gap-2 h-10 w-44">{/* Longer fixed width for all strips */}
         {variant === "videos" && (
           <>
             <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
