@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { loadRecentMedia } from '@/lib/recentMediaCache';
+import { useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 
 interface SnapModalProps {
@@ -21,6 +22,9 @@ const SnapModal = ({
   onVideoClick 
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
+  const { user } = useSupabaseSession();
+  const { data: userMedia, isLoading, error } = useSnapModalUserMedia(user?.id);
+  
   const [captureeThumbs, setCaptureeThumbs] = useState<string[]>([]);
   const [photoThumbs, setPhotoThumbs] = useState<string[]>([]);
   const [videoThumbs, setVideoThumbs] = useState<string[]>([]);
@@ -45,16 +49,26 @@ const SnapModal = ({
     ],
   };
 
-  // Load thumbnails from cache or use golf course placeholders
+  // Load thumbnails from database or use golf course placeholders
   useEffect(() => {
-    (async () => {
-      const cached = await loadRecentMedia();
-      // Only use user's own media if they exist, otherwise always show golf course photos
-      setCaptureeThumbs(cached.photos.length ? cached.photos.slice(0, 2) : placeholders.capture);
-      setPhotoThumbs(cached.photos.length ? cached.photos.slice(0, 3) : placeholders.photos);
-      setVideoThumbs(cached.videos.length ? cached.videos.slice(0, 3) : placeholders.videos);
-    })();
-  }, []);
+    if (isLoading) return; // Keep existing state during loading
+    
+    if (error) {
+      // On error, fall back to placeholders
+      setCaptureeThumbs(placeholders.capture);
+      setPhotoThumbs(placeholders.photos);
+      setVideoThumbs(placeholders.videos);
+      return;
+    }
+    
+    const photos = userMedia?.photos ?? [];
+    const videos = userMedia?.videos ?? [];
+    
+    // Use user's media if available, otherwise show placeholders
+    setCaptureeThumbs(photos.length ? photos.slice(0, 2) : placeholders.capture);
+    setPhotoThumbs(photos.length ? photos.slice(0, 3) : placeholders.photos);
+    setVideoThumbs(videos.length ? videos.slice(0, 3) : placeholders.videos);
+  }, [isLoading, error, userMedia, placeholders.capture, placeholders.photos, placeholders.videos]);
 
   // Reusable thumbnail components
   type StripVariant = "videos" | "photos" | "capture";
