@@ -193,8 +193,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             {/* Play icon for non-autoplaying videos */}
             {!hidePlayButton && (
               <div className="absolute bottom-3 right-3 z-20">
-                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
-                  <Play className="h-3 w-3 md:h-4 md:w-4 text-white ml-0.5" fill="currentColor" />
+                <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 w-5 h-5 md:w-7 md:h-7 flex items-center justify-center">
+                  <Play className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 text-white ml-0.5" fill="currentColor" />
                 </div>
               </div>
             )}
