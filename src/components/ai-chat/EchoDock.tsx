@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { PiWaveform } from 'react-icons/pi';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
@@ -78,20 +77,20 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         style={{
           position: 'fixed',
           right: '0',
-          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(144px + env(safe-area-inset-bottom, 0px))',
           zIndex: 10000,
           overflow: 'hidden',
           pointerEvents: 'none',
           // Mobile spacing
           ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
-            bottom: `calc(112px + env(safe-area-inset-bottom, 0px))`
+            bottom: `calc(160px + env(safe-area-inset-bottom, 0px))`
           })
         }}
         aria-live="polite"
       >
         {/* Handle (half-pill tab) */}
         <button
-          className="echo-handle"
+          className="echo-handle echo-handle--label"
           aria-label="Open Echo assistant"
           onKeyDown={handleKeyDown}
           onClick={handleClick}
@@ -99,8 +98,8 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             pointerEvents: 'auto',
             appearance: 'none',
             border: '0',
-            width: '48px',
-            height: '112px',
+            width: '56px',
+            height: '128px',
             background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderRadius: '9999px 0 0 9999px',
             display: 'flex',
@@ -108,18 +107,11 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             justifyContent: 'center',
             cursor: 'pointer',
             outline: 'none',
-            boxShadow: 'none'
+            boxShadow: 'none',
+            transition: 'transform 0.2s ease, width 0.2s ease'
           }}
         >
-          <span className="echo-icon" aria-hidden="true">
-            <PiWaveform 
-              size={20} 
-              className="text-white/90"
-              style={{
-                animation: 'echoWave 2s ease-in-out infinite'
-              }}
-            />
-          </span>
+          <span className="echo-label" aria-hidden="true">Echo</span>
         </button>
       </div>
     </>

@@ -369,6 +369,26 @@
     backdrop-filter: blur(8px);
   }
 
+  /* Echo label styling */
+  .echo-label {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: white;
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Optional subtle affordance on hover (desktop only) */
+  @media (hover: hover) and (pointer: fine) {
+    .echo-handle:hover { 
+      width: 60px;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .echo-handle {
       transition: none !important;
