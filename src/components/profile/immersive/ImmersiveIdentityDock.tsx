@@ -120,31 +120,31 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         onClick={onMorphToHeader}
         className="flex-shrink-0"
       >
-        <div className="px-6 py-3">
-          <div className="flex items-center gap-3">
-            {/* Avatar - made even bigger */}
-            <Avatar className="w-20 h-20 rounded-full">
+        <div className="px-4 py-2">
+          <div className="flex items-center gap-2">
+            {/* Avatar - smaller size */}
+            <Avatar className="w-14 h-14 rounded-full">
               <AvatarImage 
                 src={profile.profile_photo_url || undefined}
                 alt={profile.display_name || 'User'}
               />
-              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold text-2xl">
+              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold text-lg">
                 {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            {/* Profile Info - made text even bigger */}
+            {/* Profile Info - smaller text */}
             <div className="flex-1 min-w-0">
-              <div className="text-white font-bold text-2xl truncate">
+              <div className="text-white font-bold text-lg truncate">
                 {profile.display_name || profile.username || 'Unknown User'}
               </div>
               {profile.username && (
-                <div className="text-white/70 text-sm truncate">
+                <div className="text-white/70 text-xs truncate">
                   @{profile.username}
                 </div>
               )}
               {profile.club_name && (
-                <div className="flex items-center gap-1 text-white/80 text-sm truncate">
+                <div className="flex items-center gap-1 text-white/80 text-xs truncate">
                   <MapPin className="w-3 h-3" />
                   <span>{profile.club_name}</span>
                 </div>
@@ -153,12 +153,12 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
 
             {/* Actions */}
             {!isOwnProfile && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button
                   onClick={handleFollow}
                   size="sm"
                   variant={isFollowing ? "secondary" : "default"}
-                  className="rounded-full px-4 h-8 text-xs font-medium"
+                  className="rounded-full px-3 h-7 text-xs font-medium"
                 >
                   <UserPlus className="w-3 h-3 mr-1" />
                   {isFollowing ? 'Following' : 'Follow'}
@@ -167,7 +167,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="rounded-full px-4 h-8 text-xs font-medium text-white border-white/30 hover:bg-white/10"
+                  className="rounded-full px-3 h-7 text-xs font-medium text-white border-white/30 hover:bg-white/10"
                 >
                   <MessageCircle className="w-3 h-3 mr-1" />
                   Message
@@ -176,7 +176,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="rounded-full w-8 h-8 p-0 text-white/80 hover:text-white hover:bg-white/10"
+                  className="rounded-full w-7 h-7 p-0 text-white/80 hover:text-white hover:bg-white/10"
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
