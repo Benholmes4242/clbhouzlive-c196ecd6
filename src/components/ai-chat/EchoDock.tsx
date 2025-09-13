@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
-import EchoBadge from './EchoBadge';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -13,9 +12,7 @@ interface EchoDockProps {
 const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
   const { sentinelRef } = useAdaptiveGlass();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const dockRef = useRef<HTMLDivElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
   useEffect(() => {
@@ -36,46 +33,23 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
     }
   }, [showOnboarding]);
 
-  // Click outside to close on mobile
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dockRef.current && !dockRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen && window.innerWidth <= 768) {
-      document.addEventListener('click', handleClickOutside, { passive: true });
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [isOpen]);
-
   // Don't show on clubhouse page or when modals are open
   if (location.pathname === '/clubhouse' || location.pathname === '/' || shouldHide) {
     return null;
   }
 
-  const handleToggle = () => {
+  const handleClick = () => {
     if (showOnboarding) {
       setShowOnboarding(false);
     }
-    // Toggle dock on mobile, trigger onClick callback on desktop
-    if (window.innerWidth <= 768) {
-      setIsOpen(prev => !prev);
-    } else {
-      onClick();
-    }
+    onClick();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') { 
       e.preventDefault(); 
-      handleToggle();
+      handleClick();
     }
-  };
-
-  const handleCloseDock = () => {
-    setIsOpen(false);
   };
 
   const dockContent = (
@@ -98,20 +72,15 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         </div>
       )}
 
-      {/* Echo Dock - Right-edge tabbed handle */}
+      {/* Echo Dock - Right-edge handle only */}
       <div 
-        ref={dockRef}
-        className={`echo-dock echo-dock--right ${isOpen ? 'is-open' : ''}`}
+        className="echo-dock--right"
         style={{
           position: 'fixed',
           right: '0',
           bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
           zIndex: 10000,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
           overflow: 'hidden',
-          boxShadow: 'none',
           pointerEvents: 'none',
           // Mobile spacing
           ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
@@ -123,12 +92,9 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         {/* Handle (half-pill tab) */}
         <button
           className="echo-handle"
-          id="echoHandle"
-          aria-controls="echoPanel"
-          aria-expanded={isOpen}
           aria-label="Open Echo assistant"
           onKeyDown={handleKeyDown}
-          onClick={handleToggle}
+          onClick={handleClick}
           style={{
             pointerEvents: 'auto',
             appearance: 'none',
@@ -140,11 +106,9 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transform: 'translateX(0)',
-            transition: 'transform 0.24s ease, opacity 0.2s ease',
-            boxShadow: 'none',
             cursor: 'pointer',
-            outline: 'none'
+            outline: 'none',
+            boxShadow: 'none'
           }}
         >
           <span className="echo-icon" aria-hidden="true">
@@ -156,24 +120,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
               }}
             />
           </span>
-          <span className="sr-only">Open Echo</span>
         </button>
-
-        {/* Panel (existing Echo badge content) */}
-        <div 
-          className="echo-panel"
-          id="echoPanel"
-          style={{
-            pointerEvents: 'auto',
-            position: 'relative',
-            background: 'transparent',
-            transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-            transition: 'transform 0.24s ease',
-            willChange: 'transform'
-          }}
-        >
-          <EchoBadge onClick={onClick} onClose={handleCloseDock} />
-        </div>
       </div>
     </>
   );
