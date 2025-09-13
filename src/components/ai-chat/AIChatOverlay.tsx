@@ -448,41 +448,40 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Header - Fixed at top */}
-        <div 
+        {/* Header - Fixed at top (UI only change) */}
+        <div
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{
             height: window.innerWidth <= 768 ? '56px' : '64px',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(246, 247, 246, 0.85) 100%)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+            // gradient just in header (keep container bg/blur as-is)
+            background: 'linear-gradient(180deg, #3da0a9 0%, #6e9277 100%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
           }}
         >
           <div className="flex items-center gap-3">
-            <EchoAvatar 
-              state={getAvatarState()} 
-              size={window.innerWidth <= 768 ? 40 : 44} 
-            />
+            <EchoAvatar state={getAvatarState()} size={window.innerWidth <= 768 ? 40 : 44} />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Echo</h2>
-              <p className="text-sm text-gray-600 opacity-80">I'm your personal caddie</p>
+              <h2 className="text-xl font-semibold text-white">Echo</h2>
+              <p className="text-sm text-white/90">I'm your personal tour caddie</p>
             </div>
           </div>
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowHistory(true)}
-              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
             >
-              <History className="h-4 w-4" />
+              <History className="h-4 w-4 text-white" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0 hover:bg-white/20 transition-colors duration-120"
+              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 text-white" />
             </Button>
           </div>
         </div>
@@ -493,22 +492,43 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="px-6 pt-4 pb-2 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 h-10 bg-white/40 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm">
-              <TabsTrigger 
-                value="chat" 
-                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
+            <TabsList
+              className="
+                w-full h-11 rounded-full
+                bg-white/85 backdrop-blur-sm border border-white/50
+                shadow-sm flex items-center justify-between px-1
+              "
+            >
+              <TabsTrigger
+                value="chat"
+                className="
+                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                  transition-all
+                "
               >
                 Chat
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="logs"
-                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
+                className="
+                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                  transition-all
+                "
               >
                 Caddie Logs
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="swing-coach"
-                className="transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:border-white/20 text-gray-700 font-medium rounded-md"
+                className="
+                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                  transition-all
+                "
               >
                 Swing Coach
               </TabsTrigger>
@@ -525,23 +545,30 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div className="h-full min-h-0">
                   <div className="px-6 py-5">
                     {messages.length === 0 ? (
-                      <div className="text-center text-muted-foreground">
-                        <p className="mb-6">
+                      <div className="text-left">
+                        <p className="text-gray-800/80 text-base mb-5">
                           I'm your personal tour caddie.<br />
-                          Ask me anything, anytime, I've got you.
+                          Ask me anything, anytime—I've got you.
                         </p>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Try asking:</p>
+
+                        <div className="space-y-3">
                           {suggestedPrompts.map((prompt, index) => (
-                            <Button
+                            <button
                               key={index}
-                              variant="outline"
-                              size="sm"
                               onClick={() => handleSuggestedPrompt(prompt)}
-                              className="mx-1 mb-2 text-xs"
+                              className="
+                                w-full text-left rounded-2xl
+                                bg-white/90 backdrop-blur shadow
+                                px-4 py-4
+                                hover:-translate-y-0.5 active:translate-y-0 transition-transform
+                              "
                             >
-                              {prompt}
-                            </Button>
+                              <div className="flex items-center gap-3">
+                                {/* If you already store icons per prompt, render them here. Otherwise keep a generic icon. */}
+                                <span className="text-xl">⛳</span>
+                                <span className="text-lg font-medium text-gray-900">{prompt}</span>
+                              </div>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -615,37 +642,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           {activeTab === 'chat' && (
             <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={requestLocation}
-                  className="text-xs"
-                >
-                  <MapPin className="h-3 w-3 mr-1" />
-                  Use My Location
-                </Button>
-                {userLocation && (
-                  <Badge variant="secondary" className="text-xs">
-                    {userLocation}
-                  </Badge>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1 flex gap-2">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Ask about your swing, clubs, courses..."
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                    disabled={isLoading || isRecording || isProcessing}
-                  />
+              {/* Floating pill composer */}
+              <div className="rounded-[28px] bg-white/92 backdrop-blur shadow-md px-3 py-2 flex items-center">
+                {/* Left icons */}
+                <div className="flex items-center gap-1 pr-1">
                   <Button
                     onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isLoading || isProcessing}
-                    variant={isRecording ? "destructive" : "outline"}
-                    size="sm"
-                    className="px-3"
+                    disabled={isProcessing}
+                    variant={isRecording ? "destructive" : "ghost"}
+                    size="icon"
+                    className="h-9 w-9 rounded-full"
                   >
                     {isRecording ? (
                       <MicOff className="h-4 w-4" />
@@ -655,16 +661,53 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       <Mic className="h-4 w-4" />
                     )}
                   </Button>
+
+                  {/* Camera button – keep if you already have a media picker handler.
+                     If not, you can disable it for now (UI only) */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-full"
+                    // onClick={openMediaPicker} // only if this exists in your logic
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="currentColor"/></svg>
+                  </Button>
                 </div>
+
+                {/* Input */}
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask about your swing, clubs, courses…"
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                  disabled={isLoading || isRecording || isProcessing}
+                  className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px]"
+                />
+
+                {/* Send arrow */}
                 <Button
                   onClick={() => sendMessage(inputValue)}
                   disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                  size="sm"
-                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                  size="icon"
+                  className="h-9 w-9 rounded-full bg-gray-900 text-white hover:bg-black transition"
+                  aria-label="Send"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
+
+              {/* Recent history peek (opens existing AIChatHistory) */}
+              <button
+                className="mt-3 w-full rounded-[28px] bg-white/85 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
+                onClick={() => setShowHistory(true)}
+                aria-label="Open recent history"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-10 h-1 rounded-full bg-gray-300 block" />
+                  Recent history
+                </span>
+                <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+              </button>
             </div>
           )}
           {activeTab === 'logs' && (
