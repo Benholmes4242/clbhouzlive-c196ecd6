@@ -122,7 +122,7 @@ const SnapModal = ({
         {variant === "videos" && (
           <>
             {thumbs.slice(0, 3).map((t, i) => (
-              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10">
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-2 ring-white/20 border border-white/10 shadow-md">
                 <img
                   src={t.displaySrc}
                   alt=""
@@ -140,7 +140,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-2 ring-white/20 border border-white/10 shadow-md`}
               >
                 <img
                   src={t.displaySrc}
@@ -159,7 +159,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-2 ring-white/20 border border-white/10 shadow-md`}
               >
                 <img
                   src={t.displaySrc}
@@ -253,7 +253,7 @@ const SnapModal = ({
                   <motion.button
                     key={key}
                     onClick={onClick}
-                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-2 ring-white/20 border border-white/10 rounded-2xl hover:bg-white/5 hover:ring-white/30 transition-all duration-200 shadow-lg"
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
@@ -277,7 +277,7 @@ const SnapModal = ({
 
                 {/* Error state with retry */}
                 {error && (
-                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
+                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-2 ring-red-500/30 border border-red-500/20 rounded-2xl shadow-lg">
                     <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
@@ -294,7 +294,7 @@ const SnapModal = ({
                     onClose(); // Close modal first
                     setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-2 ring-white/20 border border-white/10 rounded-2xl hover:bg-white/5 hover:ring-white/30 transition-all duration-200 shadow-lg"
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
