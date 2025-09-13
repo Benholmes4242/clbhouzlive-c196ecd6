@@ -155,7 +155,7 @@ const SnapModal = ({
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
-      label: "Capture",
+      label: "Cam",
       description: "Take photo or video",
       icon: Camera,
       onClick: onCameraClick,
