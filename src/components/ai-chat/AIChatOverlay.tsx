@@ -467,17 +467,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
+            <Button 
+              variant="ghost" 
+              size="sm" 
               onClick={() => setShowHistory(true)}
               className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
             >
               <History className="h-4 w-4 text-white" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
+            <Button 
+              variant="ghost" 
+              size="sm" 
               onClick={handleClose}
               className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
             >
@@ -486,11 +486,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           </div>
         </div>
 
-        {/* Divider between header and tabs */}
-        <div className="border-t border-gray-300/40 mx-6" />
-
         {/* Tabs - Fixed header */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 bg-[rgba(110,146,119,0.06)]">
           <div className="px-6 pt-4 pb-2 flex-shrink-0">
             <TabsList
               className="
