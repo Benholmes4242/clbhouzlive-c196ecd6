@@ -39,16 +39,6 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
   }
 
   const handleClick = () => {
-    // ripple feedback
-    const btn = btnRef.current;
-    if (btn) {
-      btn.classList.remove("ripple");
-      // force reflow so animation can re-run
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      btn.offsetWidth; 
-      btn.classList.add("ripple");
-    }
-    
     if (showOnboarding) {
       setShowOnboarding(false);
     }
@@ -106,7 +96,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             pointerEvents: 'auto',
             appearance: 'none',
             border: '0',
-            width: '44px',
+            width: '30px',
             height: '120px',
             background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderRadius: '9999px 0 0 9999px',
@@ -115,11 +105,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             justifyContent: 'center',
             cursor: 'pointer',
             outline: 'none',
-            boxShadow: 'none',
-            position: 'relative',
-            overflow: 'hidden',
-            transformOrigin: 'center',
-            transition: 'transform 0.18s ease, width 0.18s ease, opacity 0.18s ease'
+            boxShadow: 'none'
           }}
         >
           <span className="echo-label" aria-hidden="true">Echo</span>
