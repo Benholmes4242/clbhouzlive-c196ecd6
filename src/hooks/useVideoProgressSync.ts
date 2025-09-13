@@ -107,9 +107,17 @@ export function useVideoProgressSync(
     stopSyncLoop('completed');
   }, [segments, totalSegments, stopSyncLoop]);
 
-  // Video event handlers
+  // Video event handlers with src change detection
   useEffect(() => {
     if (!videoElement || !USE_VIDEO_PROGRESS_SYNC_V1) return;
+
+    // Reset progress when src changes
+    const currentSrc = videoElement.src;
+    if (currentSrc) {
+      setProgress(0);
+      setSegmentProgress([]);
+      telemetryLoggedRef.current = false;
+    }
 
     const handlePlay = () => startSyncLoop();
     const handleCanPlay = () => startSyncLoop();
@@ -117,6 +125,12 @@ export function useVideoProgressSync(
     const handleWaiting = () => stopSyncLoop('paused');
     const handleStalled = () => stopSyncLoop('paused');
     const handleEnded = () => completeProgress();
+    const handleLoadStart = () => {
+      // Reset progress on new source load
+      setProgress(0);
+      setSegmentProgress([]);
+      stopSyncLoop();
+    };
 
     videoElement.addEventListener('play', handlePlay);
     videoElement.addEventListener('canplay', handleCanPlay);
@@ -124,6 +138,7 @@ export function useVideoProgressSync(
     videoElement.addEventListener('waiting', handleWaiting);
     videoElement.addEventListener('stalled', handleStalled);
     videoElement.addEventListener('ended', handleEnded);
+    videoElement.addEventListener('loadstart', handleLoadStart);
 
     return () => {
       videoElement.removeEventListener('play', handlePlay);
@@ -132,6 +147,7 @@ export function useVideoProgressSync(
       videoElement.removeEventListener('waiting', handleWaiting);
       videoElement.removeEventListener('stalled', handleStalled);
       videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('loadstart', handleLoadStart);
       stopSyncLoop();
     };
   }, [videoElement, startSyncLoop, stopSyncLoop, completeProgress]);

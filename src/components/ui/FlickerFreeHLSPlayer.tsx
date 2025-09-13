@@ -80,13 +80,26 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     });
   };
 
-  // Setup HLS
+  // Setup HLS with src change handling
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !hlsUrl || isHLSLoaded) return;
+    if (!video || !hlsUrl) return;
 
     const setupHLS = async () => {
       try {
+        // Clean up existing HLS instance before setting up new one
+        if (hlsInstanceRef.current) {
+          console.log('[HLS] Cleaning up previous HLS instance');
+          hlsInstanceRef.current.destroy();
+          hlsInstanceRef.current = null;
+        }
+
+        // Reset states for new source
+        setIsHLSLoaded(false);
+        setIsVideoReady(false);
+        setAutoplayAttempted(false);
+        setIsPlaying(false);
+
         if (canPlayHLSNatively()) {
           video.src = hlsUrl;
           setIsHLSLoaded(true);
@@ -126,12 +139,13 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     setupHLS();
 
     return () => {
+      // Cleanup only on unmount, not on src change
       if (hlsInstanceRef.current) {
         hlsInstanceRef.current.destroy();
         hlsInstanceRef.current = null;
       }
     };
-  }, [hlsUrl, isHLSLoaded]);
+  }, [hlsUrl]); // Only depend on hlsUrl, not isHLSLoaded
 
   // Idempotent autoplay handler
   const handleAutoplay = useCallback(async () => {

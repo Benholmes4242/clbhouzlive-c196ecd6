@@ -50,11 +50,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       url: media.media_url 
     }));
   
-  const { isPreloaded } = useVideoPreloader({
-    videos: allVideos,
-    currentIndex: currentMediaIndex,
-    preloadCount: 2
-  });
+  const { isPreloaded } = useVideoPreloader(allVideos, currentMediaIndex);
 
   // Check if this is the user's own post
   const isOwnPost = user?.id === post.user.id;

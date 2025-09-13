@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
+import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
 
 import { MediaItem } from '@/types/media';
@@ -74,6 +75,8 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     videoRef.current,
     { totalSegments: localMediaItems.length }
   );
+
+  const { isPreloaded } = useVideoPreloader(localMediaItems, activeIndex);
   
   // Enhanced mobile animations
   const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);
@@ -495,7 +498,6 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         {currentItem.media_type === 'video' ? (
           <EnhancedVideoPlayer
             ref={videoRef}
-            key={`${currentItem.id}-${activeIndex}`}
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
             autoplay={true}
