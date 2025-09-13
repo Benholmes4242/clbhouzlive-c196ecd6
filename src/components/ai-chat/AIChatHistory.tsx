@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
@@ -19,6 +19,8 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useConversationSession } from '@/hooks/useConversationSession';
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { SlideOver } from '@/components/ui/slide-over';
+import EchoProtection from './EchoProtection';
+import { useEchoProtection } from '@/hooks/useEchoProtection';
 
 // HLS Video Player Component
 const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -162,7 +164,7 @@ const SwingAnalysisCard: React.FC<{
   return (
     <div 
       ref={cardRef}
-      className={`min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+      className={`rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-all duration-200 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
       onClick={!isExpanded ? onToggleExpand : undefined}
       style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
     >
@@ -215,7 +217,6 @@ const SwingAnalysisCard: React.FC<{
               <h4 className="font-medium text-sm text-gray-900 line-clamp-1 mb-1">
                 Swing Analysis
               </h4>
-              {/* Remove the save_card text display */}
             </div>
           </div>
         </div>
@@ -348,7 +349,7 @@ const SwingAnalysisCard: React.FC<{
 
 // Skeleton Loading Component
 const SkeletonCard: React.FC = () => (
-  <div className="min-h-[112px] sm:min-h-[120px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 animate-pulse">
+  <div className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 animate-pulse">
     <div className="flex items-start justify-between mb-2">
       <div className="h-4 bg-gray-200 rounded w-1/3"></div>
       <div className="h-3 bg-gray-200 rounded w-16"></div>
@@ -455,6 +456,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const { toast } = useToast();
 
+  // Echo Protection System
+  const {
+    isProtectionOpen,
+    pendingOperation,
+    requestEchoAccess,
+    handleProtectionSuccess,
+    handleProtectionClose
+  } = useEchoProtection();
 
   // Auto-scroll hooks for each tab
   const chatAutoScroll = useAutoScroll({
@@ -516,64 +525,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       console.log('📱 Session conversations processed:', sessionConversations.length);
       setConversations(sessionConversations);
 
-      // Also try to load from Supabase database if available
-      const { data: user } = await supabase.auth.getUser();
-      console.log('👤 Current user:', user.user?.id);
-      if (user.user) {
-        console.log('💾 Loading from Supabase conversations table...');
-        const { data, error } = await supabase
-          .from('conversations')
-          .select('*')
-          .eq('user_id', user.user.id)
-          .order('updated_at', { ascending: false });
-
-        console.log('💾 Supabase conversations result:', { data: data?.length || 0, error });
-
-        if (!error && data && data.length > 0) {
-          const dbConversations = data.map(conv => {
-            const messages = (conv.messages as any[]) || [];
-            console.log('📝 Conversation DB debug:', {
-              id: conv.id,
-              title: conv.title,
-              totalMessages: messages.length,
-              messageTypes: messages.map(m => m.type),
-              messageContent: messages.map(m => ({ type: m.type, content: m.content?.substring(0, 30) + '...' })),
-              fullMessages: messages // Let's see the complete structure
-            });
-            
-            return {
-              id: conv.id,
-              title: conv.title || "New conversation",
-              customTitle: conv.title,
-              messages: messages.map((msg, index) => ({
-                id: `${conv.id}-${index}`,
-                type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-                content: msg.content || '',
-                timestamp: new Date(msg.timestamp || conv.created_at),
-                metadata: msg.metadata
-               })),
-              timestamp: new Date(conv.updated_at),
-              createdAt: new Date(conv.created_at),
-              lastActivityAt: new Date(conv.updated_at),
-              messageCount: messages.length
-            };
-          });
-
-          // Merge database conversations with local storage conversations
-          const allConversations = [...sessionConversations];
-          dbConversations.forEach(dbConv => {
-            if (!allConversations.find(localConv => localConv.id === dbConv.id)) {
-              allConversations.push(dbConv);
-            }
-          });
-
-          // Sort by last activity
-          allConversations.sort((a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime());
-          setConversations(allConversations);
-        }
-      }
     } catch (error) {
-      console.error('Error loading chat conversations:', error);
+      console.error('Failed to load chat conversations:', error);
       setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
     } finally {
       setLoadingStates(prev => ({ ...prev, conversations: false }));
@@ -581,80 +534,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadSwingAnalyses = async () => {
-    console.log('🏌️‍♂️ Loading swing analyses...');
     setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
-      const { data: user } = await supabase.auth.getUser();
-      console.log('👤 User for swing analyses:', user.user?.id);
-      if (!user.user) return;
-
-      const { data, error } = await supabase
-        .from('pro_ai_analyses')
-        .select('*')
-        .eq('user_id', user.user.id)
-        .order('created_at', { ascending: false });
-
-      console.log('🏌️‍♂️ Swing analyses result:', { data: data?.length || 0, error });
-      if (error) throw error;
-
-      const analysesWithFormatted = data?.map(analysis => {
-        let conversation: Array<{role: 'user' | 'coach', content: string, timestamp?: string}> = [];
-        let videoThumbnail = '';
-        let videoUrl = analysis.video_url || '';
-        
-        // Parse analysis results for conversation and video data
-        try {
-          if (analysis.analysis_results && typeof analysis.analysis_results === 'object') {
-            const results = analysis.analysis_results as any;
-            
-            // Extract conversation from various possible formats
-            if (results.conversation && Array.isArray(results.conversation)) {
-              conversation = results.conversation.map((msg: any) => ({
-                role: msg.role === 'user' ? 'user' : 'coach',
-                content: msg.content || msg.message || '',
-                timestamp: msg.timestamp
-              }));
-            } else if (results.messages && Array.isArray(results.messages)) {
-              conversation = results.messages.map((msg: any) => ({
-                role: msg.role === 'user' ? 'user' : 'coach',
-                content: msg.content || msg.message || '',
-                timestamp: msg.timestamp
-              }));
-            }
-            
-            // Extract video thumbnail if available
-            if (results.videoThumbnail) {
-              videoThumbnail = results.videoThumbnail;
-            } else if (results.metadata?.videoThumbnail) {
-              videoThumbnail = results.metadata.videoThumbnail;
-            }
-          }
-        } catch (parseError) {
-          console.error('Error parsing analysis results:', parseError);
-        }
-
-        return {
-          id: analysis.id,
-          save_card: analysis.swing_context || 'Swing Analysis',
-          tags: [],
-          category: 'swing-analysis',
-          content: conversation.length > 0 
-            ? conversation.map(msg => `${msg.role === 'user' ? 'You' : 'Coach'}: ${msg.content}`).join('\n\n')
-            : analysis.swing_context || 'Swing analysis',
-          videoThumbnail,
-          videoUrl,
-          timestamp: new Date(analysis.created_at),
-          conversation,
-          title: 'Swing Analysis'
-        };
-      }) || [];
-
-      console.log('🏌️‍♂️ Processed swing analyses:', analysesWithFormatted.length);
-      setSwingAnalyses(analysesWithFormatted);
+      // For now, just set empty swing analyses since the table doesn't exist
+      setSwingAnalyses([]);
     } catch (error) {
-      console.error('Error loading swing analyses:', error);
+      console.error('Failed to load swing analyses:', error);
       setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
     } finally {
       setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
@@ -663,51 +550,26 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      // Delete from local storage first
-      conversationSession.deleteConversation(conversationId);
+      // Delete from conversation session
+      await conversationSession.deleteConversation(conversationId);
       
-      // Also try to delete from database if it exists there
-      const { data: user } = await supabase.auth.getUser();
-      if (user.user) {
-        const { error } = await supabase
-          .from('conversations')
-          .delete()
-          .eq('id', conversationId)
-          .eq('user_id', user.user.id);
-
-        // Don't throw error if database deletion fails - local deletion succeeded
-        if (error) {
-          console.warn('Failed to delete conversation from database:', error);
-        }
-      }
-
       // Update local state
-      setConversations(prev => prev.filter(c => c.id !== conversationId));
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+      
+      // Collapse if this conversation was expanded
+      if (expandedCard?.type === 'chat' && expandedCard?.id === conversationId) {
+        setExpandedCard(null);
+      }
+      
       toast({
         title: "Conversation deleted",
-        description: "The conversation has been removed from your history."
+        description: "The conversation has been removed from your history",
       });
     } catch (error) {
       console.error('Error deleting conversation:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete conversation. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDeleteCaddieLog = async (logId: string) => {
-    const success = await deleteCaddieLogHook(logId);
-    if (success) {
-      toast({
-        title: "Caddie log deleted",
-        description: "The log has been removed from your history."
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to delete caddie log. Please try again.",
+        title: "Delete failed",
+        description: "Failed to delete the conversation. Please try again.",
         variant: "destructive"
       });
     }
@@ -715,28 +577,23 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   const deleteSwingAnalysis = async (analysisId: string) => {
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-
-      const { error } = await supabase
-        .from('pro_ai_analyses')
-        .delete()
-        .eq('id', analysisId)
-        .eq('user_id', user.user.id);
-
-      if (error) throw error;
-
       setSwingAnalyses(prev => prev.filter(analysis => analysis.id !== analysisId));
+      
+      // Collapse if this analysis was expanded
+      if (expandedCard?.type === 'swing' && expandedCard?.id === analysisId) {
+        setExpandedCard(null);
+      }
+      
       toast({
         title: "Analysis deleted",
-        description: "The swing analysis has been removed from your history."
+        description: "The swing analysis has been removed from your history",
       });
     } catch (error) {
       console.error('Error deleting swing analysis:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete swing analysis. Please try again.",
-        variant: "destructive",
+        title: "Delete failed",
+        description: "Failed to delete the swing analysis. Please try again.",
+        variant: "destructive"
       });
     }
   };
@@ -747,378 +604,450 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     conversation.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // Filter caddie logs based on search  
-  const filteredCaddieLogs = caddieLogs.filter(log =>
-    log.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   // Filter swing analyses based on search
   const filteredSwingAnalyses = swingAnalyses.filter(analysis =>
     analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase()) ||
     analysis.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // ESC key handler
-  useEffect(() => {
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
-      return () => document.removeEventListener('keydown', handleEscapeKey);
-    }
-  }, [isOpen, onClose]);
-
   return (
-    <SlideOver 
-      open={isOpen} 
-      onClose={onClose} 
-      ariaLabel="AI Chat History" 
-      backdrop="transparent" 
-      zIndex="z-[1200]" 
-      lockScroll={false}
-    >
+    <>
+      <SlideOver
+        open={isOpen}
+        onClose={onClose}
+        width="w-full sm:w-[90vw] sm:max-w-[1000px]"
+        zIndex="z-[1110]"
+        ariaLabel="AI chat history interface"
+      >
+        <div className="h-full flex flex-col">
+          {/* Header */}
           <div
-            key="ai-chat-history-panel"
-            className="h-full flex flex-col"
+            className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+            style={{
+              height: '64px',
+              background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
+            }}
           >
-            {/* Header – gradient bar, sticky */}
-            <header
-              className="sticky top-0 z-10 px-4 sm:px-6 pt-4 pb-3"
-              style={{
-                background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
-                borderBottom: '1px solid rgba(255,255,255,0.12)'
-              }}
+            <div className="flex items-center gap-3">
+              <PiWaveform 
+                size={32} 
+                className="text-white/90 transition-all duration-200 ease-in-out"
+              />
+              <div>
+                <h2 className="text-xl font-semibold text-white">Echo History</h2>
+                <p className="text-sm text-white/90">Find any past chat or swing</p>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <PiWaveform 
-                    size={40} 
-                    className="text-white/90 transition-all duration-200 ease-in-out"
-                    style={{
-                      animation: `echoWave 3s ease-in-out infinite`
-                    }}
-                  />
-                  <div>
-                    <h2 className="text-xl font-semibold text-white">Echo History</h2>
-                    <p className="text-sm text-white/90">Find any past chat or swing</p>
-                  </div>
-                </div>
-
-                {/* Search input (existing handlers) */}
-                <div className="hidden sm:block w-[280px]">
-                  <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-2 shadow">
-                    <Search className="h-4 w-4 text-gray-500" />
-                    <input
-                      className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-500"
-                      placeholder="Search history..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile search below title */}
-              <div className="sm:hidden mt-3">
-                <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-2 shadow">
-                  <Search className="h-4 w-4 text-gray-500" />
-                  <input
-                    className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-500"
-                    placeholder="Search history..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </div>
-            </header>
-
-            <div className="flex-1 min-h-0 flex flex-col">
-              {/* Tabs + TabPanels */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-                {/* Tabs header (matches overlay) */}
-                <div className="px-4 sm:px-6 pt-3 pb-2">
-                  <TabsList
-                    className="
-                      w-full h-11 rounded-full
-                      bg-white/85 backdrop-blur-sm border border-white/50
-                      shadow-sm flex items-center justify-between px-1
-                    "
-                  >
-                    <TabsTrigger
-                      value="chat"
-                      className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
-                                 text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
-                                 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                                 transition-all"
-                    >
-                      Chat {conversations.length > 0 && <span className="ml-1 text-gray-500">({conversations.length})</span>}
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="swing"
-                      className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
-                                 text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
-                                 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                                 transition-all"
-                    >
-                      Swing Coach {swingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({swingAnalyses.length})</span>}
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-
-              <div className="flex-1 overflow-hidden bg-[rgba(110,146,119,0.06)]">
-            {/* Chat Tab */}
-            <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-              <ScrollArea 
-                ref={chatAutoScroll.scrollAreaRef}
-                className="h-full"
-                style={{ overscrollBehavior: 'contain' }}
-              >
-                <div className="px-6 py-5">
-                  {loadingStates.conversations ? (
-                    <div className="space-y-4 sm:space-y-5">
-                      {[1, 2, 3].map((i) => (
-                        <SkeletonCard key={i} />
-                      ))}
-                    </div>
-                  ) : errorStates.conversations ? (
-                    <ErrorState
-                      message={errorStates.conversations}
-                      onRetry={loadChatConversations}
-                    />
-                  ) : filteredConversations.length > 0 ? (
-                    <div className="space-y-4 sm:space-y-5">
-                      {filteredConversations.map((conversation, index) => (
-                        <div
-                          key={`conversation-${conversation.id || index}`}
-                          className={`min-h-[112px] sm:min-h-[120px] max-h-[160px] px-4 sm:px-5 py-3 sm:py-3.5 rounded-[14px] bg-white/90 border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col ${
-                            expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'h-auto max-h-none shadow-lg' : ''
-                          }`}
-                        >
-                          <div className="flex items-start gap-2 flex-1">
-                            {editingConversationId === conversation.id ? (
-                              <div className="flex items-center gap-2 flex-1">
-                                <Input
-                                  value={editTitle}
-                                  onChange={(e) => setEditTitle(e.target.value)}
-                                  className="flex-1"
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      // Handle save edit
-                                    } else if (e.key === 'Escape') {
-                                      setEditingConversationId(null);
-                                      setEditTitle('');
-                                    }
-                                  }}
-                                  autoFocus
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    // Handle save edit
-                                  }}
-                                  className="h-7 px-2"
-                                >
-                                  Save
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setEditingConversationId(null);
-                                    setEditTitle('');
-                                  }}
-                                  className="h-7 px-2"
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
-                            ) : (
-                               <div className="flex-1 flex flex-col">
-                                 {/* Header Row */}
-                                   <div className="flex items-start justify-between mb-2">
-                                     {(() => {
-                                        const firstUserMessage = conversation.messages.find(msg => msg.type === 'user')?.content;
-                                        const displayTitle = firstUserMessage || conversation.title || "New conversation";
-                                       return (
-                                         <h3 className="font-semibold text-sm text-gray-900 flex-1 mr-3 line-clamp-1" title={displayTitle}>
-                                           {displayTitle}
-                                         </h3>
-                                       );
-                                     })()}
-                                    <span className="text-xs text-gray-500 flex-shrink-0">
-                                      {conversation.timestamp.toLocaleDateString()}
-                                    </span>
-                                  </div>
-
-                                  {/* Body Preview - First AI Response */}
-                                  <div className="flex-1 mb-3">
-                                     {(() => {
-                                       const firstAIMessage = conversation.messages.find(msg => msg.type === 'ai');
-                                       return firstAIMessage ? (
-                                         <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed">
-                                           {firstAIMessage.content}
-                                         </p>
-                                       ) : (
-                                         <p className="text-sm text-gray-400 italic">No response yet</p>
-                                       );
-                                     })()}
-                                 </div>
-
-                                 {/* Action Row */}
-                                 <div className="flex items-center justify-between">
-                                   <div className="flex items-center gap-2">
-                                     <Button
-                                       variant="outline"
-                                       size="sm"
-                                       onClick={() => handleExpansion('chat', conversation.id)}
-                                       className="bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors focus:ring-0 focus:outline-none focus:border-0"
-                                     >
-                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Hide" : "Show"} Conversation
-                                     </Button>
-                                     {conversation.messageCount && (
-                                       <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
-                                         {conversation.messageCount}
-                                       </div>
-                                     )}
-                                   </div>
-                                   <div className="flex items-center gap-1">
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => handleExpansion('chat', conversation.id)}
-                                        className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
-                                       title={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? "Collapse" : "Expand"}
-                                     >
-                                       {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                                     </Button>
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => {
-                                         if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
-                                           deleteConversation(conversation.id);
-                                         }
-                                       }}
-                                       className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                       title="Delete"
-                                     >
-                                       <Trash2 className="h-4 w-4" />
-                                     </Button>
-                                   </div>
-                                 </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id && (
-                            <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
-                               <div className="space-y-3 max-h-80 overflow-y-auto">
-                                 {conversation.messages
-                                   .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-                                   .map((message) => (
-                                   <div
-                                     key={message.id}
-                                     className={`p-3 rounded-lg ${
-                        message.type === 'user' 
-                          ? 'bg-[#3da0a9]/5 border-l-4 border-[#3da0a9]' 
-                          : 'bg-gray-50 border-l-4 border-gray-300'
-                                     }`}
-                                   >
-                                     <div className="flex justify-between items-start mb-1">
-                                       <div className="bg-gray-100 text-gray-600 border-gray-200 text-xs px-2 py-1 rounded-full">
-                                         {message.type === 'user' ? 'You' : 'Echo'}
-                                       </div>
-                                       <span className="text-xs text-gray-600">
-                                         {message.timestamp.toLocaleTimeString()}
-                                       </span>
-                                     </div>
-                                     <p className="text-sm leading-relaxed">{message.content}</p>
-                                     {message.type === 'ai' && (
-                                       <Button
-                                         variant="link"
-                                         size="sm"
-                                         onClick={() => onSelectMessage(message.content)}
-                                         className="p-0 h-auto mt-2 text-xs text-gray-600 hover:text-gray-800"
-                                       >
-                                         Use this response
-                                       </Button>
-                                     )}
-                                   </div>
-                                 ))}
-                               </div>
-                             </div>
-                           )}
-                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <EmptyState
-                      icon={<MessageCircle className="h-12 w-12" />}
-                      title="No conversations yet"
-                      subtitle="Your chat history with Echo will appear here"
-                    />
-                  )}
-                </div>
-              </ScrollArea>
-            </TabsContent>
-
-
-            {/* Swing Coach Tab */}
-            <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
-              <ScrollArea 
-                ref={swingAutoScroll.scrollAreaRef}
-                className="h-full"
-                style={{ overscrollBehavior: 'contain' }}
-              >
-                <div className="px-6 py-5">
-                  {loadingStates.swingAnalyses ? (
-                    <div className="space-y-4 sm:space-y-5">
-                      {[1, 2, 3].map((i) => (
-                        <SkeletonCard key={i} />
-                      ))}
-                    </div>
-                  ) : errorStates.swingAnalyses ? (
-                    <ErrorState
-                      message={errorStates.swingAnalyses}
-                      onRetry={loadSwingAnalyses}
-                    />
-                  ) : filteredSwingAnalyses.length > 0 ? (
-                    <div className="space-y-4 sm:space-y-5">
-                      {filteredSwingAnalyses.map((analysis) => (
-                        <div key={analysis.id} className="transition-transform duration-100">
-                          <SwingAnalysisCard
-                            analysis={{
-                              ...analysis,
-                              tags: analysis.tags || [], // Ensure tags is always an array
-                              conversation: analysis.conversation || [] // Ensure conversation is always an array
-                            }}
-                            onDelete={() => deleteSwingAnalysis(analysis.id)}
-                            isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                            onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <EmptyState
-                      icon={<BarChart3 className="h-12 w-12" />}
-                      title="No swing analyses yet"
-                      subtitle="Upload swing videos to Swing Coach to see them here"
-                    />
-                  )}
-                </div>
-              </ScrollArea>
-            </TabsContent>
+              <X className="h-4 w-4 text-white" />
+            </Button>
           </div>
-              </Tabs>
+
+          {/* Search and Filter Controls */}
+          <div className="px-6 pt-4 pb-2 border-b border-gray-200/50 bg-[rgba(110,146,119,0.06)]">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+              <Input
+                placeholder="Search conversations and analyses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
+              />
             </div>
           </div>
-        </SlideOver>
+
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+            <div className="px-6 pt-2 pb-4">
+              <TabsList className="w-full h-11 rounded-full bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm flex items-center justify-between px-1">
+                <TabsTrigger 
+                  value="chat" 
+                  className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all"
+                >
+                  Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="swing" 
+                  className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all"
+                >
+                  Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="flex-1 overflow-hidden bg-[rgba(110,146,119,0.06)]">
+              {/* Chat Tab */}
+              <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+                <ScrollArea 
+                  ref={chatAutoScroll.scrollAreaRef}
+                  className="h-full"
+                  style={{ overscrollBehavior: 'contain' }}
+                >
+                  <div className="space-y-6 px-4 sm:px-6 pb-6">
+                    {loadingStates.conversations ? (
+                      <>
+                        <SkeletonCard />
+                        <SkeletonCard />
+                        <SkeletonCard />
+                      </>
+                    ) : errorStates.conversations ? (
+                      <ErrorState
+                        message={errorStates.conversations}
+                        onRetry={loadChatConversations}
+                      />
+                    ) : filteredConversations.length === 0 ? (
+                      <EmptyState
+                        icon={<MessageCircle className="h-8 w-8" />}
+                        title="No conversations found"
+                        subtitle="Start a conversation to see your chat history here"
+                      />
+                    ) : (
+                      <>
+                        {/* Last 7 Days */}
+                        {(() => {
+                          const last7Days = filteredConversations.filter(conv => {
+                            const daysDiff = Math.floor((Date.now() - conv.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff <= 7;
+                          });
+                          
+                          if (last7Days.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Last 7 Days
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {last7Days.map((conversation) => (
+                                  <div 
+                                    key={conversation.id} 
+                                    className={`
+                                      rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 
+                                      hover:-translate-y-0.5 transition-all duration-200
+                                      ${expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'bg-white/95 shadow-lg' : 'cursor-pointer'}
+                                    `}
+                                    style={{
+                                      transition: 'max-height 0.25s ease, opacity 0.2s ease'
+                                    }}
+                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                  >
+                                    {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
+                                      <div>
+                                        <div className="flex justify-between items-center mb-3">
+                                          <h3 className="text-[17px] font-semibold text-gray-900">
+                                            {conversation.customTitle || conversation.title}
+                                          </h3>
+                                          <button 
+                                            onClick={() => setExpandedCard(null)}
+                                            aria-label="Collapse" 
+                                            className="p-2 rounded-full hover:bg-gray-100"
+                                          >
+                                            <ChevronUp className="h-4 w-4" />
+                                          </button>
+                                        </div>
+
+                                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                                          {conversation.messages.map((message) => (
+                                            <div
+                                              key={message.id}
+                                              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                            >
+                                              <div
+                                                className={`
+                                                  max-w-[75%] px-3 py-2 rounded-xl text-sm
+                                                  ${message.type === 'user'
+                                                    ? 'bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] text-white rounded-br-none'
+                                                    : 'bg-gray-100 text-gray-900 rounded-bl-none'}
+                                                `}
+                                              >
+                                                {message.content}
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+
+                                        <div className="mt-3 flex justify-end">
+                                          <button 
+                                            onClick={() => {
+                                              const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
+                                              if (lastUserMessage) {
+                                                onSelectMessage(lastUserMessage.content);
+                                                onClose();
+                                              }
+                                            }}
+                                            className="text-sm font-medium text-[#2A9D8F] hover:underline"
+                                          >
+                                            Use this response
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-start gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                          🗨️
+                                        </div>
+                                        <div className="flex-1">
+                                          <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                            {conversation.customTitle || conversation.title}
+                                          </h3>
+                                          <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                            {conversation.messages.find(m => m.type === 'user')?.content}
+                                          </p>
+                                          <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                            <span>• {conversation.messages.length} replies</span>
+                                            <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                              Show Conversation
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* This Month */}
+                        {(() => {
+                          const thisMonth = filteredConversations.filter(conv => {
+                            const daysDiff = Math.floor((Date.now() - conv.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff > 7 && daysDiff <= 30;
+                          });
+                          
+                          if (thisMonth.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                This Month
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {thisMonth.map((conversation) => (
+                                  <div 
+                                    key={conversation.id} 
+                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
+                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                        🗨️
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                          {conversation.customTitle || conversation.title}
+                                        </h3>
+                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                          {conversation.messages.find(m => m.type === 'user')?.content}
+                                        </p>
+                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                          <span>• {conversation.messages.length} replies</span>
+                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                            Show Conversation
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Older */}
+                        {(() => {
+                          const older = filteredConversations.filter(conv => {
+                            const daysDiff = Math.floor((Date.now() - conv.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff > 30;
+                          });
+                          
+                          if (older.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Older
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {older.map((conversation) => (
+                                  <div 
+                                    key={conversation.id} 
+                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
+                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                        🗨️
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                          {conversation.customTitle || conversation.title}
+                                        </h3>
+                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                          {conversation.messages.find(m => m.type === 'user')?.content}
+                                        </p>
+                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                          <span>• {conversation.messages.length} replies</span>
+                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                            Show Conversation
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+
+              {/* Swing Coach Tab */}
+              <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
+                <ScrollArea 
+                  ref={swingAutoScroll.scrollAreaRef}
+                  className="h-full"
+                  style={{ overscrollBehavior: 'contain' }}
+                >
+                  <div className="space-y-6 px-4 sm:px-6 pb-6">
+                    {loadingStates.swingAnalyses ? (
+                      <>
+                        <SkeletonCard />
+                        <SkeletonCard />
+                        <SkeletonCard />
+                      </>
+                    ) : errorStates.swingAnalyses ? (
+                      <ErrorState 
+                        message={errorStates.swingAnalyses}
+                        onRetry={loadSwingAnalyses}
+                      />
+                    ) : filteredSwingAnalyses.length === 0 ? (
+                      <EmptyState
+                        icon={<BarChart3 className="h-8 w-8" />}
+                        title="No swing analyses found"
+                        subtitle="Upload a swing video to see analyses here"
+                      />
+                    ) : (
+                      <>
+                        {/* Group swing analyses by recency */}
+                        {(() => {
+                          const last7Days = filteredSwingAnalyses.filter(analysis => {
+                            const daysDiff = Math.floor((Date.now() - analysis.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff <= 7;
+                          });
+                          
+                          if (last7Days.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Last 7 Days
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {last7Days.map((analysis) => (
+                                  <SwingAnalysisCard
+                                    key={analysis.id}
+                                    analysis={analysis}
+                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {(() => {
+                          const thisMonth = filteredSwingAnalyses.filter(analysis => {
+                            const daysDiff = Math.floor((Date.now() - analysis.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff > 7 && daysDiff <= 30;
+                          });
+                          
+                          if (thisMonth.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                This Month
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {thisMonth.map((analysis) => (
+                                  <SwingAnalysisCard
+                                    key={analysis.id}
+                                    analysis={analysis}
+                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {(() => {
+                          const older = filteredSwingAnalyses.filter(analysis => {
+                            const daysDiff = Math.floor((Date.now() - analysis.timestamp.getTime()) / (1000 * 60 * 60 * 24));
+                            return daysDiff > 30;
+                          });
+                          
+                          if (older.length === 0) return null;
+                          
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Older
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {older.map((analysis) => (
+                                  <SwingAnalysisCard
+                                    key={analysis.id}
+                                    analysis={analysis}
+                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </>
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </SlideOver>
+
+      {/* EchoProtection Modal */}
+      {isProtectionOpen && (
+        <EchoProtection
+          isOpen={isProtectionOpen}
+          onClose={handleProtectionClose}
+          onSuccess={handleProtectionSuccess}
+          operation={pendingOperation}
+        />
+      )}
+    </>
   );
 };
 
