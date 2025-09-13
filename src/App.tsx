@@ -54,7 +54,6 @@ const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
-const ImmersiveDiscoverScreen = lazy(() => import("./components/discover/ImmersiveDiscoverScreen"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,9 +137,6 @@ const App: React.FC = () => {
                         <Route path="/achievements" element={<AchievementsPage />} />
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
-                        
-                        {/* Immersive profile media route */}
-                        <Route path="/immersive/:profileId" element={<ImmersiveDiscoverScreen />} />
                         
                         
                         <Route path="*" element={<NotFound />} />
