@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import BenjaminHandicapLayout from './handicap/BenjaminHandicapLayout';
-import ThomasHandicapLayout from './handicap/ThomasHandicapLayout';
+import EnhancedHandicapLayout from './handicap/EnhancedHandicapLayout';
 import HandicapConnectModal from './handicap/HandicapConnectModal';
 import ManualHandicapModal from './handicap/ManualHandicapModal';
 import ManualHandicapCard from './handicap/ManualHandicapCard';
@@ -32,26 +31,19 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
   const [manualModalOpen, setManualModalOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(profile);
 
-  // Check if this is Benjamin Holmes' profile
-  const isBenjaminHolmes = userUsername === 'benjaminholmes';
-  
-  // Check if this is Thomas Holmes' profile
-  const isThomasHolmes = userUsername === 'tomholmes42';
+  // Use enhanced layout for all users with official handicaps
+  const hasOfficialHandicap = (handicapIndex !== null && handicapIndex !== undefined) && 
+                              currentProfile?.handicap_governing_body;
 
-  // Render Benjamin's special layout (only when he has a handicap)
-  if (isBenjaminHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
+  if (hasOfficialHandicap) {
     return (
       <div className="bg-white rounded-lg border shadow-sm">
-        <BenjaminHandicapLayout />
-      </div>
-    );
-  }
-
-  // Render Thomas's special layout (only when he has a handicap)
-  if (isThomasHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
-    return (
-      <div className="bg-white rounded-lg border shadow-sm">
-        <ThomasHandicapLayout />
+        <EnhancedHandicapLayout 
+          handicapIndex={handicapIndex}
+          homeClub={currentProfile?.home_club || 'Unknown Club'}
+          governingBody={currentProfile?.handicap_governing_body || 'England Golf'}
+          lastUpdated={lastUpdated ? new Date(lastUpdated).toLocaleDateString() : 'Today'}
+        />
       </div>
     );
   }

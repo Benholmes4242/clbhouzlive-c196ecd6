@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
-// Mock data for Benjamin Holmes' handicap performance
+// Mock data for handicap performance
 const mockPerformanceData = [
   { round: 1, handicap: 7.0, counting: 6.8, nonCounting: 7.2, history: 2.8 },
   { round: 2, handicap: 4.5, counting: 4.3, nonCounting: 4.8, history: 2.8 },

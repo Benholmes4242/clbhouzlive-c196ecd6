@@ -14,8 +14,8 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userMedia = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png',
-  userName = 'Benjamin Holmes',
-  username = '@benjaminholmes',
+  userName = 'User Name',
+  username = '@username',
   homeClub = 'Sundridge Park Golf Club',
   isCurrentUser = true,
   mediaType = 'image',

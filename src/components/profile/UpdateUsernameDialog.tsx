@@ -86,7 +86,7 @@ const UpdateUsernameDialog: React.FC<UpdateUsernameDialogProps> = ({
               id="username"
               value={username}
               onChange={handleUsernameChange}
-              placeholder="benjaminholmes"
+              placeholder="username"
             />
             <p className="text-xs text-muted-foreground">
               Your username will appear as @{username}. Spaces will be automatically removed.

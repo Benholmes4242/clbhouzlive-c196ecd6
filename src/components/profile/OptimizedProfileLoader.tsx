@@ -32,7 +32,7 @@ const OptimizedProfileLoader: React.FC<OptimizedProfileLoaderProps> = ({
 
   const { profile } = data;
 
-  // Use the same HeroProfileHeader component for consistent Benjamin Holmes layout
+  // Use the same HeroProfileHeader component for consistent layout
   return (
     <HeroProfileHeader 
       profile={profile}
