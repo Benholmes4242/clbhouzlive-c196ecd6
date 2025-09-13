@@ -453,8 +453,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{
             height: window.innerWidth <= 768 ? '56px' : '64px',
-            // gradient just in header (keep container bg/blur as-is)
-            background: 'linear-gradient(180deg, #3da0a9 0%, #6e9277 100%)',
+            // Use same gradient as EchoAvatar
+            background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
           }}
         >
