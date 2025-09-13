@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { VolumeX, Volume2, ChevronDown, Check, Upload, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { VolumeX, Volume2, ChevronDown, Check, Upload, Edit, Trash2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
 import { useGlobalAudio } from '@/hooks/useGlobalAudio';
@@ -504,67 +504,16 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       {/* Mute Button - Top Right */}
       <button
         onClick={toggleGlobalMute}
-        className="absolute top-8 right-4 z-20 w-10 h-10 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1"
+        className="absolute top-8 right-4 z-20 w-8 h-8 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1"
         style={liquidGlassStyle}
       >
         {isGloballyMuted ? (
-          <VolumeX className="w-5 h-5 text-white" />
+          <VolumeX className="w-4 h-4 text-white" />
         ) : (
-          <Volume2 className="w-5 h-5 text-white" />
+          <Volume2 className="w-4 h-4 text-white" />
         )}
       </button>
 
-      {/* Three dots menu - only show for own media */}
-      {isOwnMedia && !currentItem.isUploading && (
-        <div className="absolute top-8 right-16 z-20">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-10 h-10 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1 cursor-pointer"
-                style={liquidGlassStyle}
-                title="Media actions"
-                onClick={() => {
-                  console.log('🚨 THREE DOTS CLICKED IN IMMERSIVE MODAL!', {
-                    currentItem: currentItem?.id,
-                    isOwnMedia,
-                    mediaType: currentItem?.media_type
-                  });
-                }}
-              >
-                <MoreHorizontal className="w-5 h-5 text-white" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
-              className="w-44 rounded-xl shadow-xl border border-white/10 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm z-[1000000] overflow-hidden"
-              sideOffset={8}
-            >
-              <DropdownMenuItem 
-                onClick={() => {
-                  console.log('🚨 EDIT CLICKED IN IMMERSIVE MODAL!');
-                  handleEditMedia();
-                }}
-                className="w-full text-left px-4 py-2 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer focus:bg-black/5 dark:focus:bg-white/10"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit media
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => {
-                  console.log('🚨 DELETE CLICKED IN IMMERSIVE MODAL!');
-                  handleDeleteMedia();
-                }}
-                className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer focus:bg-red-50 dark:focus:bg-red-900/20"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete media
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
 
       {/* Media Content */}
       <div className="absolute inset-0 flex items-center justify-center" onClick={handleVideoTap}>
@@ -654,7 +603,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           className="w-8 h-8 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_1.5s_ease-in-out_infinite] p-0"
           style={liquidGlassStyle}
         >
-          <ChevronDown className="w-5 h-5 text-white mx-auto" />
+          <ChevronDown className="w-4 h-4 text-white mx-auto" />
         </button>
       </div>
     </div>
