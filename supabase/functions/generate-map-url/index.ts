@@ -39,13 +39,15 @@ Deno.serve(async (req) => {
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap'
+    const cacheBuster = `&cb=${Date.now()}`
     const mapUrl =
       `${baseUrl}?center=${latitude},${longitude}` +
       `&zoom=${zoom}` +
       `&size=${size}` +
       `&scale=2` +
       `&maptype=${finalMapType}` +
-      `&key=${googleApiKey}`
+      `&key=${googleApiKey}` +
+      cacheBuster
 
     return new Response(
       JSON.stringify({ mapUrl }),
