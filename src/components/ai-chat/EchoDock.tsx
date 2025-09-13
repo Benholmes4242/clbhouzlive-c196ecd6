@@ -78,7 +78,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         style={{
           position: 'fixed',
           right: '0',
-          bottom: '40vh',
+          bottom: '30vh',
           zIndex: 10000,
           overflow: 'hidden',
           pointerEvents: 'none'
