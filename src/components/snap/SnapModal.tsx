@@ -143,9 +143,10 @@ const SnapModal = ({
 
         {variant === "capture" && (
           <>
-            {/* two equal rectangles, each 1.5 units so total = 3, matching other strips */}
-            <Thumb className="flex-[1.5_0_0] aspect-[3/2]" src={thumbs[0]} />
-            <Thumb className="flex-[1.5_0_0] aspect-[3/2]" src={thumbs[1]} />
+            {/* extra long rectangle on left counts as 2 units */}
+            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[0]} />
+            {/* square on right counts as 1 unit */}
+            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
           </>
         )}
       </div>
