@@ -138,8 +138,6 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
             ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
             rounded-full
             bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
-            shadow-[0_0_20px_0_rgba(0,0,0,0.16),0_0_40px_0_rgba(45,157,143,0.3)]
-            hover:shadow-[0_0_24px_0_rgba(0,0,0,0.18),0_0_50px_rgba(45,157,143,0.4),0_0_14px_rgba(247,147,30,0.18)]
             active:scale-95
             flex items-center justify-center
             relative overflow-hidden
