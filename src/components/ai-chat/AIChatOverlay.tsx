@@ -667,7 +667,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 aria-label="Open recent history"
               >
                 <span className="flex items-center gap-2">
-                  <span className="w-10 h-1 rounded-full bg-gray-300 block" />
+                  <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
                   Recent history
                 </span>
                 <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>

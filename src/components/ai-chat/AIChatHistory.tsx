@@ -471,7 +471,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   
   const swingAutoScroll = useAutoScroll({
     dependencies: [swingAnalyses],
-    enabled: activeTab === 'swing-coach',
+    enabled: activeTab === 'swing',
     direction: 'top'
   });
 
@@ -804,7 +804,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   />
                   <div>
                     <h2 className="text-xl font-semibold text-white">Echo History</h2>
-                    <p className="text-sm text-white/90">Find any past chat, log, or swing</p>
+                    <p className="text-sm text-white/90">Find any past chat or swing</p>
                   </div>
                 </div>
 
@@ -858,7 +858,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       Chat {conversations.length > 0 && <span className="ml-1 text-gray-500">({conversations.length})</span>}
                     </TabsTrigger>
                     <TabsTrigger
-                      value="swing-coach"
+                      value="swing"
                       className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
                                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
                                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
@@ -1069,7 +1069,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
 
             {/* Swing Coach Tab */}
-            <TabsContent value="swing-coach" className="h-full m-0" role="tabpanel" id="swing-coach-panel" aria-labelledby="swing-coach-tab">
+            <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
               <ScrollArea 
                 ref={swingAutoScroll.scrollAreaRef}
                 className="h-full"
