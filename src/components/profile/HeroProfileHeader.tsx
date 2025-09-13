@@ -1263,9 +1263,9 @@ const HeroProfileHeader = ({
         isOpen={isImmersiveOpen}
         onClose={closeImmersive}
         onMorphToHeader={handleMorphTransition}
-        mediaItems={mediaItems.map(item => ({
+        mediaItems={mediaItems.filter(item => item.media_type === 'video').map(item => ({
           ...item,
-          media_type: item.media_type as 'image' | 'video'
+          media_type: 'video' as const
         }))}
         userId={profile?.id || ''}
         initialIndex={currentMediaIndex}
@@ -1279,9 +1279,9 @@ const HeroProfileHeader = ({
         isOpen={mediaManagerOpen}
         onClose={() => setMediaManagerOpen(false)}
         userId={profile?.id || ''}
-        mediaItems={mediaItems.map(item => ({
+        mediaItems={mediaItems.filter(item => item.media_type === 'video').map(item => ({
           ...item,
-          media_type: item.media_type as 'image' | 'video'
+          media_type: 'video' as const
         }))}
         onMediaUpdate={refetchMedia}
       />

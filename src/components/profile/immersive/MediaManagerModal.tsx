@@ -60,9 +60,9 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
     const files = event.target.files;
     if (!files) return;
 
-    // Check if adding these files would exceed the 5-item limit
+    // Check if adding these files would exceed the 5-video limit
     if (items.length + files.length > 5) {
-      toast.error(`Cannot add ${files.length} files. Maximum 5 items allowed. You currently have ${items.length} items.`);
+      toast.error(`Cannot add ${files.length} videos. Maximum 5 videos allowed. You currently have ${items.length} videos.`);
       return;
     }
 
@@ -72,54 +72,46 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
       const newItems: LocalMediaItem[] = [];
 
       for (const file of Array.from(files)) {
-        if (file.type.startsWith('video/')) {
-          // Check video duration (max 20s)
-          const video = document.createElement('video');
-          video.preload = 'metadata';
-          
-          await new Promise((resolve, reject) => {
-            video.onloadedmetadata = () => {
-              if (video.duration > 20) {
-                reject(new Error(`Video "${file.name}" is ${Math.round(video.duration)}s long. Maximum 20 seconds allowed.`));
-              } else {
-                resolve(void 0);
-              }
-            };
-            video.onerror = () => reject(new Error('Invalid video file'));
-            video.src = URL.createObjectURL(file);
-          });
+        // Only accept video files
+        if (!file.type.startsWith('video/')) {
+          toast.error(`"${file.name}" is not a video file. Only videos are allowed for immersive media.`);
+          continue;
+        }
 
-          const result = await uploadVideo(file);
-          if (result.success && result.videoUrl) {
-            newItems.push({
-              id: crypto?.randomUUID?.() ?? `temp-${Date.now()}-${newItems.length}`,
-              media_type: 'video' as const,
-              media_url: result.videoUrl,
-              thumbnail_url: result.thumbnailUrl,
-              duration: Math.round(Math.min(video.duration * 1000, 20000)), // Convert to ms, cap at 20s, ensure integer
-              display_order: items.length + newItems.length,
-              file_name: file.name,
-              video_method: 'upload'
-            });
-          }
-        } else if (file.type.startsWith('image/')) {
-          const result = await uploadImage(file);
-          if (result.success && result.imageUrl) {
-            newItems.push({
-              id: crypto?.randomUUID?.() ?? `temp-${Date.now()}-${newItems.length}`,
-              media_type: 'image' as const,
-              media_url: result.imageUrl,
-              duration: 3000, // 3 seconds for images
-              display_order: items.length + newItems.length,
-              file_name: file.name
-            });
-          }
+        // Check video duration (max 20s)
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        
+        await new Promise((resolve, reject) => {
+          video.onloadedmetadata = () => {
+            if (video.duration > 20) {
+              reject(new Error(`Video "${file.name}" is ${Math.round(video.duration)}s long. Maximum 20 seconds allowed.`));
+            } else {
+              resolve(void 0);
+            }
+          };
+          video.onerror = () => reject(new Error('Invalid video file'));
+          video.src = URL.createObjectURL(file);
+        });
+
+        const result = await uploadVideo(file);
+        if (result.success && result.videoUrl) {
+          newItems.push({
+            id: crypto?.randomUUID?.() ?? `temp-${Date.now()}-${newItems.length}`,
+            media_type: 'video' as const,
+            media_url: result.videoUrl,
+            thumbnail_url: result.thumbnailUrl,
+            duration: Math.round(Math.min(video.duration * 1000, 20000)), // Convert to ms, cap at 20s, ensure integer
+            display_order: items.length + newItems.length,
+            file_name: file.name,
+            video_method: 'upload'
+          });
         }
       }
 
       // Update local state with new items (already have IDs)
       setItems(prev => [...prev, ...newItems]);
-      toast.success(`Added ${newItems.length} item(s). Remember to save your changes.`);
+      toast.success(`Added ${newItems.length} video(s). Remember to save your changes.`);
 
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -207,7 +199,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,video/*"
+              accept="video/*"
               multiple
               onChange={handleFileChange}
               className="hidden"
@@ -221,10 +213,10 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
               <div>
                 <h3 className="text-lg font-medium">Add Media</h3>
                 <p className="text-sm text-muted-foreground">
-                  Upload up to 5 items total (photos or videos, any mix). Videos max 20s.
+                  Upload up to 5 videos total. Videos max 20s.
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Currently: {items.length}/5 items
+                  Currently: {items.length}/5 videos
                 </p>
               </div>
               
@@ -233,7 +225,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                 disabled={uploading || items.length >= 5}
                 variant="outline"
               >
-                {uploading ? 'Uploading...' : 'Choose Files'}
+                {uploading ? 'Uploading...' : 'Choose Videos'}
               </Button>
             </div>
           </div>
@@ -241,7 +233,7 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
           {/* Media List */}
           {items.length > 0 && (
             <div>
-              <h3 className="text-lg font-medium mb-4">Your Media ({items.length}/5)</h3>
+              <h3 className="text-lg font-medium mb-4">Your Videos ({items.length}/5)</h3>
               
               <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="media-list">
@@ -269,57 +261,37 @@ const MediaManagerModal: React.FC<MediaManagerModalProps> = ({
                               </div>
 
                               <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-                                {item.media_type === 'video' ? (
-                                  <>
-                                    <video
-                                      src={item.media_url}
-                                      poster={item.thumbnail_url}
-                                      className="w-full h-full object-cover"
-                                      muted
-                                    />
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                      <Play className="h-6 w-6 text-white drop-shadow-lg" />
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <img
-                                      src={item.media_url}
-                                      alt="Media thumbnail"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute top-1 left-1">
-                                      <ImageIcon className="h-4 w-4 text-white drop-shadow-lg" />
-                                    </div>
-                                  </>
-                                )}
+                                <video
+                                  src={item.media_url}
+                                  poster={item.thumbnail_url}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <Play className="h-6 w-6 text-white drop-shadow-lg" />
+                                </div>
                               </div>
 
                               <div className="flex-1">
                                 <p className="font-medium">
-                                  {item.media_type === 'video' ? 'Video' : 'Photo'} {index + 1}
+                                  Video {index + 1}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  {item.media_type === 'video' 
-                                    ? `${(item.duration / 1000).toFixed(1)}s` 
-                                    : '3s'
-                                  }
+                                  {(item.duration / 1000).toFixed(1)}s
                                   {item.file_name && ` • ${item.file_name}`}
                                 </p>
                               </div>
 
                               {/* Future: Trim/Edit buttons */}
                               <div className="flex space-x-2">
-                                {item.media_type === 'video' && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled
-                                    title="Coming soon"
-                                  >
-                                    <Scissors className="h-4 w-4" />
-                                  </Button>
-                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled
+                                  title="Coming soon"
+                                >
+                                  <Scissors className="h-4 w-4" />
+                                </Button>
                                 
                                 <Button
                                   size="sm"

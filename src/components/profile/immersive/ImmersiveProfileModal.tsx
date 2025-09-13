@@ -17,7 +17,7 @@ import { MediaItem } from '@/types/media';
 
 interface LocalMediaItem {
   id: string;
-  media_type: 'image' | 'video';
+  media_type: 'video';
   media_url: string;
   thumbnail_url?: string;
   duration: number;
@@ -255,14 +255,23 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     if (!session?.user?.id) return;
 
     const tempId = `temp_${Date.now()}`;
-    const isVideo = file.type.startsWith('video/');
+    
+    // Only accept video files
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Only videos are allowed for immersive media.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Create temporary media item
     const tempMediaItem: LocalMediaItem = {
       id: tempId,
-      media_type: isVideo ? 'video' : 'image',
+      media_type: 'video',
       media_url: URL.createObjectURL(file),
-      duration: Math.round(isVideo ? 30000 : 3000), // Ensure integer value
+      duration: 30000, // Default duration, will be updated after upload
       display_order: localMediaItems.length,
       created_at: new Date().toISOString(),
       isUploading: true,
@@ -276,34 +285,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     try {
       let uploadResult;
       
-      if (isVideo) {
-        uploadResult = await uploadVideo(file);
-        
-        // Update progress during upload
-        setLocalMediaItems(prev => prev.map(item => 
-          item.id === tempId ? { ...item, uploadProgress: 75 } : item
-        ));
-      } else {
-        // For images, simulate progress and use R2 upload
-        setLocalMediaItems(prev => prev.map(item => 
-          item.id === tempId ? { ...item, uploadProgress: 50 } : item
-        ));
-        
-        // Create form data for image upload
-        const fileName = `${userId}/${Date.now()}-${file.name}`;
-        
-        uploadResult = await uploadToR2Only(file, 'profile-media', fileName);
-          
-        if (!uploadResult.success) {
-          console.error('R2 upload error:', uploadResult.error);
-          throw new Error(uploadResult.error || 'Upload failed');
-        }
-        
-        // Update progress to 100%
-        setLocalMediaItems(prev => prev.map(item => 
-          item.id === tempId ? { ...item, uploadProgress: 100 } : item
-        ));
-      }
+      uploadResult = await uploadVideo(file);
+      
+      // Update progress during upload
+      setLocalMediaItems(prev => prev.map(item => 
+        item.id === tempId ? { ...item, uploadProgress: 75 } : item
+      ));
 
       if (uploadResult.success) {
         // Save to database
@@ -311,12 +298,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
           .from('profile_media')
           .insert({
             user_id: userId,
-            media_type: isVideo ? 'video' : 'image',
-            media_url: isVideo ? (uploadResult.urls?.hls || uploadResult.videoId) : uploadResult.url,
-            thumbnail_url: isVideo ? uploadResult.thumbnail : undefined,
-            duration: Math.round(isVideo ? 30000 : 3000), // Ensure integer value
+            media_type: 'video',
+            media_url: uploadResult.urls?.hls || uploadResult.videoId,
+            thumbnail_url: uploadResult.thumbnail,
+            duration: 30000, // Default video duration
             display_order: localMediaItems.length,
-            video_method: isVideo ? 'cloudflare_stream' : undefined,
+            video_method: 'cloudflare_stream',
             is_immersive: true
           })
           .select()
@@ -327,10 +314,10 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
         // Update with final data
         const finalMediaItem: LocalMediaItem = {
           id: data.id,
-          media_type: data.media_type as 'image' | 'video',
+          media_type: 'video',
           media_url: data.media_url,
           thumbnail_url: data.thumbnail_url,
-          duration: data.duration || (isVideo ? 30000 : 3000),
+          duration: data.duration || 30000,
           display_order: data.display_order,
           header_extended_url: data.header_extended_url,
           header_strip_url: data.header_strip_url,
@@ -378,30 +365,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   useEffect(() => {
     if (!isOpen || !currentItem || isTransitioning || currentItem.isUploading) return;
 
-    // Only use timer for images, videos will use onEnded callback for auto-advance
-    if (currentItem.media_type === 'image') {
-      const duration = 3000; // 3 seconds for images
-      
-      // Only start timer if we don't already have one running
-      if (!intervalRef.current) {
-        startTimeRef.current = Date.now();
-        setProgress(0);
-
-        const updateProgress = () => {
-          const elapsed = Date.now() - startTimeRef.current;
-          const newProgress = Math.min((elapsed / duration) * 100, 100);
-          setProgress(newProgress);
-
-          if (newProgress >= 100) {
-            handleNext();
-          }
-        };
-
-        intervalRef.current = setInterval(updateProgress, 50);
-      }
-    }
-    // For videos, progress is handled by the video duration and onEnded callback
-
+    // Videos will use onEnded callback for auto-advance, no timer needed
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
