@@ -135,7 +135,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
             border: '0',
             width: '48px',
             height: '112px',
-            background: '#2A9D8F',
+            background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderRadius: '9999px 0 0 9999px',
             display: 'flex',
             alignItems: 'center',
