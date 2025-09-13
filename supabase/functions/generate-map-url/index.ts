@@ -39,7 +39,10 @@ Deno.serve(async (req) => {
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap'
-    const cacheBuster = `&cb=${Date.now()}`
+    // Cache buster changes once every 24h
+    const today = new Date();
+    const ymd = `${today.getUTCFullYear()}${today.getUTCMonth() + 1}${today.getUTCDate()}`;
+    const cacheBuster = `&cb=${ymd}`
     const mapUrl =
       `${baseUrl}?center=${latitude},${longitude}` +
       `&zoom=${zoom}` +
