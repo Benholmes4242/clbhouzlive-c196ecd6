@@ -5,6 +5,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './components/ai-chat/ai-chat-history-scroll.css';
+
 /* Video overlay styles for mobile flicker fix */
 .videoContainer {
   position: relative;

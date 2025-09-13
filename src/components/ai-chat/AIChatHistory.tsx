@@ -690,13 +690,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
             <div className="flex-1 overflow-hidden bg-[rgba(110,146,119,0.06)]">
               {/* Chat Tab */}
-              <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+              <TabsContent value="chat" className="h-full m-0 flex flex-col" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
                 <ScrollArea 
                   ref={chatAutoScroll.scrollAreaRef}
-                  className="h-full"
-                  style={{ overscrollBehavior: 'contain' }}
+                  className="flex-1 min-h-0"
+                  style={{ 
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
                 >
-                  <div className="space-y-6 px-4 sm:px-6 pb-6">
+                  <div className="space-y-6 px-4 sm:px-6 pb-6 min-h-0">
                     {loadingStates.conversations ? (
                       <>
                         <SkeletonCard />
@@ -925,13 +928,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </TabsContent>
 
               {/* Swing Coach Tab */}
-              <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
+              <TabsContent value="swing" className="h-full m-0 flex flex-col" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
                 <ScrollArea 
                   ref={swingAutoScroll.scrollAreaRef}
-                  className="h-full"
-                  style={{ overscrollBehavior: 'contain' }}
+                  className="flex-1 min-h-0"
+                  style={{ 
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
                 >
-                  <div className="space-y-6 px-4 sm:px-6 pb-6">
+                  <div className="space-y-6 px-4 sm:px-6 pb-6 min-h-0">
                     {loadingStates.swingAnalyses ? (
                       <>
                         <SkeletonCard />
