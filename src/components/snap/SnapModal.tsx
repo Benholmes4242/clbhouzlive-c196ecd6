@@ -6,6 +6,7 @@ import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMed
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useModalContext } from '@/contexts/ModalContext';
+import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
 
 interface SnapModalProps {
   isOpen: boolean;
@@ -34,11 +35,6 @@ const SnapModal = ({
     setSnapModalOpen(isOpen);
   }, [isOpen, setSnapModalOpen]);
 
-  // Loading skeleton component
-  const SkeletonThumb = ({ className = "" }: { className?: string }) => (
-    <div className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 animate-pulse ${className}`} />
-  );
-
   // Golf course photo library - using curated golf images
   const placeholders = {
     capture: [
@@ -57,157 +53,97 @@ const SnapModal = ({
     ],
   };
 
-  // Derive stable thumbnail arrays using useMemo
-  const captureThumbs = useMemo(() => {
-    if (isLoading) return placeholders.capture;
-    if (error) return placeholders.capture;
-    return photos.length ? photos.slice(0, 2).map(p => p.thumbUrl || p.url) : placeholders.capture;
-  }, [isLoading, error, photos]);
+  const TILES_PER_ROW = { capture: 2, photos: 2, videos: 3 };
 
-  const photoThumbs = useMemo(() => {
-    if (isLoading) return placeholders.photos;
-    if (error) return placeholders.photos;
-    return photos.length ? photos.slice(0, 3).map(p => p.thumbUrl || p.url) : placeholders.photos;
-  }, [isLoading, error, photos]);
+  // One shared set per modal open => no duplicates anywhere in the modal.
+  const seen = useMemo(() => new Set<string>(), []);
 
-  const videoThumbs = useMemo(() => {
-    if (isLoading) return placeholders.videos;
-    if (error) return placeholders.videos;
-    const list = videos.map(v => ({
-      ...v,
-      // Prefer thumbUrl for <img>; fall back to url only if it's actually an image
-      displaySrc: v.thumbUrl || v.url,
-    }));
-    return list.length ? list.slice(0, 3).map(v => v.displaySrc) : placeholders.videos;
-  }, [isLoading, error, videos]);
+  const captureThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(photos, placeholders.capture, TILES_PER_ROW.capture, seen),
+    [photos, placeholders.capture, seen]
+  );
 
-  // Reusable thumbnail components
-  type StripVariant = "videos" | "photos" | "capture";
+  const photoThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(photos, placeholders.photos, TILES_PER_ROW.photos, seen),
+    [photos, placeholders.photos, seen]
+  );
 
-  function Thumb({ src, className = "", style }: { src?: string; className?: string; style?: React.CSSProperties }) {
-    return (
-      <div
-        className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
-        style={style}
-      >
-        {src && (
-          <img 
-            src={src} 
-            alt="" 
-            className="h-full w-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              // Fallback to golf course photo if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              const isVideoThumb = videoThumbs.includes(src || '');
-              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
-              target.src = fallbackImages[0]; // Use first golf course image as fallback
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // Debug version for videos row
-  function ThumbWithDebug({ src, className = "", style, index }: { 
-    src?: string; 
-    className?: string; 
-    style?: React.CSSProperties;
-    index: number;
-  }) {
-    return (
-      <div
-        className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
-        style={style}
-      >
-        {src && (
-          <img 
-            src={src} 
-            alt="" 
-            className="h-full w-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              (window as any).__snapImgErr?.("videos", index, (e.currentTarget as HTMLImageElement).src);
-              // Fallback to golf course photo if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              const isVideoThumb = videoThumbs.includes(src || '');
-              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
-              target.src = fallbackImages[0]; // Use first golf course image as fallback
-            }}
-          />
-        )}
-      </div>
-    );
-  }
+  const videoThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(videos, placeholders.videos, TILES_PER_ROW.videos, seen),
+    [videos, placeholders.videos, seen]
+  );
 
   /**
    * Keeps all rows the same total width using flex weights.
    * videos: [1,1,1]   (3 equal rects)
    * photos: [1,2]     (square + 2x wide rect)
-   * capture:[1.5,1.5] (two equal rects, same total width as 3)
+   * capture:[2,1]     (long + square)
    */
   function ThumbStrip({
     variant,
     thumbs = [],
   }: {
-    variant: StripVariant;
-    thumbs?: string[];
+    variant: "videos" | "photos" | "capture";
+    thumbs?: Thumb[];
   }) {
     return (
-      <div className="flex items-stretch gap-2 h-16 w-56">{/* Longer fixed width for all strips */}
+      <div className="flex items-stretch gap-2 h-16 w-56">
         {variant === "videos" && (
           <>
-            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[0]} index={0} />
-            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[1]} index={1} />
-            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[2]} index={2} />
+            {thumbs.slice(0, 3).map((t, i) => (
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10">
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.videos[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
           </>
         )}
 
         {variant === "photos" && (
           <>
-            {/* square counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
-            {/* extra long rectangle counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[1]} />
+            {thumbs.slice(0, 2).map((t, i) => (
+              <div 
+                key={t.id ?? `ph-${i}`} 
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+              >
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.photos[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
           </>
         )}
 
         {variant === "capture" && (
           <>
-            {/* extra long rectangle counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[0]} />
-            {/* square counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
+            {thumbs.slice(0, 2).map((t, i) => (
+              <div 
+                key={t.id ?? `ph-${i}`} 
+                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+              >
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.capture[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
           </>
         )}
       </div>
     );
   }
-
-  // DEBUG INSTRUMENTATION (temporary)
-  console.group("[SnapModal][debug]");
-  
-  console.log("videos.raw",
-    videos?.map(v => ({ id: v.id, type: v.type, url: v.url, thumbUrl: v.thumbUrl }))
-  );
-  
-  console.log("placeholders", {
-    capture: placeholders.capture?.length,
-    photos: placeholders.photos?.length,
-    videos: placeholders.videos?.length,
-  });
-  
-  // Log the computed thumb arrays
-  console.log("captureThumbs", captureThumbs?.map((src, i) => ({ i, src })));
-  console.log("photoThumbs", photoThumbs?.map((src, i) => ({ i, src })));
-  console.log("videoThumbs", videoThumbs?.map((src, i) => ({ i, src })));
-  
-  // Optional: capture image load errors for the 3rd tile
-  (window as any).__snapImgErr = (row: string, i: number, src: string) => 
-    console.warn("[SnapModal][img-error]", { row, i, src });
-  
-  console.groupEnd();
 
   const cardOptions = [
     ...(isMobile ? [{
@@ -216,7 +152,7 @@ const SnapModal = ({
       description: "Take photo or video",
       icon: Camera,
       onClick: onCameraClick,
-      variant: "capture" as StripVariant,
+      variant: "capture" as const,
       thumbs: captureThumbs,
     }] : []),
     {
@@ -225,8 +161,8 @@ const SnapModal = ({
       description: "Select from gallery",
       icon: Image,
       onClick: onImageClick,
-      variant: "photos" as StripVariant,
-      thumbs: photoThumbs.slice(0, 2), // Only need 2 for square + wide layout
+      variant: "photos" as const,
+      thumbs: photoThumbs,
     },
     {
       key: "videos",
@@ -234,8 +170,8 @@ const SnapModal = ({
       description: "Select from gallery",
       icon: Video,
       onClick: onVideoClick,
-      variant: "videos" as StripVariant,
-      thumbs: videoThumbs.slice(0, 3), // Need 3 for equal rectangles
+      variant: "videos" as const,
+      thumbs: videoThumbs,
     },
   ];
 
@@ -303,7 +239,7 @@ const SnapModal = ({
                       </div>
                     </div>
 
-                    {/* New ThumbStrip Component */}
+                    {/* ThumbStrip Component */}
                     <ThumbStrip variant={variant} thumbs={thumbs} />
                   </motion.button>
                 ))}
