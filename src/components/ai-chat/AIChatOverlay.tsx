@@ -37,9 +37,9 @@ interface AIChatOverlayProps {
 
 const suggestedPrompts = [
   { text: "when is the next major?", emoji: "🏆" },
-  { text: "Where should my ball position be?", emoji: "🎯" },
+  { text: "Where should my ball position be?", emoji: "💭" },
   { text: "Best golf clubs near me", emoji: "📍" },
-  { text: "Which driver loft should I use at 95 mph swing speed?", emoji: "⚡" },
+  { text: "Which driver loft should I use at 95 mph swing speed?", emoji: "🏌️" },
   { text: "Plan me a 5 course USA golf trip", emoji: "🚩" }
 ];
 
