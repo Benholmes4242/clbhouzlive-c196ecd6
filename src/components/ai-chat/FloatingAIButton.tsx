@@ -85,13 +85,13 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
       {/* Invisible sentinel for background sampling */}
       <div
         ref={sentinelRef}
-        className="fixed bottom-24 right-6 w-16 h-16 pointer-events-none z-[9998]"
+        className="fixed bottom-32 right-6 w-16 h-16 pointer-events-none z-[9998]"
         style={{ opacity: 0 }}
       />
       
       {/* Onboarding Tooltip */}
       {showOnboarding && (
-        <div className="fixed bottom-32 right-20 z-[10001] animate-fade-in">
+        <div className="fixed bottom-40 right-20 z-[10001] animate-fade-in">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
             <div className="font-medium text-sm mb-1">Meet Echo - your personal caddie</div>
             <div className="text-xs text-slate-300">Analyse swing or ask about swing tips, courses, golf news, or trips.</div>
@@ -106,16 +106,17 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
         style={{
           position: 'fixed',
           right: '0',
-          bottom: 'clamp(72px, 6vh, 112px)',
+          bottom: 'clamp(92px, 8vh, 132px)', // Moved up by ~20px
           width: isExpanded ? '180px' : '64px',
           height: 'auto',
           overflow: 'hidden',
           zIndex: 10000,
           pointerEvents: 'none',
           transition: 'width 0.2s ease',
-          // Mobile spacing: clear bottom tab bar + safe area
+          boxShadow: 'none', // Remove any drop shadow
+          // Mobile spacing: clear bottom tab bar + safe area + extra height
           ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
-            bottom: `calc(64px + env(safe-area-inset-bottom, 0px))`
+            bottom: `calc(84px + env(safe-area-inset-bottom, 0px))` // Moved up by 20px
           })
         }}
       >
