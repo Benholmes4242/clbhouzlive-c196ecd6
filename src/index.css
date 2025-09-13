@@ -368,6 +368,19 @@
            transition-all duration-150;
     backdrop-filter: blur(8px);
   }
+
+  /* Echo dock CSS for tabbed handle */
+  @media (hover: hover) and (pointer: fine) {
+    .echo-dock--right:hover .echo-panel {
+      transform: translateX(0) !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .echo-panel, .echo-handle {
+      transition: none !important;
+    }
+  }
   .container { @apply max-w-6xl; }
 }
 

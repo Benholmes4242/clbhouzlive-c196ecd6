@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
@@ -12,10 +12,9 @@ interface FloatingAIButtonProps {
 const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide = false }) => {
   const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
   const location = useLocation();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const [showPulse, setShowPulse] = useState(false);
+  const dockRef = useRef<HTMLDivElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
   useEffect(() => {
@@ -27,14 +26,6 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
       return () => clearTimeout(t);
     }
   }, []);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') { 
-      e.preventDefault(); 
-      onClick(); 
-    }
-  };
-
 
   // Auto-hide onboarding after 3 seconds
   useEffect(() => {
@@ -49,27 +40,12 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
     return null;
   }
 
-  const handleMouseEnter = () => {
-    setIsExpanded(true);
+  const openDock = () => {
+    setIsOpen(true);
   };
 
-  const handleMouseLeave = () => {
-    setIsExpanded(false);
-  };
-
-  const handleTouchStart = () => {
-    const timer = setTimeout(() => {
-      setIsExpanded(true);
-    }, 200);
-    setLongPressTimer(timer);
-  };
-
-  const handleTouchEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-    setTimeout(() => setIsExpanded(false), 100);
+  const closeDock = () => {
+    setIsOpen(false);
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -77,10 +53,36 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
     if (showOnboarding) {
       setShowOnboarding(false);
     }
-    onClick();
+    // Toggle dock on mobile, trigger onClick callback
+    if (window.innerWidth <= 768) {
+      isOpen ? closeDock() : openDock();
+    } else {
+      onClick();
+    }
   };
 
-  return (
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') { 
+      e.preventDefault(); 
+      handleClick(e as any);
+    }
+  };
+
+  // Click outside to close on mobile
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dockRef.current && !dockRef.current.contains(e.target as Node)) {
+        closeDock();
+      }
+    };
+
+    if (isOpen && window.innerWidth <= 768) {
+      document.addEventListener('click', handleClickOutside, { passive: true });
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [isOpen]);
+
+  const dockContent = (
     <>
       {/* Invisible sentinel for background sampling */}
       <div
@@ -100,83 +102,120 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
         </div>
       )}
 
-      {/* Echo Dock - Right-edge container that clips overflow */}
+      {/* Echo Dock - Right-edge tabbed handle */}
       <div 
-        className={`echo-dock ${isExpanded ? 'is-open' : ''}`}
+        ref={dockRef}
+        className={`echo-dock echo-dock--right ${isOpen ? 'is-open' : ''}`}
         style={{
           position: 'fixed',
           right: '0',
-          bottom: 'clamp(92px, 8vh, 132px)', // Moved up by ~20px
-          width: isExpanded ? '180px' : '64px',
-          height: 'auto',
-          overflow: 'hidden',
+          bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
           zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
           pointerEvents: 'none',
-          transition: 'width 0.2s ease',
-          boxShadow: 'none', // Remove any drop shadow
-          // Mobile spacing: clear bottom tab bar + safe area + extra height
+          // Mobile spacing
           ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
-            bottom: `calc(84px + env(safe-area-inset-bottom, 0px))` // Moved up by 20px
+            bottom: `calc(80px + env(safe-area-inset-bottom, 0px))`
           })
         }}
       >
-        {/* Echo Button */}
-        <div
-          role="button"
-          tabIndex={0}
+        {/* Handle (half-pill tab) */}
+        <button
+          className="echo-handle"
+          aria-controls="echoPanel"
+          aria-expanded={isOpen}
           aria-label="Open Echo assistant"
           onKeyDown={handleKeyDown}
           onClick={handleClick}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          className={`
-            echo-fab
-            cursor-pointer
-            transition-all duration-200 ease-out motion-reduce:transition-none
-            ${isExpanded ? 'w-[140px] h-14' : 'w-14 h-14'}
-            rounded-full
-            bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
-            active:scale-95
-            flex items-center justify-center
-            relative overflow-hidden
-            before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-br before:from-[#2A9D8F] before:to-[#1D3557] before:opacity-20 before:blur-xl before:-z-10 before:scale-110
-          `}
           style={{
-            position: 'relative',
             pointerEvents: 'auto',
-            transform: isExpanded ? 'translateX(0)' : 'translateX(12px)',
-            transition: 'transform 0.2s ease, width 0.2s ease'
+            appearance: 'none',
+            border: '0',
+            width: '48px',
+            height: '112px',
+            background: '#2A9D8F',
+            borderRadius: '9999px 0 0 9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: 'translateX(0)',
+            transition: 'transform 0.24s ease, opacity 0.2s ease',
+            boxShadow: 'none',
+            cursor: 'pointer',
+            outline: 'none'
           }}
         >
-          
-          {/* Inner gradient highlight */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60 motion-reduce:opacity-0" />
-          
-          {/* PiWaveform Icon */}
-          <div className={`flex items-center justify-center transition-all duration-200 ${isExpanded ? 'gap-3' : 'gap-0'}`}>
-            <div className="w-10 h-10 flex items-center justify-center">
-              <PiWaveform 
-                size={36} 
-                className="text-white/90 transition-all duration-200 ease-in-out"
-                style={{
-                  animation: 'echoWave 2s ease-in-out infinite'
-                }}
-              />
-            </div>
+          <span className="echo-icon" aria-hidden="true">
+            <PiWaveform 
+              size={20} 
+              className="text-white/90"
+              style={{
+                animation: 'echoWave 2s ease-in-out infinite'
+              }}
+            />
+          </span>
+          <span className="sr-only">Open Echo</span>
+        </button>
+
+        {/* Panel (existing Echo badge content) */}
+        <div 
+          className="echo-panel"
+          id="echoPanel"
+          style={{
+            pointerEvents: 'auto',
+            position: 'relative',
+            background: 'transparent',
+            transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+            transition: 'transform 0.24s ease',
+            willChange: 'transform'
+          }}
+        >
+          {/* Existing Echo badge content */}
+          <div
+            className="
+              w-[140px] h-14
+              rounded-full
+              bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
+              active:scale-95
+              flex items-center justify-center
+              relative overflow-hidden
+              cursor-pointer
+            "
+            onClick={() => {
+              closeDock();
+              onClick();
+            }}
+          >
+            {/* Inner gradient highlight */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60 motion-reduce:opacity-0" />
             
-            {/* Echo Text (shown when expanded) */}
-            {isExpanded && (
+            {/* PiWaveform Icon and Text */}
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <PiWaveform 
+                  size={36} 
+                  className="text-white/90 transition-all duration-200 ease-in-out"
+                  style={{
+                    animation: 'echoWave 2s ease-in-out infinite'
+                  }}
+                />
+              </div>
+              
+              {/* Echo Text */}
               <span className="font-medium text-lg text-white/90 pr-2 animate-fade-in whitespace-nowrap flex items-center">
                 Echo
               </span>
-            )}
+            </div>
           </div>
         </div>
       </div>
     </>
   );
+
+  // Mount to body via portal for proper fixed positioning
+  return typeof window !== 'undefined' ? createPortal(dockContent, document.body) : null;
 };
 
 export default FloatingAIButton;
