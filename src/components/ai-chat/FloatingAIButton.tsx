@@ -109,15 +109,17 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
         style={{
           position: 'fixed',
           right: '0',
-          bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(96px + env(safe-area-inset-bottom, 0px))',
           zIndex: 10000,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
+          overflow: 'hidden',
+          boxShadow: 'none',
           pointerEvents: 'none',
           // Mobile spacing
           ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
-            bottom: `calc(80px + env(safe-area-inset-bottom, 0px))`
+            bottom: `calc(112px + env(safe-area-inset-bottom, 0px))`
           })
         }}
       >
