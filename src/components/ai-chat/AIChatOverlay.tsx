@@ -414,7 +414,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       <SlideOver
         open={isOpen}
         onClose={handleClose}
-        width="w-full sm:w-[90vw] sm:max-w-[860px]"
+        width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo AI chat interface"
       >

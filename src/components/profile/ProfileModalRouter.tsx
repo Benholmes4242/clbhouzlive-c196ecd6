@@ -93,26 +93,14 @@ const ProfileModalRouter: React.FC = () => {
             onTouchStart={(e) => e.stopPropagation()}
           />
           
-          {/* Mobile Gutter Hit Target - Analytics & Explicit Touch Area */}
-          {isMobile && (
-            <div
-              className="absolute left-0 top-0 bottom-0 z-20"
-              style={{ width: 'max(40px, env(safe-area-inset-left))' }}
-              aria-hidden="true"
-              data-testid="echo-gutter"
-              onClick={onClose}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-            />
-          )}
           
           {/* Modal Panel */}
           <div 
             className={`
               fixed right-0 bg-background z-10
               ${isMobile 
-                ? 'w-[calc(100vw-max(40px,env(safe-area-inset-left)))] top-0 bottom-0 shadow-lg pl-[1px]' 
-                : 'inset-y-0 w-[90vw] max-w-[860px] rounded-l-2xl shadow-2xl'
+                ? 'w-full top-0 bottom-0 shadow-lg' 
+                : 'inset-y-0 w-full rounded-l-2xl shadow-2xl'
               }
             `}
             style={isMobile ? { height: '100dvh' } : undefined}

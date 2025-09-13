@@ -615,7 +615,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       <SlideOver
         open={isOpen}
         onClose={onClose}
-        width="w-full sm:w-[90vw] sm:max-w-[860px]"
+        width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo History"
       >
