@@ -100,7 +100,7 @@ const ImageWithPinchZoom: React.FC<{
   scale: number;
   onSwipeDisabled: (disabled: boolean) => void;
 }> = ({ src, alt, currentMediaIndex, scale, onSwipeDisabled }) => {
-  const { ref, style, scale: currentScale, reset } = usePinchZoomPointer({ doubleTapZoom: 2 });
+  const { ref, imgRef, style, scale: currentScale, reset } = usePinchZoomPointer({ doubleTapZoom: 2, overScrollMargin: 30 });
 
   // Disable swipe when zoomed
   useEffect(() => {
@@ -115,6 +115,7 @@ const ImageWithPinchZoom: React.FC<{
         className="flex items-center justify-center w-full h-full pinch-zoom-wrapper"
       >
         <img
+          ref={imgRef}
           src={src}
           alt={alt}
           className="max-h-[80vh] max-w-[90vw] object-contain select-none pinch-zoom-image"

@@ -5,16 +5,51 @@ type UsePinchZoomPointerOpts = {
   maxScale?: number;
   minScale?: number;
   doubleTapZoom?: number; // e.g., 2
+  overScrollMargin?: number; // iOS-style bounce margin
 };
+
+function clampPan({
+  dx,
+  dy,
+  scale,
+  imgWidth,
+  imgHeight,
+  containerWidth,
+  containerHeight,
+  overScrollMargin = 0,
+}: {
+  dx: number;
+  dy: number;
+  scale: number;
+  imgWidth: number;
+  imgHeight: number;
+  containerWidth: number;
+  containerHeight: number;
+  overScrollMargin?: number;
+}) {
+  const scaledW = imgWidth * scale;
+  const scaledH = imgHeight * scale;
+
+  const maxX = Math.max(0, (scaledW - containerWidth) / 2) + overScrollMargin;
+  const maxY = Math.max(0, (scaledH - containerHeight) / 2) + overScrollMargin;
+
+  return {
+    dx: Math.min(maxX, Math.max(-maxX, dx)),
+    dy: Math.min(maxY, Math.max(-maxY, dy)),
+    isOverscrolled: Math.abs(dx) > maxX - overScrollMargin || Math.abs(dy) > maxY - overScrollMargin
+  };
+}
 
 export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
   const {
     maxScale = 4,
     minScale = 1,
     doubleTapZoom = 2,
+    overScrollMargin = 30,
   } = opts;
 
   const ref = useRef<HTMLDivElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
   const [scale, setScale] = useState(1);
   const [dx, setDx] = useState(0);
@@ -41,6 +76,28 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
 
   const distance = (a: { x: number; y: number }, b: { x: number; y: number }) =>
     Math.hypot(a.x - b.x, a.y - b.y);
+
+  // Helper to get image and container dimensions
+  const getDimensions = () => {
+    const container = ref.current;
+    const img = imgRef.current;
+    
+    if (!container || !img) {
+      return {
+        imgWidth: 100,
+        imgHeight: 100,
+        containerWidth: 100,
+        containerHeight: 100
+      };
+    }
+
+    return {
+      imgWidth: img.naturalWidth || img.offsetWidth,
+      imgHeight: img.naturalHeight || img.offsetHeight,
+      containerWidth: container.clientWidth,
+      containerHeight: container.clientHeight
+    };
+  };
 
   // Style: allow vertical pass-through when not zoomed
   const style: CSSProperties = {
@@ -98,10 +155,21 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
         if (scale > 1) {
           const cur = Array.from(pointers.current.values())[0];
           const lc = lastCenter.current!;
-          const ndx = startDx.current + (cur.x - lc.x);
-          const ndy = startDy.current + (cur.y - lc.y);
-          setDx(ndx);
-          setDy(ndy);
+          const rawDx = startDx.current + (cur.x - lc.x);
+          const rawDy = startDy.current + (cur.y - lc.y);
+          
+          // Apply clamping with overscroll
+          const dimensions = getDimensions();
+          const bounds = clampPan({
+            dx: rawDx,
+            dy: rawDy,
+            scale,
+            ...dimensions,
+            overScrollMargin
+          });
+          
+          setDx(bounds.dx);
+          setDy(bounds.dy);
           // Prevent page scroll while zoomed
           e.preventDefault();
         }
@@ -119,10 +187,21 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
 
         const c = getCenter();
         const lc = lastCenter.current!;
-        const ndx = startDx.current + (c.x - lc.x);
-        const ndy = startDy.current + (c.y - lc.y);
-        setDx(ndx);
-        setDy(ndy);
+        const rawDx = startDx.current + (c.x - lc.x);
+        const rawDy = startDy.current + (c.y - lc.y);
+
+        // Apply clamping during pinch
+        const dimensions = getDimensions();
+        const bounds = clampPan({
+          dx: rawDx,
+          dy: rawDy,
+          scale: s,
+          ...dimensions,
+          overScrollMargin
+        });
+        
+        setDx(bounds.dx);
+        setDy(bounds.dy);
 
         // Capture gesture while pinching
         e.preventDefault();
@@ -139,7 +218,23 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
         const s = clamp(scale, minScale, maxScale);
         if (s !== scale) setScale(s);
 
-        // Optional: add bounds for dx/dy based on content size/container size.
+        // Snap back from overscroll with smooth animation
+        if (scale > 1) {
+          const dimensions = getDimensions();
+          const strictBounds = clampPan({
+            dx,
+            dy,
+            scale,
+            ...dimensions,
+            overScrollMargin: 0 // No margin for snap-back
+          });
+          
+          if (strictBounds.dx !== dx || strictBounds.dy !== dy) {
+            // Trigger smooth snap-back animation
+            setDx(strictBounds.dx);
+            setDy(strictBounds.dy);
+          }
+        }
       } else if (pointers.current.size === 1) {
         // When one pointer remains after a pinch, reset baselines
         startScale.current = scale;
@@ -171,5 +266,5 @@ export function usePinchZoomPointer(opts: UsePinchZoomPointerOpts = {}) {
     setDy(0);
   };
 
-  return { ref, style, scale, setScale, dx, dy, setDx, setDy, reset };
+  return { ref, imgRef, style, scale, setScale, dx, dy, setDx, setDy, reset };
 }
