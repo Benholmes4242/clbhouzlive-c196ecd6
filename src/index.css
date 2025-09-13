@@ -12,7 +12,7 @@
   background: #000;
 }
 
-/* Guard for fullscreen letterboxing - apply to all screen sizes */
+/* Scoped video styles - only apply contain to fullscreen contexts */
 .fullscreenVideoStage .videoEl { 
   object-fit: contain !important; 
 }
@@ -20,10 +20,21 @@
   background-size: contain !important; 
 }
 
-.videoEl {
+/* Vertical feed contexts also use contain for letterboxing */
+[data-stage="fullscreen"] .videoEl,
+[data-stage="vertical-feed"] .videoEl {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Grid contexts use cover to fill cards completely */
+[data-stage="grid"] .videoEl {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }

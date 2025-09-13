@@ -41,6 +41,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, o
         isPortrait={isPortrait}
         autoplayManager={autoplayManager}
         videoIndex={videoIndex}
+        stage="grid"
       />
     </div>
   );

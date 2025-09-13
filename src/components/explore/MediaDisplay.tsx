@@ -35,6 +35,8 @@ interface MediaDisplayProps {
   useSmartMedia?: boolean;
   onMediaClick?: () => void;
   showFeaturedBadge?: boolean;
+  // Stage context for CSS specificity
+  stage?: 'grid' | 'fullscreen' | 'vertical-feed';
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -52,7 +54,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   cardType,
   useSmartMedia = false,
   onMediaClick,
-  showFeaturedBadge = true
+  showFeaturedBadge = true,
+  stage = 'grid'
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
@@ -133,8 +136,12 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
+  // Apply stage-specific CSS data attribute and fit class
+  const stageDataAttr = stage === 'grid' ? 'grid' : stage;
+  const fitClass = stage === 'grid' ? '!object-cover' : 'object-contain';
+
   return (
-    <div className="relative w-full h-full overflow-hidden bg-muted">
+    <div className="relative w-full h-full overflow-hidden bg-muted" data-stage={stageDataAttr}>
       {/* Loading Skeleton - only show for images */}
       {(media.media_type === 'image' && (isLoading || imageLoading)) && (
         <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
@@ -151,7 +158,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               autoplay={shouldAutoplay}
               muted={videoIsMuted} // Use exclusive video audio state
               loop={loop}
-              className="w-full h-full pointer-events-none"
+              className={`w-full h-full pointer-events-none ${fitClass}`}
               enableHLS={true}
             />
             
@@ -172,7 +179,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                <HighQualityImage
                  src={thumbnailUrl}
                  alt={itemTitle || 'Video thumbnail'}
-                  className="w-full h-full object-contain"
+                  className={`w-full h-full ${fitClass}`}
                   onLoad={handleImageLoad}
                   onError={handleImageError}
                  width={1200}
@@ -182,7 +189,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
               <video
                 src={media.media_url}
-                className="w-full h-full object-contain"
+                className={`w-full h-full videoEl ${fitClass}`}
                 preload="metadata"
                 muted
                 onLoadedMetadata={handleImageLoad}
@@ -205,7 +212,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
            <HighQualityImage
              src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
              alt={itemTitle || 'Content'}
-             className="w-full h-full object-contain"
+             className={`w-full h-full ${fitClass}`}
               onLoad={handleImageLoad}
               onError={handleImageError}
              width={1200}
