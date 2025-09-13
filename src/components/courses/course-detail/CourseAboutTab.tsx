@@ -242,6 +242,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               latitude={course.latitude}
               longitude={course.longitude}
               className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-lg"
+              mapType="hybrid"
             />
           </div>
         </div>

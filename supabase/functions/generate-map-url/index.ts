@@ -3,11 +3,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+type MapType = 'roadmap' | 'satellite' | 'hybrid' | 'terrain';
+
 interface MapUrlRequest {
   latitude: number
   longitude: number
-  size: string
-  zoom?: number
+  size: string    // e.g. "600x300"
+  zoom?: number   // default 13
+  maptype?: MapType // NEW (defaults to 'hybrid')
 }
 
 Deno.serve(async (req) => {
@@ -17,7 +20,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { latitude, longitude, size, zoom = 13 }: MapUrlRequest = await req.json()
+    const { latitude, longitude, size, zoom = 13, maptype }: MapUrlRequest = await req.json()
+    const finalMapType: MapType = (maptype as MapType) ?? 'hybrid' // DEFAULT → HYBRID
 
     if (!latitude || !longitude || !size) {
       return new Response(
@@ -35,24 +39,26 @@ Deno.serve(async (req) => {
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap'
-    const params = new URLSearchParams({
-      center: `${latitude},${longitude}`,
-      zoom: zoom.toString(),
-      size,
-      scale: '2',
-      maptype: 'roadmap',
-      markers: `color:red|${latitude},${longitude}`,
-      style: 'feature:all|element:labels|visibility:simplified',
-      key: googleApiKey
-    })
-
-    const mapUrl = `${baseUrl}?${params.toString()}`
+    // Optional: neutral marker to pinpoint the club
+    const marker = `&markers=size:mid|color:0x2D2D2D|${latitude},${longitude}`
+    const mapUrl =
+      `${baseUrl}?center=${latitude},${longitude}` +
+      `&zoom=${zoom}` +
+      `&size=${size}` +
+      `&scale=2` +
+      `&maptype=${finalMapType}` +  // NEW
+      marker +
+      `&key=${googleApiKey}`
 
     return new Response(
       JSON.stringify({ mapUrl }),
       { 
         status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400'
+        } 
       }
     )
 

@@ -16,6 +16,7 @@ interface MapThumbnailProps {
   latitude?: number | null;
   longitude?: number | null;
   className?: string;
+  mapType?: 'roadmap' | 'satellite' | 'hybrid' | 'terrain'; // NEW (optional)
 }
 
 const MapThumbnail = ({
@@ -26,7 +27,8 @@ const MapThumbnail = ({
   subCountry,
   latitude,
   longitude,
-  className = ''
+  className = '',
+  mapType // NEW
 }: MapThumbnailProps) => {
   const [coords, setCoords] = React.useState<{ lat: number; lng: number } | null>(
     latitude && longitude ? { lat: latitude, lng: longitude } : null
@@ -41,14 +43,15 @@ const MapThumbnail = ({
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
-  const generateMapUrl = async (lat: number, lng: number, size: string, zoom: number = 13): Promise<string | null> => {
+  const generateMapUrl = async (lat: number, lng: number, size: string, zoom: number = 13, mapType?: MapThumbnailProps['mapType']): Promise<string | null> => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-map-url', {
         body: {
           latitude: lat,
           longitude: lng,
           size,
-          zoom
+          zoom,
+          maptype: mapType // NEW (undefined → backend defaults to 'hybrid')
         }
       });
 
@@ -121,8 +124,8 @@ const MapThumbnail = ({
         const largeSize = isMobile ? '350x300' : '600x400';
         
         const [thumbnailUrl, largeUrl] = await Promise.all([
-          generateMapUrl(coords.lat, coords.lng, thumbnailSize),
-          generateMapUrl(coords.lat, coords.lng, largeSize, 15)
+          generateMapUrl(coords.lat, coords.lng, thumbnailSize, 13, mapType),
+          generateMapUrl(coords.lat, coords.lng, largeSize, 15, mapType)
         ]);
         
         setMapImageUrl(thumbnailUrl);
@@ -131,7 +134,7 @@ const MapThumbnail = ({
     };
 
     generateMapUrls();
-  }, [coords, isMobile]);
+  }, [coords, isMobile, mapType]);
 
   // Find the portal element inside ProfileModalRouter
   React.useEffect(() => {
