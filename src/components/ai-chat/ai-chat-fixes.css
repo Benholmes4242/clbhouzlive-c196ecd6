@@ -1,0 +1,54 @@
+/* AI Chat Component Fixes */
+
+/* Echo History - Scrollable list container */
+.aiChatHistory__list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  max-height: calc(100vh - 220px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Echo History - Flex layout for proper scrolling */
+.aiChatHistory {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Echo Overlay - Transparent background for rounded corners */
+.aiChatOverlay {
+  background: transparent !important;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.aiChatOverlay__header {
+  background: transparent !important;
+}
+
+/* Echo Overlay - Backdrop blur effects */
+.aiChatOverlay--blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Remove any white box shadows that might cause corner issues */
+.aiChatOverlay,
+.aiChatOverlay * {
+  box-shadow: none !important;
+}
+
+/* Ensure search inputs don't have background icons */
+.aiChatOverlay__searchInput {
+  background-image: none !important;
+  padding-left: 16px;
+}
+
+/* Remove any briefcase or file icons from search areas */
+.aiChatOverlay__search .searchIcon--briefcase,
+.aiChatHistory__search .searchIcon--briefcase {
+  display: none !important;
+}
