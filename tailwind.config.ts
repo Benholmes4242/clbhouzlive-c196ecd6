@@ -75,9 +75,7 @@ export default {
 				'media-loading': 'hsl(var(--media-loading))',
 				'brand-orange': 'hsl(var(--brand-orange))',
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
-				'brand-black': 'hsl(var(--brand-black))',
-				'echo-from': 'hsl(var(--echo-from-hsl))',
-				'echo-to': 'hsl(var(--echo-to-hsl))'
+				'brand-black': 'hsl(var(--brand-black))'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

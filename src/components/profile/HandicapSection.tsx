@@ -139,7 +139,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
       <div className="bg-muted border border-border rounded-lg p-6">
         <div className="mb-4">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <TrendingUp className="h-5 w-5 text-echo-from" />
+            <TrendingUp className="h-5 w-5 text-primary" />
             Handicap Analytics
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
@@ -192,7 +192,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
       <div className="bg-muted border border-border rounded-lg p-6">
         <div className="mb-6">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Calendar className="h-5 w-5 text-echo-from" />
+            <Calendar className="h-5 w-5 text-primary" />
             Recent Rounds
           </h3>
           <p className="text-sm text-muted-foreground mt-1">

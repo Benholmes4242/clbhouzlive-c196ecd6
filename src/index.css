@@ -210,8 +210,6 @@
     /* Echo Avatar Gradient */
     --echo-from: #1D3557;
     --echo-to: #2A9D8F;
-    --echo-from-hsl: 207 49% 16%;
-    --echo-to-hsl: 174 40% 37%;
     
     /* Media and achievement tokens */
     --media-loading: 0 0% 0%;
