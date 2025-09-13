@@ -659,11 +659,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           {/* Search and Filter Controls */}
           <div className="px-6 pt-4 pb-2 border-b border-gray-200/50 bg-[rgba(110,146,119,0.06)]">
             <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
               <Input
                 placeholder="Search conversations and analyses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-4 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
+                className="pl-12 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
               />
             </div>
           </div>
@@ -687,19 +688,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </TabsList>
             </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden bg-[rgba(110,146,119,0.06)]">
+            <div className="flex-1 overflow-hidden bg-[rgba(110,146,119,0.06)]">
               {/* Chat Tab */}
               <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
                 <ScrollArea 
                   ref={chatAutoScroll.scrollAreaRef}
-                  className="h-full overflow-y-auto"
-                  style={{ 
-                    overscrollBehavior: 'contain',
-                    WebkitOverflowScrolling: 'touch',
-                    maxHeight: 'calc(100vh - 220px)',
-                    flex: '1 1 auto',
-                    minHeight: 0
-                  }}
+                  className="h-full"
+                  style={{ overscrollBehavior: 'contain' }}
                 >
                   <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.conversations ? (
@@ -933,14 +928,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
                 <ScrollArea 
                   ref={swingAutoScroll.scrollAreaRef}
-                  className="h-full overflow-y-auto"
-                  style={{ 
-                    overscrollBehavior: 'contain',
-                    WebkitOverflowScrolling: 'touch',
-                    maxHeight: 'calc(100vh - 220px)',
-                    flex: '1 1 auto',
-                    minHeight: 0
-                  }}
+                  className="h-full"
+                  style={{ overscrollBehavior: 'contain' }}
                 >
                   <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.swingAnalyses ? (

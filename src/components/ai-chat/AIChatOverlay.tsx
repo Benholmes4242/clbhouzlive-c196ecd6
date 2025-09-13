@@ -421,7 +421,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       <div 
         className="w-full h-full flex flex-col overflow-hidden rounded-l-2xl"
         style={{
-          background: 'transparent',
+          background: 'rgba(246, 247, 246, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
         }}
