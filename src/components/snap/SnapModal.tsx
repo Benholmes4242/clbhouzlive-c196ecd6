@@ -143,10 +143,9 @@ const SnapModal = ({
 
         {variant === "capture" && (
           <>
-            {/* extra long rectangle on left counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[0]} />
-            {/* square on right counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
+            {/* two equal rectangles, each 1.5 units so total = 3 */}
+            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[0]} />
+            <Thumb className="aspect-[4/3]" style={{ flex: "1.5 0 0" }} src={thumbs[1]} />
           </>
         )}
       </div>
@@ -156,7 +155,7 @@ const SnapModal = ({
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
-      label: "Cam",
+      label: "Capture",
       description: "Take photo or video",
       icon: Camera,
       onClick: onCameraClick,
