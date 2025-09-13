@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3 } from 'lucide-react';
+import { PiWaveform } from 'react-icons/pi';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
 import EchoAvatar from './EchoAvatar';
@@ -784,62 +785,100 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             key="ai-chat-history-panel"
             className="h-full flex flex-col"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-border">
-              <div className="flex items-center gap-3">
-                <EchoAvatar 
-                  state="idle"
-                  size={window.innerWidth <= 768 ? 40 : 44} 
-                />
-                <h2 className="text-lg font-semibold text-foreground">Echo History</h2>
+            {/* Header – gradient bar, sticky */}
+            <header
+              className="sticky top-0 z-10 px-4 sm:px-6 pt-4 pb-3"
+              style={{
+                background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+                borderBottom: '1px solid rgba(255,255,255,0.12)'
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <PiWaveform 
+                    size={40} 
+                    className="text-white/90 transition-all duration-200 ease-in-out"
+                    style={{
+                      animation: `echoWave 3s ease-in-out infinite`
+                    }}
+                  />
+                  <div>
+                    <h2 className="text-xl font-semibold text-white">Echo History</h2>
+                    <p className="text-sm text-white/90">Find any past chat, log, or swing</p>
+                  </div>
+                </div>
+
+                {/* Search input (existing handlers) */}
+                <div className="hidden sm:block w-[280px]">
+                  <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-2 shadow">
+                    <Search className="h-4 w-4 text-gray-500" />
+                    <input
+                      className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-500"
+                      placeholder="Search history..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
+
+              {/* Mobile search below title */}
+              <div className="sm:hidden mt-3">
+                <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-2 shadow">
+                  <Search className="h-4 w-4 text-gray-500" />
+                  <input
+                    className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-500"
                     placeholder="Search history..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 w-48"
-                    aria-label="Search chat history, caddie logs, and swing analyses"
                   />
                 </div>
               </div>
-            </div>
+            </header>
 
             <div className="flex-1 min-h-0 flex flex-col">
               {/* Tabs + TabPanels */}
-              <Tabs defaultValue="chat" className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 py-2 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 bg-white/30 backdrop-blur-sm">
-              <TabsTrigger value="chat" className="data-[state=active]:bg-white/80">
-                Chat
-                {conversations.length > 0 && (
-                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
-                    {conversations.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="insights" className="data-[state=active]:bg-white/80">
-                Caddie Logs
-                {caddieLogs.length > 0 && (
-                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
-                    {caddieLogs.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="swing-coach" className="data-[state=active]:bg-white/80 data-[state=active]:border-transparent">
-                Swing Coach
-                {swingAnalyses.length > 0 && (
-                  <Badge variant="secondary" className="ml-2 h-5 text-xs">
-                    {swingAnalyses.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-          </div>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+                {/* Tabs header (matches overlay) */}
+                <div className="px-4 sm:px-6 pt-3 pb-2">
+                  <TabsList
+                    className="
+                      w-full h-11 rounded-full
+                      bg-white/85 backdrop-blur-sm border border-white/50
+                      shadow-sm flex items-center justify-between px-1
+                    "
+                  >
+                    <TabsTrigger
+                      value="chat"
+                      className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                                 text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                                 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                                 transition-all"
+                    >
+                      Chat {conversations.length > 0 && <span className="ml-1 text-gray-500">({conversations.length})</span>}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="insights"
+                      className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                                 text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                                 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                                 transition-all"
+                    >
+                      Caddie Logs {caddieLogs.length > 0 && <span className="ml-1 text-gray-500">({caddieLogs.length})</span>}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="swing-coach"
+                      className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                                 text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                                 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                                 transition-all"
+                    >
+                      Swing Coach {swingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({swingAnalyses.length})</span>}
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
-          <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden bg-[rgba(110,146,119,0.06)]">
             {/* Chat Tab */}
             <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
               <ScrollArea 
