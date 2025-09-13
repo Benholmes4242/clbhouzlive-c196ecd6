@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useModalDetector } from '@/hooks/useModalDetector';
-import FloatingAIButton from './FloatingAIButton';
+import EchoDock from './EchoDock';
 import AIChatOverlay from './AIChatOverlay';
 
 const AIChat: React.FC = () => {
@@ -54,7 +54,7 @@ const AIChat: React.FC = () => {
 
   return (
     <>
-      <FloatingAIButton 
+      <EchoDock 
         onClick={() => setIsOverlayOpen(true)} 
         shouldHide={isOverlayOpen || isHistoryOpen}
       />

@@ -3,14 +3,15 @@ import { createPortal } from 'react-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
+import EchoBadge from './EchoBadge';
 
-interface FloatingAIButtonProps {
+interface EchoDockProps {
   onClick: () => void;
   shouldHide?: boolean;
 }
 
-const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide = false }) => {
-  const { glassMode, glassStyles, sentinelRef } = useAdaptiveGlass();
+const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
+  const { sentinelRef } = useAdaptiveGlass();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -35,44 +36,11 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
     }
   }, [showOnboarding]);
 
-  // Don't show on clubhouse page or when modals are open
-  if (location.pathname === '/clubhouse' || location.pathname === '/' || shouldHide) {
-    return null;
-  }
-
-  const openDock = () => {
-    setIsOpen(true);
-  };
-
-  const closeDock = () => {
-    setIsOpen(false);
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (showOnboarding) {
-      setShowOnboarding(false);
-    }
-    // Toggle dock on mobile, trigger onClick callback
-    if (window.innerWidth <= 768) {
-      isOpen ? closeDock() : openDock();
-    } else {
-      onClick();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') { 
-      e.preventDefault(); 
-      handleClick(e as any);
-    }
-  };
-
   // Click outside to close on mobile
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dockRef.current && !dockRef.current.contains(e.target as Node)) {
-        closeDock();
+        setIsOpen(false);
       }
     };
 
@@ -81,6 +49,34 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [isOpen]);
+
+  // Don't show on clubhouse page or when modals are open
+  if (location.pathname === '/clubhouse' || location.pathname === '/' || shouldHide) {
+    return null;
+  }
+
+  const handleToggle = () => {
+    if (showOnboarding) {
+      setShowOnboarding(false);
+    }
+    // Toggle dock on mobile, trigger onClick callback on desktop
+    if (window.innerWidth <= 768) {
+      setIsOpen(prev => !prev);
+    } else {
+      onClick();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') { 
+      e.preventDefault(); 
+      handleToggle();
+    }
+  };
+
+  const handleCloseDock = () => {
+    setIsOpen(false);
+  };
 
   const dockContent = (
     <>
@@ -122,15 +118,17 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
             bottom: `calc(112px + env(safe-area-inset-bottom, 0px))`
           })
         }}
+        aria-live="polite"
       >
         {/* Handle (half-pill tab) */}
         <button
           className="echo-handle"
+          id="echoHandle"
           aria-controls="echoPanel"
           aria-expanded={isOpen}
           aria-label="Open Echo assistant"
           onKeyDown={handleKeyDown}
-          onClick={handleClick}
+          onClick={handleToggle}
           style={{
             pointerEvents: 'auto',
             appearance: 'none',
@@ -174,43 +172,7 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
             willChange: 'transform'
           }}
         >
-          {/* Existing Echo badge content */}
-          <div
-            className="
-              w-[140px] h-14
-              rounded-full
-              bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]
-              active:scale-95
-              flex items-center justify-center
-              relative overflow-hidden
-              cursor-pointer
-            "
-            onClick={() => {
-              closeDock();
-              onClick();
-            }}
-          >
-            {/* Inner gradient highlight */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60 motion-reduce:opacity-0" />
-            
-            {/* PiWaveform Icon and Text */}
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center">
-                <PiWaveform 
-                  size={36} 
-                  className="text-white/90 transition-all duration-200 ease-in-out"
-                  style={{
-                    animation: 'echoWave 2s ease-in-out infinite'
-                  }}
-                />
-              </div>
-              
-              {/* Echo Text */}
-              <span className="font-medium text-lg text-white/90 pr-2 animate-fade-in whitespace-nowrap flex items-center">
-                Echo
-              </span>
-            </div>
-          </div>
+          <EchoBadge onClick={onClick} onClose={handleCloseDock} />
         </div>
       </div>
     </>
@@ -220,4 +182,4 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
   return typeof window !== 'undefined' ? createPortal(dockContent, document.body) : null;
 };
 
-export default FloatingAIButton;
+export default EchoDock;
