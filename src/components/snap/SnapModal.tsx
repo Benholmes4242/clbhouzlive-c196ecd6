@@ -6,6 +6,7 @@ import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMed
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useModalContext } from '@/contexts/ModalContext';
+import { composeThumbRowGlobal, Thumb, Media } from '@/utils/mediaThumbs';
 
 interface SnapModalProps {
   isOpen: boolean;
@@ -34,10 +35,7 @@ const SnapModal = ({
     setSnapModalOpen(isOpen);
   }, [isOpen, setSnapModalOpen]);
 
-  // Loading skeleton component
-  const SkeletonThumb = ({ className = "" }: { className?: string }) => (
-    <div className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 animate-pulse ${className}`} />
-  );
+  const TILES_PER_ROW = { capture: 2, photos: 2, videos: 3 };
 
   // Golf course photo library - using curated golf images
   const placeholders = {
@@ -57,54 +55,64 @@ const SnapModal = ({
     ],
   };
 
-  // Derive stable thumbnail arrays using useMemo
-  const captureThumbs = useMemo(() => {
-    if (isLoading) return placeholders.capture;
-    if (error) return placeholders.capture;
-    return photos.length ? photos.slice(0, 2).map(p => p.thumbUrl || p.url) : placeholders.capture;
-  }, [isLoading, error, photos]);
+  // One shared set per modal open = no duplicates anywhere in the modal.
+  const seen = useMemo(() => new Set<string>(), [isOpen]);
 
-  const photoThumbs = useMemo(() => {
-    if (isLoading) return placeholders.photos;
-    if (error) return placeholders.photos;
-    return photos.length ? photos.slice(0, 3).map(p => p.thumbUrl || p.url) : placeholders.photos;
-  }, [isLoading, error, photos]);
+  const captureThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(
+      photos.map(p => ({ id: p.id || p.url, type: "image" as const, url: p.url, thumbUrl: p.thumbUrl })),
+      placeholders.capture, 
+      TILES_PER_ROW.capture, 
+      seen
+    ),
+    [photos, placeholders.capture, seen]
+  );
 
-  const videoThumbs = useMemo(() => {
-    if (isLoading) return placeholders.videos;
-    if (error) return placeholders.videos;
-    const list = videos.map(v => ({
-      ...v,
-      // Prefer thumbUrl for <img>; fall back to url only if it's actually an image
-      displaySrc: v.thumbUrl || v.url,
-    }));
-    return list.length ? list.slice(0, 3).map(v => v.displaySrc) : placeholders.videos;
-  }, [isLoading, error, videos]);
+  const photoThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(
+      photos.map(p => ({ id: p.id || p.url, type: "image" as const, url: p.url, thumbUrl: p.thumbUrl })),
+      placeholders.photos, 
+      TILES_PER_ROW.photos, 
+      seen
+    ),
+    [photos, placeholders.photos, seen]
+  );
+
+  const videoThumbs: Thumb[] = useMemo(
+    () => composeThumbRowGlobal(
+      videos.map(v => ({ id: v.id || v.url, type: "video" as const, url: v.url, thumbUrl: v.thumbUrl })),
+      placeholders.videos, 
+      TILES_PER_ROW.videos, 
+      seen
+    ),
+    [videos, placeholders.videos, seen]
+  );
 
   // Reusable thumbnail components
   type StripVariant = "videos" | "photos" | "capture";
 
-  function Thumb({ src, className = "", style }: { src?: string; className?: string; style?: React.CSSProperties }) {
+  function Thumb({ thumb, className = "", style, phFallback }: { 
+    thumb: Thumb; 
+    className?: string; 
+    style?: React.CSSProperties;
+    phFallback: string;
+  }) {
     return (
       <div
         className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
         style={style}
       >
-        {src && (
-          <img 
-            src={src} 
-            alt="" 
-            className="h-full w-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              // Fallback to golf course photo if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              const isVideoThumb = videoThumbs.includes(src || '');
-              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
-              target.src = fallbackImages[0]; // Use first golf course image as fallback
-            }}
-          />
-        )}
+        <img 
+          src={thumb.displaySrc} 
+          alt="" 
+          className="h-full w-full object-cover"
+          loading="lazy"
+          onError={(e) => {
+            // Fallback to golf course photo if thumbnail fails to load
+            const target = e.target as HTMLImageElement;
+            target.src = phFallback;
+          }}
+        />
       </div>
     );
   }
@@ -112,41 +120,43 @@ const SnapModal = ({
   /**
    * Keeps all rows the same total width using flex weights.
    * videos: [1,1,1]   (3 equal rects)
-   * photos: [1,2]     (square + 2x wide rect)
-   * capture:[1.5,1.5] (two equal rects, same total width as 3)
+   * photos: [2,1]     (wide rect + square)
+   * capture:[2,1]     (wide rect + square, switched from photos)
    */
   function ThumbStrip({
     variant,
     thumbs = [],
+    placeholderFallback,
   }: {
     variant: StripVariant;
-    thumbs?: string[];
+    thumbs?: Thumb[];
+    placeholderFallback: string;
   }) {
     return (
       <div className="flex items-stretch gap-2 h-16 w-56">{/* Longer fixed width for all strips */}
         {variant === "videos" && (
           <>
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[2]} />
+            <Thumb className="flex-[1_0_0] aspect-square" thumb={thumbs[0]} phFallback={placeholderFallback} />
+            <Thumb className="flex-[1_0_0] aspect-square" thumb={thumbs[1]} phFallback={placeholderFallback} />
+            <Thumb className="flex-[1_0_0] aspect-square" thumb={thumbs[2]} phFallback={placeholderFallback} />
           </>
         )}
 
         {variant === "photos" && (
           <>
             {/* square counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
+            <Thumb className="flex-[1_0_0] aspect-square" thumb={thumbs[0]} phFallback={placeholderFallback} />
             {/* extra long rectangle counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[1]} />
+            <Thumb className="flex-[2_0_0] aspect-[8/3]" thumb={thumbs[1]} phFallback={placeholderFallback} />
           </>
         )}
 
         {variant === "capture" && (
           <>
             {/* extra long rectangle counts as 2 units */}
-            <Thumb className="flex-[2_0_0] aspect-[8/3]" src={thumbs[0]} />
+            <Thumb className="flex-[2_0_0] aspect-[8/3]" thumb={thumbs[0]} phFallback={placeholderFallback} />
             {/* square counts as 1 unit */}
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
+            <Thumb className="flex-[1_0_0] aspect-square" thumb={thumbs[1]} phFallback={placeholderFallback} />
           </>
         )}
       </div>
@@ -162,6 +172,7 @@ const SnapModal = ({
       onClick: onCameraClick,
       variant: "capture" as StripVariant,
       thumbs: captureThumbs,
+      placeholderFallback: placeholders.capture[0],
     }] : []),
     {
       key: "photos",
@@ -170,7 +181,8 @@ const SnapModal = ({
       icon: Image,
       onClick: onImageClick,
       variant: "photos" as StripVariant,
-      thumbs: photoThumbs.slice(0, 2), // Only need 2 for square + wide layout
+      thumbs: photoThumbs,
+      placeholderFallback: placeholders.photos[0],
     },
     {
       key: "videos",
@@ -179,7 +191,8 @@ const SnapModal = ({
       icon: Video,
       onClick: onVideoClick,
       variant: "videos" as StripVariant,
-      thumbs: videoThumbs.slice(0, 3), // Need 3 for equal rectangles
+      thumbs: videoThumbs,
+      placeholderFallback: placeholders.videos[0],
     },
   ];
 
@@ -226,7 +239,7 @@ const SnapModal = ({
 
               <div className="px-4 pb-5 space-y-3">
                 {/* Media Options */}
-                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
+                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs, placeholderFallback }) => (
                   <motion.button
                     key={key}
                     onClick={onClick}
@@ -248,7 +261,7 @@ const SnapModal = ({
                     </div>
 
                     {/* New ThumbStrip Component */}
-                    <ThumbStrip variant={variant} thumbs={thumbs} />
+                    <ThumbStrip variant={variant} thumbs={thumbs} placeholderFallback={placeholderFallback} />
                   </motion.button>
                 ))}
 
