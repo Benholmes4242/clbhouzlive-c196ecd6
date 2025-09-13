@@ -431,24 +431,12 @@
     100% { opacity: 0;   transform: scale(1.25); }
   }
 
-  /* Pause the idle ripple while hovering (desktop) */
-  @media (hover: hover) and (pointer: fine) {
-    .echo-handle:hover::before { 
-      animation-play-state: paused; 
-    }
-  }
-
   /* Respect reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .echo-handle::before,
     .echo-handle.ripple::after {
       animation: none !important;
     }
-  }
-
-  /* Optional: pause the idle ripple when the Echo modal is open */
-  .body-echo-open .echo-handle::before { 
-    animation-play-state: paused; 
   }
   .container { @apply max-w-6xl; }
 }
