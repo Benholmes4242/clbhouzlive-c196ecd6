@@ -1,56 +1,150 @@
 /**
  * Safe video play utility with mobile-optimized autoplay handling
- * Handles readyState gating, iOS black frame fix, and autoplay errors
+ * Handles readyState gating, iOS black frame fix, retry logic, and visibility handling
  */
 
-export async function safePlay(video: HTMLVideoElement): Promise<boolean> {
+interface SafePlayOptions {
+  maxRetries?: number;
+  baseDelay?: number;
+  maxWaitTime?: number;
+}
+
+export async function safePlay(
+  video: HTMLVideoElement, 
+  options: SafePlayOptions = {}
+): Promise<boolean> {
+  const { maxRetries = 4, baseDelay = 250, maxWaitTime = 1000 } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
   
-  try {
-    console.log(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
-    
-    // Wait for video to have enough data to play
-    if (video.readyState < 3) { // HAVE_FUTURE_DATA
-      console.log(`[safePlay] Waiting for canplay event for video ${videoId}`);
-      await new Promise<void>(resolve => {
-        const onCanPlay = () => { 
-          video.removeEventListener('canplay', onCanPlay); 
-          console.log(`[safePlay] Got canplay for video ${videoId}, readyState: ${video.readyState}`);
-          resolve(); 
-        };
-        video.addEventListener('canplay', onCanPlay, { once: true });
-      });
-    }
-    
-    // iOS black-frame nudge - only if at beginning
-    if (video.currentTime === 0) {
-      try { 
-        video.currentTime = 0.001; 
-        console.log(`[safePlay] Applied iOS nudge for video ${videoId}`);
-      } catch {
-        // Ignore errors setting currentTime
+  // Ensure proper preconditions for autoplay
+  video.muted = true;
+  video.playsInline = true;
+  video.setAttribute('webkit-playsinline', 'true');
+  
+  console.log(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // If document is hidden, wait for visibility
+      if (document.hidden) {
+        console.log(`[safePlay] Document hidden, waiting for visibility for video ${videoId}`);
+        await waitForVisibility();
+      }
+      
+      // Wait for video to have enough data to play (with timeout)
+      if (video.readyState < 2) { // HAVE_CURRENT_DATA
+        console.log(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
+        const readyStateReached = await Promise.race([
+          waitForReadyState(video, 2),
+          new Promise<boolean>(resolve => setTimeout(() => resolve(false), maxWaitTime))
+        ]);
+        
+        if (!readyStateReached) {
+          console.warn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt}`);
+          if (attempt === maxRetries) throw new Error('ReadyState timeout');
+          await delay(baseDelay * attempt);
+          continue;
+        }
+      }
+      
+      // iOS black-frame nudge - only if at beginning
+      if (video.currentTime === 0) {
+        try { 
+          video.currentTime = 0.001; 
+          console.log(`[safePlay] Applied iOS nudge for video ${videoId}`);
+        } catch {
+          // Ignore errors setting currentTime
+        }
+      }
+      
+      console.log(`[safePlay] Attempting play() for video ${videoId}, attempt ${attempt}`);
+      await video.play();
+      console.log(`[safePlay] ✅ Successfully played video ${videoId} on attempt ${attempt}`);
+      return true;
+      
+    } catch (err: any) {
+      console.warn(`[safePlay] Attempt ${attempt}/${maxRetries} failed for video ${videoId}:`, err?.name || err);
+      
+      if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
+        console.warn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
+        video.setAttribute('data-autoplay-blocked', '1');
+        return false;
+      }
+      
+      // Wait before retrying (exponential backoff)
+      if (attempt < maxRetries) {
+        await delay(baseDelay * attempt);
       }
     }
-    
-    console.log(`[safePlay] Attempting play() for video ${videoId}`);
-    await video.play();
-    console.log(`[safePlay] ✅ Successfully played video ${videoId}`);
-    return true;
-  } catch (err: any) {
-    if (err?.name === 'NotAllowedError') {
-      console.warn(`[safePlay] 🚫 NotAllowedError for video ${videoId} - marking as blocked`);
-      // Respect environment; fall back to tap-to-play for this session
-      video.setAttribute('data-autoplay-blocked', '1');
-    } else {
-      console.warn(`[safePlay] ❌ Play failed for video ${videoId}:`, err?.name || err);
-    }
-    console.warn('[safePlay] play() failed', { 
-      err, 
-      readyState: video.readyState,
-      src: video.src?.substring(0, 100) 
-    });
-    return false;
   }
+  
+  console.warn(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
+  video.setAttribute('data-autoplay-blocked', '1');
+  return false;
+}
+
+/**
+ * Enhanced autoplay with modal visibility guard
+ */
+export async function safePlayAfterAnimation(video: HTMLVideoElement): Promise<boolean> {
+  // Wait for paint cycles to ensure modal is fully visible
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  
+  // Additional check for modal visibility
+  const modal = document.getElementById('immersive-modal');
+  if (modal) {
+    const styles = getComputedStyle(modal);
+    if (styles.opacity === '0' || styles.display === 'none') {
+      console.log('[safePlayAfterAnimation] Modal not yet visible, waiting...');
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+  
+  return safePlay(video);
+}
+
+/**
+ * Wait for document to become visible
+ */
+function waitForVisibility(): Promise<void> {
+  if (!document.hidden) return Promise.resolve();
+  
+  return new Promise<void>(resolve => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        resolve();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+  });
+}
+
+/**
+ * Wait for video readyState to reach target level
+ */
+function waitForReadyState(video: HTMLVideoElement, targetState: number): Promise<boolean> {
+  if (video.readyState >= targetState) return Promise.resolve(true);
+  
+  return new Promise<boolean>(resolve => {
+    const checkReadyState = () => {
+      if (video.readyState >= targetState) {
+        video.removeEventListener('loadeddata', checkReadyState);
+        video.removeEventListener('canplay', checkReadyState);
+        resolve(true);
+      }
+    };
+    
+    video.addEventListener('loadeddata', checkReadyState);
+    video.addEventListener('canplay', checkReadyState);
+  });
+}
+
+/**
+ * Simple delay utility
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**

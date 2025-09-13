@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { safePlay, isIOS } from '@/utils/safePlay';
+import { safePlayAfterAnimation, safePlay, isIOS } from '@/utils/safePlay';
 
 interface FlickerFreeHLSPlayerProps {
   hlsUrl: string;
@@ -47,6 +47,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   const [isMuted, setIsMuted] = useState(muted);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHLSLoaded, setIsHLSLoaded] = useState(false);
+  const [autoplayAttempted, setAutoplayAttempted] = useState(false);
 
   // Expose video element to parent
   useImperativeHandle(ref, () => videoRef.current!, []);
@@ -101,7 +102,10 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
             });
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              console.log('[HLS] Manifest parsed, HLS ready');
               setIsHLSLoaded(true);
+              // Trigger autoplay handler after manifest is ready
+              handleAutoplay();
             });
             
             hls.loadSource(hlsUrl);
@@ -124,21 +128,28 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     };
   }, [hlsUrl, isHLSLoaded]);
 
+  // Idempotent autoplay handler
+  const handleAutoplay = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || !autoplay || autoplayAttempted || isPlaying) return;
+    
+    console.log('[HLSPlayer] Triggering autoplay handler');
+    setAutoplayAttempted(true);
+    
+    const success = await safePlayAfterAnimation(video);
+    if (success) {
+      setIsPlaying(true);
+      onPlay?.();
+    }
+  }, [autoplay, autoplayAttempted, isPlaying, onPlay]);
+
   // Handle autoplay when both HLS and video are ready
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !autoplay || !isVideoReady || !isHLSLoaded) return;
+    if (!video || !autoplay || !isVideoReady || !isHLSLoaded || autoplayAttempted) return;
 
-    const playVideo = async () => {
-      const success = await safePlay(video);
-      if (success) {
-        setIsPlaying(true);
-        onPlay?.();
-      }
-    };
-
-    playVideo();
-  }, [autoplay, isVideoReady, isHLSLoaded, onPlay]);
+    handleAutoplay();
+  }, [autoplay, isVideoReady, isHLSLoaded, autoplayAttempted, handleAutoplay]);
 
   // Handle external autoplay control
   useEffect(() => {
@@ -152,10 +163,40 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     }
   }, [autoplay, externallyManaged, isHLSLoaded, isPlaying]);
 
+  // Add visibility change handler
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden) {
+        // Pause when hidden
+        if (!video.paused) {
+          console.log('[HLSPlayer] Document hidden, pausing video');
+          video.pause();
+        }
+      } else {
+        // Resume when visible if autoplay is enabled and video should be playing
+        if (autoplay && video.paused && !video.getAttribute('data-autoplay-blocked')) {
+          console.log('[HLSPlayer] Document visible, attempting to resume video');
+          const success = await safePlay(video);
+          if (success) {
+            setIsPlaying(true);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [autoplay]);
+
   // Video event handlers
   const handleVideoReady = () => {
     const video = videoRef.current;
     if (!video) return;
+
+    console.log('[HLSPlayer] Video ready event fired');
 
     // Apply iOS nudge on loadeddata before potential autoplay
     if (isIOS && video.currentTime === 0) {
@@ -166,8 +207,10 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
       }
     }
 
-    if (video.readyState >= 3) { // HAVE_FUTURE_DATA
+    if (video.readyState >= 2) { // HAVE_CURRENT_DATA
       setIsVideoReady(true);
+      // Trigger autoplay handler
+      handleAutoplay();
     }
   };
 
@@ -179,6 +222,16 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   const handleVideoPause = () => {
     setIsPlaying(false);
     onPause?.();
+  };
+
+  const handleVideoWaiting = () => {
+    console.log('[HLSPlayer] Video waiting/stalled');
+    // Minimal handling: just log for now as requested
+  };
+
+  const handleVideoStalled = () => {
+    console.log('[HLSPlayer] Video stalled');
+    // Minimal handling: just log for now as requested
   };
 
   const handleVideoClick = () => {
@@ -247,6 +300,8 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         onCanPlay={handleVideoReady}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
+        onWaiting={handleVideoWaiting}
+        onStalled={handleVideoStalled}
         onEnded={onEnded}
         onClick={handleVideoClick}
       />

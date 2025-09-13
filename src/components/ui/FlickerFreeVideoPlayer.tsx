@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { safePlay, isIOS } from '@/utils/safePlay';
+import { safePlayAfterAnimation, safePlay, isIOS } from '@/utils/safePlay';
 
 interface FlickerFreeVideoPlayerProps {
   src: string;
@@ -37,6 +37,7 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
   const [isPosterLoaded, setIsPosterLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [autoplayAttempted, setAutoplayAttempted] = useState(false);
 
   // Expose video element to parent
   useImperativeHandle(ref, () => videoRef.current!, []);
@@ -49,26 +50,63 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
     }
   }, [muted]);
 
+  // Idempotent autoplay handler
+  const handleAutoplay = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || !autoplay || autoplayAttempted || isPlaying) return;
+    
+    console.log('[VideoPlayer] Triggering autoplay handler');
+    setAutoplayAttempted(true);
+    
+    const success = await safePlayAfterAnimation(video);
+    if (success) {
+      setIsPlaying(true);
+      onPlay?.();
+    }
+  }, [autoplay, autoplayAttempted, isPlaying, onPlay]);
+
   // Handle autoplay when video is ready
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !autoplay || !isVideoReady) return;
+    if (!video || !autoplay || !isVideoReady || autoplayAttempted) return;
 
-    const playVideo = async () => {
-      const success = await safePlay(video);
-      if (success) {
-        setIsPlaying(true);
-        onPlay?.();
+    handleAutoplay();
+  }, [autoplay, isVideoReady, autoplayAttempted, handleAutoplay]);
+
+  // Add visibility change handler
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden) {
+        // Pause when hidden
+        if (!video.paused) {
+          console.log('[VideoPlayer] Document hidden, pausing video');
+          video.pause();
+        }
+      } else {
+        // Resume when visible if autoplay is enabled and video should be playing
+        if (autoplay && video.paused && !video.getAttribute('data-autoplay-blocked')) {
+          console.log('[VideoPlayer] Document visible, attempting to resume video');
+          const success = await safePlay(video);
+          if (success) {
+            setIsPlaying(true);
+          }
+        }
       }
     };
 
-    playVideo();
-  }, [autoplay, isVideoReady, onPlay]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [autoplay]);
 
   // Video event handlers
   const handleVideoReady = () => {
     const video = videoRef.current;
     if (!video) return;
+
+    console.log('[VideoPlayer] Video ready event fired');
 
     // Apply iOS nudge on loadeddata before potential autoplay
     if (isIOS && video.currentTime === 0) {
@@ -80,8 +118,10 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
     }
 
     // Video is ready when it has loaded enough data to play
-    if (video.readyState >= 3) { // HAVE_FUTURE_DATA
+    if (video.readyState >= 2) { // HAVE_CURRENT_DATA
       setIsVideoReady(true);
+      // Trigger autoplay handler
+      handleAutoplay();
     }
   };
 
@@ -93,6 +133,16 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
   const handleVideoPause = () => {
     setIsPlaying(false);
     onPause?.();
+  };
+
+  const handleVideoWaiting = () => {
+    console.log('[VideoPlayer] Video waiting/stalled');
+    // Minimal handling: just log for now as requested
+  };
+
+  const handleVideoStalled = () => {
+    console.log('[VideoPlayer] Video stalled');
+    // Minimal handling: just log for now as requested
   };
 
   const handleVideoClick = () => {
@@ -157,6 +207,8 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
         onCanPlay={handleVideoReady}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
+        onWaiting={handleVideoWaiting}
+        onStalled={handleVideoStalled}
         onEnded={onEnded}
         onClick={handleVideoClick}
       />
