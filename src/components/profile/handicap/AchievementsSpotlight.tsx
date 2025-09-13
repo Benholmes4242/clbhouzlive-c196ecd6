@@ -1,0 +1,17 @@
+import React from 'react';
+
+export default function AchievementsSpotlight({ item }: {
+  item?: { id: string; title: string; subtitle?: string; icon: 'trophy' | string; earnedAt: string; isGlowing: boolean }
+}) {
+  if (!item) return null;
+  return (
+    <div className="mx-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-4 shadow-sm relative overflow-hidden">
+      {item.isGlowing && <div className="absolute inset-0 opacity-30 animate-pulse bg-white" />}
+      <div className="relative">
+        <div className="text-sm opacity-90">Achievements</div>
+        <div className="text-lg font-semibold">{item.title}</div>
+        {item.subtitle && <div className="text-sm opacity-90 mt-1">{item.subtitle}</div>}
+      </div>
+    </div>
+  );
+}
