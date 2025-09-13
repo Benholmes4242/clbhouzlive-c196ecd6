@@ -20,7 +20,7 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { usePinchZoom } from '@/hooks/usePinchZoom';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
 
 
@@ -92,7 +92,7 @@ const VideoWithAutoplay: React.FC<{
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
-// ImageWithPinchZoom component for image media with pinch-zoom support
+// ImageWithPinchZoom component for image media with pointer-based pinch-zoom support
 const ImageWithPinchZoom: React.FC<{
   src: string;
   alt?: string;
@@ -100,7 +100,7 @@ const ImageWithPinchZoom: React.FC<{
   scale: number;
   onSwipeDisabled: (disabled: boolean) => void;
 }> = ({ src, alt, currentMediaIndex, scale, onSwipeDisabled }) => {
-  const { ref, style, onTouchStart, onTouchMove, onTouchEnd, reset, scale: currentScale } = usePinchZoom();
+  const { ref, style, scale: currentScale, reset } = usePinchZoomPointer({ doubleTapZoom: 2 });
 
   // Disable swipe when zoomed
   useEffect(() => {
@@ -112,9 +112,6 @@ const ImageWithPinchZoom: React.FC<{
       <div
         ref={ref}
         style={FLAGS.USE_PINCH_ZOOM ? style : undefined}
-        onTouchStart={FLAGS.USE_PINCH_ZOOM ? onTouchStart : undefined}
-        onTouchMove={FLAGS.USE_PINCH_ZOOM ? onTouchMove : undefined}
-        onTouchEnd={FLAGS.USE_PINCH_ZOOM ? onTouchEnd : undefined}
         className="flex items-center justify-center w-full h-full pinch-zoom-wrapper"
       >
         <img
@@ -545,38 +542,80 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
-          // Touch handlers for media navigation
+          // Enhanced touch handlers for media navigation with vertical intent guardrail
           const createTouchHandlers = () => {
+            // Constants for swipe detection
+            const HORIZONTAL_TRIGGER_PX = 50;     // minimum horizontal distance to count as swipe
+            const VERTICAL_EARLY_EXIT_PX = 15;    // if user moves vertically by this much early, treat as scroll
+            const MAX_ANGLE_DEG = 30;             // only trigger if within ±30° of horizontal
+
             let startX = 0;
             let startY = 0;
+            let peakAbsDx = 0;
+            let peakAbsDy = 0;
+            let canceledByVerticalIntent = false;
+
+            const angleDeg = (dx: number, dy: number) => {
+              // 0° = pure horizontal, 90° = pure vertical
+              return Math.abs((Math.atan2(Math.abs(dy), Math.abs(dx)) * 180) / Math.PI);
+            };
             
             return {
               onTouchStart: (e: any) => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
+                const t = e.touches?.[0] ?? e;
+                startX = t.clientX;
+                startY = t.clientY;
+                peakAbsDx = 0;
+                peakAbsDy = 0;
+                canceledByVerticalIntent = false;
+              },
+              onTouchMove: (e: any) => {
+                const t = e.touches?.[0] ?? e;
+                const dx = t.clientX - startX;
+                const dy = t.clientY - startY;
+
+                peakAbsDx = Math.max(peakAbsDx, Math.abs(dx));
+                peakAbsDy = Math.max(peakAbsDy, Math.abs(dy));
+
+                // Early vertical intent guard: if user climbs vertical threshold before horizontal builds, bail
+                if (!canceledByVerticalIntent && peakAbsDy > VERTICAL_EARLY_EXIT_PX && peakAbsDy > peakAbsDx) {
+                  canceledByVerticalIntent = true;
+                  return; // let native scroll happen; do not preventDefault here
+                }
+
+                // Only prevent default if we're confident it's a horizontal swipe
+                if (Math.abs(dx) > 10 && angleDeg(dx, dy) < 45) {
+                  e.preventDefault();
+                }
               },
               onTouchEnd: (e: any) => {
-                if (!startX || !startY || swipeDisabled) return;
+                if (canceledByVerticalIntent || swipeDisabled) return;
                 
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                const diffX = startX - endX;
-                const diffY = startY - endY;
+                const t = e.changedTouches?.[0] ?? e;
+                const dx = (t.clientX ?? 0) - startX;
+                const dy = (t.clientY ?? 0) - startY;
                 
-                // Only handle horizontal swipes (ignore vertical scrolling)
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-                  e.preventDefault();
-                  if (diffX > 0 && hasMultipleMedia) {
-                    // Swiped left - next media
-                    handleNextMedia(item.id, mediaItems.length);
-                  } else if (diffX < 0 && hasMultipleMedia) {
-                    // Swiped right - previous media
-                    handlePrevMedia(item.id, mediaItems.length);
+                // Angle + magnitude check
+                if (Math.abs(dx) >= HORIZONTAL_TRIGGER_PX) {
+                  const ang = angleDeg(dx, dy);
+                  if (ang <= MAX_ANGLE_DEG) {
+                    e.preventDefault();
+                    if (dx < 0 && hasMultipleMedia) {
+                      // Swiped left - next media
+                      handleNextMedia(item.id, mediaItems.length);
+                    } else if (dx > 0 && hasMultipleMedia) {
+                      // Swiped right - previous media
+                      handlePrevMedia(item.id, mediaItems.length);
+                    }
                   }
                 }
                 
+                // Reset for next gesture
                 startX = 0;
                 startY = 0;
+                peakAbsDx = 0;
+                peakAbsDy = 0;
+                canceledByVerticalIntent = false;
               }
             };
           };
