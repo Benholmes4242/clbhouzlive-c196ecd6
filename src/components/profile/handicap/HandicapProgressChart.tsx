@@ -32,7 +32,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
         <p className="text-foreground font-medium">Round #{data.round}</p>
         <p className="text-muted-foreground text-sm">{data.date}</p>
         <div className="flex items-center gap-2 mt-1">
-          <div className="w-2 h-2 rounded-full bg-primary"></div>
+          <div className="w-2 h-2 rounded-full bg-echo-from"></div>
           <span className="text-foreground">
             Handicap: <span className="font-bold">{data.handicap.toFixed(1)}</span>
           </span>
@@ -90,8 +90,8 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
           <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="handicapGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                <stop offset="5%" stopColor="hsl(var(--echo-from-hsl))" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="hsl(var(--echo-from-hsl))" stopOpacity={0}/>
               </linearGradient>
             </defs>
             
@@ -126,11 +126,11 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
             <Area
               type="monotone"
               dataKey="handicap"
-              stroke="hsl(var(--primary))"
+              stroke="hsl(var(--echo-from-hsl))"
               strokeWidth={3}
               fill="url(#handicapGradient)"
               dot={{ 
-                fill: 'hsl(var(--primary))', 
+                fill: 'hsl(var(--echo-from-hsl))', 
                 strokeWidth: 2, 
                 r: 4,
                 stroke: 'white'
@@ -139,8 +139,8 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
                 r: 6, 
                 stroke: 'white', 
                 strokeWidth: 2,
-                fill: 'hsl(var(--primary))',
-                filter: 'drop-shadow(0 0 6px hsla(var(--primary), 0.6))'
+                fill: 'hsl(var(--echo-from-hsl))',
+                filter: 'drop-shadow(0 0 6px hsla(var(--echo-from-hsl), 0.6))'
               }}
             />
           </AreaChart>
@@ -150,7 +150,7 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
       {/* Chart info */}
       <div className="flex items-center justify-between mt-4 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-primary"></div>
+          <div className="w-3 h-3 rounded-full bg-echo-from"></div>
           <span className="text-foreground">Handicap Index</span>
         </div>
         
