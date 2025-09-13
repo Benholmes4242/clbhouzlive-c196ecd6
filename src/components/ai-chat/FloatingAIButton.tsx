@@ -85,17 +85,17 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
       {/* Invisible sentinel for background sampling */}
       <div
         ref={sentinelRef}
-        className="fixed bottom-28 right-6 w-16 h-16 pointer-events-none z-[9998]"
+        className="fixed top-1/2 right-6 w-16 h-16 pointer-events-none z-[9998] transform -translate-y-1/2"
         style={{ opacity: 0 }}
       />
       
       {/* Onboarding Tooltip */}
       {showOnboarding && (
-        <div className="fixed bottom-40 right-6 z-[10000] animate-fade-in">
+        <div className="fixed top-1/2 right-20 z-[10000] animate-fade-in transform -translate-y-1/2">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
             <div className="font-medium text-sm mb-1">Meet Echo - your personal caddie</div>
             <div className="text-xs text-slate-300">Analyse swing or ask about swing tips, courses, golf news, or trips.</div>
-            <div className="absolute -bottom-2 right-8 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-slate-900"></div>
+            <div className="absolute top-1/2 -right-2 w-0 h-0 border-t-[8px] border-b-[8px] border-l-[8px] border-t-transparent border-b-transparent border-l-slate-900 transform -translate-y-1/2"></div>
           </div>
         </div>
       )}
@@ -113,8 +113,9 @@ const FloatingAIButton: React.FC<FloatingAIButtonProps> = ({ onClick, shouldHide
         onTouchEnd={handleTouchEnd}
         style={{
           position: 'fixed',
-          bottom: '80px',
+          top: '50%',
           right: '24px',
+          transform: 'translateY(-50%)',
           zIndex: 10000
         }}
         className={`
