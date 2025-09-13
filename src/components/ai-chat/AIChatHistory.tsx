@@ -615,11 +615,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       <SlideOver
         open={isOpen}
         onClose={onClose}
-        width="w-full sm:w-[90vw] sm:max-w-[1000px]"
-        zIndex="z-[1110]"
-        ariaLabel="AI chat history interface"
+        width="w-full sm:w-[90vw] sm:max-w-[860px]"
+        zIndex="z-[1100]"
+        ariaLabel="Echo History"
       >
-        <div className="h-full flex flex-col">
+        <div 
+          className="w-full h-full flex flex-col overflow-hidden rounded-l-2xl"
+          style={{
+            background: '#F6F7F6',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+          }}
+        >
           {/* Header */}
           <div
             className="flex items-center justify-between px-6 py-4 flex-shrink-0"
