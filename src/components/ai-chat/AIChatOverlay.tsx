@@ -36,7 +36,7 @@ interface AIChatOverlayProps {
 }
 
 const suggestedPrompts = [
-  "Is my grip too strong?",
+  "when is the next major?",
   "Where should my ball position be?",
   "Best golf clubs near me",
   "Which driver loft should I use at 95 mph swing speed?",
@@ -465,19 +465,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             />
             <div>
               <h2 className="text-xl font-semibold text-white">Echo</h2>
-              <p className="text-sm text-white/90">I'm your personal tour caddie</p>
+              <p className="text-sm text-white/90">I'm your personal caddy</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowHistory(true)}
-              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
-            >
-              <History className="h-4 w-4 text-white" />
-            </Button>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -536,8 +528,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {messages.length === 0 ? (
                       <div className="text-left">
                         <p className="text-gray-800/80 text-base mb-5">
-                          I'm your personal tour caddie.<br />
-                          Ask me anything, anytime—I've got you.
+                          I'm your personal caddy.<br />
+                          Ask me anything, anytime - I've got you.
                         </p>
 
                         <div className="space-y-3">
@@ -650,7 +642,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask about your swing, clubs, courses…"
+                  placeholder="ask me anything at all, I'm here for you"
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
                   disabled={isLoading || isRecording || isProcessing}
                   className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px]"
@@ -670,7 +662,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
               {/* Recent history peek (opens existing AIChatHistory) */}
               <button
-                className="mt-3 w-full rounded-[28px] bg-white/85 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
+                className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
                 onClick={() => setShowHistory(true)}
                 aria-label="Open recent history"
               >
