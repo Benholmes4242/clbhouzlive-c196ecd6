@@ -309,13 +309,13 @@ const SwingAnalysisCard: React.FC<{
                       key={index}
                       className={`p-3 rounded-lg ${
                         message.role === 'user' 
-                          ? 'bg-orange-50 border-l-4 border-orange-400' 
+                          ? 'bg-[#3da0a9]/5 border-l-4 border-[#3da0a9]' 
                           : 'bg-muted border-l-4 border-muted-foreground'
                       }`}
                     >
                        <div className="flex justify-between items-start mb-2">
                          <div className={`text-xs px-2 py-1 rounded-full ${
-                           message.role === 'user' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'
+                           message.role === 'user' ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-gray-100 text-gray-600'
                          }`}>
                            {message.role === 'user' ? 'You' : 'Echo Coach'}
                          </div>
@@ -1033,9 +1033,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    <div
                                      key={message.id}
                                      className={`p-3 rounded-lg ${
-                                       message.type === 'user' 
-                                         ? 'bg-orange-50 border-l-4 border-orange-500' 
-                                         : 'bg-gray-50 border-l-4 border-gray-300'
+                        message.type === 'user' 
+                          ? 'bg-[#3da0a9]/5 border-l-4 border-[#3da0a9]' 
+                          : 'bg-gray-50 border-l-4 border-gray-300'
                                      }`}
                                    >
                                      <div className="flex justify-between items-start mb-1">
