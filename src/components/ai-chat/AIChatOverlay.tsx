@@ -36,11 +36,11 @@ interface AIChatOverlayProps {
 }
 
 const suggestedPrompts = [
-  "when is the next major?",
-  "Where should my ball position be?",
-  "Best golf clubs near me",
-  "Which driver loft should I use at 95 mph swing speed?",
-  "Plan me a 5 course USA golf trip"
+  { text: "when is the next major?", emoji: "🏆" },
+  { text: "Where should my ball position be?", emoji: "🎯" },
+  { text: "Best golf clubs near me", emoji: "📍" },
+  { text: "Which driver loft should I use at 95 mph swing speed?", emoji: "⚡" },
+  { text: "Plan me a 5 course USA golf trip", emoji: "🚩" }
 ];
 
 const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange }) => {
@@ -536,7 +536,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           {suggestedPrompts.map((prompt, index) => (
                             <button
                               key={index}
-                              onClick={() => handleSuggestedPrompt(prompt)}
+                              onClick={() => handleSuggestedPrompt(prompt.text)}
                               className="
                                 w-full text-left rounded-2xl
                                 bg-white/90 backdrop-blur shadow
@@ -545,9 +545,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                               "
                             >
                               <div className="flex items-center gap-3">
-                                {/* If you already store icons per prompt, render them here. Otherwise keep a generic icon. */}
-                                <span className="text-xl">⛳</span>
-                                <span className="text-lg font-medium text-gray-900">{prompt}</span>
+                                <span className="text-xl">{prompt.emoji}</span>
+                                <span className="text-lg font-medium text-gray-900">{prompt.text}</span>
                               </div>
                             </button>
                           ))}
