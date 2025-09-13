@@ -80,35 +80,69 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     });
   };
 
-  // Setup HLS with src change handling
+  // Safe src-swap sequence with proper cleanup
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !hlsUrl) return;
 
-    const setupHLS = async () => {
+    const swapSource = async () => {
       try {
-        // Clean up existing HLS instance before setting up new one
+        logVideoTelemetry('video_src_swap_started', { 
+          from_id: video.src, 
+          to_id: hlsUrl, 
+          player_type: 'HLS' 
+        });
+
+        // 1. Stop old playback
+        try { 
+          video.pause(); 
+        } catch (e) { 
+          console.warn('[HLS] Error pausing video:', e); 
+        }
+
+        // 2. Clean up existing HLS instance with proper sequence
         if (hlsInstanceRef.current) {
           console.log('[HLS] Cleaning up previous HLS instance');
-          hlsInstanceRef.current.destroy();
+          try {
+            hlsInstanceRef.current.stopLoad();
+            hlsInstanceRef.current.detachMedia();
+            hlsInstanceRef.current.destroy();
+          } catch (e) {
+            console.warn('[HLS] Error during HLS cleanup:', e);
+          }
           hlsInstanceRef.current = null;
         }
 
-        // Reset states for new source
+        // 3. Hard reset the video element (critical for Safari)
+        video.removeAttribute("src");
+        video.load(); // Flushes old resource
+
+        // 4. Reset states for new source
         setIsHLSLoaded(false);
         setIsVideoReady(false);
         setAutoplayAttempted(false);
         setIsPlaying(false);
 
+        const startTime = Date.now();
+
+        // 5. Attach new source
         if (canPlayHLSNatively()) {
           video.src = hlsUrl;
-          setIsHLSLoaded(true);
+          
+          const handleCanPlayOnce = async () => {
+            video.removeEventListener("canplay", handleCanPlayOnce);
+            logVideoTelemetry('video_src_swap_ready', { t_ready_ms: Date.now() - startTime });
+            setIsHLSLoaded(true);
+            await handleAutoplay();
+          };
+          
+          video.addEventListener("canplay", handleCanPlayOnce);
         } else {
           const Hls = await loadHlsJs();
           if (Hls.isSupported()) {
             const hls = new Hls({
-              maxBufferLength: 10,
-              backBufferLength: 5,
+              maxBufferLength: 6,  // Modest buffer for mobile
+              backBufferLength: 4,
             });
             
             hls.on(Hls.Events.ERROR, (event, data) => {
@@ -118,36 +152,56 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
               }
             });
 
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            // Wait for media attachment before loading source
+            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+              hls.loadSource(hlsUrl);
+            });
+
+            hls.on(Hls.Events.MANIFEST_PARSED, async () => {
               console.log('[HLS] Manifest parsed, HLS ready');
+              logVideoTelemetry('video_src_swap_ready', { t_ready_ms: Date.now() - startTime });
               logVideoTelemetry('hls_manifest_parsed');
               setIsHLSLoaded(true);
-              // Trigger autoplay handler after manifest is ready
-              handleAutoplay();
+              
+              // Apply iOS nudge after src swap if needed
+              if (isIOS && video.currentTime === 0) {
+                try {
+                  video.currentTime = 0.001;
+                } catch (e) {
+                  // Ignore errors setting currentTime
+                }
+              }
+              
+              await handleAutoplay();
             });
             
-            hls.loadSource(hlsUrl);
             hls.attachMedia(video);
             hlsInstanceRef.current = hls;
           }
         }
       } catch (error) {
-        console.error('Error setting up HLS:', error);
+        console.error('Error during source swap:', error);
       }
     };
 
-    setupHLS();
+    swapSource();
 
     return () => {
       // Cleanup only on unmount, not on src change
       if (hlsInstanceRef.current) {
-        hlsInstanceRef.current.destroy();
+        try {
+          hlsInstanceRef.current.stopLoad();
+          hlsInstanceRef.current.detachMedia();
+          hlsInstanceRef.current.destroy();
+        } catch (e) {
+          console.warn('[HLS] Error during cleanup:', e);
+        }
         hlsInstanceRef.current = null;
       }
     };
-  }, [hlsUrl]); // Only depend on hlsUrl, not isHLSLoaded
+  }, [hlsUrl]); // Only depend on hlsUrl
 
-  // Idempotent autoplay handler
+  // Enhanced autoplay handler with telemetry
   const handleAutoplay = useCallback(async () => {
     const video = videoRef.current;
     if (!video || !autoplay || autoplayAttempted || isPlaying) return;
@@ -159,6 +213,9 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     if (success) {
       setIsPlaying(true);
       onPlay?.();
+      logVideoTelemetry('video_src_swap_autoplay_success');
+    } else {
+      logVideoTelemetry('video_src_swap_autoplay_blocked');
     }
   }, [autoplay, autoplayAttempted, isPlaying, onPlay]);
 

@@ -76,7 +76,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     { totalSegments: localMediaItems.length }
   );
 
-  const { isPreloaded } = useVideoPreloader(localMediaItems, activeIndex);
+  const { isPreloaded, promotePreload } = useVideoPreloader(localMediaItems, activeIndex, { maxPreloadItems: 1 });
   
   // Enhanced mobile animations
   const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);

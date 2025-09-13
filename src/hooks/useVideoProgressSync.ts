@@ -124,12 +124,21 @@ export function useVideoProgressSync(
     const handlePause = () => stopSyncLoop('paused');
     const handleWaiting = () => stopSyncLoop('paused');
     const handleStalled = () => stopSyncLoop('paused');
-    const handleEnded = () => completeProgress();
+    const handleVideoEnded = () => {
+      // Force active segment to 1 to avoid visual gaps
+      const segmentCount = segments?.length || totalSegments;
+      setSegmentProgress(Array(segmentCount).fill(1));
+      setProgress(100);
+      stopSyncLoop('completed');
+    };
     const handleLoadStart = () => {
-      // Reset progress on new source load
+      // Reset progress on new source load and stop any active sync
+      console.log('[VideoProgressSync] Source changed, resetting progress');
       setProgress(0);
-      setSegmentProgress([]);
+      const segmentCount = segments?.length || totalSegments;
+      setSegmentProgress(Array(segmentCount).fill(0));
       stopSyncLoop();
+      telemetryLoggedRef.current = false;
     };
 
     videoElement.addEventListener('play', handlePlay);
@@ -137,7 +146,7 @@ export function useVideoProgressSync(
     videoElement.addEventListener('pause', handlePause);
     videoElement.addEventListener('waiting', handleWaiting);
     videoElement.addEventListener('stalled', handleStalled);
-    videoElement.addEventListener('ended', handleEnded);
+    videoElement.addEventListener('ended', handleVideoEnded);
     videoElement.addEventListener('loadstart', handleLoadStart);
 
     return () => {
@@ -146,7 +155,7 @@ export function useVideoProgressSync(
       videoElement.removeEventListener('pause', handlePause);
       videoElement.removeEventListener('waiting', handleWaiting);
       videoElement.removeEventListener('stalled', handleStalled);
-      videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('ended', handleVideoEnded);
       videoElement.removeEventListener('loadstart', handleLoadStart);
       stopSyncLoop();
     };

@@ -1,7 +1,16 @@
 import { useEffect, useRef } from 'react';
+import { logVideoTelemetry } from '@/utils/videoTelemetry';
 
 interface VideoPreloaderOptions {
   maxPreloadItems?: number;
+  preloadTimeoutMs?: number;
+}
+
+interface PreloadedVideo {
+  video: HTMLVideoElement;
+  hlsInstance?: any;
+  timeoutId?: NodeJS.Timeout;
+  created: number;
 }
 
 export function useVideoPreloader(
@@ -9,88 +18,163 @@ export function useVideoPreloader(
   currentIndex: number,
   options: VideoPreloaderOptions = {}
 ) {
-  const preloadedVideos = useRef(new Map<string, HTMLVideoElement>());
-  const { maxPreloadItems = 2 } = options;
+  const preloadedVideos = useRef(new Map<string, PreloadedVideo>());
+  const { maxPreloadItems = 1, preloadTimeoutMs = 10000 } = options; // Cap at current ± 1
+  const swapToken = useRef(0);
 
-  // Preload next video(s)
+  // Enhanced preload with memory discipline
   useEffect(() => {
+    const token = ++swapToken.current;
+
     const preloadVideo = async (item: any, index: number) => {
       if (!item || item.media_type !== 'video') return;
       if (preloadedVideos.current.has(item.media_url)) return;
 
+      logVideoTelemetry('video_preload_started', { url: item.media_url, index });
+
       const video = document.createElement('video');
       video.muted = true;
       video.playsInline = true;
+      video.setAttribute('webkit-playsinline', 'true');
       video.preload = 'metadata';
-      video.src = item.media_url;
+      video.crossOrigin = 'anonymous'; // Consistent CORS handling
 
-      // For HLS videos, setup HLS.js
+      const preloadEntry: PreloadedVideo = {
+        video,
+        created: Date.now()
+      };
+
+      // For HLS videos, setup lightweight HLS.js preloader
       if (item.media_url.includes('.m3u8') && window.Hls?.isSupported()) {
         const hls = new window.Hls({
-          maxBufferLength: 5,
+          maxBufferLength: 4,  // Modest buffer for preload
           backBufferLength: 2,
         });
-        hls.loadSource(item.media_url);
+
         hls.attachMedia(video);
-        
-        // Store HLS instance for cleanup
-        (video as any)._hlsInstance = hls;
+        hls.loadSource(item.media_url);
+        preloadEntry.hlsInstance = hls;
+
+        // Auto-cleanup after timeout to prevent memory creep
+        preloadEntry.timeoutId = setTimeout(() => {
+          if (token === swapToken.current) { // Only cleanup if we haven't swapped
+            console.log(`[VideoPreloader] Auto-cleanup preloaded video: ${item.media_url}`);
+            logVideoTelemetry('video_preload_aborted', { url: item.media_url, reason: 'timeout' });
+            cleanupPreloadEntry(item.media_url);
+          }
+        }, preloadTimeoutMs);
+      } else {
+        video.src = item.media_url;
       }
 
-      preloadedVideos.current.set(item.media_url, video);
+      preloadedVideos.current.set(item.media_url, preloadEntry);
       console.log(`[VideoPreloader] Preloaded video for index ${index}`);
     };
 
-    // Preload next items
+    const cleanupPreloadEntry = (url: string) => {
+      const entry = preloadedVideos.current.get(url);
+      if (entry) {
+        if (entry.timeoutId) {
+          clearTimeout(entry.timeoutId);
+        }
+        if (entry.hlsInstance) {
+          try {
+            entry.hlsInstance.stopLoad();
+            entry.hlsInstance.detachMedia();
+            entry.hlsInstance.destroy();
+          } catch (e) {
+            console.warn('[VideoPreloader] Error cleaning up HLS:', e);
+          }
+        }
+        entry.video.src = '';
+        entry.video.remove();
+        preloadedVideos.current.delete(url);
+      }
+    };
+
+    // Preload only adjacent items (current ± 1)
+    const preloadIndexes = [];
     for (let i = 1; i <= maxPreloadItems; i++) {
       const nextIndex = currentIndex + i;
       if (nextIndex < mediaItems.length) {
-        preloadVideo(mediaItems[nextIndex], nextIndex);
+        preloadIndexes.push(nextIndex);
+      }
+      const prevIndex = currentIndex - i;
+      if (prevIndex >= 0 && maxPreloadItems > 1) {
+        preloadIndexes.push(prevIndex);
       }
     }
+
+    preloadIndexes.forEach(index => {
+      preloadVideo(mediaItems[index], index);
+    });
 
     // Cleanup old preloaded videos (keep only adjacent items)
-    const keepKeys = new Set<string>();
-    for (let i = -1; i <= maxPreloadItems; i++) {
-      const index = currentIndex + i;
-      if (index >= 0 && index < mediaItems.length && mediaItems[index]?.media_type === 'video') {
-        keepKeys.add(mediaItems[index].media_url);
-      }
-    }
-
-    preloadedVideos.current.forEach((video, url) => {
-      if (!keepKeys.has(url)) {
-        console.log(`[VideoPreloader] Cleaning up preloaded video: ${url}`);
-        
-        // Cleanup HLS instance
-        if ((video as any)._hlsInstance) {
-          (video as any)._hlsInstance.destroy();
-        }
-        
-        video.src = '';
-        video.remove();
-        preloadedVideos.current.delete(url);
+    const keepUrls = new Set<string>();
+    preloadIndexes.forEach(index => {
+      if (mediaItems[index]?.media_type === 'video') {
+        keepUrls.add(mediaItems[index].media_url);
       }
     });
 
-  }, [currentIndex, mediaItems, maxPreloadItems]);
+    preloadedVideos.current.forEach((entry, url) => {
+      if (!keepUrls.has(url)) {
+        console.log(`[VideoPreloader] Cleaning up unused preloaded video: ${url}`);
+        cleanupPreloadEntry(url);
+      }
+    });
+
+  }, [currentIndex, mediaItems, maxPreloadItems, preloadTimeoutMs]);
 
   // Cleanup all on unmount
   useEffect(() => {
     return () => {
-      preloadedVideos.current.forEach((video, url) => {
-        if ((video as any)._hlsInstance) {
-          (video as any)._hlsInstance.destroy();
+      preloadedVideos.current.forEach((entry, url) => {
+        if (entry.timeoutId) {
+          clearTimeout(entry.timeoutId);
         }
-        video.src = '';
-        video.remove();
+        if (entry.hlsInstance) {
+          try {
+            entry.hlsInstance.stopLoad();
+            entry.hlsInstance.detachMedia();
+            entry.hlsInstance.destroy();
+          } catch (e) {
+            console.warn('[VideoPreloader] Error during cleanup:', e);
+          }
+        }
+        entry.video.src = '';
+        entry.video.remove();
       });
       preloadedVideos.current.clear();
     };
   }, []);
 
+  const promotePreload = (url: string, targetVideo: HTMLVideoElement) => {
+    const entry = preloadedVideos.current.get(url);
+    if (entry?.hlsInstance) {
+      logVideoTelemetry('video_preload_promoted', { url });
+      
+      // Clear timeout since we're promoting
+      if (entry.timeoutId) {
+        clearTimeout(entry.timeoutId);
+      }
+      
+      // Detach from preload video and attach to target
+      try {
+        entry.hlsInstance.detachMedia();
+        entry.hlsInstance.attachMedia(targetVideo);
+        return entry.hlsInstance;
+      } catch (e) {
+        console.warn('[VideoPreloader] Error promoting preload:', e);
+        return null;
+      }
+    }
+    return null;
+  };
+
   return {
-    getPreloadedVideo: (url: string) => preloadedVideos.current.get(url),
+    getPreloadedVideo: (url: string) => preloadedVideos.current.get(url)?.video,
+    promotePreload,
     isPreloaded: (url: string) => preloadedVideos.current.has(url),
   };
 }
