@@ -8,6 +8,22 @@ import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandler
 import { useModalContext } from '@/contexts/ModalContext';
 import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
 
+// Adapter for mapping hook data to expected Media type
+type RawPhoto = { id?: string; media_url?: string; url?: string; type?: string; media_type?: string; poster_url?: string; thumbUrl?: string; };
+type RawVideo = RawPhoto;
+
+function adaptMedia<T extends RawPhoto>(items: T[], forceType?: "image" | "video") {
+  return (items ?? []).map((r) => {
+    const t = forceType ?? ((r.type as any) || (r.media_type as any));
+    return {
+      id: r.id ?? "",
+      type: (t === "video" ? "video" : "image") as "image" | "video",
+      url: (r.url ?? r.media_url) || "",
+      thumbUrl: r.thumbUrl ?? r.poster_url ?? undefined,
+    };
+  });
+}
+
 interface SnapModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -58,19 +74,34 @@ const SnapModal = ({
   // One shared set per modal open => no duplicates anywhere in the modal.
   const seen = useMemo(() => new Set<string>(), []);
 
+  // Reset dedupe when modal opens
+  useEffect(() => {
+    if (isOpen) seen.clear();
+  }, [isOpen, seen]);
+
+  // Adapt raw data to expected Media shape
+  const photosA = useMemo(() => adaptMedia(photos, "image"), [photos]);
+  const videosA = useMemo(() => adaptMedia(videos, "video"), [videos]);
+
+  // Sanity check logs
+  console.group("[SnapModal] adapter check");
+  console.log("photosA", photosA.map(m => ({id:m.id, type:m.type, url:!!m.url})));
+  console.log("videosA", videosA.map(m => ({id:m.id, type:m.type, url:!!m.url, thumb:!!m.thumbUrl})));
+  console.groupEnd();
+
   const captureThumbs: Thumb[] = useMemo(
-    () => composeThumbRowGlobal(photos, placeholders.capture, TILES_PER_ROW.capture, seen),
-    [photos, placeholders.capture, seen]
+    () => composeThumbRowGlobal(photosA, placeholders.capture, TILES_PER_ROW.capture, seen),
+    [photosA, placeholders.capture, seen]
   );
 
   const photoThumbs: Thumb[] = useMemo(
-    () => composeThumbRowGlobal(photos, placeholders.photos, TILES_PER_ROW.photos, seen),
-    [photos, placeholders.photos, seen]
+    () => composeThumbRowGlobal(photosA, placeholders.photos, TILES_PER_ROW.photos, seen),
+    [photosA, placeholders.photos, seen]
   );
 
   const videoThumbs: Thumb[] = useMemo(
-    () => composeThumbRowGlobal(videos, placeholders.videos, TILES_PER_ROW.videos, seen),
-    [videos, placeholders.videos, seen]
+    () => composeThumbRowGlobal(videosA, placeholders.videos, TILES_PER_ROW.videos, seen),
+    [videosA, placeholders.videos, seen]
   );
 
   /**
