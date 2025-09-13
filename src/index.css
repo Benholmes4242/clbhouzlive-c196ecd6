@@ -369,7 +369,7 @@
     backdrop-filter: blur(8px);
   }
 
-  /* Echo label styling - simple, no animations */
+  /* Echo label styling - perfectly centered */
   .echo-label {
     display: inline-block;
     font-weight: 700;
@@ -380,6 +380,8 @@
     transform: rotate(-90deg);
     white-space: nowrap;
     pointer-events: none;
+    text-align: center;
+    width: 100%;
   }
   .container { @apply max-w-6xl; }
 }
