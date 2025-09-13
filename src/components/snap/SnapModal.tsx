@@ -109,6 +109,38 @@ const SnapModal = ({
     );
   }
 
+  // Debug version for videos row
+  function ThumbWithDebug({ src, className = "", style, index }: { 
+    src?: string; 
+    className?: string; 
+    style?: React.CSSProperties;
+    index: number;
+  }) {
+    return (
+      <div
+        className={`overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 ${className}`}
+        style={style}
+      >
+        {src && (
+          <img 
+            src={src} 
+            alt="" 
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              (window as any).__snapImgErr?.("videos", index, (e.currentTarget as HTMLImageElement).src);
+              // Fallback to golf course photo if thumbnail fails to load
+              const target = e.target as HTMLImageElement;
+              const isVideoThumb = videoThumbs.includes(src || '');
+              const fallbackImages = isVideoThumb ? placeholders.videos : placeholders.photos;
+              target.src = fallbackImages[0]; // Use first golf course image as fallback
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+
   /**
    * Keeps all rows the same total width using flex weights.
    * videos: [1,1,1]   (3 equal rects)
@@ -126,9 +158,9 @@ const SnapModal = ({
       <div className="flex items-stretch gap-2 h-16 w-56">{/* Longer fixed width for all strips */}
         {variant === "videos" && (
           <>
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[0]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[1]} />
-            <Thumb className="flex-[1_0_0] aspect-square" src={thumbs[2]} />
+            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[0]} index={0} />
+            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[1]} index={1} />
+            <ThumbWithDebug className="flex-[1_0_0] aspect-square" src={thumbs[2]} index={2} />
           </>
         )}
 
@@ -152,6 +184,30 @@ const SnapModal = ({
       </div>
     );
   }
+
+  // DEBUG INSTRUMENTATION (temporary)
+  console.group("[SnapModal][debug]");
+  
+  console.log("videos.raw",
+    videos?.map(v => ({ id: v.id, type: v.type, url: v.url, thumbUrl: v.thumbUrl }))
+  );
+  
+  console.log("placeholders", {
+    capture: placeholders.capture?.length,
+    photos: placeholders.photos?.length,
+    videos: placeholders.videos?.length,
+  });
+  
+  // Log the computed thumb arrays
+  console.log("captureThumbs", captureThumbs?.map((src, i) => ({ i, src })));
+  console.log("photoThumbs", photoThumbs?.map((src, i) => ({ i, src })));
+  console.log("videoThumbs", videoThumbs?.map((src, i) => ({ i, src })));
+  
+  // Optional: capture image load errors for the 3rd tile
+  (window as any).__snapImgErr = (row: string, i: number, src: string) => 
+    console.warn("[SnapModal][img-error]", { row, i, src });
+  
+  console.groupEnd();
 
   const cardOptions = [
     ...(isMobile ? [{
