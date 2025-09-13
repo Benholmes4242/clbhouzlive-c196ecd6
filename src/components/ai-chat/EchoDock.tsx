@@ -96,7 +96,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             pointerEvents: 'auto',
             appearance: 'none',
             border: '0',
-            width: '30px',
+            width: '25px',
             height: '120px',
             background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderRadius: '9999px 0 0 9999px',
