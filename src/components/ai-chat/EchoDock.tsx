@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
@@ -12,6 +12,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
   const { sentinelRef } = useAdaptiveGlass();
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
   useEffect(() => {
@@ -38,6 +39,16 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
   }
 
   const handleClick = () => {
+    // ripple feedback
+    const btn = btnRef.current;
+    if (btn) {
+      btn.classList.remove("ripple");
+      // force reflow so animation can re-run
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      btn.offsetWidth; 
+      btn.classList.add("ripple");
+    }
+    
     if (showOnboarding) {
       setShowOnboarding(false);
     }
@@ -86,6 +97,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
       >
         {/* Handle (half-pill tab) */}
         <button
+          ref={btnRef}
           className="echo-handle echo-handle--label"
           aria-label="Open Echo assistant"
           onKeyDown={handleKeyDown}
@@ -94,8 +106,8 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             pointerEvents: 'auto',
             appearance: 'none',
             border: '0',
-            width: '56px',
-            height: '128px',
+            width: '44px',
+            height: '120px',
             background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
             borderRadius: '9999px 0 0 9999px',
             display: 'flex',
@@ -104,7 +116,10 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
             cursor: 'pointer',
             outline: 'none',
             boxShadow: 'none',
-            transition: 'transform 0.2s ease, width 0.2s ease'
+            position: 'relative',
+            overflow: 'hidden',
+            transformOrigin: 'center',
+            transition: 'transform 0.18s ease, width 0.18s ease, opacity 0.18s ease'
           }}
         >
           <span className="echo-label" aria-hidden="true">Echo</span>
