@@ -115,12 +115,12 @@ const ImageWithPinchZoom: React.FC<{
         onTouchStart={FLAGS.USE_PINCH_ZOOM ? onTouchStart : undefined}
         onTouchMove={FLAGS.USE_PINCH_ZOOM ? onTouchMove : undefined}
         onTouchEnd={FLAGS.USE_PINCH_ZOOM ? onTouchEnd : undefined}
-        className="flex items-center justify-center w-full h-full"
+        className="flex items-center justify-center w-full h-full pinch-zoom-wrapper"
       >
         <img
           src={src}
           alt={alt}
-          className="max-h-[80vh] max-w-[90vw] object-contain select-none"
+          className="max-h-[80vh] max-w-[90vw] object-contain select-none pinch-zoom-image"
           draggable={false}
           loading="eager"
           onError={(e) => {
@@ -850,6 +850,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           display: none !important;
           width: 0 !important;
           height: 0 !important;
+        }
+        .pinch-zoom-image {
+          -webkit-user-drag: none;
+          user-select: none;
+        }
+        .pinch-zoom-wrapper {
+          touch-action: pan-y; /* Defensive: ensure vertical pass-through when not zoomed */
         }
       `}</style>
     </div>
