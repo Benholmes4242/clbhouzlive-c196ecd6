@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { safePlayAfterAnimation, safePlay, isIOS } from '@/utils/safePlay';
+import { logVideoTelemetry } from '@/utils/videoTelemetry';
 
 interface FlickerFreeHLSPlayerProps {
   hlsUrl: string;
@@ -99,10 +100,14 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
             
             hls.on(Hls.Events.ERROR, (event, data) => {
               console.error('HLS error:', data);
+              if (data.details === 'bufferStalledError') {
+                logVideoTelemetry('hls_buffer_stalled', { details: data.details });
+              }
             });
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
               console.log('[HLS] Manifest parsed, HLS ready');
+              logVideoTelemetry('hls_manifest_parsed');
               setIsHLSLoaded(true);
               // Trigger autoplay handler after manifest is ready
               handleAutoplay();

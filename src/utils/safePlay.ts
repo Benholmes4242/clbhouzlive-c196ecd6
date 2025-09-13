@@ -3,6 +3,9 @@
  * Handles readyState gating, iOS black frame fix, retry logic, and visibility handling
  */
 
+import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
+import { logVideoTelemetry } from './videoTelemetry';
+
 interface SafePlayOptions {
   maxRetries?: number;
   baseDelay?: number;
@@ -13,8 +16,15 @@ export async function safePlay(
   video: HTMLVideoElement, 
   options: SafePlayOptions = {}
 ): Promise<boolean> {
+  // Feature flag for rollback capability
+  if (!USE_SAFE_AUTOPLAY_V2) {
+    return legacySafePlay(video);
+  }
+
   const { maxRetries = 4, baseDelay = 250, maxWaitTime = 1000 } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
+  
+  logVideoTelemetry('video_autoplay_attempted', { videoId });
   
   // Ensure proper preconditions for autoplay
   video.muted = true;
@@ -60,6 +70,7 @@ export async function safePlay(
       console.log(`[safePlay] Attempting play() for video ${videoId}, attempt ${attempt}`);
       await video.play();
       console.log(`[safePlay] ✅ Successfully played video ${videoId} on attempt ${attempt}`);
+      logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
       return true;
       
     } catch (err: any) {
@@ -68,6 +79,7 @@ export async function safePlay(
       if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
         console.warn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
         video.setAttribute('data-autoplay-blocked', '1');
+        logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
         return false;
       }
       
@@ -80,7 +92,25 @@ export async function safePlay(
   
   console.warn(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
   video.setAttribute('data-autoplay-blocked', '1');
+  logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'max_retries_exceeded' });
   return false;
+}
+
+/**
+ * Legacy safe play for rollback capability
+ */
+function legacySafePlay(video: HTMLVideoElement): Promise<boolean> {
+  return new Promise((resolve) => {
+    video.muted = true;
+    video.playsInline = true;
+    
+    video.play()
+      .then(() => resolve(true))
+      .catch(() => {
+        video.setAttribute('data-autoplay-blocked', '1');
+        resolve(false);
+      });
+  });
 }
 
 /**
