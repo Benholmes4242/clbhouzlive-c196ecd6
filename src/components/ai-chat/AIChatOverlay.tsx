@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
+import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -459,7 +460,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           }}
         >
           <div className="flex items-center gap-3">
-            <EchoAvatar state={getAvatarState()} size={window.innerWidth <= 768 ? 40 : 44} />
+            <PiWaveform 
+              size={window.innerWidth <= 768 ? 28 : 32} 
+              className="text-white/90 transition-all duration-200 ease-in-out"
+              style={{
+                animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
+              }}
+            />
             <div>
               <h2 className="text-xl font-semibold text-white">Echo</h2>
               <p className="text-sm text-white/90">I'm your personal tour caddie</p>
