@@ -674,6 +674,62 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </button>
             </div>
           )}
+          {activeTab === 'logs' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Record course notes and tips..."
+                    disabled={isRecording || isProcessing}
+                    readOnly
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!isRecording && !isProcessing) {
+                      startRecording();
+                    }
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
           {activeTab === 'swing-coach' && (
             <div className="p-4">
               <div className="flex gap-2">
