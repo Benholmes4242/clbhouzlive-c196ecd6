@@ -152,10 +152,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         description: "Your voice note has been added to your caddie logs",
       });
 
-      // Switch to logs tab if we're in the chat
-      if (activeTab === 'chat') {
-        setActiveTab('logs');
-      }
 
     } catch (error) {
       console.error('Error saving voice note:', error);
@@ -515,17 +511,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 Chat
               </TabsTrigger>
               <TabsTrigger
-                value="logs"
-                className="
-                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
-                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
-                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                  transition-all
-                "
-              >
-                Caddie Logs
-              </TabsTrigger>
-              <TabsTrigger
                 value="swing-coach"
                 className="
                   flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
@@ -603,23 +588,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="logs" className="h-full m-0">
-              <ScrollArea 
-                ref={logsAutoScroll.scrollAreaRef}
-                className="h-full min-h-0"
-                style={{ overscrollBehavior: 'contain' }}
-              >
-                <CaddieLogs 
-                  onClose={() => setActiveTab('chat')}
-                  isRecording={isRecording}
-                  isProcessing={isProcessing}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  userLocation={userLocation}
-                  requestLocation={requestLocation}
-                />
-              </ScrollArea>
-            </TabsContent>
 
             <TabsContent value="swing-coach" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
               <div className="w-full px-6 py-3">
