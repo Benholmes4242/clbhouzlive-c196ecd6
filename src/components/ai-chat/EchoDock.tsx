@@ -77,14 +77,10 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         style={{
           position: 'fixed',
           right: '0',
-          bottom: 'calc(144px + env(safe-area-inset-bottom, 0px))',
+          bottom: '40vh',
           zIndex: 10000,
           overflow: 'hidden',
-          pointerEvents: 'none',
-          // Mobile spacing
-          ...(typeof window !== 'undefined' && window.innerWidth <= 768 && {
-            bottom: `calc(160px + env(safe-area-inset-bottom, 0px))`
-          })
+          pointerEvents: 'none'
         }}
         aria-live="polite"
       >
