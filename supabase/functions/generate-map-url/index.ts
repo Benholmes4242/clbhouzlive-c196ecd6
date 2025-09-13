@@ -39,15 +39,12 @@ Deno.serve(async (req) => {
     }
 
     const baseUrl = 'https://maps.googleapis.com/maps/api/staticmap'
-    // Optional: neutral marker to pinpoint the club
-    const marker = `&markers=size:mid|color:0x2D2D2D|${latitude},${longitude}`
     const mapUrl =
       `${baseUrl}?center=${latitude},${longitude}` +
       `&zoom=${zoom}` +
       `&size=${size}` +
       `&scale=2` +
-      `&maptype=${finalMapType}` +  // NEW
-      marker +
+      `&maptype=${finalMapType}` +
       `&key=${googleApiKey}`
 
     return new Response(
