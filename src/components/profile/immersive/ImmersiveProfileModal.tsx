@@ -12,6 +12,8 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
+import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
 
 import { MediaItem } from '@/types/media';
 
@@ -66,6 +68,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const startTimeRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  
+  // Video progress sync hook
+  const { progress: syncedProgress, segmentProgress } = useVideoProgressSync(
+    videoRef.current,
+    { totalSegments: localMediaItems.length }
+  );
   
   // Enhanced mobile animations
   const [isMobileTransitioning, setIsMobileTransitioning] = useState(false);
@@ -454,11 +462,13 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
               style={{
                 width: item.isUploading 
                   ? `${item.uploadProgress || 0}%`
-                  : index < activeIndex 
-                    ? '100%' 
-                    : index === activeIndex 
-                      ? `${progress}%` 
-                      : '0%'
+                  : USE_VIDEO_PROGRESS_SYNC_V1 && index === activeIndex && segmentProgress.length > 0
+                    ? `${segmentProgress[index] * 100}%`
+                    : index < activeIndex 
+                      ? '100%' 
+                      : index === activeIndex 
+                        ? USE_VIDEO_PROGRESS_SYNC_V1 ? `${syncedProgress}%` : `${progress}%`
+                        : '0%'
               }}
             />
           </div>
@@ -484,6 +494,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
         {currentItem.media_type === 'video' ? (
           <EnhancedVideoPlayer
+            ref={videoRef}
             key={`${currentItem.id}-${activeIndex}`}
             src={currentItem.media_url}
             poster={currentItem.thumbnail_url}
@@ -494,7 +505,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             className="w-full h-full"
             onPlay={() => {
               setIsVideoPaused(false);
-              // Don't start progress timer for videos - they use onEnded callback
+              // Progress is now handled by useVideoProgressSync hook
             }}
             onPause={() => setIsVideoPaused(true)}
             onEnded={() => {
