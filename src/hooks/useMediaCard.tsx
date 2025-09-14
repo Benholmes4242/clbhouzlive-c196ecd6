@@ -3,6 +3,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useHlsUrlCache } from '@/hooks/useHlsUrlCache';
 
 interface UseMediaCardProps {
   item: ExploreContentItem;
@@ -28,6 +29,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
   const [shouldAutoplayOverride, setShouldAutoplayOverride] = useState(false);
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLElement | null>(null);
+  const { preloadHlsUrl } = useHlsUrlCache();
 
   const { ref: autoplayRef, shouldAutoplay: defaultShouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
     enabled: isFeatured || isPortrait, // Enable autoplay for featured (hero) cards and portrait cards
@@ -120,6 +122,18 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
     onLike(item.id);
   };
 
+  const handlePointerDown = () => {
+    // Start preloading on pointer down (before click)
+    if (item.type === 'video' && item.src) {
+      // Extract UID from Cloudflare Stream URL if needed
+      const uid = item.src.includes('cloudflarestream.com') ? 
+        item.src.split('/').pop()?.split('.')[0] : null;
+      if (uid) {
+        preloadHlsUrl(uid);
+      }
+    }
+  };
+
   const handleMediaClick = () => {
     console.log('[OpenFlow]', 'cardClick', performance.now());
     // Only open media for image and video types, not CTA
@@ -196,6 +210,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
     handleCardMouseEnter,
     handleCardMouseLeave,
     handleLike,
+    handlePointerDown,
     handleMediaClick,
     handleImageError,
     handleImageLoad,

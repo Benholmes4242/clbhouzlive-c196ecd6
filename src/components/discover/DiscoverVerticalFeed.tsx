@@ -13,7 +13,8 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
-import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
@@ -48,20 +49,26 @@ const VideoWithAutoplay: React.FC<{
 }> = React.memo(({ src, muted, className, objectFit = 'contain', shouldAttach, autoplay }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
+  const { getHlsUrl } = useHlsUrlCache();
   
   // Extract video ID and fetch from API
   const uid = uidFromNode({ src });
+
+  // Warm hls.js on component mount
+  useEffect(() => {
+    warmHlsJs();
+  }, []);
   
   useEffect(() => {
     if (uid) {
       console.log('[OpenFlow]', 'playerInit', performance.now());
-      getCloudflareStreamHLS(uid).then((url) => {
+      getHlsUrl(uid).then((url) => {
         console.log('[OpenFlow]', 'sourceAssigned', performance.now());
         setApiHlsUrl(url);
       });
       getCloudflareStreamPoster(uid).then(setApiPoster);
     }
-  }, [uid]);
+  }, [uid, getHlsUrl]);
 
   // Use API values first, then fallbacks
   const hlsUrl = apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
