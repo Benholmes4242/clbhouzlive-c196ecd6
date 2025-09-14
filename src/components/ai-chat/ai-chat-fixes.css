@@ -20,7 +20,7 @@
 /* Echo Overlay - Transparent background for rounded corners */
 .aiChatOverlay {
   background: transparent !important;
-  border-radius: 18px;
+  border-radius: 0 !important;
   overflow: hidden;
 }
 

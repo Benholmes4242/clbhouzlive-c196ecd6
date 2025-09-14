@@ -620,7 +620,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         ariaLabel="Echo History"
       >
         <div 
-          className="w-full h-full flex flex-col overflow-hidden rounded-l-2xl"
+          className="w-full h-full flex flex-col overflow-hidden"
           style={{
             background: '#F6F7F6',
             backdropFilter: 'blur(20px)',
