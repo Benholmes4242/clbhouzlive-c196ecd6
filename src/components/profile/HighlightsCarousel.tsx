@@ -1,4 +1,5 @@
 import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
+import { VolumeX, Volume2 } from 'lucide-react';
 import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
@@ -211,7 +212,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   }}
                   title={muted ? 'Unmute' : 'Mute'}
                 >
-                  {muted ? '🔇' : '🔊'}
+                  {muted ? <VolumeX className="w-8 h-8" /> : <Volume2 className="w-8 h-8" />}
                 </button>
                 {highlight.golf_course && (
                   <div className="club-badge">

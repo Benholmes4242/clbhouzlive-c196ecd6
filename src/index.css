@@ -1276,10 +1276,16 @@ html, body, #root, .app-shell { touch-action: auto; }
   height: 36px;
   border: 0;
   border-radius: 18px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.unmute-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .club-badge {

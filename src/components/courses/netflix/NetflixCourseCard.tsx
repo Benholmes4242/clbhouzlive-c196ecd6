@@ -64,7 +64,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
   };
 
   const rankBadges = getRankBadges();
-  const cornerRadius = size === 'large' ? 'rounded-2xl' : 'rounded-xl';
+  const cornerRadius = size === 'large' ? 'rounded-none' : 'rounded-none';
   const shadowClass = size === 'large' 
     ? 'shadow-lg shadow-black/20' 
     : 'shadow-md shadow-black/15';

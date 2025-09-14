@@ -460,7 +460,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
               fixed right-0 bg-background z-10
               ${isMobile 
                 ? 'w-full top-0 bottom-0 shadow-lg' 
-                : 'inset-y-0 w-full rounded-l-2xl shadow-2xl'
+                : 'inset-y-0 w-full rounded-none shadow-2xl'
               }
             `}
             style={isMobile ? { height: '100dvh' } : undefined}
@@ -469,7 +469,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           >
             <div className="h-full overflow-hidden flex flex-col relative">
               {/* Header with title and close button */}
-              <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-tl-2xl">
+              <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-none">
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4">
                   <h2 className="text-xl sm:text-2xl font-bold">
                     {regionName}
@@ -491,7 +491,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         {/* Mobile Layout: View Toggle, Stats, and Sort */}
         <div className="flex items-center justify-between gap-2 md:hidden">
           {/* Left: View Toggle */}
-          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-none">
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
@@ -558,7 +558,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         {/* Desktop Layout: View Toggle, Stats, and Sort */}
         <div className="hidden md:flex md:items-center md:justify-between gap-4">
           {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-none">
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
@@ -678,15 +678,15 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     }}
                     showAddButton={false}
                   >
-                    <div className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative">
+                    <div className="flex items-center gap-4 p-3 border border-border rounded-none hover:bg-muted/50 transition-colors cursor-pointer relative">
                     {/* Lock overlay for unplayed courses */}
                     {!course.userPlayed && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/40 to-muted/60 rounded-lg z-10 backdrop-blur-[1px]">
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/40 to-muted/60 rounded-none z-10 backdrop-blur-[1px]">
                         <Lock className="absolute top-2 right-2 w-4 h-4 text-muted-foreground" />
                       </div>
                     )}
 
-                    <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                    <div className="w-16 h-12 rounded-none overflow-hidden flex-shrink-0 bg-muted">
                       {course.golf_courses?.thumbnail_image ? (
                         <img 
                           src={course.golf_courses.thumbnail_image} 
@@ -771,7 +771,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                   <div className="aspect-[4/5] relative">
                   {/* Lock overlay for unplayed courses */}
                   {!course.userPlayed && (
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50 rounded-lg z-20 backdrop-blur-[2px]">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50 rounded-none z-20 backdrop-blur-[2px]">
                       <Lock className="absolute top-2 right-2 w-5 h-5 text-muted-foreground" />
                       {isOwnProfile && (
                         <div className="absolute bottom-2 left-2 right-2">

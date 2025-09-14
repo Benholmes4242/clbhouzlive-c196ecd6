@@ -203,7 +203,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div 
-                            className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-lg shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
+                            className="relative flex items-center justify-between badge-standard-width h-8 md:h-9 px-2.5 py-1.5 rounded-none shadow-lg shadow-black/20 overflow-hidden backdrop-blur-md border border-white/20" 
                             style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
                             onClick={(e) => e.stopPropagation()}
                           >
