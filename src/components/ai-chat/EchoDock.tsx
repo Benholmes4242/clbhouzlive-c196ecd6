@@ -97,14 +97,6 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
     }
   };
 
-  const styleVars: React.CSSProperties = {
-    bottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
-    right: 'calc(env(safe-area-inset-right, 0px) + 16px)',
-    width: 64,
-    height: 64,
-    zIndex: 10000,
-  };
-
   const dockContent = (
     <>
       {/* Onboarding Tooltip */}
@@ -122,7 +114,6 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         ref={btnRef}
         aria-label="Open Echo assistant"
         className={`echoDoc-btn ${panelOpen ? 'is-panel-open' : ''}`}
-        style={styleVars}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
@@ -146,10 +137,6 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
           className="echoDoc-panel" 
           role="menu" 
           aria-label="Echo quick actions"
-          style={{
-            right: 'calc(env(safe-area-inset-right, 0px) + 16px)',
-            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
-          }}
         >
           <PanelItem
             label="Chat"

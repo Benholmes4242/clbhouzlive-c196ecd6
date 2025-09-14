@@ -6,6 +6,7 @@ import './index.css'
 import './styles/superellipse.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
+import './utils/echoDocNavHeight'
 
 const container = document.getElementById("root");
 if (!container) {
