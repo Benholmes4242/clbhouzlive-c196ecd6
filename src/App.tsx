@@ -22,6 +22,7 @@ import { ModalProvider } from '@/contexts/ModalContext';
 import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
+import AppShell from '@/components/AppShell';
 
 
 // Direct import for ProfilePage to avoid dynamic import issues
@@ -101,69 +102,71 @@ const App: React.FC = () => {
   }, []);
   
   return (
-    <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <SecurityHeaders />
-          <SiteAccessControl>
-            <ModalProvider>
-              <UIProvider>
-              <BrowserRouter>
-                <ScrollToTop />
-                <GlobalAudioProvider>
-                  <VideoManagerProvider>
-                    <VideoPlaybackManagerProvider>
-                      <TopTenProvider>
-                        <AuthWrapper>
-                    <Suspense fallback={<ClubhouzLoading />}>
-                      <Routes>
-                        <Route path="/" element={<Clubhouse />} />
-                        <Route path="/auth" element={<Auth />} />
-                        <Route path="/create-profile" element={<CreateProfile />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/profile-test" element={<ProfileTestPage />} />
-                        <Route path="/profile/:username" element={<UserProfilePage />} />
-                        <Route path="/settings" element={<Settings />} />
-                        {/* Explore route removed - redirects to discover */}
-                        <Route path="/clubhouse" element={<Clubhouse />} />
-                        <Route path="/discover" element={<Discover />} />
-                        <Route path="/courses" element={<Courses />} />
-                        <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                        <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-                        <Route path="/my-ratings" element={<MyRatings />} />
-                        <Route path="/news" element={<News />} />
-                        <Route path="/tour-central" element={<TourCentral />} />
-                        
-                        <Route path="/messages" element={<MessagesPage />} />
-                        <Route path="/notifications" element={<NotificationsPage />} />
-                        <Route path="/friends" element={<FriendsPage />} />
-                        <Route path="/followers" element={<FollowersPage />} />
-                        <Route path="/following" element={<FollowingPage />} />
-                        
-                        <Route path="/global-top100" element={<GlobalTop100 />} />
-                        <Route path="/achievements" element={<AchievementsPage />} />
-                        <Route path="/admin-setup" element={<AdminSetupPage />} />
-                        <Route path="/admin" element={<AdminPage />} />
-                        
-                        
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                      </Suspense>
-                      </AuthWrapper>
-                      </TopTenProvider>
-                    </VideoPlaybackManagerProvider>
-                  </VideoManagerProvider>
-                </GlobalAudioProvider>
-                <Toaster />
-                <Sonner />
-                <AIChat />
-              </BrowserRouter>
-              </UIProvider>
-            </ModalProvider>
-          </SiteAccessControl>
-      </TooltipProvider>
-    </QueryClientProvider>
-    </ThemeProvider>
+    <AppShell>
+      <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <SecurityHeaders />
+            <SiteAccessControl>
+              <ModalProvider>
+                <UIProvider>
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <GlobalAudioProvider>
+                    <VideoManagerProvider>
+                      <VideoPlaybackManagerProvider>
+                        <TopTenProvider>
+                          <AuthWrapper>
+                      <Suspense fallback={<ClubhouzLoading />}>
+                        <Routes>
+                          <Route path="/" element={<Clubhouse />} />
+                          <Route path="/auth" element={<Auth />} />
+                          <Route path="/create-profile" element={<CreateProfile />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/profile-test" element={<ProfileTestPage />} />
+                          <Route path="/profile/:username" element={<UserProfilePage />} />
+                          <Route path="/settings" element={<Settings />} />
+                          {/* Explore route removed - redirects to discover */}
+                          <Route path="/clubhouse" element={<Clubhouse />} />
+                          <Route path="/discover" element={<Discover />} />
+                          <Route path="/courses" element={<Courses />} />
+                          <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+                          <Route path="/user/:username/courses" element={<UserCoursesPage />} />
+                          <Route path="/my-ratings" element={<MyRatings />} />
+                          <Route path="/news" element={<News />} />
+                          <Route path="/tour-central" element={<TourCentral />} />
+                          
+                          <Route path="/messages" element={<MessagesPage />} />
+                          <Route path="/notifications" element={<NotificationsPage />} />
+                          <Route path="/friends" element={<FriendsPage />} />
+                          <Route path="/followers" element={<FollowersPage />} />
+                          <Route path="/following" element={<FollowingPage />} />
+                          
+                          <Route path="/global-top100" element={<GlobalTop100 />} />
+                          <Route path="/achievements" element={<AchievementsPage />} />
+                          <Route path="/admin-setup" element={<AdminSetupPage />} />
+                          <Route path="/admin" element={<AdminPage />} />
+                          
+                          
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                        </Suspense>
+                        </AuthWrapper>
+                        </TopTenProvider>
+                      </VideoPlaybackManagerProvider>
+                    </VideoManagerProvider>
+                  </GlobalAudioProvider>
+                  <Toaster />
+                  <Sonner />
+                  <AIChat />
+                </BrowserRouter>
+                </UIProvider>
+              </ModalProvider>
+            </SiteAccessControl>
+        </TooltipProvider>
+      </QueryClientProvider>
+      </ThemeProvider>
+    </AppShell>
   );
 };
 
