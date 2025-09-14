@@ -157,18 +157,32 @@ const MobileCropTool: React.FC<MobileCropToolProps> = ({
     setScale(prev => Math.max(0.5, Math.min(3, prev * delta)));
   }, []);
 
-  // Add event listeners
+  // Add event listeners (scoped to crop box/container, not document)
   useEffect(() => {
     if (isDragging || isResizing) {
+      const targetEl = cropBoxRef.current || containerRef.current || null;
+
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleMouseUp);
+
+      if (targetEl) {
+        targetEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+        targetEl.addEventListener('touchend', handleMouseUp as any);
+      } else {
+        document.addEventListener('touchmove', handleTouchMove, { passive: false });
+        document.addEventListener('touchend', handleMouseUp as any);
+      }
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
-        document.removeEventListener('touchmove', handleTouchMove);
-        document.removeEventListener('touchend', handleMouseUp);
+        if (targetEl) {
+          (targetEl as any).removeEventListener('touchmove', handleTouchMove as any);
+          (targetEl as any).removeEventListener('touchend', handleMouseUp as any);
+        } else {
+          document.removeEventListener('touchmove', handleTouchMove as any);
+          document.removeEventListener('touchend', handleMouseUp as any);
+        }
       };
     }
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp, handleTouchMove]);

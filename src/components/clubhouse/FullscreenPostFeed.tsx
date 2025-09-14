@@ -44,15 +44,9 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     }
   };
 
-  // Event handler to prevent default scrolling
+  // Removed global touchmove preventDefault to allow native gestures in WKWebView
   useEffect(() => {
-    const el = containerRef.current;
-    const preventDefault = (e: TouchEvent) => {
-      e.preventDefault();
-    };
-    
-    el?.addEventListener('touchmove', preventDefault, { passive: false });
-    return () => el?.removeEventListener('touchmove', preventDefault);
+    // Intentionally left blank
   }, []);
 
   // Swipe handlers with exclusion for right action bar
@@ -141,7 +135,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-0 z-50 touch-none bg-black"
+      className="fixed inset-0 z-50 bg-black"
       {...swipeHandlers}
       style={{ overscrollBehavior: 'none' }}
     >

@@ -14,9 +14,9 @@ class LongPressHandler {
     this.cleanup();
     
     // Add event listeners to all clickable elements
-    document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-    document.addEventListener('touchend', this.handleTouchEnd.bind(this));
-    document.addEventListener('touchcancel', this.handleTouchEnd.bind(this));
+    document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+    document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    document.addEventListener('touchcancel', this.handleTouchEnd.bind(this), { passive: true });
     document.addEventListener('click', this.hideMenu.bind(this));
   }
 
@@ -27,12 +27,15 @@ class LongPressHandler {
       return;
     }
 
-    // Prevent default iOS highlight and callout
-    e.preventDefault();
+    // Only arm long-press on explicitly whitelisted targets
+    const eligible = target.closest('[data-longpress]');
+    if (!eligible) {
+      return; // let native scroll/tap proceed
+    }
     
     this.pressTimer = window.setTimeout(() => {
       const touch = e.touches[0];
-      this.showEchoMenu(touch.clientX, touch.clientY, target);
+      this.showEchoMenu(touch.clientX, touch.clientY, eligible as HTMLElement);
     }, 600); // 600ms = long press
   }
 

@@ -60,6 +60,9 @@ img, video, canvas {
   -webkit-overflow-scrolling: touch; 
 }
 
+/* Allow gestures globally */
+html, body, #root, .app-shell { touch-action: auto; }
+
 /* Video overlay styles for mobile flicker fix */
 .videoContainer {
   position: relative;

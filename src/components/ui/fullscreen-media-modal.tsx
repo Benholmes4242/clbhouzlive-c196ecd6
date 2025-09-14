@@ -325,11 +325,7 @@ const FullscreenMediaModal = ({
           width: 100% !important;
           height: 100% !important;
           overflow: hidden !important;
-          touch-action: none !important;
           -webkit-overflow-scrolling: touch !important;
-        }
-        .modal-open * {
-          touch-action: none !important;
         }
         html.modal-open {
           overflow: hidden !important;
