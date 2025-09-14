@@ -24,6 +24,7 @@ export const useVerticalMediaFeed = (initialConfig?: UseVerticalMediaFeedConfig)
   const [initialMediaIndex, setInitialMediaIndex] = useState<number>(0);
 
   const openFeed = useCallback((item: ExploreContentItem, opts: OpenFeedOptions = {}) => {
+    console.log('[OpenFlow]', 'modalMount', performance.now());
     setInitialItem(item);
     setInitialMediaIndex(opts.initialMediaIndex ?? 0);
     setIsOpen(true);

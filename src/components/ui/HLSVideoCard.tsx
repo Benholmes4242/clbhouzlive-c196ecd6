@@ -162,14 +162,25 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     const v = videoRef.current;
     if (!v) return;
 
-    const onLoadedData = () => setReady(true);
-    const onCanPlay = () => setReady(true);
+    const onLoadedData = () => {
+      console.log('[OpenFlow]', 'metadataLoaded', performance.now());
+      setReady(true);
+    };
+    const onCanPlay = () => {
+      console.log('[OpenFlow]', 'canplay', performance.now());
+      setReady(true);
+    };
+    const onPlaying = () => {
+      console.log('[OpenFlow]', 'playing', performance.now());
+    };
 
     v.addEventListener('loadeddata', onLoadedData);
     v.addEventListener('canplay', onCanPlay);
+    v.addEventListener('playing', onPlaying);
     return () => {
       v.removeEventListener('loadeddata', onLoadedData);
       v.removeEventListener('canplay', onCanPlay);
+      v.removeEventListener('playing', onPlaying);
     };
   }, []);
 
@@ -181,11 +192,14 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     if (autoplay && attached) {
       const start = async () => {
         if (!ready) return;
+        console.log('[OpenFlow]', 'attemptPlay', performance.now());
         try {
           await v.play();
+          console.log('[OpenFlow]', 'playSucceeded', performance.now());
           setOverlayHidden(true);
           onPlay?.();
-        } catch {
+        } catch (err) {
+          console.log('[OpenFlow]', 'playFailed', performance.now(), err);
           // ignore autoplay promise errors
         }
       };

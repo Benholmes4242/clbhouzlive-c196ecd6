@@ -54,7 +54,11 @@ const VideoWithAutoplay: React.FC<{
   
   useEffect(() => {
     if (uid) {
-      getCloudflareStreamHLS(uid).then(setApiHlsUrl);
+      console.log('[OpenFlow]', 'playerInit', performance.now());
+      getCloudflareStreamHLS(uid).then((url) => {
+        console.log('[OpenFlow]', 'sourceAssigned', performance.now());
+        setApiHlsUrl(url);
+      });
       getCloudflareStreamPoster(uid).then(setApiPoster);
     }
   }, [uid]);

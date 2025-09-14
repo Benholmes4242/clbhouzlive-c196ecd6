@@ -121,6 +121,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick, isFeatured = false, i
   };
 
   const handleMediaClick = () => {
+    console.log('[OpenFlow]', 'cardClick', performance.now());
     // Only open media for image and video types, not CTA
     if (item.type === 'image' || item.type === 'video') {
       console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
