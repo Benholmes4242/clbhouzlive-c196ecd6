@@ -212,7 +212,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   }}
                   title={muted ? 'Unmute' : 'Mute'}
                 >
-                  {muted ? <VolumeX className="w-8 h-8" /> : <Volume2 className="w-8 h-8" />}
+                  {muted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                 </button>
                 {highlight.golf_course && (
                   <div className="club-badge">

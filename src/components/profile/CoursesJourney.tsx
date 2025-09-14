@@ -1053,7 +1053,7 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
                         <img
                           src={imageUrl}
                           alt={userCourse.golf_courses.name}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full h-full object-cover rounded-none"
                         />
 
                         {/* Course Info Overlay - removed course name and location */}
@@ -1261,7 +1261,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                        key={userCourse.id}
                        className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
                      >
-                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)}`}>
+                        <div className={`${index === 0 ? 'rated-card ' : ''}w-full aspect-[4/5] relative overflow-hidden rounded-none ${getCardShadow(index)}`}>
                               {/* Top Edge Gradient Accent for Top 3 */}
                               {isTopThree && (
                                 <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
@@ -1557,7 +1557,7 @@ const GreatBritainIrelandSection: React.FC<GreatBritainIrelandSectionProps> = ({
                     key={userCourse.id}
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
-                     <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
+                      <div className="w-full overflow-hidden rounded-none relative aspect-[4/5]">
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -1809,7 +1809,7 @@ const WorldwideSection: React.FC<WorldwideSectionProps> = ({
                   key={userCourse.id}
                   className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                 >
-                   <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
+                    <div className="w-full overflow-hidden rounded-none relative aspect-[4/5]">
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -2063,7 +2063,7 @@ const USASection: React.FC<USASectionProps> = ({
                     key={userCourse.id}
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
-                     <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
+                      <div className="w-full overflow-hidden rounded-none relative aspect-[4/5]">
                         <CourseCard 
                           course={{
                             ...userCourse.golf_courses,
@@ -2216,7 +2216,7 @@ const ContinentalEuropeSection: React.FC<ContinentalEuropeSectionProps> = ({
                     key={userCourse.id}
                     className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
                   >
-                     <div className="w-full overflow-hidden rounded-lg relative aspect-[4/5]">
+                     <div className="w-full overflow-hidden rounded-none relative aspect-[4/5]">
                          <CourseCard 
                            course={{
                              ...userCourse.golf_courses,
