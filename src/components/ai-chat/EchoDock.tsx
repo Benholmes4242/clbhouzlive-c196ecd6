@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
+import { PiWaveform } from 'react-icons/pi';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -121,13 +122,13 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
       >
         <span className="echoDoc-halo" aria-hidden />
         <span className="echoDoc-core">
-          <svg className="echoDoc-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-            <rect x="2" y="10" width="2" height="4" rx="1" />
-            <rect x="6" y="8" width="2" height="8" rx="1" />
-            <rect x="10" y="6" width="2" height="12" rx="1" />
-            <rect x="14" y="8" width="2" height="8" rx="1" />
-            <rect x="18" y="10" width="2" height="4" rx="1" />
-          </svg>
+          <PiWaveform 
+            size={22} 
+            className="text-white/90 transition-all duration-200 ease-in-out"
+            style={{
+              animation: 'echoWave 3s ease-in-out infinite'
+            }}
+          />
           <span className="echoDoc-text">Echo</span>
         </span>
       </button>
