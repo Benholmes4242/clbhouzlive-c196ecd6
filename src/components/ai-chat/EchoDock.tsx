@@ -117,7 +117,10 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
     if (showOnboarding) {
       setShowOnboarding(false);
     }
-    if (panelOpen) return;
+    if (panelOpen) {
+      setPanelOpen(false);
+      return;
+    }
     onClick();
   }
 
