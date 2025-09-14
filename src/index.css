@@ -1269,9 +1269,8 @@ html, body, #root, .app-shell { touch-action: auto; }
 
 .unmute-btn {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 10px;
+  right: 10px;
   z-index: 3;
   width: 36px;
   height: 36px;
