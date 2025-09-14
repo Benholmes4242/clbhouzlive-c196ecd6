@@ -17,7 +17,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [pressTimer, setPressTimer] = useState<number | null>(null);
-  const [dismissTimer, setDismissTimer] = useState<NodeJS.Timeout | null>(null);
+  const dismissTimerRef = useRef<NodeJS.Timeout | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
@@ -43,21 +43,27 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   useEffect(() => {
     if (panelOpen) {
       const timer = setTimeout(() => setPanelOpen(false), 2500);
-      setDismissTimer(timer);
-      return () => clearTimeout(timer);
+      dismissTimerRef.current = timer as unknown as NodeJS.Timeout;
+      return () => {
+        clearTimeout(timer);
+        dismissTimerRef.current = null;
+      };
     } else {
-      if (dismissTimer) {
-        clearTimeout(dismissTimer);
-        setDismissTimer(null);
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+        dismissTimerRef.current = null;
       }
     }
-  }, [panelOpen, dismissTimer]);
+  }, [panelOpen]);
 
   // Close panel on outside click or Escape
   useEffect(() => {
     function onDocPointerDown(e: PointerEvent) {
       if (!panelOpen || !btnRef.current) return;
-      if (!btnRef.current.contains(e.target as Node)) setPanelOpen(false);
+      const target = e.target as HTMLElement;
+      if (!btnRef.current.contains(target) && !target.closest('.echoDoc-panel')) {
+        setPanelOpen(false);
+      }
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setPanelOpen(false);
@@ -299,7 +305,8 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
               pointerEvents: 'auto'
             }}
             onClick={item.disabled ? undefined : () => onItemClick(item.tab)}
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.stopPropagation();
               try { (navigator as any).vibrate?.(5); } catch {}
             }}
             aria-disabled={item.disabled || undefined}
