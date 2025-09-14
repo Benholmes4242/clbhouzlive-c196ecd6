@@ -577,7 +577,7 @@
     display: flex;
     gap: 16px;
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.96);
+    background: linear-gradient(160deg, var(--echo-gradient-from), var(--echo-gradient-to));
     border-radius: 999px;
     backdrop-filter: blur(6px);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
@@ -602,8 +602,8 @@
     padding: 10px 14px;
     border-radius: 999px;
     border: 0;
-    background: #fff;
-    color: #0d0f12;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     cursor: pointer;
@@ -613,6 +613,7 @@
 
   .echoDoc-panelItem:hover {
     transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.25);
   }
 
   .echoDoc-panelItem:active {
@@ -628,9 +629,9 @@
   .echoDoc-panelIcon {
     width: 18px;
     height: 18px;
-    display: grid;
+    display: none; /* Hide bullet points */
     place-items: center;
-    color: #0d0f12;
+    color: #fff;
   }
 
   .echoDoc-panelText {
