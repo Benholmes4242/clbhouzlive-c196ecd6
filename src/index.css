@@ -469,8 +469,8 @@
     position: fixed;
     right: calc(env(safe-area-inset-right, 0px) + 16px);
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--nav-height,56px) + 16px);
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border: 0;
     background: transparent;
     border-radius: 50%;
@@ -493,18 +493,18 @@
     background: linear-gradient(160deg, var(--echo-gradient-from), var(--echo-gradient-to));
     box-shadow: 0 8px 24px rgba(0,0,0,.18);
     color: #fff;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.2px;
   }
 
   .echoDoc-icon {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     fill: currentColor;
   }
 
   .echoDoc-text {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1;
   }
 
