@@ -178,7 +178,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
   // Calculate arc positions - 90° for 3 items, positioned above dock
   const calculatePosition = (index: number, total: number) => {
     const arcAngle = total <= 3 ? 90 : 120; // degrees
-    const startAngle = total <= 3 ? 225 : 240; // start from upper left, going counter-clockwise
+    const startAngle = total <= 3 ? 180 : 200; // start from directly above, going left
     const angleStep = arcAngle / (total - 1);
     const angle = (startAngle + index * angleStep) * (Math.PI / 180);
     const radius = 80; // distance from dock center
@@ -186,10 +186,11 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
     
-    // Offset to position fan above dock (dock is 56px + padding)
+    // Offset to position fan above dock and shift left to fit viewport
     const dockOffset = 40; // dock radius + padding to clear it
+    const leftShift = 60; // additional shift left to keep in viewport
     
-    return { x: -x, y: y - dockOffset }; // negative x for left positioning, y offset for above dock
+    return { x: -x - leftShift, y: y - dockOffset }; // shift left and up from dock
   };
 
   return (
