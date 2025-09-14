@@ -16,6 +16,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [pressTimer, setPressTimer] = useState<number | null>(null);
+  const [dismissTimer, setDismissTimer] = useState<NodeJS.Timeout | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
@@ -36,6 +37,20 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
       return () => clearTimeout(timer);
     }
   }, [showOnboarding]);
+
+  // Auto-dismiss panel after 2.5s idle
+  useEffect(() => {
+    if (panelOpen) {
+      const timer = setTimeout(() => setPanelOpen(false), 2500);
+      setDismissTimer(timer);
+      return () => clearTimeout(timer);
+    } else {
+      if (dismissTimer) {
+        clearTimeout(dismissTimer);
+        setDismissTimer(null);
+      }
+    }
+  }, [panelOpen, dismissTimer]);
 
   // Close panel on outside click or Escape
   useEffect(() => {
@@ -61,6 +76,15 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
 
   function handlePointerDown() {
     const id = window.setTimeout(() => {
+      // Dock ripple animation
+      if (btnRef.current) {
+        btnRef.current.style.animation = 'echo-ripple 0.3s ease-out';
+        setTimeout(() => {
+          if (btnRef.current) {
+            btnRef.current.style.animation = '';
+          }
+        }, 300);
+      }
       setPanelOpen(true);
       try { (navigator as any).vibrate?.(10); } catch {}
     }, 600);
@@ -133,51 +157,70 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         </span>
       </button>
 
-      {panelOpen && (
-        <div 
-          className="echoDoc-panel" 
-          role="menu" 
-          aria-label="Echo quick actions"
-        >
-          <PanelItem
-            label="Chat"
-            onClick={() => { setPanelOpen(false); openAIChatOverlay('chat'); }}
-          />
-          <PanelItem
-            label="Swing Coach"
-            onClick={() => { setPanelOpen(false); openAIChatOverlay('swing'); }}
-          />
-          <PanelItem
-            label="Message"
-            disabled
-            onClick={() => {}}
-          />
-        </div>
-      )}
+      {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
     </>
   );
 
   return typeof window !== 'undefined' ? createPortal(dockContent, document.body) : null;
 };
 
-type PanelItemProps = {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
+type RadialFanProps = {
+  onItemClick: (tab: ChatTab) => void;
 };
 
-const PanelItem: React.FC<PanelItemProps> = ({ label, onClick, disabled }) => {
+const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
+  const items = [
+    { label: 'Chat', tab: 'chat' as ChatTab, disabled: false },
+    { label: 'Swing Coach', tab: 'swing' as ChatTab, disabled: false },
+    { label: 'Message', tab: 'message' as ChatTab, disabled: true },
+  ];
+
+  // Calculate arc positions - 90° for 3 items
+  const calculatePosition = (index: number, total: number) => {
+    const arcAngle = total <= 3 ? 90 : 120; // degrees
+    const startAngle = total <= 3 ? -45 : -60; // start angle
+    const angleStep = arcAngle / (total - 1);
+    const angle = (startAngle + index * angleStep) * (Math.PI / 180);
+    const radius = 80; // distance from dock center
+    
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    
+    return { x, y };
+  };
+
   return (
-    <button
-      role="menuitem"
-      className={`echoDoc-panelItem ${disabled ? 'is-disabled' : ''}`}
-      onClick={disabled ? undefined : onClick}
-      aria-disabled={disabled || undefined}
-      tabIndex={disabled ? -1 : 0}
+    <div 
+      className="echoDoc-panel" 
+      role="menu" 
+      aria-label="Echo quick actions"
     >
-      <span className="echoDoc-panelIcon" aria-hidden="true">•</span>
-      <span className="echoDoc-panelText">{label}</span>
-    </button>
+      {items.map((item, index) => {
+        const { x, y } = calculatePosition(index, items.length);
+        const delay = index * 20; // 20ms stagger
+        
+        return (
+          <button
+            key={item.tab}
+            role="menuitem"
+            className={`echoDoc-fanItem animate-in ${item.disabled ? 'is-disabled' : ''}`}
+            style={{
+              left: `${-x}px`,
+              top: `${-y}px`,
+              animationDelay: `${delay}ms`,
+            }}
+            onClick={item.disabled ? undefined : () => onItemClick(item.tab)}
+            onPointerDown={() => {
+              try { (navigator as any).vibrate?.(5); } catch {}
+            }}
+            aria-disabled={item.disabled || undefined}
+            tabIndex={item.disabled ? -1 : 0}
+          >
+            <span className="echoDoc-fanText">{item.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 };
 
