@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { useAdaptiveGlass } from '@/hooks/useAdaptiveGlass';
 
 interface EchoDockProps {
   onClick: () => void;
+  onSwingCoachClick?: () => void;
   shouldHide?: boolean;
 }
 
-const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
-  const { sentinelRef } = useAdaptiveGlass();
+type ChatTab = 'chat' | 'swing' | 'message';
+
+const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldHide = false }) => {
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [pressTimer, setPressTimer] = useState<number | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
@@ -33,37 +36,80 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
     }
   }, [showOnboarding]);
 
+  // Close panel on outside click or Escape
+  useEffect(() => {
+    function onDocPointerDown(e: PointerEvent) {
+      if (!panelOpen || !btnRef.current) return;
+      if (!btnRef.current.contains(e.target as Node)) setPanelOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setPanelOpen(false);
+    }
+    document.addEventListener('pointerdown', onDocPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDocPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [panelOpen]);
+
   // Don't show on clubhouse page or when modals are open
   if (location.pathname === '/clubhouse' || location.pathname === '/' || shouldHide) {
     return null;
   }
 
-  const handleClick = () => {
+  function handlePointerDown() {
+    const id = window.setTimeout(() => {
+      setPanelOpen(true);
+      try { (navigator as any).vibrate?.(10); } catch {}
+    }, 600);
+    setPressTimer(id);
+  }
+
+  function clearPressTimer() {
+    if (pressTimer) {
+      window.clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+  }
+
+  function handlePointerUp() {
+    clearPressTimer();
+  }
+
+  function handlePointerCancel() {
+    clearPressTimer();
+  }
+
+  function handleClick() {
     if (showOnboarding) {
       setShowOnboarding(false);
     }
+    if (panelOpen) return;
     onClick();
+  }
+
+  const openAIChatOverlay = (tab: ChatTab) => {
+    if (tab === 'swing' && onSwingCoachClick) {
+      onSwingCoachClick();
+    } else {
+      onClick();
+    }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') { 
-      e.preventDefault(); 
-      handleClick();
-    }
+  const styleVars: React.CSSProperties = {
+    bottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
+    right: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+    width: 64,
+    height: 64,
+    zIndex: 10000,
   };
 
   const dockContent = (
     <>
-      {/* Invisible sentinel for background sampling */}
-      <div
-        ref={sentinelRef}
-        className="fixed bottom-32 right-6 w-16 h-16 pointer-events-none z-[9998]"
-        style={{ opacity: 0 }}
-      />
-      
       {/* Onboarding Tooltip */}
       {showOnboarding && (
-        <div className="fixed bottom-40 right-20 z-[10001] animate-fade-in">
+        <div className="fixed bottom-32 right-20 z-[10001] animate-fade-in">
           <div className="bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-[280px] relative">
             <div className="font-medium text-sm mb-1">Meet Echo - your personal caddie</div>
             <div className="text-xs text-slate-300">Analyse swing or ask about swing tips, courses, golf news, or trips.</div>
@@ -72,50 +118,79 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, shouldHide = false }) => {
         </div>
       )}
 
-      {/* Echo Dock - Right-edge handle only */}
-      <div 
-        className="echo-dock--right"
-        style={{
-          position: 'fixed',
-          right: '0',
-          bottom: '30vh',
-          zIndex: 10000,
-          overflow: 'hidden',
-          pointerEvents: 'none'
-        }}
-        aria-live="polite"
+      <button
+        ref={btnRef}
+        aria-label="Open Echo assistant"
+        className={`echoDoc-btn ${panelOpen ? 'is-panel-open' : ''}`}
+        style={styleVars}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onClick={handleClick}
       >
-        {/* Handle (half-pill tab) */}
-        <button
-          ref={btnRef}
-          className="echo-handle echo-handle--label"
-          aria-label="Open Echo assistant"
-          onKeyDown={handleKeyDown}
-          onClick={handleClick}
+        <span className="echoDoc-halo" aria-hidden />
+        <span className="echoDoc-core">
+          <svg className="echoDoc-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <rect x="2" y="10" width="2" height="4" rx="1" />
+            <rect x="6" y="8" width="2" height="8" rx="1" />
+            <rect x="10" y="6" width="2" height="12" rx="1" />
+            <rect x="14" y="8" width="2" height="8" rx="1" />
+            <rect x="18" y="10" width="2" height="4" rx="1" />
+          </svg>
+          <span className="echoDoc-label">Echo</span>
+        </span>
+      </button>
+
+      {panelOpen && (
+        <div 
+          className="echoDoc-panel" 
+          role="menu" 
+          aria-label="Echo quick actions"
           style={{
-            pointerEvents: 'auto',
-            appearance: 'none',
-            border: '0',
-            width: '25px',
-            height: '120px',
-            background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
-            borderRadius: '9999px 0 0 9999px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            outline: 'none',
-            boxShadow: 'none'
+            right: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
           }}
         >
-          <span className="echo-label" aria-hidden="true">Echo</span>
-        </button>
-      </div>
+          <PanelItem
+            label="Chat"
+            onClick={() => { setPanelOpen(false); openAIChatOverlay('chat'); }}
+          />
+          <PanelItem
+            label="Swing Coach"
+            onClick={() => { setPanelOpen(false); openAIChatOverlay('swing'); }}
+          />
+          <PanelItem
+            label="Message"
+            disabled
+            onClick={() => {}}
+          />
+        </div>
+      )}
     </>
   );
 
-  // Mount to body via portal for proper fixed positioning
   return typeof window !== 'undefined' ? createPortal(dockContent, document.body) : null;
+};
+
+type PanelItemProps = {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
+
+const PanelItem: React.FC<PanelItemProps> = ({ label, onClick, disabled }) => {
+  return (
+    <button
+      role="menuitem"
+      className={`echoDoc-panelItem ${disabled ? 'is-disabled' : ''}`}
+      onClick={disabled ? undefined : onClick}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+    >
+      <span className="echoDoc-panelIcon" aria-hidden="true">•</span>
+      <span className="echoDoc-panelText">{label}</span>
+    </button>
+  );
 };
 
 export default EchoDock;
