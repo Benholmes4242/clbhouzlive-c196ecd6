@@ -182,7 +182,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     if (!fanRef.current) return;
 
     const PREFERRED_RADIUS = 90;
-    const GAP_ABOVE_DOCK = -30; // Move down more
+    const GAP_ABOVE_DOCK = -40; // Move down more
     const CHIP_SIZE = 72;
     const CHIP_RADIUS = CHIP_SIZE / 2;
     const PADDING = 12;

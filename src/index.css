@@ -728,7 +728,9 @@ html, body, #root, .app-shell { touch-action: auto; }
     font-weight: 400;
     letter-spacing: -0.025em;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    max-width: 60px;
+    line-height: 1.2;
   }
 
   /* Dock ripple animation */
