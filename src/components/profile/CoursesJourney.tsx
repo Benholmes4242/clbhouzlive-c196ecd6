@@ -1284,7 +1284,7 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                               />
                               
                               {/* Premium Rank Badge - Top Left */}
-                              <div className="absolute top-3 left-3 z-20">
+                              <div className="absolute top-3 left-3 z-30">
                                 <div className={`
                                   w-8 h-8 rounded-full flex items-center justify-center
                                   ${getRankBadgeGradient(index)}
