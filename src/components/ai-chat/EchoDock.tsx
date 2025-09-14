@@ -175,10 +175,10 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     { label: 'Message', tab: 'message' as ChatTab, disabled: true },
   ];
 
-  // Calculate arc positions - 90° for 3 items
+  // Calculate arc positions - 90° for 3 items, positioned above dock
   const calculatePosition = (index: number, total: number) => {
     const arcAngle = total <= 3 ? 90 : 120; // degrees
-    const startAngle = total <= 3 ? -45 : -60; // start angle
+    const startAngle = total <= 3 ? 225 : 240; // start from upper left, going counter-clockwise
     const angleStep = arcAngle / (total - 1);
     const angle = (startAngle + index * angleStep) * (Math.PI / 180);
     const radius = 80; // distance from dock center
@@ -186,7 +186,10 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
     
-    return { x, y };
+    // Offset to position fan above dock (dock is 56px + padding)
+    const dockOffset = 40; // dock radius + padding to clear it
+    
+    return { x: -x, y: y - dockOffset }; // negative x for left positioning, y offset for above dock
   };
 
   return (
@@ -205,8 +208,8 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
             role="menuitem"
             className={`echoDoc-fanItem animate-in ${item.disabled ? 'is-disabled' : ''}`}
             style={{
-              left: `${-x}px`,
-              top: `${-y}px`,
+              left: `${x}px`,
+              top: `${y}px`,
               animationDelay: `${delay}ms`,
             }}
             onClick={item.disabled ? undefined : () => onItemClick(item.tab)}
