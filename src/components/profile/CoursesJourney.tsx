@@ -1267,21 +1267,22 @@ const TopRatedSection: React.FC<TopRatedSectionProps> = ({
                                 <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
                               )}
                               
-                              <CourseCard 
-                               course={userCourse.golf_courses}
-                               viewingUserId={userId}
-                               viewContext="global"
-                               userRating={userCourse.rating}
-                               isReadOnly={!isOwnProfile}
-                               showUserRating={false}
-                               showAverageRating={false}
-                               isFromUserCoursesPage={true}
-                               customHeight="h-full"
-                               showCountryWithFlag={true}
-                               hideRankingBadges={true}
-                                mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
-                                mobileFlagSize={windowWidth < 768 ? 'md' : 'md'}
-                              />
+                               <CourseCard 
+                                course={userCourse.golf_courses}
+                                viewingUserId={userId}
+                                viewContext="global"
+                                userRating={userCourse.rating}
+                                isReadOnly={!isOwnProfile}
+                                showUserRating={false}
+                                showAverageRating={false}
+                                isFromUserCoursesPage={true}
+                                customHeight="h-full"
+                                showCountryWithFlag={true}
+                                hideRankingBadges={true}
+                                showRatingOnRight={false}
+                                 mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
+                                 mobileFlagSize={windowWidth < 768 ? 'md' : 'md'}
+                               />
                               
                               {/* Premium Rank Badge - Top Left */}
                               <div className="absolute top-3 left-3 z-30">
