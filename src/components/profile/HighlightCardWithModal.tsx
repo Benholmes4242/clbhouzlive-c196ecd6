@@ -80,7 +80,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   // Safety check for media
   if (!primaryMedia) {
     return (
-      <div className="flex-none w-80 bg-card rounded-xl overflow-hidden shadow-sm">
+      <div className="flex-none w-80 bg-card overflow-hidden shadow-sm">
         <div className="relative h-48 bg-muted flex items-center justify-center">
           <span className="text-muted-foreground">No media</span>
         </div>
@@ -105,8 +105,8 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="group/highlight bg-card rounded-xl overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
-      <div className="relative overflow-hidden rounded-2xl card-base card-highlights" onClick={handleVideoClick}>
+    <div ref={containerRef} className="group/highlight bg-card overflow-hidden shadow-sm cursor-pointer card-base card-highlights">
+      <div className="relative overflow-hidden card-base card-highlights" onClick={handleVideoClick}>
         {primaryMedia.media_type === 'image' ? (
           <img
             src={primaryMedia.media_url}

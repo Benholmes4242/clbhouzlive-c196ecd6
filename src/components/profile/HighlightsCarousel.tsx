@@ -62,9 +62,9 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
       <div className="flex items-center justify-between mb-2 pt-0">
         <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-0">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="w-80 h-60 bg-muted animate-pulse rounded-xl" />
+          <div key={i} className="w-80 h-60 bg-muted animate-pulse" />
         ))}
       </div>
     </div>
@@ -77,7 +77,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         <div className="flex items-center justify-between mb-2 pt-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
         </div>
-        <div className="bg-card border border-border rounded-xl p-8 text-center">
+        <div className="bg-card border border-border p-8 text-center">
           <div className="text-4xl mb-4">🏌️‍♂️</div>
           <h4 className="text-lg font-semibold mb-2">No Top-100 Highlights Yet</h4>
           <p className="text-muted-foreground">
@@ -123,7 +123,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
 
         <div 
           ref={combinedRefCallback}
-          className="flex overflow-x-auto gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex overflow-x-auto gap-0 sm:gap-0 md:gap-0 lg:gap-0 xl:gap-0 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0rem] sm:[--g:0rem] md:[--g:0rem] lg:[--g:0rem] xl:[--g:0rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
