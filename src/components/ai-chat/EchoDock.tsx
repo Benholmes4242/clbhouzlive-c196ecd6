@@ -182,8 +182,8 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     if (!fanRef.current) return;
 
     const PREFERRED_RADIUS = 90;
-    const GAP_ABOVE_DOCK = 8;
-    const CHIP_SIZE = 56;
+    const GAP_ABOVE_DOCK = -5; // Move down by making this negative
+    const CHIP_SIZE = 64; // Increased from 56
     const CHIP_RADIUS = CHIP_SIZE / 2;
     const PADDING = 12;
 
@@ -219,9 +219,9 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     // Use the smaller of preferred radius or max safe radius
     const radius = Math.max(dockRadius + GAP_ABOVE_DOCK + CHIP_RADIUS, Math.min(PREFERRED_RADIUS, maxRadius));
     
-    // Position items in arc from 200° (bottom-left) to 110° (top-left)
-    const startAngle = 200; // bottom-left
-    const endAngle = 110;   // top-left
+    // Position items in arc from 190° (left-down) to 100° (up-left)
+    const startAngle = 190; // left-down 
+    const endAngle = 100;   // up-left
     const steps = items.length - 1 || 1;
     
     const newPositions = items.map((_, index) => {
