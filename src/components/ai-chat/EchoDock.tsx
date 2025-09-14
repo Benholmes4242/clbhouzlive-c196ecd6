@@ -128,7 +128,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
             <rect x="14" y="8" width="2" height="8" rx="1" />
             <rect x="18" y="10" width="2" height="4" rx="1" />
           </svg>
-          <span className="echoDoc-label">Echo</span>
+          <span className="echoDoc-text">Echo</span>
         </span>
       </button>
 

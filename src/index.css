@@ -468,11 +468,7 @@
   .echoDoc-btn {
     position: fixed;
     right: calc(env(safe-area-inset-right, 0px) + 16px);
-    bottom: calc(
-      env(safe-area-inset-bottom, 0px)
-      + var(--nav-height, 56px)
-      + var(--echo-clearance, 10px)
-    );
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--nav-height,56px) + 16px);
     width: 64px;
     height: 64px;
     border: 0;
@@ -488,39 +484,38 @@
   .echoDoc-core {
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     border-radius: 50%;
     background: linear-gradient(160deg, var(--echo-gradient-from), var(--echo-gradient-to));
-    box-shadow: 0 8px 24px var(--echo-shadow);
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
     color: #fff;
     font-weight: 700;
     letter-spacing: 0.2px;
   }
 
   .echoDoc-icon {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     fill: currentColor;
-    margin-right: 6px;
   }
 
-  .echoDoc-label {
-    position: absolute;
-    bottom: 10px;
-    font-size: 12px;
+  .echoDoc-text {
+    font-size: 14px;
     line-height: 1;
   }
 
   .echoDoc-halo {
     position: absolute;
-    inset: -6px;
+    inset: 0;
     border-radius: 50%;
+    z-index: -1;
     box-shadow:
       0 0 0 var(--echo-halo-ring) var(--echo-halo),
       0 0 0 0 var(--echo-halo-strong);
     animation: echoPulse var(--echo-halo-interval) ease-in-out infinite;
-    z-index: -1;
   }
 
   .echoDoc-btn:is(:active, :focus-visible) .echoDoc-halo {
@@ -567,8 +562,8 @@
     right: calc(env(safe-area-inset-right, 0px) + 16px);
     bottom: calc(
       env(safe-area-inset-bottom, 0px)
-      + var(--nav-height, 56px)
-      + var(--echo-clearance, 10px)
+      + var(--nav-height,56px)
+      + 16px
       + 76px
     );
     display: flex;
