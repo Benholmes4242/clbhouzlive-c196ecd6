@@ -493,8 +493,9 @@
     background: linear-gradient(160deg, var(--echo-gradient-from), var(--echo-gradient-to));
     box-shadow: 0 8px 24px rgba(0,0,0,.18);
     color: #fff;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.2px;
+    transform: translateY(-3px);
   }
 
   .echoDoc-icon {
