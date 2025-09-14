@@ -495,7 +495,6 @@
     color: #fff;
     font-weight: 700;
     letter-spacing: 0.2px;
-    transform: translateY(-3px);
   }
 
   .echoDoc-icon {
@@ -507,7 +506,6 @@
   .echoDoc-text {
     font-size: 14px;
     line-height: 1;
-    font-weight: 400;
   }
 
   .echoDoc-halo {
