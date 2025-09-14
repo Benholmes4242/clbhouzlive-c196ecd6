@@ -1274,6 +1274,50 @@ html, body, #root, .app-shell { touch-action: auto; }
   z-index: 3;
   width: 36px;
   height: 36px;
+}
+
+/* Mobile-only full-bleed rails */
+@media (max-width: 768px) {
+  .fullbleed-rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    scrollbar-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw); /* stretch to true edge */
+  }
+  .fullbleed-rail::-webkit-scrollbar { 
+    display: none; 
+  }
+
+  .fullbleed-item {
+    flex: 0 0 100vw;          /* one card per screen */
+    scroll-snap-align: start;
+    position: relative;
+  }
+
+  .course-card {
+    width: 100vw;
+    height: clamp(240px, 56vw, 520px);  /* tune per design */
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  
+  .course-card__media {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover; 
+    display: block;
+  }
+
+  /* overlays stay above image/video */
+  .course-card [data-overlay] { 
+    position: absolute; 
+    z-index: 2; 
+  }
   border: 0;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.1);
