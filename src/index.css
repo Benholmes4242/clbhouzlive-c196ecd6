@@ -458,8 +458,8 @@
     --echo-shadow: rgba(29, 53, 87, 0.35);
     --echo-halo: rgba(42, 157, 143, 0.12);
     --echo-halo-strong: rgba(42, 157, 143, 0.18);
-    --echo-halo-ring: 6px;
-    --echo-halo-pulse: 3px;
+    --echo-halo-ring: 3px;
+    --echo-halo-pulse: 2px;
     --echo-halo-interval: 4s;
     --nav-height: 56px;
     --echo-clearance: 10px;
