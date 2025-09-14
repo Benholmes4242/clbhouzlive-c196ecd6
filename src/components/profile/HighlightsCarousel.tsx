@@ -1,9 +1,7 @@
-import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
-import { useTop100Highlights, Top100Highlight } from '@/hooks/useTop100Highlights';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useDragScroll } from '@/hooks/useDragScroll';
-import HighlightCardWithModal from './HighlightCardWithModal';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { useTop100Highlights } from '@/hooks/useTop100Highlights';
+import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
+import HighlightCard from './HighlightCard';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -12,139 +10,163 @@ interface HighlightsCarouselProps {
 
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
+  const railRef = useRef<HTMLDivElement>(null);
+  const { preloadHlsUrls } = useHlsUrlCache();
+  
+  // Session-wide mute persistence
+  const [muted, setMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('journeyMuted') ?? 'true') as boolean;
+    }
+    return true;
+  });
 
-  // Combined ref callback that handles both scroll container and drag functionality
-  const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
-    scrollContainerRef.current = node;
-    dragRefCallback(node);
-  }, [dragRefCallback]);
-
-  // Handle scroll to update arrow visibility
-  const handleScroll = useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    setShowLeftArrow(scrollLeft > 0);
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-  }, []);
-
+  // Persist mute state to localStorage
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+    localStorage.setItem('journeyMuted', JSON.stringify(muted));
+  }, [muted]);
 
-    // Initial check
-    handleScroll();
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [handleScroll, highlights]);
-
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+  // Warm HLS.js and preload initial URLs when component mounts
+  useEffect(() => {
+    warmHlsJs();
+    if (highlights && highlights.length > 0) {
+      prefetchAround(0);
     }
+  }, [highlights]);
+
+  const prefetchAround = useCallback((currentIndex: number) => {
+    if (!highlights) return;
+    
+    const uidsToPreload = [];
+    // Preload previous, current, and next
+    for (let i = Math.max(0, currentIndex - 1); i <= Math.min(highlights.length - 1, currentIndex + 1); i++) {
+      const media = highlights[i]?.post_media[0];
+      if (media?.media_type === 'video') {
+        // Extract uid from media_url for preloading
+        const uid = extractVideoUid(media.media_url);
+        if (uid) uidsToPreload.push(uid);
+      }
+    }
+    
+    if (uidsToPreload.length > 0) {
+      preloadHlsUrls(uidsToPreload);
+    }
+  }, [highlights, preloadHlsUrls]);
+
+  const extractVideoUid = (mediaUrl: string): string | null => {
+    // Extract Cloudflare Stream ID from various URL formats
+    const patterns = [
+      /\/([a-f0-9-]{36})\//, // Standard UUID format
+      /\/([a-z0-9-]{16,})\//, // Shorter ID format
+      /stream\/([^\/]+)/, // Stream path format
+    ];
+    
+    for (const pattern of patterns) {
+      const match = mediaUrl.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
   };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
-    }
-  };
+  // Intersection observer for autoplay/pause
+  useEffect(() => {
+    if (!railRef.current || !highlights) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(async (entry) => {
+        const element = entry.target as HTMLElement;
+        const video = element.querySelector('video') as HTMLVideoElement | null;
+        if (!video) return;
+
+        const index = Number(element.dataset.index);
+        
+        if (entry.isIntersecting && entry.intersectionRatio > 0.85) {
+          // Autoplay current video
+          try {
+            video.muted = muted;
+            video.playsInline = true;
+            await video.play();
+          } catch (e) {
+            // Silently handle autoplay failures
+          }
+          // Prefetch neighboring videos
+          prefetchAround(index);
+        } else {
+          // Pause when not in view
+          video.pause();
+        }
+      });
+    }, {
+      threshold: [0, 0.5, 0.85],
+      rootMargin: '0px'
+    });
+
+    // Observe all highlight items
+    const items = railRef.current.querySelectorAll('.highlights__item');
+    items.forEach(item => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, [muted, highlights, prefetchAround]);
 
   if (isLoading) {
-  return (
-    <div className={`${className}`}>
-      <div className="flex items-center justify-between mb-2 pt-0">
-        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
-      </div>
-      <div className="flex gap-0">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="w-80 h-60 bg-muted animate-pulse" />
-        ))}
-      </div>
-    </div>
-  );
+    return (
+      <section className={`highlights ${className}`}>
+        <div className="px-4 py-2">
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
+        </div>
+        <div className="highlights__rail">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="highlights__item">
+              <div className="highlights__card bg-muted animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
   }
 
   if (error || !highlights || highlights.length === 0) {
     return (
-      <div className={`${className}`}>
-        <div className="flex items-center justify-between mb-2 pt-0">
+      <section className={`highlights ${className}`}>
+        <div className="px-4 py-2">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
         </div>
-        <div className="bg-card border border-border p-8 text-center">
+        <div className="bg-card border border-border p-8 text-center mx-4">
           <div className="text-4xl mb-4">🏌️‍♂️</div>
           <h4 className="text-lg font-semibold mb-2">No Top-100 Highlights Yet</h4>
           <p className="text-muted-foreground">
             Share photos and videos from your rounds at Top-100 courses to see them featured here!
           </p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className={`${className}`}>
-        <div className="flex items-center justify-between mb-2 pt-0">
-          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
-          
-          {highlights.length > 1 && (
-            <div className="flex gap-2">
-              {showLeftArrow && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={scrollLeft}
-                  className="w-8 h-8 p-0 hover:bg-accent"
-                  aria-label="Scroll left"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-              )}
-              {showRightArrow && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={scrollRight}
-                  className="w-8 h-8 p-0 hover:bg-accent"
-                  aria-label="Scroll right"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div 
-          ref={combinedRefCallback}
-          className="flex overflow-x-auto gap-0 sm:gap-0 md:gap-0 lg:gap-0 xl:gap-0 [--cards:1.3] md:[--cards:3.5] lg:[--cards:3.5] xl:[--cards:3.5] [--g:0rem] sm:[--g:0rem] md:[--g:0rem] lg:[--g:0rem] xl:[--g:0rem] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            cursor: 'default'
-          }}
-        >
-           {highlights.map((highlight, index) => (
-            <div 
-              key={highlight.id} 
-              className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))]"
-            >
-              <HighlightCardWithModal 
-                highlight={highlight}
-                isLandscape={true}
-                cardIndex={index}
-                scrollContainerRef={scrollContainerRef}
-              />
-            </div>
-          ))}
-        </div>
+    <section className={`highlights ${className}`}>
+      <div className="px-4 py-2">
+        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">Highlights From My Journey</h3>
       </div>
+      
+      <div 
+        className="highlights__rail"
+        ref={railRef}
+      >
+        {highlights.map((highlight, index) => (
+          <article 
+            key={highlight.id} 
+            className="highlights__item"
+            data-index={index}
+          >
+            <HighlightCard 
+              highlight={highlight}
+              muted={muted}
+              setMuted={setMuted}
+            />
+          </article>
+        ))}
+      </div>
+    </section>
   );
 };
 
