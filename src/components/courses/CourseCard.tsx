@@ -107,6 +107,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <CourseCardBackground 
           thumbnailImage={course.thumbnail_image}
           courseName={course.name}
+          disableLazyLoading={isFromUserCoursesPage}
         />
 
         {/* Enhanced bottom gradient for better text readability when badges are on top */}
