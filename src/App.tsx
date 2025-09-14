@@ -21,6 +21,7 @@ import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
+import { longPressHandler } from '@/utils/longPressHandler';
 
 
 // Direct import for ProfilePage to avoid dynamic import issues
@@ -91,6 +92,12 @@ const App: React.FC = () => {
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {
     initRecentMediaListener();
+  }, []);
+  
+  // Initialize long press handler
+  useEffect(() => {
+    longPressHandler.init();
+    return () => longPressHandler.cleanup();
   }, []);
   
   return (

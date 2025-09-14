@@ -260,6 +260,13 @@
 @layer base {
   * {
     @apply border-border;
+    /* Disable text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Disable callout menu on iOS Safari */
+    -webkit-touch-callout: none;
   }
   html, body {
     @apply text-foreground;
@@ -628,6 +635,45 @@
 
   .echoDoc-panelText {
     font-size: 14px;
+  }
+
+  /* Echo Long-Press Menu Styles */
+  .echo-menu {
+    background-color: #6e9277; /* same as Echo Dock */
+    color: #fff;
+    border-radius: 30px;
+    padding: 10px 16px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    position: fixed;
+    z-index: 1200;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .echo-menu.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  .echo-menu button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .echo-menu button:hover {
+    background: rgba(255,255,255,0.15);
   }
 
   .container { @apply max-w-6xl; }
