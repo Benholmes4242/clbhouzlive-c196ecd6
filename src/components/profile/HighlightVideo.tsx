@@ -41,6 +41,7 @@ const HighlightVideo = memo(function HighlightVideo({
     
     const video = videoRef.current;
     video.preload = 'auto';
+    video.loop = false; // Ensure no loop
     
     // Pre-attach source once we're near visible
     const setupVideo = async () => {
@@ -58,11 +59,19 @@ const HighlightVideo = memo(function HighlightVideo({
 
     // Auto-advance when video ends (mobile behavior controlled by parent)
     const handleEnded = () => onEnded();
+    const handleTimeUpdate = () => {
+      if (!isFinite(video.duration) || video.duration <= 0) return;
+      const pct = video.currentTime / video.duration;
+      if (pct >= 0.98) onEnded(); // Robust fallback when 'ended' won't fire
+    };
+    
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('timeupdate', handleTimeUpdate);
     
     return () => { 
       cancelled = true; 
-      video.removeEventListener('ended', handleEnded); 
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
     };
   }, [videoId, onEnded]);
 
@@ -94,7 +103,6 @@ const HighlightVideo = memo(function HighlightVideo({
           poster={posterUrl || undefined}
           muted
           playsInline
-          loop
           preload="auto"
         />
       )}

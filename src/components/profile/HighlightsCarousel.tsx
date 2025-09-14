@@ -61,6 +61,14 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     rail.scrollTo({ left: x, behavior: 'smooth' });
   }, [highlights]);
 
+  // Mobile-only auto-advance
+  const tryAutoAdvance = useCallback((index: number) => {
+    if (!isMobile) return; // Desktop unchanged
+    const next = index + 1;
+    if (next >= highlights.length) return; // Last item: stop
+    scrollToIndex(next);
+  }, [isMobile, highlights?.length, scrollToIndex]);
+
   const extractVideoUid = (mediaUrl: string): string | null => {
     // Extract Cloudflare Stream ID from various URL formats
     const patterns = [
@@ -119,7 +127,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     rail.querySelectorAll('.highlights__item').forEach(item => observer.observe(item));
 
     return () => observer.disconnect();
-  }, [highlights, prefetchAround]); // Removed muted dependency
+  }, [highlights?.length, prefetchAround]); // Removed muted dependency
 
   if (isLoading) {
     return (
@@ -182,36 +190,35 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
               }}
             >
               {/* Video part is memoized and isolated from mute changes */}
-              <HighlightVideo
-                highlight={highlight}
-                index={index}
-                onEnded={() => {
-                  if (!isMobile) return; // desktop unchanged
-                  const next = index + 1;
-                  if (next < highlights.length) scrollToIndex(next);
-                }}
-              />
-              {/* Overlays re-render freely (icon/labels), no impact on video */}
-              <HighlightOverlays
-                highlight={highlight}
-                muted={muted}
-                onToggleMute={() => setMuted(currentMuted => {
-                  const next = !currentMuted;
-                  localStorage.setItem('journeyMuted', JSON.stringify(next));
-                  
-                  // Also flip the current in-view video's muted property immediately
-                  const rail = railRef.current;
-                  rail?.querySelectorAll('video').forEach(v => {
-                    const video = v as HTMLVideoElement;
-                    const parent = video.closest('.highlights__item');
-                    if (parent && isElementMostlyInView(parent)) {
-                      video.muted = next;
-                    }
-                  });
-                  
-                  return next;
-                })}
-              />
+              <div className="highlights__card">
+                <HighlightVideo
+                  highlight={highlight}
+                  index={index}
+                  onEnded={() => tryAutoAdvance(index)}
+                />
+                <button
+                  className="unmute-btn"
+                  aria-label={muted ? 'Unmute' : 'Mute'}
+                  onClick={() => {
+                    const next = !muted;
+                    setMuted(next);
+                    localStorage.setItem('journeyMuted', JSON.stringify(next));
+                    // Immediately flip mute on the most visible video element
+                    const visible = railRef.current?.querySelectorAll('video') ?? [];
+                    visible.forEach(v => {
+                      if (isElementMostlyInView(v)) (v as HTMLVideoElement).muted = next;
+                    });
+                  }}
+                  title={muted ? 'Unmute' : 'Mute'}
+                >
+                  {muted ? '🔇' : '🔊'}
+                </button>
+                {highlight.golf_course && (
+                  <div className="club-badge">
+                    {highlight.golf_course.name}
+                  </div>
+                )}
+              </div>
             </article>
           );
         })}
