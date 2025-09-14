@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
@@ -169,37 +169,117 @@ type RadialFanProps = {
 };
 
 const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
+  const [positions, setPositions] = useState<Array<{x: number, y: number}>>([]);
+  const fanRef = useRef<HTMLDivElement>(null);
+  
   const items = [
     { label: 'Chat', tab: 'chat' as ChatTab, disabled: false },
     { label: 'Swing Coach', tab: 'swing' as ChatTab, disabled: false },
     { label: 'Message', tab: 'message' as ChatTab, disabled: true },
   ];
 
-  // Calculate arc positions - 90° for 3 items, positioned above dock
-  const calculatePosition = (index: number, total: number) => {
-    const arcAngle = total <= 3 ? 90 : 120; // degrees
-    const startAngle = total <= 3 ? 225 : 240; // start from upper left, going counter-clockwise
-    const angleStep = arcAngle / (total - 1);
-    const angle = (startAngle + index * angleStep) * (Math.PI / 180);
-    const radius = 80; // distance from dock center
+  const calculateSafePositions = useCallback(() => {
+    if (!fanRef.current) return;
+
+    const PREFERRED_RADIUS = 140;
+    const GAP_ABOVE_DOCK = 12;
+    const CHIP_SIZE = 56;
+    const CHIP_RADIUS = CHIP_SIZE / 2;
+    const PADDING = 12;
+
+    // Get viewport dimensions
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const visualViewport = (window as any).visualViewport;
+    const viewportHeight = visualViewport?.height || vh;
+    const viewportTop = visualViewport?.offsetTop || 0;
+
+    // Get safe area insets
+    const computedStyle = getComputedStyle(document.documentElement);
+    const safeTop = parseFloat(computedStyle.getPropertyValue('--safe-area-inset-top') || '0');
     
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
+    // Find dock element to get its position
+    const dockElement = document.querySelector('.echoDoc-btn') as HTMLElement;
+    if (!dockElement) return;
     
-    // Offset to position fan above dock (dock is 56px + padding)
-    const dockOffset = 40; // dock radius + padding to clear it
+    const dockRect = dockElement.getBoundingClientRect();
+    const dockRadius = Math.max(dockRect.width, dockRect.height) / 2;
     
-    return { x: -x, y: y - dockOffset }; // negative x for left positioning, y offset for above dock
-  };
+    // Fan origin: directly above dock center
+    const originX = dockRect.left + dockRect.width / 2;
+    const originY = dockRect.top - (dockRadius + GAP_ABOVE_DOCK);
+    
+    // Calculate max radius to keep all items within viewport bounds
+    const minLeft = PADDING + CHIP_RADIUS;
+    const minTop = viewportTop + safeTop + PADDING + CHIP_RADIUS;
+    const maxRadiusFromLeft = originX - minLeft;
+    const maxRadiusFromTop = originY - minTop;
+    const maxRadius = Math.min(maxRadiusFromLeft, maxRadiusFromTop);
+    
+    // Use the smaller of preferred radius or max safe radius
+    const radius = Math.max(dockRadius + GAP_ABOVE_DOCK + CHIP_RADIUS, Math.min(PREFERRED_RADIUS, maxRadius));
+    
+    // Position items in arc from 180° (left) to 90° (up)
+    const startAngle = 180; // left
+    const endAngle = 90;    // up
+    const steps = items.length - 1 || 1;
+    
+    const newPositions = items.map((_, index) => {
+      const t = steps ? (index / steps) : 0.5;
+      const angleDeg = startAngle + (endAngle - startAngle) * t;
+      const angleRad = (angleDeg * Math.PI) / 180;
+      
+      const x = originX + radius * Math.cos(angleRad) - CHIP_RADIUS;
+      const y = originY - radius * Math.sin(angleRad) - CHIP_RADIUS;
+      
+      return { x, y };
+    });
+    
+    setPositions(newPositions);
+  }, [items.length]);
+
+  // Calculate positions on mount and viewport changes
+  useEffect(() => {
+    calculateSafePositions();
+    
+    const resizeObserver = new ResizeObserver(calculateSafePositions);
+    resizeObserver.observe(document.body);
+    
+    const visualViewport = (window as any).visualViewport;
+    if (visualViewport) {
+      visualViewport.addEventListener('resize', calculateSafePositions);
+      visualViewport.addEventListener('scroll', calculateSafePositions);
+    }
+    
+    window.addEventListener('resize', calculateSafePositions);
+    window.addEventListener('orientationchange', calculateSafePositions);
+    
+    return () => {
+      resizeObserver.disconnect();
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', calculateSafePositions);
+        visualViewport.removeEventListener('scroll', calculateSafePositions);
+      }
+      window.removeEventListener('resize', calculateSafePositions);
+      window.removeEventListener('orientationchange', calculateSafePositions);
+    };
+  }, [calculateSafePositions]);
 
   return (
     <div 
+      ref={fanRef}
       className="echoDoc-panel" 
       role="menu" 
       aria-label="Echo quick actions"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 9999
+      }}
     >
       {items.map((item, index) => {
-        const { x, y } = calculatePosition(index, items.length);
+        const position = positions[index] || { x: 0, y: 0 };
         const delay = index * 20; // 20ms stagger
         
         return (
@@ -208,9 +288,11 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
             role="menuitem"
             className={`echoDoc-fanItem animate-in ${item.disabled ? 'is-disabled' : ''}`}
             style={{
-              left: `${x}px`,
-              top: `${y}px`,
+              position: 'absolute',
+              left: `${position.x}px`,
+              top: `${position.y}px`,
               animationDelay: `${delay}ms`,
+              pointerEvents: 'auto'
             }}
             onClick={item.disabled ? undefined : () => onItemClick(item.tab)}
             onPointerDown={() => {
