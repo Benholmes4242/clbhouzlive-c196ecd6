@@ -181,8 +181,8 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
   const calculateSafePositions = useCallback(() => {
     if (!fanRef.current) return;
 
-    const PREFERRED_RADIUS = 140;
-    const GAP_ABOVE_DOCK = 12;
+    const PREFERRED_RADIUS = 90;
+    const GAP_ABOVE_DOCK = 8;
     const CHIP_SIZE = 56;
     const CHIP_RADIUS = CHIP_SIZE / 2;
     const PADDING = 12;
