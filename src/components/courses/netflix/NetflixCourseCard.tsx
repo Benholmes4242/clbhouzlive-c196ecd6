@@ -99,7 +99,7 @@ const NetflixCourseCard: React.FC<NetflixCourseCardProps> = ({
         className={`relative group cursor-pointer hover:scale-[1.005] transition-all duration-500 ease-out ${className}`}
         onClick={onClick}
       >
-        <div className="relative w-full aspect-[16/9] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden bg-muted shadow-2xl shadow-black/40">
+        <div className="relative w-full aspect-[16/9] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-none overflow-hidden bg-muted shadow-2xl shadow-black/40">
           {/* Course image */}
           {course.thumbnail_image ? (
             <img

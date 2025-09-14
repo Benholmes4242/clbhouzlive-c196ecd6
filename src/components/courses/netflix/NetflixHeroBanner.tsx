@@ -104,7 +104,7 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-40 md:h-48 lg:h-56 rounded-2xl overflow-hidden cursor-pointer group ${className}`}
+      className={`relative w-full h-40 md:h-48 lg:h-56 rounded-none overflow-hidden cursor-pointer group ${className}`}
       onClick={() => onClick?.(course)}
     >
       {/* Background Image */}
@@ -142,7 +142,7 @@ const NetflixHeroBanner: React.FC<NetflixHeroBannerProps> = ({
       </div>
       
       {/* Subtle border glow on hover */}
-      <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-white/20 transition-all duration-300" />
+      <div className="absolute inset-0 rounded-none ring-1 ring-white/10 group-hover:ring-white/20 transition-all duration-300" />
     </div>
   );
 };
