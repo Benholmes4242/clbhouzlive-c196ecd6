@@ -9,7 +9,6 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FullBleedRail } from "@/components/ui/FullBleedRail";
 import {
   DndContext,
   DragEndEvent,
@@ -264,154 +263,51 @@ export default function TopTenCoursesRatedByYou({
 
 
         <div className="relative mt-2">
-          {/* Mobile: Full-bleed carousel */}
-          {isMobile ? (
-            <FullBleedRail
-              items={topTen}
-              renderCard={(course, index) => (
-                <div className="course-card">
-                  {course ? (
-                    <>
-                      <img 
-                        className="course-card__media" 
-                        src={(course as any)?.image_url || (course as any)?.golf_courses?.image_url} 
-                        alt={(course as any)?.name || (course as any)?.golf_courses?.name} 
-                      />
-                      <div data-overlay className="absolute top-3 left-3">
-                        <div className={`
-                          w-10 h-10 rounded-full flex items-center justify-center
-                          ${index < 3 
-                            ? index === 0 
-                              ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-lg shadow-black/25 ring-1 ring-white/20'
-                              : index === 1 
-                                ? 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 shadow-lg shadow-black/25 ring-1 ring-white/20'
-                                : 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 shadow-lg shadow-black/25 ring-1 ring-white/20'
-                            : 'bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30 shadow-md'
-                          }
-                        `}>
-                          <span className={`
-                            ${index < 3 ? 'text-white' : 'text-black'} font-bold text-lg leading-none
-                            ${index < 3 ? 'drop-shadow-sm' : ''}
-                          `}>
-                            {index + 1}
-                          </span>
-                        </div>
-                      </div>
-                      <div data-overlay className="absolute bottom-4 left-4 text-white">
-                        <h3 className="text-xl font-bold mb-1 drop-shadow-lg">
-                          {(course as any)?.name || (course as any)?.golf_courses?.name}
-                        </h3>
-                        <p className="text-sm opacity-90 drop-shadow-md">
-                          {(course as any)?.country || (course as any)?.golf_courses?.country}
-                        </p>
-                      </div>
-                      {canEdit && (
-                        <div data-overlay className="absolute top-3 right-3">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleRemoveCourse(course, index);
-                            }}
-                            className="h-8 w-8 p-0 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full"
-                          >
-                            <X className="h-4 w-4 text-white" />
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="course-card bg-card border border-border flex flex-col items-center justify-center">
-                      <div data-overlay className="absolute top-3 left-3">
-                        <div className={`
-                          w-10 h-10 rounded-full flex items-center justify-center
-                          ${index < 3 
-                            ? index === 0 
-                              ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-lg shadow-black/25'
-                              : index === 1 
-                                ? 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 shadow-lg shadow-black/25'
-                                : 'bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 shadow-lg shadow-black/25'
-                            : 'bg-white border border-gray-200 shadow-md'
-                          }
-                        `}>
-                          <span className={`
-                            ${index < 3 ? 'text-white' : 'text-black'} font-bold text-lg leading-none
-                          `}>
-                            {index + 1}
-                          </span>
-                        </div>
-                      </div>
-                      {canEdit ? (
-                        <div className="text-center px-8">
-                          <p className="text-lg font-medium text-muted-foreground mb-2">
-                            Tap to add course
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Search for a golf course to add to your top 10
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-center px-8">
-                          <p className="text-lg font-medium text-muted-foreground">
-                            No course selected
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              getKey={(_, index) => `slot-${index}`}
-            />
-          ) : (
-            /* Desktop: Original drag & drop grid */
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-            >
-              <SortableContext items={items} strategy={rectSortingStrategy}>
-                <div 
-                  ref={combinedRefCallback}
-                  {...swipeHandlers}
-                  data-testid="top-ten-carousel"
-                  className="
-                    flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                    [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                    [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
-                    touch-pan-x
-                  "
-                >
-                  {topTen.map((course, index) => (
-                    <TopTenSlot 
-                      key={`slot-${index}`}
-                      id={`slot-${index}`}
-                      index={index} 
-                      course={course} 
-                      userId={userId}
-                      isOwnProfile={canEdit}
-                      onOpenModal={onOpenModal}
-                      onAddCourse={(selectedCourse, slotIndex) => {
-                        addCourseAtIndex(selectedCourse, slotIndex);
-                      }}
-                      onRemoveCourse={handleRemoveCourse}
-                      existingCourses={topTen}
-                      activeIndex={activeIndex}
-                    />
-                  ))}
-                </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+          >
+            <SortableContext items={items} strategy={rectSortingStrategy}>
+              {/* Match exact row styling from Top 10 Rated by You section */}
+              <div 
+                ref={combinedRefCallback}
+                {...swipeHandlers}
+                data-testid="top-ten-carousel"
+                className="
+                  flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
+                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                  touch-pan-x
+                "
+              >
+                {topTen.map((course, index) => (
+                  <TopTenSlot 
+                    key={`slot-${index}`}
+                    id={`slot-${index}`}
+                    index={index} 
+                    course={course} 
+                    userId={userId}
+                    isOwnProfile={canEdit} // Use canEdit instead of isOwnProfile for more accurate control
+                    onOpenModal={onOpenModal}
+                    onAddCourse={(selectedCourse, slotIndex) => {
+                      addCourseAtIndex(selectedCourse, slotIndex);
+                    }}
+                    onRemoveCourse={handleRemoveCourse}
+                    existingCourses={topTen}
+                    activeIndex={activeIndex}
+                  />
+                ))}
+              </div>
             </SortableContext>
-            
+
             <DragOverlay>
               {activeIndex != null && topTen[activeIndex] ? (
                 <GhostCard course={topTen[activeIndex]!} index={activeIndex} userId={userId} />
               ) : null}
             </DragOverlay>
           </DndContext>
-        )}
         </div>
 
         {/* Additional empty state message for non-owners */}
