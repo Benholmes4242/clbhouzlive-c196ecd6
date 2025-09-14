@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lock, AlertTriangle } from "lucide-react";
+import { PiWaveform } from 'react-icons/pi';
 import { useToast } from "@/hooks/use-toast";
 
 interface EchoProtectionProps {
@@ -69,7 +70,13 @@ const EchoProtection: React.FC<EchoProtectionProps> = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-amber-500" />
+            <PiWaveform 
+              size={20} 
+              className="text-amber-500 transition-all duration-200 ease-in-out"
+              style={{
+                animation: 'echoWave 3s ease-in-out infinite'
+              }}
+            />
             Echo AI Protection
           </DialogTitle>
           <DialogDescription>
