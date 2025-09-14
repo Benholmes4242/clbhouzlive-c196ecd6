@@ -103,7 +103,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     return (
       <>
          <div
-           className="relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-32"
+           className="relative overflow-hidden transition-all duration-300 cursor-pointer h-32"
            style={{
              backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`,
              backgroundSize: 'cover',
@@ -195,7 +195,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   return (
     <>
       <div
-        className={`relative rounded-lg border overflow-hidden transition-all duration-300 ${
+        className={`relative border overflow-hidden transition-all duration-300 ${
           isPlayed 
             ? 'bg-green-50 border-green-200 shadow-md transform scale-[1.02]' 
             : 'bg-card hover:shadow-lg'
@@ -203,7 +203,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         onClick={handleCardClick}
       >
         {/* Course Image */}
-        <div className="relative h-32 overflow-hidden rounded-t-lg">
+        <div className="relative h-32 overflow-hidden">
           <img
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
             alt={course.name}

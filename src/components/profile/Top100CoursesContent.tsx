@@ -79,7 +79,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   return (
     <ScrollArea className="h-[60vh] pr-4">
       {/* Dynamic layout based on view type */}
-      <div className={viewType === 'list' ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
+      <div className={viewType === 'list' ? "space-y-0" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0"}>
         {filteredAndSortedCourses.map((course) => {
           const isPlayed = playedCourses.has(course.id);
           const userRating = getUserRating(course.id);
