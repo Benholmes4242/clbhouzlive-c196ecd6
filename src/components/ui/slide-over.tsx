@@ -158,7 +158,7 @@ export function SlideOver({
               fixed bg-background z-10
               ${isMobile 
                 ? `w-full right-0 top-0 bottom-0 shadow-lg ${heightClass}` 
-                : `inset-y-0 ${width} right-0 rounded-l-2xl shadow-2xl ${heightClass}`
+                : `inset-y-0 ${width} right-0 shadow-2xl ${heightClass}`
               }
             `}
             style={isMobile ? { height: '100dvh' } : undefined}
