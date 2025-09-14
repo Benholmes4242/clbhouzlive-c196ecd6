@@ -4,11 +4,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useModalDetector } from '@/hooks/useModalDetector';
 import EchoDock from './EchoDock';
 import AIChatOverlay from './AIChatOverlay';
+import { openAIOverlay, subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayController';
 
 const AIChat: React.FC = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [activeTab, setActiveTab] = useState<AITab>('chat');
   const { user, loading } = useSupabaseSession();
   const { hasModalOpen } = useModalDetector();
   const location = useLocation();
@@ -33,6 +35,16 @@ const AIChat: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Listen to controller for overlay state changes
+  useEffect(() => {
+    return subscribeAIOverlay((shouldOpen, tab) => {
+      setIsOverlayOpen(shouldOpen);
+      if (shouldOpen && tab) {
+        setActiveTab(tab);
+      }
+    });
+  }, []);
+
   // Echo should never render on auth pages, when user is not authenticated, when modals are open, or in immersive modal
   const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen && !isImmersiveModalOpen && !isProfileModalOpen;
 
@@ -55,13 +67,15 @@ const AIChat: React.FC = () => {
   return (
     <>
       <EchoDock 
-        onClick={() => setIsOverlayOpen(true)} 
+        onClick={() => openAIOverlay('chat')} 
+        onSwingCoachClick={() => openAIOverlay('swing')}
         shouldHide={isOverlayOpen || isHistoryOpen}
       />
       <AIChatOverlay 
         isOpen={isOverlayOpen} 
         onClose={() => setIsOverlayOpen(false)}
         onHistoryStateChange={setIsHistoryOpen}
+        initialTab={activeTab}
       />
     </>
   );

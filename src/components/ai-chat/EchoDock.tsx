@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
+import { openAIOverlay } from '@/controllers/aiOverlayController';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -115,9 +116,12 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   }
 
   const openAIChatOverlay = (tab: ChatTab) => {
-    if (tab === 'swing' && onSwingCoachClick) {
-      onSwingCoachClick();
+    if (tab === 'swing') {
+      openAIOverlay('swing');
+    } else if (tab === 'chat') {
+      openAIOverlay('chat');
     } else {
+      // Default fallback - use onClick for other tabs
       onClick();
     }
   };

@@ -20,6 +20,7 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { AnimatePresence, motion } from 'framer-motion';
+import { subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayController';
 
 interface ChatMessageData {
   id: string;
@@ -33,6 +34,7 @@ interface AIChatOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   onHistoryStateChange?: (isHistoryOpen: boolean) => void;
+  initialTab?: AITab;
 }
 
 const suggestedPrompts = [
@@ -43,7 +45,7 @@ const suggestedPrompts = [
   { text: "Plan me a 5 course USA golf trip", emoji: "🚩" }
 ];
 
-const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange }) => {
+const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange, initialTab }) => {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -189,23 +191,24 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     }
   }, [showHistory, onHistoryStateChange]);
 
+  // Listen to controller for tab changes
+  useEffect(() => {
+    return subscribeAIOverlay((shouldOpen, tab) => {
+      if (shouldOpen && tab) {
+        setActiveTab(tab);
+      }
+    });
+  }, []);
+
   // Ensure fresh start when modal opens
   useEffect(() => {
     if (isOpen) {
       setMessages([]);
       setInputValue('');
-      setActiveTab('chat');
+      // Set initial tab from props or default to chat
+      setActiveTab(initialTab || 'chat');
     }
-  }, [isOpen]);
-
-  // Reset state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setMessages([]);
-      setInputValue('');
-      setActiveTab('chat');
-    }
-  }, [isOpen]);
+  }, [isOpen, initialTab]);
 
   const requestLocation = () => {
     if (navigator.geolocation) {
@@ -503,7 +506,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 Chat
               </TabsTrigger>
               <TabsTrigger
-                value="swing-coach"
+                value="swing"
                 className="
                   flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
                   text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
@@ -580,7 +583,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
 
 
-            <TabsContent value="swing-coach" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
+            <TabsContent value="swing" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
               <div className="w-full px-6 py-3">
                 <SwingCoach 
                   onClose={() => setActiveTab('chat')}
