@@ -415,7 +415,7 @@ const TopTenSlot: React.FC<{
         style={style}
         className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
       >
-        <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)} bg-card border border-border`}>
+        <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-none ${getCardShadow(index)} bg-card border border-border`}>
           {/* Top Edge Gradient Accent for Top 3 placeholders */}
           {isTopThree && (
             <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
@@ -476,7 +476,7 @@ const TopTenSlot: React.FC<{
         isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
       }`}
     >
-      <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-lg ${getCardShadow(index)} ${
+      <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-none ${getCardShadow(index)} ${
         isDragging ? 'scale-[1.02] shadow-lg' : ''
       }`}>
         {/* Top Edge Gradient Accent for Top 3 */}
@@ -575,7 +575,7 @@ const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ 
   };
 
   return (
-    <div className="w-64 aspect-[4/5] relative overflow-hidden rounded-lg shadow-xl bg-card border border-border opacity-90">
+    <div className="w-64 aspect-[4/5] relative overflow-hidden rounded-none shadow-xl bg-card border border-border opacity-90">
       {/* Top Edge Gradient Accent for Top 3 */}
       {isTopThree && (
         <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
