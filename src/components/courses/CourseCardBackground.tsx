@@ -3,11 +3,13 @@ import React from 'react';
 interface CourseCardBackgroundProps {
   thumbnailImage?: string;
   courseName: string;
+  disableLazyLoading?: boolean;
 }
 
 const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({ 
   thumbnailImage, 
-  courseName 
+  courseName,
+  disableLazyLoading = false
 }) => {
   return (
     <div className="absolute inset-0">
@@ -17,7 +19,7 @@ const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({
           : `https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop`}
         alt={`Background image for ${courseName}`}
         className="absolute inset-0 w-full h-full object-cover"
-        loading="lazy"
+        loading={disableLazyLoading ? "eager" : "lazy"}
         decoding="async"
       />
       {/* Gradient overlay for better text readability */}
