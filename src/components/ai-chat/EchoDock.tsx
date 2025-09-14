@@ -174,7 +174,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
   
   const items = [
     { label: 'Chat', tab: 'chat' as ChatTab, disabled: false },
-    { label: 'Swing Coach', tab: 'swing' as ChatTab, disabled: false },
+    { label: 'Swing\nCoach', tab: 'swing' as ChatTab, disabled: false },
     { label: 'Message', tab: 'message' as ChatTab, disabled: false },
   ];
 
