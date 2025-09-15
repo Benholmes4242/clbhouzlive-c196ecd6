@@ -834,12 +834,12 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                       key={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`}
                       className="
                         shrink-0
-                        basis-[calc(100vw/2.4)]
+                        basis-[calc(100vw/2.6)]
                         md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))]
                         snap-start
                       "
                     >
-                      <div className="relative w-[calc(100vw/2.4)] md:w-full aspect-[4/5] overflow-hidden">
+                      <div className="relative w-[calc(100vw/2.6)] md:w-full aspect-[4/5] overflow-hidden">
                         <div className="absolute inset-0 w-full h-full">
                           <CourseCard 
                             course={userCourse.golf_courses}
