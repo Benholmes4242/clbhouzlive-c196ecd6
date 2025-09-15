@@ -415,12 +415,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     }
   };
 
-  // Responsive grid classes - edge-to-edge with 2.6 cards on mobile
+  // Responsive grid classes
   const getGridClasses = () => {
     if (view === 'list') return 'space-y-3';
-    return isMobile 
-      ? 'flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-1 scroll-px-0' 
-      : 'grid grid-cols-4 gap-4';
+    return isMobile ? 'grid grid-cols-3 gap-3' : 'grid grid-cols-4 gap-4';
   };
 
   // Count played vs unplayed
@@ -753,31 +751,24 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                  );
                }
 
-                // Grid view - edge-to-edge carousel on mobile, grid on desktop
+                // Grid view - show full cards
                 return (
-                 <div
+                 <CourseCardDraggable
                    key={course.course_id || `${course.course_id}-${index}`}
-                   className={
-                     isMobile 
-                       ? "shrink-0 basis-[calc(100vw/2.6)] snap-start" 
-                       : ""
-                   }
+                   course={{
+                     id: course.golf_courses?.id || '',
+                     name: course.golf_courses?.name || '',
+                     country: course.golf_courses?.country || undefined,
+                     sub_country: course.golf_courses?.sub_country || undefined,
+                     region: course.golf_courses?.region || undefined,
+                     thumbnail_image: course.golf_courses?.thumbnail_image || undefined,
+                     global_rank: course.golf_courses?.global_rank,
+                     regional_rank: course.golf_courses?.regional_rank,
+                     usa_rank: course.golf_courses?.usa_rank,
+                   }}
+                   showAddButton={false}
                  >
-                   <CourseCardDraggable
-                     course={{
-                       id: course.golf_courses?.id || '',
-                       name: course.golf_courses?.name || '',
-                       country: course.golf_courses?.country || undefined,
-                       sub_country: course.golf_courses?.sub_country || undefined,
-                       region: course.golf_courses?.region || undefined,
-                       thumbnail_image: course.golf_courses?.thumbnail_image || undefined,
-                       global_rank: course.golf_courses?.global_rank,
-                       regional_rank: course.golf_courses?.regional_rank,
-                       usa_rank: course.golf_courses?.usa_rank,
-                     }}
-                     showAddButton={false}
-                   >
-                  <div className={`${isMobile ? 'w-[calc(100vw/2.6)]' : 'w-full'} aspect-[4/5] relative`}>
+                   <div className="aspect-[4/5] relative">
                   {/* Lock overlay for unplayed courses */}
                   {!course.userPlayed && (
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50 rounded-none z-20 backdrop-blur-[2px]">
@@ -818,7 +809,6 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     />
                    </div>
                  </CourseCardDraggable>
-                 </div>
                );
             })}
           </div>
