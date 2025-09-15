@@ -277,9 +277,7 @@ export default function TopTenCoursesRatedByYou({
                 data-testid="top-ten-carousel"
                 className="
                   flex overflow-x-auto no-scrollbar
-                  snap-x snap-mandatory
                   gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                  scroll-px-0 md:scroll-px-0
                   touch-pan-x
                 "
               >
@@ -414,7 +412,7 @@ const TopTenSlot: React.FC<{
       <div 
         ref={setNodeRef}
         style={style}
-        className="shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] snap-start relative"
+        className="shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] relative"
       >
         <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} bg-card border border-border`}>
           {/* Top Edge Gradient Accent for Top 3 placeholders */}
@@ -473,7 +471,7 @@ const TopTenSlot: React.FC<{
       style={style}
       {...attributes}
       {...listeners}
-      className={`shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] snap-start relative ${
+      className={`shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] relative ${
         isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
       }`}
     >

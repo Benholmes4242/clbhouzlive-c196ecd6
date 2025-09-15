@@ -822,9 +822,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               ref={carouselRef}
               className="
                 flex overflow-x-auto no-scrollbar
-                snap-x snap-mandatory
                 gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                scroll-px-0 md:scroll-px-0
               "
             >
                 {filteredCourses.map((userCourse, index) => {
@@ -836,7 +834,6 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                         shrink-0
                         basis-[calc(100vw/2.6)]
                         md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))]
-                        snap-start
                       "
                     >
                       <div className="relative w-[calc(100vw/2.6)] md:w-full aspect-[4/5] overflow-hidden">
