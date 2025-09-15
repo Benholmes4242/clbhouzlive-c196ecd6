@@ -785,9 +785,9 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   }
 
   return (
-    <div className="w-full px-4 pt-4 pb-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between">
+    <section className="w-full fullbleed md:mx-auto md:px-0 pt-4 pb-4" data-section="recently-played">
+      <div className="max-w-none md:max-w-6xl md:mx-auto">
+        <div className="flex items-center justify-between px-4 md:px-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
             Recently Played
           </h3>
@@ -821,19 +821,26 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
             <div
               ref={carouselRef}
               className="
-                 flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                flex overflow-x-auto no-scrollbar
+                snap-x snap-mandatory
+                gap-3 md:gap-4
+                scroll-px-0 md:scroll-px-0
               "
             >
                 {filteredCourses.map((userCourse, index) => {
 
                   return (
-                    <div 
+                    <article 
                       key={`recently-played-${userCourse.course_id || userCourse.golf_courses?.id || userCourse.id}-${index}`}
-                      className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] data-card"
+                      className="
+                        shrink-0
+                        basis-[88vw]
+                        md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))]
+                        snap-start
+                      "
                     >
-                      <div className={`w-full ${windowWidth >= 768 ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
+                      <div className="relative w-[88vw] md:w-full aspect-[4/5] overflow-hidden rounded-xl md:rounded-2xl">
+                        <div className="absolute inset-0 w-full h-full">
                           <CourseCard 
                             course={userCourse.golf_courses}
                             viewingUserId={userId}
@@ -849,16 +856,17 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
                             hideRankingBadges={true}
                             mobileTextScale={windowWidth < 768 ? 'small' : 'small'}
                             mobileFlagSize={windowWidth < 768 ? 'md' : 'md'}
-                         />
+                          />
+                        </div>
                       </div>
-                    </div>
+                    </article>
                   );
                 })}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

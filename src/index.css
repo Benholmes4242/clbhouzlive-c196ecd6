@@ -1080,6 +1080,15 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 }
 
+/* Full-bleed utility class for edge-to-edge layouts */
+.fullbleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
+}
+
 /* Tablet optimization */
 @media (min-width: 769px) and (max-width: 1023px) {
   .course-hero-container {
