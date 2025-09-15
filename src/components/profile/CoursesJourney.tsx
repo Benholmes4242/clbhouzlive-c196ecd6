@@ -823,7 +823,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
               className="
                 flex overflow-x-auto no-scrollbar
                 snap-x snap-mandatory
-                gap-3 md:gap-4
+                gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
                 scroll-px-0 md:scroll-px-0
               "
             >
