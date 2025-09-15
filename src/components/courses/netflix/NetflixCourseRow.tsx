@@ -80,7 +80,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         <div
           ref={carouselRef}
           className={`flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] ${
-            isFirstRow ? 'recently-played-carousel px-4 md:px-4' : 'px-4 md:px-0'
+            isFirstRow ? 'recently-played-carousel' : 'px-4 md:px-0'
           }`}
           style={{
             // momentum + no snap (defends against any global/parent styles)
