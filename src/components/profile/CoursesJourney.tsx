@@ -1340,8 +1340,8 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
   userDisplayName
 }) => {
   return (
-    <div className="w-full px-4 pt-0 pb-8 mb-0">
-      <div className="max-w-6xl mx-auto">
+    <section className="w-full fullbleed md:mx-auto md:px-0 pt-0 pb-8 mb-0" data-section="courses-by-region">
+      <div className="max-w-none md:max-w-6xl md:mx-auto">
       </div>
       
       {/* Reordered sections: Worldwide, USA, Great Britain & Ireland, Continental Europe */}
@@ -1357,7 +1357,7 @@ const CoursesbyRegionSection: React.FC<CoursesbyRegionSectionProps> = ({
       
       {/* Continental Europe Section */}
       <ContinentalEuropeConditionalSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
-    </div>
+    </section>
   );
 };
 

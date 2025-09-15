@@ -220,9 +220,9 @@ export default function TopTenCoursesRatedByYou({
   const hasAnyCourses = filled > 0;
 
   return (
-    <section className="w-full px-4 pt-0 pb-0">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-0">
+    <section className="w-full fullbleed md:mx-auto md:px-0 pt-0 pb-0" data-section="top-ten-rated">
+      <div className="max-w-none md:max-w-6xl md:mx-auto">
+        <div className="flex items-center justify-between mb-0 px-4 md:px-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
             {title}
             {filled > 0 && (
@@ -270,15 +270,16 @@ export default function TopTenCoursesRatedByYou({
             onDragEnd={onDragEnd}
           >
             <SortableContext items={items} strategy={rectSortingStrategy}>
-              {/* Match exact row styling from Top 10 Rated by You section */}
+              {/* Edge-to-edge carousel with snap scrolling */}
               <div 
                 ref={combinedRefCallback}
                 {...swipeHandlers}
                 data-testid="top-ten-carousel"
                 className="
-                  flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
-                  [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5]
-                  [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]
+                  flex overflow-x-auto no-scrollbar
+                  snap-x snap-mandatory
+                  gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4
+                  scroll-px-0 md:scroll-px-0
                   touch-pan-x
                 "
               >
@@ -413,9 +414,9 @@ const TopTenSlot: React.FC<{
       <div 
         ref={setNodeRef}
         style={style}
-        className="shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative"
+        className="shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] snap-start relative"
       >
-        <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-none ${getCardShadow(index)} bg-card border border-border`}>
+        <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} bg-card border border-border`}>
           {/* Top Edge Gradient Accent for Top 3 placeholders */}
           {isTopThree && (
             <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
@@ -472,11 +473,11 @@ const TopTenSlot: React.FC<{
       style={style}
       {...attributes}
       {...listeners}
-      className={`shrink-0 basis-[calc((100%-((var(--g)*(var(--cards)-1))))/var(--cards))] relative ${
+      className={`shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] snap-start relative ${
         isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
       }`}
     >
-      <div className={`w-full aspect-[4/5] relative overflow-hidden rounded-none ${getCardShadow(index)} ${
+      <div className={`w-[calc(100vw/2.6)] md:w-full aspect-[4/5] relative overflow-hidden ${getCardShadow(index)} ${
         isDragging ? 'scale-[1.02] shadow-lg' : ''
       }`}>
         {/* Top Edge Gradient Accent for Top 3 */}
