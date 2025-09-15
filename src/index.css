@@ -1372,66 +1372,38 @@ html, body, #root, .app-shell { touch-action: auto; }
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Recently Played True Edge-to-Edge Styling - Mobile Only */
-@media (max-width: 767px) {
-  .recently-played-section {
-    /* Bulletproof full-bleed technique - forces true edge-to-edge on mobile */
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    width: 100vw;
-    padding-inline: 0 !important;
-    margin-inline: 0 !important;
-  }
-
-  .recently-played-carousel {
-    /* Remove all outer padding - true edge-to-edge on mobile */
-    padding-inline: 0 !important;
-    margin-inline: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-gutter: auto !important;
-    scroll-padding-inline: 0 !important;
-  }
-
-  /* Ensure cards have no outer margins on mobile */
-  .recently-played-carousel .shrink-0 {
-    margin-inline: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  /* Ensure first card starts at left edge */
-  .recently-played-carousel .shrink-0:first-child {
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-  }
-
-  /* Ensure last card goes to right edge */
-  .recently-played-carousel .shrink-0:last-child {
-    margin-right: 0 !important;
-    padding-right: 0 !important;
-  }
+/* Recently Played True Edge-to-Edge Styling */
+.recently-played-section {
+  /* Bulletproof full-bleed technique - forces true edge-to-edge */
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  padding-inline: 0;
+  /* Respect safe areas */
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
 }
 
-/* Desktop: normal behavior */
-@media (min-width: 768px) {
-  .recently-played-section {
-    /* Normal layout on desktop */
-    position: static;
-    left: auto;
-    right: auto;
-    margin-left: 0;
-    margin-right: 0;
-    width: auto;
-  }
+.recently-played-carousel {
+  /* Remove all outer padding - true edge-to-edge */
+  padding-inline: 0 !important;
+  margin-inline: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
 
-  .recently-played-carousel {
-    /* Normal padding on desktop */
-    padding-inline: 0;
-  }
+/* Ensure cards have no outer margins */
+.recently-played-carousel .shrink-0 {
+  margin-inline: 0 !important;
+}
+
+.recently-played-carousel .shrink-0:first-child {
+  margin-left: 0 !important;
+}
+
+.recently-played-carousel .shrink-0:last-child {
+  margin-right: 0 !important;
 }
