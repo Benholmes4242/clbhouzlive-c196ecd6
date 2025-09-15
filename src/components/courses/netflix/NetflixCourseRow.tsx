@@ -34,9 +34,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   const isFirstRow = title === "Recently Played";
 
   return (
-    <div className={`relative group/row ${isFirstRow ? 'mb-4 md:mb-6' : 'mb-4 md:mb-6 lg:mb-8'}`}>
-      {/* Row title with responsive typography */}
-      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground mb-3 px-4 md:px-0">
+    <div className={`relative group/row ${isFirstRow ? 'mb-4 md:mb-6' : 'mb-4 md:mb-6 lg:mb-8'} ${isFirstRow ? 'recently-played-section' : ''}`}>
+      {/* Row title with responsive typography - add horizontal padding for non-first rows */}
+      <h2 className={`text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground mb-3 ${isFirstRow ? 'px-4 md:px-4' : 'px-4 md:px-0'}`}>
         {title}
       </h2>
       
@@ -47,7 +47,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
+            className={`absolute ${isFirstRow ? 'left-6' : 'left-2'} top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
               isFirstRow ? 'hover:scale-110' : 'hover:scale-105'
             }`}
             style={{
@@ -64,7 +64,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
+            className={`absolute ${isFirstRow ? 'right-6' : 'right-2'} top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ${
               isFirstRow ? 'hover:scale-110' : 'hover:scale-105'
             }`}
             style={{
@@ -79,7 +79,9 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
         {/* Scrollable course cards */}
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem]"
+          className={`flex overflow-x-auto no-scrollbar gap-1 sm:gap-2 md:gap-3 lg:gap-3 xl:gap-4 [--cards:2.5] md:[--cards:4.5] lg:[--cards:4.5] xl:[--cards:4.5] [--g:0.5rem] sm:[--g:0.75rem] md:[--g:1rem] lg:[--g:1.25rem] xl:[--g:1.5rem] ${
+            isFirstRow ? 'recently-played-carousel px-4 md:px-4' : 'px-4 md:px-0'
+          }`}
           style={{
             // momentum + no snap (defends against any global/parent styles)
             WebkitOverflowScrolling: 'touch',

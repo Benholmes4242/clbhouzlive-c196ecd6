@@ -1371,3 +1371,27 @@ html, body, #root, .app-shell { touch-action: auto; }
 .liquid-glass-button.following:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Recently Played Edge-to-Edge Styling */
+.recently-played-section {
+  margin-left: calc(var(--page-padding, 16px) * -1);
+  margin-right: calc(var(--page-padding, 16px) * -1);
+}
+
+.recently-played-carousel {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Override any global page padding for Recently Played on desktop */
+@media (min-width: 768px) {
+  .recently-played-section {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .recently-played-carousel {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
