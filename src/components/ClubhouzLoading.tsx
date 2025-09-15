@@ -2,7 +2,7 @@ import React from 'react';
 
 const ClubhouzLoading: React.FC = () => {
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="relative w-16 h-16 mx-auto">
           <img 
