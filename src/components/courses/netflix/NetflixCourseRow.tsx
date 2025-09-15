@@ -36,7 +36,7 @@ const NetflixCourseRow: React.FC<NetflixCourseRowProps> = ({
   return (
     <div className={`relative group/row ${isFirstRow ? 'mb-4 md:mb-6' : 'mb-4 md:mb-6 lg:mb-8'} ${isFirstRow ? 'recently-played-section' : ''}`}>
       {/* Row title with responsive typography - add horizontal padding for non-first rows */}
-      <h2 className={`text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground mb-3 ${isFirstRow ? 'px-4 md:px-4' : 'px-4 md:px-0'}`}>
+      <h2 className={`text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold text-foreground mb-3 ${isFirstRow ? 'px-0 md:px-4' : 'px-4 md:px-0'}`}>
         {title}
       </h2>
       
