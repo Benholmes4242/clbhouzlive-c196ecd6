@@ -223,19 +223,12 @@ export default function TopTenCoursesRatedByYou({
     <section className="w-full fullbleed md:mx-auto md:px-0 pt-0 pb-0" data-section="top-ten-rated">
       <div className="max-w-none md:max-w-6xl md:mx-auto">
         <div className="flex items-center justify-between mb-0 px-4 md:px-0">
-          <div>
-            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
-              {title}
-              {filled > 0 && (
-                <span className="text-sm text-muted-foreground ml-2">({filled}/10)</span>
-              )}
-            </h3>
-            {isOwnProfile && canEdit && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Swipe down to remove a card from your top ten
-              </p>
+          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+            {title}
+            {filled > 0 && (
+              <span className="text-sm text-muted-foreground ml-2">({filled}/10)</span>
             )}
-          </div>
+          </h3>
           <div className="flex gap-2 relative z-10">
             {localCanScrollLeft && (
               <Button
@@ -360,18 +353,6 @@ const TopTenSlot: React.FC<{
     disabled: !isOwnProfile || isSearchMode // Re-add isSearchMode check to prevent dragging during search
   });
 
-  // Swipe down detection for removal
-  const swipeDownHandlers = useSwipeable({
-    onSwipedDown: () => {
-      if (course && onRemoveCourse && isOwnProfile) {
-        onRemoveCourse(course, index);
-      }
-    },
-    preventScrollOnSwipe: false,
-    trackMouse: false, // Only track touch events
-    delta: 50, // Minimum distance for swipe detection
-  });
-
   const handleRemoveClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -490,7 +471,6 @@ const TopTenSlot: React.FC<{
       style={style}
       {...attributes}
       {...listeners}
-      {...(isOwnProfile && course ? swipeDownHandlers : {})}
       className={`shrink-0 basis-[calc(100vw/2.6)] md:basis-[calc((100%-((var(--g,1rem)*(var(--cards,4)-1))))/var(--cards,4))] relative ${
         isOwnProfile ? 'cursor-grab active:cursor-grabbing touch-manipulation' : ''
       }`}
@@ -503,6 +483,23 @@ const TopTenSlot: React.FC<{
           <div className={`absolute top-0 left-0 right-0 h-1 z-10 ${getTopAccentGradient(index)}`} />
         )}
         
+        {/* Remove ribbon - only show when not dragging and can edit */}
+        {isOwnProfile && !isDragging && (
+          <div className="absolute top-0 right-0 z-30">
+            <div className="relative w-11 h-11">
+              {/* Liquid glass rounded corner banner */}
+              <div className="absolute top-0 right-0 w-9 h-9 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm border border-white/30 rounded-bl-2xl" />
+              {/* X icon */}
+              <button
+                onClick={handleRemoveClick}
+                className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center text-white hover:scale-110 transition-transform z-10"
+                aria-label="Remove course from Top 10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
         
         <CourseCard
           course={{
