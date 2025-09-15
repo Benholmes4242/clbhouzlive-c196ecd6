@@ -258,6 +258,39 @@ html, body, #root, .app-shell { touch-action: auto; }
     display: none;
   }
 
+  /* Liquid Glass Effect for Suggested Users */
+  .liquid-glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .liquid-glass {
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .liquid-glass-button {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .liquid-glass-button:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .liquid-glass-button.following {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .liquid-glass-button.following:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
   :root {
     /* Brand colors for Swing Coach */
     --brand-orange: 32 93% 54%;
@@ -1304,4 +1337,37 @@ html, body, #root, .app-shell { touch-action: auto; }
   color: #fff;
   font-weight: 600;
   font-size: 12px;
+}
+
+/* Liquid Glass Effect for Suggested Users */
+.liquid-glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .liquid-glass {
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.liquid-glass-button {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.liquid-glass-button:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.liquid-glass-button.following {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.liquid-glass-button.following:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
