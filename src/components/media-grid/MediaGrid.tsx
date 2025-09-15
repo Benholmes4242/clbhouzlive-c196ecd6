@@ -30,7 +30,7 @@ const MediaGrid: React.FC<MediaGridProps> = memo(({
     return (
       <div className={gridClasses}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="aspect-square bg-muted animate-pulse" />
+          <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
         ))}
       </div>
     );
@@ -60,6 +60,7 @@ const MediaGrid: React.FC<MediaGridProps> = memo(({
         >
           <div
             className="relative bg-background overflow-hidden h-full cursor-pointer border-0"
+            style={{ borderRadius: '0px' }}
             onClick={() => handleMediaClick(layoutItem.item)}
           >
             <MediaDisplay

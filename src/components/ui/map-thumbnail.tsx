@@ -225,7 +225,7 @@ const MapThumbnail = ({
 
   if (isLoading) {
     return (
-      <div className={`relative bg-muted animate-pulse ${className}`}>
+      <div className={`relative rounded-2xl bg-muted animate-pulse ${className}`}>
         <div className="flex items-center justify-center h-full min-h-[120px]">
           <MapPin className="h-6 w-6 text-muted-foreground animate-pulse" />
         </div>
@@ -235,7 +235,7 @@ const MapThumbnail = ({
 
   if (!coords || !mapImageUrl) {
     return (
-      <div className={`relative bg-muted border border-border ${className}`}>
+      <div className={`relative rounded-2xl bg-muted border border-border ${className}`}>
         <div className="flex flex-col items-center justify-center h-full min-h-[120px] p-4">
           <MapPin className="h-6 w-6 text-muted-foreground mb-2" />
           <span className="text-xs text-muted-foreground text-center">
@@ -249,7 +249,7 @@ const MapThumbnail = ({
   return (
     <>
       <div 
-        className={`relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] ${className}`}
+        className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] ${className}`}
         onClick={handleThumbnailClick}
       >
         <img
