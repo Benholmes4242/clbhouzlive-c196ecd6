@@ -115,24 +115,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Bottom Overlay with User Info */}
       <div className="absolute bottom-0 left-0 right-0 p-3">
         <div className="liquid-glass rounded-xl p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-              <h4 className="text-white font-semibold text-sm truncate leading-tight drop-shadow-sm">
-                {user.displayName}
-              </h4>
-              <p className="text-white/90 text-xs truncate drop-shadow-sm">
-                {user.handle}
-              </p>
-            </div>
+          <div className="flex flex-col items-center space-y-2">
+            {/* Display Name */}
+            <h4 className="text-white font-semibold text-sm text-center truncate w-full leading-tight drop-shadow-sm">
+              {user.displayName}
+            </h4>
 
             {/* Follow Button */}
             <button
               data-follow-button
               onClick={handleFollowClick}
               disabled={isFollowLoading}
-              aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName} (${user.handle})`}
+              aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
               className={cn(
-                "ml-3 px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 min-w-[80px]",
+                "px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 min-w-[80px]",
                 "liquid-glass-button",
                 user.isFollowing && "following",
                 user.isFollowing 

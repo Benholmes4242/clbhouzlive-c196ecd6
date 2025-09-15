@@ -32,7 +32,7 @@ export const useSuggestedUsersDiscover = () => {
         return;
       }
 
-      // Get users with their latest posts and media
+      // Get users with their latest posts and media, excluding current user
       const { data: usersWithPosts, error: usersError } = await supabase
         .from('user_profiles')
         .select(`
@@ -76,7 +76,7 @@ export const useSuggestedUsersDiscover = () => {
 
       const followingIds = new Set(followingData?.map(f => f.following_id) || []);
 
-      // Process users and find their latest media
+      // Process users and find their latest media - only include users with actual posts
       const processedUsers: SuggestedUserMedia[] = (usersWithPosts || [])
         .map(user => {
           // Find user's posts with media
@@ -84,19 +84,9 @@ export const useSuggestedUsersDiscover = () => {
             .filter(post => post.user_id === user.id && post.post_media && post.post_media.length > 0)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
+          // Skip users with no posts (exclude users with zero posts requirement)
           if (!userPosts || userPosts.length === 0) {
-            // Use profile photo as fallback
-            return {
-              id: user.id,
-              displayName: user.display_name || user.username || 'User',
-              handle: user.username ? `@${user.username}` : '@user',
-              isFollowing: followingIds.has(user.id),
-              latestVideo: undefined,
-              latestPhoto: user.profile_photo_url ? {
-                url: user.profile_photo_url
-              } : undefined,
-              latestPostAt: new Date().toISOString() // Recent fallback
-            };
+            return null;
           }
 
           const latestPost = userPosts[0];
