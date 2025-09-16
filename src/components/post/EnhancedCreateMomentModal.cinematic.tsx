@@ -1,13 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useSnapModal } from "@/hooks/useSnapModal";
+import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useModalContext } from '@/contexts/ModalContext';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
+import MediaCarousel from "@/components/posts/MediaCarousel";
+import CarouselDots from "@/components/posts/CarouselDots";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -27,6 +29,7 @@ type Props = {
   onSubmit: (data: any) => void;
   isSubmitting: boolean;
   initialFiles?: File[];
+  mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
 };
@@ -38,6 +41,7 @@ export default function EnhancedCreateMomentModalCinematic({
   onSubmit, 
   isSubmitting,
   initialFiles = [],
+  mediaItems = [],
   selectedCourse,
   onCourseSelect
 }: Props) {
@@ -52,9 +56,20 @@ export default function EnhancedCreateMomentModalCinematic({
     setCreateMomentModalOpen(isOpen);
   }, [isOpen, setCreateMomentModalOpen]);
 
-  // Media carousel state
-  const media = useMemo(() => (initialFiles || []).slice(0, 5), [initialFiles]);
-  const [mediaIndex, setMediaIndex] = useState(0);
+  // Media carousel state - use mediaItems if available, fallback to initialFiles
+  const media = useMemo(() => {
+    if (mediaItems?.length > 0) {
+      return mediaItems.slice(0, 5);
+    }
+    return (initialFiles || []).slice(0, 5).map(file => ({
+      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+      type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
+      file,
+      previewUrl: URL.createObjectURL(file)
+    }));
+  }, [mediaItems, initialFiles]);
+  
+  const [activeIndex, setActiveIndex] = useState(0);
   const canSlide = media.length > 1;
   
   // Touch handlers for swipe
@@ -72,18 +87,18 @@ export default function EnhancedCreateMomentModalCinematic({
     setSelectedCourse
   } = useSnapModal();
 
-  // Use the files and course from props
-  const files = initialFiles;
+  // Use the media items or files and course from props
+  const files = mediaItems?.length > 0 ? mediaItems.map(item => item.file) : initialFiles;
   const course = selectedCourse || snapCourse;
 
-  const canPost = useMemo(() => files?.length > 0 && !isSubmitting, [files, isSubmitting]);
+  const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
 
   // Close handler
   const close = () => onClose?.();
 
   // Carousel navigation
-  const prevMedia = () => setMediaIndex((i) => (i - 1 + media.length) % media.length);
-  const nextMedia = () => setMediaIndex((i) => (i + 1) % media.length);
+  const prevMedia = () => setActiveIndex((i) => (i - 1 + media.length) % media.length);
+  const nextMedia = () => setActiveIndex((i) => (i + 1) % media.length);
 
   // Touch handlers for mobile swipe
   const onTouchStart = (e: React.TouchEvent) => {
@@ -136,12 +151,12 @@ export default function EnhancedCreateMomentModalCinematic({
   const handleAICaption = async () => {
     try {
       setAiLoading(true);
-      const first = files?.[0];
-      if (!first) return;
+      const firstMedia = media?.[0];
+      if (!firstMedia) return;
 
       const body = {
-        type: first.type.startsWith('video') ? "video" : "image",
-        previewUrl: URL.createObjectURL(first),
+        type: firstMedia.type === 'video' ? "video" : "image",
+        previewUrl: 'previewUrl' in firstMedia ? firstMedia.previewUrl : URL.createObjectURL(firstMedia),
         captionContext: caption || "",
       };
 
@@ -219,19 +234,20 @@ export default function EnhancedCreateMomentModalCinematic({
                 className="relative w-full overflow-hidden rounded-2xl"
                 style={mediaHeight ? { height: `${mediaHeight}px` } : undefined}
               >
-                <MediaCarousel 
-                  media={media} 
-                  currentIndex={mediaIndex}
+                <EnhancedMediaCarousel 
+                  media={media}
+                  activeIndex={activeIndex}
+                  onIndexChange={setActiveIndex}
+                  onClose={close}
                   onTouchStart={onTouchStart}
                   onTouchEnd={onTouchEnd}
-                  onPrevious={prevMedia}
-                  onNext={nextMedia}
-                  onClose={close}
-                  canSlide={canSlide}
                   theme={theme}
                   className="h-full w-full"
                 />
               </div>
+
+              {/* White indicator dots above caption */}
+              <CarouselDots count={media.length} activeIndex={activeIndex} />
                 
               {/* CAPTION CARD */}
               <div
@@ -253,7 +269,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     <label className="block text-[15px] text-white">Add a caption</label>
                     <button
                       onClick={handleAICaption}
-                      disabled={aiLoading || files.length === 0}
+                      disabled={aiLoading || media.length === 0}
                       className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-sm disabled:opacity-50 text-white"
                       aria-label="Write a caption for me"
                     >
@@ -357,142 +373,6 @@ export default function EnhancedCreateMomentModalCinematic({
   );
 }
 
-/* Media Carousel Component */
-function MediaCarousel({ 
-  media, 
-  currentIndex, 
-  onTouchStart, 
-  onTouchEnd, 
-  onPrevious, 
-  onNext, 
-  onClose,
-  canSlide,
-  theme,
-  className 
-}: { 
-  media: File[]; 
-  currentIndex: number;
-  onTouchStart: (e: React.TouchEvent) => void;
-  onTouchEnd: (e: React.TouchEvent) => void;
-  onPrevious: () => void;
-  onNext: () => void;
-  onClose: () => void;
-  canSlide: boolean;
-  theme?: "dark" | "light";
-  className?: string;
-}) {
-  const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
-  
-  if (!media?.length) {
-    return <div className={`${className || 'h-[46vh] md:h-[48vh]'} ${fallback} flex items-center justify-center rounded-2xl`}>
-      <span className="text-white/50 text-sm">No media selected</span>
-    </div>;
-  }
-
-  const currentFile = media[currentIndex];
-  const previewUrl = URL.createObjectURL(currentFile);
-  const isVideo = currentFile.type.startsWith('video/');
-
-  return (
-    <div 
-      className={`relative w-full overflow-hidden rounded-2xl bg-black ${className || 'h-[46vh] md:h-[48vh]'}`}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Current Media */}
-      {isVideo ? (
-        <video 
-          key={`v-${currentIndex}`}
-          src={previewUrl} 
-          className="h-full w-full object-cover" 
-          muted 
-          playsInline
-        />
-      ) : (
-        <img 
-          key={`i-${currentIndex}`}
-          src={previewUrl} 
-          alt="" 
-          className="h-full w-full object-cover"
-          draggable={false}
-        />
-      )}
-
-      {/* Navigation Arrows (only if >1 media) */}
-      {canSlide && (
-        <>
-          <button
-            type="button"
-            aria-label="Previous"
-            onClick={onPrevious}
-            className="
-              absolute left-3 top-1/2 -translate-y-1/2
-              h-10 w-10 rounded-full
-              bg-white/12 backdrop-blur-md border border-white/15
-              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
-            "
-          >
-            <ChevronLeft className="h-5 w-5 text-white" />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Next"
-            onClick={onNext}
-            className="
-              absolute right-3 top-1/2 -translate-y-1/2
-              h-10 w-10 rounded-full
-              bg-white/12 backdrop-blur-md border border-white/15
-              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
-            "
-          >
-            <ChevronRight className="h-5 w-5 text-white" />
-          </button>
-        </>
-      )}
-
-      {/* Media Dots Indicator (only if >1 media) */}
-      {canSlide && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-          {media.map((_, i) => (
-            <span
-              key={i}
-              className={`
-                h-2.5 w-2.5 rounded-full transition-colors
-                ${i === currentIndex ? "bg-white" : "bg-white/40"}
-                ring-1 ring-white/30
-              `}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Close Button */}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="
-          absolute top-3 right-3
-          h-6 w-6 rounded-full
-          bg-white/12 backdrop-blur-md
-          border border-white/15
-          shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-          flex items-center justify-center
-          hover:bg-white/18 active:scale-[0.98] transition
-        "
-      >
-        <X className="h-3 w-3 text-white" />
-      </button>
-      
-      {/* Gradients for overlay effect */}
-      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-    </div>
-  );
-}
 
 function Segmented({
   value, 
@@ -521,6 +401,133 @@ function Segmented({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/* Enhanced Media Carousel Component */
+function EnhancedMediaCarousel({ 
+  media, 
+  activeIndex, 
+  onIndexChange,
+  onClose,
+  onTouchStart,
+  onTouchEnd,
+  theme,
+  className 
+}: { 
+  media: ComposerMediaItem[] | any[];
+  activeIndex: number;
+  onIndexChange: (index: number) => void;
+  onClose: () => void;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
+  theme?: "dark" | "light";
+  className?: string;
+}) {
+  const fallback = theme === "dark" ? "bg-black/40" : "bg-black/10";
+  const canSlide = media.length > 1;
+  
+  if (!media?.length) {
+    return <div className={`${className || 'h-[46vh] md:h-[48vh]'} ${fallback} flex items-center justify-center rounded-2xl`}>
+      <span className="text-white/50 text-sm">No media selected</span>
+    </div>;
+  }
+
+  const currentMedia = media[activeIndex];
+  const previewUrl = 'previewUrl' in currentMedia ? currentMedia.previewUrl : URL.createObjectURL(currentMedia);
+  const isVideo = 'type' in currentMedia ? currentMedia.type === 'video' : currentMedia.type.startsWith('video/');
+
+  const handlePrevious = () => {
+    onIndexChange(activeIndex > 0 ? activeIndex - 1 : media.length - 1);
+  };
+
+  const handleNext = () => {
+    onIndexChange(activeIndex < media.length - 1 ? activeIndex + 1 : 0);
+  };
+
+  return (
+    <div 
+      className={`relative w-full overflow-hidden rounded-2xl bg-black ${className || 'h-[46vh] md:h-[48vh]'}`}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Current Media */}
+      {isVideo ? (
+        <video 
+          key={`v-${activeIndex}`}
+          src={previewUrl} 
+          className="h-full w-full object-cover" 
+          muted 
+          playsInline
+          controls
+        />
+      ) : (
+        <img 
+          key={`i-${activeIndex}`}
+          src={previewUrl} 
+          alt="" 
+          className="h-full w-full object-cover"
+          draggable={false}
+        />
+      )}
+
+      {/* Navigation Arrows (only if >1 media) */}
+      {canSlide && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous"
+            onClick={handlePrevious}
+            className="
+              absolute left-3 top-1/2 -translate-y-1/2
+              h-10 w-10 rounded-full
+              bg-white/12 backdrop-blur-md border border-white/15
+              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
+            "
+          >
+            <ChevronLeft className="h-5 w-5 text-white" />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Next"
+            onClick={handleNext}
+            className="
+              absolute right-3 top-1/2 -translate-y-1/2
+              h-10 w-10 rounded-full
+              bg-white/12 backdrop-blur-md border border-white/15
+              shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+              flex items-center justify-center hover:bg-white/18 active:scale-[0.98] transition
+            "
+          >
+            <ChevronRight className="h-5 w-5 text-white" />
+          </button>
+        </>
+      )}
+
+      {/* Close Button */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="
+          absolute top-3 right-3
+          h-6 w-6 rounded-full
+          bg-white/12 backdrop-blur-md
+          border border-white/15
+          shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+          flex items-center justify-center
+          hover:bg-white/18 active:scale-[0.98] transition
+        "
+      >
+        <X className="h-3 w-3 text-white" />
+      </button>
+      
+      {/* Gradients for overlay effect */}
+      <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
     </div>
   );
 }

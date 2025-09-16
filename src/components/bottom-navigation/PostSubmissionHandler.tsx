@@ -91,6 +91,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       initialFiles={mediaItems.length > 0 ? mediaItems.map(item => item.file) : (selectedFile ? [selectedFile] : [])}
+      mediaItems={mediaItems}
       selectedCourse={selectedCourse}
       onCourseSelect={onCourseSelect}
     />
