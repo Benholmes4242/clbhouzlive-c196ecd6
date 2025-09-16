@@ -58,10 +58,13 @@ const SnapModal = ({
       localStorage.setItem('clb_media_tip', '1');
     }
 
-    // Do NOT close SnapModal here; let openComposerWithFiles close it in finally
     openMediaPicker((files) => {
       console.log('[snapmodal] picker returned:', files?.length);
       openComposerWithFiles(files);
+      setTimeout(() => {
+        console.log('[snapmodal] closing SnapModal after selection');
+        onClose();
+      }, 0);
     });
   };
 

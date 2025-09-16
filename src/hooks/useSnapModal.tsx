@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useModalContext } from '@/contexts/ModalContext';
 import { normalizeFilesToMediaItems, revokeMediaItemUrls } from '@/lib/mediaUtils';
 
 interface TaggableEntity {
@@ -52,6 +53,7 @@ type SnapState = {
 
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
+  const { setSnapModalOpen } = useModalContext();
   const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   
@@ -110,9 +112,9 @@ export const useSnapModal = () => {
         setPreviewUrl(items[0].previewUrl);
       }
 
-      // Ensure items land before opening modal; avoid race with SnapModal
+      // Ensure items land first, then open modal
       setTimeout(() => {
-        console.log('[composer] opening modal now');
+        console.log('[composer] setting isComposerOpen to true');
         setIsComposerOpen(true);
       }, 0);
     } catch (error) {
@@ -133,13 +135,15 @@ export const useSnapModal = () => {
           setSelectedFile(minimal[0].file);
           setPreviewUrl(minimal[0].previewUrl);
         }
+        console.log('[composer] opening with minimal items');
         setIsComposerOpen(true);
         console.warn('[composer] opened with minimal items due to normalize error');
       } catch (e2) {
         console.error('[composer] fallback failed:', e2);
       }
     } finally {
-      // Single source of truth: close SnapModal after flow progresses
+      // Close SnapModal after everything processes
+      console.log('[composer] closing snap modal');
       setIsSnapModalOpen(false);
     }
   };
