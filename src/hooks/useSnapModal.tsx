@@ -91,32 +91,56 @@ export const useSnapModal = () => {
 
   // NEW: Multi-file opener
   const openComposerWithFiles = async (files: File[]): Promise<void> => {
-    console.log('OpenComposerWithFiles called with files:', files.length);
-    
-    // Close snap modal first
-    setIsSnapModalOpen(false);
-    
+    console.log('[composer] received files:', files?.length);
+
     // Clean previous state
     cleanupPreviousMedia();
-    
+
     try {
-      // Normalize files to media items
+      console.time('[composer] normalize');
       const items = await normalizeFilesToMediaItems(files);
+      console.timeEnd('[composer] normalize');
+      console.log('[composer] normalized items:', items?.length);
+
       setMediaItems(items);
-      
-      // Set legacy state for first file (backward compatibility)
+
+      // Legacy state for first file (backward compatibility)
       if (items.length > 0) {
         setSelectedFile(items[0].file);
         setPreviewUrl(items[0].previewUrl);
       }
-      
-      // Open composer with a small delay to ensure snap modal is closed
+
+      // Ensure items land before opening modal; avoid race with SnapModal
       setTimeout(() => {
-        console.log('Opening composer modal now with', items.length, 'items');
+        console.log('[composer] opening modal now');
         setIsComposerOpen(true);
-      }, 100);
+      }, 0);
     } catch (error) {
-      console.error('Failed to process files for composer:', error);
+      console.error('[composer] normalize failed:', error);
+      // Fallback: open with minimal items so user isn't blocked
+      try {
+        const minimal: ComposerMediaItem[] = files.map((f, i) => {
+          const url = URL.createObjectURL(f);
+          return {
+            id: `${Date.now()}-${i}`,
+            type: f.type.startsWith('video') ? 'video' : 'image',
+            file: f,
+            previewUrl: url,
+          };
+        });
+        setMediaItems(minimal);
+        if (minimal.length > 0) {
+          setSelectedFile(minimal[0].file);
+          setPreviewUrl(minimal[0].previewUrl);
+        }
+        setIsComposerOpen(true);
+        console.warn('[composer] opened with minimal items due to normalize error');
+      } catch (e2) {
+        console.error('[composer] fallback failed:', e2);
+      }
+    } finally {
+      // Single source of truth: close SnapModal after flow progresses
+      setIsSnapModalOpen(false);
     }
   };
 
