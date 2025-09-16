@@ -1,4 +1,5 @@
 import React from "react";
+import { haptic } from "@/utils/haptics";
 
 interface CarouselDotsProps {
   count: number;
@@ -18,7 +19,10 @@ export default function CarouselDots({ count, activeIndex, onDotClick }: Carouse
       {Array.from({ length: count }).map((_, i) => (
         <button
           key={i}
-          onClick={() => onDotClick?.(i)}
+          onClick={() => {
+            onDotClick?.(i);
+            haptic('light');
+          }}
           className={`h-2 w-2 rounded-full transition-colors ${
             i === activeIndex ? "bg-white" : "bg-white/50"
           } ${onDotClick ? 'hover:bg-white/80 cursor-pointer' : 'cursor-default'}`}

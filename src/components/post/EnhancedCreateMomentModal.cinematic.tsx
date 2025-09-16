@@ -70,6 +70,7 @@ export default function EnhancedCreateMomentModalCinematic({
   }, [mediaItems, initialFiles]);
   
   const [activeIndex, setActiveIndex] = useState(0);
+  const [coverIndex, setCoverIndex] = useState(0);
   const canSlide = media.length > 1;
   
   // Touch handlers for swipe
@@ -192,7 +193,8 @@ export default function EnhancedCreateMomentModalCinematic({
       selectedCourse: course,
       visibility,
       isPrivate: visibility === "private",
-      backgroundMusic: null // Default for now
+      backgroundMusic: null, // Default for now
+      coverIndex // NEW: thumbnail source for feeds
     });
   };
 
@@ -231,17 +233,24 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               {/* MEDIA */}
               <div
-                className="relative w-full overflow-hidden rounded-2xl"
+                className="relative w-full aspect-video overflow-hidden rounded-2xl"
                 style={mediaHeight ? { height: `${mediaHeight}px` } : undefined}
               >
-                <EnhancedMediaCarousel 
-                  media={media}
-                  activeIndex={activeIndex}
+                <MediaCarousel
+                  items={media.map(item => ({
+                    id: item.id,
+                    type: item.type,
+                    previewUrl: item.previewUrl,
+                    url: item.url,
+                    file: item.file,
+                    alt: `Media item ${item.id}`
+                  }))}
+                  initialIndex={0}
                   onIndexChange={setActiveIndex}
-                  onClose={close}
-                  onTouchStart={onTouchStart}
-                  onTouchEnd={onTouchEnd}
-                  theme={theme}
+                  onSetCover={setCoverIndex}
+                  coverIndex={coverIndex}
+                  enableSwipe
+                  loop={false}
                   className="h-full w-full"
                 />
               </div>

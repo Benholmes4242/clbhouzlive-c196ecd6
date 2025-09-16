@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CarouselSlide from './CarouselSlide';
+import { haptic } from '@/utils/haptics';
 
 interface MediaItem {
   id: string;
@@ -16,6 +17,8 @@ interface MediaCarouselProps {
   items: MediaItem[];
   initialIndex?: number;
   onIndexChange?: (index: number) => void;
+  onSetCover?: (index: number) => void;
+  coverIndex?: number;
   enableSwipe?: boolean;
   loop?: boolean;
   className?: string;
@@ -25,6 +28,8 @@ const MediaCarousel = ({
   items, 
   initialIndex = 0, 
   onIndexChange,
+  onSetCover,
+  coverIndex = 0,
   enableSwipe = true,
   loop = false,
   className = '' 
@@ -68,9 +73,16 @@ const MediaCarousel = ({
     });
   }, [activeIndex]);
 
-  // Handle index changes
+  // Handle index changes with haptic feedback
+  const hasMountedRef = useRef(false);
   useEffect(() => {
     onIndexChange?.(activeIndex);
+    // Fire haptic only on user-driven changes (not initial mount)
+    if (hasMountedRef.current) {
+      haptic('light');
+    } else {
+      hasMountedRef.current = true;
+    }
   }, [activeIndex, onIndexChange]);
 
   // Keyboard navigation
@@ -182,8 +194,11 @@ const MediaCarousel = ({
       <div className="absolute inset-0 pt-[calc(env(safe-area-inset-top,0px))]">
         <CarouselSlide
           item={items[activeIndex]}
+          index={activeIndex}
           isActive={true}
           onVideoRef={registerVideoRef(activeIndex)}
+          onSetCover={onSetCover}
+          coverIndex={coverIndex}
         />
       </div>
 

@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play } from 'lucide-react';
+import { useLongPress } from '@/hooks/useLongPress';
+import { useCappedLoading } from '@/hooks/useCappedLoading';
+import { haptic } from '@/utils/haptics';
+import { useToast } from '@/hooks/use-toast';
 
 interface CarouselSlideProps {
   item: {
@@ -10,15 +14,27 @@ interface CarouselSlideProps {
     file?: File;
     alt?: string;
   };
+  index?: number;
   isActive: boolean;
   onVideoRef?: (ref: HTMLVideoElement | null) => void;
+  onSetCover?: (index: number) => void;
+  coverIndex?: number;
 }
 
-export default function CarouselSlide({ item, isActive, onVideoRef }: CarouselSlideProps) {
+export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, onSetCover, coverIndex = 0 }: CarouselSlideProps) {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState<string>('00:00');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { toast } = useToast();
+  
+  const showSkeleton = useCappedLoading(loaded, 600);
+  
+  const longPressProps = useLongPress(() => {
+    onSetCover?.(index);
+    toast({ description: 'Cover set' });
+    haptic('light');
+  });
 
   const src = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
 
@@ -45,9 +61,9 @@ export default function CarouselSlide({ item, isActive, onVideoRef }: CarouselSl
 
   if (item.type === 'video') {
     return (
-      <div className="relative w-full h-full overflow-hidden">
+      <div className="relative w-full h-full overflow-hidden select-none" {...longPressProps}>
         {/* Skeleton loading state */}
-        <div className={`absolute inset-0 ${loaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+        <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
           <div className="w-full h-full animate-pulse bg-white/10" />
         </div>
 
@@ -83,6 +99,29 @@ export default function CarouselSlide({ item, isActive, onVideoRef }: CarouselSl
           </button>
         )}
 
+        {/* Cover chip */}
+        {coverIndex === index && (
+          <span className="absolute top-2 left-2 text-[11px] px-2 py-1 rounded bg-black/60 text-white backdrop-blur-sm">
+            Cover
+          </span>
+        )}
+        
+        {/* Set as cover button */}
+        {onSetCover && (
+          <button
+            aria-label="Set as cover"
+            className="absolute top-2 right-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              onSetCover(index); 
+              haptic('light');
+              toast({ description: 'Cover set' });
+            }}
+          >
+            Set as cover
+          </button>
+        )}
+
         {/* Duration badge */}
         {loaded && (
           <span className="absolute bottom-2 right-2 rounded bg-black/60 text-white text-xs px-2 py-1 backdrop-blur-sm">
@@ -94,9 +133,9 @@ export default function CarouselSlide({ item, isActive, onVideoRef }: CarouselSl
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden select-none" {...longPressProps}>
       {/* Skeleton loading state */}
-      <div className={`absolute inset-0 ${loaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+      <div className={`absolute inset-0 ${showSkeleton ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
         <div className="w-full h-full animate-pulse bg-white/10" />
       </div>
 
@@ -109,6 +148,29 @@ export default function CarouselSlide({ item, isActive, onVideoRef }: CarouselSl
         }`}
         draggable={false}
       />
+      
+      {/* Cover chip */}
+      {coverIndex === index && (
+        <span className="absolute top-2 left-2 text-[11px] px-2 py-1 rounded bg-black/60 text-white backdrop-blur-sm">
+          Cover
+        </span>
+      )}
+      
+      {/* Set as cover button */}
+      {onSetCover && (
+        <button
+          aria-label="Set as cover"
+          className="absolute top-2 right-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            onSetCover(index); 
+            haptic('light');
+            toast({ description: 'Cover set' });
+          }}
+        >
+          Set as cover
+        </button>
+      )}
     </div>
   );
 }
