@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image, Video, X, Sparkles } from 'lucide-react';
+import { Camera, Images, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useModalContext } from '@/contexts/ModalContext';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
 
 // Adapter for mapping hook data to expected Media type
@@ -29,7 +30,7 @@ interface SnapModalProps {
   onClose: () => void;
   onCameraClick: () => void;
   onImageClick: () => void;
-  onVideoClick: () => void;
+  onVideoClick: () => void; // Keep for backward compatibility
 }
 
 const SnapModal = ({ 
@@ -43,8 +44,43 @@ const SnapModal = ({
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
+  const { openComposerWithFiles } = useSnapModal();
   
-  const { handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
+  const { handleCameraClick, handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
+  
+  // Enhanced multi-select media picker for iOS compatibility
+  const openMediaPicker = async () => {
+    const ACCEPT = "image/*,video/*";
+    const MAX_FILES = 10;
+    
+    // Check if iOS and show hint on first use
+    const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isiOS && !localStorage.getItem('multiSelectHintShown')) {
+      // Optional: show toast here if you have one available
+      localStorage.setItem('multiSelectHintShown', '1');
+    }
+
+    // Use File Input fallback for best iOS support
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = ACCEPT;
+    input.multiple = true; // Critical for iOS multi-select
+    input.capture = undefined as any; // Ensure NOT set to avoid forcing camera
+
+    input.onchange = () => {
+      const files = Array.from(input.files ?? []).slice(0, MAX_FILES);
+      if (files.length > 0) {
+        if (files.length > MAX_FILES) {
+          // Optional: show toast "Max 10 items"
+        }
+        openComposerWithFiles(files);
+      }
+      input.remove();
+    };
+
+    onClose(); // Close modal first
+    setTimeout(() => input.click(), 100); // Small delay for smooth UX
+  };
 
   // Update modal context when snap modal opens/closes
   useEffect(() => {
@@ -179,30 +215,21 @@ const SnapModal = ({
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
-      label: "Camra",
+      label: "Camera",
       description: "Take photo or video",
       icon: Camera,
-      onClick: onCameraClick,
+      onClick: () => handleCameraClick(user),
       variant: "capture" as const,
       thumbs: captureThumbs,
     }] : []),
     {
-      key: "photos",
-      label: "Photos",
-      description: "Select from gallery",
-      icon: Image,
-      onClick: onImageClick,
-      variant: "photos" as const,
+      key: "media",
+      label: "Media",
+      description: "Pick photos & videos",
+      icon: Images,
+      onClick: openMediaPicker,
+      variant: "photos" as const, // Reuse photos layout for thumbnails
       thumbs: photoThumbs,
-    },
-    {
-      key: "videos",
-      label: "Videos", 
-      description: "Select from gallery",
-      icon: Video,
-      onClick: onVideoClick,
-      variant: "videos" as const,
-      thumbs: videoThumbs,
     },
   ];
 
@@ -264,7 +291,7 @@ const SnapModal = ({
                       <div className="text-left">
                         <div className="text-[17px] font-medium text-white">{label}</div>
                         {/* Show empty state message if no user media and not loading */}
-                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'photos' && (
+                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
                           <div className="text-xs text-white/50">No posts yet - start creating!</div>
                         )}
                       </div>
