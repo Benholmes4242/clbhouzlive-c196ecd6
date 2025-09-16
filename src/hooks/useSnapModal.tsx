@@ -92,7 +92,6 @@ export const useSnapModal = () => {
   // NEW: Multi-file opener
   const openComposerWithFiles = async (files: File[]): Promise<void> => {
     console.log('OpenComposerWithFiles called with files:', files.length);
-    console.log('Files:', files.map(f => ({ name: f.name, type: f.type, size: f.size })));
     
     // Close snap modal first
     setIsSnapModalOpen(false);

@@ -1,5 +1,4 @@
 export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10) {
-  console.log('openMediaPicker called');
   // Prefer showOpenFilePicker when available (desktop), but fallback to input for iOS
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const canUseOPF = 'showOpenFilePicker' in window && !isIOS;
@@ -21,7 +20,6 @@ export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10
         ],
       });
       const files = await Promise.all(handles.map((h: any) => h.getFile()));
-      console.log('showOpenFilePicker succeeded, calling callback with', files.length, 'files');
       onFiles(files.slice(0, max));
       return;
     } catch {/* user canceled */}
@@ -42,7 +40,6 @@ export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10
 
   input.addEventListener('change', () => {
     const files = Array.from(input.files ?? []).slice(0, max);
-    console.log('Input file picker succeeded, calling callback with', files.length, 'files');
     onFiles(files);
     document.body.removeChild(input);
   });
