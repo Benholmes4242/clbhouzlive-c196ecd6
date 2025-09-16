@@ -6,7 +6,7 @@ import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMed
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useModalContext } from '@/contexts/ModalContext';
-import { useSnapModal } from '@/hooks/useSnapModal';
+
 import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
 import { openMediaPicker } from '@/utils/openMediaPicker';
 
@@ -32,6 +32,7 @@ interface SnapModalProps {
   onCameraClick: () => void;
   onImageClick: () => void;
   onVideoClick: () => void; // Keep for backward compatibility
+  openComposerWithFiles: (files: File[]) => void;
 }
 
 const SnapModal = ({ 
@@ -39,13 +40,14 @@ const SnapModal = ({
   onClose, 
   onCameraClick, 
   onImageClick, 
-  onVideoClick 
+  onVideoClick, 
+  openComposerWithFiles,
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
-  const { openComposerWithFiles } = useSnapModal();
+  // using openComposerWithFiles from props
   
   const { handleCameraClick, handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
   

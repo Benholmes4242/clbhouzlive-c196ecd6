@@ -35,6 +35,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     openSnapModal,
     closeSnapModal,
     openComposer,
+    openComposerWithFiles,
     closeComposer,
     showConfirmationToast,
     hideToast
@@ -81,6 +82,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         onCameraClick={() => handleCameraClick({})}
         onImageClick={() => handleImageClick({})}
         onVideoClick={() => handleVideoClick({})}
+        openComposerWithFiles={openComposerWithFiles}
       />
 
       <PostSubmissionHandler
