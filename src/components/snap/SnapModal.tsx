@@ -8,6 +8,7 @@ import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandler
 import { useModalContext } from '@/contexts/ModalContext';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
+import { openMediaPicker } from '@/utils/openMediaPicker';
 
 // Adapter for mapping hook data to expected Media type
 type RawPhoto = { id?: string; media_url?: string; url?: string; type?: string; media_type?: string; poster_url?: string; thumbUrl?: string; };
@@ -48,38 +49,19 @@ const SnapModal = ({
   
   const { handleCameraClick, handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
   
-  // Enhanced multi-select media picker for iOS compatibility
-  const openMediaPicker = async () => {
-    const ACCEPT = "image/*,video/*";
-    const MAX_FILES = 10;
-    
+  // Media picker handler - safe for iOS, no camera triggers
+  const handlePickMedia = () => {
     // Check if iOS and show hint on first use
-    const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isiOS && !localStorage.getItem('multiSelectHintShown')) {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS && !localStorage.getItem('clb_media_tip')) {
       // Optional: show toast here if you have one available
-      localStorage.setItem('multiSelectHintShown', '1');
+      localStorage.setItem('clb_media_tip', '1');
     }
 
-    // Use File Input fallback for best iOS support
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = ACCEPT;
-    input.multiple = true; // Critical for iOS multi-select
-    input.capture = undefined as any; // Ensure NOT set to avoid forcing camera
-
-    input.onchange = () => {
-      const files = Array.from(input.files ?? []).slice(0, MAX_FILES);
-      if (files.length > 0) {
-        if (files.length > MAX_FILES) {
-          // Optional: show toast "Max 10 items"
-        }
-        openComposerWithFiles(files);
-      }
-      input.remove();
-    };
-
     onClose(); // Close modal first
-    setTimeout(() => input.click(), 100); // Small delay for smooth UX
+    setTimeout(() => {
+      openMediaPicker((files) => openComposerWithFiles(files));
+    }, 100); // Small delay for smooth UX
   };
 
   // Update modal context when snap modal opens/closes
@@ -227,7 +209,7 @@ const SnapModal = ({
       label: "Media",
       description: "Pick photos & videos",
       icon: Images,
-      onClick: openMediaPicker,
+      onClick: handlePickMedia,
       variant: "photos" as const, // Reuse photos layout for thumbnails
       thumbs: photoThumbs,
     },
