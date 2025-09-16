@@ -51,6 +51,8 @@ const SnapModal = ({
   
   // Media picker handler - safe for iOS, no camera triggers
   const handlePickMedia = () => {
+    console.log('handlePickMedia called');
+    
     // Check if iOS and show hint on first use
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isIOS && !localStorage.getItem('clb_media_tip')) {
@@ -60,7 +62,11 @@ const SnapModal = ({
 
     onClose(); // Close modal first
     setTimeout(() => {
-      openMediaPicker((files) => openComposerWithFiles(files));
+      console.log('About to call openMediaPicker');
+      openMediaPicker((files) => {
+        console.log('Media picker callback received files:', files.length);
+        openComposerWithFiles(files);
+      });
     }, 100); // Small delay for smooth UX
   };
 
