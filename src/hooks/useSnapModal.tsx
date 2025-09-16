@@ -53,7 +53,7 @@ type SnapState = {
 
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
-  const { setSnapModalOpen } = useModalContext();
+  const { setSnapModalOpen, setCreateMomentModalOpen } = useModalContext();
   const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   
@@ -116,6 +116,7 @@ export const useSnapModal = () => {
       setTimeout(() => {
         console.log('[composer] setting isComposerOpen to true');
         setIsComposerOpen(true);
+        setCreateMomentModalOpen(true); // Update modal context
       }, 0);
     } catch (error) {
       console.error('[composer] normalize failed:', error);
@@ -137,6 +138,7 @@ export const useSnapModal = () => {
         }
         console.log('[composer] opening with minimal items');
         setIsComposerOpen(true);
+        setCreateMomentModalOpen(true); // Update modal context
         console.warn('[composer] opened with minimal items due to normalize error');
       } catch (e2) {
         console.error('[composer] fallback failed:', e2);
@@ -145,6 +147,7 @@ export const useSnapModal = () => {
       // Close SnapModal after everything processes
       console.log('[composer] closing snap modal');
       setIsSnapModalOpen(false);
+      setSnapModalOpen(false); // Also update context
     }
   };
 
@@ -163,6 +166,7 @@ export const useSnapModal = () => {
   const closeComposer = () => {
     console.log('Closing composer');
     setIsComposerOpen(false);
+    setCreateMomentModalOpen(false); // Update modal context
     
     // Clean up media
     cleanupPreviousMedia();

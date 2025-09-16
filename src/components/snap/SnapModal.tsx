@@ -61,10 +61,7 @@ const SnapModal = ({
     openMediaPicker((files) => {
       console.log('[snapmodal] picker returned:', files?.length);
       openComposerWithFiles(files);
-      setTimeout(() => {
-        console.log('[snapmodal] closing SnapModal after selection');
-        onClose();
-      }, 0);
+      // Let openComposerWithFiles handle closing the SnapModal
     });
   };
 
