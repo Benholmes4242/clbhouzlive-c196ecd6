@@ -26,7 +26,6 @@ export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10
   }
 
   // iOS & fallback path: use <input type="file">
-  // CRUCIAL: Append to document.body with off-screen positioning to center the iOS picker
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*,video/*';
@@ -34,23 +33,16 @@ export async function openMediaPicker(onFiles: (files: File[]) => void, max = 10
 
   // IMPORTANT: never set or propagate 'capture' or it will open camera
   input.removeAttribute('capture');
+  // (Ensure no code wraps this input and re-adds capture)
 
-  // Keep it out of layout so Safari anchors the sheet to viewport center
-  // (not to a bottom-right button or fixed bar)
-  input.style.position = 'fixed';
-  input.style.left = '-9999px';
-  input.style.top = '0';
-  input.style.opacity = '0';
-  input.style.pointerEvents = 'none';
-
+  input.style.display = 'none';
   document.body.appendChild(input);
 
   input.addEventListener('change', () => {
     const files = Array.from(input.files ?? []).slice(0, max);
     onFiles(files);
     document.body.removeChild(input);
-  }, { once: true });
+  });
 
-  // Defer click to next frame to avoid being tied to the triggering element's geometry
-  requestAnimationFrame(() => input.click());
+  input.click();
 }
