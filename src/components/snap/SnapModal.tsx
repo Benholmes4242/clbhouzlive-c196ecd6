@@ -4,7 +4,7 @@ import { Camera, Images, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
+
 import { useModalContext } from '@/contexts/ModalContext';
 
 import { composeThumbRowGlobal, Thumb } from '@/utils/mediaThumbs';
@@ -49,7 +49,7 @@ const SnapModal = ({
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
   // using openComposerWithFiles from props
   
-  const { handleCameraClick, handleMixedMediaClick } = useMediaHandlers(onClose, () => {});
+  
   
   // Media picker handler - safe for iOS, no camera triggers
   const handlePickMedia = () => {
@@ -203,7 +203,7 @@ const SnapModal = ({
       label: "Camera",
       description: "Take photo or video",
       icon: Camera,
-      onClick: () => handleCameraClick(user),
+      onClick: onCameraClick,
       variant: "capture" as const,
       thumbs: captureThumbs,
     }] : []),
@@ -303,8 +303,8 @@ const SnapModal = ({
                 {/* Tell Your Story Card - AT BOTTOM */}
                 <motion.button
                   onClick={() => {
-                    onClose(); // Close modal first
-                    setTimeout(() => handleMixedMediaClick(), 100); // Then open picker
+                    // Open the same media picker flow
+                    handlePickMedia();
                   }}
                   className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
                   whileTap={{ scale: 0.98 }}
