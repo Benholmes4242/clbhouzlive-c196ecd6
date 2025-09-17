@@ -492,12 +492,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     @apply inline-flex items-center gap-2 rounded-full px-4 py-2
            select-none whitespace-nowrap
            backdrop-blur-md bg-white/30 text-neutral-600
-           ring-1 ring-black/5 shadow-none
+           border border-black/5 shadow-none
            transition-colors transition-shadow duration-150;
   }
 
   .pill:hover { 
-    @apply bg-white/40 ring-black/10; 
+    @apply bg-white/40 border-black/10; 
   }
   
   .pill:active { 
@@ -505,7 +505,7 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   .pill--active {
-    @apply bg-white/60 text-black ring-black/10;
+    @apply bg-white/60 text-black border-black/10;
   }
 
   .pill:focus-visible {
