@@ -72,7 +72,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   return (
     <div
-      className="relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer bg-gray-900 group"
+      className="relative aspect-[3/4] overflow-hidden cursor-pointer bg-gray-900 group"
       onClick={handleCardClick}
     >
       {/* Media Content */}
