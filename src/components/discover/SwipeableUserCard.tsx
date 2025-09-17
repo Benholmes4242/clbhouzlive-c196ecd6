@@ -143,11 +143,16 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
 
       {/* Liquid Glass Overlay */}
       <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-b-2xl flex flex-col items-center justify-between px-3 py-2 z-10">
-        {/* Name & Status */}
+        {/* Name & Club */}
         <div className="flex flex-col items-center mb-2">
           <div className="text-white font-medium truncate">
             {user.displayName || user.username || 'User'}
           </div>
+          {user.primaryClub && (
+            <div className="text-white/70 text-xs truncate">
+              {user.primaryClub}
+            </div>
+          )}
           <div className="text-white/80 text-xs">
             {user.isFollowing ? 'Following' : 'Follow'}
           </div>
