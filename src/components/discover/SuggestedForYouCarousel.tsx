@@ -135,8 +135,8 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
   }
 
   return (
-    <div className="px-4 pt-1 pb-6">
-      <div className="md:container md:mx-auto md:px-0">
+    <div className="pt-1 pb-6">
+      <div className="px-4 md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -146,28 +146,28 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
             Swipe or tap to follow/dismiss
           </span>
         </div>
+      </div>
 
-        {/* Horizontal Scrollable Cards */}
-        <div 
-          ref={containerRef}
-          className="suggested-carousel overflow-x-auto scrollbar-hide grid grid-flow-col auto-cols-[var(--card-w)] gap-px snap-x snap-mandatory pb-2"
-          style={{ touchAction: 'pan-y' }} // Allow vertical scroll
-        >
-          {queue.map((user) => (
-            <div
-              key={user.id}
-              data-card-id={user.id}
-              className="snap-start"
-            >
-              <SwipeableUserCard
-                user={user}
-                onFollow={handleFollow}
-                onDismiss={handleDismiss}
-                isVisible={visibleCards.has(user.id)}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Horizontal Scrollable Cards - Edge to Edge */}
+      <div 
+        ref={containerRef}
+        className="suggested-carousel overflow-x-auto scrollbar-hide grid grid-flow-col auto-cols-[var(--card-w)] gap-px snap-x snap-mandatory pb-2"
+        style={{ touchAction: 'pan-y' }} // Allow vertical scroll
+      >
+        {queue.map((user) => (
+          <div
+            key={user.id}
+            data-card-id={user.id}
+            className="snap-start"
+          >
+            <SwipeableUserCard
+              user={user}
+              onFollow={handleFollow}
+              onDismiss={handleDismiss}
+              isVisible={visibleCards.has(user.id)}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
