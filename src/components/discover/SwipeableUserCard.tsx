@@ -151,7 +151,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
           aria-label="Dismiss suggestion"
           className={cn(
             "group relative w-9 h-9 rounded-full flex items-center justify-center outline-none",
-            "bg-red-500/15 hover:bg-red-500/25 text-white",
+            "bg-red-500/25 hover:bg-red-500/35 text-white",
             "after:content-[''] after:absolute after:-inset-1",
             "transition-all duration-200 active:scale-90 hover:scale-105",
             isActionLoading && "opacity-50 cursor-not-allowed"
@@ -184,7 +184,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
           aria-label="Follow user"
           className={cn(
             "group relative w-9 h-9 rounded-full flex items-center justify-center outline-none",
-            "bg-green-500/15 hover:bg-green-500/25 text-white",
+            "bg-green-500/25 hover:bg-green-500/35 text-white",
             "after:content-[''] after:absolute after:-inset-1",
             "transition-all duration-200 active:scale-90 hover:scale-105",
             isActionLoading && "opacity-50 cursor-not-allowed"
