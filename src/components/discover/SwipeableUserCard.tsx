@@ -141,57 +141,58 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
       {/* Gradient Overlay for Text Legibility */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-      {/* Bottom Overlay with User Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-        <div className="liquid-glass rounded-xl p-3">
-          <div className="flex flex-col space-y-3">
-            {/* Display Name */}
-            <h4 className="text-white font-semibold text-sm text-center truncate w-full leading-tight drop-shadow-sm">
-              {user.displayName || user.username || 'User'}
-            </h4>
-
-            {/* Action Buttons */}
-            <div className="flex justify-between items-center">
-              {/* Dismiss Button */}
-              <button
-                data-action-button
-                onClick={handleDismissClick}
-                disabled={isActionLoading}
-                aria-label={`Dismiss ${user.displayName}`}
-                className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
-                  "liquid-glass-button bg-white/10 hover:bg-white/20",
-                  "border border-white/30",
-                  isActionLoading && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
-
-              {/* Follow Button */}
-              <button
-                data-action-button
-                onClick={handleFollowClick}
-                disabled={isActionLoading}
-                aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
-                className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
-                  user.isFollowing 
-                    ? "liquid-glass-button following bg-white/10 text-white border border-white/30"
-                    : "liquid-glass-button bg-white/90 hover:bg-white text-black border border-white/30",
-                  isActionLoading && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                {isActionLoading ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : user.isFollowing ? (
-                  <span className="text-xs font-medium">✓</span>
-                ) : (
-                  <Plus className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+      {/* Liquid Glass Overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-b-2xl flex items-center justify-between px-3 py-2 z-10">
+        {/* Left: Name & Status */}
+        <div className="min-w-0">
+          <div className="text-white/95 font-medium truncate">
+            {user.displayName || user.username || 'User'}
           </div>
+          <div className="mt-0.5 text-white/80 text-xs">
+            {user.isFollowing ? 'Following' : user.primaryClub ?? ''}
+          </div>
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2">
+          {/* Dismiss Button */}
+          <button
+            data-action-button
+            onClick={handleDismissClick}
+            disabled={isActionLoading}
+            aria-label={`Dismiss ${user.displayName}`}
+            className={cn(
+              "relative rounded-full w-9 h-9 bg-white/15 hover:bg-white/25 flex items-center justify-center outline-none",
+              "after:content-[''] after:absolute after:-inset-1",
+              isActionLoading && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            <X className="w-4 h-4 text-white" />
+          </button>
+
+          {/* Follow Button */}
+          <button
+            data-action-button
+            onClick={handleFollowClick}
+            disabled={isActionLoading}
+            aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
+            className={cn(
+              "relative rounded-full w-9 h-9 flex items-center justify-center outline-none",
+              "after:content-[''] after:absolute after:-inset-1",
+              user.isFollowing 
+                ? "bg-white/15 hover:bg-white/25 text-white"
+                : "bg-white/20 hover:bg-white/30 text-white",
+              isActionLoading && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            {isActionLoading ? (
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : user.isFollowing ? (
+              <span className="text-sm font-medium">✓</span>
+            ) : (
+              <Plus className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
 
