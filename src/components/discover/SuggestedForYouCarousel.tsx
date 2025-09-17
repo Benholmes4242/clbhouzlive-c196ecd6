@@ -13,7 +13,6 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
 }) => {
   const { queue, loading, error, follow, dismiss, refetch } = useSuggestionsQueue();
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
-  const [activeSwipeCard, setActiveSwipeCard] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Intersection observer for video autoplay
@@ -164,8 +163,6 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
                 onFollow={handleFollow}
                 onDismiss={handleDismiss}
                 isVisible={visibleCards.has(user.id)}
-                activeSwipeCard={activeSwipeCard}
-                setActiveSwipeCard={setActiveSwipeCard}
               />
             </div>
           ))}
