@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 interface SuggestedUserCardProps {
   user: {
@@ -16,16 +17,19 @@ interface SuggestedUserCardProps {
     latestPostAt: string;
   };
   onToggleFollow: (userId: string) => Promise<boolean>;
+  onDismiss: (userId: string) => void;
   isVisible: boolean;
 }
 
 const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({ 
   user, 
   onToggleFollow,
+  onDismiss,
   isVisible 
 }) => {
   const navigate = useNavigate();
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [isDismissLoading, setIsDismissLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Handle video autoplay based on visibility
@@ -56,7 +60,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setIsFollowLoading(true);
     try {
       const success = await onToggleFollow(user.id);
-      if (!success) {
+      if (success) {
+        // Announce to screen readers
+        const announcement = user.isFollowing ? `Unfollowed ${user.displayName}` : `Followed ${user.displayName}`;
+        toast.success(announcement);
+        
+        // Analytics
+        console.log('Analytics: suggestion_follow', { userId: user.id, action: user.isFollowing ? 'unfollow' : 'follow' });
+      } else {
         toast.error('Failed to update follow status');
       }
     } catch (error) {
@@ -67,12 +78,32 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
+  const handleDismissClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isDismissLoading) return;
+    
+    setIsDismissLoading(true);
+    try {
+      onDismiss(user.id);
+      toast.success(`Dismissed ${user.displayName}`);
+      
+      // Analytics
+      console.log('Analytics: suggestion_dismiss', { userId: user.id });
+    } catch (error) {
+      console.error('Dismiss error:', error);
+      toast.error('Failed to dismiss suggestion');
+    } finally {
+      setIsDismissLoading(false);
+    }
+  };
+
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
   const isVideo = !!user.latestVideo;
 
   return (
     <div
-      className="relative aspect-[3/4] overflow-hidden cursor-pointer bg-gray-900 group"
+      className="relative overflow-hidden rounded-none snap-start aspect-[3/4] cursor-pointer bg-gray-900 group"
       onClick={handleCardClick}
     >
       {/* Media Content */}
@@ -107,38 +138,46 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Gradient Overlay for Text Legibility - ALWAYS SHOW */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      {/* Bottom Overlay with Controls */}
+      <div className="
+        absolute inset-x-0 bottom-0
+        h-[clamp(64px,30%,96px)]
+        bg-black/35 backdrop-blur-md
+        rounded-none
+        px-3 py-2 z-10
+        grid grid-cols-[auto_1fr_auto] items-center
+      ">
+        {/* Left - Dismiss */}
+        <button 
+          aria-label="Dismiss suggestion" 
+          onClick={handleDismissClick}
+          disabled={isDismissLoading}
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-red-500/30"
+        >
+          <FaThumbsDown className="w-4 h-4" />
+          <span className="absolute -inset-1" />
+        </button>
 
-      {/* Bottom Overlay with User Info - ALWAYS SHOW */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-        <div className="liquid-glass rounded-xl p-3">
-          <div className="flex flex-col items-center space-y-2">
-            {/* Display Name - ALWAYS SHOW */}
-            <h4 className="text-white font-semibold text-sm text-center truncate w-full leading-tight drop-shadow-sm">
-              {user.displayName || user.handle || 'User'}
-            </h4>
-
-            {/* Follow Button - ALWAYS SHOW */}
-            <button
-              data-follow-button
-              onClick={handleFollowClick}
-              disabled={isFollowLoading}
-              aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 min-w-[80px]",
-                "liquid-glass-button",
-                user.isFollowing && "following",
-                user.isFollowing 
-                  ? "text-white" 
-                  : "text-black",
-                isFollowLoading && "opacity-70 cursor-not-allowed"
-              )}
-            >
-              {isFollowLoading ? '...' : user.isFollowing ? 'Following' : 'Follow'}
-            </button>
-          </div>
+        {/* Center - User Info */}
+        <div className="flex flex-col items-center min-w-0">
+          <span className="text-white font-medium truncate text-sm">
+            {user.displayName || user.handle || 'User'}
+          </span>
+          <span className="text-white/80 text-xs">
+            {user.isFollowing ? 'Following' : 'Follow'}
+          </span>
         </div>
+
+        {/* Right - Follow */}
+        <button 
+          aria-label="Follow user" 
+          onClick={handleFollowClick}
+          disabled={isFollowLoading}
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-green-500/30"
+        >
+          <FaThumbsUp className="w-4 h-4" />
+          <span className="absolute -inset-1" />
+        </button>
       </div>
     </div>
   );
@@ -146,10 +185,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
 interface SuggestedUsersRedesignedProps {
   onUserFollow?: (userId: string) => void;
+  onUserDismiss?: (userId: string) => void;
 }
 
 const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({ 
-  onUserFollow 
+  onUserFollow,
+  onUserDismiss 
 }) => {
   const { users, loading, error, toggleFollow, refetch } = useSuggestedUsersDiscover();
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
@@ -195,6 +236,12 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
       onUserFollow(userId);
     }
     return success;
+  };
+
+  const handleDismiss = (userId: string) => {
+    if (onUserDismiss) {
+      onUserDismiss(userId);
+    }
   };
 
   if (loading) {
@@ -269,6 +316,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
               <SuggestedUserCard
                 user={user}
                 onToggleFollow={handleToggleFollow}
+                onDismiss={handleDismiss}
                 isVisible={visibleCards.has(user.id)}
               />
             </div>
