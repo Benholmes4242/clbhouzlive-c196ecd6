@@ -306,6 +306,15 @@ html, body, #root, .app-shell { touch-action: auto; }
     --media-loading: 0 0% 0%;
     --media-loading-dark: 0 0% 0%;
     --achv-badge-size: 10rem;
+    
+    /* Apple-Inspired Pill Design Tokens */
+    --pill-text: #4A4A4A;
+    --pill-text-active: #000000;
+    --pill-bg: rgba(255,255,255,0.28);
+    --pill-bg-active: rgba(255,255,255,0.56);
+    --pill-ring: rgba(0,0,0,0.06);
+    --pill-ring-active: rgba(0,0,0,0.10);
+    --trend-icon: #FF6A00;
   }
 
   .dark {
@@ -476,6 +485,40 @@ html, body, #root, .app-shell { touch-action: auto; }
            px-4 py-3 text-sm md:text-base font-medium
            transition-all duration-150;
     backdrop-filter: blur(8px);
+  }
+
+  /* Apple-Inspired Pill Components */
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2
+           select-none whitespace-nowrap
+           backdrop-blur-md bg-white/30 text-neutral-600
+           ring-1 ring-black/5 shadow-none
+           transition-colors transition-shadow duration-150;
+  }
+
+  .pill:hover { 
+    @apply bg-white/40 ring-black/10; 
+  }
+  
+  .pill:active { 
+    @apply scale-[0.99] bg-white/50; 
+  }
+
+  .pill--active {
+    @apply bg-white/60 text-black ring-black/10;
+  }
+
+  .pill:focus-visible {
+    outline: 2px solid rgba(0,0,0,.25);
+    outline-offset: 2px;
+  }
+
+  .pill__icon {
+    @apply w-4 h-4 shrink-0;
+  }
+
+  .pill--sm { 
+    @apply px-3 py-1.5 text-[15px]; 
   }
 
   /* Echo label styling - perfectly centered both ways */

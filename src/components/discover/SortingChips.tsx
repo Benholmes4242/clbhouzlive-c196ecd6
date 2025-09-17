@@ -24,7 +24,7 @@ const sortingChips: SortingChip[] = [
 const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect }) => {
   return (
     <div className="px-4 pb-2">
-      <div className="flex overflow-x-auto scrollbar-hide gap-2">
+      <div className="flex overflow-x-auto scrollbar-hide gap-3">
         {sortingChips.map((chip) => {
           const isSelected = selectedChip === chip.id;
           
@@ -33,13 +33,11 @@ const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect 
               key={chip.id}
               onClick={() => onChipSelect(isSelected ? null : chip.id)}
               className={cn(
-                "flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 text-black border-transparent",
-                isSelected
-                  ? "bg-[hsl(var(--brand-orange)_/_0.2)]"
-                  : "bg-gray-500/20 hover:bg-[hsl(var(--brand-orange)_/_0.2)]"
+                "pill",
+                isSelected && "pill--active"
               )}
             >
-              {chip.label}
+              <span>{chip.label}</span>
             </button>
           );
         })}
