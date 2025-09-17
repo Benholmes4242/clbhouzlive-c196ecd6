@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSwipeableCard } from '@/hooks/useSwipeableCard';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
@@ -160,14 +159,15 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             data-action-button
             onClick={handleDismissClick}
             disabled={isActionLoading}
-            aria-label={`Dismiss ${user.displayName}`}
+            aria-label="Dismiss suggestion"
             className={cn(
               "relative rounded-full w-9 h-9 bg-white/15 hover:bg-white/25 flex items-center justify-center outline-none",
               "after:content-[''] after:absolute after:-inset-1",
+              "transition-all duration-200 active:scale-90 hover:scale-105",
               isActionLoading && "opacity-50 cursor-not-allowed"
             )}
           >
-            <X className="w-4 h-4 text-white" />
+            <span className="text-lg leading-none">👎</span>
           </button>
 
           {/* Follow Button */}
@@ -175,10 +175,11 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             data-action-button
             onClick={handleFollowClick}
             disabled={isActionLoading}
-            aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
+            aria-label="Follow user"
             className={cn(
               "relative rounded-full w-9 h-9 flex items-center justify-center outline-none",
               "after:content-[''] after:absolute after:-inset-1",
+              "transition-all duration-200 active:scale-90 hover:scale-105",
               user.isFollowing 
                 ? "bg-white/15 hover:bg-white/25 text-white"
                 : "bg-white/20 hover:bg-white/30 text-white",
@@ -190,7 +191,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             ) : user.isFollowing ? (
               <span className="text-sm font-medium">✓</span>
             ) : (
-              <Plus className="w-4 h-4" />
+              <span className="text-lg leading-none">👍</span>
             )}
           </button>
         </div>
@@ -198,22 +199,17 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
 
       {/* Swipe Direction Indicators */}
       {swipeState.isDragging && swipeState.progress > 0.3 && (
-        <>
-          {swipeState.direction === 'left' && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center">
-                <X className="w-8 h-8 text-white" />
-              </div>
-            </div>
-          )}
-          {swipeState.direction === 'right' && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
-                <Plus className="w-8 h-8 text-white" />
-              </div>
-            </div>
-          )}
-        </>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div
+            className={cn(
+              "w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl",
+              swipeState.direction === 'right' && "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]",
+              swipeState.direction === 'left' && "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+            )}
+          >
+            {swipeState.direction === 'right' ? '👍' : '👎'}
+          </div>
+        </div>
       )}
     </div>
   );
