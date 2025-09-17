@@ -3,6 +3,7 @@ import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSuggestionsQueue } from '@/hooks/useSuggestionsQueue';
 import SwipeableUserCard from './SwipeableUserCard';
+import './SuggestedCarousel.css';
 
 interface SuggestedForYouCarouselProps {
   onUserFollow?: (userId: string) => void;
@@ -149,14 +150,14 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
         {/* Horizontal Scrollable Cards */}
         <div 
           ref={containerRef}
-          className="flex overflow-x-auto scrollbar-hide gap-3 pb-2"
+          className="suggested-carousel overflow-x-auto scrollbar-hide grid grid-flow-col auto-cols-[var(--card-w)] gap-px snap-x snap-mandatory pb-2"
           style={{ touchAction: 'pan-y' }} // Allow vertical scroll
         >
           {queue.map((user) => (
             <div
               key={user.id}
               data-card-id={user.id}
-              className="flex-shrink-0 w-40"
+              className="snap-start"
             >
               <SwipeableUserCard
                 user={user}

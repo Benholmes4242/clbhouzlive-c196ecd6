@@ -94,7 +94,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
   return (
     <div
       {...bind}
-      className="relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer bg-gray-900 group"
+      className="relative aspect-[3/4] rounded-none overflow-hidden cursor-pointer bg-gray-900 group"
       onClick={handleCardClick}
       style={{
         transform: swipeState.transform,
@@ -142,60 +142,61 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
       {/* Liquid Glass Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-b-2xl flex flex-col items-center justify-between px-3 py-2 z-10">
-        {/* Name & Club */}
-        <div className="flex flex-col items-center mb-2">
-          <div className="text-white font-medium truncate">
-            {user.displayName || user.username || 'User'}
-          </div>
-          {user.primaryClub && (
-            <div className="text-white/70 text-xs truncate">
-              {user.primaryClub}
-            </div>
+      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-none px-3 py-2 z-10 grid grid-cols-[auto_1fr_auto] items-center">
+        {/* Left: Dismiss Button */}
+        <button
+          data-action-button
+          onClick={handleDismissClick}
+          disabled={isActionLoading}
+          aria-label="Dismiss suggestion"
+          className={cn(
+            "group relative w-9 h-9 rounded-full flex items-center justify-center outline-none",
+            "bg-white/15 hover:bg-white/25 text-white",
+            "after:content-[''] after:absolute after:-inset-1",
+            "transition-all duration-200 active:scale-90 hover:scale-105",
+            isActionLoading && "opacity-50 cursor-not-allowed"
           )}
-          <div className="text-white/80 text-xs">
+        >
+          <FaThumbsDown className="w-4 h-4" />
+          <span className="absolute -inset-1" />
+        </button>
+
+        {/* Center: User Info */}
+        <div className="flex flex-col items-center min-w-0">
+          <span className="text-white font-medium truncate">
+            {user.displayName || user.username || 'User'}
+          </span>
+          {user.primaryClub && (
+            <span className="text-white/70 text-xs truncate">
+              {user.primaryClub}
+            </span>
+          )}
+          <span className="text-white/80 text-xs">
             {user.isFollowing ? 'Following' : 'Follow'}
-          </div>
+          </span>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-6">
-          {/* Dismiss Button */}
-          <button
-            data-action-button
-            onClick={handleDismissClick}
-            disabled={isActionLoading}
-            aria-label="Dismiss suggestion"
-            className={cn(
-              "relative rounded-full w-9 h-9 bg-red-500/40 hover:bg-red-500/60 flex items-center justify-center outline-none",
-              "after:content-[''] after:absolute after:-inset-1",
-              "transition-all duration-200 active:scale-90 hover:scale-105",
-              isActionLoading && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <FaThumbsDown className="w-4 h-4 text-white" />
-          </button>
-
-          {/* Follow Button */}
-          <button
-            data-action-button
-            onClick={handleFollowClick}
-            disabled={isActionLoading}
-            aria-label="Follow user"
-            className={cn(
-              "relative rounded-full w-9 h-9 bg-green-500/40 hover:bg-green-500/60 flex items-center justify-center outline-none",
-              "after:content-[''] after:absolute after:-inset-1",
-              "transition-all duration-200 active:scale-90 hover:scale-105",
-              isActionLoading && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            {isActionLoading ? (
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <FaThumbsUp className="w-4 h-4 text-white" />
-            )}
-          </button>
-        </div>
+        {/* Right: Follow Button */}
+        <button
+          data-action-button
+          onClick={handleFollowClick}
+          disabled={isActionLoading}
+          aria-label="Follow user"
+          className={cn(
+            "group relative w-9 h-9 rounded-full flex items-center justify-center outline-none",
+            "bg-white/15 hover:bg-white/25 text-white",
+            "after:content-[''] after:absolute after:-inset-1",
+            "transition-all duration-200 active:scale-90 hover:scale-105",
+            isActionLoading && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          {isActionLoading ? (
+            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <FaThumbsUp className="w-4 h-4" />
+          )}
+          <span className="absolute -inset-1" />
+        </button>
       </div>
 
       {/* Swipe Direction Indicators */}
