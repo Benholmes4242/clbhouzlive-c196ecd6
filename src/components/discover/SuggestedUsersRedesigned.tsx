@@ -1,7 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
 
@@ -16,16 +19,21 @@ interface SuggestedUserCardProps {
     latestPostAt: string;
   };
   onToggleFollow: (userId: string) => Promise<boolean>;
+  onDismiss: (userId: string) => Promise<void>;
   isVisible: boolean;
 }
 
 const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({ 
   user, 
   onToggleFollow,
+  onDismiss,
   isVisible 
 }) => {
   const navigate = useNavigate();
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [isDismissLoading, setIsDismissLoading] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | null>(null);
+  const [dragY, setDragY] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Handle video autoplay based on visibility
@@ -51,12 +59,18 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (isFollowLoading) return;
+    if (isFollowLoading || isDismissLoading) return;
     
     setIsFollowLoading(true);
     try {
       const success = await onToggleFollow(user.id);
-      if (!success) {
+      if (success) {
+        toast.success(`Followed ${user.displayName}`);
+        // Analytics
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'suggestion_follow', { method: 'tap' });
+        }
+      } else {
         toast.error('Failed to update follow status');
       }
     } catch (error) {
@@ -67,13 +81,110 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
+  const handleDismissClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isDismissLoading || isFollowLoading) return;
+    
+    setIsDismissLoading(true);
+    try {
+      await onDismiss(user.id);
+      toast.success(`Dismissed ${user.displayName}`);
+      // Analytics
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'suggestion_dismiss', { method: 'tap' });
+      }
+    } catch (error) {
+      console.error('Dismiss error:', error);
+      toast.error('Failed to dismiss suggestion');
+    } finally {
+      setIsDismissLoading(false);
+    }
+  };
+
+  const handleSwipeUp = async () => {
+    if (isFollowLoading || isDismissLoading) return;
+    
+    setSwipeDirection('up');
+    setIsFollowLoading(true);
+    
+    try {
+      const success = await onToggleFollow(user.id);
+      if (success) {
+        toast.success(`Followed ${user.displayName}`);
+        // Analytics
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'suggestion_follow', { method: 'swipe_up' });
+        }
+      }
+    } catch (error) {
+      console.error('Follow error:', error);
+      toast.error('Failed to follow user');
+    } finally {
+      setIsFollowLoading(false);
+      setSwipeDirection(null);
+    }
+  };
+
+  const handleSwipeDown = async () => {
+    if (isDismissLoading || isFollowLoading) return;
+    
+    setSwipeDirection('down');
+    setIsDismissLoading(true);
+    
+    try {
+      await onDismiss(user.id);
+      toast.success(`Dismissed ${user.displayName}`);
+      // Analytics
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'suggestion_dismiss', { method: 'swipe_down' });
+      }
+    } catch (error) {
+      console.error('Dismiss error:', error);
+      toast.error('Failed to dismiss suggestion');
+    } finally {
+      setIsDismissLoading(false);
+      setSwipeDirection(null);
+    }
+  };
+
+  const handleSwiping = (deltaX: number, deltaY: number) => {
+    // Only respond to vertical swipes (axis lock)
+    if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
+      setDragY(deltaY);
+    }
+  };
+
+  const handleSwipeEnd = () => {
+    setDragY(0);
+  };
+
+  // Swipe gesture hook
+  const swipeRef = useSwipeGesture({
+    onSwipeUp: handleSwipeUp,
+    onSwipeDown: handleSwipeDown,
+    onSwiping: handleSwiping,
+    onSwipeEnd: handleSwipeEnd,
+    threshold: 90,
+    preventDefaultTouchMove: true
+  });
+
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
   const isVideo = !!user.latestVideo;
 
   return (
-    <div
-      className="relative aspect-[3/4] overflow-hidden cursor-pointer bg-gray-900 group"
+    <motion.div
+      ref={swipeRef}
+      className="relative overflow-hidden rounded-none snap-start cursor-pointer bg-gray-900"
       onClick={handleCardClick}
+      style={{
+        transform: `translateY(${dragY * 0.05}px)`,
+        opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1
+      }}
+      animate={{
+        scale: swipeDirection ? 0.95 : 1
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       {/* Media Content */}
       {mediaUrl ? (
@@ -82,11 +193,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             ref={videoRef}
             src={mediaUrl}
             poster={user.latestVideo?.poster}
-            autoplay={false} // Controlled manually
+            autoplay={false}
             muted={true}
             loop={true}
             controls={false}
-            className="w-full h-full"
+            className="w-full h-full aspect-[3/4]"
             objectFit="cover"
             hideControls={true}
           />
@@ -94,11 +205,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <img
             src={mediaUrl}
             alt={`${user.displayName}'s post`}
-            className="w-full h-full object-cover"
+            className="w-full h-full aspect-[3/4] object-cover"
           />
         )
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+        <div className="w-full h-full aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
             <span className="text-white text-lg font-bold">
               {user.displayName.charAt(0).toUpperCase()}
@@ -107,53 +218,137 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Gradient Overlay for Text Legibility - ALWAYS SHOW */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      {/* Swipe Direction Overlay */}
+      {dragY !== 0 && (
+        <div 
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{
+            backgroundColor: dragY > 0 
+              ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
+              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
+          }}
+        >
+          {Math.abs(dragY) > 30 && (
+            <div className={cn(
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
+              dragY > 0 
+                ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
+                : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+            )}>
+              {dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />}
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Bottom Overlay with User Info - ALWAYS SHOW */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-        <div className="liquid-glass rounded-xl p-3">
-          <div className="flex flex-col items-center space-y-2">
-            {/* Display Name - ALWAYS SHOW */}
-            <h4 className="text-white font-semibold text-sm text-center truncate w-full leading-tight drop-shadow-sm">
-              {user.displayName || user.handle || 'User'}
-            </h4>
-
-            {/* Follow Button - ALWAYS SHOW */}
-            <button
-              data-follow-button
-              onClick={handleFollowClick}
-              disabled={isFollowLoading}
-              aria-label={`${user.isFollowing ? 'Unfollow' : 'Follow'} ${user.displayName}`}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 min-w-[80px]",
-                "liquid-glass-button",
-                user.isFollowing && "following",
-                user.isFollowing 
-                  ? "text-white" 
-                  : "text-black",
-                isFollowLoading && "opacity-70 cursor-not-allowed"
-              )}
-            >
-              {isFollowLoading ? '...' : user.isFollowing ? 'Following' : 'Follow'}
-            </button>
+      {/* Swipe Feedback Bubble */}
+      {swipeDirection && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div
+            className={cn(
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
+              swipeDirection === 'up'
+                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+            )}
+          >
+            {swipeDirection === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
           </div>
         </div>
+      )}
+
+      {/* Liquid Glass Overlay */}
+      <div className="
+        absolute inset-x-0 bottom-0
+        h-[clamp(64px,25%,92px)]
+        bg-black/35 backdrop-blur-md
+        rounded-none
+        px-3 py-2 z-10
+        grid grid-cols-[auto_1fr_auto] items-center
+      ">
+        {/* Left: Dismiss Button */}
+        <motion.button
+          aria-label="Dismiss suggestion"
+          onClick={handleDismissClick}
+          disabled={isDismissLoading || isFollowLoading}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+        >
+          <FaThumbsDown className="text-base" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
+
+        {/* Center: User Info */}
+        <div className="flex flex-col items-center min-w-0">
+          <span className="text-white font-medium truncate">
+            {user.displayName || user.handle || 'User'}
+          </span>
+          <span className="text-white/80 text-xs">
+            {user.isFollowing ? 'Following' : 'Follow'}
+          </span>
+        </div>
+
+        {/* Right: Follow Button */}
+        <motion.button
+          aria-label="Follow user"
+          onClick={handleFollowClick}
+          disabled={isFollowLoading || isDismissLoading}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+        >
+          <FaThumbsUp className="text-base" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 interface SuggestedUsersRedesignedProps {
   onUserFollow?: (userId: string) => void;
+  onUserDismiss?: (userId: string) => void;
 }
 
 const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({ 
-  onUserFollow 
+  onUserFollow,
+  onUserDismiss 
 }) => {
   const { users, loading, error, toggleFollow, refetch } = useSuggestedUsersDiscover();
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const [dismissedUsers, setDismissedUsers] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleToggleFollow = async (userId: string) => {
+    const success = await toggleFollow(userId);
+    if (success && onUserFollow) {
+      onUserFollow(userId);
+    }
+    return success;
+  };
+
+  const handleDismiss = async (userId: string) => {
+    setDismissedUsers(prev => new Set([...prev, userId]));
+    if (onUserDismiss) {
+      onUserDismiss(userId);
+    }
+  };
+
+  // Filter out dismissed users
+  const filteredUsers = users.filter(user => !dismissedUsers.has(user.id));
 
   // Intersection observer for video autoplay
   useEffect(() => {
@@ -188,14 +383,6 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
 
     return () => observer.disconnect();
   }, [users]);
-
-  const handleToggleFollow = async (userId: string) => {
-    const success = await toggleFollow(userId);
-    if (success && onUserFollow) {
-      onUserFollow(userId);
-    }
-    return success;
-  };
 
   if (loading) {
     return (
@@ -241,7 +428,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
     );
   }
 
-  if (users.length === 0) {
+  if (filteredUsers.length === 0) {
     return null;
   }
 
@@ -260,7 +447,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
           ref={containerRef}
           className="flex overflow-x-auto scrollbar-hide gap-px pb-2"
         >
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user.id}
               data-card-id={user.id}
@@ -269,6 +456,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
               <SuggestedUserCard
                 user={user}
                 onToggleFollow={handleToggleFollow}
+                onDismiss={handleDismiss}
                 isVisible={visibleCards.has(user.id)}
               />
             </div>
