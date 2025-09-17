@@ -32,6 +32,8 @@ export const useSuggestedUsersDiscover = () => {
         return;
       }
 
+      console.log('Current user ID:', currentUser.id);
+
       // Get users with their latest posts and media, excluding current user
       const { data: usersWithPosts, error: usersError } = await supabase
         .from('user_profiles')
@@ -44,6 +46,8 @@ export const useSuggestedUsersDiscover = () => {
         .neq('id', currentUser.id)
         .eq('is_public', true)
         .limit(50);
+
+      console.log('Fetched users (excluding current):', usersWithPosts?.length, usersWithPosts?.map(u => ({ id: u.id, name: u.display_name })));
 
       // Get posts separately due to relation issues
       const { data: postsData } = await supabase
@@ -79,6 +83,12 @@ export const useSuggestedUsersDiscover = () => {
       // Process users and find their latest media - only include users with actual posts
       const processedUsers: SuggestedUserMedia[] = (usersWithPosts || [])
         .map(user => {
+          // Additional safety check: never include current user
+          if (user.id === currentUser.id) {
+            console.log('WARNING: Current user found in results, filtering out:', user.id);
+            return null;
+          }
+
           // Find user's posts with media
           const userPosts = (postsData || [])
             .filter(post => post.user_id === user.id && post.post_media && post.post_media.length > 0)
@@ -86,6 +96,7 @@ export const useSuggestedUsersDiscover = () => {
 
           // Skip users with no posts (exclude users with zero posts requirement)
           if (!userPosts || userPosts.length === 0) {
+            console.log('Filtering out user with no media posts:', user.display_name || user.username);
             return null;
           }
 
@@ -148,7 +159,16 @@ export const useSuggestedUsersDiscover = () => {
       }
 
       // Limit to 30 users for performance
-      setUsers(balanced.slice(0, 30));
+      const finalUsers = balanced.slice(0, 30);
+      
+      // Final safety check - log if current user somehow made it through
+      const currentUserInResults = finalUsers.find(u => u.id === currentUser.id);
+      if (currentUserInResults) {
+        console.error('CRITICAL: Current user found in final results!', currentUserInResults);
+      }
+      
+      console.log('Final suggested users:', finalUsers.length, finalUsers.map(u => ({ id: u.id, name: u.displayName })));
+      setUsers(finalUsers);
 
     } catch (error) {
       console.error('Error in fetchSuggestedUsers:', error);
