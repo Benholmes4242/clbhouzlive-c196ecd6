@@ -207,7 +207,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
             </h3>
           </div>
           
-          <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
+          <div className="flex overflow-x-auto scrollbar-hide gap-px pb-2">
             {[...Array(5)].map((_, i) => (
               <div 
                 key={i} 
@@ -258,7 +258,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         {/* Horizontal Scrollable Cards */}
         <div 
           ref={containerRef}
-          className="flex overflow-x-auto scrollbar-hide gap-3 pb-2"
+          className="flex overflow-x-auto scrollbar-hide gap-px pb-2"
         >
           {users.map((user) => (
             <div
