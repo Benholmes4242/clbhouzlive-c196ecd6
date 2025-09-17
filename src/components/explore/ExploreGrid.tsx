@@ -301,12 +301,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
               const row1Squares = squareItems.filter(item => item.row === 1).slice(0, 3);
               const row2Squares = squareItems.filter(item => item.row === 2).slice(0, 3);
               
-              // Add row 1 items
-              if (isPortraitOnRight) {
-                // Portrait on right: squares in cols 1,2,3, portrait in col 4
-                row1Squares.forEach((item, idx) => {
-                  sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
+                 // Add row 1 items
+                if (isPortraitOnRight) {
+                  // Portrait on right: squares in cols 1,2,3, portrait in col 4
+                  row1Squares.forEach((item, idx) => {
+                    sections.push(
+                      <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -440,7 +440,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 
                 row1Squares.forEach((item, idx) => {
                   sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
+                    <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -477,7 +477,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
               if (isPortraitOnRight) {
                 row2Squares.forEach((item, idx) => {
                   sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
+                    <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -511,7 +511,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
               } else {
                 row2Squares.forEach((item, idx) => {
                   sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 2 }}>
+                    <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: idx + 2, gridRow: sectionStart + 2 }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -592,7 +592,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 if (heroItem) {
                   const heroCol = isHeroOnRight ? 2 : 1;
                   sections.push(
-                    <div key={heroItem.key} className="col-span-2 row-span-2 aspect-square" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: 'span 2' }}>
+                    <div key={heroItem.key} className="col-span-2 row-span-2 aspect-[3/4]" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: 'span 2' }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(heroItem.item)}
@@ -629,7 +629,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 squareItems.forEach((item, idx) => {
                   const squareCol = isHeroOnRight ? 1 : 3;
                   sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
+                    <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -710,7 +710,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   const col = baseCol + colOffset;
                   
                   sections.push(
-                    <div key={item.key} className="aspect-square" style={{ gridColumn: col, gridRow: sectionStart + row }}>
+                    <div key={item.key} className="aspect-[3/4]" style={{ gridColumn: col, gridRow: sectionStart + row }}>
                       <div
                         className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(item.item)}
@@ -765,24 +765,26 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
 
   return (
     <>
-      {/* Fixed Grid Layout with Square and Portrait Cards */}
+      {/* Fixed Grid Layout with Cards Matching Suggested Users Size */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'portrait') {
             return (
               <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isPortrait={true}
-                />
+                <div className="aspect-[3/4]">
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isPortrait={true}
+                  />
+                </div>
               </div>
             );
           } else if (gridItem.type === 'hero') {
             return (
-              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-[3/4]">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
@@ -793,9 +795,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
               </div>
             );
           } else {
-            // Square card
+            // Standard card with matching aspect ratio
             return (
-              <div key={gridItem.key} className="aspect-square">
+              <div key={gridItem.key} className="aspect-[3/4]">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
