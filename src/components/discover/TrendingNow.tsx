@@ -110,7 +110,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                 key={hashtag.id}
                 onClick={() => handleHashtagClick(hashtag.tag)}
                 className={cn(
-                  "pill pill--sm",
+                  "pill",
                   isSelected && "pill--active"
                 )}
               >
