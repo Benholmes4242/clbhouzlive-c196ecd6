@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSwipeableCard } from '@/hooks/useSwipeableCard';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
@@ -167,7 +168,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
               isActionLoading && "opacity-50 cursor-not-allowed"
             )}
           >
-            <span className="text-lg leading-none">👎</span>
+            <ThumbsDown className="w-4 h-4 text-white" />
           </button>
 
           {/* Follow Button */}
@@ -191,7 +192,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             ) : user.isFollowing ? (
               <span className="text-sm font-medium">✓</span>
             ) : (
-              <span className="text-lg leading-none">👍</span>
+              <ThumbsUp className="w-4 h-4 text-white" />
             )}
           </button>
         </div>
@@ -207,7 +208,11 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
               swipeState.direction === 'left' && "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
             )}
           >
-            {swipeState.direction === 'right' ? '👍' : '👎'}
+            {swipeState.direction === 'right' ? (
+              <ThumbsUp className="w-6 h-6 text-white" />
+            ) : (
+              <ThumbsDown className="w-6 h-6 text-white" />
+            )}
           </div>
         </div>
       )}
