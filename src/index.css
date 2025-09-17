@@ -489,11 +489,12 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   /* Apple-Inspired Pill Components */
   .pill {
-    @apply inline-flex items-center gap-2 rounded-full px-4 py-2
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
            select-none whitespace-nowrap
            backdrop-blur-md bg-white/30 text-neutral-600
            border border-black/5 shadow-none
            transition-colors transition-shadow duration-150;
+    line-height: 1;
   }
 
   .pill:hover { 
@@ -514,7 +515,8 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   .pill__icon {
-    @apply w-4 h-4 shrink-0;
+    @apply w-4 h-4 shrink-0 flex items-center justify-center;
+    line-height: 1;
   }
 
   .pill--sm { 
