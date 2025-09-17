@@ -189,8 +189,6 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
           >
             {isActionLoading ? (
               <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : user.isFollowing ? (
-              <span className="text-sm font-medium">✓</span>
             ) : (
               <FaThumbsUp className="w-4 h-4 text-white" />
             )}
