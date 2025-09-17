@@ -138,7 +138,7 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
     <div className="pt-1 pb-6">
       <div className="px-4 md:container md:mx-auto md:px-0">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Suggested users to follow
           </h3>
