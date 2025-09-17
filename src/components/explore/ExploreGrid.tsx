@@ -765,47 +765,18 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
 
   return (
     <>
-      {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
-        {gridItems.map((gridItem) => {
-          if (gridItem.type === 'portrait') {
-            return (
-              <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isPortrait={true}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'hero') {
-            return (
-              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isFeatured={true}
-                />
-              </div>
-            );
-          } else {
-            // Square card
-            return (
-              <div key={gridItem.key} className="aspect-[3/4]">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          }
-        })}
+      {/* Uniform Grid Layout with Same Size Cards as Suggested Users */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0">
+        {content.map((item, index) => (
+          <div key={`${item.id}-${index}`} className="aspect-[3/4]">
+            <ExploreContentCard 
+              item={item} 
+              onLike={onLike} 
+              onFollow={onFollow} 
+              onMediaClick={onMediaClick}
+            />
+          </div>
+        ))}
       </div>
       
       {/* Preload sentinel and Infinite scroll sentinel */}
