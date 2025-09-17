@@ -50,7 +50,7 @@ export const useSuggestionsQueue = (): UseSuggestionsQueue => {
       const dismissedUserIds = dismissedData?.map(d => d.dismissed_user_id) || [];
       
       // Get users with their latest posts and media, excluding current user and dismissed users
-      const { data: usersWithPosts, error: usersError } = await supabase
+      let query = supabase
         .from('user_profiles')
         .select(`
           id,
@@ -59,9 +59,14 @@ export const useSuggestionsQueue = (): UseSuggestionsQueue => {
           profile_photo_url
         `)
         .neq('id', currentUser.id)
-        .not('id', 'in', `(${dismissedUserIds.join(',') || 'null'})`)
-        .eq('is_public', true)
-        .limit(50);
+        .eq('is_public', true);
+
+      // Only add the not.in filter if there are dismissed users
+      if (dismissedUserIds.length > 0) {
+        query = query.not('id', 'in', `(${dismissedUserIds.join(',')})`);
+      }
+
+      const { data: usersWithPosts, error: usersError } = await query.limit(50);
 
       if (usersError) {
         console.error('Error fetching users:', usersError);
