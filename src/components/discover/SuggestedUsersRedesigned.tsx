@@ -5,6 +5,7 @@ import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface SuggestedUserCardProps {
   user: {
@@ -31,6 +32,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [isDismissLoading, setIsDismissLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Add swipe gesture support
+  const swipeRef = useSwipeGesture({
+    onSwipeUp: () => {
+      if (!isFollowLoading) {
+        handleFollowClick({ stopPropagation: () => {} } as React.MouseEvent);
+      }
+    },
+    onSwipeDown: () => {
+      if (!isDismissLoading) {
+        handleDismissClick({ stopPropagation: () => {} } as React.MouseEvent);
+      }
+    },
+    threshold: 50,
+    preventDefaultTouchMove: true
+  });
 
   // Handle video autoplay based on visibility
   useEffect(() => {
@@ -103,6 +120,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   return (
     <div
+      ref={swipeRef}
       className="relative overflow-hidden rounded-none snap-start aspect-[3/4] cursor-pointer bg-gray-900 group"
       onClick={handleCardClick}
     >
@@ -145,19 +163,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        grid grid-cols-[auto_1fr_auto] items-center
+        flex items-center justify-center
       ">
-        {/* Left - Dismiss */}
-        <button 
-          aria-label="Dismiss suggestion" 
-          onClick={handleDismissClick}
-          disabled={isDismissLoading}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-red-500/30"
-        >
-          <FaThumbsDown className="w-4 h-4" />
-          <span className="absolute -inset-1" />
-        </button>
-
         {/* Center - User Info */}
         <div className="flex flex-col items-center min-w-0">
           <span className="text-white font-medium truncate text-sm">
@@ -167,18 +174,29 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             {user.isFollowing ? 'Following' : 'Follow'}
           </span>
         </div>
-
-        {/* Right - Follow */}
-        <button 
-          aria-label="Follow user" 
-          onClick={handleFollowClick}
-          disabled={isFollowLoading}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-green-500/30"
-        >
-          <FaThumbsUp className="w-4 h-4" />
-          <span className="absolute -inset-1" />
-        </button>
       </div>
+
+      {/* Bottom Left - Dismiss */}
+      <button 
+        aria-label="Dismiss suggestion (swipe down)" 
+        onClick={handleDismissClick}
+        disabled={isDismissLoading}
+        className="absolute bottom-2 left-2 group relative w-7 h-7 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-red-500/30 z-20"
+      >
+        <FaThumbsDown className="w-3 h-3" />
+        <span className="absolute -inset-1" />
+      </button>
+
+      {/* Bottom Right - Follow */}
+      <button 
+        aria-label="Follow user (swipe up)" 
+        onClick={handleFollowClick}
+        disabled={isFollowLoading}
+        className="absolute bottom-2 right-2 group relative w-7 h-7 rounded-full flex items-center justify-center bg-white/15 hover:bg-white/25 text-white transition-all duration-200 hover:bg-green-500/30 z-20"
+      >
+        <FaThumbsUp className="w-3 h-3" />
+        <span className="absolute -inset-1" />
+      </button>
     </div>
   );
 };
