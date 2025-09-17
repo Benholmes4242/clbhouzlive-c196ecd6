@@ -33,14 +33,19 @@ export const useSwipeGesture = ({
   };
 
   const handleTouchMove = (e: TouchEvent) => {
-    if (preventDefaultTouchMove) {
-      e.preventDefault();
-    }
-    
     if (onSwiping) {
       const deltaX = e.targetTouches[0].clientX - touchStartX.current;
       const deltaY = e.targetTouches[0].clientY - touchStartY.current;
       onSwiping(deltaX, deltaY);
+    }
+    
+    // Only prevent default if explicitly requested and it's a vertical gesture
+    if (preventDefaultTouchMove && onSwiping) {
+      const deltaX = e.targetTouches[0].clientX - touchStartX.current;
+      const deltaY = e.targetTouches[0].clientY - touchStartY.current;
+      if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
+        e.preventDefault();
+      }
     }
   };
 
@@ -88,7 +93,7 @@ export const useSwipeGesture = ({
     if (!element) return;
 
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
-    element.addEventListener('touchmove', handleTouchMove, { passive: !preventDefaultTouchMove });
+    element.addEventListener('touchmove', handleTouchMove, { passive: true });
     element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {

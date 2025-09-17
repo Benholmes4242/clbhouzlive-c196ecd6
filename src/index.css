@@ -127,6 +127,26 @@ html, body, #root, .app-shell { touch-action: auto; }
   animation: subtle-bounce 2s ease-in-out infinite;
 }
 
+/* One-shot ping animation for swipe feedback */
+@keyframes pingonce {
+  0% { 
+    transform: scale(0.9); 
+    opacity: 0.95; 
+  }
+  60% { 
+    transform: scale(1.05); 
+    opacity: 0.9; 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 0; 
+  }
+}
+
+.animate-pingonce {
+  animation: pingonce 340ms ease-out both;
+}
+
 /* Echo Avatar Waveform Animation */
 @keyframes echoWave {
   0%, 100% {

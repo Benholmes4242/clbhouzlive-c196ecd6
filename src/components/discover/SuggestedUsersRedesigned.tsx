@@ -34,6 +34,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [isDismissLoading, setIsDismissLoading] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | null>(null);
   const [dragY, setDragY] = useState(0);
+  const [flash, setFlash] = useState<'up' | 'down' | null>(null);
+  const [isVertical, setIsVertical] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Handle video autoplay based on visibility
@@ -102,11 +104,17 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
+  const flashGlow = (dir: 'up' | 'down') => {
+    setFlash(dir);
+    setTimeout(() => setFlash(null), 350);
+  };
+
   const handleSwipeUp = async () => {
-    if (isFollowLoading || isDismissLoading) return;
+    if (isFollowLoading || isDismissLoading || !isVertical) return;
     
     setSwipeDirection('up');
     setIsFollowLoading(true);
+    flashGlow('up');
     
     try {
       const success = await onToggleFollow(user.id);
@@ -127,10 +135,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   };
 
   const handleSwipeDown = async () => {
-    if (isDismissLoading || isFollowLoading) return;
+    if (isDismissLoading || isFollowLoading || !isVertical) return;
     
     setSwipeDirection('down');
     setIsDismissLoading(true);
+    flashGlow('down');
     
     try {
       await onDismiss(user.id);
@@ -149,14 +158,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   };
 
   const handleSwiping = (deltaX: number, deltaY: number) => {
-    // Only respond to vertical swipes (axis lock)
+    // Axis lock: engage vertical only when clearly vertical
     if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
+      setIsVertical(true);
       setDragY(deltaY);
+    } else {
+      setIsVertical(false);
+      setDragY(0);
     }
   };
 
   const handleSwipeEnd = () => {
     setDragY(0);
+    setIsVertical(false);
   };
 
   // Swipe gesture hook
@@ -166,7 +180,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     onSwiping: handleSwiping,
     onSwipeEnd: handleSwipeEnd,
     threshold: 90,
-    preventDefaultTouchMove: true
+    preventDefaultTouchMove: false
   });
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
@@ -179,7 +193,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       onClick={handleCardClick}
       style={{
         transform: `translateY(${dragY * 0.05}px)`,
-        opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1
+        opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1,
+        touchAction: 'pan-y'
       }}
       animate={{
         scale: swipeDirection ? 0.95 : 1
@@ -238,6 +253,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               {dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Flash Feedback Bubble */}
+      {flash && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+          <div
+            className={cn(
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
+              flash === 'up'
+                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+            )}
+          >
+            {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
+          </div>
         </div>
       )}
 
@@ -446,6 +477,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         <div 
           ref={containerRef}
           className="flex overflow-x-auto scrollbar-hide gap-px pb-2"
+          style={{ touchAction: 'pan-x' }}
         >
           {filteredUsers.map((user) => (
             <div
