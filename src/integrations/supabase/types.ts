@@ -1700,33 +1700,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_suggestion_dismissals: {
-        Row: {
-          created_at: string
-          dismissed_at: string
-          dismissed_user_id: string
-          expires_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          dismissed_at?: string
-          dismissed_user_id: string
-          expires_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          dismissed_at?: string
-          dismissed_user_id?: string
-          expires_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_top_ten_lists: {
         Row: {
           courses: Json
@@ -1885,10 +1858,6 @@ export type Database = {
         Returns: {
           newly_awarded_badges: Json
         }[]
-      }
-      cleanup_expired_dismissals: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
       execute_sql: {
         Args: { params?: Json; query: string }

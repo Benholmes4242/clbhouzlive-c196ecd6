@@ -4,7 +4,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import SuggestedForYouCarousel from '@/components/discover/SuggestedForYouCarousel';
+import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import TrendingNow from '@/components/discover/TrendingNow';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
@@ -179,7 +179,7 @@ const Discover = () => {
 
 
           {/* Suggested Users */}
-          <SuggestedForYouCarousel onUserFollow={handleUserFollow} />
+          <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
 
           {/* Trending Now Section */}
           <div>

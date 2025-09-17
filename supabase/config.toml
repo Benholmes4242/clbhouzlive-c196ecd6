@@ -136,6 +136,3 @@ verify_jwt = false
 
 [functions.generate-map-url]
 verify_jwt = false
-
-[functions.dismiss-suggestion]
-verify_jwt = true
