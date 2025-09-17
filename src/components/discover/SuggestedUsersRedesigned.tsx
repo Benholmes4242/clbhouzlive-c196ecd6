@@ -32,22 +32,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [isDismissLoading, setIsDismissLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
-  // Add swipe gesture support
-  const swipeRef = useSwipeGesture({
-    onSwipeUp: () => {
-      if (!isFollowLoading) {
-        handleFollowClick({ stopPropagation: () => {} } as React.MouseEvent);
-      }
-    },
-    onSwipeDown: () => {
-      if (!isDismissLoading) {
-        handleDismissClick({ stopPropagation: () => {} } as React.MouseEvent);
-      }
-    },
-    threshold: 50,
-    preventDefaultTouchMove: true
-  });
 
   // Handle video autoplay based on visibility
   useEffect(() => {
@@ -115,12 +99,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
+
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
   const isVideo = !!user.latestVideo;
 
   return (
     <div
-      ref={swipeRef}
       className="relative overflow-hidden rounded-none snap-start aspect-[3/4] cursor-pointer bg-gray-900 group"
       onClick={handleCardClick}
     >
