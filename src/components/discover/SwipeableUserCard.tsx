@@ -142,19 +142,19 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
       {/* Liquid Glass Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-b-2xl flex items-center justify-between px-3 py-2 z-10">
-        {/* Left: Name & Status */}
-        <div className="min-w-0">
-          <div className="text-white/95 font-medium truncate">
+      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-b-2xl flex flex-col items-center justify-between px-3 py-2 z-10">
+        {/* Name & Status */}
+        <div className="flex flex-col items-center mb-2">
+          <div className="text-white font-medium truncate">
             {user.displayName || user.username || 'User'}
           </div>
-          <div className="mt-0.5 text-white/80 text-xs">
-            {user.isFollowing ? 'Following' : user.primaryClub ?? ''}
+          <div className="text-white/80 text-xs">
+            {user.isFollowing ? 'Following' : 'Follow'}
           </div>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="flex gap-6">
           {/* Dismiss Button */}
           <button
             data-action-button
@@ -162,7 +162,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             disabled={isActionLoading}
             aria-label="Dismiss suggestion"
             className={cn(
-              "relative rounded-full w-9 h-9 bg-white/15 hover:bg-white/25 flex items-center justify-center outline-none",
+              "relative rounded-full w-9 h-9 bg-red-500/40 hover:bg-red-500/60 flex items-center justify-center outline-none",
               "after:content-[''] after:absolute after:-inset-1",
               "transition-all duration-200 active:scale-90 hover:scale-105",
               isActionLoading && "opacity-50 cursor-not-allowed"
@@ -178,12 +178,9 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
             disabled={isActionLoading}
             aria-label="Follow user"
             className={cn(
-              "relative rounded-full w-9 h-9 flex items-center justify-center outline-none",
+              "relative rounded-full w-9 h-9 bg-green-500/40 hover:bg-green-500/60 flex items-center justify-center outline-none",
               "after:content-[''] after:absolute after:-inset-1",
               "transition-all duration-200 active:scale-90 hover:scale-105",
-              user.isFollowing 
-                ? "bg-white/15 hover:bg-white/25 text-white"
-                : "bg-white/20 hover:bg-white/30 text-white",
               isActionLoading && "opacity-50 cursor-not-allowed"
             )}
           >

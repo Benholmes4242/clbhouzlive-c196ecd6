@@ -66,7 +66,7 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
         <div className="md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Suggested for you
+              Suggested users to follow
             </h3>
           </div>
           
@@ -89,7 +89,7 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
         <div className="md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Suggested for you
+              Suggested users to follow
             </h3>
             <button 
               onClick={refetch}
@@ -111,7 +111,7 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
         <div className="md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Suggested for you
+              Suggested users to follow
             </h3>
           </div>
           
@@ -139,7 +139,7 @@ const SuggestedForYouCarousel: React.FC<SuggestedForYouCarouselProps> = ({
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Suggested for you
+            Suggested users to follow
           </h3>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Swipe or tap to follow/dismiss
