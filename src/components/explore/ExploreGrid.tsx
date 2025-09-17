@@ -271,8 +271,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout - use new grid structure (desktop only)
-  if (isDiscoverPage && !isMobile) {
+  // Check if we should use Discover page layout - disabled to use uniform grid
+  if (false) {
     const gridItems = createGridLayout();
     
     return (
