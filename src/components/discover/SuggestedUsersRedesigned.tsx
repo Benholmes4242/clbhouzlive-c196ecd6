@@ -76,52 +76,50 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       onClick={handleCardClick}
     >
       {/* Media Content */}
-      {mediaUrl && (
-        <>
-          {isVideo ? (
-            <EnhancedVideoPlayer
-              ref={videoRef}
-              src={mediaUrl}
-              poster={user.latestVideo?.poster}
-              autoplay={false} // Controlled manually
-              muted={true}
-              loop={true}
-              controls={false}
-              className="w-full h-full"
-              objectFit="cover"
-              hideControls={true}
-            />
-          ) : mediaUrl ? (
-            <img
-              src={mediaUrl}
-              alt={`${user.displayName}'s post`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                <span className="text-white text-lg font-bold">
-                  {user.displayName.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
-          )}
-        </>
+      {mediaUrl ? (
+        isVideo ? (
+          <EnhancedVideoPlayer
+            ref={videoRef}
+            src={mediaUrl}
+            poster={user.latestVideo?.poster}
+            autoplay={false} // Controlled manually
+            muted={true}
+            loop={true}
+            controls={false}
+            className="w-full h-full"
+            objectFit="cover"
+            hideControls={true}
+          />
+        ) : (
+          <img
+            src={mediaUrl}
+            alt={`${user.displayName}'s post`}
+            className="w-full h-full object-cover"
+          />
+        )
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+            <span className="text-white text-lg font-bold">
+              {user.displayName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        </div>
       )}
 
-      {/* Gradient Overlay for Text Legibility */}
+      {/* Gradient Overlay for Text Legibility - ALWAYS SHOW */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-      {/* Bottom Overlay with User Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-3">
+      {/* Bottom Overlay with User Info - ALWAYS SHOW */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
         <div className="liquid-glass rounded-xl p-3">
           <div className="flex flex-col items-center space-y-2">
-            {/* Display Name */}
+            {/* Display Name - ALWAYS SHOW */}
             <h4 className="text-white font-semibold text-sm text-center truncate w-full leading-tight drop-shadow-sm">
-              {user.displayName}
+              {user.displayName || user.handle || 'User'}
             </h4>
 
-            {/* Follow Button */}
+            {/* Follow Button - ALWAYS SHOW */}
             <button
               data-follow-button
               onClick={handleFollowClick}
