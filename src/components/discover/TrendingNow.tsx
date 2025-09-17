@@ -110,18 +110,13 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                 key={hashtag.id}
                 onClick={() => handleHashtagClick(hashtag.tag)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150",
-                  "whitespace-nowrap flex-shrink-0",
-                  isSelected
-                    ? "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700"
-                    : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700"
+                  "pill pill--sm",
+                  isSelected && "pill--active"
                 )}
               >
-                <IoFlameOutline className="w-5 h-5 text-orange-500" />
-                <span>{hashtag.tag.replace('#', '')}</span>
-                <span className="text-xs text-gray-500 ml-1">
-                  {formatCount(hashtag.postCount)}
-                </span>
+                <IoFlameOutline className="pill__icon" style={{color: 'var(--trend-icon)'}} />
+                <span className="font-medium">{hashtag.tag.replace('#', '')}</span>
+                <span className="opacity-70">{formatCount(hashtag.postCount)}</span>
                 {isSelected && (
                   <X 
                     className="w-3 h-3 ml-1 cursor-pointer hover:text-orange-900" 

@@ -69,25 +69,15 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       <button
         key={filter}
         onClick={() => onFilterChange(filter)}
-        className={`
-          flex items-center gap-2 px-4 py-2 group
-          whitespace-nowrap flex-shrink-0 transition-none
-          focus:outline-none border rounded-full text-black
-          ${isActive 
-            ? 'bg-[hsl(var(--brand-orange)_/_0.2)] border-transparent' 
-            : 'bg-gray-100 border-transparent hover:bg-[hsl(var(--brand-orange)_/_0.2)] hover:border-transparent transition-all duration-200'
-          }
-        `}
+        className={`pill ${isActive ? 'pill--active' : ''}`}
       >
         {/* Icon */}
-        <div className="text-black">
+        <div className="pill__icon">
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
-        <span className="text-base font-medium text-black">
-          {filter}
-        </span>
+        <span>{filter}</span>
       </button>
     );
   };
