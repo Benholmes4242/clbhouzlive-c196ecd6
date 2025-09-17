@@ -142,7 +142,7 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
       {/* Liquid Glass Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-[clamp(64px,30%,96px)] bg-black/35 backdrop-blur-md rounded-none px-3 py-2 z-10 grid grid-cols-[auto_1fr_auto] items-center">
+      <div className="absolute inset-x-0 bottom-0 h-[clamp(48px,20%,72px)] bg-white/25 backdrop-blur-md rounded-none px-3 py-2 z-10 grid grid-cols-[auto_1fr_auto] items-center">
         {/* Left: Dismiss Button */}
         <button
           data-action-button
