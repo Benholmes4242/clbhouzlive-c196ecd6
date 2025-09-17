@@ -7,10 +7,17 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event
+// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker activating');
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    Promise.all([
+      // Clean up all old caches
+      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))),
+      // Claim all clients
+      self.clients.claim()
+    ])
+  );
 });
 
 // Push event handler
