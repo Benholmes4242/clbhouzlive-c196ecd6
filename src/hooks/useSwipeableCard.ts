@@ -1,11 +1,14 @@
 import { useRef, useState, useCallback } from 'react';
 
 interface UseSwipeableCardOptions {
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
+  onSwipeLeft?: () => void | Promise<void>;
+  onSwipeRight?: () => void | Promise<void>;
+  onSwipeStart?: () => boolean | void;
+  onSwipeEnd?: () => void;
   threshold?: number;
   velocityThreshold?: number;
   lockAxis?: 'x' | 'y' | false;
+  disabled?: boolean;
 }
 
 interface SwipeState {
@@ -18,9 +21,12 @@ interface SwipeState {
 export const useSwipeableCard = ({
   onSwipeLeft,
   onSwipeRight,
+  onSwipeStart,
+  onSwipeEnd,
   threshold = 90,
   velocityThreshold = 0.3,
-  lockAxis = 'x'
+  lockAxis = 'x',
+  disabled = false
 }: UseSwipeableCardOptions) => {
   const [swipeState, setSwipeState] = useState<SwipeState>({
     isDragging: false,
@@ -36,6 +42,11 @@ export const useSwipeableCard = ({
   const hasTriggered = useRef(false);
 
   const handleStart = useCallback((clientX: number, clientY: number) => {
+    if (disabled) return;
+    
+    // Call onSwipeStart and check if swipe should be allowed
+    if (onSwipeStart && onSwipeStart() === false) return;
+    
     startX.current = clientX;
     startY.current = clientY;
     startTime.current = Date.now();
@@ -46,10 +57,10 @@ export const useSwipeableCard = ({
       ...prev,
       isDragging: true
     }));
-  }, []);
+  }, [disabled, onSwipeStart]);
 
   const handleMove = useCallback((clientX: number, clientY: number) => {
-    if (!isDragging.current) return;
+    if (!isDragging.current || disabled) return;
 
     const deltaX = clientX - startX.current;
     const deltaY = clientY - startY.current;
@@ -80,10 +91,10 @@ export const useSwipeableCard = ({
       progress,
       transform: `translateX(${clampedDeltaX}px) rotate(${rotation}deg)`
     });
-  }, [threshold, lockAxis]);
+  }, [threshold, lockAxis, disabled]);
 
   const handleEnd = useCallback((clientX: number) => {
-    if (!isDragging.current) return;
+    if (!isDragging.current || disabled) return;
 
     const deltaX = clientX - startX.current;
     const absDeltaX = Math.abs(deltaX);
@@ -108,7 +119,12 @@ export const useSwipeableCard = ({
       progress: 0,
       transform: 'translateX(0px) rotate(0deg)'
     });
-  }, [threshold, velocityThreshold, onSwipeLeft, onSwipeRight]);
+
+    // Call onSwipeEnd after state reset
+    if (onSwipeEnd) {
+      onSwipeEnd();
+    }
+  }, [threshold, velocityThreshold, onSwipeLeft, onSwipeRight, onSwipeEnd, disabled]);
 
   const bind = {
     onPointerDown: (e: React.PointerEvent) => {

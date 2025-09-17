@@ -11,13 +11,17 @@ interface SwipeableUserCardProps {
   onFollow: (userId: string) => Promise<void>;
   onDismiss: (userId: string) => Promise<void>;
   isVisible: boolean;
+  activeSwipeCard: string | null;
+  setActiveSwipeCard: (cardId: string | null) => void;
 }
 
 const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({ 
   user, 
   onFollow,
   onDismiss,
-  isVisible 
+  isVisible,
+  activeSwipeCard,
+  setActiveSwipeCard
 }) => {
   const navigate = useNavigate();
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -28,17 +32,28 @@ const SwipeableUserCard: React.FC<SwipeableUserCardProps> = ({
       if (isActionLoading) return;
       setIsActionLoading(true);
       await onDismiss(user.id);
+      setActiveSwipeCard(null);
       setIsActionLoading(false);
     },
     onSwipeRight: async () => {
       if (isActionLoading) return;
       setIsActionLoading(true);
       await onFollow(user.id);
+      setActiveSwipeCard(null);
       setIsActionLoading(false);
+    },
+    onSwipeStart: () => {
+      if (activeSwipeCard && activeSwipeCard !== user.id) return false;
+      setActiveSwipeCard(user.id);
+      return true;
+    },
+    onSwipeEnd: () => {
+      setActiveSwipeCard(null);
     },
     threshold: 90,
     velocityThreshold: 0.3,
-    lockAxis: 'x'
+    lockAxis: 'x',
+    disabled: activeSwipeCard !== null && activeSwipeCard !== user.id
   });
 
   // Handle video autoplay based on visibility
