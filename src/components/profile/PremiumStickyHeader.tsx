@@ -58,7 +58,7 @@ const PremiumStickyHeader: React.FC<PremiumStickyHeaderProps> = ({
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out header-safe-area ${
         isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}
       style={liquidGlassStyle}
