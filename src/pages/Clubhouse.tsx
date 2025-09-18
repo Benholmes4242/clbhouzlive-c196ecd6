@@ -44,7 +44,7 @@ const Clubhouse = () => {
       
       {/* Tabs Row - Shows/hides on scroll */}
       <div 
-        className={`sticky top-16 z-40 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0 transition-transform duration-300 ${
+        className={`sticky top-16 z-[59] backdrop-blur-md bg-black/35 transition-transform duration-300 ${
           isMobile && currentPostIndex > 0 ? '-translate-y-full' : 'translate-y-0'
         }`}
         style={{

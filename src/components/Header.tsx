@@ -40,23 +40,23 @@ const Header = () => {
 
   return (
     <header className={headerClasses} style={headerStyle}>
-      <div className="container mx-auto pl-[2px] pr-1 md:pl-[14px] md:pr-4 compact-header-padding max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
+      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md bg-black/35 px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />
         ) : (
           <div className="flex items-center justify-between h-16 max-w-full">
-            {/* Logo - Enlarged and optimized positioning */}
-            <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
+            {/* Logo - White variant */}
+            <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0 text-white">
               <img
                 src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                 alt="Logo Mark"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                 onClick={handleLogoClick}
               />
               <img
                 src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
                 alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                 onClick={handleLogoClick}
               />
             </div>
