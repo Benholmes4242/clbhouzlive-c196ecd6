@@ -589,21 +589,33 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {filteredUsers.map((user) => (
-            <div
-              key={user.id}
-              data-card-id={user.id}
-              className="flex-shrink-0 w-40"
-            >
-              <SuggestedUserCard
-                user={user}
-                onToggleFollow={handleToggleFollow}
-                onDismiss={handleDismiss}
-                isVisible={visibleCards.has(user.id)}
-                onFirstSwipe={() => dismissTutorial('swiped')}
-              />
-            </div>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {filteredUsers.map((user) => (
+              <motion.div
+                key={user.id}
+                data-card-id={user.id}
+                className="flex-shrink-0 w-40"
+                layout
+                initial={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -160, scale: 0.8 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 25,
+                  opacity: { duration: 0.2 },
+                  x: { duration: 0.4 }
+                }}
+              >
+                <SuggestedUserCard
+                  user={user}
+                  onToggleFollow={handleToggleFollow}
+                  onDismiss={handleDismiss}
+                  isVisible={visibleCards.has(user.id)}
+                  onFirstSwipe={() => dismissTutorial('swiped')}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
 
