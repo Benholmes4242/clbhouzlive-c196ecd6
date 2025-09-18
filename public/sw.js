@@ -20,6 +20,23 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Handle manual cache clean messages
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'CLEAN_CACHE') {
+    event.waitUntil((async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+      await self.skipWaiting();
+      await self.clients.claim();
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const client of clients) {
+        client.postMessage({ type: 'CACHE_CLEARED' });
+      }
+    })());
+  }
+});
+
 // Push event handler
 self.addEventListener('push', (event) => {
   console.log('Push event received:', event);
