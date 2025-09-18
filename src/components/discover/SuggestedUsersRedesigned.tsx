@@ -9,6 +9,7 @@ import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
+import { useMedia } from '@/hooks/useMedia';
 
 interface SuggestedUserCardProps {
   user: {
@@ -39,6 +40,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flash, setFlash] = useState<'up' | 'down' | null>(null);
   const [isVertical, setIsVertical] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Desktop vs mobile gating
+  const isDesktop = useMedia('(min-width: 1024px)');
+  const enableVerticalSwipe = !isDesktop;
 
   // Handle video autoplay based on visibility
   useEffect(() => {
@@ -106,64 +111,36 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
+  // Local flash helper (robust even for flicks)
   const flashGlow = (dir: 'up' | 'down') => {
     setFlash(dir);
-    setTimeout(() => setFlash(null), 350);
+    // Clear any pending timeout
+    (flashGlow as any)._t && clearTimeout((flashGlow as any)._t);
+    (flashGlow as any)._t = setTimeout(() => setFlash(null), 350);
   };
 
   const handleSwipeUp = async () => {
-    if (isFollowLoading || isDismissLoading || !isVertical) return;
-    
+    if (!enableVerticalSwipe) return;        // gate
     setSwipeDirection('up');
-    setIsFollowLoading(true);
     flashGlow('up');
-    
-    try {
-      const success = await onToggleFollow(user.id);
-      if (success) {
-        toast.success(`Followed ${user.displayName}`);
-        // Analytics
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'suggestion_follow', { method: 'swipe_up' });
-        }
-      }
-    } catch (error) {
-      console.error('Follow error:', error);
-      toast.error('Failed to follow user');
-    } finally {
-      setIsFollowLoading(false);
-      setSwipeDirection(null);
-    }
+    await onToggleFollow(user.id);
+    setSwipeDirection(null);
   };
 
   const handleSwipeDown = async () => {
-    if (isDismissLoading || isFollowLoading || !isVertical) return;
-    
+    if (!enableVerticalSwipe) return;        // gate
     setSwipeDirection('down');
-    setIsDismissLoading(true);
     flashGlow('down');
-    
-    try {
-      await onDismiss(user.id);
-      toast.success(`Dismissed ${user.displayName}`);
-      // Analytics
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'suggestion_dismiss', { method: 'swipe_down' });
-      }
-    } catch (error) {
-      console.error('Dismiss error:', error);
-      toast.error('Failed to dismiss suggestion');
-    } finally {
-      setIsDismissLoading(false);
-      setSwipeDirection(null);
-    }
+    await onDismiss(user.id);
+    setSwipeDirection(null);
   };
 
-  const handleSwiping = (deltaX: number, deltaY: number) => {
-    // Axis lock: engage vertical only when clearly vertical
-    if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
+  // Axis lock keeps carousel horizontal intact
+  const handleSwiping = (dx: number, dy: number) => {
+    if (!enableVerticalSwipe) return;        // gate
+    if (Math.abs(dy) > Math.abs(dx) + 12) {  // vertical only
       setIsVertical(true);
-      setDragY(deltaY);
+      setDragY(dy);
     } else {
       setIsVertical(false);
       setDragY(0);
@@ -175,29 +152,32 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setIsVertical(false);
   };
 
-  // Swipe gesture hook
+  // Attach swipe only if enabled
   const swipeRef = useSwipeGesture({
-    onSwipeUp: handleSwipeUp,
-    onSwipeDown: handleSwipeDown,
-    onSwiping: handleSwiping,
-    onSwipeEnd: handleSwipeEnd,
+    onSwipeUp:    enableVerticalSwipe ? handleSwipeUp   : undefined,
+    onSwipeDown:  enableVerticalSwipe ? handleSwipeDown : undefined,
+    onSwiping:    enableVerticalSwipe ? handleSwiping   : undefined,
+    onSwipeEnd:   handleSwipeEnd,
     threshold: 90,
-    preventDefaultTouchMove: false
+    preventDefaultTouchMove: false,          // DO NOT block scroll
   });
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
   const isVideo = !!user.latestVideo;
 
   return (
-    <motion.div
+    <div
       ref={swipeRef}
-      className="relative overflow-hidden rounded-none snap-start cursor-pointer bg-gray-900"
-      onClick={handleCardClick}
-      style={{
-        transform: `translateY(${dragY * 0.05}px)`,
-        opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1,
-        touchAction: 'pan-y'
-      }}
+      className="relative snap-start"
+      style={{ touchAction: enableVerticalSwipe ? 'pan-y' : 'auto' }} // mobile: vertical; desktop: let browser decide
+    >
+      <motion.div
+        className="relative overflow-hidden rounded-none cursor-pointer bg-gray-900"
+        onClick={handleCardClick}
+        style={{
+          transform: `translateY(${dragY * 0.05}px)`,
+          opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1
+        }}
       animate={{
         scale: swipeDirection ? 0.95 : 1
       }}
@@ -347,7 +327,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                            transition-transform duration-300 bg-white/30" />
         </motion.button>
       </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Flash overlay (works on quick flicks) */}
+      {flash && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+          <div className={flash === 'up'
+            ? "w-14 h-14 rounded-full bg-green-500 text-white text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,0,.6)] animate-pingonce"
+            : "w-14 h-14 rounded-full bg-red-500 text-white text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,.6)] animate-pingonce"}>
+            {flash === 'up' ? <FaThumbsUp/> : <FaThumbsDown/>}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -534,7 +526,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         <div 
           ref={containerRef}
           className="flex overflow-x-auto scrollbar-hide gap-px pb-2"
-          style={{ touchAction: 'pan-x' }}
+          style={{ touchAction: 'pan-x' }}   // explicit: owns horizontal
         >
           {filteredUsers.map((user) => (
             <div

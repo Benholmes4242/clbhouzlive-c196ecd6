@@ -450,6 +450,7 @@ html, body, #root, .app-shell { touch-action: auto; }
   :root {
     --card-w-portrait: 17rem;  /* existing Rated width */
     --card-h-portrait: 24rem;  /* existing Rated height */
+    --card-w: 10rem;           /* suggested users card width */
   }
 
   /* Responsive tokens (match Rated breakpoints exactly) */
