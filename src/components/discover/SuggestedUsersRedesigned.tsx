@@ -313,21 +313,63 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Feedback Overlay */}
-      {showFeedback && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="bg-black/60 backdrop-blur-md rounded-2xl px-6 py-4 mx-4">
-            <div className="text-white text-center">
-              <div className="text-lg font-medium">
-                {showFeedback === 'follow' 
-                  ? `You've followed ${user.displayName}!`
-                  : `You've dismissed ${user.displayName}!`
-                }
+      {/* Liquid Glass Feedback Overlay */}
+      <AnimatePresence>
+        {showFeedback && (
+          <motion.div 
+            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="bg-white/10 backdrop-blur-xl rounded-2xl px-8 py-6 mx-4 border border-white/20 shadow-2xl"
+              initial={{ 
+                opacity: 0, 
+                scale: 0.9, 
+                y: 20 
+              }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1, 
+                y: 0 
+              }}
+              exit={{ 
+                opacity: 0, 
+                scale: 0.95, 
+                y: 10 
+              }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 25,
+                duration: 0.4
+              }}
+            >
+              <div className="flex flex-col items-center space-y-3">
+                {/* Icon with glow */}
+                <div className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center text-xl",
+                  showFeedback === 'follow' 
+                    ? "bg-green-500/20 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.4)]" 
+                    : "bg-red-500/20 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                )}>
+                  {showFeedback === 'follow' ? '✅' : '❌'}
+                </div>
+                
+                {/* Text */}
+                <div className="text-white text-center font-medium text-base" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+                  {showFeedback === 'follow' 
+                    ? `You've followed ${user.displayName}`
+                    : `You've dismissed ${user.displayName}`
+                  }
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
