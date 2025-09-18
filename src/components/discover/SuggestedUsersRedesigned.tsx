@@ -24,6 +24,9 @@ interface SuggestedUserCardProps {
     displayName: string;
     handle: string;
     isFollowing: boolean;
+    profilePhotoUrl?: string;
+    homeClub?: string;
+    handicap?: number;
     latestVideo?: { url: string; poster?: string };
     latestPhoto?: { url: string };
     latestPostAt: string;
@@ -54,6 +57,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
   const [showFeedback, setShowFeedback] = useState<'follow' | 'dismiss' | null>(null);
   const [isCardFading, setIsCardFading] = useState(false);
+  const [isDetailExpanded, setIsDetailExpanded] = useState(false);
   const FEEDBACK_MS = 1500;
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
@@ -122,6 +126,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       setIsCardFading(true);
       setTimeout(() => onDismiss(user.id), 300); // Fade duration
     }, FEEDBACK_MS);
+  };
+
+  const handleDetailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDetailExpanded(!isDetailExpanded);
   };
 
   // Local flash helper with remount to retrigger CSS
@@ -375,6 +384,52 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
+      {/* Expandable Detail Pane */}
+      <AnimatePresence>
+        {isDetailExpanded && (
+          <motion.div
+            className="absolute inset-x-0 top-0 bottom-0 bg-black/60 backdrop-blur-md rounded-2xl p-6 z-20 flex flex-col items-center justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+          >
+            {/* Avatar */}
+            {user.profilePhotoUrl ? (
+              <div 
+                className="w-16 h-16 rounded-full bg-cover bg-center mb-4 shadow-lg"
+                style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4 shadow-lg">
+                <span className="text-white text-xl font-bold">
+                  {user.displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+            
+            {/* User Name */}
+            <h3 className="text-white font-bold text-lg text-center mb-2">
+              {user.displayName || user.handle || "User"}
+            </h3>
+            
+            {/* Home Club */}
+            {user.homeClub && (
+              <p className="text-white/80 font-medium text-sm text-center mb-1">
+                {user.homeClub}
+              </p>
+            )}
+            
+            {/* Handicap */}
+            {user.handicap !== null && user.handicap !== undefined && (
+              <p className="text-teal-400 font-bold text-sm text-center">
+                Handicap: {user.handicap.toFixed(1)}
+              </p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Liquid Glass Overlay */}
       <div className="
         absolute inset-x-0 bottom-0
@@ -382,7 +437,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        grid grid-cols-[auto_auto_1fr_auto_auto] items-end gap-2
+        flex items-end justify-center gap-4
       ">
         {/* Left: Dismiss Button */}
         <motion.button
@@ -392,11 +447,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-7 h-7 rounded-full flex items-center justify-center
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
           <FaThumbsDown className="text-sm" />
-          <span className="absolute -inset-1" />
+          <span className="absolute -inset-2" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
                            group-active:scale-150 group-active:opacity-0
@@ -406,26 +461,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         {/* Center Detail Button */}
         <motion.button
           aria-label="View details"
+          onClick={handleDetailClick}
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-7 h-7 rounded-full flex items-center justify-center
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white"
         >
           <BiSolidDetail className="text-sm fill-white" />
-          <span className="absolute -inset-1" />
+          <span className="absolute -inset-2" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
                            group-active:scale-150 group-active:opacity-0
                            transition-transform duration-300 bg-white/30" />
         </motion.button>
-
-        {/* Center: User Info */}
-        <div className="flex flex-col items-center min-w-0 mb-8 px-1">
-          <span className="text-white font-medium text-center text-sm whitespace-nowrap">
-            {user.displayName || user.handle || "User"}
-          </span>
-        </div>
 
         {/* Right: Follow Button */}
         <motion.button
@@ -435,16 +484,23 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-7 h-7 rounded-full flex items-center justify-center
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
           <FaThumbsUp className="text-sm" />
-          <span className="absolute -inset-1" />
+          <span className="absolute -inset-2" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
                            group-active:scale-150 group-active:opacity-0
                            transition-transform duration-300 bg-white/30" />
         </motion.button>
+
+        {/* Center: User Info (now positioned above buttons) */}
+        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+          <span className="text-white font-medium text-center text-sm whitespace-nowrap">
+            {user.displayName || user.handle || "User"}
+          </span>
+        </div>
       </div>
       </motion.div>
 
