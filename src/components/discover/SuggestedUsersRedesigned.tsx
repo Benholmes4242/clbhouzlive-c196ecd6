@@ -156,15 +156,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setSwipeDirection(null);
   };
 
-  // Axis lock keeps carousel horizontal intact
+  // Show glow during any vertical movement, regardless of axis lock
   const handleSwiping = (dx: number, dy: number) => {
-    if (!enableVerticalSwipe) return;        // gate
-    if (Math.abs(dy) > Math.abs(dx) + 12) {  // vertical only
+    if (!enableVerticalSwipe) return;
+    // Always show glow for any vertical movement
+    setDragY(dy);
+    // Only set vertical flag when clearly vertical (for axis lock)
+    if (Math.abs(dy) > Math.abs(dx) + 12) {
       setIsVertical(true);
-      setDragY(dy);
     } else {
       setIsVertical(false);
-      setDragY(0);
     }
   };
 
