@@ -506,8 +506,8 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
     <div className="pb-0 mb-0">
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-0 px-1 md:px-0">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between my-0 py-0 px-1 md:px-0">
+          <h3 className="text-lg font-semibold leading-none my-0 text-gray-900 dark:text-white">
             Suggested for you
           </h3>
           <div className="flex gap-2">
@@ -516,9 +516,9 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => scroll('left')}
-                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+                className="h-6 w-6 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
-                <ChevronLeft className="h-10 w-10" />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
             )}
             {canScrollRight && (
@@ -526,9 +526,9 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => scroll('right')}
-                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+                className="h-6 w-6 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
               >
-                <ChevronRight className="h-10 w-10" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
             )}
           </div>
