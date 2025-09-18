@@ -191,7 +191,7 @@ const Discover = () => {
           </div>
 
           {/* Main Grid with Container - 16px gap from Trending Now pills */}
-          <div className="md:container md:mx-auto md:px-0 mt-0">
+          <div className="md:container md:mx-auto md:px-0 mt-4">
             <ExploreGrid 
               content={uniqueContent}
               onLike={handleLike}
