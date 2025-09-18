@@ -6,8 +6,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* iOS Full-Screen Support for Median WebView */
-/* Full height baseline */
+/* iOS Full-Screen Support for Edge-to-Edge Rendering */
+/* Full height baseline - extend background behind status bar */
 html, body, #root { 
   height: 100%; 
   margin: 0; 
@@ -19,9 +19,10 @@ html, body {
   overscroll-behavior: none;
   overscroll-behavior-y: contain;
   overflow-x: clip; /* Prevent horizontal overflow on iOS */
+  background: hsl(var(--background)); /* Ensure background extends behind status bar */
 }
 
-/* Safe-area variables for iOS */
+/* Enhanced safe-area variables for iOS edge-to-edge */
 :root {
   --safe-top: 0px; 
   --safe-bottom: 0px; 
@@ -29,12 +30,23 @@ html, body {
   --safe-right: 0px;
 }
 
+/* Modern safe area inset support */
 @supports (padding: env(safe-area-inset-top)) {
   :root {
     --safe-top: env(safe-area-inset-top);
     --safe-bottom: env(safe-area-inset-bottom);
     --safe-left: env(safe-area-inset-left);
     --safe-right: env(safe-area-inset-right);
+  }
+}
+
+/* Legacy iOS support (iOS 11.0-11.2) */
+@supports (padding: constant(safe-area-inset-top)) {
+  :root {
+    --safe-top: constant(safe-area-inset-top);
+    --safe-bottom: constant(safe-area-inset-bottom);
+    --safe-left: constant(safe-area-inset-left);
+    --safe-right: constant(safe-area-inset-right);
   }
 }
 
@@ -232,23 +244,19 @@ html, body, #root, .app-shell { touch-action: auto; }
     position: relative;
     height: 100vh;
     height: calc(var(--vh, 1vh) * 100);
-    /* Extend background behind status bar on mobile */
-    @media (max-width: 768px) {
-      height: 100vh;
-      height: calc(var(--vh, 1vh) * 100);
-      padding-top: env(safe-area-inset-top);
-    }
+    background: hsl(var(--background)); /* Ensure background extends behind status bar */
+    /* Remove any existing top margins that might create black bars */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
 
   #root {
-    background-color: white !important;
+    background-color: hsl(var(--background)) !important;
     height: 100vh;
     height: calc(var(--vh, 1vh) * 100);
-    /* Ensure root extends behind status bar on mobile */
-    @media (max-width: 768px) {
-      height: 100vh;
-      height: calc(var(--vh, 1vh) * 100);
-    }
+    /* Remove any margins that could create gaps */
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Prevent iOS zoom on input focus */
@@ -420,12 +428,15 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
   html, body {
     @apply text-foreground;
-    background-color: white !important;
+    background-color: hsl(var(--background)) !important;
     font-family: 'League Spartan', system-ui, sans-serif;
     overflow-x: hidden;
     width: 100vw;
     max-width: 100%;
     position: relative;
+    /* Remove any hard-coded top margins that could interfere with edge-to-edge */
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 
@@ -455,21 +466,17 @@ html, body, #root, .app-shell { touch-action: auto; }
     display: none;
   }
 
-  /* Safe area utilities for mobile devices */
+  /* Safe area utilities for mobile devices - Updated for edge-to-edge */
   .safe-area-full {
-    @media (max-width: 768px) {
-      min-height: 100vh;
-      min-height: calc(100vh + env(safe-area-inset-top));
-      padding-top: env(safe-area-inset-top, 0);
-    }
+    min-height: 100vh;
+    /* Remove margin adjustment that could create black bars */
   }
 
   .safe-area-bg {
-    @media (max-width: 768px) {
-      padding-top: env(safe-area-inset-top, 0);
-      margin-top: calc(-1 * env(safe-area-inset-top, 0));
-    }
+    /* Simplified safe area background without negative margins */
+    padding-top: env(safe-area-inset-top, 0);
   }
+
 
   /* Achievement badge size token */
   .achv-badge-size {

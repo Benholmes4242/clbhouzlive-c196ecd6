@@ -29,12 +29,8 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   const isClubhousePage = location.pathname === '/clubhouse';
   const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
   
-  // Apply safe-area insets and unified background for clubhouse
-  const headerStyle = isClubhousePage ? {
-    paddingTop: 'env(safe-area-inset-top, 0)',
-    paddingLeft: 'env(safe-area-inset-left, 0)', 
-    paddingRight: 'env(safe-area-inset-right, 0)'
-  } : {};
+  // Simplified safe area handling - let CSS handle the padding
+  const headerStyle = {};
 
   // Check if we should use compact mode (≤375px and mobile)
   const useCompactMode = isClubhousePage && isMobile && (typeof window !== 'undefined' && window.innerWidth <= 375);
@@ -103,7 +99,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   // Standard header for other pages
   return (
     <header className={headerClasses} style={headerStyle}>
-      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md bg-black/35 px-3 md:px-4">
+      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />
         ) : (
@@ -119,7 +115,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               <img
                 src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
                 alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
                 onClick={handleLogoClick}
               />
             </div>
