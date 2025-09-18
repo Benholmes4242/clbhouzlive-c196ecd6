@@ -319,12 +319,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </motion.button>
 
         {/* Center: User Info */}
-        <div className="flex flex-col items-center min-w-0 mb-2">
-          <span className="text-white font-medium truncate">
-            {user.displayName || user.handle || 'User'}
+        <div className="flex flex-col items-center min-w-0 mb-4 px-1">
+          <span className="text-white font-medium truncate max-w-full text-center text-sm">
+            {user.displayName || user.handle || "User"}
           </span>
           <span className="text-white/80 text-xs">
-            {user.isFollowing ? 'Following' : 'Follow'}
+            {user.isFollowing ? "Following" : "Follow"}
           </span>
         </div>
 
