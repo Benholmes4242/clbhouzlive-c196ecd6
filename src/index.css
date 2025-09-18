@@ -50,11 +50,10 @@ html, body {
   }
 }
 
-/* App shell applies safe-area padding and guarantees edge-to-edge */
+/* App shell without top padding - let header handle its own safe area */
 .app-shell {
   min-height: 100vh;
   width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
-  padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
