@@ -46,53 +46,53 @@ export const useSwipeGesture = ({
   const touchEndY = useRef<number>(0);
   const elementRef = useRef<HTMLDivElement>(null);
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    const t = e.targetTouches[0];
-    touchStartX.current = t.clientX;
-    touchStartY.current = t.clientY;
-    touchEndX.current = t.clientX;
-    touchEndY.current = t.clientY;
-  }, []);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    const t = e.targetTouches[0];
-    const deltaX = t.clientX - touchStartX.current;
-    const deltaY = t.clientY - touchStartY.current;
-
-    // update latest end positions
-    touchEndX.current = t.clientX;
-    touchEndY.current = t.clientY;
-
-    // Live feedback (do not preventDefault; use CSS touch-action to manage scroll)
-    latest.current.onSwiping?.(deltaX, deltaY);
-  }, [latest]);
-
-  const handleTouchEnd = useCallback(() => {
-    const deltaX = touchStartX.current - touchEndX.current;
-    const deltaY = touchStartY.current - touchEndY.current;
-
-    const th = latest.current.threshold ?? 50;
-
-    const isLeftSwipe = deltaX > th;
-    const isRightSwipe = deltaX < -th;
-    const isUpSwipe = deltaY > th;
-    const isDownSwipe = deltaY < -th;
-
-    // Axis lock: prefer vertical when clearly vertical (|dy| > |dx| + 12)
-    if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
-      if (isUpSwipe) latest.current.onSwipeUp?.();
-      else if (isDownSwipe) latest.current.onSwipeDown?.();
-    } else {
-      if (isLeftSwipe) latest.current.onSwipeLeft?.();
-      else if (isRightSwipe) latest.current.onSwipeRight?.();
-    }
-
-    latest.current.onSwipeEnd?.();
-  }, [latest]);
-
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const t = e.targetTouches[0];
+      touchStartX.current = t.clientX;
+      touchStartY.current = t.clientY;
+      touchEndX.current = t.clientX;
+      touchEndY.current = t.clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const t = e.targetTouches[0];
+      const deltaX = t.clientX - touchStartX.current;
+      const deltaY = t.clientY - touchStartY.current;
+
+      // update latest end positions
+      touchEndX.current = t.clientX;
+      touchEndY.current = t.clientY;
+
+      // Live feedback (do not preventDefault; use CSS touch-action to manage scroll)
+      latest.current.onSwiping?.(deltaX, deltaY);
+    };
+
+    const handleTouchEnd = () => {
+      const deltaX = touchStartX.current - touchEndX.current;
+      const deltaY = touchStartY.current - touchEndY.current;
+
+      const th = latest.current.threshold ?? 50;
+
+      const isLeftSwipe = deltaX > th;
+      const isRightSwipe = deltaX < -th;
+      const isUpSwipe = deltaY > th;
+      const isDownSwipe = deltaY < -th;
+
+      // Axis lock: prefer vertical when clearly vertical (|dy| > |dx| + 12)
+      if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
+        if (isUpSwipe) latest.current.onSwipeUp?.();
+        else if (isDownSwipe) latest.current.onSwipeDown?.();
+      } else {
+        if (isLeftSwipe) latest.current.onSwipeLeft?.();
+        else if (isRightSwipe) latest.current.onSwipeRight?.();
+      }
+
+      latest.current.onSwipeEnd?.();
+    };
 
     el.addEventListener('touchstart', handleTouchStart, { passive: true });
     el.addEventListener('touchmove', handleTouchMove, { passive: true });
@@ -103,7 +103,7 @@ export const useSwipeGesture = ({
       el.removeEventListener('touchmove', handleTouchMove as EventListener);
       el.removeEventListener('touchend', handleTouchEnd as EventListener);
     };
-  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
+  }, []); // Attach once; handlers read from latest.current
 
   return elementRef;
 };

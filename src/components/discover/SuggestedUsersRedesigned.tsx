@@ -127,7 +127,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setFlashKey((k) => k + 1);
     setFlash(dir);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setFlash(null), 420);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 340);
   }, []);
 
   const handleSwipeUp = async () => {
@@ -156,16 +156,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setSwipeDirection(null);
   };
 
-  // Axis lock keeps carousel horizontal intact
+  // Always update dragY for immediate visual feedback; keep axis lock for actions only
   const handleSwiping = (dx: number, dy: number) => {
-    if (!enableVerticalSwipe) return;        // gate
-    if (Math.abs(dy) > Math.abs(dx) + 12) {  // vertical only
-      setIsVertical(true);
-      setDragY(dy);
-    } else {
-      setIsVertical(false);
-      setDragY(0);
-    }
+    if (!enableVerticalSwipe) return;
+
+    // Always update dragY so overlay/glow responds immediately
+    setDragY(dy);
+
+    // Track "clearly vertical" only as a hint for action logic
+    const verticalCandidate = Math.abs(dy) > Math.abs(dx) + 12;
+    setIsVertical(verticalCandidate);
   };
 
   const handleSwipeEnd = () => {
@@ -247,7 +247,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
           }}
         >
-          {Math.abs(dragY) > 30 && (
+          {Math.abs(dragY) > 4 && (
             <div className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               dragY > 0 
