@@ -293,18 +293,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         absolute inset-x-0 bottom-0
         h-[clamp(64px,25%,92px)]
         bg-black/35 backdrop-blur-md
-        rounded-none px-3 py-2 z-10
+        rounded-none
+        px-3 py-2 z-10
         relative
-        flex items-center justify-center
       ">
         {/* Centered text block */}
-        <div className="flex flex-col items-center min-w-0 pointer-events-none">
-          <span className="text-white font-medium truncate">
-            {user.displayName || user.handle || 'User'}
-          </span>
-          <span className="text-white/80 text-xs">
-            {user.isFollowing ? 'Following' : 'Follow'}
-          </span>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="flex flex-col items-center min-w-0">
+            <span className="text-white font-medium truncate">
+              {user.displayName || user.handle || 'User'}
+            </span>
+            <span className="text-white/80 text-xs">
+              {user.isFollowing ? 'Following' : 'Follow'}
+            </span>
+          </div>
         </div>
 
         {/* Bottom-left: 👎 dismiss */}
