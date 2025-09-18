@@ -88,24 +88,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     
     if (isFollowLoading || isDismissLoading) return;
     
-    setIsFollowLoading(true);
-    try {
-      const success = await onToggleFollow(user.id);
-      if (success) {
-        toast.success(`Followed ${user.displayName}`);
-        // Analytics
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'suggestion_follow', { method: 'tap' });
-        }
-      } else {
-        toast.error('Failed to update follow status');
-      }
-    } catch (error) {
-      console.error('Follow error:', error);
-      toast.error('Failed to update follow status');
-    } finally {
-      setIsFollowLoading(false);
+    // Show feedback overlay
+    setShowFeedback('follow');
+    
+    // Analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'suggestion_follow', { method: 'tap' });
     }
+    
+    // After feedback, fade card and then call API
+    setTimeout(() => {
+      setIsCardFading(true);
+      setTimeout(() => onToggleFollow(user.id), 300); // Fade duration
+    }, FEEDBACK_MS);
   };
 
   const handleDismissClick = async (e: React.MouseEvent) => {
@@ -113,20 +108,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     
     if (isDismissLoading || isFollowLoading) return;
     
-    setIsDismissLoading(true);
-    try {
-      await onDismiss(user.id);
-      toast.success(`Dismissed ${user.displayName}`);
-      // Analytics
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'suggestion_dismiss', { method: 'tap' });
-      }
-    } catch (error) {
-      console.error('Dismiss error:', error);
-      toast.error('Failed to dismiss suggestion');
-    } finally {
-      setIsDismissLoading(false);
+    // Show feedback overlay
+    setShowFeedback('dismiss');
+    
+    // Analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'suggestion_dismiss', { method: 'tap' });
     }
+    
+    // After feedback, fade card and then call API
+    setTimeout(() => {
+      setIsCardFading(true);
+      setTimeout(() => onDismiss(user.id), 300); // Fade duration
+    }, FEEDBACK_MS);
   };
 
   // Local flash helper with remount to retrigger CSS
