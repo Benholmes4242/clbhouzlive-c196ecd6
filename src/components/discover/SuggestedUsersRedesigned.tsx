@@ -407,9 +407,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
-          <span className="text-white/80 text-xs">
-            {user.isFollowing ? "Following" : "Follow"}
-          </span>
         </div>
 
         {/* Right: Follow Button */}
