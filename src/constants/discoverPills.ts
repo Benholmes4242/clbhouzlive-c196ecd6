@@ -10,7 +10,7 @@ export type MainPill =
 export const SUBPILLS: Record<MainPill, string[]> = {
   friends: ["Videos", "Photos", "Shorts"],
   videos: [
-    "Videos",       // default first
+    "Explore",      // default first (was "Videos")
     "Trending",
     "Shorts",
     "Chipping",
@@ -27,7 +27,7 @@ export const SUBPILLS: Record<MainPill, string[]> = {
   "hack-shack": ["Videos", "Gear", "Drills", "DIY"],
 };
 
-export const DEFAULT_SUBPILL = "Videos";
+export const DEFAULT_SUBPILL = "Explore";
 
 // Map filter types to main pills
 export const FILTER_TO_MAIN_PILL: Record<string, MainPill> = {
