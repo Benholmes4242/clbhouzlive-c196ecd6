@@ -46,10 +46,11 @@ export function useDiscoverOnboarding(isMobile: boolean, autoHideMs = 5000) {
   useEffect(() => {
     if (!show) return;
     countShown();
-    if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
-    autoHideTimer.current = window.setTimeout(() => {
-      setShow(false); // auto-fade hides, but does NOT increment "dismisses"
-    }, autoHideMs);
+    // Temporarily disabled auto-hide for testing
+    // if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
+    // autoHideTimer.current = window.setTimeout(() => {
+    //   setShow(false); // auto-fade hides, but does NOT increment "dismisses"
+    // }, autoHideMs);
 
     return () => {
       if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
