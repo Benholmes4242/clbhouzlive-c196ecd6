@@ -152,8 +152,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setSwipeDirection('up');
     triggerFlash('up');
     await flushAnimationFrame();
-    await onToggleFollow(user.id);
+    
+    // Hide the swipe direction immediately after flash, don't wait for API
     setSwipeDirection(null);
+    
+    // Continue with API call in background
+    onToggleFollow(user.id);
   };
 
   const handleSwipeDown = async () => {
@@ -166,8 +170,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setSwipeDirection('down');
     triggerFlash('down');
     await flushAnimationFrame();
-    await onDismiss(user.id);
+    
+    // Hide the swipe direction immediately after flash, don't wait for API
     setSwipeDirection(null);
+    
+    // Continue with API call in background
+    onDismiss(user.id);
   };
 
   // Always update dragY for immediate visual feedback; keep axis lock for actions only
