@@ -39,24 +39,8 @@ const Clubhouse = () => {
     <div className="h-screen bg-transparent overflow-hidden relative" style={{
       minHeight: '100dvh',
     }}>
-      {/* Unified Header */}
-      <Header />
-      
-      {/* Tabs Row - Shows/hides on scroll */}
-      <div 
-        className={`sticky top-16 z-[59] backdrop-blur-md bg-black/35 transition-transform duration-300 ${
-          isMobile && currentPostIndex > 0 ? '-translate-y-full' : 'translate-y-0'
-        }`}
-        style={{
-          paddingLeft: 'env(safe-area-inset-left, 0)', 
-          paddingRight: 'env(safe-area-inset-right, 0)'
-        }}
-      >
-        <ScrollableTabs 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
-        />
-      </div>
+      {/* Unified Header with Tabs */}
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <ClubhouseVerticalFeed
