@@ -92,7 +92,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
   };
 
   return (
-    <div className="pt-1 pb-6">
+    <div className="pt-1">
       <div className="px-1 md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-1">
