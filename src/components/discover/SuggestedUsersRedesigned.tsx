@@ -246,16 +246,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       data-card={user.id}
-      className="relative snap-start overflow-hidden"
+      className="relative snap-start"
       style={{ touchAction: 'auto' }}
     >
       <motion.div
-        className="relative overflow-hidden rounded-none cursor-pointer bg-gray-900"
+        className="relative group rounded-xl overflow-hidden cursor-pointer bg-gray-900"
         onClick={handleCardClick}
         style={{
           transform: `translateY(${dragY * 0.05}px)`,
-          opacity: isCardFading ? 0 : (dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1)
-        }}
+          opacity: isCardFading ? 0 : (dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1),
+          "--control-size": "40px",
+          "--control-gap": "12px", 
+          "--control-safe": "calc(var(--control-size) + 16px)"
+        } as React.CSSProperties}
         animate={{
           scale: swipeDirection ? 0.95 : 1,
           opacity: isCardFading ? 0 : 1
@@ -267,7 +270,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           opacity: { duration: 0.3 }
         }}
     >
-      {/* Media Content */}
+      {/* Media Content - z-10 */}
       {mediaUrl ? (
         isVideo ? (
           <EnhancedVideoPlayer
@@ -278,7 +281,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             muted={true}
             loop={true}
             controls={false}
-            className="w-full h-full aspect-[3/4]"
+            className="w-full h-full aspect-[3/4] object-cover select-none pointer-events-none z-10"
             objectFit="cover"
             hideControls={true}
           />
@@ -286,11 +289,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <img
             src={mediaUrl}
             alt={`${user.displayName}'s post`}
-            className="w-full h-full aspect-[3/4] object-cover"
+            className="w-full h-full aspect-[3/4] object-cover select-none pointer-events-none z-10"
           />
         )
       ) : (
-        <div className="w-full h-full aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+        <div className="w-full h-full aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center z-10">
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
             <span className="text-white text-lg font-bold">
               {user.displayName.charAt(0).toUpperCase()}
@@ -299,114 +302,149 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Swipe Direction Overlay - Removed for cleaner experience */}
 
-      {/* Full-Card Liquid Glass Feedback Overlay - Covers entire card */}
+      {/* Detail Pane - z-20 */}
       <AnimatePresence>
-        {showFeedback && (
-          <motion.div 
-            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+        {isDetailExpanded && (
+          <motion.div
+            key="detail"
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 16, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 360, damping: 30 }}
+            className="absolute left-2 right-2 z-20"
+            style={{ bottom: "var(--control-safe)" }}
           >
-            {/* Full card glass background */}
-            <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border border-white/20" />
-            
-            {/* Centered feedback content */}
-            <motion.div 
-              className="relative z-10 flex flex-col items-center"
-              initial={{ 
-                opacity: 0, 
-                scale: 0.8, 
-                y: 30 
-              }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1, 
-                y: 0 
-              }}
-              exit={{ 
-                opacity: 0, 
-                scale: 0.9, 
-                y: 20 
-              }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 400, 
-                damping: 25,
-                duration: 0.4
-              }}
-            >
-              {/* Icon with glow - larger for full card */}
-              <div className={cn(
-                "w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4",
-                showFeedback === 'follow' 
-                  ? "bg-green-500/30 text-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)]" 
-                  : "bg-red-500/30 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.6)]"
-              )}>
-                {showFeedback === 'follow' ? '✅' : '❌'}
+            <div className="rounded-[14px] border border-white/30 bg-gradient-to-b from-white/22 to-white/10 backdrop-blur-lg px-4 py-3 shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
+              {/* Avatar */}
+              <div className="flex items-center mb-3">
+                {user.profilePhotoUrl ? (
+                  <div 
+                    className="w-12 h-12 rounded-full bg-cover bg-center shadow-[0_2px_12px_rgba(0,0,0,0.25)] border border-white/20 mr-3"
+                    style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-white/25 flex items-center justify-center shadow-[0_2px_12px_rgba(0,0,0,0.25)] border border-white/20 mr-3">
+                    <span className="text-white text-lg font-bold">
+                      {user.displayName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <div className="text-white font-semibold leading-tight text-[15px] drop-shadow-sm">
+                    {user.displayName || user.handle || "User"}
+                  </div>
+                  {user.homeClub && (
+                    <div className="text-white/90 text-sm">{user.homeClub}</div>
+                  )}
+                </div>
               </div>
               
-              {/* Confirmation text */}
-              <div className="text-white text-center font-semibold text-base px-4">
-                {showFeedback === 'follow' 
-                  ? `You've followed ${user.displayName}`
-                  : `You've dismissed ${user.displayName}`
-                }
-              </div>
-            </motion.div>
+              {/* Handicap */}
+              {user.handicap !== null && user.handicap !== undefined && (
+                <div className="text-emerald-200 font-semibold text-sm">
+                  Handicap: {user.handicap.toFixed(1)}
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
-
-      {/* Fixed Liquid Glass Control Overlay - Always visible and in fixed position */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex items-center space-x-4">
-        {/* Dismiss Button */}
-        <motion.button
-          data-follow-button
-          onClick={handleDismissClick}
-          disabled={isDismissLoading || isFollowLoading}
-          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+      {/* Fixed Controls - z-30 */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 z-30"
+        style={{ bottom: "12px" }}
+      >
+        <div 
+          className="flex items-center"
+          style={{ gap: "var(--control-gap)" }}
         >
-          <FaThumbsDown className="text-white text-lg" />
-        </motion.button>
+          {/* Dismiss Button */}
+          <button
+            data-follow-button
+            onClick={handleDismissClick}
+            disabled={isDismissLoading || isFollowLoading}
+            className="grid place-items-center rounded-full border border-white/25 bg-white/18 backdrop-blur-md shadow-[0_4px_18px_rgba(0,0,0,0.25)] outline-none hover:ring-2 hover:ring-white focus:ring-2 focus:ring-white transition-all duration-150"
+            style={{ 
+              width: "var(--control-size)", 
+              height: "var(--control-size)" 
+            }}
+          >
+            <FaThumbsDown className="text-white/95 text-[20px]" />
+          </button>
 
-        {/* Detail Button */}
-        <motion.button
-          data-follow-button
-          onClick={handleDetailClick}
-          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <BiSolidDetail className="text-white text-lg" />
-        </motion.button>
+          {/* Detail Button */}
+          <button
+            data-follow-button
+            onClick={handleDetailClick}
+            className="grid place-items-center rounded-full border border-white/25 bg-white/18 backdrop-blur-md shadow-[0_4px_18px_rgba(0,0,0,0.25)] outline-none hover:ring-2 hover:ring-white focus:ring-2 focus:ring-white transition-all duration-150"
+            style={{ 
+              width: "var(--control-size)", 
+              height: "var(--control-size)" 
+            }}
+          >
+            <BiSolidDetail className="text-white/95 text-[20px]" />
+          </button>
 
-        {/* Follow Button */}
-        <motion.button
-          data-follow-button
-          onClick={handleFollowClick}
-          disabled={isFollowLoading || isDismissLoading}
-          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <FaThumbsUp className="text-white text-lg" />
-        </motion.button>
+          {/* Follow Button */}
+          <button
+            data-follow-button
+            onClick={handleFollowClick}
+            disabled={isFollowLoading || isDismissLoading}
+            className="grid place-items-center rounded-full border border-white/25 bg-white/18 backdrop-blur-md shadow-[0_4px_18px_rgba(0,0,0,0.25)] outline-none hover:ring-2 hover:ring-white focus:ring-2 focus:ring-white transition-all duration-150"
+            style={{ 
+              width: "var(--control-size)", 
+              height: "var(--control-size)" 
+            }}
+          >
+            <FaThumbsUp className="text-white/95 text-[20px]" />
+          </button>
+        </div>
       </div>
 
-      {/* User Name - Always visible below media */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-20 px-4">
-        <h3 className="text-white font-semibold text-center drop-shadow-lg whitespace-nowrap">
-          {user.displayName}
-        </h3>
-      </div>
+      {/* Feedback Overlay - z-40 */}
+      <AnimatePresence>
+        {showFeedback && (
+          <motion.div
+            key="feedback"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 z-40 pointer-events-none bg-white/10 backdrop-blur-xl"
+          >
+            <div className="w-full h-full flex items-center justify-center">
+              <motion.div
+                initial={{ y: 8, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.08, duration: 0.2 }}
+                className="rounded-2xl px-5 py-3 border border-white/30 bg-white/18 backdrop-blur-md"
+              >
+                <div className="flex flex-col items-center space-y-2">
+                  {/* Icon */}
+                  <div className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center text-xl",
+                    showFeedback === 'follow' 
+                      ? "bg-green-500/20 text-green-400" 
+                      : "bg-red-500/20 text-red-400"
+                  )}>
+                    {showFeedback === 'follow' ? '✅' : '❌'}
+                  </div>
+                  
+                  {/* Text */}
+                  <div className="text-white text-center font-semibold text-lg">
+                    {showFeedback === 'follow' 
+                      ? `You've followed ${user.displayName}`
+                      : `You've dismissed ${user.displayName}`
+                    }
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Liquid Glass Detail Pane - Slides up from bottom */}
       <AnimatePresence>
