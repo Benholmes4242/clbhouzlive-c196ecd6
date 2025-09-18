@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,6 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
-import { useDiscoverOnboarding } from '@/hooks/useDiscoverOnboarding';
-import { t } from '@/lib/i18n';
 
 // Utility: ensures paint before heavy updates
 const flushAnimationFrame = () =>
@@ -30,15 +28,13 @@ interface SuggestedUserCardProps {
   onToggleFollow: (userId: string) => Promise<boolean>;
   onDismiss: (userId: string) => Promise<void>;
   isVisible: boolean;
-  onFirstSwipe?: () => void;
 }
 
 const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({ 
   user, 
   onToggleFollow,
   onDismiss,
-  isVisible,
-  onFirstSwipe 
+  isVisible 
 }) => {
   const navigate = useNavigate();
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -50,7 +46,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [flashKey, setFlashKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
-  const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
 
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
@@ -135,13 +130,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     timeoutRef.current = window.setTimeout(() => setFlash(null), 340);
   }, []);
 
-  const handleFirstSwipe = () => {
-    if (!hasSwipedOnce && onFirstSwipe) {
-      setHasSwipedOnce(true);
-      onFirstSwipe();
-    }
-  };
-
   const handleSwipeUp = async () => {
     if (!enableVerticalSwipe) {
       console.debug('[SUG] blocked swipeUp: gate off', user.id);
@@ -150,7 +138,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     console.debug('[SUG] swipeUp → flash', user.id);
     setSwipeDirection('up');
     triggerFlash('up');
-    handleFirstSwipe();
     await flushAnimationFrame();
     await onToggleFollow(user.id);
     setSwipeDirection(null);
@@ -164,7 +151,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     console.debug('[SUG] swipeDown → flash', user.id);
     setSwipeDirection('down');
     triggerFlash('down');
-    handleFirstSwipe();
     await flushAnimationFrame();
     await onDismiss(user.id);
     setSwipeDirection(null);
@@ -385,13 +371,6 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Detect mobile
-  const isDesktop = useMedia('(min-width: 1024px)');
-  const isMobile = !isDesktop;
-
-  // Onboarding visibility
-  const { show: showTutorial, dismiss: dismissTutorial } = useDiscoverOnboarding(isMobile);
-
   const handleToggleFollow = async (userId: string) => {
     const success = await toggleFollow(userId);
     if (success && onUserFollow) {
@@ -574,72 +553,11 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                 onToggleFollow={handleToggleFollow}
                 onDismiss={handleDismiss}
                 isVisible={visibleCards.has(user.id)}
-                onFirstSwipe={() => dismissTutorial('swiped')}
               />
             </div>
           ))}
         </div>
       </div>
-
-      {/* Swipe Tutorial Overlay */}
-      <AnimatePresence>
-        {showTutorial && (
-          <motion.div
-            key="discover-tutorial-backdrop"
-            className="fixed inset-0 z-[60]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-            <motion.div
-              className="relative mx-auto mt-[15vh] w-[min(520px,92vw)] rounded-2xl bg-white/10 text-white shadow-2xl p-5 sm:p-6"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Swipe tutorial"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
-            >
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{t('discover.tip.title')}</h3>
-                <p className="mt-1 text-sm opacity-90">
-                  {t('discover.tip.body')}
-                </p>
-              </div>
-
-              <div className="mt-5 flex items-center justify-center gap-16">
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl animate-bounce">⬆️</div>
-                  <div className="mt-1 text-xs opacity-90">{t('discover.tip.follow')}</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl animate-bounce">⬇️</div>
-                  <div className="mt-1 text-xs opacity-90">{t('discover.tip.dismiss')}</div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => dismissTutorial('got_it')}
-                  className="rounded-xl px-4 py-2 bg-white/20 hover:bg-white/30 transition active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-white/60"
-                >
-                  {t('common.got_it')}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
