@@ -319,7 +319,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </motion.button>
 
         {/* Center: User Info */}
-        <div className="flex flex-col items-center min-w-0">
+        <div className="flex flex-col items-center min-w-0 mb-2">
           <span className="text-white font-medium truncate">
             {user.displayName || user.handle || 'User'}
           </span>
