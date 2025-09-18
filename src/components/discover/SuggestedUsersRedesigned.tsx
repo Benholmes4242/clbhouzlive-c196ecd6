@@ -403,7 +403,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </motion.button>
 
         {/* Center: User Info */}
-        <div className="flex flex-col items-center min-w-0 mb-6 px-1">
+        <div className="flex flex-col items-center min-w-0 mb-8 px-1">
           <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
