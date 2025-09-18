@@ -587,7 +587,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         {showTutorial && (
           <motion.div
             key="discover-tutorial-backdrop"
-            className="fixed inset-0 z-[60] flex items-center justify-center"
+            className="fixed inset-0 z-[1200] flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
