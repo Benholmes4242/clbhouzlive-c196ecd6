@@ -243,16 +243,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{
             backgroundColor: dragY > 0 
-              ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
-              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
+              ? `hsla(var(--swipe-error), ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
+              : `hsla(var(--swipe-success), ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
           }}
         >
           {Math.abs(dragY) > 1 && (
             <div className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               dragY > 0 
-                ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
-                : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                ? "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]" 
+                : "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
             )}>
               {dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />}
             </div>
@@ -267,8 +267,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               className={cn(
                 "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
                 flash === 'up'
-                  ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
-                  : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+                  ? "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
+                  : "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]"
               )}
             >
               {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
@@ -283,8 +283,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               swipeDirection === 'up'
-                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
-                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+                ? "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
+                : "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]"
             )}
           >
             {swipeDirection === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
