@@ -407,6 +407,8 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
       const cardWidth = 160; // Card width (w-40 = 160px)
       const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+      // Update buttons after scroll completes
+      setTimeout(updateScrollButtons, 300);
     }
   };
 
