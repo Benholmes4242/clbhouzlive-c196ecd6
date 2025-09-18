@@ -51,7 +51,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flashKey, setFlashKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
-
+  const FEEDBACK_MS = 2500;
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
   const enableVerticalSwipe = !isDesktop;
@@ -154,10 +154,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     await flushAnimationFrame();
     
     // Hide the swipe direction after 2.5 seconds to match flash duration
-    setTimeout(() => setSwipeDirection(null), 2500);
+    setTimeout(() => setSwipeDirection(null), FEEDBACK_MS);
     
-    // Continue with API call in background
-    onToggleFollow(user.id);
+    // Delay API call to keep card mounted during feedback
+    setTimeout(() => onToggleFollow(user.id), FEEDBACK_MS);
   };
 
   const handleSwipeDown = async () => {
@@ -172,10 +172,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     await flushAnimationFrame();
     
     // Hide the swipe direction after 2.5 seconds to match flash duration
-    setTimeout(() => setSwipeDirection(null), 2500);
+    setTimeout(() => setSwipeDirection(null), FEEDBACK_MS);
     
-    // Continue with API call in background
-    onDismiss(user.id);
+    // Delay API call to keep card mounted during feedback
+    setTimeout(() => onDismiss(user.id), FEEDBACK_MS);
   };
 
   // Always update dragY for immediate visual feedback; keep axis lock for actions only
@@ -260,13 +260,17 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       )}
 
       {/* Swipe Direction Overlay */}
-      {dragY !== 0 && (
+      {(dragY !== 0 || swipeDirection !== null) && (
         <div 
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{
-            backgroundColor: dragY > 0 
-              ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
-              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
+            backgroundColor: swipeDirection
+              ? (swipeDirection === 'down' 
+                  ? 'rgba(239, 68, 68, 0.30)'
+                  : 'rgba(34, 197, 94, 0.30)')
+              : (dragY > 0 
+                  ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
+                  : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`)
           }}
         >
           {Math.abs(dragY) > 4 && (
