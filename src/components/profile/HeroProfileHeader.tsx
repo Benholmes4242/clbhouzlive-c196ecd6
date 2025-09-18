@@ -804,7 +804,7 @@ const HeroProfileHeader = ({
                  {/* Home Club - centered */}
                  <div className="mt-4 w-full max-w-sm mx-auto text-center">
                    <div className="text-xs text-gray-700">Home Club</div>
-                   <div className="mt-1 text-base font-medium text-gray-900">
+                   <div className="mt-1 text-base font-medium text-gray-900 whitespace-nowrap">
                      {homeClubLines.map((line, index) => (
                        <div key={index}>{line}</div>
                      ))}
@@ -934,7 +934,7 @@ const HeroProfileHeader = ({
                  {/* Home Club - centered */}
                  <div className="mt-5 w-full max-w-md mx-auto text-center">
                    <div className="text-sm text-gray-700">Home Club</div>
-                   <div className="mt-1 text-lg font-medium text-gray-900">
+                   <div className="mt-1 text-lg font-medium text-gray-900 whitespace-nowrap">
                      {homeClub}
                    </div>
                  </div>
