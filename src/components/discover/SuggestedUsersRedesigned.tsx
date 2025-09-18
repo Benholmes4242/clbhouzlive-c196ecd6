@@ -93,7 +93,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     
     if (isFollowLoading || isDismissLoading) return;
     
-    // Show feedback overlay
+    // Show feedback overlay - works from both default and detail states
     setShowFeedback('follow');
     
     // Analytics
@@ -104,7 +104,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     // After feedback, fade card and then call API
     setTimeout(() => {
       setIsCardFading(true);
-      setTimeout(() => onToggleFollow(user.id), 300); // Fade duration
+      setTimeout(() => {
+        // Collapse detail pane if open before API call
+        setIsDetailExpanded(false);
+        onToggleFollow(user.id);
+      }, 300); // Fade duration
     }, FEEDBACK_MS);
   };
 
@@ -113,7 +117,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     
     if (isDismissLoading || isFollowLoading) return;
     
-    // Show feedback overlay
+    // Show feedback overlay - works from both default and detail states
     setShowFeedback('dismiss');
     
     // Analytics
@@ -124,7 +128,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     // After feedback, fade card and then call API
     setTimeout(() => {
       setIsCardFading(true);
-      setTimeout(() => onDismiss(user.id), 300); // Fade duration
+      setTimeout(() => {
+        // Collapse detail pane if open before API call
+        setIsDetailExpanded(false);
+        onDismiss(user.id);
+      }, 300); // Fade duration
     }, FEEDBACK_MS);
   };
 
@@ -159,7 +167,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('up');
     await flushAnimationFrame();
     
-    // Show feedback overlay
+    // Show feedback overlay - works in both default and detail states
     setShowFeedback('follow');
     
     // Hide the swipe direction after 1.5 seconds to match flash duration
@@ -168,7 +176,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     // After feedback, fade card and then call API
     setTimeout(() => {
       setIsCardFading(true);
-      setTimeout(() => onToggleFollow(user.id), 300); // Fade duration
+      setTimeout(() => {
+        // Collapse detail pane if open before API call
+        setIsDetailExpanded(false);
+        onToggleFollow(user.id);
+      }, 300); // Fade duration
     }, FEEDBACK_MS);
   };
 
@@ -183,7 +195,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('down');
     await flushAnimationFrame();
     
-    // Show feedback overlay
+    // Show feedback overlay - works in both default and detail states
     setShowFeedback('dismiss');
     
     // Hide the swipe direction after 1.5 seconds to match flash duration
@@ -192,7 +204,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     // After feedback, fade card and then call API
     setTimeout(() => {
       setIsCardFading(true);
-      setTimeout(() => onDismiss(user.id), 300); // Fade duration
+      setTimeout(() => {
+        // Collapse detail pane if open before API call
+        setIsDetailExpanded(false);
+        onDismiss(user.id);
+      }, 300); // Fade duration
     }, FEEDBACK_MS);
   };
 
@@ -324,7 +340,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Liquid Glass Feedback Overlay */}
+      {/* Full-Card Liquid Glass Feedback Overlay - Covers entire card */}
       <AnimatePresence>
         {showFeedback && (
           <motion.div 
@@ -334,12 +350,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Full card glass background */}
+            <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border border-white/20" />
+            
+            {/* Centered feedback content */}
             <motion.div 
-              className="bg-white/10 backdrop-blur-xl rounded-2xl px-6 py-3 mx-4 border border-white/20 shadow-2xl"
+              className="relative z-10 flex flex-col items-center"
               initial={{ 
                 opacity: 0, 
-                scale: 0.9, 
-                y: 20 
+                scale: 0.8, 
+                y: 30 
               }}
               animate={{ 
                 opacity: 1, 
@@ -348,8 +368,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               }}
               exit={{ 
                 opacity: 0, 
-                scale: 0.95, 
-                y: 10 
+                scale: 0.9, 
+                y: 20 
               }}
               transition={{ 
                 type: "spring", 
@@ -358,24 +378,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 duration: 0.4
               }}
             >
-              <div className="flex flex-col items-center space-y-1">
-                {/* Icon with glow */}
-                <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center text-lg",
-                  showFeedback === 'follow' 
-                    ? "bg-green-500/20 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.4)]" 
-                    : "bg-red-500/20 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
-                )}>
-                  {showFeedback === 'follow' ? '✅' : '❌'}
-                </div>
-                
-                {/* Text */}
-                <div className="text-white text-center font-medium text-sm">
-                  {showFeedback === 'follow' 
-                    ? `You've followed ${user.displayName}`
-                    : `You've dismissed ${user.displayName}`
-                  }
-                </div>
+              {/* Icon with glow - larger for full card */}
+              <div className={cn(
+                "w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4",
+                showFeedback === 'follow' 
+                  ? "bg-green-500/30 text-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)]" 
+                  : "bg-red-500/30 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.6)]"
+              )}>
+                {showFeedback === 'follow' ? '✅' : '❌'}
+              </div>
+              
+              {/* Confirmation text */}
+              <div className="text-white text-center font-semibold text-base px-4">
+                {showFeedback === 'follow' 
+                  ? `You've followed ${user.displayName}`
+                  : `You've dismissed ${user.displayName}`
+                }
               </div>
             </motion.div>
           </motion.div>
@@ -384,112 +402,138 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
-      {/* Liquid Glass Detail Pane */}
+      {/* Fixed Liquid Glass Control Overlay - Always visible and in fixed position */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex items-center space-x-4">
+        {/* Dismiss Button */}
+        <motion.button
+          data-follow-button
+          onClick={handleDismissClick}
+          disabled={isDismissLoading || isFollowLoading}
+          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <FaThumbsDown className="text-white text-lg" />
+        </motion.button>
+
+        {/* Detail Button */}
+        <motion.button
+          data-follow-button
+          onClick={handleDetailClick}
+          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <BiSolidDetail className="text-white text-lg" />
+        </motion.button>
+
+        {/* Follow Button */}
+        <motion.button
+          data-follow-button
+          onClick={handleFollowClick}
+          disabled={isFollowLoading || isDismissLoading}
+          className="w-12 h-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:bg-white/30 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <FaThumbsUp className="text-white text-lg" />
+        </motion.button>
+      </div>
+
+      {/* User Name - Always visible below media */}
+      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-20 px-4">
+        <h3 className="text-white font-semibold text-center drop-shadow-lg whitespace-nowrap">
+          {user.displayName}
+        </h3>
+      </div>
+
+      {/* Liquid Glass Detail Pane - Slides up from bottom */}
       <AnimatePresence>
         {isDetailExpanded && (
-          <>
-            {/* Card content slide up animation */}
-            <motion.div
-              className="absolute inset-0 z-15"
-              initial={{ y: 0 }}
-              animate={{ y: -20 }}
-              exit={{ y: 0 }}
-              transition={{ 
-                duration: 0.3, 
-                ease: "easeOut",
-                type: "spring",
-                stiffness: 300,
-                damping: 25
-              }}
-              style={{ willChange: 'transform' }}
-            />
+          <motion.div
+            className="absolute inset-x-0 bottom-0 z-25 flex flex-col items-center justify-end pb-24"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ 
+              duration: 0.4, 
+              ease: "easeOut",
+              type: "spring",
+              stiffness: 300,
+              damping: 30
+            }}
+          >
+            {/* Glass Background - Expands around control overlay */}
+            <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border-t border-white/25 shadow-[0_-8px_32px_rgba(0,0,0,0.12)]">
+              {/* Subtle gradient overlay */}
+              <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-white/10 to-transparent" />
+              {/* Edge shimmer */}
+              <div className="absolute inset-0 border-t border-white/20 pointer-events-none" />
+            </div>
             
-            {/* Liquid Glass Pane */}
-            <motion.div
-              className="absolute inset-x-0 top-0 bottom-0 z-20 flex flex-col items-center justify-center px-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-            >
-              {/* Glass Background */}
-              <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
-                {/* Subtle top highlight */}
-                <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-white/10 to-transparent" />
-                {/* Edge shimmer */}
-                <div className="absolute inset-0 border border-white/20 pointer-events-none" />
-              </div>
+            {/* Content Container */}
+            <div className="relative z-10 flex flex-col items-center pt-8 pb-4 px-6">
+              {/* Avatar */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.25 }}
+                className="mb-4"
+              >
+                {user.profilePhotoUrl ? (
+                  <div 
+                    className="w-16 h-16 rounded-full bg-cover bg-center shadow-[0_4px_20px_rgba(0,0,0,0.25)] border-2 border-white/30"
+                    style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-white/25 flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.25)] border-2 border-white/30">
+                    <span className="text-white text-xl font-bold">
+                      {user.displayName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </motion.div>
               
-              {/* Content Container */}
-              <div className="relative z-10 flex flex-col items-center">
-                {/* Avatar */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1, duration: 0.25 }}
-                  className="mb-6"
-                >
-                  {user.profilePhotoUrl ? (
-                    <div 
-                      className="w-16 h-16 rounded-full bg-cover bg-center shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
-                      style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-white/25 flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
-                      <span className="text-white text-xl font-bold">
-                        {user.displayName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
-                
-                {/* User Name - Auto-fit */}
+              {/* User Name - Single line, no truncation */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.25 }}
+                className="mb-3"
+              >
+                <h3 className="text-white font-bold text-lg text-center whitespace-nowrap">
+                  {user.displayName || user.handle || "User"}
+                </h3>
+              </motion.div>
+              
+              {/* Home Golf Club */}
+              {user.homeClub && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15, duration: 0.25 }}
-                  className="mb-4 w-full px-4"
+                  transition={{ delay: 0.2, duration: 0.25 }}
+                  className="mb-2"
                 >
-                  <h3 
-                    className="text-white font-bold text-center whitespace-nowrap overflow-hidden"
-                    style={{
-                      fontSize: 'clamp(14px, 4vw, 20px)',
-                      lineHeight: '1.2'
-                    }}
-                  >
-                    {user.displayName || user.handle || "User"}
-                  </h3>
+                  <p className="text-white/90 font-medium text-sm text-center">
+                    {user.homeClub}
+                  </p>
                 </motion.div>
-                
-                {/* Home Club */}
-                {user.homeClub && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.25 }}
-                    className="mb-3"
-                  >
-                    <p className="text-white/85 font-medium text-sm text-center whitespace-nowrap">
-                      {user.homeClub}
-                    </p>
-                  </motion.div>
-                )}
-                
-                {/* Handicap */}
-                {user.handicap !== null && user.handicap !== undefined && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.25 }}
-                  >
-                    <p className="text-teal-400 font-bold text-sm text-center whitespace-nowrap">
-                      Handicap: {user.handicap.toFixed(1)}
-                    </p>
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          </>
+              )}
+              
+              {/* Handicap */}
+              {user.handicap !== null && user.handicap !== undefined && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25, duration: 0.25 }}
+                >
+                  <p className="text-teal-400 font-bold text-sm text-center">
+                    Handicap: {user.handicap.toFixed(1)}
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
