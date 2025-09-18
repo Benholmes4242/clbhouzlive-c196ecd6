@@ -51,7 +51,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flashKey, setFlashKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
-  const FEEDBACK_MS = 2500;
+  const FEEDBACK_MS = 1500;
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
   const enableVerticalSwipe = !isDesktop;
@@ -132,7 +132,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setFlashKey((k) => k + 1);
     setFlash(dir);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setFlash(null), 2500);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 1500);
   }, []);
 
   const handleFirstSwipe = () => {
