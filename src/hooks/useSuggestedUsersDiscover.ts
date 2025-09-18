@@ -6,6 +6,9 @@ interface SuggestedUserMedia {
   displayName: string;
   handle: string;
   isFollowing: boolean;
+  profilePhotoUrl?: string;
+  homeClub?: string;
+  handicap?: number;
   latestVideo?: {
     url: string;
     poster?: string;
@@ -41,7 +44,9 @@ export const useSuggestedUsersDiscover = () => {
           id,
           display_name,
           username,
-          profile_photo_url
+          profile_photo_url,
+          home_club,
+          eg_handicap_index
         `)
         .neq('id', currentUser.id)
         .eq('is_public', true)
@@ -126,6 +131,9 @@ export const useSuggestedUsersDiscover = () => {
             displayName: user.display_name || user.username || 'User',
             handle: user.username ? `@${user.username}` : '@user',
             isFollowing: followingIds.has(user.id),
+            profilePhotoUrl: user.profile_photo_url || undefined,
+            homeClub: user.home_club || undefined,
+            handicap: user.eg_handicap_index || undefined,
             latestVideo,
             latestPhoto,
             latestPostAt: latestPost.created_at
