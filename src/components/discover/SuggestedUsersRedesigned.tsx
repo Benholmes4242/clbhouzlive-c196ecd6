@@ -132,7 +132,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setFlashKey((k) => k + 1);
     setFlash(dir);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setFlash(null), 340);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 2500);
   }, []);
 
   const handleFirstSwipe = () => {
@@ -153,8 +153,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('up');
     await flushAnimationFrame();
     
-    // Hide the swipe direction immediately after flash, don't wait for API
-    setSwipeDirection(null);
+    // Hide the swipe direction after 2.5 seconds to match flash duration
+    setTimeout(() => setSwipeDirection(null), 2500);
     
     // Continue with API call in background
     onToggleFollow(user.id);
@@ -171,8 +171,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('down');
     await flushAnimationFrame();
     
-    // Hide the swipe direction immediately after flash, don't wait for API
-    setSwipeDirection(null);
+    // Hide the swipe direction after 2.5 seconds to match flash duration
+    setTimeout(() => setSwipeDirection(null), 2500);
     
     // Continue with API call in background
     onDismiss(user.id);
