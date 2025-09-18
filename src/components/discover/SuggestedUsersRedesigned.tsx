@@ -53,7 +53,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   // DEBUG mount log per card
   useEffect(() => {
-    console.debug('[SUG] mount card', { id: user.id, enableVerticalSwipe });
+    console.log('[SUG] mount card', { id: user.id, enableVerticalSwipe });
   }, []);
   
   // Handle video autoplay based on visibility
@@ -132,10 +132,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   const handleSwipeUp = async () => {
     if (!enableVerticalSwipe) {
-      console.debug('[SUG] blocked swipeUp: gate off', user.id);
+      console.log('[SUG] blocked swipeUp: gate off', user.id);
       return;
     }
-    console.debug('[SUG] swipeUp → flash', user.id);
+    console.log('[SUG] swipeUp → flash', user.id);
     setSwipeDirection('up');
     triggerFlash('up');
     await flushAnimationFrame();
@@ -145,10 +145,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   const handleSwipeDown = async () => {
     if (!enableVerticalSwipe) {
-      console.debug('[SUG] blocked swipeDown: gate off', user.id);
+      console.log('[SUG] blocked swipeDown: gate off', user.id);
       return;
     }
-    console.debug('[SUG] swipeDown → flash', user.id);
+    console.log('[SUG] swipeDown → flash', user.id);
     setSwipeDirection('down');
     triggerFlash('down');
     await flushAnimationFrame();
