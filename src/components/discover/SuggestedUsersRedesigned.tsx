@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -362,6 +364,8 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [dismissedUsers, setDismissedUsers] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const handleToggleFollow = async (userId: string) => {
     const success = await toggleFollow(userId);
@@ -380,6 +384,37 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
 
   // Filter out dismissed users
   const filteredUsers = users.filter(user => !dismissedUsers.has(user.id));
+
+  // Update scroll button visibility
+  const updateScrollButtons = () => {
+    const container = containerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      );
+    }
+  };
+
+  // Scroll function
+  const scroll = (direction: 'left' | 'right') => {
+    const container = containerRef.current;
+    if (container) {
+      const cardWidth = 160; // Card width (w-40 = 160px)
+      const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
+      container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+    }
+  };
+
+  // Set up scroll listener
+  useEffect(() => {
+    updateScrollButtons();
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', updateScrollButtons);
+      return () => container.removeEventListener('scroll', updateScrollButtons);
+    }
+  }, [filteredUsers.length]);
 
   // Intersection observer for video autoplay
   useEffect(() => {
@@ -471,6 +506,28 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Suggested for you
           </h3>
+          <div className="flex gap-2">
+            {canScrollLeft && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('left')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </Button>
+            )}
+            {canScrollRight && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => scroll('right')}
+                className="h-12 w-12 p-0 hover:bg-transparent focus:outline-none focus:ring-0 focus:border-0"
+              >
+                <ChevronRight className="h-10 w-10" />
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Horizontal Scrollable Cards */}
