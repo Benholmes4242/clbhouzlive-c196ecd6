@@ -293,31 +293,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         absolute inset-x-0 bottom-0
         h-[clamp(64px,25%,92px)]
         bg-black/35 backdrop-blur-md
-        rounded-none
-        px-3 py-2 z-10
-        grid grid-cols-[auto_1fr_auto] items-center
+        rounded-none px-3 py-2 z-10
+        relative
+        flex items-center justify-center
       ">
-        {/* Left: Dismiss Button */}
-        <motion.button
-          aria-label="Dismiss suggestion"
-          onClick={handleDismissClick}
-          disabled={isDismissLoading || isFollowLoading}
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center
-                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-        >
-          <FaThumbsDown className="text-base" />
-          <span className="absolute -inset-1" />
-          <span className="absolute inset-0 rounded-full pointer-events-none
-                           scale-0 opacity-60
-                           group-active:scale-150 group-active:opacity-0
-                           transition-transform duration-300 bg-white/30" />
-        </motion.button>
-
-        {/* Center: User Info */}
-        <div className="flex flex-col items-center min-w-0">
+        {/* Centered text block */}
+        <div className="flex flex-col items-center min-w-0 pointer-events-none">
           <span className="text-white font-medium truncate">
             {user.displayName || user.handle || 'User'}
           </span>
@@ -326,7 +307,30 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           </span>
         </div>
 
-        {/* Right: Follow Button */}
+        {/* Bottom-left: 👎 dismiss */}
+        <motion.button
+          aria-label="Dismiss suggestion"
+          onClick={handleDismissClick}
+          disabled={isDismissLoading || isFollowLoading}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="
+            group absolute left-2 bottom-2
+            w-8 h-8 rounded-full flex items-center justify-center
+            bg-white/15 hover:bg-white/25 text-white disabled:opacity-50
+          "
+        >
+          <FaThumbsDown className="text-[14px]" />
+          <span className="absolute -inset-3" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
+
+
+        {/* Bottom-right: 👍 follow */}
         <motion.button
           aria-label="Follow user"
           onClick={handleFollowClick}
@@ -334,11 +338,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center
-                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+          className="
+            group absolute right-2 bottom-2
+            w-8 h-8 rounded-full flex items-center justify-center
+            bg-white/15 hover:bg-white/25 text-white disabled:opacity-50
+          "
         >
-          <FaThumbsUp className="text-base" />
-          <span className="absolute -inset-1" />
+          <FaThumbsUp className="text-[14px]" />
+          <span className="absolute -inset-3" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
                            group-active:scale-150 group-active:opacity-0
