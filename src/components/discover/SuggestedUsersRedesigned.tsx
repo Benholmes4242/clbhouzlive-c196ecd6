@@ -417,8 +417,12 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
 
   const handleToggleFollow = async (userId: string) => {
     const success = await toggleFollow(userId);
-    if (success && onUserFollow) {
-      onUserFollow(userId);
+    if (success) {
+      // Remove user from display after successful follow
+      setDismissedUsers(prev => new Set([...prev, userId]));
+      if (onUserFollow) {
+        onUserFollow(userId);
+      }
     }
     return success;
   };
