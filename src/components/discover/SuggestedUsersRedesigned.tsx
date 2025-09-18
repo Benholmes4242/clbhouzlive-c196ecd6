@@ -242,12 +242,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           style={{
             backgroundColor: dragY > 0 
               ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
-              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
+              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`,
+            transform: 'translateY(16px)'
           }}
         >
           {Math.abs(dragY) > 30 && (
             <div className={cn(
-              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
+              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center",
               dragY > 0 
                 ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
                 : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
@@ -260,10 +261,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
       {/* Flash Feedback Bubble */}
       {flash && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+             style={{ transform: 'translateY(16px)' }}>
           <div
             className={cn(
-              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
+              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center animate-pingonce",
               flash === 'up'
                 ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
                 : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
@@ -276,10 +278,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
       {/* Swipe Feedback Bubble */}
       {swipeDirection && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
+             style={{ transform: 'translateY(16px)' }}>
           <div
             className={cn(
-              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
+              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center",
               swipeDirection === 'up'
                 ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
                 : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
