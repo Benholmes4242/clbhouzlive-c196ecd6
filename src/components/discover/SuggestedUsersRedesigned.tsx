@@ -247,7 +247,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         >
           {Math.abs(dragY) > 30 && (
             <div className={cn(
-              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center",
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               dragY > 0 
                 ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
                 : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
@@ -263,7 +263,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
           <div
             className={cn(
-              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center animate-pingonce",
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
               flash === 'up'
                 ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
                 : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
@@ -279,7 +279,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             className={cn(
-              "w-12 h-12 rounded-full text-white text-xl flex items-center justify-center",
+              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               swipeDirection === 'up'
                 ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
                 : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
@@ -307,10 +307,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-8 h-8 rounded-full flex items-center justify-center
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
-          <FaThumbsDown className="text-sm" />
+          <FaThumbsDown className="text-base" />
           <span className="absolute -inset-1" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
@@ -336,10 +336,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-8 h-8 rounded-full flex items-center justify-center
+          className="group relative w-9 h-9 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
-          <FaThumbsUp className="text-sm" />
+          <FaThumbsUp className="text-base" />
           <span className="absolute -inset-1" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
