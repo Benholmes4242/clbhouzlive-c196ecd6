@@ -317,7 +317,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
           className="
             group absolute left-2 bottom-2
-            w-8 h-8 rounded-full flex items-center justify-center
+            w-7 h-7 rounded-full flex items-center justify-center
             bg-white/15 hover:bg-white/25 text-white disabled:opacity-50
           "
         >
@@ -340,7 +340,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
           className="
             group absolute right-2 bottom-2
-            w-8 h-8 rounded-full flex items-center justify-center
+            w-7 h-7 rounded-full flex items-center justify-center
             bg-white/15 hover:bg-white/25 text-white disabled:opacity-50
           "
         >
