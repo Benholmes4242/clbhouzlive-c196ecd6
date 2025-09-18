@@ -393,7 +393,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
               >
                 {/* User Avatar */}
-                <div className="flex justify-center mb-3">
+                <div className="flex justify-center mb-2">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30">
                     {user.profilePhotoUrl ? (
                       <img
@@ -413,7 +413,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
                 {/* User Name */}
                 <motion.div
-                  className="text-center mb-3"
+                  className="text-center mb-1"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.3 }}
@@ -432,7 +432,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     transition={{ delay: 0.25, duration: 0.3 }}
                   >
                     <p className="text-white/80 text-sm font-medium">
-                      🏌️ {user.homeClub}
+                      {user.homeClub}
                     </p>
                   </motion.div>
                 )}
