@@ -537,7 +537,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         {/* Horizontal Scrollable Cards */}
         <div 
           ref={containerRef}
-          className="flex overflow-x-auto scrollbar-hide gap-px pb-2"
+          className="flex overflow-x-auto scrollbar-hide gap-px pb-0"
           style={{ touchAction: 'pan-x' }}   // explicit: owns horizontal
         >
           {filteredUsers.map((user) => (
