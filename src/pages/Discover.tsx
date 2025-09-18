@@ -169,29 +169,29 @@ const Discover = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Your Discover Section */}
-          <div className="md:container md:mx-auto md:px-0 pt-6">
+          {/* Your Discover Section - 16px gap from header */}
+          <div className="md:container md:mx-auto md:px-0 pt-4">
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
             />
           </div>
 
+          {/* Suggested Users - 16px mobile / 32px desktop spacing from tabs */}
+          <div className="mt-4 md:mt-8">
+            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
+          </div>
 
-          {/* Suggested Users */}
-          <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
-
-          {/* Trending Now Section */}
-          <div>
+          {/* Trending Now Section - 16px mobile / 32px desktop spacing from previous section */}
+          <div className="mt-4 md:mt-8">
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
             />
           </div>
 
-
-          {/* Main Grid with Container */}
-          <div className="md:container md:mx-auto md:px-0">
+          {/* Main Grid with Container - 16px mobile / 32px desktop spacing from previous section */}
+          <div className="md:container md:mx-auto md:px-0 mt-4 md:mt-8">
             <ExploreGrid 
               content={uniqueContent}
               onLike={handleLike}
