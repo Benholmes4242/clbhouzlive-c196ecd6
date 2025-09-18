@@ -521,14 +521,10 @@ const HeroProfileHeader = ({
   const username = useMemo(() => profile?.username || 'user', [profile?.username]);
   const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
   
-  // Function to wrap text with max 2 words per line
+  // Keep home club on a single line (no wrapping)
   const wrapHomeClubText = (text: string) => {
-    const words = text.split(' ');
-    const lines = [];
-    for (let i = 0; i < words.length; i += 2) {
-      lines.push(words.slice(i, i + 2).join(' '));
-    }
-    return lines;
+    const cleaned = (text || '').trim();
+    return cleaned ? [cleaned] : [];
   };
   
   const homeClubLines = wrapHomeClubText(homeClub);
