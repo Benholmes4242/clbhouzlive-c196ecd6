@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
@@ -10,6 +10,10 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
+
+// Utility: ensures paint before heavy updates
+const flushAnimationFrame = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
 interface SuggestedUserCardProps {
   user: {
@@ -40,12 +44,18 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flash, setFlash] = useState<'up' | 'down' | null>(null);
   const [isVertical, setIsVertical] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [flashKey, setFlashKey] = useState(0);
+  const timeoutRef = useRef<number | null>(null);
 
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
   const enableVerticalSwipe = !isDesktop;
 
+  // DEBUG mount log per card
+  useEffect(() => {
+    console.debug('[SUG] mount card', { id: user.id, enableVerticalSwipe });
+  }, []);
+  
   // Handle video autoplay based on visibility
   useEffect(() => {
     const video = videoRef.current;
@@ -112,28 +122,36 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
-  // Local flash helper (robust per-card timeout)
-  const flashGlow = (dir: 'up' | 'down') => {
+  // Local flash helper with remount to retrigger CSS
+  const triggerFlash = useCallback((dir: 'up' | 'down') => {
+    setFlashKey((k) => k + 1);
     setFlash(dir);
-    // Clear any pending timeout for this card
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => setFlash(null), 350);
-  };
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 420);
+  }, []);
 
   const handleSwipeUp = async () => {
-    if (!enableVerticalSwipe || !isVertical) return; // Gate + axis lock
+    if (!enableVerticalSwipe) {
+      console.debug('[SUG] blocked swipeUp: gate off', user.id);
+      return;
+    }
+    console.debug('[SUG] swipeUp → flash', user.id);
     setSwipeDirection('up');
-    flashGlow('up');
+    triggerFlash('up');
+    await flushAnimationFrame();
     await onToggleFollow(user.id);
     setSwipeDirection(null);
   };
 
   const handleSwipeDown = async () => {
-    if (!enableVerticalSwipe || !isVertical) return; // Gate + axis lock
+    if (!enableVerticalSwipe) {
+      console.debug('[SUG] blocked swipeDown: gate off', user.id);
+      return;
+    }
+    console.debug('[SUG] swipeDown → flash', user.id);
     setSwipeDirection('down');
-    flashGlow('down');
+    triggerFlash('down');
+    await flushAnimationFrame();
     await onDismiss(user.id);
     setSwipeDirection(null);
   };
@@ -153,12 +171,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const handleSwipeEnd = () => {
     setDragY(0);
     setIsVertical(false);
-    // Clear flash state on swipe end
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    setFlash(null);
   };
 
   // Attach swipe only if enabled
@@ -177,7 +189,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   return (
     <div
       ref={swipeRef}
-      className="relative snap-start"
+      data-card={user.id}
+      className="relative snap-start overflow-hidden"
       style={{ touchAction: enableVerticalSwipe ? 'pan-y' : 'pan-x' }} // mobile: vertical; desktop: horizontal
     >
       <motion.div
@@ -248,20 +261,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       )}
 
       {/* Flash Feedback Bubble */}
-      {flash && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <div
-            className={cn(
-              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
-              flash === 'up'
-                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
-                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
-            )}
-          >
-            {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
+        {flash && (
+          <div key={flashKey} className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+            <div
+              className={cn(
+                "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
+                flash === 'up'
+                  ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                  : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+              )}
+            >
+              {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Swipe Feedback Bubble */}
       {swipeDirection && (
