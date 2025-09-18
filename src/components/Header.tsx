@@ -45,7 +45,7 @@ const Header = () => {
           <CompactHeader />
         ) : (
           <div className="flex items-center justify-between h-16 max-w-full">
-            {/* Logo - Original colors */}
+            {/* Logo - Orange mark + White text */}
             <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
               <img
                 src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -56,7 +56,7 @@ const Header = () => {
               <img
                 src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
                 alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                 onClick={handleLogoClick}
               />
             </div>
