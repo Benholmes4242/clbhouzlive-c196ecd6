@@ -402,78 +402,182 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
 
-      {/* Fixed Liquid Glass Control Overlay */}
-      <div className="
-        absolute inset-x-0 bottom-0
-        h-[clamp(80px,28%,108px)]
-        bg-white/10 backdrop-blur-xl border-t border-white/20
-        rounded-none
-        px-3 py-3 z-30
-        flex items-end justify-center gap-4
-      ">
-        {/* Left: Dismiss Button */}
-        <motion.button
-          aria-label="Dismiss suggestion"
-          onClick={handleDismissClick}
-          disabled={isDismissLoading || isFollowLoading}
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-        >
-          <FaThumbsDown className="text-sm" />
-          <span className="absolute -inset-2" />
-          <span className="absolute inset-0 rounded-full pointer-events-none
-                           scale-0 opacity-60
-                           group-active:scale-150 group-active:opacity-0
-                           transition-transform duration-300 bg-white/30" />
-        </motion.button>
+      {/* Detail Overlay - Animated */}
+      <motion.div
+        className="absolute inset-x-0 bottom-0 z-30"
+        initial={false}
+        animate={{
+          height: isDetailExpanded ? "100%" : "clamp(80px,28%,108px)"
+        }}
+        transition={{
+          duration: 0.35,
+          ease: [0.25, 0.1, 0.25, 1] // ease-in-out
+        }}
+      >
+        <div className="relative w-full h-full bg-white/10 backdrop-blur-xl border-t border-white/20 rounded-none">
+          
+          {/* Expanded Content - User Information */}
+          <AnimatePresence>
+            {isDetailExpanded && (
+              <motion.div
+                className="absolute inset-x-0 top-0 bottom-20 px-4 py-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ 
+                  duration: 0.3,
+                  delay: 0.1,
+                  ease: "easeOut"
+                }}
+              >
+                {/* User Avatar */}
+                <div className="flex justify-center mb-4">
+                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30">
+                    {user.profilePhotoUrl ? (
+                      <img
+                        src={user.profilePhotoUrl}
+                        alt={user.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">
+                          {user.displayName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-        {/* Center Detail Button */}
-        <motion.button
-          aria-label="View details"
-          onClick={handleDetailClick}
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                     bg-white/15 hover:bg-white/25 text-white"
-        >
-          <BiSolidDetail className="text-sm fill-white" />
-          <span className="absolute -inset-2" />
-          <span className="absolute inset-0 rounded-full pointer-events-none
-                           scale-0 opacity-60
-                           group-active:scale-150 group-active:opacity-0
-                           transition-transform duration-300 bg-white/30" />
-        </motion.button>
+                {/* User Name */}
+                <motion.div
+                  className="text-center mb-3"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
+                >
+                  <h3 className="text-white font-semibold text-lg">
+                    {user.displayName}
+                  </h3>
+                  <p className="text-white/70 text-sm">
+                    @{user.handle}
+                  </p>
+                </motion.div>
 
-        {/* Right: Follow Button */}
-        <motion.button
-          aria-label="Follow user"
-          onClick={handleFollowClick}
-          disabled={isFollowLoading || isDismissLoading}
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-        >
-          <FaThumbsUp className="text-sm" />
-          <span className="absolute -inset-2" />
-          <span className="absolute inset-0 rounded-full pointer-events-none
-                           scale-0 opacity-60
-                           group-active:scale-150 group-active:opacity-0
-                           transition-transform duration-300 bg-white/30" />
-        </motion.button>
+                {/* Home Golf Club */}
+                {user.homeClub && (
+                  <motion.div
+                    className="text-center mb-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25, duration: 0.3 }}
+                  >
+                    <p className="text-white/80 text-sm font-medium">
+                      🏌️ {user.homeClub}
+                    </p>
+                  </motion.div>
+                )}
 
-        {/* Center: User Info (now positioned above buttons) */}
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
-          <span className="text-white font-medium text-center text-sm whitespace-nowrap">
-            {user.displayName || user.handle || "User"}
-          </span>
+                {/* Handicap */}
+                {user.handicap !== undefined && user.handicap !== null && (
+                  <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    <p className="text-white/80 text-sm">
+                      Handicap: {user.handicap}
+                    </p>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Fixed Button Controls - Always at bottom */}
+          <div className="absolute inset-x-0 bottom-0 px-3 py-3 flex items-center justify-center gap-4">
+            {/* Left: Dismiss Button */}
+            <motion.button
+              aria-label="Dismiss suggestion"
+              onClick={handleDismissClick}
+              disabled={isDismissLoading || isFollowLoading}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 320, damping: 18 }}
+              className="group relative w-8 h-8 rounded-full flex items-center justify-center
+                         bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+            >
+              <FaThumbsDown className="text-sm" />
+              <span className="absolute -inset-2" />
+              <span className="absolute inset-0 rounded-full pointer-events-none
+                               scale-0 opacity-60
+                               group-active:scale-150 group-active:opacity-0
+                               transition-transform duration-300 bg-white/30" />
+            </motion.button>
+
+            {/* Center Detail Button */}
+            <motion.button
+              aria-label="View details"
+              onClick={handleDetailClick}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 320, damping: 18 }}
+              className={cn(
+                "group relative w-8 h-8 rounded-full flex items-center justify-center text-white",
+                isDetailExpanded 
+                  ? "bg-white/30 hover:bg-white/40" 
+                  : "bg-white/15 hover:bg-white/25"
+              )}
+            >
+              <motion.div
+                animate={{ rotate: isDetailExpanded ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <BiSolidDetail className="text-sm fill-white" />
+              </motion.div>
+              <span className="absolute -inset-2" />
+              <span className="absolute inset-0 rounded-full pointer-events-none
+                               scale-0 opacity-60
+                               group-active:scale-150 group-active:opacity-0
+                               transition-transform duration-300 bg-white/30" />
+            </motion.button>
+
+            {/* Right: Follow Button */}
+            <motion.button
+              aria-label="Follow user"
+              onClick={handleFollowClick}
+              disabled={isFollowLoading || isDismissLoading}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 320, damping: 18 }}
+              className="group relative w-8 h-8 rounded-full flex items-center justify-center
+                         bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+            >
+              <FaThumbsUp className="text-sm" />
+              <span className="absolute -inset-2" />
+              <span className="absolute inset-0 rounded-full pointer-events-none
+                               scale-0 opacity-60
+                               group-active:scale-150 group-active:opacity-0
+                               transition-transform duration-300 bg-white/30" />
+            </motion.button>
+          </div>
+
+          {/* Compact User Info - Only show when collapsed */}
+          {!isDetailExpanded && (
+            <motion.div
+              className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: isDetailExpanded ? 0 : 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="text-white font-medium text-center text-sm whitespace-nowrap">
+                {user.displayName || user.handle || "User"}
+              </span>
+            </motion.div>
+          )}
         </div>
-      </div>
+      </motion.div>
       </motion.div>
 
     </div>
