@@ -320,7 +320,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
         {/* Center: User Info */}
         <div className="flex flex-col items-center min-w-0 mb-4 px-1">
-          <span className="text-white font-medium text-center text-sm">
+          <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
           <span className="text-white/80 text-xs">
