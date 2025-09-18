@@ -415,7 +415,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             whileTap={{ scale: 0.9 }}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="group absolute -bottom-2 w-7 h-7 rounded-full flex items-center justify-center
+            className="group absolute bottom-0 w-7 h-7 rounded-full flex items-center justify-center
                        bg-white/15 hover:bg-white/25 text-white"
           >
             <BiSolidDetail className="text-sm fill-white" />
