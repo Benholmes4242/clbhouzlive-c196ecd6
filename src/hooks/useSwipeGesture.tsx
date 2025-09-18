@@ -1,14 +1,22 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 interface SwipeGestureOptions {
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
-  onSwipeUp?: () => void;
-  onSwipeDown?: () => void;
+  onSwipeLeft?: () => void | Promise<void>;
+  onSwipeRight?: () => void | Promise<void>;
+  onSwipeUp?: () => void | Promise<void>;
+  onSwipeDown?: () => void | Promise<void>;
   threshold?: number;
+  // Kept for backward-compat; we rely on CSS touch-action instead
   preventDefaultTouchMove?: boolean;
   onSwiping?: (deltaX: number, deltaY: number) => void;
   onSwipeEnd?: () => void;
+}
+
+// Keep the latest handlers without re-binding listeners
+function useLatest<T>(value: T) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
 }
 
 export const useSwipeGesture = ({
@@ -17,91 +25,85 @@ export const useSwipeGesture = ({
   onSwipeUp,
   onSwipeDown,
   threshold = 50,
-  preventDefaultTouchMove = false,
+  // preventDefaultTouchMove is ignored; rely on touch-action CSS
+  preventDefaultTouchMove,
   onSwiping,
-  onSwipeEnd
+  onSwipeEnd,
 }: SwipeGestureOptions) => {
+  const latest = useLatest({
+    onSwipeLeft,
+    onSwipeRight,
+    onSwipeUp,
+    onSwipeDown,
+    threshold,
+    onSwiping,
+    onSwipeEnd,
+  });
+
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
   const touchEndX = useRef<number>(0);
   const touchEndY = useRef<number>(0);
   const elementRef = useRef<HTMLDivElement>(null);
 
-  const handleTouchStart = (e: TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-    touchStartY.current = e.targetTouches[0].clientY;
-  };
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    const t = e.targetTouches[0];
+    touchStartX.current = t.clientX;
+    touchStartY.current = t.clientY;
+    touchEndX.current = t.clientX;
+    touchEndY.current = t.clientY;
+  }, []);
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (onSwiping) {
-      const deltaX = e.targetTouches[0].clientX - touchStartX.current;
-      const deltaY = e.targetTouches[0].clientY - touchStartY.current;
-      onSwiping(deltaX, deltaY);
-    }
-    
-    // Only prevent default if explicitly requested and it's a vertical gesture
-    if (preventDefaultTouchMove && onSwiping) {
-      const deltaX = e.targetTouches[0].clientX - touchStartX.current;
-      const deltaY = e.targetTouches[0].clientY - touchStartY.current;
-      if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
-        e.preventDefault();
-      }
-    }
-  };
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    const t = e.targetTouches[0];
+    const deltaX = t.clientX - touchStartX.current;
+    const deltaY = t.clientY - touchStartY.current;
 
-  const handleTouchEnd = (e: TouchEvent) => {
-    touchEndX.current = e.changedTouches[0].clientX;
-    touchEndY.current = e.changedTouches[0].clientY;
-    checkDirection();
-    if (onSwipeEnd) {
-      onSwipeEnd();
-    }
-  };
+    // update latest end positions
+    touchEndX.current = t.clientX;
+    touchEndY.current = t.clientY;
 
-  const checkDirection = () => {
+    // Live feedback (do not preventDefault; use CSS touch-action to manage scroll)
+    latest.current.onSwiping?.(deltaX, deltaY);
+  }, [latest]);
+
+  const handleTouchEnd = useCallback(() => {
     const deltaX = touchStartX.current - touchEndX.current;
     const deltaY = touchStartY.current - touchEndY.current;
-    
-    const isLeftSwipe = deltaX > threshold;
-    const isRightSwipe = deltaX < -threshold;
-    const isUpSwipe = deltaY > threshold;
-    const isDownSwipe = deltaY < -threshold;
 
-    // Check for vertical swipes first (axis lock: |dy| > |dx| + 12)
+    const th = latest.current.threshold ?? 50;
+
+    const isLeftSwipe = deltaX > th;
+    const isRightSwipe = deltaX < -th;
+    const isUpSwipe = deltaY > th;
+    const isDownSwipe = deltaY < -th;
+
+    // Axis lock: prefer vertical when clearly vertical (|dy| > |dx| + 12)
     if (Math.abs(deltaY) > Math.abs(deltaX) + 12) {
-      if (isUpSwipe && onSwipeUp) {
-        onSwipeUp();
-        return;
-      }
-      if (isDownSwipe && onSwipeDown) {
-        onSwipeDown();
-        return;
-      }
+      if (isUpSwipe) latest.current.onSwipeUp?.();
+      else if (isDownSwipe) latest.current.onSwipeDown?.();
+    } else {
+      if (isLeftSwipe) latest.current.onSwipeLeft?.();
+      else if (isRightSwipe) latest.current.onSwipeRight?.();
     }
 
-    // Then check horizontal swipes
-    if (isLeftSwipe && onSwipeLeft) {
-      onSwipeLeft();
-    }
-    if (isRightSwipe && onSwipeRight) {
-      onSwipeRight();
-    }
-  };
+    latest.current.onSwipeEnd?.();
+  }, [latest]);
 
   useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
+    const el = elementRef.current;
+    if (!el) return;
 
-    element.addEventListener('touchstart', handleTouchStart, { passive: true });
-    element.addEventListener('touchmove', handleTouchMove, { passive: true });
-    element.addEventListener('touchend', handleTouchEnd, { passive: true });
+    el.addEventListener('touchstart', handleTouchStart, { passive: true });
+    el.addEventListener('touchmove', handleTouchMove, { passive: true });
+    el.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      element.removeEventListener('touchstart', handleTouchStart);
-      element.removeEventListener('touchmove', handleTouchMove);
-      element.removeEventListener('touchend', handleTouchEnd);
+      el.removeEventListener('touchstart', handleTouchStart as EventListener);
+      el.removeEventListener('touchmove', handleTouchMove as EventListener);
+      el.removeEventListener('touchend', handleTouchEnd as EventListener);
     };
-  }, [onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, threshold, preventDefaultTouchMove, onSwiping, onSwipeEnd]);
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   return elementRef;
 };
