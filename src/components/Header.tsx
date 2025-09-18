@@ -57,20 +57,20 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
             </div>
           ) : (
             <div className="px-4">
-              {/* Main header row - Mobile: h-14 (56px), Desktop: h-16 (64px) */}
-              <div className={`flex items-center justify-between max-w-full bg-transparent ${isMobile ? 'h-14 py-1.5' : 'h-16 py-2.5'}`}>
+              {/* Main header row */}
+              <div className="flex items-center justify-between h-16 max-w-full bg-transparent">
                 {/* Logo - Orange mark + White text */}
-                <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 min-w-0">
+                <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
                   <img
                     src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                     alt="Logo Mark"
-                    className={`w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 ${isMobile ? 'h-6' : 'h-10 md:h-12'}`}
+                    className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
                     onClick={handleLogoClick}
                   />
                   <img
                     src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
                     alt="clbhouz Logo"
-                    className={`w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert ${isMobile ? 'h-6' : 'h-10 md:h-12'}`}
+                    className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                     onClick={handleLogoClick}
                   />
                 </div>
@@ -103,12 +103,12 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   // Standard header for other pages
   return (
     <header className={headerClasses} style={headerStyle}>
-      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md bg-white/20 px-3 md:px-4">
+      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md bg-black/35 px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />
         ) : (
           <div className="flex items-center justify-between h-16 max-w-full">
-            {/* Logo - Orange mark + Black text */}
+            {/* Logo - Orange mark + White text */}
             <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
               <img
                 src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
@@ -119,7 +119,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               <img
                 src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
                 alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                 onClick={handleLogoClick}
               />
             </div>
