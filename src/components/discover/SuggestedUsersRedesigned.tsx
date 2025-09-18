@@ -421,9 +421,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   <h3 className="text-white font-semibold text-lg">
                     {user.displayName}
                   </h3>
-                  <p className="text-white/70 text-sm">
-                    @{user.handle}
-                  </p>
                 </motion.div>
 
                 {/* Home Golf Club */}
@@ -436,20 +433,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   >
                     <p className="text-white/80 text-sm font-medium">
                       🏌️ {user.homeClub}
-                    </p>
-                  </motion.div>
-                )}
-
-                {/* Handicap */}
-                {user.handicap !== undefined && user.handicap !== null && (
-                  <motion.div
-                    className="text-center"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.3 }}
-                  >
-                    <p className="text-white/80 text-sm">
-                      Handicap: {user.handicap}
                     </p>
                   </motion.div>
                 )}
