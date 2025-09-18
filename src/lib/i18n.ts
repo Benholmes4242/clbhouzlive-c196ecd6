@@ -4,7 +4,9 @@ type Dict = Record<string, Record<string, string>>;
 const dict: Dict = {
   en: {
     'discover.tip.title': 'Tip: Swipe on suggested cards to follow players!',
-    'discover.tip.body': 'Swipe up to follow 👍 · Swipe down to dismiss 👎',
+    'discover.tip.body': '',
+    'discover.tip.swipe_up': 'Swipe up to follow',
+    'discover.tip.swipe_down': 'Swipe down to dismiss',
     'discover.tip.follow': 'Follow',
     'discover.tip.dismiss': 'Dismiss',
     'common.got_it': 'Got it',

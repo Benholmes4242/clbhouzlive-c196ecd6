@@ -610,19 +610,20 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
             >
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{t('discover.tip.title')}</h3>
-                <p className="mt-1 text-sm opacity-90">{t('discover.tip.body')}</p>
-              </div>
+               <div className="text-center">
+                 <h3 className="text-lg font-semibold">{t('discover.tip.title')}</h3>
+               </div>
 
-               <div className="mt-5 flex items-center justify-center gap-16">
+               <div className="mt-5 flex items-start justify-center gap-16">
                  <div className="flex flex-col items-center">
+                   <div className="text-center text-sm mb-3">{t('discover.tip.swipe_down')}</div>
                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-500/20">
                      <FaThumbsDown className="text-white text-lg" />
                    </div>
                    <div className="mt-2 text-xs opacity-90">{t('discover.tip.dismiss')}</div>
                  </div>
                  <div className="flex flex-col items-center">
+                   <div className="text-center text-sm mb-3">{t('discover.tip.swipe_up')}</div>
                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-500/20">
                      <FaThumbsUp className="text-white text-lg" />
                    </div>
