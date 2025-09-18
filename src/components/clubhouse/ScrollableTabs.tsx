@@ -80,10 +80,10 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
         {/* Scrollable tabs container */}
         <div 
           ref={tabsRef}
-          className={`flex items-center scrollbar-hide py-3 ${
+          className={`flex items-center scrollbar-hide min-h-[32px] md:min-h-[44px] py-1 md:py-3 ${
             isOverflowing 
-              ? 'overflow-x-auto px-6 space-x-5 md:space-x-8' 
-              : 'justify-center space-x-8 px-6'
+              ? 'overflow-x-auto px-6 space-x-4 md:space-x-8' 
+              : 'justify-center space-x-6 md:space-x-8 px-6'
           }`}
           style={{ 
             scrollSnapType: isOverflowing ? 'x mandatory' : 'none',
@@ -118,10 +118,11 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
             }`}
             style={{
               scrollSnapAlign: isOverflowing ? 'start' : 'none',
-              minHeight: '44px',
-              minWidth: '44px',
-              padding: '12px 8px',
-              fontSize: 'clamp(13px, 1.4vw, 15px)'
+              minHeight: '40px',
+              minWidth: '40px',
+              padding: '8px',
+              fontSize: 'clamp(13px, 1.4vw, 15px)',
+              lineHeight: '1.2'
             }}
             role="tab"
             aria-selected={item.id === activeTab}
@@ -133,11 +134,11 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
         
           {/* Search icon button */}
           <button 
-            className="text-white/70 hover:text-white transition-colors duration-200 flex-shrink-0 p-3"
+            className="text-white/70 hover:text-white transition-colors duration-200 flex-shrink-0 p-2"
             style={{
               scrollSnapAlign: isOverflowing ? 'start' : 'none',
-              minHeight: '44px',
-              minWidth: '44px'
+              minHeight: '40px',
+              minWidth: '40px'
             }}
             aria-label="Search"
           >
