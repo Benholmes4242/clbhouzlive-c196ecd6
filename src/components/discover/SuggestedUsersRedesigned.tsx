@@ -324,7 +324,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             transition={{ duration: 0.3 }}
           >
             <motion.div 
-              className="bg-white/10 backdrop-blur-xl rounded-2xl px-6 py-5 mx-4 border border-white/20 shadow-2xl"
+              className="bg-white/10 backdrop-blur-xl rounded-2xl px-6 py-3 mx-4 border border-white/20 shadow-2xl"
               initial={{ 
                 opacity: 0, 
                 scale: 0.9, 
@@ -347,10 +347,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 duration: 0.4
               }}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-1">
                 {/* Icon with glow */}
                 <div className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center text-xl",
+                  "w-10 h-10 rounded-full flex items-center justify-center text-lg",
                   showFeedback === 'follow' 
                     ? "bg-green-500/20 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.4)]" 
                     : "bg-red-500/20 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
