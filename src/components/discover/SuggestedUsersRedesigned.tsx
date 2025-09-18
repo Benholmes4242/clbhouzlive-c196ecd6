@@ -383,14 +383,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         px-3 py-2 z-10
         flex flex-col items-center justify-end
       ">
-        {/* User Info - Centered */}
-        <div className="flex flex-col items-center min-w-0 mb-3">
+        {/* User Info - Centered within glass panel */}
+        <div className="flex flex-col items-center min-w-0 mb-2 px-1">
           <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
         </div>
 
-        {/* Action Buttons - Centered under name */}
+        {/* Action Buttons - Centered under name within glass panel */}
         <div className="flex items-center justify-center gap-6 mb-2">
           {/* Left: Dismiss Button */}
           <motion.button
