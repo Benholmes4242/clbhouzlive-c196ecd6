@@ -382,7 +382,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        grid grid-cols-[auto_auto_1fr_auto] items-end gap-2
+        grid grid-cols-[auto_auto_1fr_auto_auto] items-end gap-2
       ">
         {/* Left: Dismiss Button */}
         <motion.button
