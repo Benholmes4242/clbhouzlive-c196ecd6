@@ -4,13 +4,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useModalContext } from '@/contexts/ModalContext';
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
+import CompactHeader from './clubhouse/CompactHeader';
 import { useAppLogo } from '@/hooks/useAppLogo';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentLogo } = useAppLogo();
   const { shouldHideHeader } = useModalContext();
+  const isMobile = useIsMobile();
 
   // Hide header when modals are active
   if (shouldHideHeader) {
@@ -21,40 +24,54 @@ const Header = () => {
     navigate('/clubhouse');
   };
 
-  // Only sticky on clubhouse page, fixed everywhere else
+  // Always sticky on clubhouse page, relative everywhere else  
   const isClubhousePage = location.pathname === '/clubhouse';
   const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
+  
+  // Apply safe-area insets and compact mode styling for clubhouse
+  const headerStyle = isClubhousePage ? {
+    paddingTop: 'env(safe-area-inset-top, 0)',
+    paddingLeft: 'env(safe-area-inset-left, 0)', 
+    paddingRight: 'env(safe-area-inset-right, 0)'
+  } : {};
+
+  // Check if we should use compact mode (≤375px and mobile)
+  const useCompactMode = isClubhousePage && isMobile && (typeof window !== 'undefined' && window.innerWidth <= 375);
 
   return (
-    <header className={headerClasses}>
-      <div className="container mx-auto pl-[2px] pr-1 md:pl-[14px] md:pr-4 max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
-        <div className="flex items-center justify-between h-16 max-w-full">
-          {/* Logo - Enlarged and optimized positioning */}
-          <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
-            <img
-              src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-              alt="Logo Mark"
-              className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
-              onClick={handleLogoClick}
-            />
-            <img
-              src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
-              alt="clbhouz Logo"
-              className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
-              onClick={handleLogoClick}
-            />
-          </div>
+    <header className={headerClasses} style={headerStyle}>
+      <div className="container mx-auto pl-[2px] pr-1 md:pl-[14px] md:pr-4 compact-header-padding max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
+        {useCompactMode ? (
+          <CompactHeader />
+        ) : (
+          <div className="flex items-center justify-between h-16 max-w-full">
+            {/* Logo - Enlarged and optimized positioning */}
+            <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
+              <img
+                src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+                alt="Logo Mark"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                onClick={handleLogoClick}
+              />
+              <img
+                src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
+                alt="clbhouz Logo"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                onClick={handleLogoClick}
+              />
+            </div>
 
-          {/* Search Bar - Desktop */}
-          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0">
-            <HeaderSearch />
-          </div>
+            {/* Search Bar - Desktop */}
+            <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0">
+              <HeaderSearch />
+            </div>
 
-          {/* Navigation Icons */}
-          <div className="flex items-center space-x-1 md:space-x-4 flex-shrink-0 min-w-0">
-            <HeaderNavigation />
+            {/* Navigation Icons */}
+            <div className="flex items-center space-x-1 md:space-x-4 flex-shrink-0 min-w-0">
+              <HeaderNavigation />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

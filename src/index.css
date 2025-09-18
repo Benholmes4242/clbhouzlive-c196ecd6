@@ -18,6 +18,7 @@ html, body, #root {
 html, body { 
   overscroll-behavior: none;
   overscroll-behavior-y: contain;
+  overflow-x: clip; /* Prevent horizontal overflow on iOS */
 }
 
 /* Safe-area variables for iOS */
@@ -40,7 +41,7 @@ html, body {
 /* App shell applies safe-area padding and guarantees edge-to-edge */
 .app-shell {
   min-height: 100vh;
-  min-width: 100vw;
+  width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
@@ -62,6 +63,36 @@ img, video, canvas {
 
 /* Allow gestures globally */
 html, body, #root, .app-shell { touch-action: auto; }
+
+/* Compact Mode Helpers (≤375px) */
+@media (max-width: 375px) {
+  .compact-header-padding {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  .compact-icon-size {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .compact-tab-gap {
+    gap: 20px !important;
+  }
+  
+  .compact-tab-font {
+    font-size: clamp(13px, 1.4vw, 15px) !important;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
 /* Video overlay styles for mobile flicker fix */
 .videoContainer {
