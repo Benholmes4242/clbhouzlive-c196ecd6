@@ -804,9 +804,9 @@ const HeroProfileHeader = ({
                  {/* Home Club - centered */}
                  <div className="mt-4 w-full max-w-sm mx-auto text-center">
                    <div className="text-xs text-gray-700">Home Club</div>
-                   <div className="mt-1 text-base font-medium text-gray-900 whitespace-nowrap">
+                   <div className="mt-1 text-base font-medium text-gray-900">
                      {homeClubLines.map((line, index) => (
-                       <div key={index}>{line}</div>
+                       <div key={index} className="whitespace-nowrap">{line}</div>
                      ))}
                    </div>
                  </div>
@@ -837,8 +837,8 @@ const HeroProfileHeader = ({
               </div>
               <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-                <div className="text-xs md:text-sm text-gray-700">Following</div>
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Followers</div>
               </div>
            </div>
         </div>
@@ -965,8 +965,8 @@ const HeroProfileHeader = ({
               </div>
               <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-                <div className="text-xs md:text-sm text-gray-700">Following</div>
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Followers</div>
               </div>
            </div>
         </div>
