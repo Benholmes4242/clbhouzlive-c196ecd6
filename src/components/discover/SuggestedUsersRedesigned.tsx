@@ -600,8 +600,8 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             />
-            <motion.div
-              className="relative mx-6 w-[min(520px,92vw)] rounded-2xl bg-white/10 text-white shadow-2xl p-5 sm:p-6"
+             <motion.div
+               className="relative mx-6 w-[min(390px,69vw)] rounded-2xl bg-black/10 backdrop-blur-md text-white shadow-2xl p-5 sm:p-6"
               role="dialog"
               aria-modal="true"
               aria-label="Swipe tutorial"
@@ -615,26 +615,30 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                 <p className="mt-1 text-sm opacity-90">{t('discover.tip.body')}</p>
               </div>
 
-              <div className="mt-5 flex items-center justify-center gap-16">
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl animate-bounce">⬆️</div>
-                  <div className="mt-1 text-xs opacity-90">{t('discover.tip.follow')}</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl animate-bounce">⬇️</div>
-                  <div className="mt-1 text-xs opacity-90">{t('discover.tip.dismiss')}</div>
-                </div>
-              </div>
+               <div className="mt-5 flex items-center justify-center gap-16">
+                 <div className="flex flex-col items-center">
+                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-500/20">
+                     <FaThumbsDown className="text-white text-lg" />
+                   </div>
+                   <div className="mt-2 text-xs opacity-90">{t('discover.tip.dismiss')}</div>
+                 </div>
+                 <div className="flex flex-col items-center">
+                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-500/20">
+                     <FaThumbsUp className="text-white text-lg" />
+                   </div>
+                   <div className="mt-2 text-xs opacity-90">{t('discover.tip.follow')}</div>
+                 </div>
+               </div>
 
-              <div className="mt-6 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => dismissTutorial('got_it')}
-                  className="rounded-xl px-4 py-2 bg-white/20 hover:bg-white/30 transition active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-white/60"
-                >
-                  {t('common.got_it')}
-                </button>
-              </div>
+               <div className="mt-5 flex justify-center">
+                 <button
+                   type="button"
+                   onClick={() => dismissTutorial('got_it')}
+                   className="rounded-xl px-4 py-2 bg-white/20 hover:bg-white/30 transition active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-white/60"
+                 >
+                   {t('common.got_it')}
+                 </button>
+               </div>
             </motion.div>
           </motion.div>
         )}
