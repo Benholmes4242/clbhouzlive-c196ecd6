@@ -51,6 +51,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flashKey, setFlashKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
+  const [showFeedback, setShowFeedback] = useState<'follow' | 'dismiss' | null>(null);
+  const [isCardFading, setIsCardFading] = useState(false);
   const FEEDBACK_MS = 1500;
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
@@ -153,11 +155,17 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('up');
     await flushAnimationFrame();
     
-    // Hide the swipe direction after 2.5 seconds to match flash duration
+    // Show feedback overlay
+    setShowFeedback('follow');
+    
+    // Hide the swipe direction after 1.5 seconds to match flash duration
     setTimeout(() => setSwipeDirection(null), FEEDBACK_MS);
     
-    // Delay API call to keep card mounted during feedback
-    setTimeout(() => onToggleFollow(user.id), FEEDBACK_MS);
+    // After feedback, fade card and then call API
+    setTimeout(() => {
+      setIsCardFading(true);
+      setTimeout(() => onToggleFollow(user.id), 300); // Fade duration
+    }, FEEDBACK_MS);
   };
 
   const handleSwipeDown = async () => {
@@ -171,11 +179,17 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     triggerFlash('down');
     await flushAnimationFrame();
     
-    // Hide the swipe direction after 2.5 seconds to match flash duration
+    // Show feedback overlay
+    setShowFeedback('dismiss');
+    
+    // Hide the swipe direction after 1.5 seconds to match flash duration
     setTimeout(() => setSwipeDirection(null), FEEDBACK_MS);
     
-    // Delay API call to keep card mounted during feedback
-    setTimeout(() => onDismiss(user.id), FEEDBACK_MS);
+    // After feedback, fade card and then call API
+    setTimeout(() => {
+      setIsCardFading(true);
+      setTimeout(() => onDismiss(user.id), 300); // Fade duration
+    }, FEEDBACK_MS);
   };
 
   // Always update dragY for immediate visual feedback; keep axis lock for actions only
@@ -220,12 +234,18 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         onClick={handleCardClick}
         style={{
           transform: `translateY(${dragY * 0.05}px)`,
-          opacity: dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1
+          opacity: isCardFading ? 0 : (dragY !== 0 ? Math.max(0.7, 1 - Math.abs(dragY) * 0.003) : 1)
         }}
-      animate={{
-        scale: swipeDirection ? 0.95 : 1
-      }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        animate={{
+          scale: swipeDirection ? 0.95 : 1,
+          opacity: isCardFading ? 0 : 1
+        }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 300, 
+          damping: 20,
+          opacity: { duration: 0.3 }
+        }}
     >
       {/* Media Content */}
       {mediaUrl ? (
@@ -293,7 +313,21 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Flash Feedback Bubble - Remove duplicate since it's handled above */}
+      {/* Feedback Overlay */}
+      {showFeedback && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-md rounded-2xl px-6 py-4 mx-4">
+            <div className="text-white text-center">
+              <div className="text-lg font-medium">
+                {showFeedback === 'follow' 
+                  ? `You've followed ${user.displayName}!`
+                  : `You've dismissed ${user.displayName}!`
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
