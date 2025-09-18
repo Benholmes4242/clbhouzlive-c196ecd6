@@ -93,14 +93,14 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
 
   return (
     <div className="pt-1 pb-6">
-      <div className="md:container md:mx-auto md:px-0">
+      <div className="px-1 md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-3">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">Trending Now</h3>
         </div>
 
         {/* Trending Hashtags - Always Show */}
-        <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
+        <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1 px-1 md:px-0">
           {trendingHashtags.map((hashtag) => {
             const isSelected = selectedHashtag === hashtag.tag;
             
