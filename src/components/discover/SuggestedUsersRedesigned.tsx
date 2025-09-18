@@ -430,13 +430,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         )}
       </AnimatePresence>
 
-      {/* User Name Above Overlay */}
-      <div className="absolute bottom-[clamp(80px,28%,108px)] left-0 right-0 z-20 px-3">
-        <h3 className="text-white font-bold text-sm text-center drop-shadow-lg">
-          {user.displayName || user.handle || "User"}
-        </h3>
-      </div>
-
       {/* Liquid Glass Overlay */}
       <div className="
         absolute inset-x-0 bottom-0
@@ -444,8 +437,15 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-white/10 backdrop-blur-xl border-t border-white/20
         rounded-none
         px-3 py-3 z-10
-        flex items-end justify-center gap-4
+        flex flex-col items-center justify-between
       ">
+        {/* User Name */}
+        <h3 className="text-white font-bold text-sm text-center drop-shadow-lg pt-1">
+          {user.displayName || user.handle || "User"}
+        </h3>
+        
+        {/* Action Buttons */}
+        <div className="flex items-center justify-center gap-4">
         {/* Left: Dismiss Button */}
         <motion.button
           aria-label="Dismiss suggestion"
@@ -502,11 +502,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                            transition-transform duration-300 bg-white/30" />
         </motion.button>
 
-        {/* Center: User Info (now positioned above buttons) */}
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
-          <span className="text-white font-medium text-center text-sm whitespace-nowrap">
-            {user.displayName || user.handle || "User"}
-          </span>
         </div>
       </div>
       </motion.div>
