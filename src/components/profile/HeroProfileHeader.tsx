@@ -802,11 +802,11 @@ const HeroProfileHeader = ({
                  </div>
 
                  {/* Home Club - centered */}
-                 <div className="mt-4 w-full max-w-sm mx-auto text-center">
+                 <div className="mt-4 w-full mx-auto text-center px-2">
                    <div className="text-xs text-gray-700">Home Club</div>
-                   <div className="mt-1 text-base font-medium text-gray-900">
+                   <div className="mt-1 text-base font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                      {homeClubLines.map((line, index) => (
-                       <div key={index} className="whitespace-nowrap">{line}</div>
+                       <div key={index} className="whitespace-nowrap overflow-hidden text-ellipsis">{line}</div>
                      ))}
                    </div>
                  </div>
