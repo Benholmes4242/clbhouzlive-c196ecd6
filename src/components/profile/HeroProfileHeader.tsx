@@ -801,25 +801,15 @@ const HeroProfileHeader = ({
                    </p>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-4 w-full max-w-sm mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="text-center">
-                       <div className="text-xs text-gray-700">Home Club</div>
-                        <div className="mt-1 text-base font-medium text-gray-900">
-                          {homeClubLines.map((line, index) => (
-                            <div key={index}>{line}</div>
-                          ))}
-                        </div>
-                     </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Handicap</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* Home Club - centered */}
+                 <div className="mt-4 w-full max-w-sm mx-auto text-center">
+                   <div className="text-xs text-gray-700">Home Club</div>
+                   <div className="mt-1 text-base font-medium text-gray-900">
+                     {homeClubLines.map((line, index) => (
+                       <div key={index}>{line}</div>
+                     ))}
+                   </div>
+                 </div>
 
               </div>
             </div>
@@ -830,26 +820,26 @@ const HeroProfileHeader = ({
            
            {/* Glass Chips Stats */}
            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Posts</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Following</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Followers</div>
-             </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{handicap}</div>
+                <div className="text-xs md:text-sm text-gray-700">Handicap</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Posts</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Following</div>
+              </div>
            </div>
         </div>
       ) : (
@@ -941,23 +931,13 @@ const HeroProfileHeader = ({
                    </p>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-5 w-full max-w-md mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Home Club</div>
-                       <div className="mt-1 text-lg font-medium text-gray-900">
-                         {homeClub}
-                       </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Handicap</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* Home Club - centered */}
+                 <div className="mt-5 w-full max-w-md mx-auto text-center">
+                   <div className="text-sm text-gray-700">Home Club</div>
+                   <div className="mt-1 text-lg font-medium text-gray-900">
+                     {homeClub}
+                   </div>
+                 </div>
 
               </div>
             </div>
@@ -968,26 +948,26 @@ const HeroProfileHeader = ({
            
            {/* Glass Chips Stats */}
            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Posts</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Following</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Followers</div>
-             </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{handicap}</div>
+                <div className="text-xs md:text-sm text-gray-700">Handicap</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Posts</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+              </div>
+              <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Following</div>
+              </div>
            </div>
         </div>
       )}
