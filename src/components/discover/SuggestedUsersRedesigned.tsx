@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { BiSolidDetail } from 'react-icons/bi';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -381,7 +382,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        grid grid-cols-[auto_1fr_auto] items-end
+        grid grid-cols-[auto_auto_1fr_auto_auto] items-end gap-2
       ">
         {/* Left: Dismiss Button */}
         <motion.button
@@ -395,6 +396,23 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
           <FaThumbsDown className="text-sm" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
+
+        {/* Center Detail Button */}
+        <motion.button
+          aria-label="View details"
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-7 h-7 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white"
+        >
+          <BiSolidDetail className="text-sm fill-white" />
           <span className="absolute -inset-1" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
