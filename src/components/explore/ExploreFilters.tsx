@@ -120,7 +120,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         <div className="relative">
           <div 
             ref={scrollContainerRef}
-            className="flex space-x-3 overflow-x-auto scrollbar-hide px-1"
+            className="flex space-x-3 overflow-x-auto scrollbar-hide"
             onScroll={handleScroll}
             style={{
               scrollbarWidth: 'none',
