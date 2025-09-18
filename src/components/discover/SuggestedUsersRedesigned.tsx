@@ -382,7 +382,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        grid grid-cols-[auto_1fr_auto] items-end
+        grid grid-cols-[auto_auto_1fr_auto] items-end gap-2
       ">
         {/* Left: Dismiss Button */}
         <motion.button
@@ -403,28 +403,28 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                            transition-transform duration-300 bg-white/30" />
         </motion.button>
 
-        {/* Center: User Info with Detail Button */}
-        <div className="flex flex-col items-center min-w-0 mb-8 px-1 relative">
+        {/* Center Detail Button */}
+        <motion.button
+          aria-label="View details"
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-7 h-7 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white"
+        >
+          <BiSolidDetail className="text-sm fill-white" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
+
+        {/* Center: User Info */}
+        <div className="flex flex-col items-center min-w-0 mb-8 px-1">
           <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
-          
-          {/* Absolutely positioned detail button */}
-          <motion.button
-            aria-label="View details"
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="group absolute bottom-0 w-7 h-7 rounded-full flex items-center justify-center
-                       bg-white/15 hover:bg-white/25 text-white"
-          >
-            <BiSolidDetail className="text-sm fill-white" />
-            <span className="absolute -inset-1" />
-            <span className="absolute inset-0 rounded-full pointer-events-none
-                             scale-0 opacity-60
-                             group-active:scale-150 group-active:opacity-0
-                             transition-transform duration-300 bg-white/30" />
-          </motion.button>
         </div>
 
         {/* Right: Follow Button */}
