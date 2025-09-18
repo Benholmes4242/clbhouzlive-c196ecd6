@@ -262,7 +262,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Direction Overlay */}
       {(dragY !== 0 || swipeDirection !== null) && (
         <div 
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none"
           style={{
             backgroundColor: swipeDirection
               ? (swipeDirection === 'down' 
