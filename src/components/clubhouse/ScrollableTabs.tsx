@@ -88,8 +88,8 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
           style={{ 
             scrollSnapType: isOverflowing ? 'x mandatory' : 'none',
             scrollBehavior: 'smooth',
-            paddingTop: '4px',
-            paddingBottom: '8px'
+            paddingTop: '2px',
+            paddingBottom: '6px'
           }}
           onScroll={checkOverflow}
           role="tablist"

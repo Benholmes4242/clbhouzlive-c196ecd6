@@ -45,10 +45,10 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
       <header className={headerClasses} style={headerStyle}>
         <div className="backdrop-blur-md bg-black/35">
           {useCompactMode ? (
-            <div className="px-3 py-0.5">
+            <div className="px-3">
               <CompactHeader />
               {/* Tabs row for compact */}
-              <div className="bg-transparent -mt-2">
+              <div className="bg-transparent -mt-3">
                 <ScrollableTabs 
                   activeTab={activeTab || 'Following'} 
                   onTabChange={onTabChange || (() => {})} 
@@ -56,9 +56,9 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               </div>
             </div>
           ) : (
-            <div className="px-4 py-0.5">
+            <div className="px-4">
               {/* Main header row */}
-              <div className="flex items-center justify-between h-12 max-w-full bg-transparent">
+              <div className="flex items-center justify-between h-10 max-w-full bg-transparent">
                 {/* Logo - Orange mark + White text */}
                 <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 min-w-0">
                   <img
@@ -87,7 +87,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               </div>
               
               {/* Tabs row */}
-              <div className="bg-transparent -mt-2">
+              <div className="bg-transparent -mt-3">
                 <ScrollableTabs 
                   activeTab={activeTab || 'Following'} 
                   onTabChange={onTabChange || (() => {})} 
