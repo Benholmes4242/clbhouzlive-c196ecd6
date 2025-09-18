@@ -40,6 +40,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [flash, setFlash] = useState<'up' | 'down' | null>(null);
   const [isVertical, setIsVertical] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
@@ -111,16 +112,18 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }
   };
 
-  // Local flash helper (robust even for flicks)
+  // Local flash helper (robust per-card timeout)
   const flashGlow = (dir: 'up' | 'down') => {
     setFlash(dir);
-    // Clear any pending timeout
-    (flashGlow as any)._t && clearTimeout((flashGlow as any)._t);
-    (flashGlow as any)._t = setTimeout(() => setFlash(null), 350);
+    // Clear any pending timeout for this card
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => setFlash(null), 350);
   };
 
   const handleSwipeUp = async () => {
-    if (!enableVerticalSwipe) return;        // gate
+    if (!enableVerticalSwipe || !isVertical) return; // Gate + axis lock
     setSwipeDirection('up');
     flashGlow('up');
     await onToggleFollow(user.id);
@@ -128,7 +131,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   };
 
   const handleSwipeDown = async () => {
-    if (!enableVerticalSwipe) return;        // gate
+    if (!enableVerticalSwipe || !isVertical) return; // Gate + axis lock
     setSwipeDirection('down');
     flashGlow('down');
     await onDismiss(user.id);
@@ -150,6 +153,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const handleSwipeEnd = () => {
     setDragY(0);
     setIsVertical(false);
+    // Clear flash state on swipe end
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setFlash(null);
   };
 
   // Attach swipe only if enabled
@@ -169,7 +178,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       className="relative snap-start"
-      style={{ touchAction: enableVerticalSwipe ? 'pan-y' : 'auto' }} // mobile: vertical; desktop: let browser decide
+      style={{ touchAction: enableVerticalSwipe ? 'pan-y' : 'pan-x' }} // mobile: vertical; desktop: horizontal
     >
       <motion.div
         className="relative overflow-hidden rounded-none cursor-pointer bg-gray-900"
@@ -329,16 +338,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       </div>
       </motion.div>
 
-      {/* Flash overlay (works on quick flicks) */}
-      {flash && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <div className={flash === 'up'
-            ? "w-14 h-14 rounded-full bg-green-500 text-white text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,0,.6)] animate-pingonce"
-            : "w-14 h-14 rounded-full bg-red-500 text-white text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,.6)] animate-pingonce"}>
-            {flash === 'up' ? <FaThumbsUp/> : <FaThumbsDown/>}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
