@@ -359,7 +359,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 </div>
                 
                 {/* Text */}
-                <div className="text-white text-center font-medium text-base" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+                <div className="text-white text-center font-medium text-base">
                   {showFeedback === 'follow' 
                     ? `You've followed ${user.displayName}`
                     : `You've dismissed ${user.displayName}`
