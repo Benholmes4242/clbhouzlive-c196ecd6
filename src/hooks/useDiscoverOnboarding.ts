@@ -33,26 +33,23 @@ export function useDiscoverOnboarding(isMobile: boolean, autoHideMs = 5000) {
   }, []);
 
   useEffect(() => {
-    // Force show for testing - ignore mobile check and show count
-    setShow(true);
-    
-    // Original logic (commented out for testing):
-    // if (!isMobile) return;
-    // const shows = Number(localStorage.getItem(SHOWS_KEY) || '0');
-    // if (shows < MAX_SHOWS) {
-    //   setShow(true);
-    // }
+    if (!isMobile) return;
+
+    // show if we've shown less than MAX_SHOWS
+    const shows = Number(localStorage.getItem(SHOWS_KEY) || '0');
+    if (shows < MAX_SHOWS) {
+      setShow(true);
+    }
   }, [isMobile]);
 
   // start auto-hide + count "shown" only when visible
   useEffect(() => {
     if (!show) return;
     countShown();
-  // Temporarily disabled auto-hide for testing
-  // if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
-  // autoHideTimer.current = window.setTimeout(() => {
-  //   setShow(false); // auto-fade hides, but does NOT increment "dismisses"
-  // }, autoHideMs);
+    if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
+    autoHideTimer.current = window.setTimeout(() => {
+      setShow(false); // auto-fade hides, but does NOT increment "dismisses"
+    }, autoHideMs);
 
     return () => {
       if (autoHideTimer.current) window.clearTimeout(autoHideTimer.current);
