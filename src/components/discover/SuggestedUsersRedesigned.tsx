@@ -310,10 +310,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
-          <FaThumbsDown className="text-base" />
+          <FaThumbsDown className="text-sm" />
           <span className="absolute -inset-1" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
@@ -339,10 +339,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 320, damping: 18 }}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
                      bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
         >
-          <FaThumbsUp className="text-base" />
+          <FaThumbsUp className="text-sm" />
           <span className="absolute -inset-1" />
           <span className="absolute inset-0 rounded-full pointer-events-none
                            scale-0 opacity-60
