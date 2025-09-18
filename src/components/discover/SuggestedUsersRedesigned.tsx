@@ -215,16 +215,18 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }, FEEDBACK_MS);
   };
 
-  // Always update dragY for immediate visual feedback; keep axis lock for actions only
+  // Only update dragY for vertical gestures to prevent red circle on horizontal swipes
   const handleSwiping = (dx: number, dy: number) => {
     if (!enableVerticalSwipe) return;
 
-    // Always update dragY so overlay/glow responds immediately
-    setDragY(dy);
-
-    // Track "clearly vertical" only as a hint for action logic
+    // Track "clearly vertical" movement
     const verticalCandidate = Math.abs(dy) > Math.abs(dx) + 14;
     setIsVertical(verticalCandidate);
+
+    // Only update dragY for vertical movement to prevent red circle on horizontal carousel swipes
+    if (verticalCandidate) {
+      setDragY(dy);
+    }
   };
 
   const handleSwipeEnd = () => {
