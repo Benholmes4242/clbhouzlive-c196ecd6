@@ -68,17 +68,62 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     console.debug('[SUG] mount card', { id: user.id, enableVerticalSwipe });
   }, []);
   
-  // Handle video autoplay based on visibility
+  // Enhanced mobile autoplay handling
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !user.latestVideo) return;
 
-    if (isVisible) {
-      video.play().catch(console.error);
-    } else {
-      video.pause();
-    }
-  }, [isVisible, user.latestVideo]);
+    const attemptAutoplay = async () => {
+      if (!isVisible) {
+        video.pause();
+        return;
+      }
+
+      try {
+        // Ensure video is properly configured for mobile autoplay
+        video.muted = true;
+        video.playsInline = true;
+        video.preload = 'metadata';
+        
+        // Mobile-specific: Wait for video to be ready before attempting play
+        if (video.readyState < 2) {
+          await new Promise(resolve => {
+            const onReady = () => {
+              video.removeEventListener('loadeddata', onReady);
+              video.removeEventListener('canplay', onReady);
+              resolve(void 0);
+            };
+            video.addEventListener('loadeddata', onReady);
+            video.addEventListener('canplay', onReady);
+          });
+        }
+
+        // Attempt autoplay with multiple fallbacks
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+      } catch (error) {
+        console.debug('[Mobile Autoplay] Failed for user:', user.id, error);
+        
+        // Mobile fallback: Add click listener to start video on any user interaction
+        const enableOnTouch = () => {
+          video.play().catch(console.error);
+          document.removeEventListener('touchstart', enableOnTouch);
+          document.removeEventListener('click', enableOnTouch);
+        };
+        
+        document.addEventListener('touchstart', enableOnTouch, { once: true, passive: true });
+        document.addEventListener('click', enableOnTouch, { once: true });
+      }
+    };
+
+    // Debounce autoplay attempts on mobile to avoid rapid fire
+    const timeoutId = setTimeout(attemptAutoplay, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [isVisible, user.latestVideo, user.id]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking the follow button
@@ -258,13 +303,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             ref={videoRef}
             src={mediaUrl}
             poster={user.latestVideo?.poster}
-            autoplay={true}
+            autoplay={false} // We handle autoplay manually for better mobile control
             muted={true}
             loop={true}
             controls={false}
             className="w-full h-full aspect-[3/4]"
             objectFit="cover"
             hideControls={true}
+            preloadLevel="metadata"
           />
         ) : (
           <img
