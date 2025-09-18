@@ -273,50 +273,29 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`)
           }}
         >
-          {Math.abs(dragY) > 4 && (
+          {(Math.abs(dragY) > 4 || swipeDirection !== null) && (
             <div className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
-              dragY > 0 
-                ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
-                : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+              swipeDirection 
+                ? (swipeDirection === 'down' 
+                    ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+                    : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]")
+                : (dragY > 0 
+                    ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
+                    : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]")
             )}>
-              {dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />}
+              {swipeDirection 
+                ? (swipeDirection === 'down' ? <FaThumbsDown /> : <FaThumbsUp />)
+                : (dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />)
+              }
             </div>
           )}
         </div>
       )}
 
-      {/* Flash Feedback Bubble */}
-        {flash && (
-          <div key={flashKey} className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <div
-              className={cn(
-                "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
-                flash === 'up'
-                  ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
-                  : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
-              )}
-            >
-              {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
-            </div>
-          </div>
-        )}
+      {/* Flash Feedback Bubble - Remove duplicate since it's handled above */}
 
-      {/* Swipe Feedback Bubble */}
-      {swipeDirection && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div
-            className={cn(
-              "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
-              swipeDirection === 'up'
-                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
-                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
-            )}
-          >
-            {swipeDirection === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
-          </div>
-        </div>
-      )}
+      {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
       {/* Liquid Glass Overlay */}
       <div className="
