@@ -77,10 +77,12 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
           <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-black/35 to-transparent z-10 pointer-events-none" />
         )}
 
-        {/* Scrollable tabs container */}
+        {/* Scrollable tabs container - Mobile: min-h-[36px] py-1, Desktop: py-3 */}
         <div 
           ref={tabsRef}
-          className={`flex items-center scrollbar-hide py-3 ${
+          className={`flex items-center scrollbar-hide min-h-[36px] md:min-h-[44px] ${
+            typeof window !== 'undefined' && window.innerWidth < 768 ? 'py-1' : 'py-3'
+          } ${
             isOverflowing 
               ? 'overflow-x-auto px-6 space-x-5 md:space-x-8' 
               : 'justify-center space-x-8 px-6'
@@ -118,10 +120,11 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
             }`}
             style={{
               scrollSnapAlign: isOverflowing ? 'start' : 'none',
-              minHeight: '44px',
+              minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '36px' : '44px',
               minWidth: '44px',
-              padding: '12px 8px',
-              fontSize: 'clamp(13px, 1.4vw, 15px)'
+              padding: typeof window !== 'undefined' && window.innerWidth < 768 ? '8px 8px' : '12px 8px',
+              fontSize: 'clamp(13px, 1.4vw, 15px)',
+              lineHeight: '1.2'
             }}
             role="tab"
             aria-selected={item.id === activeTab}
@@ -133,11 +136,12 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
         
           {/* Search icon button */}
           <button 
-            className="text-white/70 hover:text-white transition-colors duration-200 flex-shrink-0 p-3"
+            className="text-white/70 hover:text-white transition-colors duration-200 flex-shrink-0"
             style={{
               scrollSnapAlign: isOverflowing ? 'start' : 'none',
-              minHeight: '44px',
-              minWidth: '44px'
+              minHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? '36px' : '44px',
+              minWidth: '44px',
+              padding: typeof window !== 'undefined' && window.innerWidth < 768 ? '8px 12px' : '12px'
             }}
             aria-label="Search"
           >
