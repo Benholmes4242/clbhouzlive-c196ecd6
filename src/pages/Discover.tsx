@@ -177,21 +177,21 @@ const Discover = () => {
             />
           </div>
 
-          {/* Suggested Users - 16px mobile / 32px desktop spacing from tabs */}
-          <div className="mt-4 md:mt-8">
+          {/* Suggested Users - 16px gap from pills */}
+          <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Trending Now Section - 16px mobile / 32px desktop spacing from previous section */}
-          <div className="mt-4 md:mt-8">
+          {/* Trending Now Section - 16px gap from Suggested Users cards */}
+          <div className="mt-4">
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
             />
           </div>
 
-          {/* Main Grid with Container - 16px mobile / 32px desktop spacing from previous section */}
-          <div className="md:container md:mx-auto md:px-0 mt-4 md:mt-8">
+          {/* Main Grid with Container - 16px gap from Trending Now pills */}
+          <div className="md:container md:mx-auto md:px-0 mt-4">
             <ExploreGrid 
               content={uniqueContent}
               onLike={handleLike}
