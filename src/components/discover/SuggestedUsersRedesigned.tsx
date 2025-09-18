@@ -381,55 +381,55 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
-        flex flex-col items-center justify-end
+        grid grid-cols-[auto_1fr_auto] items-end
       ">
-        {/* User Info - Centered within glass panel */}
-        <div className="flex flex-col items-center min-w-0 mb-2 px-1">
+        {/* Left: Dismiss Button */}
+        <motion.button
+          aria-label="Dismiss suggestion"
+          onClick={handleDismissClick}
+          disabled={isDismissLoading || isFollowLoading}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+        >
+          <FaThumbsDown className="text-sm" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
+
+        {/* Center: User Info */}
+        <div className="flex flex-col items-center min-w-0 mb-4 px-1">
           <span className="text-white font-medium text-center text-sm whitespace-nowrap">
             {user.displayName || user.handle || "User"}
           </span>
+          <span className="text-white/80 text-xs">
+            {user.isFollowing ? "Following" : "Follow"}
+          </span>
         </div>
 
-        {/* Action Buttons - Centered under name within glass panel */}
-        <div className="flex items-center justify-center gap-6 mb-2">
-          {/* Left: Dismiss Button */}
-          <motion.button
-            aria-label="Dismiss suggestion"
-            onClick={handleDismissClick}
-            disabled={isDismissLoading || isFollowLoading}
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                       bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-          >
-            <FaThumbsDown className="text-sm" />
-            <span className="absolute -inset-1" />
-            <span className="absolute inset-0 rounded-full pointer-events-none
-                             scale-0 opacity-60
-                             group-active:scale-150 group-active:opacity-0
-                             transition-transform duration-300 bg-white/30" />
-          </motion.button>
-
-          {/* Right: Follow Button */}
-          <motion.button
-            aria-label="Follow user"
-            onClick={handleFollowClick}
-            disabled={isFollowLoading || isDismissLoading}
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                       bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-          >
-            <FaThumbsUp className="text-sm" />
-            <span className="absolute -inset-1" />
-            <span className="absolute inset-0 rounded-full pointer-events-none
-                             scale-0 opacity-60
-                             group-active:scale-150 group-active:opacity-0
-                             transition-transform duration-300 bg-white/30" />
-          </motion.button>
-        </div>
+        {/* Right: Follow Button */}
+        <motion.button
+          aria-label="Follow user"
+          onClick={handleFollowClick}
+          disabled={isFollowLoading || isDismissLoading}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+          className="group relative w-8 h-8 rounded-full flex items-center justify-center
+                     bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
+        >
+          <FaThumbsUp className="text-sm" />
+          <span className="absolute -inset-1" />
+          <span className="absolute inset-0 rounded-full pointer-events-none
+                           scale-0 opacity-60
+                           group-active:scale-150 group-active:opacity-0
+                           transition-transform duration-300 bg-white/30" />
+        </motion.button>
       </div>
       </motion.div>
 
