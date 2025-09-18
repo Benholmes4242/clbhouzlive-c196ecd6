@@ -299,46 +299,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         </div>
       )}
 
-      {/* Swipe Direction Overlay */}
-      {(dragY !== 0 || swipeDirection !== null) && !showFeedback && (
-        <div 
-          className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none"
-          style={{
-            backgroundColor: swipeDirection
-              ? (swipeDirection === 'down' 
-                  ? 'rgba(239, 68, 68, 0.30)'
-                  : 'rgba(34, 197, 94, 0.30)')
-              : (dragY > 0 
-                  ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
-                  : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`)
-          }}
-        >
-          {(Math.abs(dragY) > 4 || swipeDirection !== null) && (
-            <motion.div 
-              className={cn(
-                "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
-                swipeDirection 
-                  ? (swipeDirection === 'down' 
-                      ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
-                      : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]")
-                  : (dragY > 0 
-                      ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
-                      : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]")
-              )}
-              animate={{ 
-                opacity: showFeedback ? 0 : 1,
-                scale: showFeedback ? 0.8 : 1
-              }}
-              transition={{ duration: 0.2 }}
-            >
-              {swipeDirection 
-                ? (swipeDirection === 'down' ? <FaThumbsDown /> : <FaThumbsUp />)
-                : (dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />)
-              }
-            </motion.div>
-          )}
-        </div>
-      )}
+      {/* Swipe Direction Overlay - Removed for cleaner experience */}
 
       {/* Full-Card Liquid Glass Feedback Overlay - Covers entire card */}
       <AnimatePresence>
