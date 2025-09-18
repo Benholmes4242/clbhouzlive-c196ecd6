@@ -8,6 +8,8 @@ import { IoFlameOutline } from 'react-icons/io5';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
+import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
+import { FILTER_TO_MAIN_PILL } from '@/constants/discoverPills';
 
 interface ExploreFiltersProps {
   activeFilter: string;
@@ -20,6 +22,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const { main, setMainFromFilter } = useDiscoverQuery();
 
   // Filter out excluded filters
   const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
@@ -65,10 +68,16 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   const renderFilterButton = (filter: string) => {
     const isActive = activeFilter === filter;
     
+    const handleFilterClick = () => {
+      // Update both the old filter state and new URL state
+      onFilterChange(filter);
+      setMainFromFilter(filter);
+    };
+    
     return (
       <button
         key={filter}
-        onClick={() => onFilterChange(filter)}
+        onClick={handleFilterClick}
         className={`pill ${isActive ? 'pill--active' : ''}`}
       >
         {/* Icon */}

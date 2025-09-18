@@ -2,13 +2,14 @@ import React, { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
-import TrendingNow from '@/components/discover/TrendingNow';
+import SubpillBar from '@/components/discover/SubpillBar';
+import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
+import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -22,19 +23,33 @@ const Discover = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   
-  // Get content for the active filter (for the tabs section)
+  const { main, sub } = useDiscoverQuery();
+  
+  // Sync activeFilter with URL state
+  React.useEffect(() => {
+    const mainToFilter: Record<string, string> = {
+      'friends': FILTER_TYPES.FRIENDS,
+      'videos': FILTER_TYPES.VIDEOS,
+      'photos': FILTER_TYPES.PHOTOS,
+      'trending': FILTER_TYPES.TRENDING,
+      'verified-pros': FILTER_TYPES.VERIFIED_PROS,
+      'channels': FILTER_TYPES.CHANNELS,
+      'hack-shack': FILTER_TYPES.HACK_SHACK,
+    };
+    const newFilter = mainToFilter[main] || FILTER_TYPES.VIDEOS;
+    if (newFilter !== activeFilter) {
+      setActiveFilter(newFilter);
+    }
+  }, [main]);
+  
+  // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent(activeFilter === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : activeFilter);
-  
-  // Get trending content specifically for the trending tab
-  const { 
-    content: trendingContent
-  } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
-  
+
   const { 
     isOpen: isFeedOpen, 
     posts: feedPosts,
@@ -67,7 +82,7 @@ const Discover = () => {
       }
     } else {
       // Use vertical feed - set posts and open feed
-      setPosts(uniqueContent);
+      setPosts(content || []);
       openFeed(item);
     }
   };
@@ -77,63 +92,10 @@ const Discover = () => {
     // In real app: API call to follow user
   };
 
-  const handleHashtagClick = (tag: string) => {
-    // Filter content by hashtag
-    console.log('Filter by hashtag:', tag);
-  };
-
-  const handleAudioClick = (audioId: string) => {
-    // Show posts using this audio or preview the audio
-    console.log('Audio clicked:', audioId);
-  };
-
-  // Apply client-side filtering for non-database filters
-  const filteredContent = (activeFilter === FILTER_TYPES.TRENDING ? trendingContent : content).filter(item => {
-    // First apply existing filter logic
-    let passesFilter = true;
-    
-    // Friends filtering is handled in the database
-    if (activeFilter === FILTER_TYPES.FRIENDS || activeFilter === FILTER_TYPES.TRENDING) {
-      passesFilter = true;
-    }
-    // Videos and Photos filtering is handled in the database
-    else if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
-      passesFilter = true;
-    }
-    // Verified Pros: Empty for now (no content yet)
-    else if (activeFilter === FILTER_TYPES.VERIFIED_PROS) {
-      passesFilter = false; // No content for verified pros yet
-    }
-    // Channels: Empty for now (no content yet)
-    else if (activeFilter === FILTER_TYPES.CHANNELS) {
-      passesFilter = false; // No content for channels yet
-    }
-    // Hack Shack: Only videos with #hackshack hashtag
-    else if (activeFilter === FILTER_TYPES.HACK_SHACK) {
-      passesFilter = item.type === MEDIA_TYPES.VIDEO && (
-        item.title?.toLowerCase().includes('#hackshack') || 
-        item.title?.toLowerCase().includes('hackshack')
-      );
-    }
-    // Brain Game: Videos and photos with #braingame hashtag
-    else if (activeFilter === FILTER_TYPES.BRAIN_GAME) {
-      passesFilter = (item.type === MEDIA_TYPES.VIDEO || item.type === MEDIA_TYPES.IMAGE) && (
-        item.title?.toLowerCase().includes('#braingame') || 
-        item.title?.toLowerCase().includes('braingame')
-      );
-    }
-
-    return passesFilter;
-  });
-
-  // Remove duplicates based on src URL for tab content
-  const uniqueContent = filteredContent.filter((item, index, self) => 
-    index === self.findIndex(t => t.src === item.src)
-  );
-
   // Transform content to MediaItem[] for FullscreenMediaModal
   const mediaItems: MediaItem[] = useMemo(() => {
-    return uniqueContent.flatMap((post, postIndex) => {
+    const currentContent = content || [];
+    return currentContent.flatMap((post, postIndex) => {
       // Handle posts with media array vs single media
       const mediaArray = post.media && post.media.length > 0 ? post.media : [{ 
         id: `${post.id}-single`, 
@@ -161,7 +123,7 @@ const Discover = () => {
         };
       });
     });
-  }, [uniqueContent]);
+  }, [content]);
 
 
   return (
@@ -182,26 +144,17 @@ const Discover = () => {
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Trending Now Section - 0px gap from Suggested Users cards */}
+          {/* Dynamic Subpill Bar - Replaces Trending Now */}
           <div className="mt-4">
-            <TrendingNow 
-              onHashtagClick={handleHashtagClick}
-              onAudioClick={handleAudioClick}
-            />
+            <SubpillBar />
           </div>
 
-          {/* Main Grid with Container - 16px gap from Trending Now pills */}
+          {/* Main Grid with Container - 16px gap from Subpill bar */}
           <div className="md:container md:mx-auto md:px-0 mt-4">
-            <ExploreGrid 
-              content={uniqueContent}
+            <DiscoverContent
               onLike={handleLike}
               onFollow={handleFollow}
               onMediaClick={handleMediaClick}
-              isLoading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              activeFilter={activeFilter}
-              isDiscoverPage={true}
             />
           </div>
         </main>
