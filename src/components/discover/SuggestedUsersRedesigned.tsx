@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
 import { useDiscoverOnboarding } from '@/hooks/useDiscoverOnboarding';
 import { t } from '@/lib/i18n';
+import { safePlay } from '@/utils/safePlay';
 
 // Utility: ensures paint before heavy updates
 const flushAnimationFrame = () =>
@@ -74,7 +75,25 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     if (!video || !user.latestVideo) return;
 
     if (isVisible) {
-      video.play().catch(console.error);
+      // Wrap in IIFE to handle async operations in useEffect
+      (async () => {
+        // Ensure attributes are set *before* attempting play
+        video.muted = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        try {
+          // Use robust utility that handles iOS, readyState, black-frame, retries
+          const ok = await safePlay(video);
+          if (!ok) {
+            video.setAttribute('data-autoplay-blocked', '1');
+          } else {
+            video.removeAttribute('data-autoplay-blocked');
+          }
+        } catch (e) {
+          console.warn('autoplay failed', e);
+          video.setAttribute('data-autoplay-blocked', '1');
+        }
+      })();
     } else {
       video.pause();
     }
@@ -259,6 +278,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             src={mediaUrl}
             poster={user.latestVideo?.poster}
             autoplay={true}
+            playsInline={true}
             muted={true}
             loop={true}
             controls={false}
@@ -547,7 +567,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
           const cardId = entry.target.getAttribute('data-card-id');
           if (!cardId) return;
 
-          if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
             setVisibleCards(prev => new Set([...prev, cardId]));
           } else {
             setVisibleCards(prev => {
@@ -559,8 +579,10 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         });
       },
       {
-        threshold: [0, 0.7, 1],
-        rootMargin: '0px'
+        // Lower threshold ensures modest in-view portion triggers play
+        threshold: [0, 0.3, 0.6, 1],
+        // Small positive margin gives the video a head start before it's fully centered
+        rootMargin: '25px 0px 25px 0px'
       }
     );
 
@@ -674,6 +696,20 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                   damping: 25,
                   opacity: { duration: 0.2 },
                   x: { duration: 0.4 }
+                }}
+                onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  const card = e.currentTarget;
+                  const video = card.querySelector('video') as HTMLVideoElement;
+                  if (!video) return;
+                  if (video.getAttribute('data-autoplay-blocked') === '1') {
+                    video.muted = true;
+                    video.setAttribute('playsinline', 'true');
+                    video.setAttribute('webkit-playsinline', 'true');
+                    safePlay(video).then((ok) => {
+                      if (ok) video.removeAttribute('data-autoplay-blocked');
+                    });
+                  }
                 }}
               >
                 <SuggestedUserCard

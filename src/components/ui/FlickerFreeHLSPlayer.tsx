@@ -7,6 +7,7 @@ interface FlickerFreeHLSPlayerProps {
   hlsUrl: string;
   poster?: string;
   autoplay?: boolean;
+  playsInline?: boolean;
   muted?: boolean;
   loop?: boolean;
   className?: string;
@@ -29,6 +30,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   hlsUrl,
   poster,
   autoplay = false,
+  playsInline = true,
   muted = true,
   loop = false,
   className = '',
@@ -364,6 +366,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
           objectFit === 'contain' ? 'object-contain' : 'object-cover'
         } ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
         muted
+        autoPlay={autoplay}
         playsInline
         webkit-playsinline="true"
         loop={loop}

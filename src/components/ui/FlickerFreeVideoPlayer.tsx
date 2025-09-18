@@ -6,6 +6,7 @@ interface FlickerFreeVideoPlayerProps {
   src: string;
   poster?: string;
   autoplay?: boolean;
+  playsInline?: boolean;
   muted?: boolean;
   loop?: boolean;
   className?: string;
@@ -21,6 +22,7 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
   src,
   poster,
   autoplay = false,
+  playsInline = true,
   muted = true,
   loop = false,
   className = '',
@@ -195,6 +197,7 @@ const FlickerFreeVideoPlayer = forwardRef<HTMLVideoElement, FlickerFreeVideoPlay
           objectFit === 'contain' ? 'object-contain' : 'object-cover'
         } ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
         muted
+        autoPlay={autoplay}
         playsInline
         webkit-playsinline="true"
         loop={loop}

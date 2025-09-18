@@ -7,6 +7,7 @@ interface EnhancedVideoPlayerProps {
   src: string;
   poster?: string;
   autoplay?: boolean;
+  playsInline?: boolean;
   muted?: boolean;
   loop?: boolean;
   className?: string;
@@ -34,6 +35,7 @@ interface EnhancedVideoPlayerProps {
 const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProps>(({
   src,
   autoplay = false,
+  playsInline = true,
   muted = true,
   loop = false,
   controls = false,
@@ -74,6 +76,7 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
         objectFit={objectFit === 'smart' ? 'cover' : objectFit}
         showMuteButton={false}
         autoplay={autoplay}
+        playsInline={playsInline}
         muted={muted}
         loop={loop}
         onClick={onClick}
@@ -91,6 +94,7 @@ const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProp
       ref={ref}
       src={src}
       autoplay={autoplay}
+      playsInline={playsInline}
       muted={muted}
       loop={loop}
       className={className}
