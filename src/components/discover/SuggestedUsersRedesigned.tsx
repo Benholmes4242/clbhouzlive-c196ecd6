@@ -384,60 +384,123 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
-      {/* Expandable Detail Pane */}
+      {/* Liquid Glass Detail Pane */}
       <AnimatePresence>
         {isDetailExpanded && (
-          <motion.div
-            className="absolute inset-x-0 top-0 bottom-0 bg-black/60 backdrop-blur-md rounded-2xl p-6 z-20 flex flex-col items-center justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-          >
-            {/* Avatar */}
-            {user.profilePhotoUrl ? (
-              <div 
-                className="w-16 h-16 rounded-full bg-cover bg-center mb-4 shadow-lg"
-                style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4 shadow-lg">
-                <span className="text-white text-xl font-bold">
-                  {user.displayName.charAt(0).toUpperCase()}
-                </span>
+          <>
+            {/* Card content slide up animation */}
+            <motion.div
+              className="absolute inset-0 z-15"
+              initial={{ y: 0 }}
+              animate={{ y: -20 }}
+              exit={{ y: 0 }}
+              transition={{ 
+                duration: 0.3, 
+                ease: "easeOut",
+                type: "spring",
+                stiffness: 300,
+                damping: 25
+              }}
+              style={{ willChange: 'transform' }}
+            />
+            
+            {/* Liquid Glass Pane */}
+            <motion.div
+              className="absolute inset-x-0 top-0 bottom-0 z-20 flex flex-col items-center justify-center px-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              {/* Glass Background */}
+              <div className="absolute inset-0 bg-white/15 backdrop-blur-xl border border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+                {/* Subtle top highlight */}
+                <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-white/10 to-transparent" />
+                {/* Edge shimmer */}
+                <div className="absolute inset-0 border border-white/20 pointer-events-none" />
               </div>
-            )}
-            
-            {/* User Name */}
-            <h3 className="text-white font-bold text-lg text-center mb-2">
-              {user.displayName || user.handle || "User"}
-            </h3>
-            
-            {/* Home Club */}
-            {user.homeClub && (
-              <p className="text-white/80 font-medium text-sm text-center mb-1">
-                {user.homeClub}
-              </p>
-            )}
-            
-            {/* Handicap */}
-            {user.handicap !== null && user.handicap !== undefined && (
-              <p className="text-teal-400 font-bold text-sm text-center">
-                Handicap: {user.handicap.toFixed(1)}
-              </p>
-            )}
-          </motion.div>
+              
+              {/* Content Container */}
+              <div className="relative z-10 flex flex-col items-center">
+                {/* Avatar */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1, duration: 0.25 }}
+                  className="mb-6"
+                >
+                  {user.profilePhotoUrl ? (
+                    <div 
+                      className="w-16 h-16 rounded-full bg-cover bg-center shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+                      style={{ backgroundImage: `url(${user.profilePhotoUrl})` }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-white/25 flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
+                      <span className="text-white text-xl font-bold">
+                        {user.displayName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+                
+                {/* User Name - Auto-fit */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, duration: 0.25 }}
+                  className="mb-4 w-full px-4"
+                >
+                  <h3 
+                    className="text-white font-bold text-center whitespace-nowrap overflow-hidden"
+                    style={{
+                      fontSize: 'clamp(14px, 4vw, 20px)',
+                      lineHeight: '1.2'
+                    }}
+                  >
+                    {user.displayName || user.handle || "User"}
+                  </h3>
+                </motion.div>
+                
+                {/* Home Club */}
+                {user.homeClub && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.25 }}
+                    className="mb-3"
+                  >
+                    <p className="text-white/85 font-medium text-sm text-center whitespace-nowrap">
+                      {user.homeClub}
+                    </p>
+                  </motion.div>
+                )}
+                
+                {/* Handicap */}
+                {user.handicap !== null && user.handicap !== undefined && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25, duration: 0.25 }}
+                  >
+                    <p className="text-teal-400 font-bold text-sm text-center whitespace-nowrap">
+                      Handicap: {user.handicap.toFixed(1)}
+                    </p>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
 
-      {/* Liquid Glass Overlay */}
+      {/* Fixed Liquid Glass Control Overlay */}
       <div className="
         absolute inset-x-0 bottom-0
         h-[clamp(80px,28%,108px)]
         bg-white/10 backdrop-blur-xl border-t border-white/20
         rounded-none
-        px-3 py-3 z-10
+        px-3 py-3 z-30
         flex items-end justify-center gap-4
       ">
         {/* Left: Dismiss Button */}
