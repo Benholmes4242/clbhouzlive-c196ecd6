@@ -183,7 +183,7 @@ const Discover = () => {
           </div>
 
           {/* Trending Now Section - 0px gap from Suggested Users cards */}
-          <div className="-mt-0.5 md:mt-0">
+          <div className="mt-4">
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
