@@ -465,9 +465,9 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
 
   return (
     <div className="pt-1 pb-6">
-      <div className="px-1 md:container md:mx-auto md:px-0">
+      <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 px-1 md:px-0">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Suggested for you
           </h3>
