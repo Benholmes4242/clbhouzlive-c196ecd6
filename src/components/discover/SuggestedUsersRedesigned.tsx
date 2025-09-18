@@ -179,7 +179,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     onSwipeDown:  enableVerticalSwipe ? handleSwipeDown : undefined,
     onSwiping:    enableVerticalSwipe ? handleSwiping   : undefined,
     onSwipeEnd:   handleSwipeEnd,
-    threshold: 90,
+    threshold: 10,
     preventDefaultTouchMove: false,          // DO NOT block scroll
   });
 
@@ -247,7 +247,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
           }}
         >
-          {Math.abs(dragY) > 30 && (
+          {Math.abs(dragY) > 10 && (
             <div className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               dragY > 0 
