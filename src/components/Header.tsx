@@ -45,10 +45,10 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
       <header className={headerClasses} style={headerStyle}>
         <div className="backdrop-blur-md bg-black/35">
           {useCompactMode ? (
-            <div className="px-3">
+            <div className="px-3 py-1">
               <CompactHeader />
               {/* Tabs row for compact */}
-              <div className="bg-transparent">
+              <div className="bg-transparent -mt-1">
                 <ScrollableTabs 
                   activeTab={activeTab || 'Following'} 
                   onTabChange={onTabChange || (() => {})} 
@@ -56,11 +56,11 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               </div>
             </div>
           ) : (
-            <div className="px-4">
+            <div className="px-4 py-1">
               {/* Main header row */}
-              <div className="flex items-center justify-between h-16 max-w-full bg-transparent">
+              <div className="flex items-center justify-between h-14 max-w-full bg-transparent">
                 {/* Logo - Orange mark + White text */}
-                <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
+                <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 min-w-0">
                   <img
                     src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                     alt="Logo Mark"
@@ -87,7 +87,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
               </div>
               
               {/* Tabs row */}
-              <div className="bg-transparent">
+              <div className="bg-transparent -mt-1">
                 <ScrollableTabs 
                   activeTab={activeTab || 'Following'} 
                   onTabChange={onTabChange || (() => {})} 

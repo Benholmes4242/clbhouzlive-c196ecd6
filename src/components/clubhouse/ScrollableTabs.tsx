@@ -80,14 +80,16 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
         {/* Scrollable tabs container */}
         <div 
           ref={tabsRef}
-          className={`flex items-center scrollbar-hide py-3 ${
+          className={`flex items-center scrollbar-hide ${
             isOverflowing 
               ? 'overflow-x-auto px-6 space-x-5 md:space-x-8' 
               : 'justify-center space-x-8 px-6'
           }`}
           style={{ 
             scrollSnapType: isOverflowing ? 'x mandatory' : 'none',
-            scrollBehavior: 'smooth'
+            scrollBehavior: 'smooth',
+            paddingTop: '8px',
+            paddingBottom: '12px'
           }}
           onScroll={checkOverflow}
           role="tablist"
