@@ -27,7 +27,7 @@ const Header = () => {
 
   return (
     <header className={headerClasses}>
-      <div className="container mx-auto pl-[3px] pr-1 md:pl-[14px] md:pr-4 max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
+      <div className="container mx-auto pl-[2px] pr-1 md:pl-[14px] md:pr-4 max-w-full box-border backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
         <div className="flex items-center justify-between h-16 max-w-full">
           {/* Logo - Enlarged and optimized positioning */}
           <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
