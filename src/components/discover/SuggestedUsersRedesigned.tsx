@@ -258,7 +258,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             ref={videoRef}
             src={mediaUrl}
             poster={user.latestVideo?.poster}
-            autoplay={isVisible}
+            autoplay={true}
             muted={true}
             loop={true}
             controls={false}
@@ -430,13 +430,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         )}
       </AnimatePresence>
 
+      {/* User Name Above Overlay */}
+      <div className="absolute bottom-[clamp(80px,28%,108px)] left-0 right-0 z-20 px-3">
+        <h3 className="text-white font-bold text-sm text-center drop-shadow-lg">
+          {user.displayName || user.handle || "User"}
+        </h3>
+      </div>
+
       {/* Liquid Glass Overlay */}
       <div className="
         absolute inset-x-0 bottom-0
-        h-[clamp(64px,25%,92px)]
-        bg-black/35 backdrop-blur-md
+        h-[clamp(80px,28%,108px)]
+        bg-white/10 backdrop-blur-xl border-t border-white/20
         rounded-none
-        px-3 py-2 z-10
+        px-3 py-3 z-10
         flex items-end justify-center gap-4
       ">
         {/* Left: Dismiss Button */}
