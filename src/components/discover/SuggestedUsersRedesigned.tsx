@@ -430,12 +430,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         )}
       </AnimatePresence>
 
-      {/* User Name Above Overlay */}
-      <div className="absolute bottom-[clamp(80px,28%,108px)] left-0 right-0 z-20 px-3">
-        <h3 className="text-white font-bold text-sm text-center drop-shadow-lg">
-          {user.displayName || user.handle || "User"}
-        </h3>
-      </div>
 
       {/* Liquid Glass Overlay */}
       <div className="
