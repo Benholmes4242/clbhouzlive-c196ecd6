@@ -296,7 +296,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         h-[clamp(64px,25%,92px)]
         bg-black/35 backdrop-blur-md
         rounded-none
-        px-3 py-3 z-10
+        px-3 py-2 z-10
         grid grid-cols-[auto_1fr_auto] items-end
       ">
         {/* Left: Dismiss Button */}
