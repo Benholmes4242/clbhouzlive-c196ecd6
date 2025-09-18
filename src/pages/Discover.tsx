@@ -182,8 +182,8 @@ const Discover = () => {
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Trending Now Section - 16px gap from Suggested Users cards */}
-          <div className="mt-4">
+          {/* Trending Now Section - 8px gap from Suggested Users cards */}
+          <div className="mt-2">
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
