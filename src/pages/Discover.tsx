@@ -132,7 +132,7 @@ const Discover = () => {
         
         <main className="pb-20">
           {/* Your Discover Section - 16px gap from header */}
-          <div className="md:container md:mx-auto md:px-0 pt-4">
+          <div className="pt-4">
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
