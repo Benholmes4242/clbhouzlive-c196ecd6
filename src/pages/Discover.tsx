@@ -177,8 +177,8 @@ const Discover = () => {
             />
           </div>
 
-          {/* Suggested Users - 16px gap from pills */}
-          <div className="mt-4">
+          {/* Suggested Users - 16px gap from pills on mobile only */}
+          <div className="mt-4 md:mt-8">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
