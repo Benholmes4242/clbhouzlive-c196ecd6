@@ -25,13 +25,13 @@ const CompactHeader = () => {
   };
 
   return (
-    <div className="flex items-center justify-between h-16 max-w-full">
+    <div className="flex items-center justify-between min-h-[52px] max-w-full py-1">
       {/* Logo - Mark only in compact mode, original orange */}
       <div className="flex items-center flex-shrink-0 py-1 min-w-0">
         <img
           src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
           alt="Logo Mark"
-          className="h-8 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 compact-icon-size"
+          className="h-[22px] w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 compact-icon-size"
           onClick={handleLogoClick}
         />
       </div>
@@ -43,7 +43,7 @@ const CompactHeader = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10"
+              className="h-10 w-10 p-2"
               aria-label="Search"
             >
               <Search className="h-5 w-5 compact-icon-size" />
