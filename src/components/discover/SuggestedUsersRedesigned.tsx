@@ -291,7 +291,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Liquid Glass Overlay */}
       <div className="
         absolute inset-x-0 bottom-0
-        h-[clamp(64px,25%,92px)]
+        h-1/4
         bg-black/35 backdrop-blur-md
         rounded-none
         px-3 py-2 z-10
