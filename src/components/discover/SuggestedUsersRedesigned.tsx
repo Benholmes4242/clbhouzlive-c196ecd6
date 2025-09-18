@@ -503,7 +503,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
   }
 
   return (
-    <div className="pt-1 pb-6">
+    <div className="pb-6">
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-1 px-1 md:px-0">
