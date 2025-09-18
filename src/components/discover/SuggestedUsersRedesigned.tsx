@@ -127,7 +127,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setFlashKey((k) => k + 1);
     setFlash(dir);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setFlash(null), 1200);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 420);
   }, []);
 
   const handleSwipeUp = async () => {
@@ -156,16 +156,15 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setSwipeDirection(null);
   };
 
-  // Show glow during any vertical movement, regardless of axis lock
+  // Axis lock keeps carousel horizontal intact
   const handleSwiping = (dx: number, dy: number) => {
-    if (!enableVerticalSwipe) return;
-    // Always show glow for any vertical movement
-    setDragY(dy);
-    // Only set vertical flag when clearly vertical (for axis lock)
-    if (Math.abs(dy) > Math.abs(dx) + 12) {
+    if (!enableVerticalSwipe) return;        // gate
+    if (Math.abs(dy) > Math.abs(dx) + 12) {  // vertical only
       setIsVertical(true);
+      setDragY(dy);
     } else {
       setIsVertical(false);
+      setDragY(0);
     }
   };
 
@@ -180,7 +179,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     onSwipeDown:  enableVerticalSwipe ? handleSwipeDown : undefined,
     onSwiping:    enableVerticalSwipe ? handleSwiping   : undefined,
     onSwipeEnd:   handleSwipeEnd,
-    threshold: 10,
+    threshold: 90,
     preventDefaultTouchMove: false,          // DO NOT block scroll
   });
 
@@ -244,16 +243,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
           style={{
             backgroundColor: dragY > 0 
-              ? `hsla(var(--swipe-error), ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
-              : `hsla(var(--swipe-success), ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
+              ? `rgba(239, 68, 68, ${Math.min(0.3, Math.abs(dragY) * 0.005)})` 
+              : `rgba(34, 197, 94, ${Math.min(0.3, Math.abs(dragY) * 0.005)})`
           }}
         >
-          {Math.abs(dragY) > 1 && (
+          {Math.abs(dragY) > 30 && (
             <div className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               dragY > 0 
-                ? "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]" 
-                : "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
+                ? "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]" 
+                : "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
             )}>
               {dragY > 0 ? <FaThumbsDown /> : <FaThumbsUp />}
             </div>
@@ -268,8 +267,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               className={cn(
                 "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center animate-pingonce",
                 flash === 'up'
-                  ? "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
-                  : "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]"
+                  ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                  : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
               )}
             >
               {flash === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
@@ -284,8 +283,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             className={cn(
               "w-14 h-14 rounded-full text-white text-2xl flex items-center justify-center",
               swipeDirection === 'up'
-                ? "bg-green-600 shadow-[0_0_20px_hsla(var(--swipe-success-glow),0.6)]"
-                : "bg-destructive shadow-[0_0_20px_hsla(var(--swipe-error-glow),0.6)]"
+                ? "bg-green-500 shadow-[0_0_20px_rgba(0,255,0,0.6)]"
+                : "bg-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)]"
             )}
           >
             {swipeDirection === 'up' ? <FaThumbsUp /> : <FaThumbsDown />}
