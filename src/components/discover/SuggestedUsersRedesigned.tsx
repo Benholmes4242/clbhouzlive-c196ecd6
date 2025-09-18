@@ -127,7 +127,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setFlashKey((k) => k + 1);
     setFlash(dir);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => setFlash(null), 420);
+    timeoutRef.current = window.setTimeout(() => setFlash(null), 1200);
   }, []);
 
   const handleSwipeUp = async () => {
