@@ -33,6 +33,41 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Chunk recovery - Must be before main script to catch early errors
+      let triedReload = false;
+      window.addEventListener('error', (e) => {
+        const msg = String((e && e.message) || '');
+        if (!triedReload && (
+            msg.includes('ChunkLoadError') ||
+            msg.includes('Importing a module script failed') ||
+            msg.includes('Failed to fetch dynamically imported module') ||
+            msg.includes('Loading chunk'))) {
+          triedReload = true;
+          console.log('[Chunk Recovery] Detected chunk loading error, clearing caches and reloading...');
+          
+          (async () => {
+            try {
+              // Unregister all service workers
+              if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map(r => r.unregister()));
+              }
+              
+              // Clear all caches
+              if (window.caches) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+              }
+            } catch (error) {
+              console.error('[Chunk Recovery] Error clearing caches:', error);
+            } finally {
+              location.reload();
+            }
+          })();
+        }
+      }, true);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       // Register service worker for caching

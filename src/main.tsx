@@ -7,7 +7,7 @@ import './styles/superellipse.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 import './utils/echoDocNavHeight'
-import './utils/chunk-recovery'
+// Chunk recovery moved to index.html for earlier error handling
 
 const container = document.getElementById("root");
 if (!container) {
