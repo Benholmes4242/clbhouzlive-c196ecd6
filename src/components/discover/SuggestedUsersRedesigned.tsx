@@ -178,7 +178,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setDragY(dy);
 
     // Track "clearly vertical" only as a hint for action logic
-    const verticalCandidate = Math.abs(dy) > Math.abs(dx) + 12;
+    const verticalCandidate = Math.abs(dy) > Math.abs(dx) + 14;
     setIsVertical(verticalCandidate);
   };
 
@@ -205,7 +205,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       ref={swipeRef}
       data-card={user.id}
       className="relative snap-start overflow-hidden"
-      style={{ touchAction: enableVerticalSwipe ? 'pan-y' : 'pan-x' }} // mobile: vertical; desktop: horizontal
+      style={{ touchAction: 'auto' }}
     >
       <motion.div
         className="relative overflow-hidden rounded-none cursor-pointer bg-gray-900"
@@ -559,7 +559,10 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
         <div 
           ref={containerRef}
           className="flex overflow-x-auto scrollbar-hide gap-px pb-0"
-          style={{ touchAction: 'pan-x' }}   // explicit: owns horizontal
+          style={{
+            touchAction: 'pan-x',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {filteredUsers.map((user) => (
             <div
