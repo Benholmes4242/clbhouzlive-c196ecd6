@@ -382,7 +382,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-x-0 top-0 bottom-20 px-4 py-6"
+                className="absolute inset-x-0 top-0 bottom-20 px-4 py-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -393,7 +393,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
               >
                 {/* User Avatar */}
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-3">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30">
                     {user.profilePhotoUrl ? (
                       <img
