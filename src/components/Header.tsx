@@ -27,7 +27,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
 
   // Always sticky on clubhouse page, relative everywhere else  
   const isClubhousePage = location.pathname === '/clubhouse';
-  const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
+  const headerClasses = isClubhousePage ? "sticky top-0 z-[60] header-safe-area" : "relative z-[60] header-safe-area";
   
   // Simplified safe area handling - let CSS handle the padding
   const headerStyle = {};
