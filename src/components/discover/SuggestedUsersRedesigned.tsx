@@ -458,7 +458,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           </AnimatePresence>
 
           {/* Fixed Button Controls - Always at bottom */}
-          <div className="absolute inset-x-0 bottom-0 px-3 py-1 flex items-center justify-center gap-2">
+          <div className="absolute inset-x-0 bottom-0 px-3 py-2 flex items-center justify-center gap-3">
             {/* Left: Dismiss Button */}
             <motion.button
               aria-label="Dismiss suggestion"
