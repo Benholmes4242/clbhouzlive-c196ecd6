@@ -37,6 +37,8 @@ interface MediaDisplayProps {
   showFeaturedBadge?: boolean;
   // Stage context for CSS specificity
   stage?: 'grid' | 'fullscreen' | 'vertical-feed';
+  // Above the fold optimization
+  isAboveTheFold?: boolean;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -55,7 +57,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   useSmartMedia = false,
   onMediaClick,
   showFeaturedBadge = true,
-  stage = 'grid'
+  stage = 'grid',
+  isAboveTheFold = false
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
@@ -142,9 +145,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted" data-stage={stageDataAttr}>
-      {/* Loading Skeleton - only show for images */}
-      {(media.media_type === 'image' && (isLoading || imageLoading)) && (
-        <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
+      {/* Loading Skeleton - only show for off-screen images */}
+      {(!isAboveTheFold && media.media_type === 'image' && (isLoading || imageLoading)) && (
+        <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
           <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
         </div>
       )}
@@ -173,8 +176,15 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             </div>
           </div>
         ) : (
-          /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
+          /* Video thumbnail - ALWAYS use static poster in grid, defer HLS until click */
           <div className="relative w-full h-full">
+            {/* Video thumbnail loading state - only for off-screen items */}
+            {!isAboveTheFold && !mediaLoaded && (
+              <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
+                <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
+              </div>
+            )}
+            
             {hasCloudflareThumb ? (
                <HighQualityImage
                  src={thumbnailUrl}
@@ -184,16 +194,25 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                   onError={handleImageError}
                  width={1200}
                  height={1600}
+                 isAboveTheFold={isAboveTheFold}
                />
             ) : (
               /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
               <video
                 src={media.media_url}
-                className={`w-full h-full videoEl ${fitClass}`}
+                className={`w-full h-full videoEl ${fitClass} transition-opacity duration-200 ${
+                  mediaLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
                 preload="metadata"
                 muted
-                onLoadedMetadata={handleImageLoad}
-                onError={handleImageError}
+                onLoadedMetadata={() => {
+                  setMediaLoaded(true);
+                  handleImageLoad();
+                }}
+                onError={() => {
+                  setMediaLoaded(true);
+                  handleImageError();
+                }}
               />
             )}
             
@@ -208,17 +227,17 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           </div>
         )
       ) : (
-        <div className="relative w-full h-full">
-           <HighQualityImage
-             src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
-             alt={itemTitle || 'Content'}
-             className={`w-full h-full ${fitClass}`}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-             width={1200}
-             height={1600}
-           />
-        </div>
+        /* Image display with high quality optimization */
+        <HighQualityImage
+          src={media.media_url}
+          alt={itemTitle || 'Photo'}
+          className={`w-full h-full ${fitClass}`}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          width={1200}
+          height={1600}
+          isAboveTheFold={isAboveTheFold}
+        />
       )}
     </div>
   );

@@ -18,10 +18,11 @@ interface ExploreContentCardProps {
     isVideoAutoplaying: (videoId: string) => boolean;
   };
   videoIndex?: number;
+  isAboveTheFold?: boolean;
 }
 
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, isPortrait, autoplayManager, videoIndex }) => {
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, isPortrait, autoplayManager, videoIndex, isAboveTheFold = false }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -42,6 +43,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, o
         autoplayManager={autoplayManager}
         videoIndex={videoIndex}
         stage="grid"
+        isAboveTheFold={isAboveTheFold}
       />
     </div>
   );

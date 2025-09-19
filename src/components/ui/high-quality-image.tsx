@@ -10,6 +10,7 @@ interface HighQualityImageProps {
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
   onLoad?: () => void;
   onClick?: () => void;
+  isAboveTheFold?: boolean; // default false - suppresses overlay for first screenful
 }
 
 const HighQualityImage: React.FC<HighQualityImageProps> = ({
@@ -20,21 +21,22 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   height,
   onError,
   onLoad,
-  onClick
+  onClick,
+  isAboveTheFold = false
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(src);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     // Reset states when src changes
     setImageSrc(src);
-    setIsLoading(true);
+    setLoaded(false);
     setHasError(false);
   }, [src]);
 
   const handleImageLoad = () => {
-    setIsLoading(false);
+    setLoaded(true);
     onLoad?.();
   };
 
@@ -50,7 +52,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
         message: 'Video files should be handled by video components, not image components'
       });
       setHasError(true);
-      setIsLoading(false);
+      setLoaded(true); // Clear overlay even on error
       if (onError) {
         onError(e);
       }
@@ -73,7 +75,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     }
     
     setHasError(true);
-    setIsLoading(false);
+    setLoaded(true); // Clear overlay even on error
     if (onError) {
       onError(e);
     }
@@ -105,15 +107,16 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   return (
     <div className={`relative ${className}`} onClick={onClick}>
-      {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit]" />
+      {/* Remove grey overlay for above-the-fold images */}
+      {!isAboveTheFold && !loaded && !hasError && (
+        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit] z-0" />
       )}
       
       <img
         src={optimizedSrc}
         alt={alt}
         className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
+          loaded ? 'opacity-100' : 'opacity-0'
         }`}
         style={{
           imageRendering: 'auto',
@@ -127,12 +130,13 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
         onError={handleImageError}
         width={width}
         height={height}
-        loading="lazy"
+        loading={isAboveTheFold ? "eager" : "lazy"}
+        fetchPriority={isAboveTheFold ? "high" : "auto"}
         decoding="async"
       />
       
       {hasError && (
-        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
+        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center z-0">
           <div className="text-xs text-muted-foreground">Failed to load</div>
         </div>
       )}

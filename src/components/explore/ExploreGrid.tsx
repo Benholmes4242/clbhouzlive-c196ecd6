@@ -43,6 +43,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
 
+  // Above the fold optimization - first screenful doesn't get grey overlays
+  const ABOVE_THE_FOLD_COUNT = isMobile ? 9 : 12; // 3x3 mobile, 4x3 desktop
+
   // Optimized mobile detection
   const checkMobile = useCallback(() => {
     setIsMobile(window.innerWidth < 768);
@@ -767,7 +770,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     <>
       {/* Fixed Grid Layout with Square and Portrait Cards */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
-        {gridItems.map((gridItem) => {
+        {gridItems.map((gridItem, index) => {
+          const isAboveTheFold = index < ABOVE_THE_FOLD_COUNT;
+          
           if (gridItem.type === 'portrait') {
             return (
               <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
@@ -777,6 +782,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isPortrait={true}
+                  isAboveTheFold={isAboveTheFold}
                 />
               </div>
             );
@@ -789,6 +795,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isFeatured={true}
+                  isAboveTheFold={isAboveTheFold}
                 />
               </div>
             );
@@ -801,6 +808,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onLike={onLike} 
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
+                  isAboveTheFold={isAboveTheFold}
                 />
               </div>
             );

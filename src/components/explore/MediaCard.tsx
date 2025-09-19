@@ -23,9 +23,10 @@ interface MediaCardProps {
   };
   videoIndex?: number;
   stage?: 'grid' | 'fullscreen' | 'vertical-feed';
+  isAboveTheFold?: boolean;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, isPortrait, autoplayManager, videoIndex, stage = 'grid', ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, isPortrait, autoplayManager, videoIndex, stage = 'grid', isAboveTheFold = false, ...props }) => {
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -88,6 +89,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           currentIndex={currentMediaIndex}
           loop={true}
           stage={stage}
+          isAboveTheFold={isAboveTheFold}
         />
 
         <MediaControls
