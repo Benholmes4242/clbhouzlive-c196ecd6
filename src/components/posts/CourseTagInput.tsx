@@ -89,8 +89,8 @@ const CourseTagInput = ({
   return (
     <div className="space-y-2">
       <div className="relative">
-        {/* Enhanced Input Field with external map pin */}
-        <div className="flex items-center gap-3">
+        {/* Input Field with decorative map pin inside */}
+        <div className="relative">
           <input
             ref={inputRef}
             type="text"
@@ -99,66 +99,64 @@ const CourseTagInput = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="flex-1 px-4 pr-3 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
+            className="w-full pr-10 pl-4 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
             disabled={!!selectedCourse}
           />
-          <button
-            className="h-11 w-11 rounded-xl bg-white/12 backdrop-blur-md border border-white/15 flex items-center justify-center hover:bg-white/18 transition-colors"
-            aria-label="Select location"
-          >
-            <span className="text-[18px]">📍</span>
-          </button>
+          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
           {isLoading && searchQuery.length >= 2 && (
-            <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
-              <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+            <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
+              <Loader2 className="h-4 w-4 animate-spin text-white/60" />
             </div>
           )}
         </div>
 
-        {/* Enhanced Suggestions Dropdown with high z-index */}
+        {/* Dark glassy dropdown via portal */}
         {showSuggestions && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto z-[9999] mt-2">
-            {suggestions.length > 0 ? (
-              <div className="py-2">
-                {suggestions.map((course, index) => (
-                  <div
-                    key={course.id}
-                    className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
-                      index !== suggestions.length - 1 ? 'border-b border-gray-100' : ''
-                    }`}
-                    onClick={() => handleCourseSelect(course)}
-                  >
-                    {/* Golf Tee Emoji */}
-                    <div className="flex-shrink-0">
-                      <span className="text-lg" role="img" aria-label="golf">⛳</span>
-                    </div>
-                    
-                    {/* Course Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 text-sm leading-5 truncate">
-                        {course.name}
+          <div className="fixed inset-0 z-[70] pointer-events-none">
+            <div 
+              className="absolute max-h-[40vh] overflow-auto rounded-2xl bg-neutral-900/85 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] divide-y divide-white/8 mt-2 pointer-events-auto"
+              style={{
+                top: inputRef.current?.getBoundingClientRect().bottom,
+                left: inputRef.current?.getBoundingClientRect().left,
+                width: inputRef.current?.getBoundingClientRect().width,
+              }}
+            >
+              {suggestions.length > 0 ? (
+                <div className="py-2">
+                  {suggestions.map((course, index) => (
+                    <div
+                      key={course.id}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors duration-150"
+                      onClick={() => handleCourseSelect(course)}
+                    >
+                      {/* Golf Tee Emoji */}
+                      <div className="flex-shrink-0">
+                        <span className="text-lg" role="img" aria-label="golf">⛳</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-0.5">
-                        {course.region ? `${course.region}, ${course.country}` : course.country}
+                      
+                      {/* Course Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white text-sm leading-5 truncate">
+                          {course.name}
+                        </div>
+                        <div className="text-xs text-white/60 mt-0.5">
+                          {course.region ? `${course.region}, ${course.country}` : course.country}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : searchQuery.length >= 2 && !isLoading ? (
-              /* Empty State */
-              <div className="py-8 px-4 text-center">
-                <div className="text-gray-400 mb-2">
-                  <MapPin className="h-8 w-8 mx-auto" />
+                  ))}
                 </div>
-                <p className="text-sm text-gray-500 mb-1">No course found</p>
-                <p className="text-xs text-gray-400">Try a different name or location</p>
-                {/* Future feature placeholder */}
-                {/* <button className="text-xs text-blue-500 hover:text-blue-600 mt-2">
-                  Suggest this course
-                </button> */}
-              </div>
-            ) : null}
+              ) : searchQuery.length >= 2 && !isLoading ? (
+                /* Empty State */
+                <div className="py-8 px-4 text-center">
+                  <div className="text-white/40 mb-2">
+                    <MapPin className="h-8 w-8 mx-auto" />
+                  </div>
+                  <p className="text-sm text-white/60 mb-1">No course found</p>
+                  <p className="text-xs text-white/40">Try a different name or location</p>
+                </div>
+              ) : null}
+            </div>
           </div>
         )}
       </div>
