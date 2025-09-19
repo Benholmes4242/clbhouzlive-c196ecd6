@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import { Play, X } from 'lucide-react';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useCappedLoading } from '@/hooks/useCappedLoading';
 import { haptic } from '@/utils/haptics';
@@ -99,28 +99,36 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           </button>
         )}
 
-        {/* Cover chip */}
-        {coverIndex === index && (
-          <span className="absolute top-2 left-2 text-[11px] px-2 py-1 rounded bg-black/60 text-white backdrop-blur-sm">
-            Cover
-          </span>
-        )}
-        
-        {/* Set as cover button */}
+        {/* Cover badge - shows "Cover" on cover image, "Set as cover" on others */}
         {onSetCover && (
           <button
-            aria-label="Set as cover"
-            className="absolute top-2 right-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
+            aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
+            className="absolute top-2 left-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
             onClick={(e) => { 
               e.stopPropagation(); 
-              onSetCover(index); 
-              haptic('light');
-              toast({ description: 'Cover set' });
+              if (coverIndex !== index) {
+                onSetCover(index); 
+                haptic('light');
+                toast({ description: 'Cover set' });
+              }
             }}
+            disabled={coverIndex === index}
           >
-            Set as cover
+            {coverIndex === index ? 'Cover' : 'Set as cover'}
           </button>
         )}
+
+        {/* Close button - positioned where "Set as cover" was */}
+        <button
+          onClick={() => {
+            // Get the close function from parent component
+            window.dispatchEvent(new CustomEvent('closeModal'));
+          }}
+          className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
+          aria-label="Close modal"
+        >
+          <X className="h-3 w-3 text-white" />
+        </button>
 
         {/* Duration badge */}
         {loaded && (
@@ -149,28 +157,36 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
         draggable={false}
       />
       
-      {/* Cover chip */}
-      {coverIndex === index && (
-        <span className="absolute top-2 left-2 text-[11px] px-2 py-1 rounded bg-black/60 text-white backdrop-blur-sm">
-          Cover
-        </span>
-      )}
-      
-      {/* Set as cover button */}
+      {/* Cover badge - shows "Cover" on cover image, "Set as cover" on others */}
       {onSetCover && (
         <button
-          aria-label="Set as cover"
-          className="absolute top-2 right-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
+          aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
+          className="absolute top-2 left-2 rounded bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 hover:bg-black/70 transition-colors"
           onClick={(e) => { 
             e.stopPropagation(); 
-            onSetCover(index); 
-            haptic('light');
-            toast({ description: 'Cover set' });
+            if (coverIndex !== index) {
+              onSetCover(index); 
+              haptic('light');
+              toast({ description: 'Cover set' });
+            }
           }}
+          disabled={coverIndex === index}
         >
-          Set as cover
+          {coverIndex === index ? 'Cover' : 'Set as cover'}
         </button>
       )}
+
+      {/* Close button - positioned where "Set as cover" was */}
+      <button
+        onClick={() => {
+          // Get the close function from parent component
+          window.dispatchEvent(new CustomEvent('closeModal'));
+        }}
+        className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
+        aria-label="Close modal"
+      >
+        <X className="h-3 w-3 text-white" />
+      </button>
     </div>
   );
 }
