@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -219,9 +219,9 @@ export default function EnhancedCreateMomentModalCinematic({
           exit={{ opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop with click-to-close */}
+          {/* backdrop with gradient and click-to-close */}
           <div 
-            className={`absolute inset-0 ${panel} backdrop-blur-xl`} 
+            className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/70 backdrop-blur-xl" 
             onClick={close}
             role="dialog"
             aria-modal="true"
@@ -322,58 +322,74 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   </div>
 
-                  {/* Floating cards below with 12px rhythm */}
-                  <div className="space-y-3 px-4 pt-3">
-                    {/* Course with High Z-Index */}
-                    <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
-                      <div className="text-[15px] mb-1">Tag a golf course</div>
-                      <CourseTagInput
-                        selectedCourse={course}
-                        onCourseSelect={onCourseSelect || setSelectedCourse}
-                        placeholder="Start typing to find a course..."
-                      />
-                    </div>
+                  {/* Content sections grouped in a soft card */}
+                  <div className="mx-4 pt-3">
+                    <div className="bg-black/30 backdrop-blur-sm rounded-3xl p-4 ring-1 ring-white/10 shadow-2xl space-y-4">
+                      {/* Course with High Z-Index */}
+                      <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
+                        <div className="text-[15px] mb-1">Tag a golf course</div>
+                        <CourseTagInput
+                          selectedCourse={course}
+                          onCourseSelect={onCourseSelect || setSelectedCourse}
+                          placeholder="Start typing to find a course..."
+                        />
+                      </div>
 
-                    {/* Music */}
-                    <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="text-[15px] mb-1">Background music</div>
-                          <div className={`${subtl} text-sm`}>
-                            Popular golf tracks today
+                      {/* Enhanced Music Selector */}
+                      <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="text-[15px] mb-1">Background music</div>
+                            <div className={`${subtl} text-sm`}>
+                              Popular golf tracks today
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                // TODO: Preview music
+                                console.log("Music preview clicked");
+                              }}
+                              className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} p-2 rounded-lg transition-colors`}
+                              aria-label="Preview music"
+                            >
+                              <Play className="h-4 w-4 text-orange-500" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                // TODO: Background music selector
+                                console.log("Music selector clicked");
+                              }}
+                              className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} p-2 rounded-lg transition-colors`}
+                              aria-label="Select music"
+                            >
+                              <BarChart3 className="h-4 w-4 text-orange-500" />
+                            </button>
                           </div>
                         </div>
-                        <button
-                          onClick={() => {
-                            // TODO: Background music selector
-                            console.log("Music selector clicked");
-                          }}
-                          className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
-                          aria-label="Select music"
-                        >
-                          <span className="text-orange-500 text-xl">🎵</span>
-                        </button>
                       </div>
-                    </div>
 
-                    {/* Visibility segmented - Wired to state */}
-                    <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                      <Segmented
-                        value={visibility}
-                        onChange={(value) => setVisibility(value as "public" | "private")}
-                        options={[
-                          { value: "public", label: "Public", icon: Globe },
-                          { value: "private", label: "Private Archive", icon: Lock },
-                        ]}
-                      />
+                      {/* Visibility segmented - Wired to state */}
+                      <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                        <Segmented
+                          value={visibility}
+                          onChange={(value) => setVisibility(value as "public" | "private")}
+                          options={[
+                            { value: "public", label: "Public", icon: Globe },
+                            { value: "private", label: "Private Archive", icon: Lock },
+                          ]}
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* FOOTER - Pinned to bottom */}
-                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-4 pb-[calc(var(--footer-safe)+16px)] px-4 bg-gradient-to-t from-black/40 via-black/20 to-transparent backdrop-blur-sm">
+                  {/* FOOTER - Pinned to bottom with proper safe area */}
+                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] px-4 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-sm">
                     <motion.button
                       onClick={handlePost}
                       disabled={!canPost}
+                      aria-pressed={isSubmitting}
+                      aria-busy={isSubmitting}
                       className="relative w-full h-14 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 shadow-2xl"
                       style={{ 
                         background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
@@ -445,11 +461,15 @@ function Segmented({
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className={`h-10 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2
+            className={`h-10 rounded-lg transition-all duration-150 font-medium flex items-center justify-center gap-2
               ${active 
                 ? "bg-gradient-to-r from-white/90 to-white/80 text-neutral-900 shadow-lg font-bold" 
                 : "text-white/80 hover:bg-white/10"
               }`}
+            aria-pressed={active}
+            style={{
+              color: active ? 'rgb(23, 23, 23)' : 'rgba(255, 255, 255, 0.8)'
+            }}
           >
             <IconComponent className="h-4 w-4" />
             {option.label}
