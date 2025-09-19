@@ -316,11 +316,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <motion.div
-              className="bg-black/55 backdrop-blur-[12px] px-8 py-6 border border-white/10 shadow-2xl w-full h-full flex items-center justify-center rounded-2xl"
+            <motion.div 
+              className="bg-white/10 backdrop-blur-xl px-6 py-3 border border-white/20 shadow-2xl w-full h-full flex items-center justify-center"
               initial={{ 
                 opacity: 0, 
-                scale: 0.95
+                scale: 0.9
               }}
               animate={{ 
                 opacity: 1, 
@@ -328,8 +328,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               }}
               exit={{ 
                 opacity: 0, 
-                scale: 0.95,
-                y: 20
+                scale: 0.95
               }}
               transition={{ 
                 type: "spring", 
@@ -338,64 +337,24 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 duration: 0.4
               }}
             >
-              <div className="flex flex-col items-center space-y-3">
-                {/* Icon with liquid glass container */}
-                <motion.div 
-                  className={cn(
-                    "w-14 h-14 rounded-full flex items-center justify-center text-xl backdrop-blur-sm border border-white/20",
-                    "shadow-[0_0_30px_rgba(0,0,0,0.3)]",
-                    showFeedback === 'follow' 
-                      ? "bg-green-500/20 text-green-400 shadow-[0_0_25px_rgba(34,197,94,0.6)]" 
-                      : "bg-red-500/20 text-red-400 shadow-[0_0_25px_rgba(239,68,68,0.6)]"
-                  )}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ 
-                    scale: [0.8, 1.2, 1], 
-                    opacity: 1,
-                    boxShadow: showFeedback === 'follow' 
-                      ? ["0 0 25px rgba(34,197,94,0.6)", "0 0 35px rgba(34,197,94,0.8)", "0 0 25px rgba(34,197,94,0.6)"]
-                      : ["0 0 25px rgba(239,68,68,0.6)", "0 0 35px rgba(239,68,68,0.8)", "0 0 25px rgba(239,68,68,0.6)"]
-                  }}
-                  transition={{ 
-                    scale: { duration: 0.4, ease: "easeOut" },
-                    boxShadow: { duration: 0.6, ease: "easeInOut" }
-                  }}
-                >
-                  {showFeedback === 'follow' ? (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-                    >
-                      ✅
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-                      className="font-bold"
-                    >
-                      ❌
-                    </motion.span>
-                  )}
-                </motion.div>
+              <div className="flex flex-col items-center space-y-1">
+                {/* Icon with glow */}
+                <div className={cn(
+                  "w-10 h-10 flex items-center justify-center text-lg",
+                  showFeedback === 'follow' 
+                    ? "bg-green-500/20 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.4)]" 
+                    : "bg-red-500/20 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                )}>
+                  {showFeedback === 'follow' ? '✅' : '❌'}
+                </div>
                 
-                {/* Text with staggered animation */}
-                <motion.div 
-                  className="text-white text-center text-sm"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.3 }}
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                >
-                  <span className="font-semibold">
-                    {showFeedback === 'follow' ? "You've followed " : "You've dismissed "}
-                  </span>
-                  <span className="font-normal opacity-90">
-                    {user.displayName}
-                  </span>
-                </motion.div>
+                {/* Text */}
+                <div className="text-white text-center font-medium text-sm">
+                  {showFeedback === 'follow' 
+                    ? `You've followed ${user.displayName}`
+                    : `You've dismissed ${user.displayName}`
+                  }
+                </div>
               </div>
             </motion.div>
           </motion.div>
