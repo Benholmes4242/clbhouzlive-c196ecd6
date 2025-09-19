@@ -61,17 +61,8 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
 
   // Standard header for other pages
   return (
-    <header className={`${headerClasses} global-header bg-background/95 backdrop-blur-md border-b border-border/50`} style={headerStyle}>
-      {/* Safe-area overlay */}
-      <div
-        className="pointer-events-none absolute inset-x-0 -top-[env(safe-area-inset-top)] bg-background/95 backdrop-blur-md border-b border-border/50"
-        style={{
-          height: 'env(safe-area-inset-top)',
-          zIndex: -1,
-          WebkitBackdropFilter: 'blur(12px)',
-        }}
-      />
-      <div className="container mx-auto compact-header-padding max-w-full box-border px-3 md:px-4">
+    <header className={`${headerClasses} global-header`} style={headerStyle}>
+      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />
         ) : (
