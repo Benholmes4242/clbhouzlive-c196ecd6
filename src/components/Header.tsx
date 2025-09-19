@@ -62,7 +62,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   // Standard header for other pages
   return (
     <header className={`${headerClasses} global-header`} style={headerStyle}>
-      <div className="container mx-auto compact-header-padding max-w-full box-border px-3 md:px-4">
+      <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />
         ) : (

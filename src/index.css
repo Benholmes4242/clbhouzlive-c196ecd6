@@ -50,56 +50,32 @@ html, body {
   }
 }
 
-/* App shell provides edge-to-edge container - headers handle their own safe-area */
+/* App shell applies safe-area padding and guarantees edge-to-edge */
 .app-shell {
   min-height: 100vh;
   width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
+  padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   box-sizing: border-box;
 }
 
-/* Clubhouse specific: hide standard header */
+/* Clubhouse specific: remove global safe-area top padding and hide standard header */
+body.route-clubhouse .app-shell {
+  padding-top: 0 !important;
+}
 body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Global and clubhouse headers: original styling with safe-area */
-.global-header,
+/* Clubhouse header: anchored to top with safe-area handling */
 .clubhouse-header {
-  position: relative;
-  z-index: 50;
-  padding-top: env(safe-area-inset-top);
-  background-color: hsl(var(--background) / 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-  isolation: isolate;
-}
-
-/* Safe-area overlay using SAME tokens as header */
-.global-header::before,
-.clubhouse-header::before {
-  content: "";
-  position: absolute;
-  left: 0; 
-  right: 0;
-  top: calc(-1 * env(safe-area-inset-top));
-  height: calc(env(safe-area-inset-top) + var(--header-height, 64px));
-  /* INHERIT the exact same styling - no custom greys */
-  background-color: inherit;
-  backdrop-filter: inherit;
-  -webkit-backdrop-filter: inherit;
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.clubhouse-header {
-  touch-action: pan-x; /* no vertical pull on header */
   position: sticky;
   top: 0;
+  z-index: 60;
+  padding-top: env(safe-area-inset-top);
+  touch-action: pan-x; /* no vertical pull on header */
 }
 
 /* Clubhouse scroll container: prevent pull-down behavior */
@@ -403,9 +379,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     --brand-orange-light: 32 93% 64%;
     --brand-black: 0 0% 10%;
     --brand-glass: 0 0% 100% / 0.8;
-    
-    /* Header height for pseudo-element calculations */
-    --header-height: 64px;
     
     /* Echo Avatar Gradient */
     --echo-from: #1D3557;

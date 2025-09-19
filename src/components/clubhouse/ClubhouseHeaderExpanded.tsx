@@ -30,7 +30,7 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
 
   return (
     <header id="clubhouse-header-expanded" className={`clubhouse-header ${className}`}>
-      <div>
+      <div className="backdrop-blur-md">
         <div className="px-4">
           {/* Main header row */}
           <div className="flex items-center justify-between h-16 max-w-full bg-transparent">
