@@ -45,7 +45,7 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
               <img
                 src="/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"
                 alt="clbhouz Logo White"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
                 onClick={handleLogoClick}
               />
             </div>
