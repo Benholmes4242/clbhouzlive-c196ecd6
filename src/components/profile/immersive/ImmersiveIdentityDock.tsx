@@ -120,7 +120,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         onClick={onMorphToHeader}
         className="flex-shrink-0"
       >
-        <div className="px-4 py-2">
+        <div className="px-4 py-1.5">
           <div className="flex items-center gap-2">
             {/* Avatar - smaller size */}
             <Avatar className="w-14 h-14 rounded-full">
@@ -133,18 +133,18 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
               </AvatarFallback>
             </Avatar>
 
-            {/* Profile Info - smaller text */}
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-bold text-lg truncate">
+            {/* Profile Info - brought closer with reduced spacing */}
+            <div className="flex-1 min-w-0 -ml-1">
+              <div className="text-white font-bold text-lg truncate leading-tight">
                 {profile.display_name || profile.username || 'Unknown User'}
               </div>
               {profile.username && (
-                <div className="text-white/70 text-xs truncate">
+                <div className="text-white/70 text-xs truncate -mt-0.5">
                   @{profile.username}
                 </div>
               )}
               {profile.club_name && (
-                <div className="flex items-center gap-1 text-white/80 text-xs truncate">
+                <div className="flex items-center gap-1 text-white/80 text-xs truncate -mt-0.5">
                   <MapPin className="w-3 h-3" />
                   <span>{profile.club_name}</span>
                 </div>
