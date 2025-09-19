@@ -18,6 +18,7 @@ export interface CardMediaProps {
   shouldAutoplay?: boolean;
   isLazyLoaded?: boolean;
   onMediaClick?: () => void;
+  onLoaded?: () => void; // New callback for when media finishes loading
   className?: string;
   showFeaturedBadge?: boolean;
 }

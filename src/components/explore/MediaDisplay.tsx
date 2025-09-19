@@ -22,9 +22,10 @@ interface MediaDisplayProps {
   media: LocalMediaItem;
   itemTitle?: string;
   shouldAutoplay: boolean;
-  isLoading: boolean;
+  isLoading?: boolean;
   onImageError: () => void;
   onImageLoad: () => void;
+  onLoaded?: () => void; // New unified callback for when media is ready
   itemId: string;
   currentIndex: number;
   loop?: boolean;
@@ -45,9 +46,10 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   media,
   itemTitle,
   shouldAutoplay,
-  isLoading,
+  isLoading = false,
   onImageError,
   onImageLoad,
+  onLoaded,
   itemId,
   currentIndex,
   loop = false,
@@ -143,8 +145,11 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   const stageDataAttr = stage === 'grid' ? 'grid' : stage;
   const fitClass = stage === 'grid' ? '!object-cover' : 'object-contain';
 
+  // Apply loading-gated background color
+  const wrapperClass = `relative w-full h-full overflow-hidden ${isLoading ? 'bg-muted' : 'bg-transparent'}`;
+
   return (
-    <div className="relative w-full h-full overflow-hidden bg-muted" data-stage={stageDataAttr}>
+    <div className={wrapperClass} data-stage={stageDataAttr}>
       {/* Loading Skeleton - only show for off-screen images */}
       {(!isAboveTheFold && media.media_type === 'image' && (isLoading || imageLoading)) && (
         <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
@@ -207,11 +212,11 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                 muted
                 onLoadedMetadata={() => {
                   setMediaLoaded(true);
-                  handleImageLoad();
+                  handleImageLoad(); // This now calls onLoaded
                 }}
                 onError={() => {
                   setMediaLoaded(true);
-                  handleImageError();
+                  handleImageError(); // This now calls onLoaded
                 }}
               />
             )}

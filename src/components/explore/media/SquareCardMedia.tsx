@@ -16,11 +16,15 @@ import { getStreamPoster } from '@/utils/stream';
 const SquareCardMedia: React.FC<CardMediaProps> = memo(({
   media,
   onMediaClick,
+  onLoaded,
   className = ''
 }) => {
-  // Always use static image for square cards - use consistent poster generation
+  // Always use static image for square cards - use consistent poster generation with fallbacks
   const imageUrl = media.media_type === 'video' 
-    ? (media.poster_url || getStreamPoster(media.media_url, '1s') || '/placeholder.svg')
+    ? (media.poster_url || 
+       getStreamPoster(media.media_url, '1s') || 
+       media.thumbnail_url ||
+       'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&h=640&fit=crop&crop=center')
     : media.media_url;
 
   return (
@@ -32,6 +36,8 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
         src={imageUrl}
         alt="Media content"
         className="w-full h-full object-cover"
+        onLoad={() => onLoaded?.()} // Call onLoaded when image loads
+        onError={() => onLoaded?.()} // Still call onLoaded even on error to clear skeleton
       />
       
       {/* Video play icon in bottom right for video sources */}

@@ -41,7 +41,34 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
-  const [itemLoadingStates, setItemLoadingStates] = useState<{[key: string]: boolean}>({});
+  const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, boolean>>({});
+
+  // Initialize loading states for new items and clean up stale ones
+  useEffect(() => {
+    if (!content?.length) return;
+    setItemLoadingStates(prev => {
+      const next = { ...prev };
+      // Initialize new items to loading=true
+      for (const item of content) {
+        if (next[item.id] === undefined) {
+          next[item.id] = true;
+        }
+      }
+      // Clean up stale IDs (optional optimization)
+      const currentIds = new Set(content.map(item => item.id));
+      for (const id of Object.keys(next)) {
+        if (!currentIds.has(id)) {
+          delete next[id];
+        }
+      }
+      return next;
+    });
+  }, [content]);
+
+  // Memoized handler to flip tiles to loaded state
+  const handleTileLoaded = useCallback((id: string) => {
+    setItemLoadingStates(prev => (prev[id] === false ? prev : { ...prev, [id]: false }));
+  }, []);
 
   // Above the fold optimization - first screenful doesn't get grey overlays
   const ABOVE_THE_FOLD_COUNT = isMobile ? 9 : 12; // 3x3 mobile, 4x3 desktop
@@ -311,7 +338,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                         <MediaDisplay
@@ -329,6 +356,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                           onImageLoad={() => {
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
                           }}
+                          onLoaded={() => handleTileLoaded(item.item.id)}
                           itemId={item.item.id}
                           currentIndex={0}
                           loop={true}
@@ -356,7 +384,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: 4 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                       <MediaDisplay
@@ -374,6 +402,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                         onImageLoad={() => {
                           setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
                         }}
+                        onLoaded={() => handleTileLoaded(portraitItem.item.id)}
                         itemId={portraitItem.item.id}
                         currentIndex={0}
                         loop={true}
@@ -401,7 +430,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: 1 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
                          <MediaDisplay
@@ -445,31 +474,32 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
-                         <MediaDisplay
-                           media={{
-                             id: item.item.id,
-                             media_type: item.item.type as 'video' | 'image',
-                             media_url: item.item.src
-                           }}
-                           itemTitle={item.item.title}
-                             shouldAutoplay={true}
-                           isLoading={itemLoadingStates[item.item.id] ?? true}
-                           onImageError={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           onImageLoad={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           itemId={item.item.id}
-                           currentIndex={0}
-                           loop={true}
-                           cardType={CardType.SQUARE}
-                           useSmartMedia={true}
-                           onMediaClick={() => onMediaClick?.(item.item)}
-                         />
+                          <MediaDisplay
+                            media={{
+                              id: item.item.id,
+                              media_type: item.item.type as 'video' | 'image',
+                              media_url: item.item.src
+                            }}
+                            itemTitle={item.item.title}
+                            shouldAutoplay={true}
+                            isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
                       </div>
                     </div>
                   );
@@ -482,7 +512,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   sections.push(
                     <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
                       <div
-                        className="relative bg-muted overflow-hidden cursor-pointer group transition-all h-full"
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
                         onClick={() => onMediaClick?.(item.item)}
                       >
                          <MediaDisplay
@@ -494,19 +524,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                            itemTitle={item.item.title}
                              shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                           onImageError={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           onImageLoad={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           itemId={item.item.id}
-                           currentIndex={0}
-                           loop={true}
-                           cardType={CardType.SQUARE}
-                           useSmartMedia={true}
-                           onMediaClick={() => onMediaClick?.(item.item)}
-                         />
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
                       </div>
                     </div>
                   );
@@ -528,19 +559,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                            itemTitle={item.item.title}
                              shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                           onImageError={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           onImageLoad={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           itemId={item.item.id}
-                           currentIndex={0}
-                           loop={true}
-                           cardType={CardType.SQUARE}
-                           useSmartMedia={true}
-                           onMediaClick={() => onMediaClick?.(item.item)}
-                         />
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
                       </div>
                     </div>
                   );
@@ -615,6 +647,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                           onImageLoad={() => {
                             setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
                           }}
+                          onLoaded={() => handleTileLoaded(heroItem.item.id)}
                           itemId={heroItem.item.id}
                           currentIndex={0}
                           loop={true}
@@ -646,19 +679,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                            itemTitle={item.item.title}
                            shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                           onImageError={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           onImageLoad={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           itemId={item.item.id}
-                           currentIndex={0}
-                           loop={true}
-                           cardType={CardType.SQUARE}
-                           useSmartMedia={true}
-                           onMediaClick={() => onMediaClick?.(item.item)}
-                         />
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
                       </div>
                     </div>
                   );
@@ -727,19 +761,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                            itemTitle={item.item.title}
                            shouldAutoplay={true}
                            isLoading={itemLoadingStates[item.item.id] ?? true}
-                           onImageError={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           onImageLoad={() => {
-                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                           }}
-                           itemId={item.item.id}
-                           currentIndex={0}
-                           loop={true}
-                           cardType={CardType.SQUARE}
-                           useSmartMedia={true}
-                           onMediaClick={() => onMediaClick?.(item.item)}
-                         />
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
                       </div>
                     </div>
                   );
