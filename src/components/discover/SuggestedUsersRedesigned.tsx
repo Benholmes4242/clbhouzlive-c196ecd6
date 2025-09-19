@@ -309,25 +309,38 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/35 pointer-events-none" />
 
 
-      {/* Edge-to-Edge Feedback Overlay */}
+      {/* Liquid Glass Feedback Overlay */}
       <AnimatePresence>
         {showFeedback && (
           <motion.div 
             className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, y: showFeedback === 'follow' ? -30 : 30 }}
+            transition={{ 
+              duration: 0.35,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
           >
+            {/* Liquid Glass Panel */}
             <motion.div 
-              className="bg-white/10 backdrop-blur-xl px-6 py-3 border border-white/20 shadow-2xl w-full h-full flex items-center justify-center"
+              className="flex flex-col items-center justify-center px-8 py-6"
+              style={{
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(12px)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+              }}
               initial={{ 
                 opacity: 0, 
-                scale: 0.9
+                scale: 0.9,
+                y: 20
               }}
               animate={{ 
                 opacity: 1, 
-                scale: 1
+                scale: 1,
+                y: 0
               }}
               exit={{ 
                 opacity: 0, 
@@ -336,29 +349,166 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               transition={{ 
                 type: "spring", 
                 stiffness: 400, 
-                damping: 25,
-                duration: 0.4
+                damping: 25
               }}
             >
-              <div className="flex flex-col items-center space-y-1">
-                {/* Icon with glow */}
-                <div className={cn(
-                  "w-10 h-10 flex items-center justify-center text-lg",
-                  showFeedback === 'follow' 
-                    ? "bg-green-500/20 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.4)]" 
-                    : "bg-red-500/20 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
-                )}>
-                  {showFeedback === 'follow' ? '✅' : '❌'}
-                </div>
+              {/* Icon Container with liquid glass circle and glow */}
+              <motion.div 
+                className={cn(
+                  "w-16 h-16 rounded-full flex items-center justify-center mb-4 relative overflow-hidden",
+                  "backdrop-blur-md border border-white/20"
+                )}
+                style={{
+                  background: showFeedback === 'follow' 
+                    ? 'rgba(34, 197, 94, 0.15)' 
+                    : 'rgba(239, 68, 68, 0.15)',
+                  boxShadow: showFeedback === 'follow'
+                    ? '0 0 32px rgba(34, 197, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                    : '0 0 32px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                }}
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1
+                }}
+                transition={{ 
+                  delay: 0,
+                  duration: 0.2,
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 20
+                }}
+              >
+                {/* Gradient glow behind icon */}
+                <div 
+                  className="absolute inset-0 rounded-full opacity-40"
+                  style={{
+                    background: showFeedback === 'follow'
+                      ? 'radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)'
+                  }}
+                />
                 
-                {/* Text */}
-                <div className="text-white text-center font-medium text-sm">
-                  {showFeedback === 'follow' 
-                    ? `You've followed ${user.displayName}`
-                    : `You've dismissed ${user.displayName}`
-                  }
+                {/* Pulse glow animation */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: showFeedback === 'follow'
+                      ? 'rgba(34, 197, 94, 0.2)'
+                      : 'rgba(239, 68, 68, 0.2)'
+                  }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.3, 0, 0.3]
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeOut"
+                  }}
+                />
+                
+                {/* Icon */}
+                <motion.div
+                  className={cn(
+                    "relative z-10 text-2xl font-bold",
+                    showFeedback === 'follow' 
+                      ? "text-green-400" 
+                      : "text-red-400"
+                  )}
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ 
+                    scale: 1, 
+                    rotate: 0
+                  }}
+                  transition={{ 
+                    delay: 0.1,
+                    duration: 0.3,
+                    type: "spring",
+                    stiffness: 600,
+                    damping: 15
+                  }}
+                >
+                  {showFeedback === 'follow' ? (
+                    // Animated checkmark with stroke draw effect
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <motion.path
+                        d="M20 6L9 17l-5-5"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ 
+                          delay: 0.2,
+                          duration: 0.3,
+                          ease: "easeOut"
+                        }}
+                      />
+                    </svg>
+                  ) : (
+                    // Softer X icon
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <motion.path
+                        d="M18 6L6 18"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ 
+                          delay: 0.2,
+                          duration: 0.2,
+                          ease: "easeOut"
+                        }}
+                      />
+                      <motion.path
+                        d="M6 6l12 12"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ 
+                          delay: 0.3,
+                          duration: 0.2,
+                          ease: "easeOut"
+                        }}
+                      />
+                    </svg>
+                  )}
+                </motion.div>
+              </motion.div>
+              
+              {/* Text with fade-in delay */}
+              <motion.div 
+                className="text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  delay: 0.1,
+                  duration: 0.3,
+                  ease: "easeOut"
+                }}
+              >
+                <div className="text-white font-medium text-base leading-tight">
+                  <span 
+                    className="font-bold"
+                    style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.7)' }}
+                  >
+                    {showFeedback === 'follow' ? "You've followed" : "You've dismissed"}
+                  </span>
+                  <br />
+                  <span 
+                    className="font-normal opacity-90"
+                    style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.7)' }}
+                  >
+                    {user.displayName}
+                  </span>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
