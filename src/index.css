@@ -50,31 +50,32 @@ html, body {
   }
 }
 
-/* App shell applies safe-area padding and guarantees edge-to-edge */
+/* App shell provides edge-to-edge container - headers handle their own safe-area */
 .app-shell {
   min-height: 100vh;
   width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
-  padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   box-sizing: border-box;
 }
 
-/* Clubhouse specific: remove global safe-area top padding and hide standard header */
-body.route-clubhouse .app-shell {
-  padding-top: 0 !important;
-}
+/* Clubhouse specific: hide standard header */
 body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Clubhouse header: anchored to top with safe-area handling */
+/* Global and clubhouse headers: handle safe-area top themselves */
+.global-header,
 .clubhouse-header {
+  padding-top: var(--safe-top);
+  background: var(--header-bg, hsl(var(--background)));
   position: sticky;
   top: 0;
   z-index: 60;
-  padding-top: env(safe-area-inset-top);
+}
+
+.clubhouse-header {
   touch-action: pan-x; /* no vertical pull on header */
 }
 
