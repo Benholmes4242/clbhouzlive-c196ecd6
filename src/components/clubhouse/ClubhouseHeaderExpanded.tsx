@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from '../header/HeaderNavigation';
 import HeaderSearch from '../header/HeaderSearch';
@@ -18,6 +18,11 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
 }) => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("[DEBUG] ClubhouseHeaderExpanded mounted with props:", { activeTab, className });
+  }, [activeTab, className]);
 
   const handleLogoClick = () => {
     navigate('/clubhouse');

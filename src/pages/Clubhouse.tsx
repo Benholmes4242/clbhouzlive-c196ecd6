@@ -31,6 +31,11 @@ const Clubhouse = () => {
   };
 
 
+  // Debug logging for Clubhouse page
+  useEffect(() => {
+    console.log("[DEBUG] Clubhouse page mounted, activeTab:", activeTab);
+  }, [activeTab]);
+
   if (isLoading) {
     return <ClubhouzLoading />;
   }

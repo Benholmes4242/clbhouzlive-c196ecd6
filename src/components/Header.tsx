@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useModalContext } from '@/contexts/ModalContext';
 import HeaderNavigation from './header/HeaderNavigation';
@@ -16,6 +16,11 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   const { currentLogo } = useAppLogo();
   const { shouldHideHeader } = useModalContext();
   const isMobile = useIsMobile();
+
+  // Debug logging for troubleshooting
+  useEffect(() => {
+    console.log("[DEBUG] Header mounted", "pathname:", location.pathname);
+  }, [location.pathname]);
 
   // Hide header when modals are active
   if (shouldHideHeader) {
@@ -35,8 +40,10 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
 
   // For Clubhouse, always use expanded header regardless of screen size
   if (isClubhousePage) {
+    console.log("[DEBUG] Rendering ClubhouseHeaderExpanded for path:", location.pathname);
     return (
       <ClubhouseHeaderExpanded 
+        className="clubhouse-header"
         activeTab={activeTab} 
         onTabChange={onTabChange} 
       />
@@ -45,6 +52,9 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
 
   // Check if we should use compact mode (≤375px and mobile) for other pages
   const useCompactMode = isMobile && (typeof window !== 'undefined' && window.innerWidth <= 375);
+
+  // Standard header for other pages
+  console.log("[DEBUG] Rendering standard header for path:", location.pathname, "useCompactMode:", useCompactMode);
 
   // Standard header for other pages
   return (
