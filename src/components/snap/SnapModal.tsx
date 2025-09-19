@@ -143,7 +143,7 @@ const SnapModal = ({
         {variant === "videos" && (
           <>
             {thumbs.slice(0, 3).map((t, i) => (
-              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10">
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity">
                 <img
                   src={t.displaySrc}
                   alt=""
@@ -161,7 +161,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
               >
                 <img
                   src={t.displaySrc}
@@ -180,7 +180,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10`}
+                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
               >
                 <img
                   src={t.displaySrc}
@@ -240,7 +240,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl ring-1 ring-white/10 text-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] text-white"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -248,14 +248,17 @@ const SnapModal = ({
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h2 className="text-xl font-semibold">Create a Moment</h2>
+              <div className="flex items-center justify-between px-5 pt-5 pb-1">
+                <div>
+                  <h2 className="text-2xl font-semibold">Create a Moment</h2>
+                  <p className="text-sm text-white/60 mt-1">Choose how you'd like to share</p>
+                </div>
                 <button 
                   onClick={onClose} 
                   aria-label="Close" 
-                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/10 transition-colors"
+                  className="h-8 w-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
@@ -265,7 +268,7 @@ const SnapModal = ({
                   <motion.button
                     key={key}
                     onClick={onClick}
-                    className="w-full flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:bg-white/5 transition-colors"
+                    className="w-full h-20 flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
@@ -274,16 +277,17 @@ const SnapModal = ({
                         <Icon className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <div className="text-[17px] font-medium text-white">{label}</div>
+                        <div className="font-medium text-white">{label}</div>
                         {/* Show empty state message if no user media and not loading */}
                         {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
-                          <div className="text-xs text-white/50">No posts yet - start creating!</div>
+                          <div className="text-sm text-white/60">No posts yet - start creating!</div>
                         )}
                       </div>
                     </div>
 
-                    {/* ThumbStrip Component */}
-                    <ThumbStrip variant={variant} thumbs={thumbs} />
+                    <div className="border-l border-white/10 pl-3">
+                      <ThumbStrip variant={variant} thumbs={thumbs} />
+                    </div>
                   </motion.button>
                 ))}
 
@@ -306,7 +310,7 @@ const SnapModal = ({
                     // Open the same media picker flow
                     handlePickMedia();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-white/10 hover:bg-white/5 transition-colors"
+                  className="w-full h-24 flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-yellow-500/20 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
@@ -314,8 +318,8 @@ const SnapModal = ({
                     <Sparkles className="h-5 w-5 text-amber-400" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-[17px] font-medium text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/70">Mix photos & videos in one go</span>
+                    <span className="font-bold text-white">Tell Your Story</span>
+                    <span className="text-sm text-white/60">Mix photos & videos in one go</span>
                   </div>
                 </motion.button>
               </div>
