@@ -134,19 +134,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     );
   }
 
-  // Create simple grid items from content (same as ActivityFeed pattern)
-  const gridItems = useMemo(() => {
-    return content.map((item, index) => {
-      // Determine if it's a portrait video (simplified logic)
-      const isPortrait = item.type === 'video' && Math.random() > 0.7; // Temporary logic
-      
-      return {
-        key: `${item.id}-${index}`,
-        item,
-        type: isPortrait ? 'portrait' : 'square'
-      };
-    });
-  }, [content]);
+  // Ensure content is safe
+  const safeContent = content ?? [];
+
+  // Simple grid items from content - no useMemo to avoid React #310 error
+  const gridItems = safeContent.map((item, index) => {
+    // Determine if it's a portrait video (simplified logic)
+    const isPortrait = item.type === 'video' && Math.random() > 0.7;
+    
+    return {
+      key: `${item.id}-${index}`,
+      item,
+      type: isPortrait ? 'portrait' : 'square'
+    };
+  });
 
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
@@ -154,7 +155,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       <>
         {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
         <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
-          {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
+          {safeContent.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
               className="relative overflow-hidden cursor-pointer group aspect-[9/16]"
