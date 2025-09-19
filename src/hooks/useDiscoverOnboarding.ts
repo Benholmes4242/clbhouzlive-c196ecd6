@@ -4,7 +4,7 @@ const SHOWS_KEY = 'discover_swipe_tutorial_v1_shows';
 const DISMISSES_KEY = 'discover_swipe_tutorial_v1_dismisses';
 const MAX_SHOWS = 3;
 
-export function useDiscoverOnboarding(isMobile: boolean, autoHideMs = 5000) {
+export function useDiscoverOnboarding(isMobile: boolean, autoHideMs = 10000) {
   const [show, setShow] = useState(false);
   const autoHideTimer = useRef<number | null>(null);
   const countedThisSession = useRef(false); // prevent double-counting
