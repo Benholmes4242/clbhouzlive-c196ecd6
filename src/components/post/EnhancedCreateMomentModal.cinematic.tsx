@@ -224,155 +224,158 @@ export default function EnhancedCreateMomentModalCinematic({
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
             <motion.div
               ref={wrapperRef}
-              className="w-full max-w-[520px] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)] flex flex-col h-full"
+              className="w-full max-w-[520px] h-[min(92vh,900px)] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* MEDIA */}
-              <div
-                className="relative w-full aspect-video overflow-hidden rounded-2xl"
-                style={mediaHeight ? { height: `${mediaHeight}px` } : undefined}
-              >
-                <MediaCarousel
-                  items={media.map(item => ({
-                    id: item.id,
-                    type: item.type,
-                    previewUrl: item.previewUrl,
-                    url: item.url,
-                    file: item.file,
-                    alt: `Media item ${item.id}`
-                  }))}
-                  initialIndex={0}
-                  onIndexChange={setActiveIndex}
-                  onSetCover={setCoverIndex}
-                  coverIndex={coverIndex}
-                  enableSwipe
-                  loop={false}
-                  className="h-full w-full"
-                />
-              </div>
-
-              {/* White indicator dots above caption */}
-              <CarouselDots count={media.length} activeIndex={activeIndex} />
-                
-              {/* CAPTION CARD */}
-              <div
-                ref={captionRef}
-                className="relative z-10"
-                style={{ marginTop: `-${CAPTION_OVERLAP_PX}px` }}
-              >
-                <div
-                  className="
-                    mx-4
-                    rounded-2xl
-                    bg-black/55 backdrop-blur
-                    shadow-[0_10px_30px_rgba(0,0,0,0.35)]
-                    ring-1 ring-white/10
-                    px-4 py-3
-                  "
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[15px] text-white">Add a caption</label>
-                    <button
-                      onClick={handleAICaption}
-                      disabled={aiLoading || media.length === 0}
-                      className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-sm disabled:opacity-50 text-white"
-                      aria-label="Write a caption for me"
-                    >
-                      {aiLoading ? <StarsLoading /> : <><span className="text-lg">✨</span> Write a caption for me</>}
-                    </button>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <textarea
-                      className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white"
-                      rows={2}
-                      placeholder="Write a caption…"
-                      value={caption}
-                      onChange={(e) => setCaption(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Spacer to prevent collision with overlapped caption */}
-              <div className="h-6" />
-
-              {/* Floating cards below with 12px rhythm */}
-              <div className="space-y-3 px-4 pb-3">
-
-                {/* Course with High Z-Index */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
-                  <div className="text-[15px] mb-1">Tag a golf course</div>
-                  <CourseTagInput
-                    selectedCourse={course}
-                    onCourseSelect={onCourseSelect || setSelectedCourse}
-                    placeholder="Start typing to find a course..."
+              <div className="flex h-full flex-col">
+                {/* MEDIA SECTION */}
+                <section id="media" className="relative flex-1 overflow-hidden">
+                  <MediaCarousel
+                    items={media.map(item => ({
+                      id: item.id,
+                      type: item.type,
+                      previewUrl: item.previewUrl,
+                      url: item.url,
+                      file: item.file,
+                      alt: `Media item ${item.id}`
+                    }))}
+                    initialIndex={0}
+                    onIndexChange={setActiveIndex}
+                    onSetCover={setCoverIndex}
+                    coverIndex={coverIndex}
+                    enableSwipe
+                    loop={false}
+                    className="h-full w-full"
                   />
-                </div>
 
-                {/* Music */}
-                <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="text-[15px] mb-1">Background music</div>
-                      <div className={`${subtl} text-sm`}>
-                        Popular golf tracks today
+                  {/* White indicator dots overlay */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                    <CarouselDots count={media.length} activeIndex={activeIndex} />
+                  </div>
+                </section>
+
+                {/* CONTROLS SECTION */}
+                <section 
+                  id="controls" 
+                  className="relative shrink-0 overflow-y-auto overscroll-contain [--footer-safe:env(safe-area-inset-bottom)]"
+                >
+                  {/* CAPTION CARD */}
+                  <div
+                    ref={captionRef}
+                    className="relative z-10 mx-4 mt-4"
+                  >
+                    <div
+                      className="
+                        rounded-2xl
+                        bg-black/55 backdrop-blur
+                        shadow-[0_10px_30px_rgba(0,0,0,0.35)]
+                        ring-1 ring-white/10
+                        px-4 py-3
+                      "
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-[15px] text-white">Add a caption</label>
+                        <button
+                          onClick={handleAICaption}
+                          disabled={aiLoading || media.length === 0}
+                          className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-sm disabled:opacity-50 text-white"
+                          aria-label="Write a caption for me"
+                        >
+                          {aiLoading ? <StarsLoading /> : <><span className="text-lg">✨</span> Write a caption for me</>}
+                        </button>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <textarea
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white"
+                          rows={2}
+                          placeholder="Write a caption…"
+                          value={caption}
+                          onChange={(e) => setCaption(e.target.value)}
+                        />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Floating cards below with 12px rhythm */}
+                  <div className="space-y-3 px-4 pt-3">
+                    {/* Course with High Z-Index */}
+                    <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
+                      <div className="text-[15px] mb-1">Tag a golf course</div>
+                      <CourseTagInput
+                        selectedCourse={course}
+                        onCourseSelect={onCourseSelect || setSelectedCourse}
+                        placeholder="Start typing to find a course..."
+                      />
+                    </div>
+
+                    {/* Music */}
+                    <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="text-[15px] mb-1">Background music</div>
+                          <div className={`${subtl} text-sm`}>
+                            Popular golf tracks today
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            // TODO: Background music selector
+                            console.log("Music selector clicked");
+                          }}
+                          className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
+                          aria-label="Select music"
+                        >
+                          <span className="text-orange-500 text-xl">🎵</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Visibility segmented - Wired to state */}
+                    <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                      <Segmented
+                        value={visibility}
+                        onChange={(value) => setVisibility(value as "public" | "private")}
+                        options={[
+                          { value: "public", label: "Public" },
+                          { value: "private", label: "Private Archive" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+
+                  {/* FOOTER - Pinned to bottom */}
+                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-3 pb-[calc(var(--footer-safe)+12px)] px-4 bg-gradient-to-t from-black/30 to-transparent backdrop-blur-[2px]">
                     <button
-                      onClick={() => {
-                        // TODO: Background music selector
-                        console.log("Music selector clicked");
+                      onClick={handlePost}
+                      disabled={!canPost}
+                      className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      style={{ 
+                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
                       }}
-                      className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} px-3 py-2 rounded-lg transition-colors`}
-                      aria-label="Select music"
                     >
-                      <span className="text-orange-500 text-xl">🎵</span>
+                      {/* Shimmer animation while submitting */}
+                      {isSubmitting && (
+                        <motion.div
+                          className="absolute inset-0"
+                          initial={{ backgroundPositionX: "0%" }}
+                          animate={{ backgroundPositionX: "200%" }}
+                          transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
+                          style={{ 
+                            backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%)",
+                            backgroundSize: "50% 100%"
+                          }}
+                        />
+                      )}
+                      <span className="relative z-10 font-medium">
+                        {isSubmitting ? "Posting…" : "Post"}
+                      </span>
                     </button>
                   </div>
-                </div>
-
-                {/* Visibility segmented - Wired to state */}
-                <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
-                  <Segmented
-                    value={visibility}
-                    onChange={(value) => setVisibility(value as "public" | "private")}
-                    options={[
-                      { value: "public", label: "Public" },
-                      { value: "private", label: "Private Archive" },
-                    ]}
-                  />
-                </div>
-
-                {/* CTA with Echo Gradient */}
-                <button
-                  onClick={handlePost}
-                  disabled={!canPost}
-                  className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
-                  style={{ 
-                    background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
-                  }}
-                >
-                  {/* Shimmer animation while submitting */}
-                  {isSubmitting && (
-                    <motion.div
-                      className="absolute inset-0"
-                      initial={{ backgroundPositionX: "0%" }}
-                      animate={{ backgroundPositionX: "200%" }}
-                      transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
-                      style={{ 
-                        backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%)",
-                        backgroundSize: "50% 100%"
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10 font-medium">
-                    {isSubmitting ? "Posting…" : "Post"}
-                  </span>
-                </button>
+                </section>
               </div>
             </motion.div>
           </div>
