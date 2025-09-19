@@ -121,7 +121,7 @@ const ScrollableTabs: React.FC<ScrollableTabsProps> = ({ activeTab, onTabChange 
               minHeight: '44px',
               minWidth: '44px',
               padding: '12px 8px',
-              fontSize: 'clamp(13px, 1.4vw, 15px)'
+              fontSize: 'clamp(14px, 1.5vw, 16px)'
             }}
             role="tab"
             aria-selected={item.id === activeTab}
