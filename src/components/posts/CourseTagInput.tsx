@@ -100,7 +100,7 @@ const CourseTagInput = ({
             className="w-full pr-10 pl-4 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
             disabled={!!selectedCourse}
           />
-          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
           {isLoading && searchQuery.length >= 2 && (
             <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
               <Loader2 className="h-4 w-4 animate-spin text-white/60" />
