@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -257,12 +257,16 @@ export default function EnhancedCreateMomentModalCinematic({
                     coverIndex={coverIndex}
                     enableSwipe
                     loop={false}
-                    className="h-full w-full"
+                    className="h-full w-full rounded-b-xl"
                   />
 
-                  {/* White indicator dots overlay */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                    <CarouselDots count={media.length} activeIndex={activeIndex} />
+                  {/* Pager indicator - bottom left */}
+                  <div className="absolute bottom-4 left-4">
+                    <div className="bg-black/30 backdrop-blur-sm rounded-full px-3 py-1">
+                      <span className="text-white text-sm font-medium">
+                        {activeIndex + 1}/{media.length}
+                      </span>
+                    </div>
                   </div>
                 </section>
 
@@ -285,24 +289,34 @@ export default function EnhancedCreateMomentModalCinematic({
                         px-4 py-3
                       "
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-start justify-between mb-1">
                         <label className="block text-[15px] text-white">Add a caption</label>
                         <button
                           onClick={handleAICaption}
                           disabled={aiLoading || media.length === 0}
-                          className="hover:bg-white/10 px-2 py-1 rounded-lg shrink-0 transition-colors text-sm disabled:opacity-50 text-white"
+                          className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95"
                           aria-label="Write a caption for me"
                         >
-                          {aiLoading ? <StarsLoading /> : <><span className="text-lg">✨</span> Write a caption for me</>}
+                          {aiLoading ? <StarsLoading /> : (
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span className="font-medium">AI Caption</span>
+                            </div>
+                          )}
                         </button>
                       </div>
                       <div className="flex items-start gap-2">
                         <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white"
-                          rows={2}
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
                           placeholder="Write a caption…"
                           value={caption}
-                          onChange={(e) => setCaption(e.target.value)}
+                          onChange={(e) => {
+                            setCaption(e.target.value);
+                            // Auto-expand textarea
+                            e.target.style.height = 'auto';
+                            e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
+                          }}
+                          style={{ height: 'auto' }}
                         />
                       </div>
                     </div>
@@ -348,23 +362,42 @@ export default function EnhancedCreateMomentModalCinematic({
                         value={visibility}
                         onChange={(value) => setVisibility(value as "public" | "private")}
                         options={[
-                          { value: "public", label: "Public" },
-                          { value: "private", label: "Private Archive" },
+                          { value: "public", label: "Public", icon: Globe },
+                          { value: "private", label: "Private Archive", icon: Lock },
                         ]}
                       />
                     </div>
                   </div>
 
                   {/* FOOTER - Pinned to bottom */}
-                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-3 pb-[calc(var(--footer-safe)+12px)] px-4 bg-gradient-to-t from-black/30 to-transparent backdrop-blur-[2px]">
-                    <button
+                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-4 pb-[calc(var(--footer-safe)+16px)] px-4 bg-gradient-to-t from-black/40 via-black/20 to-transparent backdrop-blur-sm">
+                    <motion.button
                       onClick={handlePost}
                       disabled={!canPost}
-                      className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      className="relative w-full h-14 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 shadow-2xl"
                       style={{ 
-                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
+                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
+                        boxShadow: '0 0 20px rgba(var(--echo-from-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
                       }}
+                      whileHover={{ scale: !canPost ? 1 : 1.02 }}
+                      whileTap={{ scale: !canPost ? 1 : 0.98 }}
+                      animate={isSubmitting ? { 
+                        boxShadow: ['0 0 20px rgba(var(--echo-from-rgb), 0.3)', '0 0 30px rgba(var(--echo-from-rgb), 0.5)', '0 0 20px rgba(var(--echo-from-rgb), 0.3)']
+                      } : {}}
+                      transition={{ duration: 0.6, repeat: isSubmitting ? Infinity : 0 }}
                     >
+                      {/* Inner glow effect */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 rounded-2xl" />
+                      
+                      {/* Ripple effect on tap */}
+                      <motion.div
+                        className="absolute inset-0 bg-white/20 rounded-2xl"
+                        initial={{ scale: 0, opacity: 0.8 }}
+                        animate={{ scale: 1.5, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                        key={Date.now()}
+                      />
+
                       {/* Shimmer animation while submitting */}
                       {isSubmitting && (
                         <motion.div
@@ -373,15 +406,15 @@ export default function EnhancedCreateMomentModalCinematic({
                           animate={{ backgroundPositionX: "200%" }}
                           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
                           style={{ 
-                            backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%)",
+                            backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%)",
                             backgroundSize: "50% 100%"
                           }}
                         />
                       )}
-                      <span className="relative z-10 font-medium">
+                      <span className="relative z-10 font-bold text-lg">
                         {isSubmitting ? "Posting…" : "Post"}
                       </span>
-                    </button>
+                    </motion.button>
                   </div>
                 </section>
               </div>
@@ -401,22 +434,24 @@ function Segmented({
 }: { 
   value: string; 
   onChange: (v: string) => void; 
-  options: { value: string; label: string }[] 
+  options: { value: string; label: string; icon: any }[] 
 }) {
   return (
     <div className="grid grid-cols-2 gap-1 rounded-xl p-1 bg-white/10">
       {options.map(option => {
         const active = value === option.value;
+        const IconComponent = option.icon;
         return (
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className={`h-10 rounded-lg transition-all duration-200 font-medium
+            className={`h-10 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2
               ${active 
-                ? "bg-white/90 text-neutral-900 shadow-sm" 
+                ? "bg-gradient-to-r from-white/90 to-white/80 text-neutral-900 shadow-lg font-bold" 
                 : "text-white/80 hover:bg-white/10"
               }`}
           >
+            <IconComponent className="h-4 w-4" />
             {option.label}
           </button>
         );
