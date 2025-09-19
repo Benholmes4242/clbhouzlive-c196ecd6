@@ -25,13 +25,13 @@ import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
 
 
-// Direct import for ProfilePage to avoid dynamic import issues
+// Direct import for ProfilePage and Discover to avoid dynamic import issues
 import ProfilePage from "./pages/ProfilePage";
+import Discover from "./pages/Discover";
 
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
-const Discover = lazy(() => import("./pages/Discover"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
