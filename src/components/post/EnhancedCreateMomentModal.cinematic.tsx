@@ -260,14 +260,50 @@ export default function EnhancedCreateMomentModalCinematic({
                     className="h-full w-full rounded-b-xl"
                   />
 
-                  {/* Pager indicator - bottom left */}
-                  <div className="absolute bottom-4 left-4">
-                    <div className="bg-black/30 backdrop-blur-sm rounded-full px-3 py-1">
-                      <span className="text-white text-sm font-medium">
-                        {activeIndex + 1}/{media.length}
-                      </span>
+                  {/* Media metadata pills - bottom left */}
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                      <span>{activeIndex + 1}/{media.length}</span>
                     </div>
+                    {media[activeIndex]?.type === 'video' && (
+                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                        <span>00:09</span>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Navigation arrows */}
+                  {canSlide && (
+                    <>
+                      <button
+                        onClick={prevMedia}
+                        disabled={activeIndex === 0}
+                        className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 
+                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
+                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+                                 flex items-center justify-center hover:bg-white/18 
+                                 active:scale-[0.98] transition-all duration-200
+                                 ${activeIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        aria-label="Previous media"
+                      >
+                        <ChevronLeft className="h-5 w-5 text-white" />
+                      </button>
+
+                      <button
+                        onClick={nextMedia}
+                        disabled={activeIndex === media.length - 1}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 
+                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
+                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+                                 flex items-center justify-center hover:bg-white/18 
+                                 active:scale-[0.98] transition-all duration-200
+                                 ${activeIndex === media.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        aria-label="Next media"
+                      >
+                        <ChevronRight className="h-5 w-5 text-white" />
+                      </button>
+                    </>
+                  )}
                 </section>
 
                 {/* CONTROLS SECTION */}
