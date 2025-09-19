@@ -1,10 +1,16 @@
+
 import React, { memo, useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
+import MediaDisplay from './MediaDisplay';
+import { CardType } from './media/CardMediaTypes';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
+import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
+import { PlacementConfig } from './types/PostPlacementTypes';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -16,6 +22,7 @@ interface ExploreGridProps {
   onLoadMore: () => void;
   activeFilter?: string;
   isClubhousePage?: boolean;
+  isDiscoverPage?: boolean;
   hideBadges?: boolean;
 }
 
@@ -29,9 +36,42 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   onLoadMore,
   activeFilter,
   isClubhousePage = false,
+  isDiscoverPage = false,
   hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
+  const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, boolean>>({});
+
+  // Initialize loading states for new items and clean up stale ones
+  useEffect(() => {
+    if (!content?.length) return;
+    setItemLoadingStates(prev => {
+      const next = { ...prev };
+      // Initialize new items to loading=true
+      for (const item of content) {
+        if (next[item.id] === undefined) {
+          next[item.id] = true;
+        }
+      }
+      // Clean up stale IDs (optional optimization)
+      const currentIds = new Set(content.map(item => item.id));
+      for (const id of Object.keys(next)) {
+        if (!currentIds.has(id)) {
+          delete next[id];
+        }
+      }
+      return next;
+    });
+  }, [content]);
+
+  // Memoized handler to flip tiles to loaded state
+  const handleTileLoaded = useCallback((id: string) => {
+    setItemLoadingStates(prev => (prev[id] === false ? prev : { ...prev, [id]: false }));
+  }, []);
+
+  // Above the fold optimization - first screenful doesn't get grey overlays
+  const ABOVE_THE_FOLD_COUNT = isMobile ? 9 : 12; // 3x3 mobile, 4x3 desktop
 
   // Optimized mobile detection
   const checkMobile = useCallback(() => {
@@ -73,6 +113,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return words.slice(0, 5).join(' ') + '...';
   };
 
+  // Temporarily disable autoplay manager to fix loading issues
+  // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll with preload threshold
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -84,23 +126,25 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       { threshold: 0.3 }
     );
 
+    // Preload observer - triggers earlier to preload content
     const preloadObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoading) {
-          // Preload more content when close to end
-          onLoadMore();
+          // Trigger preload when user is closer to bottom
+          const event = new CustomEvent('triggerPreload');
+          window.dispatchEvent(event);
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0.8 }
     );
 
     const sentinel = document.getElementById('scroll-sentinel');
     const preloadSentinel = document.getElementById('preload-sentinel');
-
+    
     if (sentinel) {
       observer.observe(sentinel);
     }
-
+    
     if (preloadSentinel) {
       preloadObserver.observe(preloadSentinel);
     }
@@ -134,20 +178,33 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     );
   }
 
-  // Ensure content is safe
-  const safeContent = content ?? [];
+  // Helper function to determine if media is portrait (H/W >= 1.1)
+  const isPortraitMedia = (item: ExploreContentItem): boolean => {
+    // For demo purposes, let's treat every 3rd item as portrait to ensure we have portrait cards
+    // In real implementation, you'd check actual image dimensions
+    const index = content.indexOf(item);
+    return index % 3 === 0; // Every 3rd item is considered portrait
+  };
 
-  // Simple grid items from content - no useMemo to avoid React #310 error
-  const gridItems = safeContent.map((item, index) => {
-    // Determine if it's a portrait video (simplified logic)
-    const isPortrait = item.type === 'video' && Math.random() > 0.7;
-    
-    return {
-      key: `${item.id}-${index}`,
-      item,
-      type: isPortrait ? 'portrait' : 'square'
-    };
-  });
+  // Configuration for post placement
+  const placementConfig: PlacementConfig = {
+    maxSections: isMobile ? 20 : 10,
+    isPortraitMedia
+  };
+
+  // Create mobile layout with deduplication (3 columns, section-based)
+  const createMobileGridLayout = () => {
+    const result = createMobileGridLayoutWithDeduplication(content, placementConfig);
+    return result.gridItems;
+  };
+
+  // Create layout with fixed grid structure and deduplication - 2 rows per section (Desktop)
+  const createGridLayout = () => {
+    const result = createDesktopGridLayoutWithDeduplication(content, placementConfig);
+    return result.gridItems;
+  };
+
+  const gridItems = createGridLayout();
 
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
@@ -155,58 +212,68 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       <>
         {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
         <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
-          {safeContent.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
+          {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className="relative overflow-hidden cursor-pointer group aspect-[9/16]"
+              className="relative bg-muted overflow-hidden cursor-pointer group aspect-[9/16]"
               style={{ borderRadius: '0px' }}
               onClick={() => onMediaClick?.(item)}
             >
-              <ExploreContentCard 
-                item={item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
-                isPortrait={true}
-              />
+              {/* Media Display */}
+          <MediaDisplay
+            media={{
+              id: item.id,
+              media_type: item.type as 'video' | 'image',
+              media_url: item.src
+            }}
+            itemTitle={item.title}
+            shouldAutoplay={true}
+            isLoading={itemLoadingStates[item.id] ?? true}
+            onImageError={() => {
+              setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+            }}
+            onImageLoad={() => {
+              setItemLoadingStates(prev => ({ ...prev, [item.id]: false }));
+            }}
+            itemId={item.id}
+            currentIndex={index}
+            loop={true}
+            cardType={CardType.PORTRAIT}
+            useSmartMedia={true}
+            onMediaClick={() => onMediaClick?.(item)}
+          />
               
-              {/* Golf course overlay for videos */}
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              {/* Golf Club Tag */}
               {item.golfCourse && (
-                <div className="absolute bottom-4 left-4 right-4 z-20">
-                  <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3">
-                    <div className="flex items-center text-white">
-                      <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm truncate">{item.golfCourse.name}</p>
-                        <p className="text-xs text-white/80 truncate">{item.golfCourse.country}</p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full flex items-center gap-2 max-w-[70%]">
+                  <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                  <span className="text-white text-sm font-medium truncate">
+                    {item.golfCourse.name}
+                  </span>
                 </div>
               )}
               
-              {/* Title overlay */}
-              {item.title && (
-                <div className="absolute top-4 left-4 right-4 z-20">
-                  <div className="bg-black/40 backdrop-blur-sm rounded-lg p-2">
-                    <p className="text-white text-sm font-medium leading-tight">
-                      {truncateTitle(item.title)}
+              {/* User info */}
+              <div className="absolute bottom-3 left-3 right-3">
+                <div className="flex items-center gap-2">
+                  <img
+                    src={item.user?.avatar || '/placeholder.svg'}
+                    alt={item.user?.name || 'User'}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-white text-base font-medium truncate">
+                      {item.user?.name || item.user?.username || 'Anonymous'}
                     </p>
+                    {truncateTitle(item.title) && (
+                      <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
+                    )}
                   </div>
                 </div>
-              )}
-              
-              {/* Trending icon - this shouldn't appear in Friends filter */}
-              {/* Removed trending icon as this is specifically the Friends layout */}
-              
-              {/* Play icon for videos */}
-              {item.type === 'video' && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="bg-black/50 rounded-full p-4">
-                    <MdOutlinePlayCircle className="h-12 w-12 text-white" />
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -224,12 +291,523 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     );
   }
 
-  // Simple grid layout (same as Profile Activity) - ALWAYS used now for Discover and all other pages
+  // Function to get aspect ratio for masonry layout
+  const getAspectRatio = (index: number) => {
+    const ratios = [
+      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
+      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
+      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
+    ];
+    return ratios[index % ratios.length];
+  };
+
+  // Check if we should use Discover page layout - use new grid structure (desktop only)
+  if (isDiscoverPage && !isMobile) {
+    const gridItems = createGridLayout();
+    
+    return (
+      <>
+        {/* New Grid Layout for Discover Page - Section-based with alternating portraits */}
+        <div className="grid grid-cols-4 gap-px min-h-0">
+          {(() => {
+            const sections = [];
+            let currentSection = 0;
+            let itemIndex = 0;
+            
+            while (itemIndex < gridItems.length && currentSection < 10) {
+              const sectionItems = gridItems.filter(item => item.sectionIndex === currentSection);
+              const isPortraitOnRight = currentSection % 2 === 0;
+              
+              if (sectionItems.length === 0) break;
+              
+              // Find portrait and square items for this section
+              const portraitItem = sectionItems.find(item => item.type === 'portrait');
+              const squareItems = sectionItems.filter(item => item.type === 'square');
+              
+              // Section starts here - 2 rows
+              const sectionStart = currentSection * 2;
+              
+              // Row 1: 3 squares + portrait top half
+              const row1Squares = squareItems.filter(item => item.row === 1).slice(0, 3);
+              const row2Squares = squareItems.filter(item => item.row === 2).slice(0, 3);
+              
+              // Add row 1 items
+              if (isPortraitOnRight) {
+                // Portrait on right: squares in cols 1,2,3, portrait in col 4
+                row1Squares.forEach((item, idx) => {
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 1 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                        <MediaDisplay
+                          media={{
+                            id: item.item.id,
+                            media_type: item.item.type as 'video' | 'image',
+                            media_url: item.item.src
+                          }}
+                          itemTitle={item.item.title}
+                           shouldAutoplay={true}
+                          isLoading={itemLoadingStates[item.item.id] ?? true}
+                          onImageError={() => {
+                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                          }}
+                          onImageLoad={() => {
+                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                          }}
+                          onLoaded={() => handleTileLoaded(item.item.id)}
+                          itemId={item.item.id}
+                          currentIndex={0}
+                          loop={true}
+                          cardType={CardType.SQUARE}
+                          useSmartMedia={true}
+                          onMediaClick={() => onMediaClick?.(item.item)}
+                        />
+                        
+                        {/* Multiple media indicator */}
+                        {item.item.media && item.item.media.length > 1 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <MediaNavigationDots
+                              mediaCount={item.item.media.length}
+                              currentIndex={0}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                });
+                
+                // Portrait card (spans 2 rows)
+                if (portraitItem) {
+                  sections.push(
+                    <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: 4 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(portraitItem.item)}
+                      >
+                      <MediaDisplay
+                        media={{
+                          id: portraitItem.item.id,
+                          media_type: portraitItem.item.type as 'video' | 'image',
+                          media_url: portraitItem.item.src
+                        }}
+                        itemTitle={portraitItem.item.title}
+                        shouldAutoplay={true}
+                        isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
+                        onImageError={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                        }}
+                        onImageLoad={() => {
+                          setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                        }}
+                        onLoaded={() => handleTileLoaded(portraitItem.item.id)}
+                        itemId={portraitItem.item.id}
+                        currentIndex={0}
+                        loop={true}
+                        cardType={CardType.PORTRAIT}
+                        useSmartMedia={true}
+                        onMediaClick={() => onMediaClick?.(portraitItem.item)}
+                      />
+                        
+                        {/* Multiple media indicator */}
+                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <MediaNavigationDots
+                              mediaCount={portraitItem.item.media.length}
+                              currentIndex={0}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+              } else {
+                // Portrait on left: portrait in col 1, squares in cols 2,3,4
+                if (portraitItem) {
+                  sections.push(
+                    <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: 1 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(portraitItem.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: portraitItem.item.id,
+                             media_type: portraitItem.item.type as 'video' | 'image',
+                             media_url: portraitItem.item.src
+                           }}
+                           itemTitle={portraitItem.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
+                           onImageError={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           onImageLoad={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           itemId={portraitItem.item.id}
+                           currentIndex={0}
+                           loop={true}
+                           cardType={CardType.PORTRAIT}
+                           useSmartMedia={true}
+                           onMediaClick={() => onMediaClick?.(portraitItem.item)}
+                         />
+                        
+                        {/* Multiple media indicator */}
+                        {portraitItem.item.media && portraitItem.item.media.length > 1 && (
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                            <MediaNavigationDots
+                              mediaCount={portraitItem.item.media.length}
+                              currentIndex={0}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                row1Squares.forEach((item, idx) => {
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 1 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                          <MediaDisplay
+                            media={{
+                              id: item.item.id,
+                              media_type: item.item.type as 'video' | 'image',
+                              media_url: item.item.src
+                            }}
+                            itemTitle={item.item.title}
+                            shouldAutoplay={true}
+                            isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
+                      </div>
+                    </div>
+                  );
+                });
+              }
+              
+              // Row 2 squares
+              if (isPortraitOnRight) {
+                row2Squares.forEach((item, idx) => {
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 1, gridRow: sectionStart + 2 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
+                             shouldAutoplay={true}
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
+                      </div>
+                    </div>
+                  );
+                });
+              } else {
+                row2Squares.forEach((item, idx) => {
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: idx + 2, gridRow: sectionStart + 2 }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
+                             shouldAutoplay={true}
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
+                      </div>
+                    </div>
+                  );
+                });
+              } // Fixed row3Squares reference issue
+              
+              currentSection++;
+            }
+            
+            return sections;
+          })()}
+        </div>
+        
+        {/* Preload sentinel and Infinite scroll sentinel */}
+        <div id="preload-sentinel" className="h-20" />
+        <div id="scroll-sentinel" className="h-4">
+          {isLoading && hasMore && (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // Check if mobile for new 3-column layout
+  if (isMobile) {
+    const mobileGridItems = createMobileGridLayout();
+    
+    return (
+      <>
+        {/* Mobile 3-column section-based layout */}
+        <div className="grid grid-cols-3 gap-px">
+          {(() => {
+            const sections = [];
+            let currentSection = 0;
+            
+            while (currentSection < 20) {
+              const sectionItems = mobileGridItems.filter(item => item.sectionIndex === currentSection);
+              if (sectionItems.length === 0) break;
+              
+              const isHeroSection = (currentSection + 1) % 3 === 0;
+              const sectionStart = currentSection * 2; // Each section is 2 rows tall
+              
+              if (isHeroSection) {
+                // Hero section
+                const heroItem = sectionItems.find(item => item.type === 'hero');
+                const squareItems = sectionItems.filter(item => item.type === 'square');
+                const isHeroOnRight = heroItem?.isOnRight ?? true; // Use the isOnRight property from the grid item
+                
+                if (heroItem) {
+                  const heroCol = isHeroOnRight ? 2 : 1;
+                  sections.push(
+                    <div key={heroItem.key} className="col-span-2 row-span-2 aspect-square" style={{ gridColumn: `${heroCol} / ${heroCol + 2}`, gridRow: 'span 2' }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(heroItem.item)}
+                      >
+                        <MediaDisplay
+                          media={{
+                            id: heroItem.item.id,
+                            media_type: heroItem.item.type as 'video' | 'image',
+                            media_url: heroItem.item.src
+                          }}
+                          itemTitle={heroItem.item.title}
+                          shouldAutoplay={true}
+                          isLoading={itemLoadingStates[heroItem.item.id] ?? true}
+                          onImageError={() => {
+                            setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
+                          }}
+                          onImageLoad={() => {
+                            setItemLoadingStates(prev => ({ ...prev, [heroItem.item.id]: false }));
+                          }}
+                          onLoaded={() => handleTileLoaded(heroItem.item.id)}
+                          itemId={heroItem.item.id}
+                          currentIndex={0}
+                          loop={true}
+                          cardType={CardType.HERO}
+                          useSmartMedia={true}
+                          onMediaClick={() => onMediaClick?.(heroItem.item)}
+                          showFeaturedBadge={!hideBadges}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Add 2 stacked squares on opposite side
+                squareItems.forEach((item, idx) => {
+                  const squareCol = isHeroOnRight ? 1 : 3;
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: squareCol, gridRow: sectionStart + 1 + idx }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
+                      </div>
+                    </div>
+                  );
+                });
+              } else {
+                // Standard section
+                const portraitItem = sectionItems.find(item => item.type === 'portrait');
+                const squareItems = sectionItems.filter(item => item.type === 'square');
+                const isPortraitOnRight = currentSection % 2 === 0;
+                
+                // Add portrait card (spans 2 rows)
+                if (portraitItem) {
+                  const portraitCol = isPortraitOnRight ? 3 : 1;
+                  sections.push(
+                    <div key={portraitItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridColumn: portraitCol, gridRow: 'span 2' }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(portraitItem.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: portraitItem.item.id,
+                             media_type: portraitItem.item.type as 'video' | 'image',
+                             media_url: portraitItem.item.src
+                           }}
+                           itemTitle={portraitItem.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
+                           onImageError={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           onImageLoad={() => {
+                             setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                           }}
+                           itemId={portraitItem.item.id}
+                           currentIndex={0}
+                           loop={true}
+                           cardType={CardType.PORTRAIT}
+                           useSmartMedia={true}
+                           onMediaClick={() => onMediaClick?.(portraitItem.item)}
+                         />
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Add 4 squares in 2x2 grid
+                squareItems.forEach((item, idx) => {
+                  const row = Math.floor(idx / 2) + 1; // Row 1 or 2
+                  const colOffset = idx % 2; // 0 or 1
+                  const baseCol = isPortraitOnRight ? 1 : 2; // Start at col 1 or 2
+                  const col = baseCol + colOffset;
+                  
+                  sections.push(
+                    <div key={item.key} className="aspect-square" style={{ gridColumn: col, gridRow: sectionStart + row }}>
+                      <div
+                        className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
+                        onClick={() => onMediaClick?.(item.item)}
+                      >
+                         <MediaDisplay
+                           media={{
+                             id: item.item.id,
+                             media_type: item.item.type as 'video' | 'image',
+                             media_url: item.item.src
+                           }}
+                           itemTitle={item.item.title}
+                           shouldAutoplay={true}
+                           isLoading={itemLoadingStates[item.item.id] ?? true}
+                            onImageError={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onImageLoad={() => {
+                              setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
+                            }}
+                            onLoaded={() => handleTileLoaded(item.item.id)}
+                            itemId={item.item.id}
+                            currentIndex={0}
+                            loop={true}
+                            cardType={CardType.SQUARE}
+                            useSmartMedia={true}
+                            onMediaClick={() => onMediaClick?.(item.item)}
+                          />
+                      </div>
+                    </div>
+                  );
+                });
+              }
+              
+              currentSection++;
+            }
+            
+            return sections;
+          })()}
+        </div>
+        
+        {/* Preload sentinel and Infinite scroll sentinel */}
+        <div id="preload-sentinel" className="h-20" />
+        <div id="scroll-sentinel" className="h-4">
+          {isLoading && hasMore && (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      {/* Simple Grid Layout - same as Profile Activity tab */}
+      {/* Fixed Grid Layout with Square and Portrait Cards */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
         {gridItems.map((gridItem, index) => {
+          const isAboveTheFold = index < ABOVE_THE_FOLD_COUNT;
+          
           if (gridItem.type === 'portrait') {
             return (
               <div key={gridItem.key} className="row-span-2 overflow-hidden self-stretch" style={{ gridRow: 'span 2' }}>
@@ -239,6 +817,20 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isPortrait={true}
+                  isAboveTheFold={isAboveTheFold}
+                />
+              </div>
+            );
+          } else if (gridItem.type === 'hero') {
+            return (
+              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                  isFeatured={true}
+                  isAboveTheFold={isAboveTheFold}
                 />
               </div>
             );
@@ -251,6 +843,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                   onLike={onLike} 
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
+                  isAboveTheFold={isAboveTheFold}
                 />
               </div>
             );

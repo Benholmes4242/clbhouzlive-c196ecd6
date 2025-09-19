@@ -79,6 +79,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick }: Disc
         hasMore={false}
         onLoadMore={loadMore}
         activeFilter={filterType}
+        isDiscoverPage={true}
       />
     );
   }
@@ -93,6 +94,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick }: Disc
       hasMore={hasMore}
       onLoadMore={loadMore}
       activeFilter={filterType}
+      isDiscoverPage={true}
     />
   );
 }
