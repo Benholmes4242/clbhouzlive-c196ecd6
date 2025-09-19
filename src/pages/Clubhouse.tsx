@@ -36,21 +36,23 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="h-screen bg-transparent overflow-hidden relative" style={{
+    <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
       minHeight: '100dvh',
     }}>
       {/* Unified Header with Tabs */}
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}
-      <ClubhouseVerticalFeed
-        posts={posts}
-        onLike={handleLike}
-        onLoadMore={loadMore}
-        hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-        onCurrentPostChange={handleCurrentPostChange}
-      />
+      <div className="clubhouse-scroll">
+        <ClubhouseVerticalFeed
+          posts={posts}
+          onLike={handleLike}
+          onLoadMore={loadMore}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          onCurrentPostChange={handleCurrentPostChange}
+        />
+      </div>
       
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">

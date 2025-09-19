@@ -61,6 +61,26 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Clubhouse specific: remove global safe-area top padding */
+.clubhouse-root.app-shell {
+  padding-top: 0 !important;
+}
+
+/* Clubhouse header: anchored to top with safe-area handling */
+.clubhouse-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  padding-top: env(safe-area-inset-top);
+  touch-action: pan-x; /* no vertical pull on header */
+}
+
+/* Clubhouse scroll container: prevent pull-down behavior */
+.clubhouse-scroll {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Common UI hygiene */
 img, video, canvas { 
   display: block; 
