@@ -65,7 +65,7 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Global and clubhouse headers: handle safe-area top with transparent blur overlay */
+/* Global and clubhouse headers: handle safe-area top with original frosted glass */
 .global-header,
 .clubhouse-header {
   padding-top: var(--safe-top);
@@ -76,7 +76,7 @@ body.route-clubhouse .global-header {
   isolation: isolate;
 }
 
-/* Pseudo-element creates frosted glass effect extending into safe area */
+/* Restore original Tailwind backdrop-blur-md style extending into safe area */
 .global-header::before,
 .clubhouse-header::before {
   content: "";
@@ -85,10 +85,11 @@ body.route-clubhouse .global-header {
   right: 0;
   top: calc(-1 * var(--safe-top));
   height: calc(var(--safe-top) + var(--header-height, 64px));
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  background: var(--header-tint);
-  border-bottom: 1px solid var(--header-border);
+  /* Original Tailwind styles: bg-background/95 backdrop-blur-md border-b border-border/50 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: hsl(var(--background) / 0.95);
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
   z-index: -1;
   pointer-events: none;
   transform: translateZ(0);
@@ -400,9 +401,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     --brand-black: 0 0% 10%;
     --brand-glass: 0 0% 100% / 0.8;
     
-    /* Header frosted glass effect */
-    --header-tint: rgba(255, 255, 255, 0.65);
-    --header-border: rgba(0, 0, 0, 0.06);
+    /* Header height for pseudo-element calculations */
     --header-height: 64px;
     
     /* Echo Avatar Gradient */
@@ -450,10 +449,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
-    
-    /* Dark theme header tint */
-    --header-tint: rgba(10, 15, 20, 0.45);
-    --header-border: rgba(255, 255, 255, 0.06);
   }
 }
 
