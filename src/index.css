@@ -65,35 +65,41 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Global and clubhouse headers: handle safe-area top with original styling */
+/* Global and clubhouse headers: original styling with safe-area */
 .global-header,
 .clubhouse-header {
-  padding-top: var(--safe-top);
-  position: sticky;
-  top: 0;
-  z-index: 60;
+  position: relative;
+  z-index: 50;
+  padding-top: env(safe-area-inset-top);
+  background-color: hsl(var(--background) / 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
   isolation: isolate;
 }
 
-/* Extend the exact same styling into safe area */
+/* Safe-area overlay using SAME tokens as header */
 .global-header::before,
 .clubhouse-header::before {
   content: "";
   position: absolute;
   left: 0; 
   right: 0;
-  top: calc(-1 * var(--safe-top));
-  height: var(--safe-top);
-  /* Match the exact header styling: bg-background/95 backdrop-blur-md border-b border-border/50 */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: hsl(var(--background) / 0.95);
-  z-index: -1;
+  top: calc(-1 * env(safe-area-inset-top));
+  height: calc(env(safe-area-inset-top) + var(--header-height, 64px));
+  /* INHERIT the exact same styling - no custom greys */
+  background-color: inherit;
+  backdrop-filter: inherit;
+  -webkit-backdrop-filter: inherit;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
   pointer-events: none;
+  z-index: -1;
 }
 
 .clubhouse-header {
   touch-action: pan-x; /* no vertical pull on header */
+  position: sticky;
+  top: 0;
 }
 
 /* Clubhouse scroll container: prevent pull-down behavior */

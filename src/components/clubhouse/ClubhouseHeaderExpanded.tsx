@@ -29,7 +29,7 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
   };
 
   return (
-    <header id="clubhouse-header-expanded" className={`clubhouse-header bg-background/95 backdrop-blur-md border-b border-border/50 ${className}`}>
+    <header id="clubhouse-header-expanded" className={`clubhouse-header ${className}`}>
       <div>
         <div className="px-4">
           {/* Main header row */}
