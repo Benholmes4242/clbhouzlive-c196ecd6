@@ -212,22 +212,13 @@ export default function EnhancedCreateMomentModalCinematic({
           exit={{ opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop with click-to-close and liquid glass effect */}
+          {/* backdrop with click-to-close */}
           <div 
-            className="absolute inset-0 bg-white/10 backdrop-blur-xl backdrop-saturate-150"
+            className={`absolute inset-0 ${panel} backdrop-blur-xl`} 
             onClick={close}
             role="dialog"
             aria-modal="true"
           />
-
-          {/* Close button - top right on backdrop */}
-          <button
-            onClick={close}
-            className="absolute top-6 right-6 z-20 h-10 w-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/50 transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="h-5 w-5 text-white" />
-          </button>
 
           {/* shell */}
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
@@ -243,6 +234,15 @@ export default function EnhancedCreateMomentModalCinematic({
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION */}
                 <section id="media" className="relative flex-1 overflow-hidden">
+                  {/* Close button - top right */}
+                  <button
+                    onClick={close}
+                    className="absolute top-4 right-4 z-20 h-8 w-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    aria-label="Close modal"
+                  >
+                    <X className="h-4 w-4 text-white" />
+                  </button>
+
                   <MediaCarousel
                     items={media.map(item => ({
                       id: item.id,
