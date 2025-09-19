@@ -31,52 +31,72 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
   const isClubhouse = source === 'index';
   
   return (
-    <div className="absolute top-3 left-3 z-20">
-      <div 
-        className="cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          onProfileClick();
-        }}
-      >
-        <div className="flex items-center">
-          <OptimizedImage
-            src={getOptimizedImageUrl(
-              user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
-              64,
-              64
-            )}
-            alt={displayName}
-            className="w-16 h-16 rounded-full mr-2 object-cover"
-            width={64}
-            height={64}
-            priority={true}
-          />
-          <div className="flex flex-col">
-            <span 
-              className="text-white text-base font-medium"
-              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-            >
-              {displayName}
-            </span>
+    <>
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/35 pointer-events-none" />
+      
+      <div className="absolute top-3 left-3 z-20">
+        <div 
+          className="cursor-pointer group"
+          onClick={(e) => {
+            e.stopPropagation();
+            onProfileClick();
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {/* Enhanced Profile Photo with XP Ring */}
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur-sm animate-pulse"></div>
+              <OptimizedImage
+                src={getOptimizedImageUrl(
+                  user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
+                  64,
+                  64
+                )}
+                alt={displayName}
+                className="relative w-16 h-16 rounded-full object-cover ring-2 ring-white/30 group-hover:ring-white/50 transition-all duration-300 group-hover:scale-110"
+                width={64}
+                height={64}
+                priority={true}
+              />
+            </div>
             
-            {/* Golf Course Badge - Only show on clubhouse page */}
-            {isClubhouse && golfCourse && (
-              <div className="mt-1">
-                <CoursePostBadge 
-                  course={{
-                    id: golfCourse.id,
-                    name: golfCourse.name,
-                    country: golfCourse.country,
-                    region: golfCourse.region
-                  }}
-                  isClubhouse={true}
-                />
+            {/* User Info with Glassmorphic Background */}
+            <div className="relative">
+              <div 
+                className="absolute inset-0 rounded-2xl backdrop-blur-md border border-white/20"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.18)',
+                  boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37)'
+                }}
+              />
+              <div className="relative px-4 py-2 space-y-1">
+                <span 
+                  className="block text-white text-base font-semibold leading-tight"
+                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                >
+                  {displayName}
+                </span>
+                
+                {/* Golf Course Badge - Only show on clubhouse page */}
+                {isClubhouse && golfCourse && (
+                  <div className="opacity-80 text-sm font-medium text-white/90">
+                    <CoursePostBadge 
+                      course={{
+                        id: golfCourse.id,
+                        name: golfCourse.name,
+                        country: golfCourse.country,
+                        region: golfCourse.region
+                      }}
+                      isClubhouse={true}
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
