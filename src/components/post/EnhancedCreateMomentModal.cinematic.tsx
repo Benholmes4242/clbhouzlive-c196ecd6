@@ -234,6 +234,15 @@ export default function EnhancedCreateMomentModalCinematic({
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION */}
                 <section id="media" className="relative flex-1 overflow-hidden">
+                  {/* Close button - top right */}
+                  <button
+                    onClick={close}
+                    className="absolute top-4 right-4 z-20 h-8 w-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    aria-label="Close modal"
+                  >
+                    <X className="h-4 w-4 text-white" />
+                  </button>
+
                   <MediaCarousel
                     items={media.map(item => ({
                       id: item.id,
