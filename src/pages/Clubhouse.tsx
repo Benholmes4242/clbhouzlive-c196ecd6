@@ -30,11 +30,16 @@ const Clubhouse = () => {
     setCurrentPostIndex(index);
   };
 
-
   // Debug logging for Clubhouse page
   useEffect(() => {
     console.log("[DEBUG] Clubhouse page mounted, activeTab:", activeTab);
   }, [activeTab]);
+
+  // Mark body for Clubhouse-specific CSS overrides
+  useEffect(() => {
+    document.body.classList.add('route-clubhouse');
+    return () => document.body.classList.remove('route-clubhouse');
+  }, []);
 
   if (isLoading) {
     return <ClubhouzLoading />;
@@ -44,7 +49,6 @@ const Clubhouse = () => {
     <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
       minHeight: '100dvh',
     }}>
-      {/* Unified Header with Tabs */}
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}

@@ -29,7 +29,7 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
   };
 
   return (
-    <header className={`clubhouse-header ${className}`}>
+    <header id="clubhouse-header-expanded" className={`clubhouse-header ${className}`}>
       <div className="backdrop-blur-md bg-black/35">
         <div className="px-4">
           {/* Main header row */}
@@ -43,9 +43,9 @@ const ClubhouseHeaderExpanded: React.FC<ClubhouseHeaderExpandedProps> = ({
                 onClick={handleLogoClick}
               />
               <img
-                src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
-                alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0 brightness-0 invert"
+                src="/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"
+                alt="clbhouz Logo White"
+                className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
                 onClick={handleLogoClick}
               />
             </div>

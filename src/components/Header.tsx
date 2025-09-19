@@ -32,15 +32,18 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   };
 
   // Always sticky on clubhouse page, relative everywhere else  
-  const isClubhousePage = location.pathname === '/clubhouse';
+  const hashPath = location.hash && location.hash.startsWith('#/') ? location.hash.slice(1) : null;
+  const pathname = hashPath || location.pathname;
+  const isClubhousePage = pathname === '/clubhouse' || pathname === '/' || pathname.startsWith('/clubhouse');
   const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
   
   // Simplified safe area handling - let CSS handle the padding
   const headerStyle = {};
 
+  console.log("[DEBUG] Header path:", { pathname, rawPathname: location.pathname, hash: (location as any).hash, isClubhouse: isClubhousePage });
   // For Clubhouse, always use expanded header regardless of screen size
   if (isClubhousePage) {
-    console.log("[DEBUG] Rendering ClubhouseHeaderExpanded for path:", location.pathname);
+    console.log("[DEBUG] Rendering ClubhouseHeaderExpanded for path:", pathname);
     return (
       <ClubhouseHeaderExpanded 
         className="clubhouse-header"
@@ -54,11 +57,11 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   const useCompactMode = isMobile && (typeof window !== 'undefined' && window.innerWidth <= 375);
 
   // Standard header for other pages
-  console.log("[DEBUG] Rendering standard header for path:", location.pathname, "useCompactMode:", useCompactMode);
+  console.log("[DEBUG] Rendering standard header for path:", pathname, "useCompactMode:", useCompactMode);
 
   // Standard header for other pages
   return (
-    <header className={headerClasses} style={headerStyle}>
+    <header className={`${headerClasses} global-header`} style={headerStyle}>
       <div className="container mx-auto compact-header-padding max-w-full box-border backdrop-blur-md px-3 md:px-4">
         {useCompactMode ? (
           <CompactHeader />

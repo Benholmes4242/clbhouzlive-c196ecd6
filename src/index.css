@@ -61,9 +61,12 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Clubhouse specific: remove global safe-area top padding */
-.clubhouse-root.app-shell {
+/* Clubhouse specific: remove global safe-area top padding and hide standard header */
+body.route-clubhouse .app-shell {
   padding-top: 0 !important;
+}
+body.route-clubhouse .global-header {
+  display: none !important;
 }
 
 /* Clubhouse header: anchored to top with safe-area handling */
