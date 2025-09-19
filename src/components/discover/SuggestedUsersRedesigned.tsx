@@ -303,7 +303,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             </span>
           </div>
         </div>
-      )}
+        )}
+
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/35 pointer-events-none" />
 
 
       {/* Edge-to-Edge Feedback Overlay */}
@@ -376,13 +379,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           ease: [0.25, 0.1, 0.25, 1] // ease-in-out
         }}
       >
-        <div className="relative w-full h-full bg-white/10 backdrop-blur-xl border-t border-white/20 rounded-none">
+        <div 
+          className="relative w-full h-full backdrop-blur-md border-t border-white/20 rounded-none"
+          style={{
+            background: 'rgba(255, 255, 255, 0.18)',
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37)'
+          }}
+        >
           
           {/* Expanded Content - User Information */}
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-x-0 top-0 bottom-20 px-4 py-3"
+                className="absolute inset-x-0 top-0 bottom-20 px-4 py-3 mt-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -394,15 +403,17 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               >
                 {/* User Avatar */}
                 <div className="flex justify-center mb-2">
-                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/30">
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 group-hover:border-white/50 transition-all duration-300 group-hover:scale-110">
+                    {/* XP Ring Effect */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur-sm animate-pulse"></div>
                     {user.profilePhotoUrl ? (
                       <img
                         src={user.profilePhotoUrl}
                         alt={user.displayName}
-                        className="w-full h-full object-cover"
+                        className="relative w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                         <span className="text-white text-2xl font-bold">
                           {user.displayName.charAt(0).toUpperCase()}
                         </span>
@@ -418,7 +429,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.3 }}
                 >
-                  <h3 className="text-white font-semibold text-lg">
+                  <h3 className="text-white font-bold text-lg"
+                      style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
                     {user.displayName}
                   </h3>
                 </motion.div>
@@ -431,7 +443,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25, duration: 0.3 }}
                   >
-                    <p className="text-white/80 text-sm font-medium">
+                    <p className="text-white/80 text-sm font-medium opacity-80"
+                       style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
                       {user.homeClub}
                     </p>
                   </motion.div>
@@ -440,83 +453,114 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Fixed Button Controls - Always at bottom */}
-          <div className="absolute inset-x-0 bottom-0 px-3 py-1 flex items-center justify-center gap-3">
-            {/* Left: Dismiss Button */}
-            <motion.button
-              aria-label="Dismiss suggestion"
-              onClick={handleDismissClick}
-              disabled={isDismissLoading || isFollowLoading}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 320, damping: 18 }}
-              className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                         bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-            >
-              <FaThumbsDown className="text-sm" />
-              <span className="absolute -inset-2" />
-              <span className="absolute inset-0 rounded-full pointer-events-none
-                               scale-0 opacity-60
-                               group-active:scale-150 group-active:opacity-0
-                               transition-transform duration-300 bg-white/30" />
-            </motion.button>
-
-            {/* Center Detail Button */}
-            <motion.button
-              aria-label="View details"
-              onClick={handleDetailClick}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 320, damping: 18 }}
-              className={cn(
-                "group relative w-8 h-8 rounded-full flex items-center justify-center text-white",
-                isDetailExpanded 
-                  ? "bg-white/30 hover:bg-white/40" 
-                  : "bg-white/15 hover:bg-white/25"
-              )}
-            >
-              <motion.div
-                animate={{ rotate: isDetailExpanded ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
+          {/* Enhanced Button Controls with glassmorphic container */}
+          <div 
+            className="absolute inset-x-0 bottom-0 px-3 py-2 backdrop-blur-md border-t border-white/20"
+            style={{
+              background: 'rgba(255, 255, 255, 0.18)',
+              boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37)'
+            }}
+          >
+            <div className="flex items-center justify-center gap-3">
+              {/* Left: Dismiss Button */}
+              <motion.button
+                aria-label="Dismiss suggestion"
+                onClick={handleDismissClick}
+                disabled={isDismissLoading || isFollowLoading}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 320, damping: 18 }}
+                className="group relative w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white/10 backdrop-blur-sm border border-white/20 
+                           hover:bg-white/20 active:scale-95 disabled:opacity-50
+                           transition-all duration-200 overflow-hidden"
               >
-                <BiSolidDetail className="text-sm fill-white" />
-              </motion.div>
-              <span className="absolute -inset-2" />
-              <span className="absolute inset-0 rounded-full pointer-events-none
-                               scale-0 opacity-60
-                               group-active:scale-150 group-active:opacity-0
-                               transition-transform duration-300 bg-white/30" />
-            </motion.button>
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
+                
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
+                
+                <FaThumbsDown className="relative text-sm z-10" />
+                <span className="absolute -inset-2" />
+              </motion.button>
 
-            {/* Right: Follow Button */}
-            <motion.button
-              aria-label="Follow user"
-              onClick={handleFollowClick}
-              disabled={isFollowLoading || isDismissLoading}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 320, damping: 18 }}
-              className="group relative w-8 h-8 rounded-full flex items-center justify-center
-                         bg-white/15 hover:bg-white/25 text-white disabled:opacity-50"
-            >
-              <FaThumbsUp className="text-sm" />
-              <span className="absolute -inset-2" />
-              <span className="absolute inset-0 rounded-full pointer-events-none
-                               scale-0 opacity-60
-                               group-active:scale-150 group-active:opacity-0
-                               transition-transform duration-300 bg-white/30" />
-            </motion.button>
+              {/* Center Detail Button */}
+              <motion.button
+                aria-label="View details"
+                onClick={handleDetailClick}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 320, damping: 18 }}
+                className={cn(
+                  "group relative w-10 h-10 rounded-full flex items-center justify-center text-white",
+                  "bg-white/10 backdrop-blur-sm border border-white/20",
+                  "hover:bg-white/20 active:scale-95 transition-all duration-200 overflow-hidden",
+                  isDetailExpanded 
+                    ? "bg-white/30 hover:bg-white/40" 
+                    : "bg-white/15 hover:bg-white/25"
+                )}
+              >
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
+                
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
+                
+                <motion.div
+                  className="relative z-10"
+                  animate={{ rotate: isDetailExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <BiSolidDetail className="text-sm fill-white" />
+                </motion.div>
+                <span className="absolute -inset-2" />
+              </motion.button>
+
+              {/* Right: Follow Button */}
+              <motion.button
+                aria-label="Follow user"
+                onClick={handleFollowClick}
+                disabled={isFollowLoading || isDismissLoading}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 320, damping: 18 }}
+                className="group relative w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white/10 backdrop-blur-sm border border-white/20 
+                           hover:bg-white/20 active:scale-95 disabled:opacity-50
+                           transition-all duration-200 overflow-hidden"
+              >
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
+                
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
+                
+                <FaThumbsUp className="relative text-sm z-10" />
+                <span className="absolute -inset-2" />
+              </motion.button>
+            </div>
           </div>
 
           {/* Compact User Info - Only show when collapsed */}
           {!isDetailExpanded && (
             <motion.div
-              className="absolute bottom-9 left-1/2 transform -translate-x-1/2"
+              className="absolute bottom-16 left-1/2 transform -translate-x-1/2"
               initial={{ opacity: 1 }}
               animate={{ opacity: isDetailExpanded ? 0 : 1 }}
               transition={{ duration: 0.2 }}
             >
-              <span className="text-white font-medium text-center text-sm whitespace-nowrap">
+              <span className="text-white font-semibold text-center text-sm whitespace-nowrap px-3 py-1 rounded-full backdrop-blur-sm"
+                    style={{ 
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                      background: 'rgba(255, 255, 255, 0.15)'
+                    }}>
                 {user.displayName || user.handle || "User"}
               </span>
             </motion.div>
