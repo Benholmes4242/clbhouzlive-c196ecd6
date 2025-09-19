@@ -195,14 +195,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                 </div>
               )}
               
-              {/* Trending icon for trending videos */}
-              {activeFilter === FILTER_TYPES.TRENDING && (
-                <div className="absolute top-4 right-4 z-20">
-                  <div className="bg-red-500 rounded-full p-2">
-                    <HiTrendingUp className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-              )}
+              {/* Trending icon - this shouldn't appear in Friends filter */}
+              {/* Removed trending icon as this is specifically the Friends layout */}
               
               {/* Play icon for videos */}
               {item.type === 'video' && (
