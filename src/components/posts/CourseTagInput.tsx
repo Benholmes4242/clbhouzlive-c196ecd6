@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { X, MapPin, Loader2 } from 'lucide-react';
 
@@ -37,7 +38,6 @@ const CourseTagInput = ({
 
       setIsLoading(true);
       try {
-        // Enhanced search - match by name, city, region, or country
         const { data, error } = await supabase
           .from('golf_courses')
           .select('id, name, country, region')
@@ -82,14 +82,12 @@ const CourseTagInput = ({
   };
 
   const handleInputBlur = () => {
-    // Delay hiding suggestions to allow click on suggestion
     setTimeout(() => setShowSuggestions(false), 200);
   };
 
   return (
     <div className="space-y-2">
       <div className="relative">
-        {/* Input Field with decorative map pin inside */}
         <div className="relative">
           <input
             ref={inputRef}
@@ -110,58 +108,43 @@ const CourseTagInput = ({
           )}
         </div>
 
-        {/* Dark glassy dropdown via portal */}
-        {showSuggestions && (
-          <div className="fixed inset-0 z-[70] pointer-events-none">
+        {showSuggestions && suggestions.length > 0 && typeof window !== 'undefined' && (
+          createPortal(
             <div 
-              className="absolute max-h-[40vh] overflow-auto rounded-2xl bg-neutral-900/85 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] divide-y divide-white/8 mt-2 pointer-events-auto"
+              className="fixed z-[70] max-h-[40vh] overflow-auto rounded-2xl bg-neutral-900/85 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] divide-y divide-white/8 pointer-events-auto"
               style={{
-                top: inputRef.current?.getBoundingClientRect().bottom,
-                left: inputRef.current?.getBoundingClientRect().left,
-                width: inputRef.current?.getBoundingClientRect().width,
+                top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 8 : 0,
+                left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
+                width: inputRef.current ? inputRef.current.getBoundingClientRect().width : 'auto',
               }}
             >
-              {suggestions.length > 0 ? (
-                <div className="py-2">
-                  {suggestions.map((course, index) => (
-                    <div
-                      key={course.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors duration-150"
-                      onClick={() => handleCourseSelect(course)}
-                    >
-                      {/* Golf Tee Emoji */}
-                      <div className="flex-shrink-0">
-                        <span className="text-lg" role="img" aria-label="golf">⛳</span>
+              <div className="py-2">
+                {suggestions.map((course) => (
+                  <div
+                    key={course.id}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors duration-150"
+                    onClick={() => handleCourseSelect(course)}
+                  >
+                    <div className="flex-shrink-0">
+                      <span className="text-lg" role="img" aria-label="golf">⛳</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white text-sm leading-5 truncate">
+                        {course.name}
                       </div>
-                      
-                      {/* Course Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white text-sm leading-5 truncate">
-                          {course.name}
-                        </div>
-                        <div className="text-xs text-white/60 mt-0.5">
-                          {course.region ? `${course.region}, ${course.country}` : course.country}
-                        </div>
+                      <div className="text-xs text-white/60 mt-0.5">
+                        {course.region ? `${course.region}, ${course.country}` : course.country}
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : searchQuery.length >= 2 && !isLoading ? (
-                /* Empty State */
-                <div className="py-8 px-4 text-center">
-                  <div className="text-white/40 mb-2">
-                    <MapPin className="h-8 w-8 mx-auto" />
                   </div>
-                  <p className="text-sm text-white/60 mb-1">No course found</p>
-                  <p className="text-xs text-white/40">Try a different name or location</p>
-                </div>
-              ) : null}
-            </div>
-          </div>
+                ))}
+              </div>
+            </div>,
+            document.body
+          )
         )}
       </div>
 
-      {/* Selected Course Display */}
       {selectedCourse && (
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 text-green-800 rounded-xl text-sm">
