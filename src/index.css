@@ -65,14 +65,33 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Global and clubhouse headers: handle safe-area top themselves */
+/* Global and clubhouse headers: handle safe-area top with transparent blur overlay */
 .global-header,
 .clubhouse-header {
   padding-top: var(--safe-top);
-  background: var(--header-bg, hsl(var(--background)));
+  background: transparent;
   position: sticky;
   top: 0;
   z-index: 60;
+  isolation: isolate;
+}
+
+/* Pseudo-element creates frosted glass effect extending into safe area */
+.global-header::before,
+.clubhouse-header::before {
+  content: "";
+  position: absolute;
+  left: 0; 
+  right: 0;
+  top: calc(-1 * var(--safe-top));
+  height: calc(var(--safe-top) + var(--header-height, 64px));
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  background: var(--header-tint);
+  border-bottom: 1px solid var(--header-border);
+  z-index: -1;
+  pointer-events: none;
+  transform: translateZ(0);
 }
 
 .clubhouse-header {
@@ -381,6 +400,11 @@ html, body, #root, .app-shell { touch-action: auto; }
     --brand-black: 0 0% 10%;
     --brand-glass: 0 0% 100% / 0.8;
     
+    /* Header frosted glass effect */
+    --header-tint: rgba(255, 255, 255, 0.65);
+    --header-border: rgba(0, 0, 0, 0.06);
+    --header-height: 64px;
+    
     /* Echo Avatar Gradient */
     --echo-from: #1D3557;
     --echo-to: #2A9D8F;
@@ -426,6 +450,10 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
+    
+    /* Dark theme header tint */
+    --header-tint: rgba(10, 15, 20, 0.45);
+    --header-border: rgba(255, 255, 255, 0.06);
   }
 }
 
