@@ -511,7 +511,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           {/* Compact User Info - Only show when collapsed */}
           {!isDetailExpanded && (
             <motion.div
-              className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+              className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
               initial={{ opacity: 1 }}
               animate={{ opacity: isDetailExpanded ? 0 : 1 }}
               transition={{ duration: 0.2 }}
