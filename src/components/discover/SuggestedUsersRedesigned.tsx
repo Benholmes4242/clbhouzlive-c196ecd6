@@ -426,7 +426,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 {/* Home Golf Club */}
                 {user.homeClub && (
                   <motion.div
-                    className="text-center mb-2"
+                    className="text-center mb-1"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25, duration: 0.3 }}
