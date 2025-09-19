@@ -130,12 +130,6 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           <X className="h-3 w-3 text-white" />
         </button>
 
-        {/* Duration badge */}
-        {loaded && (
-          <span className="absolute bottom-2 right-2 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-            {duration}
-          </span>
-        )}
       </div>
     );
   }
