@@ -522,7 +522,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
-          height: isDetailExpanded ? "100%" : "clamp(64px,24%,80px)"
+          height: isDetailExpanded ? "100%" : "clamp(64px,24%,80px)",
+          y: swipeDirection === 'up' ? '-60%' : 0
         }}
         transition={{
           duration: 0.35,
@@ -539,7 +540,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           
           {/* Expanded Content - User Information at Top */}
           <AnimatePresence>
-            {isDetailExpanded && (
+            {(isDetailExpanded || swipeDirection === 'up') && (
               <motion.div
                 className="absolute inset-x-0 top-0 px-4 pt-4 pb-3"
                 initial={{ opacity: 0, y: 20 }}
