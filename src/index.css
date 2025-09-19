@@ -65,18 +65,17 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
-/* Global and clubhouse headers: handle safe-area top with original frosted glass */
+/* Global and clubhouse headers: handle safe-area top with original styling */
 .global-header,
 .clubhouse-header {
   padding-top: var(--safe-top);
-  background: transparent;
   position: sticky;
   top: 0;
   z-index: 60;
   isolation: isolate;
 }
 
-/* Restore original Tailwind backdrop-blur-md style extending into safe area */
+/* Extend the exact same styling into safe area */
 .global-header::before,
 .clubhouse-header::before {
   content: "";
@@ -84,15 +83,13 @@ body.route-clubhouse .global-header {
   left: 0; 
   right: 0;
   top: calc(-1 * var(--safe-top));
-  height: calc(var(--safe-top) + var(--header-height, 64px));
-  /* Original Tailwind styles: bg-background/95 backdrop-blur-md border-b border-border/50 */
+  height: var(--safe-top);
+  /* Match the exact header styling: bg-background/95 backdrop-blur-md border-b border-border/50 */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   background: hsl(var(--background) / 0.95);
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
   z-index: -1;
   pointer-events: none;
-  transform: translateZ(0);
 }
 
 .clubhouse-header {
