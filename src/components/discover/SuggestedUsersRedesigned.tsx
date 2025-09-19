@@ -537,11 +537,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           }}
         >
           
-          {/* Expanded Content - User Information */}
+          {/* Expanded Content - User Information at Top */}
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-x-0 top-0 bottom-20 px-4 py-3 mt-3"
+                className="absolute inset-x-0 top-0 px-4 pt-4 pb-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -551,8 +551,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   ease: "easeOut"
                 }}
               >
-                {/* User Avatar */}
-                <div className="flex justify-center mb-2">
+                {/* User Avatar - Moved to very top */}
+                <div className="flex justify-center mb-3">
                   <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 group-hover:border-white/50 transition-all duration-300 group-hover:scale-110">
                     {/* XP Ring Effect */}
                     <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur-sm animate-pulse"></div>
@@ -572,9 +572,9 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   </div>
                 </div>
 
-                {/* User Name */}
+                {/* User Name - Directly below avatar */}
                 <motion.div
-                  className="text-center mb-1"
+                  className="text-center mb-2"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.3 }}
@@ -585,10 +585,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   </h3>
                 </motion.div>
 
-                {/* Home Golf Club */}
+                {/* Home Golf Club - Directly below name */}
                 {user.homeClub && (
                   <motion.div
-                    className="text-center mb-1"
+                    className="text-center mb-4"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25, duration: 0.3 }}
