@@ -20,11 +20,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           : 'bg-background/95 backdrop-blur-md border-t border-border/50'
       }`}
       style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom), 12px)'
+        // expose safe area to a CSS var so we can use a fallback with var()
+        ['--safe-bottom' as any]: 'env(safe-area-inset-bottom)',
+        // at least 6px padding; if device has a safe inset, use the larger one
+        paddingBottom: 'max(var(--safe-bottom, 0px), 6px)',
       }}
     >
       <div className={`w-full px-2 ${isClubhouse ? 'bg-transparent' : ''}`}>
-        <div className={`flex items-center justify-between h-16 relative ${isClubhouse ? 'bg-transparent' : ''}`}>
+        {/* Reduce base height on small screens, keep 64px on md+ if you prefer */}
+        <div className={`flex items-center justify-between h-14 md:h-16 relative ${isClubhouse ? 'bg-transparent' : ''}`}>
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
