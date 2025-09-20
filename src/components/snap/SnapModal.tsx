@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Images, X, Sparkles, Zap, Palette } from 'lucide-react';
+import { Camera, Images, X, Sparkles, Zap, Film } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -300,10 +300,11 @@ const SnapModal = ({
     {
       key: "story",
       label: "Tell Your Story",
-      icon: Palette,
+      icon: Film,
       onClick: handleTellYourStory,
       preview: videoThumbs,
-      description: "Mix photos & videos"
+      description: "Mix photos & videos in one go",
+      isSpecial: true // Flag for special styling
     },
   ];
 
@@ -380,7 +381,7 @@ const SnapModal = ({
               {/* Action Options with Dynamic Previews */}
               <div className="px-6 pb-8">
                 <div className="space-y-6">
-                  {cardOptions.map(({ key, label, icon: Icon, onClick, preview, description }, index) => (
+                  {cardOptions.map(({ key, label, icon: Icon, onClick, preview, description, isSpecial }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
@@ -395,16 +396,32 @@ const SnapModal = ({
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
                     >
                       {/* Option Card */}
-                      <div className="p-4 rounded-2xl liquid-glass-subtle border border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10 transition-all duration-300">
+                      <div className={`p-4 rounded-2xl liquid-glass-subtle border transition-all duration-300 ${
+                        isSpecial 
+                          ? 'border-brand-orange/30 group-hover:border-brand-orange/60 group-hover:shadow-lg group-hover:shadow-brand-orange/20 ring-1 ring-brand-orange/20 group-hover:ring-brand-orange/40' 
+                          : 'border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10'
+                      }`}>
                         <div className="flex items-center gap-4 mb-3">
                           {/* Icon */}
-                          <div className="w-12 h-12 rounded-xl liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/30 transition-all duration-300">
-                            <Icon className="h-6 w-6 text-white group-hover:text-brand-orange transition-colors duration-300" />
+                          <div className={`w-12 h-12 rounded-xl liquid-glass-button flex items-center justify-center transition-all duration-300 ${
+                            isSpecial 
+                              ? 'group-hover:ring-2 group-hover:ring-brand-orange/50 group-hover:bg-brand-orange/10' 
+                              : 'group-hover:ring-2 group-hover:ring-brand-orange/30'
+                          }`}>
+                            <Icon className={`h-6 w-6 transition-colors duration-300 ${
+                              isSpecial 
+                                ? 'text-brand-orange group-hover:text-brand-orange' 
+                                : 'text-white group-hover:text-brand-orange'
+                            }`} />
                           </div>
                           
                           {/* Text */}
                           <div className="text-left flex-1">
-                            <h3 className="text-base font-semibold text-white group-hover:text-brand-orange transition-colors duration-300">
+                            <h3 className={`text-base font-semibold transition-colors duration-300 ${
+                              isSpecial 
+                                ? 'text-brand-orange group-hover:text-brand-orange' 
+                                : 'text-white group-hover:text-brand-orange'
+                            }`}>
                               {label}
                             </h3>
                             <p className="text-sm text-white/60 group-hover:text-white/80 transition-colors duration-300">
