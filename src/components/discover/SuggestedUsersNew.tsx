@@ -321,7 +321,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       data-card={user.id}
-      className="relative overflow-hidden select-none cursor-pointer"
+      className="relative overflow-hidden select-none"
       style={{ 
         touchAction: 'pan-x',
         overscrollBehavior: 'contain'
@@ -1120,7 +1120,7 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
         ref={(node) => {
           containerRef.current = node;
         }}
-        className="flex gap-0.5 overflow-x-auto scrollbar-hide pb-2"
+        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
