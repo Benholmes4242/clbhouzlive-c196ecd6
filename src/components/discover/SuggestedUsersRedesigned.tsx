@@ -615,19 +615,21 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
 
-      {/* Single Liquid Glass Overlay - Edge Contained with Top Anchoring */}
+      {/* Single Liquid Glass Overlay - Performance Optimized */}
       <motion.div
-        className={cn(
-          "absolute z-30 transition-all duration-220 ease-out",
-          isDetailExpanded 
-            ? "inset-x-3 top-3 bottom-3" 
-            : "inset-x-3 bottom-3 h-16"
-        )}
+        className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
+        animate={{
+          height: isDetailExpanded ? "100%" : "64px",
+        }}
         style={{
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
           // Performance: Optimize GPU layers and prevent repaints
-          willChange: isPanelDragging || isDetailExpanded ? 'transform' : 'auto'
+          willChange: isPanelDragging || isDetailExpanded ? 'height, transform' : 'auto'
+        }}
+        transition={{
+          duration: isPanelDragging ? 0 : (prefersReducedMotion ? 0.12 : 0.22),
+          ease: isDetailExpanded ? "easeOut" : "easeIn"
         }}
         onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
       >
@@ -778,19 +780,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Now with edge containment and top anchoring */}
+          {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className={cn(
-              "absolute inset-x-0 px-3 py-3 transition-all duration-220 ease-out",
-              isDetailExpanded 
-                ? "top-0" 
-                : "bottom-0"
-            )}
+            className="absolute bottom-0 inset-x-0 px-4 py-4"
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
-              borderTop: isDetailExpanded ? 'none' : '1px solid hsl(var(--glass-border))',
-              borderBottom: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
+              borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
             {/* Swipe indicator for expanded state */}
@@ -804,7 +800,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-2">{/* Reduced gap for edge containment */}
+            <div className="flex items-center justify-center gap-6">
               {/* Left: Dismiss Button - Accessible & Performance Optimized */}
               <motion.button
                 aria-label={`Dismiss suggestion for ${user.displayName}`}
