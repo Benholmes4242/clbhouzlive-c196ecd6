@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Settings, User } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAppLogo } from '@/hooks/useAppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SearchPill from './SearchPill';
+import HeaderNavigation from '@/components/header/HeaderNavigation';
 import { cn } from '@/lib/utils';
 
 interface ClubhouseHeaderNewProps {
@@ -94,7 +95,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
           </div>
 
           {/* Right Utilities */}
-          <nav className="flex items-center space-x-4 md:space-x-6">
+          <nav className="flex items-center space-x-2">
             {/* Mobile Search Button */}
             <button 
               className="md:hidden p-2 rounded-full hover:bg-white/10 transition-colors"
@@ -103,20 +104,10 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
               <Search className="h-5 w-5 text-white" />
             </button>
             
-            {/* Bell Icon */}
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-              <Bell className="h-5 w-5 text-white" />
-            </button>
-            
-            {/* Profile Icon */}
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-              <User className="h-5 w-5 text-white" />
-            </button>
-            
-            {/* Settings Icon */}
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-              <Settings className="h-5 w-5 text-white" />
-            </button>
+            {/* Navigation Icons */}
+            <div className="scale-50 md:scale-75 origin-right -mt-3">
+              <HeaderNavigation />
+            </div>
           </nav>
         </div>
       </header>
