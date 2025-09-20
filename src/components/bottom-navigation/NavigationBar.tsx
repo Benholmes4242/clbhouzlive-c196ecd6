@@ -16,7 +16,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
     <nav 
       className={`fixed bottom-0 left-0 right-0 z-50 md:z-40 ${
         isClubhouse 
-          ? 'bg-black' 
+          ? 'bg-black/60 backdrop-blur-md border-t border-white/10' 
           : 'bg-background/95 backdrop-blur-md border-t border-border/50'
       }`}
       style={{
@@ -42,23 +42,16 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   e.stopPropagation();
                   onTabClick(tab);
                 }}
-                className={`flex items-center justify-center relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
-                  isClubhouse
-                    ? tab.id === 'post'
-                      ? '' // Camera icon gets its own styling
-                      : tab.id === 'clubhouse'
-                        ? 'text-white' // Home icon stays white always on clubhouse
-                        : 'text-white hover:text-white/80'
-                    : tab.id === 'post'
-                      ? '' // Camera icon gets its own styling
+                className={`flex items-center justify-center relative focus:outline-none min-h-[60px] min-w-[60px] p-3 transition-colors duration-200 ${
+                  isActive 
+                    ? 'text-[hsl(var(--accent))]'
+                    : isClubhouse
+                      ? 'text-white/80 hover:text-white/90'
                       : 'text-black'
                 }`}
                 aria-label={tab.label}
               >
-                <Icon 
-                  className="h-9 w-9 font-normal" 
-                  style={tab.id === 'post' ? { color: '#f7931e' } : undefined}
-                />
+                <Icon className="h-9 w-9 font-normal" />
               </button>
             );
           })}
