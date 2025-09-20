@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import UserAccountInfo from '@/components/profile/UserAccountInfo';
 import EmailChangeSection from '@/components/profile/EmailChangeSection';
 import NotificationSettings from '@/components/settings/NotificationSettings';
@@ -36,7 +34,6 @@ const Settings = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -46,7 +43,6 @@ const Settings = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -54,8 +50,7 @@ const Settings = () => {
   // Show error if there's an issue
   if (error) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        <Header />
+      <div className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading settings</span>
@@ -67,7 +62,6 @@ const Settings = () => {
             </button>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -78,8 +72,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      <Header />
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
         
@@ -95,7 +88,6 @@ const Settings = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       </div>
-      <BottomNavigation />
     </div>
   );
 };

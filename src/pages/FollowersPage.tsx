@@ -1,12 +1,11 @@
 
 import React from 'react';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ArrowLeft, Users } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const FollowersPage = () => {
@@ -57,64 +56,60 @@ const FollowersPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        <Header />
+      <div className="min-h-screen bg-background">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="text-center">Loading followers...</div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      <Header />
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">
-          <Users className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Followers</h1>
+          <button 
+            onClick={() => window.history.back()} 
+            className="p-2 rounded-full hover:bg-gray-100"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-xl font-semibold">Followers</h1>
         </div>
 
         {followers && followers.length > 0 ? (
-          <div className="space-y-3">
-            {followers.map((profile) => (
-              <Card key={profile.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={profile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                        alt={profile.display_name || profile.username || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="font-semibold">
-                          {profile.display_name || profile.username || 'User'}
-                        </h3>
-                        {profile.username && (
-                          <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                        )}
-                        {profile.bio && (
-                          <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
-                        )}
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      View Profile
-                    </Button>
+          <div className="space-y-4">
+            {followers.map((follower) => (
+              <div key={follower.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage 
+                      src={follower.profile_photo_url} 
+                      alt={follower.username} 
+                    />
+                    <AvatarFallback>
+                      {follower.username?.charAt(0)?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{follower.username}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {follower.display_name}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <Button variant="outline" size="sm">
+                  Following
+                </Button>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            No followers yet.
+          <div className="text-center text-muted-foreground py-8">
+            <p>No followers yet</p>
           </div>
         )}
       </div>
-      <BottomNavigation />
     </div>
   );
 };

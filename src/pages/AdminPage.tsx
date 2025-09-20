@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from "@/components/Header";
 import { useAdmin } from '@/hooks/useAdmin';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminRouteProtection from '@/components/admin/AdminRouteProtection';
@@ -27,8 +26,7 @@ const AdminPage = () => {
   return (
     <AdminRouteProtection requiredRole="limited_admin">
       <div className="min-h-screen bg-background">
-        <Header />
-        <AdminDashboard 
+        <AdminDashboard
           users={users} 
           onRoleChange={handleRoleChange}
           userRole={userRole || 'admin'}

@@ -1,12 +1,11 @@
 
 import React from 'react';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UserCheck } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ArrowLeft, UserCheck } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const FriendsPage = () => {
@@ -57,64 +56,60 @@ const FriendsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        <Header />
+      <div className="min-h-screen bg-background">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="text-center">Loading following...</div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      <Header />
+    <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">
-          <UserCheck className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Following</h1>
+          <button 
+            onClick={() => window.history.back()} 
+            className="p-2 rounded-full hover:bg-gray-100"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-xl font-semibold">Friends</h1>
         </div>
 
         {following && following.length > 0 ? (
-          <div className="space-y-3">
-            {following.map((profile) => (
-              <Card key={profile.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={profile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                        alt={profile.display_name || profile.username || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="font-semibold">
-                          {profile.display_name || profile.username || 'User'}
-                        </h3>
-                        {profile.username && (
-                          <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                        )}
-                        {profile.bio && (
-                          <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
-                        )}
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      View Profile
-                    </Button>
+          <div className="space-y-4">
+            {following.map((friend) => (
+              <div key={friend.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage 
+                      src={friend.profile_photo_url} 
+                      alt={friend.username} 
+                    />
+                    <AvatarFallback>
+                      {friend.username?.charAt(0)?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{friend.username}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {friend.display_name}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <Button variant="outline" size="sm">
+                  Message
+                </Button>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            Not following anyone yet.
+          <div className="text-center text-muted-foreground py-8">
+            <p>No friends yet</p>
           </div>
         )}
       </div>
-      <BottomNavigation />
     </div>
   );
 };

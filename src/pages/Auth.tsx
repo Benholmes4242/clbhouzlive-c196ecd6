@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
 import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
-import BottomNavigation from "@/components/BottomNavigation";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import type { AuthChangeEvent } from "@supabase/supabase-js";
 
@@ -95,7 +94,6 @@ const Auth: React.FC = () => {
           />
         )}
       </AuthLayout>
-      <BottomNavigation />
     </>
   );
 };

@@ -1,8 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import UserProfileLoader from '@/components/profile/UserProfileLoader';
 import UserProfileContent from '@/components/profile/UserProfileContent';
 import { useUserProfileQueries } from '@/hooks/useUserProfileQueries';

@@ -1,8 +1,6 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Header from '@/components/Header';
-import BottomNavigation from '@/components/BottomNavigation';
 import UpcomingEvents from '@/components/tour/UpcomingEvents';
 import LiveLeaderboards from '@/components/tour/LiveLeaderboards';
 import NewsComponent from '@/components/News';
@@ -13,42 +11,29 @@ const TourCentral = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-center">Tour Central</h1>
-          <p className="text-muted-foreground text-center mt-2">
-            Your hub for global golf competitions and live events
-          </p>
-        </div>
-
+        <h1 className="text-2xl font-bold mb-6">Tour Central</h1>
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="upcoming">Events</TabsTrigger>
-            <TabsTrigger value="leaderboards">Live</TabsTrigger>
-            <TabsTrigger value="news">News</TabsTrigger>
-            <TabsTrigger value="rankings">Rankings</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="past">Past</TabsTrigger>
+            <TabsTrigger value="favorites">Favorites</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="upcoming" className="mt-6">
+          
+          <TabsContent value="upcoming" className="space-y-4">
             <UpcomingEvents />
           </TabsContent>
-
-          <TabsContent value="leaderboards" className="mt-6">
-            <LiveLeaderboards />
+          
+          <TabsContent value="past" className="space-y-4">
+            <p className="text-center text-muted-foreground">Past events coming soon...</p>
           </TabsContent>
-
-          <TabsContent value="news" className="mt-6">
-            <NewsComponent />
-          </TabsContent>
-
-          <TabsContent value="rankings" className="mt-6">
-            <RankingsSection />
+          
+          <TabsContent value="favorites" className="space-y-4">
+            <p className="text-center text-muted-foreground">Favorite venues coming soon...</p>
           </TabsContent>
         </Tabs>
       </div>
-      
-      <BottomNavigation />
     </div>
   );
 };

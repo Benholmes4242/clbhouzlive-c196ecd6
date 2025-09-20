@@ -1,6 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import Header from '@/components/Header';
-import BottomNavigation from '@/components/BottomNavigation';
 import MediaSearch from '@/components/discover/MediaSearch';
 import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
 import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
@@ -133,7 +131,6 @@ const Discover = () => {
 
   return (
       <div className="min-h-screen bg-white">
-        <Header />
         <AnnouncementRegion />
         
         <main className="pb-20">
@@ -172,8 +169,6 @@ const Discover = () => {
             />
           </div>
         </main>
-        
-        <BottomNavigation />
 
         {/* Conditional Modal/Feed based on feature flag */}
         {USE_MODAL_DISCOVER ? (
