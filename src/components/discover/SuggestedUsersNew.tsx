@@ -311,7 +311,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       handlePanelDragEnd();
     },
     threshold: 90,
-    preventDefaultTouchMove: false,
+    preventDefaultTouchMove: enableVerticalSwipe,
   });
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
@@ -321,8 +321,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       data-card={user.id}
-      className="relative snap-start overflow-hidden"
-      style={{ touchAction: 'auto' }}
+      className="relative snap-start overflow-hidden select-none"
+      style={{ 
+        touchAction: enableVerticalSwipe ? 'none' : 'auto',
+        overscrollBehavior: 'contain'
+      }}
     >
       <motion.div
         ref={cardRef}
