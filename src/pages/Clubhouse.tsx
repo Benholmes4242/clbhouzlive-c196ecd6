@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import Header from '@/components/Header';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
-import BottomNavigation from '@/components/BottomNavigation';
+import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
-import ScrollableTabs from '@/components/clubhouse/ScrollableTabs';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -69,7 +67,11 @@ const Clubhouse = () => {
       
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
-        <BottomNavigation variant="clubhouse" />
+        <NavigationBar 
+          activeTab="clubhouse" 
+          onTabClick={() => {}} 
+          variant="clubhouse" 
+        />
       </div>
     </div>
   );

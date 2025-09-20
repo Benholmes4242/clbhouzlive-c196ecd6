@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAppLogo } from '@/hooks/useAppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useHeaderVariant } from '@/contexts/HeaderContext';
 import SearchPill from './SearchPill';
 import HeaderNavigation from '@/components/header/HeaderNavigation';
 import { cn } from '@/lib/utils';
@@ -16,8 +17,18 @@ interface ClubhouseHeaderNewProps {
 const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHeaderNewProps) => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
+  const { variant } = useHeaderVariant();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Get variant-specific styles
+  const isGlassDark = variant === 'glass-dark';
+  const isSolidLight = variant === 'solid-light';
+  
+  // Logo source based on variant
+  const logoSrc = isGlassDark 
+    ? "/assets/clbhouz-white-logo.png" 
+    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -65,8 +76,11 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
       {/* Main Header */}
       <header
         className={cn(
-          "sticky top-0 z-header backdrop-blur-md transition-all duration-300",
+          "sticky top-0 z-header transition-all duration-300",
           "h-16 md:h-18", // 64px mobile, 72px desktop
+          // Variant-specific backgrounds
+          isGlassDark && "backdrop-blur-md bg-black/60",
+          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           className
         )}
         data-hides-on-scroll
@@ -82,7 +96,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
               onClick={handleLogoClick}
             />
             <img
-              src="/assets/clbhouz-white-logo.png"
+              src={logoSrc}
               alt="clbhouz Logo"
               className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
               onClick={handleLogoClick}
@@ -91,17 +105,25 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
 
           {/* Desktop Search Pill */}
           <div className="hidden md:flex flex-1 justify-center px-4">
-            <SearchPill className="w-full max-w-xl" />
+            <SearchPill className="w-full max-w-xl" variant={variant} />
           </div>
 
           {/* Right Utilities */}
           <nav className="flex items-center space-x-2">
             {/* Mobile Search Button */}
             <button 
-              className="md:hidden p-2 rounded-full hover:bg-white/10 transition-colors"
+              className={cn(
+                "md:hidden p-2 rounded-full transition-colors",
+                isGlassDark && "hover:bg-white/10",
+                isSolidLight && "hover:bg-black/10"
+              )}
               onClick={() => setSearchOpen(true)}
             >
-              <Search className="h-5 w-5 text-white" />
+              <Search className={cn(
+                "h-5 w-5",
+                isGlassDark && "text-white",
+                isSolidLight && "text-black"
+              )} />
             </button>
             
             {/* Navigation Icons */}
@@ -121,11 +143,16 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
           
           {/* Search pill overlay */}
           <div className="fixed inset-x-0 top-0 z-[70] p-3">
-            <div className="rounded-full bg-hud-bg backdrop-blur-2xl border border-hud-border shadow-hud">
+            <div className={cn(
+              "rounded-full backdrop-blur-2xl border shadow-hud",
+              isGlassDark && "bg-hud-bg border-hud-border",
+              isSolidLight && "bg-white/95 border-gray-200"
+            )}>
               <SearchPill 
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
+                variant={variant}
               />
             </div>
           </div>

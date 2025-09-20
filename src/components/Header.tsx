@@ -6,7 +6,6 @@ import { useHeaderVariant } from '@/contexts/HeaderContext';
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
 import CompactHeader from './clubhouse/CompactHeader';
-import ClubhouseHeaderExpanded from './clubhouse/ClubhouseHeaderExpanded';
 import SearchPill from './clubhouse/SearchPill';
 import { Search } from 'lucide-react';
 import ScrollableTabs from './clubhouse/ScrollableTabs';
@@ -68,16 +67,11 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   const headerStyle = {};
 
   console.log("[DEBUG] Header path:", { pathname, rawPathname: location.pathname, hash: (location as any).hash, isClubhouse: isClubhousePage });
-  // For Clubhouse, always use expanded header regardless of screen size
+  
+  // For Clubhouse, don't render this Header component - let the page handle its own header
   if (isClubhousePage) {
-    console.log("[DEBUG] Rendering ClubhouseHeaderExpanded for path:", pathname);
-    return (
-      <ClubhouseHeaderExpanded 
-        className="clubhouse-header"
-        activeTab={activeTab} 
-        onTabChange={onTabChange} 
-      />
-    );
+    console.log("[DEBUG] Skipping Header for Clubhouse page - using ClubhouseHeaderNew");
+    return null;
   }
 
   // Check if we should use compact mode (≤375px and mobile) for other pages
