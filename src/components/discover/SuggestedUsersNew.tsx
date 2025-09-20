@@ -514,7 +514,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           )}
           initial={false}
           animate={{
-            height: isDetailExpanded ? "100%" : "auto",
+            height: isDetailExpanded ? "100%" : "80px",
           }}
           style={{
             transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
