@@ -8,6 +8,7 @@ import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { AnnouncementRegion } from '@/components/ui/AnnouncementRegion';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
@@ -133,6 +134,7 @@ const Discover = () => {
   return (
       <div className="min-h-screen bg-white">
         <Header />
+        <AnnouncementRegion />
         
         <main className="pb-20">
           {/* Media Search - Discover Only */}

@@ -11,6 +11,7 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { FILTER_TYPES } from './types';
 import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
 import { PlacementConfig } from './types/PostPlacementTypes';
+import { PostSpotlight } from '@/components/ui/PostSpotlight';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -24,6 +25,7 @@ interface ExploreGridProps {
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
   hideBadges?: boolean;
+  shouldShowSpotlight?: (postId: string) => boolean;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = memo(({ 
@@ -37,7 +39,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   activeFilter,
   isClubhousePage = false,
   isDiscoverPage = false,
-  hideBadges = false
+  hideBadges = false,
+  shouldShowSpotlight
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
@@ -837,27 +840,31 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
           } else if (gridItem.type === 'hero') {
             return (
               <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isFeatured={true}
-                  isAboveTheFold={isAboveTheFold}
-                />
+                <PostSpotlight isActive={shouldShowSpotlight?.(gridItem.item.id) || false}>
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isFeatured={true}
+                    isAboveTheFold={isAboveTheFold}
+                  />
+                </PostSpotlight>
               </div>
             );
           } else {
             // Square card
             return (
               <div key={gridItem.key} className="aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isAboveTheFold={isAboveTheFold}
-                />
+                <PostSpotlight isActive={shouldShowSpotlight?.(gridItem.item.id) || false}>
+                  <ExploreContentCard 
+                    item={gridItem.item} 
+                    onLike={onLike} 
+                    onFollow={onFollow} 
+                    onMediaClick={onMediaClick}
+                    isAboveTheFold={isAboveTheFold}
+                  />
+                </PostSpotlight>
               </div>
             );
           }

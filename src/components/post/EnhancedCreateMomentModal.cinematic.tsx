@@ -209,8 +209,15 @@ export default function EnhancedCreateMomentModalCinematic({
         coverIndex // NEW: thumbnail source for feeds
       });
       
-      // Show success overlay
+      // Show success overlay first
       setShowSuccessOverlay(true);
+      
+      // Wait for success overlay animation, then begin transition
+      setTimeout(() => {
+        // Close the modal with cinematic exit animation
+        close();
+      }, 900); // Show success for ~900ms, then transition
+      
     } catch (error) {
       console.error('Post submission failed:', error);
     }
@@ -241,16 +248,16 @@ export default function EnhancedCreateMomentModalCinematic({
 
           {/* shell */}
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
-            <motion.div
-              ref={wrapperRef}
-              className="w-full max-w-[520px] h-[min(92vh,900px)] liquid-glass rounded-3xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-              initial={prefersReducedMotion ? { opacity: 0 } : { y: window.innerHeight, opacity: 0, scale: 0.9 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { y: -20, opacity: 0, scale: 0.98 }}
-              transition={prefersReducedMotion ? 
-                { duration: 0.1 } : 
-                { type: "spring", stiffness: 280, damping: 32, duration: 0.25 }
-              }
+          <motion.div
+            ref={wrapperRef}
+            className="w-full max-w-[520px] h-[min(92vh,900px)] liquid-glass rounded-3xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
+            initial={prefersReducedMotion ? { opacity: 0 } : { y: window.innerHeight, opacity: 0, scale: 0.9 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }}
+            transition={prefersReducedMotion ? 
+              { duration: 0.1 } : 
+              { type: "spring", stiffness: 300, damping: 28, duration: 0.2 }
+            }
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
