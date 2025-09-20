@@ -28,6 +28,11 @@ import AppShell from '@/components/AppShell';
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
 import ProfilePage from "./pages/ProfilePage";
 import Discover from "./pages/Discover";
+import { HeaderProvider } from '@/contexts/HeaderContext';
+
+// Import wrapped components
+import ClubhouseWrapped from "./pages/ClubhouseWrapped";
+import DiscoverWrapped from "./pages/DiscoverWrapped";
 
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
@@ -108,7 +113,8 @@ const App: React.FC = () => {
           <TooltipProvider>
             <SecurityHeaders />
             <SiteAccessControl>
-              <ModalProvider>
+              <HeaderProvider>
+                <ModalProvider>
                 <UIProvider>
                 <BrowserRouter>
                   <ScrollToTop />
@@ -119,7 +125,7 @@ const App: React.FC = () => {
                           <AuthWrapper>
                       <Suspense fallback={<ClubhouzLoading />}>
                         <Routes>
-                          <Route path="/" element={<Clubhouse />} />
+                          <Route path="/" element={<ClubhouseWrapped />} />
                           <Route path="/auth" element={<Auth />} />
                           <Route path="/create-profile" element={<CreateProfile />} />
                           <Route path="/profile" element={<ProfilePage />} />
@@ -127,8 +133,8 @@ const App: React.FC = () => {
                           <Route path="/profile/:username" element={<UserProfilePage />} />
                           <Route path="/settings" element={<Settings />} />
                           {/* Explore route removed - redirects to discover */}
-                          <Route path="/clubhouse" element={<Clubhouse />} />
-                          <Route path="/discover" element={<Discover />} />
+                          <Route path="/clubhouse" element={<ClubhouseWrapped />} />
+                          <Route path="/discover" element={<DiscoverWrapped />} />
                           <Route path="/courses" element={<Courses />} />
                           <Route path="/courses/:courseId" element={<CourseDetailPage />} />
                           <Route path="/user/:username/courses" element={<UserCoursesPage />} />
@@ -161,7 +167,8 @@ const App: React.FC = () => {
                   <AIChat />
                 </BrowserRouter>
                 </UIProvider>
-              </ModalProvider>
+                </ModalProvider>
+              </HeaderProvider>
             </SiteAccessControl>
         </TooltipProvider>
       </QueryClientProvider>
