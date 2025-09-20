@@ -968,6 +968,12 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
     }
   };
 
+  const handleHorizontalSwipe = useSwipeGesture({
+    onSwipeLeft: () => scroll('right'),
+    onSwipeRight: () => scroll('left'),
+    threshold: 50,
+  });
+
   useEffect(() => {
     updateScrollButtons();
     const container = containerRef.current;
@@ -1066,9 +1072,16 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
       </div>
       
       <div 
-        ref={containerRef}
+        ref={(node) => {
+          containerRef.current = node;
+          handleHorizontalSwipe.current = node;
+        }}
         className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        style={{ 
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none',
+          touchAction: 'pan-x pinch-zoom'
+        }}
       >
         {filteredUsers.map((user) => (
           <div
