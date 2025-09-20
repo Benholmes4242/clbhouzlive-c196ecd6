@@ -226,102 +226,105 @@ const SnapModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
         >
-          {/* Backdrop */}
+          {/* Liquid Glass Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-md"
             onClick={onClose}
           />
           
-          {/* Panel */}
-          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
+          {/* Liquid Glass Panel */}
+          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={onClose}>
             <motion.div
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] text-white"
+              className="w-full max-w-md liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               onClick={(e) => e.stopPropagation()}
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
+              initial={{ y: 30, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              exit={{ y: -20, opacity: 0, scale: 0.95 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 25,
+                duration: 0.22
+              }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-1">
+              <div className="flex items-center justify-between px-6 pt-6 pb-4">
                 <div>
-                  <h2 className="text-2xl font-semibold">Create a Moment</h2>
-                  <p className="text-sm text-white/60 mt-1">Choose how you'd like to share</p>
+                  <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
+                  <p className="text-sm text-white/70 mt-1">Choose how you'd like to share</p>
                 </div>
                 <button 
                   onClick={onClose} 
                   aria-label="Close" 
-                  className="h-8 w-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
+                  className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4 text-white" />
                 </button>
               </div>
 
-              <div className="px-4 pb-5 space-y-3">
-                {/* Media Options */}
-                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
-                  <motion.button
-                    key={key}
-                    onClick={onClick}
-                    className="w-full h-20 flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                        <Icon className="h-5 w-5 text-white" />
+              {/* Circular Glass Action Buttons */}
+              <div className="px-6 pb-8">
+                <div className="flex justify-center items-center gap-8 mb-6">
+                  {cardOptions.map(({ key, label, icon: Icon, onClick }) => (
+                    <motion.button
+                      key={key}
+                      onClick={onClick}
+                      className="flex flex-col items-center gap-3 min-w-[44px]"
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    >
+                      {/* Circular Glass Button */}
+                      <div className="w-16 h-16 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-brand-orange/30 border border-white/20 hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(247,147,30,0.3)]">
+                        <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <div className="text-left">
-                        <div className="font-medium text-white">{label}</div>
-                        {/* Show empty state message if no user media and not loading */}
-                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
-                          <div className="text-sm text-white/60">No posts yet - start creating!</div>
-                        )}
-                      </div>
-                    </div>
+                      {/* Label */}
+                      <span className="text-sm font-medium text-white/90">{label}</span>
+                    </motion.button>
+                  ))}
+                </div>
 
-                    <div className="border-l border-white/10 pl-3">
-                      <ThumbStrip variant={variant} thumbs={thumbs} />
+                {/* Enhanced Story Button */}
+                <motion.button
+                  onClick={handlePickMedia}
+                  className="w-full rounded-2xl backdrop-filter backdrop-blur-sm bg-gradient-to-r from-brand-orange/20 to-brand-orange/10 hover:from-brand-orange/30 hover:to-brand-orange/15 border border-brand-orange/30 hover:border-brand-orange/50 p-4 transition-all duration-200 shadow-lg hover:shadow-[0_0_24px_rgba(247,147,30,0.2)]"
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-orange/30 to-brand-orange/20 border border-brand-orange/40 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-brand-orange" />
                     </div>
-                  </motion.button>
-                ))}
+                    <div className="flex flex-col items-start text-left">
+                      <span className="font-semibold text-white text-base">Tell Your Story</span>
+                      <span className="text-sm text-white/70">Mix photos & videos in one go</span>
+                    </div>
+                  </div>
+                </motion.button>
 
                 {/* Error state with retry */}
                 {error && (
-                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
-                    <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
+                  <div className="mt-4 px-4 py-3 rounded-2xl backdrop-filter backdrop-blur-sm bg-red-500/10 border border-red-500/20">
+                    <div className="text-sm text-red-200 mb-2">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
-                      className="text-xs text-red-400 hover:text-red-300 underline"
+                      className="text-xs text-red-300 hover:text-red-200 underline transition-colors duration-200"
                     >
                       Retry
                     </button>
                   </div>
                 )}
 
-                {/* Tell Your Story Card - AT BOTTOM */}
-                <motion.button
-                  onClick={() => {
-                    // Open the same media picker flow
-                    handlePickMedia();
-                  }}
-                  className="w-full h-24 flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-yellow-500/20 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-amber-400" />
+                {/* Empty state message */}
+                {!isLoading && !error && photos.length === 0 && videos.length === 0 && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm text-white/60">No posts yet - start creating!</p>
                   </div>
-                  <div className="flex flex-col items-start">
-                    <span className="font-bold text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/60">Mix photos & videos in one go</span>
-                  </div>
-                </motion.button>
+                )}
               </div>
             </motion.div>
           </div>
