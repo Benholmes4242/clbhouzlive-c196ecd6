@@ -602,6 +602,21 @@ html, body, #root, .app-shell { touch-action: auto; }
   .z-video { z-index: 0; }
   .z-bg-blur { z-index: -10; }
 
+  /* Custom animations for MiniProfileSheet */
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(100%) scale(0.95);
+    }
+    70% {
+      transform: translateY(-2%) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   /* Accessibility and performance optimizations */
   @media (prefers-reduced-motion: reduce) {
     .discover-pill,
@@ -614,6 +629,13 @@ html, body, #root, .app-shell { touch-action: auto; }
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+    }
+
+    @keyframes slide-up {
+      0%, 100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
   }
 
