@@ -59,7 +59,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [showFeedback, setShowFeedback] = useState<'follow' | 'dismiss' | null>(null);
   const [isCardFading, setIsCardFading] = useState(false);
   const [isDetailExpanded, setIsDetailExpanded] = useState(false);
+  const [panelDragY, setPanelDragY] = useState(0);
+  const [isPanelDragging, setIsPanelDragging] = useState(false);
   const FEEDBACK_MS = 1500;
+  const COLLAPSE_THRESHOLD = 0.3; // 30% threshold for collapse
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
   const enableVerticalSwipe = !isDesktop;
@@ -152,6 +155,38 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setIsDetailExpanded(!isDetailExpanded);
   };
 
+  // Handle panel drag for collapse gesture
+  const handlePanelDragStart = () => {
+    if (!isDetailExpanded) return;
+    setIsPanelDragging(true);
+  };
+
+  const handlePanelDrag = (dy: number) => {
+    if (!isDetailExpanded || !isPanelDragging) return;
+    // Only allow downward drag
+    setPanelDragY(Math.max(0, dy));
+  };
+
+  const handlePanelDragEnd = () => {
+    if (!isDetailExpanded || !isPanelDragging) {
+      setPanelDragY(0);
+      setIsPanelDragging(false);
+      return;
+    }
+
+    const cardHeight = 300; // Approximate card height
+    const dragPercentage = panelDragY / cardHeight;
+    
+    if (dragPercentage >= COLLAPSE_THRESHOLD) {
+      // Collapse the panel
+      setIsDetailExpanded(false);
+    }
+    
+    // Reset drag state
+    setPanelDragY(0);
+    setIsPanelDragging(false);
+  };
+
   // Local flash helper with remount to retrigger CSS
   const triggerFlash = useCallback((dir: 'up' | 'down') => {
     setFlashKey((k) => k + 1);
@@ -234,14 +269,24 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setIsVertical(false);
   };
 
-  // Attach swipe only if enabled
+  // Enhanced swipe gesture with panel drag support
   const swipeRef = useSwipeGesture({
     onSwipeUp:    enableVerticalSwipe ? handleSwipeUp   : undefined,
-    onSwipeDown:  enableVerticalSwipe ? handleSwipeDown : undefined,
-    onSwiping:    enableVerticalSwipe ? handleSwiping   : undefined,
-    onSwipeEnd:   handleSwipeEnd,
+    onSwipeDown:  enableVerticalSwipe ? (isDetailExpanded ? undefined : handleSwipeDown) : undefined,
+    onSwiping:    enableVerticalSwipe ? (dx, dy) => {
+      // Handle card swiping vs panel dragging
+      if (isDetailExpanded && dy > 0) {
+        handlePanelDrag(dy);
+      } else {
+        handleSwiping(dx, dy);
+      }
+    } : undefined,
+    onSwipeEnd:   () => {
+      handleSwipeEnd();
+      handlePanelDragEnd();
+    },
     threshold: 90,
-    preventDefaultTouchMove: false,          // DO NOT block scroll
+    preventDefaultTouchMove: false,
   });
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
@@ -493,18 +538,21 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
 
-      {/* Liquid Glass Overlay System */}
+      {/* Single Liquid Glass Overlay - Expand-in-Place */}
       <motion.div
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
           height: isDetailExpanded ? "100%" : "64px",
-          y: 0
+        }}
+        style={{
+          transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`
         }}
         transition={{
-          duration: 0.3,
+          duration: isPanelDragging ? 0 : 0.3,
           ease: [0.25, 0.1, 0.25, 1]
         }}
+        onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
       >
         {/* Single Overlay Container */}
         <div 
@@ -517,86 +565,99 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           }}
         >
           
-          {/* Expanded Content - User Information at Top */}
+          {/* Expanded Profile Content - Full Height Coverage */}
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-x-0 top-0 px-4 pt-6 pb-20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
+                className="absolute inset-0 flex flex-col"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ 
                   duration: 0.2,
-                  delay: 0.05,
                   ease: "easeOut"
                 }}
               >
-                {/* User Avatar */}
-                <div className="flex justify-center mb-4">
-                  <div 
-                    className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/profile/${user.id}`);
-                    }}
-                  >
-                    {user.profilePhotoUrl ? (
-                      <img
-                        src={user.profilePhotoUrl}
-                        alt={user.displayName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-white text-xl font-bold">
-                          {user.displayName.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                {/* Profile Info Section - Top Area */}
+                <div className="flex-1 flex flex-col justify-center px-4 pt-8 pb-20">
+                  {/* User Avatar */}
+                  <div className="flex justify-center mb-4">
+                    <div 
+                      className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${user.id}`);
+                      }}
+                    >
+                      {user.profilePhotoUrl ? (
+                        <img
+                          src={user.profilePhotoUrl}
+                          alt={user.displayName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <span className="text-white text-2xl font-bold">
+                            {user.displayName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* User Info */}
+                  <div className="text-center space-y-2">
+                    <h3 
+                      className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200"
+                      style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${user.id}`);
+                      }}
+                    >
+                      {user.displayName}
+                    </h3>
+                    
+                    <p className="text-white/70 text-base"
+                       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                      @{user.handle}
+                    </p>
+                    
+                    {user.homeClub && (
+                      <p className="text-white/80 text-base font-medium mt-3"
+                         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                        {user.homeClub}
+                        {user.handicap !== undefined && (
+                          <span className="block mt-1 text-sm opacity-90">HCP {user.handicap}</span>
+                        )}
+                      </p>
                     )}
                   </div>
-                </div>
-
-                {/* User Info */}
-                <div className="text-center space-y-2">
-                  <h3 
-                    className="text-white font-bold text-lg cursor-pointer hover:text-white/90 transition-colors duration-200"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/profile/${user.id}`);
-                    }}
-                  >
-                    {user.displayName}
-                  </h3>
-                  
-                  <p className="text-white/70 text-sm"
-                     style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                    @{user.handle}
-                  </p>
-                  
-                  {user.homeClub && (
-                    <p className="text-white/80 text-sm font-medium"
-                       style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                      {user.homeClub}
-                      {user.handicap !== undefined && (
-                        <span className="ml-2 opacity-90">• HCP {user.handicap}</span>
-                      )}
-                    </p>
-                  )}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Fixed position at bottom with consistent padding */}
+          {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
             className="absolute bottom-0 inset-x-0 px-4 py-4"
             style={{
-              background: isDetailExpanded ? 'hsl(var(--glass-dark))' : 'transparent',
-              backdropFilter: isDetailExpanded ? 'blur(16px)' : 'none',
+              background: 'hsl(var(--glass-dark))',
+              backdropFilter: 'blur(16px)',
               borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
+            {/* Swipe indicator for expanded state */}
+            {isDetailExpanded && (
+              <div className="flex justify-center mb-2">
+                <div 
+                  className="w-8 h-1 rounded-full bg-white/30"
+                  style={{
+                    opacity: isPanelDragging ? 0.6 : 0.3
+                  }}
+                />
+              </div>
+            )}
             <div className="flex items-center justify-center gap-6">
               {/* Left: Dismiss Button - Enhanced circular glass */}
               <motion.button
