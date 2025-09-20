@@ -28,6 +28,7 @@ interface SuggestedUserCardProps {
   onDismiss: (userId: string) => Promise<void>;
   isVisible: boolean;
   onFirstSwipe?: () => void;
+  onHorizontalSwipe?: (direction: 'left' | 'right') => void;
 }
 
 const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({ 
@@ -35,7 +36,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   onToggleFollow,
   onDismiss,
   isVisible,
-  onFirstSwipe
+  onFirstSwipe,
+  onHorizontalSwipe
 }) => {
   const navigate = useNavigate();
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -295,10 +297,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setDragY(0);
   };
 
-  // Enhanced swipe gesture with panel drag support
+  // Enhanced swipe gesture with panel drag support and horizontal swipe
   const swipeRef = useSwipeGesture({
     onSwipeUp: enableVerticalSwipe ? handleSwipeUp : undefined,
     onSwipeDown: enableVerticalSwipe ? (isDetailExpanded ? undefined : handleSwipeDown) : undefined,
+    onSwipeLeft: onHorizontalSwipe ? () => onHorizontalSwipe('left') : undefined,
+    onSwipeRight: onHorizontalSwipe ? () => onHorizontalSwipe('right') : undefined,
     onSwiping: enableVerticalSwipe ? (dx, dy) => {
       if (isDetailExpanded && dy > 0) {
         handlePanelDrag(dy);
@@ -1096,6 +1100,10 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
               isVisible={visibleCards.has(user.id)}
               onFirstSwipe={() => {
                 // Handle first swipe tutorial if needed
+              }}
+              onHorizontalSwipe={(direction) => {
+                if (direction === 'left') scroll('right');
+                else scroll('left');
               }}
             />
           </div>
