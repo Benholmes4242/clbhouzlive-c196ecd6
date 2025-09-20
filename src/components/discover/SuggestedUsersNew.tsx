@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSuggestedUsersDiscover } from '@/hooks/useSuggestedUsersDiscover';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useMedia } from '@/hooks/useMedia';
 import { safePlay } from '@/utils/safePlay';
@@ -45,8 +46,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [showFeedback, setShowFeedback] = useState<'follow' | 'dismiss' | null>(null);
   const [isCardFading, setIsCardFading] = useState(false);
   const [isDetailExpanded, setIsDetailExpanded] = useState(false);
-  const [panelDragY, setPanelDragY] = useState(0);
-  const [isPanelDragging, setIsPanelDragging] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showStaggeredContent, setShowStaggeredContent] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -223,36 +222,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   };
 
   // Handle panel drag for collapse gesture
-  const handlePanelDragStart = () => {
-    if (!isDetailExpanded) return;
-    setIsPanelDragging(true);
-  };
-
-  const handlePanelDrag = (dy: number) => {
-    if (!isDetailExpanded || !isPanelDragging) return;
-    setPanelDragY(Math.max(0, dy));
-  };
-
-  const handlePanelDragEnd = async () => {
-    if (!isDetailExpanded || !isPanelDragging) {
-      setPanelDragY(0);
-      setIsPanelDragging(false);
-      return;
-    }
-
-    const cardHeight = 300;
-    const dragPercentage = panelDragY / cardHeight;
-    
-    if (dragPercentage >= COLLAPSE_THRESHOLD && dragPercentage <= 0.4) {
-      triggerHaptic('light');
-      setShowStaggeredContent(false);
-      await new Promise(resolve => setTimeout(resolve, prefersReducedMotion ? 60 : 120));
-      setIsDetailExpanded(false);
-    }
-    
-    setPanelDragY(0);
-    setIsPanelDragging(false);
-  };
+  // Panel drag handlers removed - overlay controls restricted to detail icon only
 
   const handleSwipeUp = async () => {
     if (!enableVerticalSwipe) return;
@@ -295,23 +265,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setDragY(0);
   };
 
-  // Enhanced swipe gesture with panel drag support
+  // Simplified swipe gesture - vertical only for follow/dismiss
   const swipeRef = useSwipeGesture({
     onSwipeUp: enableVerticalSwipe ? handleSwipeUp : undefined,
-    onSwipeDown: enableVerticalSwipe ? (isDetailExpanded ? undefined : handleSwipeDown) : undefined,
-    onSwiping: enableVerticalSwipe ? (dx, dy) => {
-      if (isDetailExpanded && dy > 0) {
-        handlePanelDrag(dy);
-      } else {
-        handleSwiping(dx, dy);
-      }
-    } : undefined,
-    onSwipeEnd: () => {
-      handleSwipeEnd();
-      handlePanelDragEnd();
-    },
+    onSwipeDown: enableVerticalSwipe ? handleSwipeDown : undefined,
+    onSwiping: enableVerticalSwipe ? handleSwiping : undefined,
+    onSwipeEnd: handleSwipeEnd,
     threshold: 90,
-    preventDefaultTouchMove: enableVerticalSwipe,
   });
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
@@ -323,7 +283,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       data-card={user.id}
       className="relative snap-start overflow-hidden select-none"
       style={{ 
-        touchAction: enableVerticalSwipe ? 'none' : 'auto',
+        touchAction: enableVerticalSwipe ? 'pan-x' : 'auto', // Allow horizontal pan for carousel
         overscrollBehavior: 'contain'
       }}
     >
@@ -519,15 +479,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           animate={{
             height: isDetailExpanded ? "100%" : "90px",
           }}
-          style={{
-            transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
-            willChange: isPanelDragging || isDetailExpanded ? 'height, transform' : 'auto'
-          }}
           transition={{
-            duration: isPanelDragging ? 0 : (prefersReducedMotion ? 0.12 : 0.22),
-            ease: isDetailExpanded ? "easeOut" : "easeOut"
+            duration: prefersReducedMotion ? 0.12 : 0.25,
+            ease: isDetailExpanded ? "easeOut" : "easeIn"
           }}
-          onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
         >
           {/* Glass Container with Proper Safe Areas */}
           <div 
@@ -922,9 +877,7 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
   const { users, loading, error, toggleFollow, refetch } = useSuggestedUsersDiscover();
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [dismissedUsers, setDismissedUsers] = useState<Set<string>>(new Set());
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
 
   const isDesktop = useMedia('(min-width: 1024px)');
 
@@ -948,67 +901,21 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
 
   const filteredUsers = users.filter(user => !dismissedUsers.has(user.id));
 
-  const updateScrollButtons = () => {
-    const container = containerRef.current;
-    if (container) {
-      setCanScrollLeft(container.scrollLeft > 0);
-      setCanScrollRight(
-        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
-      );
-    }
-  };
-
-  const scroll = (direction: 'left' | 'right') => {
-    const container = containerRef.current;
-    if (container) {
-      const cardWidth = 160;
-      const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
-      container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
-      setTimeout(updateScrollButtons, 300);
-    }
-  };
-
+  // Track visible cards for video autoplay
   useEffect(() => {
-    updateScrollButtons();
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', updateScrollButtons);
-      return () => container.removeEventListener('scroll', updateScrollButtons);
-    }
-  }, [filteredUsers.length]);
+    const startIndex = Math.floor(currentCarouselIndex);
+    const endIndex = Math.min(startIndex + 3, filteredUsers.length); // Show 3 cards at a time
+    
+    const visibleUserIds = filteredUsers
+      .slice(startIndex, endIndex)
+      .map(user => user.id);
+    
+    setVisibleCards(new Set(visibleUserIds));
+  }, [currentCarouselIndex, filteredUsers]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const cardId = entry.target.getAttribute('data-card-id');
-          if (!cardId) return;
-
-          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
-            setVisibleCards(prev => new Set([...prev, cardId]));
-          } else {
-            setVisibleCards(prev => {
-              const newSet = new Set(prev);
-              newSet.delete(cardId);
-              return newSet;
-            });
-          }
-        });
-      },
-      {
-        threshold: [0, 0.3, 0.6, 1],
-        rootMargin: '25px 0px 25px 0px'
-      }
-    );
-
-    const cards = container.querySelectorAll('[data-card-id]');
-    cards.forEach(card => observer.observe(card));
-
-    return () => observer.disconnect();
-  }, [users]);
+  const handleCarouselIndexChange = (index: number) => {
+    setCurrentCarouselIndex(index);
+  };
 
   if (loading) {
     return (
@@ -1029,65 +936,38 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
     return null;
   }
 
+  // Create carousel items
+  const carouselItems = filteredUsers.map((user) => (
+    <div
+      key={user.id}
+      data-card-id={user.id}
+      className="flex-shrink-0 w-40"
+    >
+      <SuggestedUserCard
+        user={user}
+        onToggleFollow={handleToggleFollow}
+        onDismiss={handleDismiss}
+        isVisible={visibleCards.has(user.id)}
+        onFirstSwipe={() => {
+          // Handle first swipe tutorial if needed
+        }}
+      />
+    </div>
+  ));
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Suggested For You</h2>
-        {isDesktop && (
-          <div className="flex gap-2">
-            <motion.button
-              onClick={() => scroll('left')}
-              disabled={!canScrollLeft}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={cn(
-                "w-8 h-8 rounded-full border border-border bg-background/80 backdrop-blur-sm",
-                "flex items-center justify-center transition-colors",
-                canScrollLeft ? "hover:bg-accent/10" : "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </motion.button>
-            <motion.button
-              onClick={() => scroll('right')}
-              disabled={!canScrollRight}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={cn(
-                "w-8 h-8 rounded-full border border-border bg-background/80 backdrop-blur-sm",
-                "flex items-center justify-center transition-colors",
-                canScrollRight ? "hover:bg-accent/10" : "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
-          </div>
-        )}
       </div>
       
-      <div 
-        ref={containerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {filteredUsers.map((user) => (
-          <div
-            key={user.id}
-            data-card-id={user.id}
-            className="flex-shrink-0 w-40 snap-start"
-          >
-            <SuggestedUserCard
-              user={user}
-              onToggleFollow={handleToggleFollow}
-              onDismiss={handleDismiss}
-              isVisible={visibleCards.has(user.id)}
-              onFirstSwipe={() => {
-                // Handle first swipe tutorial if needed
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      <SwipeCarousel
+        items={carouselItems}
+        className="pb-2"
+        showDots={false}
+        showArrows={isDesktop}
+        onSlideChange={handleCarouselIndexChange}
+      />
     </div>
   );
 };
