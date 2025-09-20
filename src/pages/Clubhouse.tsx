@@ -106,8 +106,14 @@ const Clubhouse = () => {
       
       <ClubhouseHeaderNew activeTab={headerActiveTab} onTabChange={setHeaderActiveTab} />
 
-      {/* Main Content - Fullscreen Vertical Feed */}
-      <div className="clubhouse-scroll">
+      {/* Main Content - Fullscreen Vertical Feed with header offset */}
+      <div 
+        className="clubhouse-scroll" 
+        style={{ 
+          paddingTop: 'calc(64px + env(safe-area-inset-top))', // Header height + safe area
+          marginTop: 'calc(-64px - env(safe-area-inset-top))' // Negative margin to offset padding
+        }}
+      >
         <ClubhouseVerticalFeed
           posts={posts}
           onLike={handleLike}

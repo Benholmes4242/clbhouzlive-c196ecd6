@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeaderVariantSetter } from '@/hooks/useHeaderVariant';
 import { useBottomNavigationVariant } from '@/hooks/useBottomNavigationVariant';
 import ProfilePage from './ProfilePage';
 
@@ -11,7 +12,8 @@ const ProfileWrapped = () => {
     setVariant('glass-dark');
   }, [setVariant]);
 
-  // Set bottom navigation variant for profile
+  // Set header and bottom navigation variants for profile
+  useHeaderVariantSetter('glass-dark');
   useBottomNavigationVariant('default');
 
   return <ProfilePage />;

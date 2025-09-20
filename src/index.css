@@ -29,6 +29,7 @@ html, body {
   --safe-left: 0px; 
   --safe-right: 0px;
   --nav-height: 56px; /* Default navigation height */
+  --header-height: 64px; /* Default header height */
 }
 
 /* Modern safe area inset support */
@@ -61,11 +62,12 @@ html, body {
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   box-sizing: border-box;
-  /* Add bottom padding for nav space using dynamic nav height */
+  /* Add top padding for fixed header and bottom padding for nav space */
+  padding-top: calc(var(--header-height) + var(--safe-top));
   padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
 }
 
-/* Clubhouse specific: remove global safe-area top padding and hide standard header */
+/* Clubhouse specific: remove global header offset since it handles its own layout */
 body.route-clubhouse .app-shell {
   padding-top: 0 !important;
 }

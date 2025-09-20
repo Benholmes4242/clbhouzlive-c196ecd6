@@ -21,6 +21,7 @@ import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
+import GlobalHeader from '@/components/GlobalHeader';
 import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
@@ -171,6 +172,7 @@ const App: React.FC = () => {
                         <Toaster />
                         <Sonner />
                         <AIChat />
+                        <GlobalHeader />
                         <GlobalBottomNavigation />
                       </BrowserRouter>
                     </BottomNavigationProvider>

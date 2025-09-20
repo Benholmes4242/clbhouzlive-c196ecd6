@@ -5,6 +5,8 @@ export type HeaderVariant = 'glass-dark' | 'solid-light';
 interface HeaderContextType {
   variant: HeaderVariant;
   setVariant: (variant: HeaderVariant) => void;
+  isVisible: boolean;
+  setVisible: (visible: boolean) => void;
 }
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -20,7 +22,9 @@ export const useHeaderVariant = () => {
     console.warn('useHeaderVariant called outside HeaderProvider, using solid-light fallback');
     return {
       variant: 'solid-light' as HeaderVariant,
-      setVariant: () => console.warn('setVariant called outside HeaderProvider')
+      setVariant: () => console.warn('setVariant called outside HeaderProvider'),
+      isVisible: true,
+      setVisible: () => console.warn('setVisible called outside HeaderProvider')
     };
   }
   return context;
@@ -33,9 +37,14 @@ interface HeaderProviderProps {
 
 export const HeaderProvider = ({ children, defaultVariant = 'glass-dark' }: HeaderProviderProps) => {
   const [variant, setVariant] = useState<HeaderVariant>(defaultVariant);
+  const [isVisible, setIsVisible] = useState(true);
+
+  const setVisible = (visible: boolean) => {
+    setIsVisible(visible);
+  };
 
   return (
-    <HeaderContext.Provider value={{ variant, setVariant }}>
+    <HeaderContext.Provider value={{ variant, setVariant, isVisible, setVisible }}>
       {children}
     </HeaderContext.Provider>
   );

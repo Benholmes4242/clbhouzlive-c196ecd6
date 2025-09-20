@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeaderVariantSetter } from '@/hooks/useHeaderVariant';
 import { useBottomNavigationVariant } from '@/hooks/useBottomNavigationVariant';
 import Clubhouse from './Clubhouse';
 
@@ -10,7 +11,8 @@ const ClubhouseWrapped = () => {
     setVariant('glass-dark');
   }, [setVariant]);
 
-  // Set bottom navigation variant for clubhouse
+  // Set header and bottom navigation variants for clubhouse
+  useHeaderVariantSetter('glass-dark');
   useBottomNavigationVariant('clubhouse');
 
   return <Clubhouse />;

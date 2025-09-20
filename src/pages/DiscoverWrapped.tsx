@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeaderVariantSetter } from '@/hooks/useHeaderVariant';
 import { useBottomNavigationVariant } from '@/hooks/useBottomNavigationVariant';
 import Discover from './Discover';
 
@@ -10,7 +11,8 @@ const DiscoverWrapped = () => {
     setVariant('solid-light');
   }, [setVariant]);
 
-  // Set bottom navigation variant for discover
+  // Set header and bottom navigation variants for discover
+  useHeaderVariantSetter('solid-light');
   useBottomNavigationVariant('default');
 
   return <Discover />;
