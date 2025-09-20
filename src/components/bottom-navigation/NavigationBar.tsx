@@ -23,12 +23,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
       )}
       style={{
         ['--safe-bottom' as any]: 'env(safe-area-inset-bottom)',
-        paddingBottom: 'max(var(--safe-bottom, 0px), 6px)',
+        paddingBottom: 'max(var(--safe-bottom, 0px), 4px)',
       }}
     >
       <div className="w-full px-2">
-        {/* Compact height: 48px mobile / 56px desktop */}
-        <div className="flex items-center justify-between h-12 md:h-14 relative">
+        {/* Reduced height for compactness: 44px mobile / 48px desktop */}
+        <div className="flex items-center justify-between h-11 md:h-12 relative">
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

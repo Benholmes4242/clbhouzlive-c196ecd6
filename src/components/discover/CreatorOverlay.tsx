@@ -26,10 +26,11 @@ const CreatorOverlay: React.FC<CreatorOverlayProps> = ({ user, onCreatorClick })
   };
 
   return (
-    <div className="absolute bottom-2 left-2 z-10 pointer-events-auto">
+    <div className="absolute bottom-2 left-2 z-creator-overlay pointer-events-auto">
       <button
         onClick={handleClick}
-        className="flex items-center gap-2 px-2 py-1.5 bg-black/70 backdrop-blur-sm border border-white/10 rounded-lg transition-all duration-200 hover:bg-black/80 hover:border-white/20 max-w-[200px] group"
+        className="flex items-center gap-2 px-2 py-1.5 bg-black/70 backdrop-blur-sm border border-white/10 rounded-lg transition-all duration-200 hover:bg-black/80 hover:border-white/20 max-w-[200px] group focus:outline-none focus:ring-2 focus:ring-white/30"
+        aria-label={`View ${displayName}'s profile`}
       >
         <img
           src={user.avatar}

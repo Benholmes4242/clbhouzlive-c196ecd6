@@ -78,6 +78,8 @@ const MediaSearch = ({
       setShowSuggestions(false);
       inputRef.current?.blur();
     }
+    // Prevent event bubbling to avoid unwanted behaviors
+    e.stopPropagation();
   };
 
   // Click outside to close
@@ -144,7 +146,7 @@ const MediaSearch = ({
 
       {/* Search Suggestions Dropdown */}
       {showSuggestions && hasContent && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg z-50 max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg z-[9999] max-h-80 overflow-y-auto">
           {query.length === 0 && (
             <>
               {/* Recent Searches */}
@@ -167,7 +169,14 @@ const MediaSearch = ({
                       <button
                         key={search.id}
                         onClick={() => handleRecentClick(search.query)}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleRecentClick(search.query);
+                          }
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-orange/20"
+                        tabIndex={0}
                       >
                         {search.query}
                       </button>
@@ -188,7 +197,14 @@ const MediaSearch = ({
                       <button
                         key={index}
                         onClick={() => handleTrendingClick(trending)}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleTrendingClick(trending);
+                          }
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:bg-gray-50 focus:ring-2 focus:ring-brand-orange/20"
+                        tabIndex={0}
                       >
                         {trending}
                       </button>

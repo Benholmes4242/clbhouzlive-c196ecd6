@@ -153,9 +153,7 @@ const Discover = () => {
           </div>
 
           {/* Trending Tags Bar */}
-          <div className="mt-3">
-            <TrendingTagsBar onTagsChange={setSelectedTags} />
-          </div>
+          <TrendingTagsBar onTagsChange={setSelectedTags} />
 
           {/* Suggested Users */}
           <div className="mt-4">

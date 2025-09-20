@@ -38,42 +38,46 @@ const TrendingTagsBar: React.FC<TrendingTagsBarProps> = ({ onTagsChange, classNa
   };
 
   return (
-    <div className={`px-4 md:container md:mx-auto md:px-6 ${className}`}>
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {/* Clear all button - only show when tags are selected */}
-        {selectedTags.length > 0 && (
-          <button
-            onClick={clearTags}
-            className="flex items-center gap-1 px-3 py-1.5 bg-discover-orange text-white text-xs font-medium rounded-full hover:bg-discover-orange-dark transition-colors flex-shrink-0"
-          >
-            <X className="w-3 h-3" />
-            Clear
-          </button>
-        )}
-        
-        {/* Trending tags */}
-        {tags.map((tag) => {
-          const isSelected = selectedTags.includes(tag.tag);
-          
-          return (
+    <div className="sticky top-28 z-sticky-pills bg-background/95 backdrop-blur-sm pb-2">{/* Position under pills */}
+      <div className="px-4 md:container md:mx-auto md:px-6">{/* Container with proper spacing */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {/* Clear all button - only show when tags are selected */}
+          {selectedTags.length > 0 && (
             <button
-              key={tag.tag}
-              onClick={() => toggleTag(tag.tag)}
-              className={`
-                flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex-shrink-0 border
-                ${isSelected 
-                  ? 'bg-discover-orange text-white border-discover-orange shadow-sm' 
-                  : 'bg-white/70 backdrop-blur-sm text-foreground border-border hover:border-discover-orange/30 hover:bg-discover-orange/5'
-                }
-              `}
+              onClick={clearTags}
+              className="flex items-center gap-1 px-3 py-1.5 bg-discover-orange text-white text-xs font-medium rounded-full hover:bg-discover-orange-dark transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-discover-orange/50"
+              aria-label="Clear all selected tags"
             >
-              <span className="font-medium">#{tag.tag}</span>
-              <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
-                {formatCount(tag.uses)}
-              </span>
+              <X className="w-3 h-3" />
+              Clear
             </button>
-          );
-        })}
+          )}
+          
+          {/* Trending tags */}
+          {tags.map((tag) => {
+            const isSelected = selectedTags.includes(tag.tag);
+            
+            return (
+              <button
+                key={tag.tag}
+                onClick={() => toggleTag(tag.tag)}
+                className={`
+                  flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex-shrink-0 border min-h-[44px] focus:outline-none focus:ring-2
+                  ${isSelected 
+                    ? 'bg-discover-orange text-white border-discover-orange shadow-sm focus:ring-discover-orange/50' 
+                    : 'bg-white/70 backdrop-blur-sm text-foreground border-border hover:border-discover-orange/30 hover:bg-discover-orange/5 focus:ring-discover-orange/30'
+                  }
+                `}
+                aria-label={`${isSelected ? 'Remove' : 'Add'} ${tag.tag} tag filter`}
+              >
+                <span className="font-medium">#{tag.tag}</span>
+                <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                  {formatCount(tag.uses)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

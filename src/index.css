@@ -587,12 +587,41 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   /* Z-index layering map */
+  /* Z-index layering system */
+  .z-global-header { z-index: 60; }
+  .z-sticky-pills { z-index: 20; }
+  .z-search-dropdown { z-index: 9999; }
+  .z-creator-overlay { z-index: 30; }
+  .z-card-badges { z-index: 40; }
+  .z-bottom-nav { z-index: 55; }
+  
+  /* Legacy z-index classes */
   .z-header { z-index: 60; }
   .z-overlay { z-index: 50; }
-  .z-bottom-nav { z-index: 55; }
   .z-gradient { z-index: 10; }
   .z-video { z-index: 0; }
   .z-bg-blur { z-index: -10; }
+
+  /* Accessibility and performance optimizations */
+  @media (prefers-reduced-motion: reduce) {
+    .discover-pill,
+    .discover-pill--active,
+    .transition-all,
+    .transition-colors,
+    .transition-transform,
+    .animate-pulse,
+    .animate-spin {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Focus ring visibility */
+  .focus-visible {
+    outline: 2px solid var(--discover-orange);
+    outline-offset: 2px;
+  }
 
 
   /* Achievement badge size token */

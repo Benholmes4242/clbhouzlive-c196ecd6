@@ -121,7 +121,7 @@ const DiscoverPillRow: React.FC<DiscoverPillRowProps> = ({
   };
 
   return (
-    <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm">
+    <div className="sticky top-16 z-sticky-pills bg-background/95 backdrop-blur-sm">{/* Updated z-index */}
       <div className="px-4 md:container md:mx-auto md:px-6">
         {/* Single Row Horizontal Scroll */}
         <div className="relative py-3">
