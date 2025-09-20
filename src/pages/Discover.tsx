@@ -144,7 +144,7 @@ const Discover = () => {
           </div>
 
           {/* Filter Pills Row */}
-          <div className="mt-3">
+          <div className="mt-3 mb-1">
             <DiscoverPillRow 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}

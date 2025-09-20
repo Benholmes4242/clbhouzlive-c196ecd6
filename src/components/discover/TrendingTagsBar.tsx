@@ -38,7 +38,7 @@ const TrendingTagsBar: React.FC<TrendingTagsBarProps> = ({ onTagsChange, classNa
   };
 
   return (
-    <div className="sticky top-28 z-sticky-pills bg-background/95 backdrop-blur-sm pb-2">{/* Position under pills */}
+    <div className="mt-2 pb-2">{/* Static positioning - no longer sticky */}
       <div className="px-4 md:container md:mx-auto md:px-6">{/* Container with proper spacing */}
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
           {/* Clear all button - only show when tags are selected */}

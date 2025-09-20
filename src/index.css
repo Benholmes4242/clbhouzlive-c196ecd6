@@ -694,12 +694,12 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   /* Apple-Inspired Pill Components */
   .pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
-           select-none whitespace-nowrap
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
+           select-none whitespace-nowrap text-sm font-medium
            backdrop-blur-md bg-transparent text-black
            border border-gray-300 shadow-none
            transition-colors transition-shadow duration-150;
-    line-height: 1;
+    line-height: 1.2;
   }
 
   .pill:hover { 
@@ -726,12 +726,12 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   /* Discover Page Specific Pills with Brand Orange */
   .discover-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
-           select-none whitespace-nowrap text-sm font-medium
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
+           select-none whitespace-nowrap
            backdrop-blur-md bg-gray-50/80 text-gray-700
            border border-gray-200/60 shadow-none
            transition-all duration-200;
-    line-height: 1.2;
+    line-height: 1;
     scroll-snap-align: start;
   }
 
@@ -1105,12 +1105,12 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   /* Discover Page Specific Pills with Brand Orange */
   .discover-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
-           select-none whitespace-nowrap text-sm font-medium
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
+           select-none whitespace-nowrap
            backdrop-blur-md bg-gray-50/80 text-gray-700
            border border-gray-200/60 shadow-none
            transition-all duration-200;
-    line-height: 1.2;
+    line-height: 1;
     scroll-snap-align: start;
   }
 
