@@ -30,9 +30,12 @@ import ProfilePage from "./pages/ProfilePage";
 import Discover from "./pages/Discover";
 import { HeaderProvider } from '@/contexts/HeaderContext';
 
-// Import wrapped components
+// Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import DiscoverWrapped from "./pages/DiscoverWrapped";
+import ProfileWrapped from "./pages/ProfileWrapped";
+import SettingsWrapped from "./pages/SettingsWrapped";
+import AuthWrapped from "./pages/AuthWrapped";
 
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
@@ -115,23 +118,23 @@ const App: React.FC = () => {
             <SiteAccessControl>
               <HeaderProvider>
                 <ModalProvider>
-                <UIProvider>
-                <BrowserRouter>
-                  <ScrollToTop />
-                  <GlobalAudioProvider>
-                    <VideoManagerProvider>
-                      <VideoPlaybackManagerProvider>
-                        <TopTenProvider>
-                          <AuthWrapper>
-                      <Suspense fallback={<ClubhouzLoading />}>
+                  <UIProvider>
+                    <BrowserRouter>
+                      <ScrollToTop />
+                      <GlobalAudioProvider>
+                        <VideoManagerProvider>
+                          <VideoPlaybackManagerProvider>
+                            <TopTenProvider>
+                              <AuthWrapper>
+                                <Suspense fallback={<ClubhouzLoading />}>
                         <Routes>
                           <Route path="/" element={<ClubhouseWrapped />} />
-                          <Route path="/auth" element={<Auth />} />
+                          <Route path="/auth" element={<AuthWrapped />} />
                           <Route path="/create-profile" element={<CreateProfile />} />
-                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/profile" element={<ProfileWrapped />} />
                           <Route path="/profile-test" element={<ProfileTestPage />} />
                           <Route path="/profile/:username" element={<UserProfilePage />} />
-                          <Route path="/settings" element={<Settings />} />
+                          <Route path="/settings" element={<SettingsWrapped />} />
                           {/* Explore route removed - redirects to discover */}
                           <Route path="/clubhouse" element={<ClubhouseWrapped />} />
                           <Route path="/discover" element={<DiscoverWrapped />} />
@@ -156,17 +159,17 @@ const App: React.FC = () => {
                           
                           <Route path="*" element={<NotFound />} />
                         </Routes>
-                        </Suspense>
-                        </AuthWrapper>
-                        </TopTenProvider>
-                      </VideoPlaybackManagerProvider>
-                    </VideoManagerProvider>
-                  </GlobalAudioProvider>
-                  <Toaster />
-                  <Sonner />
-                  <AIChat />
-                </BrowserRouter>
-                </UIProvider>
+                                </Suspense>
+                              </AuthWrapper>
+                            </TopTenProvider>
+                          </VideoPlaybackManagerProvider>
+                        </VideoManagerProvider>
+                      </GlobalAudioProvider>
+                      <Toaster />
+                      <Sonner />
+                      <AIChat />
+                    </BrowserRouter>
+                  </UIProvider>
                 </ModalProvider>
               </HeaderProvider>
             </SiteAccessControl>

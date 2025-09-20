@@ -12,7 +12,16 @@ const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
 export const useHeaderVariant = () => {
   const context = useContext(HeaderContext);
   if (!context) {
-    throw new Error('useHeaderVariant must be used within a HeaderProvider');
+    // Development: throw error to catch provider issues
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useHeaderVariant must be used within a HeaderProvider');
+    }
+    // Production: safe fallback to prevent blank screens
+    console.warn('useHeaderVariant called outside HeaderProvider, using solid-light fallback');
+    return {
+      variant: 'solid-light' as HeaderVariant,
+      setVariant: () => console.warn('setVariant called outside HeaderProvider')
+    };
   }
   return context;
 };
