@@ -635,7 +635,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
                     {/* User Info - Staggered */}
                      <motion.div 
-                       className="text-center space-y-1.5 px-3"
+                       className="text-center space-y-1.5 px-1"
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
@@ -692,30 +692,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                        >
                          {user.handle.startsWith("@") ? user.handle : `@${user.handle}`}
                        </motion.p>
-                      
-                      {/* Home Club - truncate with ellipsis */}
-                      {user.homeClub && (
-                        <motion.p 
-                          className="text-white/80 text-base font-medium mt-3 truncate px-4"
-                          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ 
-                            opacity: showStaggeredContent ? 1 : 0,
-                            y: showStaggeredContent ? 0 : 10
-                          }}
-                          transition={{ 
-                            duration: prefersReducedMotion ? 0.06 : 0.2,
-                            delay: prefersReducedMotion ? 0 : 0.1,
-                            ease: "easeOut"
-                          }}
-                        >
-                          {user.homeClub}
-                          {user.handicap !== undefined && (
-                            <span className="block mt-1 text-sm opacity-90">HCP {user.handicap}</span>
-                          )}
-                        </motion.p>
-                      )}
-                    </motion.div>
+                     </motion.div>
                   </div>
                 </motion.div>
               )}
