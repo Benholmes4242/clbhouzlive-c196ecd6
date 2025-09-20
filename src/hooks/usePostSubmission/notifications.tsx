@@ -3,7 +3,6 @@ import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getFileErrorMessage } from '@/components/posts/utils/fileValidation';
 import { uploadMediaWithRetry } from '@/components/posts/utils/mediaUpload';
-import { showToast } from '@/utils/toast';
 
 export const usePostNotifications = () => {
   const { toast } = useToast();
@@ -70,7 +69,8 @@ export const usePostNotifications = () => {
   };
 
   const showSuccessMessage = () => {
-    showToast("Your Post Is Out There");
+    // Success is now handled by SuccessOverlay component
+    return { success: true };
   };
 
   return {

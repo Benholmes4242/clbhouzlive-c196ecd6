@@ -5,7 +5,6 @@ import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import SnapModal from '@/components/snap/SnapModal';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
-import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
@@ -146,15 +145,8 @@ const Clubhouse = () => {
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
         onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
-      />
-
-      <SnapToast
-        message={toastMessage}
-        isVisible={showToast}
-        onHide={hideToast}
       />
     </div>
   );

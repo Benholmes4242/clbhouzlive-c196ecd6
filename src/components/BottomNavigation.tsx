@@ -4,7 +4,6 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import SnapModal from '@/components/snap/SnapModal';
-import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
@@ -92,16 +91,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
         onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
       />
 
-      <SnapToast
-        message={toastMessage}
-        isVisible={showToast}
-        onHide={hideToast}
-      />
     </>
   );
 };
