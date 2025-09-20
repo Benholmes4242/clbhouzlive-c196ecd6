@@ -24,19 +24,6 @@ html, body {
 
 /* Enhanced safe-area variables for iOS edge-to-edge */
 :root {
-  /* Clubhouse tokens */
-  --accent: 247 76% 54%;            /* #f7931e active icon color */
-  --hud-bg: 0 0% 0% / 0.45;         /* translucent HUD chips */
-  --hud-border: 0 0% 100% / 0.18;
-  --hud-shadow: 0 6px 30px hsl(0 0% 0% / 0.35);
-
-  /* Header heights */
-  --header-h-mobile: 60px;
-  --header-h-desktop: 72px;
-
-  /* Spacing */
-  --tag-offset: 8px;
-
   --safe-top: 0px; 
   --safe-bottom: 0px; 
   --safe-left: 0px; 
@@ -60,13 +47,6 @@ html, body {
     --safe-bottom: constant(safe-area-inset-bottom);
     --safe-left: constant(safe-area-inset-left);
     --safe-right: constant(safe-area-inset-right);
-  }
-}
-
-/* Use desktop height ≥ md */
-@media (min-width: 768px) {
-  :root { 
-    --header-h-mobile: var(--header-h-desktop); 
   }
 }
 
@@ -102,58 +82,6 @@ body.route-clubhouse .global-header {
 .clubhouse-scroll {
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Clubhouse Utilities */
-.overlay-gradient {
-  position: absolute; 
-  inset-inline: 0; 
-  bottom: 0; 
-  height: 35svh;
-  background: linear-gradient(to top, hsl(0 0% 0% / 0.55), hsl(0 0% 0% / 0.15) 40%, transparent);
-  pointer-events: none;
-}
-
-.video-wrap { 
-  position: relative; 
-  height: 100dvh; 
-}
-
-.video-el {
-  width: 100%; 
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  background: #000;
-}
-
-.tag-below-header {
-  top: calc(var(--header-h-mobile) + env(safe-area-inset-top, 0px) + var(--tag-offset));
-}
-
-.header-hidden .tag-below-header {
-  top: calc(12px + env(safe-area-inset-top, 0px));
-}
-
-/* Animations */
-@keyframes marquee { 
-  0% { transform: translateX(0); } 
-  100% { transform: translateX(-50%); } 
-}
-
-@keyframes ripple { 
-  0% { transform: scale(0.8); opacity: 0.3; } 
-  100% { transform: scale(1.4); opacity: 0; } 
-}
-
-.rippling::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: currentColor;
-  opacity: 0.3;
-  animation: ripple 600ms ease-out;
 }
 
 /* Common UI hygiene */
