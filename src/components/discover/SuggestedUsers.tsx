@@ -113,11 +113,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
         </div>
 
         {/* Horizontal Scrollable Video Cards */}
-        <div className="flex overflow-x-auto scrollbar-hide gap-0.5 pb-2">
+        <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
           {availableUsers.map((user, index) => (
             <div
               key={user.id}
-              className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 overflow-hidden relative cursor-pointer"
+              className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 overflow-hidden relative"
             >
               {/* Video/Image Content */}
               <div className="w-full h-32 relative bg-gray-100">
