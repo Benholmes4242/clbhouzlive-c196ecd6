@@ -369,7 +369,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       data-card={user.id}
-      className="relative snap-start overflow-hidden rounded-none"
+      className="relative snap-start overflow-hidden"
       style={{ touchAction: 'auto' }}
     >
       <motion.div
@@ -404,7 +404,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             muted={true}
             loop={true}
             controls={false}
-            className="w-full h-full aspect-[3/4] rounded-none"
+            className="w-full h-full aspect-[3/4]"
             objectFit="cover"
             hideControls={true}
           />
@@ -412,13 +412,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <img
             src={mediaUrl}
             alt={`${user.displayName}'s post`}
-            className="w-full h-full aspect-[3/4] object-cover rounded-none"
+            className="w-full h-full aspect-[3/4] object-cover"
             loading="lazy" // Performance: Lazy load images
             decoding="async" // Performance: Async image decoding
           />
         )
       ) : (
-        <div className="w-full h-full aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center rounded-none">
+        <div className="w-full h-full aspect-[3/4] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
             <span className="text-white text-lg font-bold">
               {user.displayName.charAt(0).toUpperCase()}
@@ -1111,7 +1111,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
             {[...Array(5)].map((_, i) => (
               <div 
                 key={i} 
-                className="flex-shrink-0 w-40 aspect-[3/4] bg-gray-200 dark:bg-gray-800 rounded-none animate-pulse"
+                className="flex-shrink-0 w-40 aspect-[3/4] bg-gray-200 dark:bg-gray-800 rounded-2xl animate-pulse"
               />
             ))}
           </div>
