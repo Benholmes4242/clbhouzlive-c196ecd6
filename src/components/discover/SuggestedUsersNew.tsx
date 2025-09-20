@@ -28,7 +28,6 @@ interface SuggestedUserCardProps {
   onDismiss: (userId: string) => Promise<void>;
   isVisible: boolean;
   onFirstSwipe?: () => void;
-  onHorizontalSwipe?: (direction: 'left' | 'right') => void;
 }
 
 const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({ 
@@ -36,8 +35,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   onToggleFollow,
   onDismiss,
   isVisible,
-  onFirstSwipe,
-  onHorizontalSwipe
+  onFirstSwipe
 }) => {
   const navigate = useNavigate();
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -297,12 +295,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setDragY(0);
   };
 
-  // Enhanced swipe gesture with panel drag support and horizontal swipe
+  // Enhanced swipe gesture with panel drag support (vertical only)
   const swipeRef = useSwipeGesture({
     onSwipeUp: enableVerticalSwipe ? handleSwipeUp : undefined,
     onSwipeDown: enableVerticalSwipe ? (isDetailExpanded ? undefined : handleSwipeDown) : undefined,
-    onSwipeLeft: onHorizontalSwipe ? () => onHorizontalSwipe('left') : undefined,
-    onSwipeRight: onHorizontalSwipe ? () => onHorizontalSwipe('right') : undefined,
     onSwiping: enableVerticalSwipe ? (dx, dy) => {
       if (isDetailExpanded && dy > 0) {
         handlePanelDrag(dy);
@@ -325,9 +321,9 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     <div
       ref={swipeRef}
       data-card={user.id}
-      className="relative snap-start overflow-hidden select-none"
+      className="relative overflow-hidden select-none"
       style={{ 
-        touchAction: enableVerticalSwipe ? 'none' : 'auto',
+        touchAction: 'pan-x',
         overscrollBehavior: 'contain'
       }}
     >
@@ -985,11 +981,6 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
     }
   };
 
-  const handleHorizontalSwipe = useSwipeGesture({
-    onSwipeLeft: () => scroll('right'),
-    onSwipeRight: () => scroll('left'),
-    threshold: 50,
-  });
 
   useEffect(() => {
     updateScrollButtons();
@@ -1032,6 +1023,43 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
 
     return () => observer.disconnect();
   }, [users]);
+
+  // Edge bounce on native horizontal pan when at boundaries
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    let startX = 0;
+    let lastBounce = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const atStart = el.scrollLeft <= 0;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1;
+      const now = Date.now();
+      if (atStart && dx > 12 && now - lastBounce > 450) {
+        setBounceDirection('left');
+        lastBounce = now;
+        setTimeout(() => setBounceDirection(null), 400);
+      } else if (atEnd && dx < -12 && now - lastBounce > 450) {
+        setBounceDirection('right');
+        lastBounce = now;
+        setTimeout(() => setBounceDirection(null), 400);
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart as EventListener);
+      el.removeEventListener('touchmove', onTouchMove as EventListener);
+    };
+  }, [filteredUsers.length]);
 
   if (loading) {
     return (
@@ -1091,13 +1119,16 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
       <motion.div 
         ref={(node) => {
           containerRef.current = node;
-          handleHorizontalSwipe.current = node;
         }}
         className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
-          touchAction: 'pan-x pinch-zoom'
+          touchAction: 'pan-x pinch-zoom',
+          scrollSnapType: 'none',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorX: 'contain',
+          scrollbarGutter: 'stable both-edges'
         }}
         animate={{
           x: bounceDirection === 'left' ? [0, -8, 0] : bounceDirection === 'right' ? [0, 8, 0] : 0
@@ -1120,10 +1151,6 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
               isVisible={visibleCards.has(user.id)}
               onFirstSwipe={() => {
                 // Handle first swipe tutorial if needed
-              }}
-              onHorizontalSwipe={(direction) => {
-                if (direction === 'left') scroll('right');
-                else scroll('left');
               }}
             />
           </div>
