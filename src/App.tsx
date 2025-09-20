@@ -23,6 +23,7 @@ import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
+import { SuccessOverlay } from '@/components/ui/SuccessOverlay';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -168,6 +169,7 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <AIChat />
+                      <SuccessOverlay isVisible={true} onClose={() => {}} message="Moment posted successfully!" />
                     </BrowserRouter>
                   </UIProvider>
                 </ModalProvider>
