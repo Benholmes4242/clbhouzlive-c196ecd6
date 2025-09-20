@@ -201,20 +201,14 @@ const SnapModal = ({
     ...(isMobile ? [{
       key: "capture",
       label: "Camera",
-      description: "Take photo or video",
       icon: Camera,
       onClick: onCameraClick,
-      variant: "capture" as const,
-      thumbs: captureThumbs,
     }] : []),
     {
       key: "media",
-      label: "Media",
-      description: "Pick photos & videos",
+      label: "Photos",
       icon: Images,
       onClick: handlePickMedia,
-      variant: "photos" as const, // Reuse photos layout for thumbnails
-      thumbs: photoThumbs,
     },
   ];
 
@@ -228,101 +222,79 @@ const SnapModal = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Backdrop */}
+          {/* Backdrop - Consistent with Discover overlay scrim */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
           />
           
-          {/* Panel */}
-          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
+          {/* Panel - Light floating sheet */}
+          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={onClose}>
             <motion.div
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] liquid-glass rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.5)] text-white"
+              className="w-full max-w-[400px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
               onClick={(e) => e.stopPropagation()}
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
+              initial={{ y: 40, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              transition={{ type: "spring", stiffness: 280, damping: 26, duration: 0.22 }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 pt-6 pb-3">
-                <div>
-                  <h2 className="text-2xl font-semibold">Create a Moment</h2>
-                  <p className="text-sm text-white/70 mt-1">Choose how you'd like to share</p>
-                </div>
-                <button 
-                  onClick={onClose} 
-                  aria-label="Close" 
-                  className="h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center ring-1 ring-white/20"
-                >
-                  <X className="h-4 w-4 text-white" />
-                </button>
+              <div className="px-8 pt-8 pb-6 text-center">
+                <h2 className="text-2xl font-semibold mb-2">Create a Moment</h2>
+                <p className="text-sm text-white/70">Choose how you'd like to share</p>
               </div>
 
-              <div className="px-5 pb-6 space-y-4">
-                {/* Media Options */}
-                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
-                  <motion.button
-                    key={key}
-                    onClick={onClick}
-                    className="w-full h-20 flex items-center justify-between gap-4 px-5 py-4 liquid-glass rounded-3xl hover:scale-[1.02] hover:shadow-lg hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300 group"
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl liquid-glass-button flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors duration-300">
-                        <Icon className="h-6 w-6 text-white group-hover:text-brand-orange transition-colors duration-300" />
+              {/* Action Icons */}
+              <div className="px-8 pb-8">
+                <div className={`flex ${isMobile ? 'justify-center gap-12' : 'justify-center gap-16'} items-center`}>
+                  {cardOptions.map(({ key, label, icon: Icon, onClick }) => (
+                    <motion.button
+                      key={key}
+                      onClick={onClick}
+                      className="flex flex-col items-center gap-4 group"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      {/* Circular Glass Button */}
+                      <div className="w-16 h-16 rounded-full liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/40 group-hover:shadow-lg group-hover:shadow-brand-orange/20 transition-all duration-300">
+                        <Icon className="h-7 w-7 text-white group-hover:text-brand-orange transition-colors duration-300" />
                       </div>
-                      <div className="text-left">
-                        <div className="font-semibold text-white">{label}</div>
-                        {/* Show empty state message if no user media and not loading */}
-                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
-                          <div className="text-sm text-white/70">No posts yet - start creating!</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="border-l border-white/20 pl-4">
-                      <ThumbStrip variant={variant} thumbs={thumbs} />
-                    </div>
-                  </motion.button>
-                ))}
+                      
+                      {/* Label */}
+                      <span className="text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
+                        {label}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
 
                 {/* Error state with retry */}
                 {error && (
-                  <div className="px-5 py-4 bg-red-500/10 backdrop-blur-md ring-1 ring-red-500/30 rounded-3xl">
-                    <div className="text-sm text-red-200 mb-2">Couldn't load your media</div>
+                  <div className="mt-6 px-5 py-4 bg-red-500/10 backdrop-blur-md ring-1 ring-red-500/30 rounded-2xl">
+                    <div className="text-sm text-red-200 mb-2 text-center">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
-                      className="text-xs text-red-300 hover:text-red-100 underline transition-colors duration-200"
+                      className="text-xs text-red-300 hover:text-red-100 underline transition-colors duration-200 block mx-auto"
                     >
                       Retry
                     </button>
                   </div>
                 )}
 
-                {/* Tell Your Story Card - AT BOTTOM */}
-                <motion.button
-                  onClick={() => {
-                    // Open the same media picker flow
-                    handlePickMedia();
-                  }}
-                  className="w-full h-24 flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-brand-orange/30 to-brand-orange/10 backdrop-blur-md ring-1 ring-brand-orange/40 rounded-3xl hover:scale-[1.02] hover:shadow-lg hover:from-brand-orange/40 hover:to-brand-orange/20 transition-all duration-300"
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-orange/40 to-brand-orange/20 flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="font-bold text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/80">Mix photos & videos in one go</span>
-                  </div>
-                </motion.button>
               </div>
+
+              {/* Close button - positioned at top right */}
+              <button 
+                onClick={onClose} 
+                aria-label="Close" 
+                className="absolute top-4 right-4 h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center"
+              >
+                <X className="h-4 w-4 text-white" />
+              </button>
             </motion.div>
           </div>
         </motion.div>
