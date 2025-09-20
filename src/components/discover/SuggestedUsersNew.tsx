@@ -929,6 +929,7 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [bounceDirection, setBounceDirection] = useState<'left' | 'right' | null>(null);
 
   const isDesktop = useMedia('(min-width: 1024px)');
 
@@ -967,6 +968,18 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
     if (container) {
       const cardWidth = 160;
       const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
+      
+      // Check if we're at the boundaries before scrolling
+      const isAtStart = container.scrollLeft <= 0;
+      const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 1;
+      
+      if ((direction === 'left' && isAtStart) || (direction === 'right' && isAtEnd)) {
+        // Trigger bounce effect
+        setBounceDirection(direction);
+        setTimeout(() => setBounceDirection(null), 400);
+        return;
+      }
+      
       container.scrollBy({ left: scrollDistance, behavior: 'smooth' });
       setTimeout(updateScrollButtons, 300);
     }
@@ -1075,23 +1088,30 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
         )}
       </div>
       
-      <div 
+      <motion.div 
         ref={(node) => {
           containerRef.current = node;
           handleHorizontalSwipe.current = node;
         }}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2"
+        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
           touchAction: 'pan-x pinch-zoom'
+        }}
+        animate={{
+          x: bounceDirection === 'left' ? [0, -8, 0] : bounceDirection === 'right' ? [0, 8, 0] : 0
+        }}
+        transition={{
+          duration: 0.4,
+          ease: [0.25, 0.46, 0.45, 0.94]
         }}
       >
         {filteredUsers.map((user) => (
           <div
             key={user.id}
             data-card-id={user.id}
-            className="flex-shrink-0 w-40 snap-start"
+            className="flex-shrink-0 w-40"
           >
             <SuggestedUserCard
               user={user}
@@ -1108,7 +1128,7 @@ const SuggestedUsersNew: React.FC<SuggestedUsersNewProps> = ({
             />
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };
