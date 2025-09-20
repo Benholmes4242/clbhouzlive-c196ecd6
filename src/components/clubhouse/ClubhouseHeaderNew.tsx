@@ -81,7 +81,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
               onClick={handleLogoClick}
             />
             <img
-              src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
+              src="/assets/clbhouz-white-logo.png"
               alt="clbhouz Logo"
               className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
               onClick={handleLogoClick}
