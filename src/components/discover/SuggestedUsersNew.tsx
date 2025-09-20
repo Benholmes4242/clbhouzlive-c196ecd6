@@ -635,7 +635,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
                     {/* User Info - Staggered */}
                      <motion.div 
-                       className="text-center space-y-1.5 px-1"
+                       className="text-center space-y-1.5 px-0.5"
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
