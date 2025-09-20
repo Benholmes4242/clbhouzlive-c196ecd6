@@ -74,6 +74,7 @@ export default {
 				},
 				'media-loading': 'hsl(var(--media-loading))',
 				'brand-orange': 'hsl(var(--brand-orange))',
+				'brand-orange-hover': 'hsl(var(--brand-orange-hover))',
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
 				'brand-black': 'hsl(var(--brand-black))',
 				'hud-bg': 'var(--hud-bg)',

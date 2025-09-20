@@ -292,6 +292,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     }
   }
   :root {
+    /* Brand Colors */
+    --brand-orange: 21 94 78; /* #f7931e in HSL */
+    --brand-orange-hover: 19 89 73; /* Slightly darker for hover */
+    --brand-orange-light: 24 96 85; /* Lighter variant */
+    
+    /* Design System Colors */
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
@@ -306,6 +312,9 @@ html, body, #root, .app-shell { touch-action: auto; }
     --muted-foreground: 220 8.9% 46.1%;
     --accent: 32 93% 54%;
     --accent-foreground: 210 20% 98%;
+    --brand-orange: 21 94 78; /* #f7931e in HSL */
+    --brand-orange-hover: 19 89 73; /* Slightly darker for hover */
+    --brand-orange-light: 24 96 85; /* Lighter variant */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --border: 220 13% 91%;
@@ -686,6 +695,38 @@ html, body, #root, .app-shell { touch-action: auto; }
     line-height: 1;
   }
 
+  /* Discover Page Specific Pills with Brand Orange */
+  .discover-pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
+           select-none whitespace-nowrap text-sm font-medium
+           backdrop-blur-md bg-gray-50/80 text-gray-700
+           border border-gray-200/60 shadow-none
+           transition-all duration-200;
+    line-height: 1.2;
+    scroll-snap-align: start;
+  }
+
+  .discover-pill:hover {
+    @apply border-brand-orange/30 bg-brand-orange/5;
+  }
+
+  .discover-pill:focus-visible {
+    @apply outline-none ring-2 ring-brand-orange ring-offset-2;
+  }
+
+  .discover-pill--active {
+    @apply bg-brand-orange text-white border-brand-orange shadow-md;
+  }
+
+  .discover-pill__icon {
+    @apply w-4 h-4 flex-shrink-0;
+  }
+
+  .discover-pill__label {
+    @apply font-medium;
+  }
+  }
+
   .pill--sm { 
     @apply px-3 py-1.5 text-[15px]; 
   }
@@ -1032,7 +1073,37 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   .container { @apply max-w-6xl; }
-}
+
+  /* Discover Page Specific Pills with Brand Orange */
+  .discover-pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
+           select-none whitespace-nowrap text-sm font-medium
+           backdrop-blur-md bg-gray-50/80 text-gray-700
+           border border-gray-200/60 shadow-none
+           transition-all duration-200;
+    line-height: 1.2;
+    scroll-snap-align: start;
+  }
+
+  .discover-pill:hover {
+    @apply border-brand-orange/30 bg-brand-orange/5;
+  }
+
+  .discover-pill:focus-visible {
+    @apply outline-none ring-2 ring-brand-orange ring-offset-2;
+  }
+
+  .discover-pill--active {
+    @apply bg-brand-orange text-white border-brand-orange shadow-md;
+  }
+
+  .discover-pill__icon {
+    @apply w-4 h-4 flex-shrink-0;
+  }
+
+  .discover-pill__label {
+    @apply font-medium;
+  }
 
 @media (max-width: 960px) {
   .container {

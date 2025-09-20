@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ExploreFilters from '@/components/explore/ExploreFilters';
+import MediaSearch from '@/components/discover/MediaSearch';
+import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import SubpillBar from '@/components/discover/SubpillBar';
@@ -10,7 +11,6 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -22,6 +22,7 @@ const Discover = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const { main, sub } = useDiscoverQuery();
   
@@ -131,30 +132,39 @@ const Discover = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Your Discover Section - 16px gap from header */}
-          <div className="pt-4">
-            <ExploreFilters 
+          {/* Media Search - Discover Only */}
+          <div className="px-4 md:container md:mx-auto md:px-6 pt-4">
+            <MediaSearch 
+              placeholder="Search videos and photos..." 
+              onSearchChange={setSearchQuery}
+            />
+          </div>
+
+          {/* Filter Pills Row */}
+          <div className="mt-3">
+            <DiscoverPillRow 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
             />
           </div>
 
-          {/* Suggested Users - 8px gap from pills on mobile, 32px on desktop */}
+          {/* Suggested Users */}
           <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Dynamic Subpill Bar - Replaces Trending Now */}
+          {/* Dynamic Subpill Bar */}
           <div className="mt-4">
             <SubpillBar />
           </div>
 
-          {/* Main Grid with Container - 16px gap from Subpill bar */}
+          {/* Main Grid with Container */}
           <div className="md:container md:mx-auto md:px-0 mt-4">
             <DiscoverContent
               onLike={handleLike}
               onFollow={handleFollow}
               onMediaClick={handleMediaClick}
+              searchQuery={searchQuery}
             />
           </div>
         </main>

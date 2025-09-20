@@ -9,6 +9,7 @@ interface DiscoverContentProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
   onMediaClick: (item: any) => void;
+  searchQuery?: string;
 }
 
 // Map main+sub combinations to filter types for API calls
@@ -38,7 +39,7 @@ function applySubFilter(content: ExploreContentItem[], main: string, sub: string
   return content;
 }
 
-export default function DiscoverContent({ onLike, onFollow, onMediaClick }: DiscoverContentProps) {
+export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery }: DiscoverContentProps) {
   const { main, sub } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   
@@ -53,10 +54,22 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick }: Disc
     loadMore 
   } = useInfiniteExploreContent(filterType === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : filterType);
 
-  // Apply sub-filtering whenever content or pills change
+  // Apply sub-filtering and search filtering whenever content or pills change
   useEffect(() => {
     if (content) {
-      const filtered = applySubFilter(content, main, sub);
+      let filtered = applySubFilter(content, main, sub);
+      
+      // Apply search filter if query exists
+      if (searchQuery && searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(item => 
+          item.title?.toLowerCase().includes(query) ||
+          item.ctaDescription?.toLowerCase().includes(query) ||
+          item.user?.name?.toLowerCase().includes(query) ||
+          item.user?.username?.toLowerCase().includes(query)
+        );
+      }
+      
       // Remove duplicates
       const unique = filtered.filter((item, index, self) => 
         index === self.findIndex(t => t.src === item.src)
@@ -65,7 +78,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick }: Disc
     } else {
       setCurrentContent(null);
     }
-  }, [content, main, sub]);
+  }, [content, main, sub, searchQuery]);
 
   // Show loading while content is null
   if (currentContent === null) {
