@@ -143,7 +143,7 @@ const SnapModal = ({
         {variant === "videos" && (
           <>
             {thumbs.slice(0, 3).map((t, i) => (
-              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity">
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300">
                 <img
                   src={t.displaySrc}
                   alt=""
@@ -161,7 +161,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300`}
               >
                 <img
                   src={t.displaySrc}
@@ -180,7 +180,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
+                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300`}
               >
                 <img
                   src={t.displaySrc}
@@ -240,7 +240,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] text-white"
+              className="w-full max-w-[480px] liquid-glass rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.5)] text-white"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -248,44 +248,44 @@ const SnapModal = ({
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-1">
+              <div className="flex items-center justify-between px-6 pt-6 pb-3">
                 <div>
                   <h2 className="text-2xl font-semibold">Create a Moment</h2>
-                  <p className="text-sm text-white/60 mt-1">Choose how you'd like to share</p>
+                  <p className="text-sm text-white/70 mt-1">Choose how you'd like to share</p>
                 </div>
                 <button 
                   onClick={onClose} 
                   aria-label="Close" 
-                  className="h-8 w-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
+                  className="h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center ring-1 ring-white/20"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4 text-white" />
                 </button>
               </div>
 
-              <div className="px-4 pb-5 space-y-3">
+              <div className="px-5 pb-6 space-y-4">
                 {/* Media Options */}
                 {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
                   <motion.button
                     key={key}
                     onClick={onClick}
-                    className="w-full h-20 flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+                    className="w-full h-20 flex items-center justify-between gap-4 px-5 py-4 liquid-glass rounded-3xl hover:scale-[1.02] hover:shadow-lg hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300 group"
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                        <Icon className="h-5 w-5 text-white" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl liquid-glass-button flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors duration-300">
+                        <Icon className="h-6 w-6 text-white group-hover:text-brand-orange transition-colors duration-300" />
                       </div>
                       <div className="text-left">
-                        <div className="font-medium text-white">{label}</div>
+                        <div className="font-semibold text-white">{label}</div>
                         {/* Show empty state message if no user media and not loading */}
                         {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
-                          <div className="text-sm text-white/60">No posts yet - start creating!</div>
+                          <div className="text-sm text-white/70">No posts yet - start creating!</div>
                         )}
                       </div>
                     </div>
 
-                    <div className="border-l border-white/10 pl-3">
+                    <div className="border-l border-white/20 pl-4">
                       <ThumbStrip variant={variant} thumbs={thumbs} />
                     </div>
                   </motion.button>
@@ -293,11 +293,11 @@ const SnapModal = ({
 
                 {/* Error state with retry */}
                 {error && (
-                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
-                    <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
+                  <div className="px-5 py-4 bg-red-500/10 backdrop-blur-md ring-1 ring-red-500/30 rounded-3xl">
+                    <div className="text-sm text-red-200 mb-2">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
-                      className="text-xs text-red-400 hover:text-red-300 underline"
+                      className="text-xs text-red-300 hover:text-red-100 underline transition-colors duration-200"
                     >
                       Retry
                     </button>
@@ -310,16 +310,16 @@ const SnapModal = ({
                     // Open the same media picker flow
                     handlePickMedia();
                   }}
-                  className="w-full h-24 flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-yellow-500/20 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+                  className="w-full h-24 flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-brand-orange/30 to-brand-orange/10 backdrop-blur-md ring-1 ring-brand-orange/40 rounded-3xl hover:scale-[1.02] hover:shadow-lg hover:from-brand-orange/40 hover:to-brand-orange/20 transition-all duration-300"
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-amber-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-orange/40 to-brand-orange/20 flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-bold text-white">Tell Your Story</span>
-                    <span className="text-sm text-white/60">Mix photos & videos in one go</span>
+                    <span className="text-sm text-white/80">Mix photos & videos in one go</span>
                   </div>
                 </motion.button>
               </div>

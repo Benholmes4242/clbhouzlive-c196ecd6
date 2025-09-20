@@ -221,7 +221,7 @@ export default function EnhancedCreateMomentModalCinematic({
         >
           {/* backdrop with gradient and click-to-close */}
           <div 
-            className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/70 backdrop-blur-xl" 
+            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/80 backdrop-blur-xl" 
             onClick={close}
             role="dialog"
             aria-modal="true"
@@ -231,7 +231,7 @@ export default function EnhancedCreateMomentModalCinematic({
           <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
             <motion.div
               ref={wrapperRef}
-              className="w-full max-w-[520px] h-[min(92vh,900px)] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              className="w-full max-w-[520px] h-[min(92vh,900px)] liquid-glass rounded-3xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
               initial={{ y: 20, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0, scale: 0.98 }}
@@ -278,11 +278,10 @@ export default function EnhancedCreateMomentModalCinematic({
                       <button
                         onClick={prevMedia}
                         disabled={activeIndex === 0}
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 
-                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                 flex items-center justify-center hover:bg-white/18 
-                                 active:scale-[0.98] transition-all duration-200
+                        className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 
+                                 h-12 w-12 rounded-full liquid-glass-button
+                                 flex items-center justify-center hover:scale-110 hover:ring-brand-orange/30 hover:ring-2
+                                 active:scale-95 transition-all duration-300
                                  ${activeIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         aria-label="Previous media"
                       >
@@ -292,11 +291,10 @@ export default function EnhancedCreateMomentModalCinematic({
                       <button
                         onClick={nextMedia}
                         disabled={activeIndex === media.length - 1}
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 
-                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                 flex items-center justify-center hover:bg-white/18 
-                                 active:scale-[0.98] transition-all duration-200
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 
+                                 h-12 w-12 rounded-full liquid-glass-button
+                                 flex items-center justify-center hover:scale-110 hover:ring-brand-orange/30 hover:ring-2
+                                 active:scale-95 transition-all duration-300
                                  ${activeIndex === media.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         aria-label="Next media"
                       >
@@ -318,11 +316,10 @@ export default function EnhancedCreateMomentModalCinematic({
                   >
                     <div
                       className="
-                        rounded-2xl
-                        bg-black/55 backdrop-blur
-                        shadow-[0_10px_30px_rgba(0,0,0,0.35)]
-                        ring-1 ring-white/10
-                        px-4 py-3
+                        rounded-3xl
+                        liquid-glass
+                        shadow-[0_12px_32px_rgba(0,0,0,0.4)]
+                        px-5 py-4
                       "
                     >
                       <div className="flex items-start justify-between mb-1">
@@ -330,7 +327,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         <button
                           onClick={handleAICaption}
                           disabled={aiLoading || media.length === 0}
-                          className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95"
+                          className="liquid-glass-button hover:scale-105 hover:ring-brand-orange/30 hover:ring-2 px-4 py-2 rounded-full shrink-0 transition-all duration-300 text-sm disabled:opacity-50 text-white active:scale-95"
                           aria-label="Write a caption for me"
                         >
                           {aiLoading ? <StarsLoading /> : (
@@ -359,11 +356,11 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
 
                   {/* Content sections grouped in a soft card */}
-                  <div className="mx-4 pt-3">
-                    <div className="bg-black/30 backdrop-blur-sm rounded-3xl p-4 ring-1 ring-white/10 shadow-2xl space-y-4">
+                  <div className="mx-5 pt-4">
+                    <div className="liquid-glass rounded-3xl p-5 shadow-2xl space-y-5">
                       {/* Course with High Z-Index */}
-                      <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10 relative z-[9999]`}>
-                        <div className="text-[15px] mb-1">Tag a golf course</div>
+                      <div className="liquid-glass-button rounded-3xl px-5 py-4 relative z-[9999]">
+                        <div className="text-[15px] mb-2 text-white font-medium">Tag a golf course</div>
                         <CourseTagInput
                           selectedCourse={course}
                           onCourseSelect={onCourseSelect || setSelectedCourse}
@@ -372,11 +369,11 @@ export default function EnhancedCreateMomentModalCinematic({
                       </div>
 
                       {/* Enhanced Music Selector */}
-                      <div className={`rounded-2xl px-4 py-3 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                      <div className="liquid-glass-button rounded-3xl px-5 py-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex-1">
-                            <div className="text-[15px] mb-1">Background music</div>
-                            <div className={`${subtl} text-sm`}>
+                            <div className="text-[15px] mb-1 text-white font-medium">Background music</div>
+                            <div className="text-white/70 text-sm">
                               Popular golf tracks today
                             </div>
                           </div>
@@ -386,27 +383,27 @@ export default function EnhancedCreateMomentModalCinematic({
                                 // TODO: Preview music
                                 console.log("Music preview clicked");
                               }}
-                              className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} p-2 rounded-lg transition-colors`}
+                              className="liquid-glass-button p-3 rounded-full hover:scale-110 hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300"
                               aria-label="Preview music"
                             >
-                              <Play className="h-4 w-4 text-orange-500" />
+                              <Play className="h-4 w-4 text-brand-orange" />
                             </button>
                             <button
                               onClick={() => {
                                 // TODO: Background music selector
                                 console.log("Music selector clicked");
                               }}
-                              className={`${isDark ? "hover:bg-white/10" : "hover:bg-black/5"} p-2 rounded-lg transition-colors`}
+                              className="liquid-glass-button p-3 rounded-full hover:scale-110 hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300"
                               aria-label="Select music"
                             >
-                              <BarChart3 className="h-4 w-4 text-orange-500" />
+                              <BarChart3 className="h-4 w-4 text-brand-orange" />
                             </button>
                           </div>
                         </div>
                       </div>
 
                       {/* Visibility segmented - Wired to state */}
-                      <div className={`rounded-2xl px-2 py-2 ${card} backdrop-blur-md ring-1 ring-white/10`}>
+                      <div className="liquid-glass-button rounded-3xl px-3 py-3">
                         <Segmented
                           value={visibility}
                           onChange={(value) => setVisibility(value as "public" | "private")}
@@ -420,45 +417,32 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
 
                   {/* FOOTER - Pinned to bottom with proper safe area */}
-                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] px-4 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-sm">
+                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-6 pb-[calc(env(safe-area-inset-bottom)+20px)] px-5 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm">
                     <motion.button
                       onClick={handlePost}
                       disabled={!canPost}
                       aria-pressed={isSubmitting}
                       aria-busy={isSubmitting}
-                      className="relative w-full h-14 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 shadow-2xl"
-                      style={{ 
-                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
-                        boxShadow: '0 0 20px rgba(var(--echo-from-rgb), 0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                      }}
-                      whileHover={{ scale: !canPost ? 1 : 1.02 }}
-                      whileTap={{ scale: !canPost ? 1 : 0.98 }}
+                      className="relative w-full h-14 rounded-3xl text-white overflow-hidden disabled:opacity-50 transition-all duration-300 shadow-2xl bg-gradient-to-r from-brand-orange to-brand-orange-light hover:from-brand-orange-hover hover:to-brand-orange hover:scale-105 hover:shadow-[0_8px_32px_rgba(247,147,30,0.4)] active:scale-95"
+                      whileHover={{ scale: !canPost ? 1 : 1.05 }}
+                      whileTap={{ scale: !canPost ? 1 : 0.95 }}
                       animate={isSubmitting ? { 
-                        boxShadow: ['0 0 20px rgba(var(--echo-from-rgb), 0.3)', '0 0 30px rgba(var(--echo-from-rgb), 0.5)', '0 0 20px rgba(var(--echo-from-rgb), 0.3)']
+                        boxShadow: ['0 8px 32px rgba(247,147,30,0.4)', '0 12px 40px rgba(247,147,30,0.6)', '0 8px 32px rgba(247,147,30,0.4)']
                       } : {}}
                       transition={{ duration: 0.6, repeat: isSubmitting ? Infinity : 0 }}
                     >
                       {/* Inner glow effect */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 rounded-2xl" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 rounded-3xl" />
                       
-                      {/* Ripple effect on tap */}
-                      <motion.div
-                        className="absolute inset-0 bg-white/20 rounded-2xl"
-                        initial={{ scale: 0, opacity: 0.8 }}
-                        animate={{ scale: 1.5, opacity: 0 }}
-                        transition={{ duration: 0.6 }}
-                        key={Date.now()}
-                      />
-
                       {/* Shimmer animation while submitting */}
                       {isSubmitting && (
                         <motion.div
-                          className="absolute inset-0"
+                          className="absolute inset-0 rounded-3xl"
                           initial={{ backgroundPositionX: "0%" }}
                           animate={{ backgroundPositionX: "200%" }}
                           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
                           style={{ 
-                            backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%)",
+                            backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,.3) 50%, transparent 100%)",
                             backgroundSize: "50% 100%"
                           }}
                         />
@@ -489,7 +473,7 @@ function Segmented({
   options: { value: string; label: string; icon: any }[] 
 }) {
   return (
-    <div className="grid grid-cols-2 gap-1 rounded-xl p-1 bg-white/10">
+    <div className="grid grid-cols-2 gap-2 rounded-2xl p-2 liquid-glass">
       {options.map(option => {
         const active = value === option.value;
         const IconComponent = option.icon;
@@ -497,15 +481,12 @@ function Segmented({
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className={`h-10 rounded-lg transition-all duration-150 font-medium flex items-center justify-center gap-2
+            className={`h-12 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2
               ${active 
-                ? "bg-gradient-to-r from-white/90 to-white/80 text-neutral-900 shadow-lg font-bold" 
-                : "text-white/80 hover:bg-white/10"
+                ? "bg-brand-orange text-white shadow-lg font-bold hover:bg-brand-orange-hover" 
+                : "text-white/80 hover:bg-white/10 hover:scale-105"
               }`}
             aria-pressed={active}
-            style={{
-              color: active ? 'rgb(23, 23, 23)' : 'rgba(255, 255, 255, 0.8)'
-            }}
           >
             <IconComponent className="h-4 w-4" />
             {option.label}
