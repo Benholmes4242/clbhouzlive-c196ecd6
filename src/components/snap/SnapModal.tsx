@@ -49,6 +49,8 @@ const SnapModal = ({
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
+  const [isModalFocused, setIsModalFocused] = useState(true);
+  const [selectedOption, setSelectedOption] = useState<string>('');
   // using openComposerWithFiles from props
   
   
@@ -171,14 +173,14 @@ const SnapModal = ({
       placeholders.photos.slice(0, 3).map((url, i) => ({ id: `placeholder-${i}`, displaySrc: url }));
 
     useEffect(() => {
-      if (displayImages.length <= 1) return;
+      if (displayImages.length <= 1 || !isModalFocused) return;
       
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % displayImages.length);
       }, 1800);
 
       return () => clearInterval(interval);
-    }, [displayImages.length]);
+    }, [displayImages.length, isModalFocused]);
 
     return (
       <div className="relative h-12 w-full rounded-lg overflow-hidden">
@@ -211,12 +213,14 @@ const SnapModal = ({
       { id: 'placeholder-video', displaySrc: placeholders.videos[0] };
 
     useEffect(() => {
+      if (!isModalFocused) return;
+      
       const interval = setInterval(() => {
         setShowVideo(prev => !prev);
       }, 2000);
 
       return () => clearInterval(interval);
-    }, []);
+    }, [isModalFocused]);
 
     return (
       <div className="relative h-12 w-full rounded-lg overflow-hidden bg-gradient-to-br from-white/5 to-white/10">
@@ -273,6 +277,7 @@ const SnapModal = ({
 
   // Handle mixed media (Tell Your Story) option
   const handleTellYourStory = () => {
+    setSelectedOption('Tell Your Story');
     if (onMixedMediaClick) {
       onMixedMediaClick();
     } else {
@@ -280,12 +285,17 @@ const SnapModal = ({
     }
   };
 
+  const handleOptionClick = (key: string, action: () => void) => {
+    setSelectedOption(key === "capture" ? "Camera" : key === "media" ? "Photos" : "Tell Your Story");
+    action();
+  };
+
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
       label: "Camera",
       icon: Camera,
-      onClick: onCameraClick,
+      onClick: () => handleOptionClick("capture", onCameraClick),
       preview: captureThumbs,
       description: "Take a photo or video right now"
     }] : []),
@@ -293,7 +303,7 @@ const SnapModal = ({
       key: "media",
       label: "Photos",
       icon: Images,
-      onClick: handlePickMedia,
+      onClick: () => handleOptionClick("media", handlePickMedia),
       preview: photoThumbs,
       description: "Choose from your gallery"
     },
@@ -301,7 +311,7 @@ const SnapModal = ({
       key: "story",
       label: "Tell Your Story",
       icon: Film,
-      onClick: handleTellYourStory,
+      onClick: () => handleOptionClick("story", handleTellYourStory),
       preview: videoThumbs,
       description: "Mix photos & videos in one go",
       isSpecial: true // Flag for special styling
@@ -326,6 +336,16 @@ const SnapModal = ({
             onClick={onClose}
           />
           
+          {/* ARIA live region for announcements */}
+          <div 
+            role="status" 
+            aria-live="polite" 
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {selectedOption && `Selected ${selectedOption}`}
+          </div>
+          
           {/* Panel - Light floating sheet */}
           <div className="absolute inset-0 flex items-center justify-center p-6" onClick={onClose}>
             <motion.div
@@ -334,6 +354,13 @@ const SnapModal = ({
               aria-label="Create a Moment"
               className="w-full max-w-[480px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
               onClick={(e) => e.stopPropagation()}
+              onFocus={() => setIsModalFocused(true)}
+              onBlur={(e) => {
+                // Only set unfocused if focus is leaving the modal entirely
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setIsModalFocused(false);
+                }
+              }}
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: -12, opacity: 0, scale: 0.98 }}
@@ -347,7 +374,8 @@ const SnapModal = ({
                 const centerY = rect.top + rect.height / 2;
                 const deltaX = (e.clientX - centerX) / rect.width;
                 const deltaY = (e.clientY - centerY) / rect.height;
-                e.currentTarget.style.setProperty('--parallax-y', `${deltaY * 2}px`);
+                // Subtle parallax - max 2px movement
+                e.currentTarget.style.setProperty('--parallax-y', `${Math.max(-2, Math.min(2, deltaY * 2))}px`);
               } : undefined}
               onMouseLeave={!prefersReducedMotion ? (e) => {
                 e.currentTarget.style.setProperty('--parallax-y', '0px');
@@ -395,7 +423,7 @@ const SnapModal = ({
                     <motion.button
                       key={key}
                       onClick={onClick}
-                      className="w-full group relative overflow-hidden"
+                      className="w-full group relative overflow-hidden min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/60 focus:ring-offset-2 focus:ring-offset-black/20 rounded-2xl"
                       initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
                       animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
                       transition={prefersReducedMotion ? 
@@ -404,6 +432,7 @@ const SnapModal = ({
                       }
                       whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                      aria-label={`${label}: ${description}`}
                     >
                       {/* Option Card */}
                       <div className={`p-4 rounded-2xl liquid-glass-subtle border transition-all duration-300 ${
@@ -419,10 +448,27 @@ const SnapModal = ({
                               : 'group-hover:ring-2 group-hover:ring-brand-orange/30'
                           }`}>
                             <motion.div
+                              animate={!prefersReducedMotion && isSpecial ? {
+                                filter: ["drop-shadow(0 0 0px rgba(251,146,60,0))", "drop-shadow(0 0 8px rgba(251,146,60,0.4))", "drop-shadow(0 0 0px rgba(251,146,60,0))"]
+                              } : {}}
+                              transition={!prefersReducedMotion && isSpecial ? { 
+                                duration: 2, 
+                                repeat: Infinity, 
+                                ease: "easeInOut" 
+                              } : {}}
                               whileHover={!prefersReducedMotion ? 
-                                key === "capture" ? { scale: [1, 0.9, 1], transition: { duration: 0.2 } } :
-                                key === "media" ? { x: [0, 1, -1, 0], transition: { duration: 0.3 } } :
-                                key === "story" ? { scale: [1, 1.05, 1], transition: { duration: 0.2 } } : {}
+                                key === "capture" ? { 
+                                  opacity: [1, 0.7, 1], 
+                                  transition: { duration: 0.2, ease: "easeInOut" } 
+                                } :
+                                key === "media" ? { 
+                                  x: [0, 1, -1, 0], 
+                                  transition: { duration: 0.3, ease: "easeInOut" } 
+                                } :
+                                key === "story" ? { 
+                                  scale: [1, 1.05, 1], 
+                                  transition: { duration: 0.2, ease: "easeInOut" } 
+                                } : {}
                                 : {}
                               }
                               whileTap={!prefersReducedMotion ? { scale: 0.95 } : {}}
@@ -431,7 +477,7 @@ const SnapModal = ({
                                 isSpecial 
                                   ? 'text-brand-orange group-hover:text-brand-orange' 
                                   : 'text-white group-hover:text-brand-orange'
-                              } ${key === "story" ? 'group-hover:drop-shadow-[0_0_4px_rgba(251,146,60,0.6)]' : ''}`} />
+                              }`} />
                             </motion.div>
                           </div>
                           
@@ -459,7 +505,7 @@ const SnapModal = ({
                       </div>
                       
                       {/* Hover gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out pointer-events-none" />
                     </motion.button>
                   ))}
                 </div>
@@ -482,8 +528,8 @@ const SnapModal = ({
               {/* Close button - positioned at top right */}
               <button 
                 onClick={onClose} 
-                aria-label="Close" 
-                className="absolute top-4 right-4 h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center"
+                aria-label="Close modal" 
+                className="absolute top-4 right-4 h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black/20"
               >
                 <X className="h-4 w-4 text-white" />
               </button>
