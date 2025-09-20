@@ -52,16 +52,16 @@ const SearchPill = ({
     <div className={cn("relative", className)}>
       <div 
         className={cn(
-          "relative flex items-center rounded-full transition-all duration-200",
+          "relative flex items-center rounded-full transition-all duration-300 ease-out",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
           // Variant-specific styling
           isGlassDark && [
             "bg-white/10 backdrop-blur-md border border-white/20",
-            isFocused && "bg-white/15 border-white/30 ring-2 ring-accent/50"
+            isFocused && "bg-white/15 border-discover-orange/60 ring-2 ring-discover-orange/30 shadow-lg shadow-discover-orange/10"
           ],
           isSolidLight && [
             "bg-gray-100/80 border border-gray-200/60",
-            isFocused && "bg-white border-gray-300 ring-2 ring-accent/50"
+            isFocused && "bg-white border-discover-orange/50 ring-2 ring-discover-orange/20 shadow-lg shadow-discover-orange/10"
           ]
         )}
       >
@@ -101,16 +101,17 @@ const SearchPill = ({
           <button
             onClick={handleClear}
             className={cn(
-              "flex-shrink-0 p-1 rounded-full transition-colors focus:outline-none",
-              isGlassDark && "hover:bg-white/10 focus:bg-white/10",
-              isSolidLight && "hover:bg-gray-200 focus:bg-gray-200"
+              "flex-shrink-0 p-1 rounded-full transition-all duration-300 ease-out focus:outline-none",
+              "hover:backdrop-blur-sm hover:shadow-md",
+              isGlassDark && "hover:bg-discover-orange/20 hover:border hover:border-discover-orange/30 focus:bg-discover-orange/20",
+              isSolidLight && "hover:bg-discover-orange/10 hover:border hover:border-discover-orange/20 focus:bg-discover-orange/10"
             )}
             aria-label="Clear search"
           >
             <X className={cn(
-              "h-3 w-3 md:h-4 md:w-4",
-              isGlassDark && "text-white/70",
-              isSolidLight && "text-gray-500"
+              "h-3 w-3 md:h-4 md:w-4 transition-colors duration-300",
+              isGlassDark && "text-white/70 hover:text-discover-orange-light",
+              isSolidLight && "text-gray-500 hover:text-discover-orange"
             )} />
           </button>
         )}

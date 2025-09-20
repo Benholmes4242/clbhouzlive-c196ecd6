@@ -33,19 +33,23 @@ const HeaderNavigation = () => {
   // Use adaptive text color for profile page, fallback to existing logic for other pages
   const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
   
-  // Get variant-specific icon colors
+  // Get variant-specific icon colors with liquid glass hover effects
   const getIconColorClass = () => {
     if (variant === 'glass-dark') {
-      return 'text-white/80 hover:text-white';
+      return 'text-white/80 hover:text-discover-orange-light transition-all duration-300 hover:bg-discover-orange/20 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/30 rounded-full';
     }
     if (variant === 'solid-light') {
-      return 'text-black/70 hover:text-black';
+      return 'text-black/70 hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/10 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/20 rounded-full';
     }
     // Fallback to adaptive detection for specific pages
     if (isProfilePage) {
-      return shouldUseDarkText ? 'text-black hover:text-black' : 'text-white hover:text-white';
+      return shouldUseDarkText 
+        ? 'text-black hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/10 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/20 rounded-full' 
+        : 'text-white hover:text-discover-orange-light transition-all duration-300 hover:bg-discover-orange/20 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/30 rounded-full';
     }
-    return isDiscoverPage ? 'text-black hover:text-black' : 'text-white hover:text-white';
+    return isDiscoverPage 
+      ? 'text-black hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/10 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/20 rounded-full' 
+      : 'text-white hover:text-discover-orange-light transition-all duration-300 hover:bg-discover-orange/20 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/30 rounded-full';
   };
 
   // Check if user is admin or limited admin
@@ -146,17 +150,17 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
+        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())} onClick={handleNotificationsClick}>
           <Bell className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
+        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+            <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())}>
               <Settings className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
@@ -176,7 +180,7 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-      <Button variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
+      <Button variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())} onClick={handleNotificationsClick}>
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -185,13 +189,13 @@ const HeaderNavigation = () => {
         )}
       </Button>
 
-      <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
+      <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())} onClick={handleProfileClick}>
         <User className="h-5 w-5" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+          <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3", getIconColorClass())}>
             <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
