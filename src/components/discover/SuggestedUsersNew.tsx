@@ -508,7 +508,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
         {/* Main Control Overlay - Reduced Height for More Media Visibility */}
         <motion.div
-          className="absolute inset-x-0 bottom-0 z-30 max-h-[32%]"
+          className={cn(
+            "absolute inset-x-0 bottom-0 z-30",
+            isDetailExpanded ? "" : "max-h-[32%]"
+          )}
           initial={false}
           animate={{
             height: isDetailExpanded ? "100%" : "auto",
