@@ -318,26 +318,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, y: showFeedback === 'follow' ? -30 : 30 }}
             transition={{ 
-              duration: 0.25,
+              duration: 0.35,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
           >
-            {/* Semi-transparent liquid glass background */}
+            {/* Liquid Glass Panel */}
             <motion.div 
-              className="absolute inset-0"
+              className="flex flex-col items-center justify-center px-8 py-6"
               style={{
-                background: 'hsl(var(--glass-dark))',
-                backdropFilter: 'blur(16px)',
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(12px)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
               }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-            
-            {/* Feedback Content */}
-            <motion.div 
-              className="relative flex flex-col items-center justify-center px-6 py-4"
               initial={{ 
                 opacity: 0, 
                 scale: 0.9,
@@ -358,39 +352,67 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 damping: 25
               }}
             >
-              {/* Icon Container with brand orange/red outline */}
+              {/* Icon Container with liquid glass circle and glow */}
               <motion.div 
                 className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center mb-3 relative",
-                  "border-2"
+                  "w-16 h-16 rounded-full flex items-center justify-center mb-4 relative overflow-hidden",
+                  "backdrop-blur-md border border-white/20"
                 )}
                 style={{
-                  borderColor: showFeedback === 'follow' 
-                    ? 'hsl(var(--accent))' 
-                    : 'hsl(0 67% 56%)',
+                  background: showFeedback === 'follow' 
+                    ? 'rgba(34, 197, 94, 0.15)' 
+                    : 'rgba(239, 68, 68, 0.15)',
                   boxShadow: showFeedback === 'follow'
-                    ? '0 0 20px hsl(var(--accent) / 0.3)'
-                    : '0 0 20px hsl(0 67% 56% / 0.3)'
+                    ? '0 0 32px rgba(34, 197, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                    : '0 0 32px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                 }}
-                initial={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ 
                   scale: 1, 
                   opacity: 1
                 }}
                 transition={{ 
-                  delay: 0.1,
-                  duration: 0.25,
+                  delay: 0,
+                  duration: 0.2,
                   type: "spring",
                   stiffness: 500,
                   damping: 20
                 }}
               >
-                {/* Icon with bounce animation */}
+                {/* Gradient glow behind icon */}
+                <div 
+                  className="absolute inset-0 rounded-full opacity-40"
+                  style={{
+                    background: showFeedback === 'follow'
+                      ? 'radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)'
+                  }}
+                />
+                
+                {/* Pulse glow animation */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: showFeedback === 'follow'
+                      ? 'rgba(34, 197, 94, 0.2)'
+                      : 'rgba(239, 68, 68, 0.2)'
+                  }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.3, 0, 0.3]
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeOut"
+                  }}
+                />
+                
+                {/* Icon */}
                 <motion.div
                   className={cn(
-                    "relative z-10 text-lg",
+                    "relative z-10 text-2xl font-bold",
                     showFeedback === 'follow' 
-                      ? "text-accent" 
+                      ? "text-green-400" 
                       : "text-red-400"
                   )}
                   initial={{ scale: 0, rotate: -90 }}
@@ -399,7 +421,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     rotate: 0
                   }}
                   transition={{ 
-                    delay: 0.15,
+                    delay: 0.1,
                     duration: 0.3,
                     type: "spring",
                     stiffness: 600,
@@ -407,7 +429,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   }}
                 >
                   {showFeedback === 'follow' ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    // Animated checkmark with stroke draw effect
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <motion.path
                         d="M20 6L9 17l-5-5"
                         stroke="currentColor"
@@ -424,7 +447,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                       />
                     </svg>
                   ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    // Softer X icon
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <motion.path
                         d="M18 6L6 18"
                         stroke="currentColor"
@@ -448,7 +472,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: 1 }}
                         transition={{ 
-                          delay: 0.25,
+                          delay: 0.3,
                           duration: 0.2,
                           ease: "easeOut"
                         }}
@@ -458,27 +482,27 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 </motion.div>
               </motion.div>
               
-              {/* Text with smaller, lighter styling */}
+              {/* Text with fade-in delay */}
               <motion.div 
                 className="text-center"
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ 
-                  delay: 0.15,
-                  duration: 0.25,
+                  delay: 0.1,
+                  duration: 0.3,
                   ease: "easeOut"
                 }}
               >
-                <div className="text-white text-sm leading-tight">
+                <div className="text-white font-medium text-base leading-tight">
                   <span 
-                    className="font-normal opacity-90"
+                    className="font-bold"
                     style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.7)' }}
                   >
-                    {showFeedback === 'follow' ? "Followed" : "Dismissed"}
+                    {showFeedback === 'follow' ? "You've followed" : "You've dismissed"}
                   </span>
                   <br />
                   <span 
-                    className="font-semibold"
+                    className="font-normal opacity-90"
                     style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.7)' }}
                   >
                     {user.displayName}
@@ -498,30 +522,27 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
-          height: isDetailExpanded ? "70%" : "clamp(64px,20%,72px)",
+          height: isDetailExpanded ? "100%" : "clamp(64px,24%,80px)",
           y: swipeDirection === 'up' ? '-60%' : 0
         }}
         transition={{
           duration: 0.35,
-          ease: [0.25, 0.1, 0.25, 1]
+          ease: [0.25, 0.1, 0.25, 1] // ease-in-out
         }}
       >
         <div 
-          className="relative w-full h-full"
+          className="relative w-full h-full backdrop-blur-md border-t border-white/20 rounded-none"
           style={{
-            background: 'hsl(var(--glass-dark))',
-            backdropFilter: 'blur(16px)',
-            borderRadius: '0',
-            border: '1px solid hsl(var(--glass-border))',
-            boxShadow: 'var(--glass-shadow)'
+            background: 'rgba(255, 255, 255, 0.18)',
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37)'
           }}
         >
           
           {/* Expanded Content - User Information at Top */}
           <AnimatePresence>
-            {isDetailExpanded && (
+            {(isDetailExpanded || swipeDirection === 'up') && (
               <motion.div
-                className="absolute inset-x-0 top-0 px-4 pt-4 pb-2"
+                className="absolute inset-x-0 top-0 px-4 pt-4 pb-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -531,24 +552,20 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   ease: "easeOut"
                 }}
               >
-                {/* User Avatar */}
+                {/* User Avatar - Moved to very top */}
                 <div className="flex justify-center mb-3">
-                  <div 
-                    className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/profile/${user.id}`);
-                    }}
-                  >
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 group-hover:border-white/50 transition-all duration-300 group-hover:scale-110">
+                    {/* XP Ring Effect */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur-sm animate-pulse"></div>
                     {user.profilePhotoUrl ? (
                       <img
                         src={user.profilePhotoUrl}
                         alt={user.displayName}
-                        className="w-full h-full object-cover"
+                        className="relative w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-white text-xl font-bold">
+                      <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">
                           {user.displayName.charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -556,111 +573,94 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   </div>
                 </div>
 
-                {/* User Info */}
-                <div className="text-center space-y-1 mb-3">
-                  <h3 
-                    className="text-white font-bold text-base cursor-pointer hover:text-white/90 transition-colors duration-200"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/profile/${user.id}`);
-                    }}
-                  >
+                {/* User Name - Directly below avatar */}
+                <motion.div
+                  className="text-center mb-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
+                >
+                  <h3 className="text-white font-bold text-lg"
+                      style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
                     {user.displayName}
                   </h3>
-                  
-                  <p className="text-white/70 text-sm"
-                     style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                    @{user.handle}
-                  </p>
-                  
-                  {user.homeClub && (
-                    <p className="text-white/80 text-sm font-medium"
+                </motion.div>
+
+                {/* Home Golf Club - Directly below name */}
+                {user.homeClub && (
+                  <motion.div
+                    className="text-center mb-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25, duration: 0.3 }}
+                  >
+                    <p className="text-white/80 text-sm font-medium opacity-80"
                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
                       {user.homeClub}
-                      {user.handicap !== undefined && (
-                        <span className="ml-2 opacity-90">• HCP {user.handicap}</span>
-                      )}
                     </p>
-                  )}
-                </div>
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Positioned above bottom edge with proper spacing */}
-          <motion.div 
-            className={cn(
-              "absolute inset-x-0 px-3 py-3",
-              isDetailExpanded ? "bottom-0" : "bottom-2"
-            )}
+          {/* Enhanced Button Controls with glassmorphic container */}
+          <div 
+            className="absolute inset-x-0 bottom-0 px-3 py-2 backdrop-blur-md border-t border-white/20"
             style={{
-              background: isDetailExpanded ? 'hsl(var(--glass-dark))' : 'transparent',
-              backdropFilter: isDetailExpanded ? 'blur(16px)' : 'none',
-              borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
-            }}
-            animate={{
-              y: isDetailExpanded ? 0 : 0
-            }}
-            transition={{
-              duration: 0.35,
-              ease: [0.25, 0.1, 0.25, 1]
+              background: 'rgba(255, 255, 255, 0.18)',
+              boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37)'
             }}
           >
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-3">
               {/* Left: Dismiss Button */}
               <motion.button
                 aria-label="Dismiss suggestion"
                 onClick={handleDismissClick}
                 disabled={isDismissLoading || isFollowLoading}
                 whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 320, damping: 18 }}
-                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
-                style={{
-                  background: 'hsl(var(--glass-dark))',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid hsl(var(--glass-border))',
-                  boxShadow: 'var(--glass-shadow)',
-                  opacity: 0.8
-                }}
+                className="group relative w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white/10 backdrop-blur-sm border border-white/20 
+                           hover:bg-white/20 active:scale-95 disabled:opacity-50
+                           transition-all duration-200 overflow-hidden"
               >
-                {/* Subtle ripple effect */}
-                <div className="absolute inset-0 bg-white/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
                 
-                <FaThumbsDown className="relative text-white text-sm z-10" />
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
+                
+                <FaThumbsDown className="relative text-sm z-10" />
                 <span className="absolute -inset-2" />
               </motion.button>
 
-              {/* Center Detail Button with faint halo */}
+              {/* Center Detail Button */}
               <motion.button
                 aria-label="View details"
                 onClick={handleDetailClick}
                 whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 320, damping: 18 }}
                 className={cn(
-                  "group relative w-12 h-12 rounded-full flex items-center justify-center text-white overflow-hidden",
-                  isDetailExpanded && "ring-1 ring-white/20"
+                  "group relative w-10 h-10 rounded-full flex items-center justify-center text-white",
+                  "bg-white/10 backdrop-blur-sm border border-white/20",
+                  "hover:bg-white/20 active:scale-95 transition-all duration-200 overflow-hidden",
+                  isDetailExpanded 
+                    ? "bg-white/30 hover:bg-white/40" 
+                    : "bg-white/15 hover:bg-white/25"
                 )}
-                style={{
-                  background: 'hsl(var(--glass-dark))',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid hsl(var(--glass-border))',
-                  boxShadow: isDetailExpanded 
-                    ? '0 0 20px hsl(var(--glass-border) / 0.4), var(--glass-shadow)'
-                    : 'var(--glass-shadow)',
-                  opacity: 0.8
-                }}
               >
-                {/* Subtle ripple effect */}
-                <div className="absolute inset-0 bg-white/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
+                
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
                 
                 <motion.div
                   className="relative z-10"
@@ -678,52 +678,42 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 onClick={handleFollowClick}
                 disabled={isFollowLoading || isDismissLoading}
                 whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 320, damping: 18 }}
-                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
-                style={{
-                  background: 'hsl(var(--glass-dark))',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid hsl(var(--glass-border))',
-                  boxShadow: 'var(--glass-shadow)',
-                  opacity: 0.8
-                }}
+                className="group relative w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white/10 backdrop-blur-sm border border-white/20 
+                           hover:bg-white/20 active:scale-95 disabled:opacity-50
+                           transition-all duration-200 overflow-hidden"
               >
-                {/* Subtle ripple effect */}
-                <div className="absolute inset-0 bg-white/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Pulse animation on hover */}
+                <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
+                             opacity-0 group-hover:opacity-30 transition-all duration-300" />
                 
-                <FaThumbsUp className="relative text-white text-sm z-10" />
+                {/* Ripple effect on tap */}
+                <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
+                             opacity-0 group-active:opacity-50 transition-all duration-200" />
+                
+                <FaThumbsUp className="relative text-sm z-10" />
                 <span className="absolute -inset-2" />
               </motion.button>
             </div>
-          </motion.div>
+          </div>
 
           {/* Compact User Info - Only show when collapsed */}
           {!isDetailExpanded && (
             <motion.div
-              className="absolute bottom-20 left-1/2 transform -translate-x-1/2"
+              className="absolute bottom-16 left-1/2 transform -translate-x-1/2"
               initial={{ opacity: 1 }}
               animate={{ opacity: isDetailExpanded ? 0 : 1 }}
               transition={{ duration: 0.2 }}
             >
-              <div 
-                className="text-white font-medium text-center text-sm whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
-                style={{ 
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                  background: 'hsl(var(--glass-dark))',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid hsl(var(--glass-border))'
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/profile/${user.id}`);
-                }}
-              >
+              <span className="text-white font-semibold text-center text-sm whitespace-nowrap px-3 py-1 rounded-full backdrop-blur-sm"
+                    style={{ 
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                      background: 'rgba(255, 255, 255, 0.15)'
+                    }}>
                 {user.displayName || user.handle || "User"}
-              </div>
+              </span>
             </motion.div>
           )}
         </div>
