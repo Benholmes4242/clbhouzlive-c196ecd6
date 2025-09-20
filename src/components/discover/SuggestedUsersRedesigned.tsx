@@ -588,113 +588,124 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Fixed position at bottom */}
+          {/* Glass Control Bar - Fixed position at bottom with consistent padding */}
           <motion.div 
-            className="absolute bottom-0 inset-x-0 px-3 py-3"
+            className="absolute bottom-0 inset-x-0 px-4 py-4"
             style={{
               background: isDetailExpanded ? 'hsl(var(--glass-dark))' : 'transparent',
               backdropFilter: isDetailExpanded ? 'blur(16px)' : 'none',
               borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
-            <div className="flex items-center justify-center gap-5">
-              {/* Left: Dismiss Button - Circular Glass */}
+            <div className="flex items-center justify-center gap-6">
+              {/* Left: Dismiss Button - Enhanced circular glass */}
               <motion.button
                 aria-label="Dismiss suggestion"
                 onClick={handleDismissClick}
                 disabled={isDismissLoading || isFollowLoading}
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 0 20px hsl(0 67% 56% / 0.3)'
-                }}
-                transition={{ type: "spring", stiffness: 320, damping: 18 }}
-                className="group relative w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
+                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0"
                 style={{
                   background: 'hsl(var(--glass-dark))',
                   backdropFilter: 'blur(16px)',
                   border: '1px solid hsl(var(--glass-border))',
                   boxShadow: 'var(--glass-shadow)',
-                  opacity: 0.85
+                  opacity: 0.9
                 }}
               >
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 bg-red-500/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-red-500/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Glow effects */}
+                <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 bg-red-500/10 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-50 transition-all duration-300" />
+                <div className="absolute inset-0 bg-accent/15 rounded-full scale-100 group-active:scale-110 
+                             opacity-0 group-active:opacity-70 transition-all duration-200" />
                 
-                <FaThumbsDown className="relative text-white text-sm z-10" />
+                {/* Perfect centering with flex */}
+                <div className="relative z-10 flex items-center justify-center w-full h-full">
+                  <FaThumbsDown className="text-white text-base" />
+                </div>
+                
+                {/* Extended touch target */}
                 <span className="absolute -inset-2" />
               </motion.button>
 
               {/* Center: Detail Button with enhanced halo */}
               <motion.button
-                aria-label="View details"
+                aria-label={isDetailExpanded ? "Hide details" : "Show details"}
                 onClick={handleDetailClick}
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 0 20px hsl(var(--accent) / 0.3)'
-                }}
-                transition={{ type: "spring", stiffness: 320, damping: 18 }}
+                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 className={cn(
-                  "group relative w-11 h-11 rounded-full flex items-center justify-center text-white overflow-hidden",
-                  isDetailExpanded && "ring-1 ring-white/20"
+                  "group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden",
+                  "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0",
+                  isDetailExpanded && "ring-1 ring-accent/30"
                 )}
                 style={{
                   background: 'hsl(var(--glass-dark))',
                   backdropFilter: 'blur(16px)',
                   border: '1px solid hsl(var(--glass-border))',
                   boxShadow: isDetailExpanded 
-                    ? '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
+                    ? '0 0 16px hsl(var(--accent) / 0.3), var(--glass-shadow)'
                     : 'var(--glass-shadow)',
-                  opacity: 0.85
+                  opacity: 0.9
                 }}
               >
-                {/* Enhanced glow when expanded */}
-                <div className="absolute inset-0 bg-white/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Enhanced glow when expanded or hovered */}
+                <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 bg-accent/10 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-60 transition-all duration-300" />
+                <div className="absolute inset-0 bg-accent/20 rounded-full scale-100 group-active:scale-110 
+                             opacity-0 group-active:opacity-80 transition-all duration-200" />
                 
+                {/* Perfect centering with rotation animation */}
                 <motion.div
-                  className="relative z-10"
+                  className="relative z-10 flex items-center justify-center w-full h-full"
                   animate={{ rotate: isDetailExpanded ? 180 : 0 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
                 >
-                  <BiSolidDetail className="text-sm fill-white" />
+                  <BiSolidDetail className="text-white text-base" />
                 </motion.div>
+                
+                {/* Extended touch target */}
                 <span className="absolute -inset-2" />
               </motion.button>
 
-              {/* Right: Follow Button with orange accent */}
+              {/* Right: Follow Button with brand orange accent */}
               <motion.button
                 aria-label="Follow user"
                 onClick={handleFollowClick}
                 disabled={isFollowLoading || isDismissLoading}
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 0 20px hsl(var(--accent) / 0.3)'
-                }}
-                transition={{ type: "spring", stiffness: 320, damping: 18 }}
-                className="group relative w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
+                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0"
                 style={{
                   background: 'hsl(var(--glass-dark))',
                   backdropFilter: 'blur(16px)',
                   border: '1px solid hsl(var(--glass-border))',
                   boxShadow: 'var(--glass-shadow)',
-                  opacity: 0.85
+                  opacity: 0.9
                 }}
               >
-                {/* Orange glow effect */}
-                <div className="absolute inset-0 bg-accent/10 rounded-full scale-0 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-20 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/20 rounded-full scale-0 group-active:scale-110 
-                             opacity-0 group-active:opacity-30 transition-all duration-200" />
+                {/* Brand orange glow effects */}
+                <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 bg-accent/15 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-60 transition-all duration-300" />
+                <div className="absolute inset-0 bg-accent/25 rounded-full scale-100 group-active:scale-110 
+                             opacity-0 group-active:opacity-80 transition-all duration-200" />
                 
-                <FaThumbsUp className="relative text-white text-sm z-10" />
+                {/* Perfect centering with flex */}
+                <div className="relative z-10 flex items-center justify-center w-full h-full">
+                  <FaThumbsUp className="text-white text-base" />
+                </div>
+                
+                {/* Extended touch target */}
                 <span className="absolute -inset-2" />
               </motion.button>
             </div>
