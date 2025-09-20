@@ -363,6 +363,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                           cardType={CardType.SQUARE}
                           useSmartMedia={true}
                           onMediaClick={() => onMediaClick?.(item.item)}
+                          user={item.item.user}
+                          isDiscoverPage={isDiscoverPage}
+                          onCreatorClick={(e) => {
+                            e.stopPropagation();
+                            // Navigate to creator profile
+                            console.log('Navigate to creator:', item.item.user);
+                          }}
                         />
                         
                         {/* Multiple media indicator */}
@@ -387,29 +394,35 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                         className="relative overflow-hidden cursor-pointer group transition-all h-full w-full"
                         onClick={() => onMediaClick?.(portraitItem.item)}
                       >
-                      <MediaDisplay
-                        media={{
-                          id: portraitItem.item.id,
-                          media_type: portraitItem.item.type as 'video' | 'image',
-                          media_url: portraitItem.item.src
-                        }}
-                        itemTitle={portraitItem.item.title}
-                        shouldAutoplay={true}
-                        isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
-                        onImageError={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                        }}
-                        onImageLoad={() => {
-                          setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
-                        }}
-                        onLoaded={() => handleTileLoaded(portraitItem.item.id)}
-                        itemId={portraitItem.item.id}
-                        currentIndex={0}
-                        loop={true}
-                        cardType={CardType.PORTRAIT}
-                        useSmartMedia={true}
-                        onMediaClick={() => onMediaClick?.(portraitItem.item)}
-                      />
+                       <MediaDisplay
+                         media={{
+                           id: portraitItem.item.id,
+                           media_type: portraitItem.item.type as 'video' | 'image',
+                           media_url: portraitItem.item.src
+                         }}
+                         itemTitle={portraitItem.item.title}
+                         shouldAutoplay={true}
+                         isLoading={itemLoadingStates[portraitItem.item.id] ?? true}
+                         onImageError={() => {
+                           setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                         }}
+                         onImageLoad={() => {
+                           setItemLoadingStates(prev => ({ ...prev, [portraitItem.item.id]: false }));
+                         }}
+                         onLoaded={() => handleTileLoaded(portraitItem.item.id)}
+                         itemId={portraitItem.item.id}
+                         currentIndex={0}
+                         loop={true}
+                         cardType={CardType.PORTRAIT}
+                         useSmartMedia={true}
+                         onMediaClick={() => onMediaClick?.(portraitItem.item)}
+                         user={portraitItem.item.user}
+                         isDiscoverPage={isDiscoverPage}
+                         onCreatorClick={(e) => {
+                           e.stopPropagation();
+                           console.log('Navigate to creator:', portraitItem.item.user);
+                         }}
+                       />
                         
                         {/* Multiple media indicator */}
                         {portraitItem.item.media && portraitItem.item.media.length > 1 && (

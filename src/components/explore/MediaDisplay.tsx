@@ -5,10 +5,12 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { Play } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
+import { useDiscoverMediaPreview } from '@/hooks/useDiscoverMediaPreview';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import SmartCardMedia from './media/SmartCardMedia';
 import { CardType } from './media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import CreatorOverlay from '@/components/discover/CreatorOverlay';
 
 import { MediaItem } from '@/types/media';
 
@@ -40,6 +42,16 @@ interface MediaDisplayProps {
   stage?: 'grid' | 'fullscreen' | 'vertical-feed';
   // Above the fold optimization
   isAboveTheFold?: boolean;
+  // Discover page specific props
+  user?: {
+    id: string;
+    name: string;
+    username?: string;
+    avatar: string;
+    verified?: boolean;
+  };
+  isDiscoverPage?: boolean;
+  onCreatorClick?: (e: React.MouseEvent) => void;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -60,11 +72,22 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   onMediaClick,
   showFeaturedBadge = true,
   stage = 'grid',
-  isAboveTheFold = false
+  isAboveTheFold = false,
+  user,
+  isDiscoverPage = false,
+  onCreatorClick
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
+  
+  // Use discover media preview for hover/long-press interactions
+  const isVideo = media.media_type === 'video';
+  const discoverPreview = useDiscoverMediaPreview({
+    itemId,
+    mediaType: media.media_type,
+    isVideo
+  });
   
   // Image loading state
   const [imageLoading, setImageLoading] = useState(true);
@@ -123,18 +146,28 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Use smart media logic if enabled
   if (useSmartMedia && cardType) {
     return (
-      <SmartCardMedia
-        media={{
-          ...media,
-          thumbnail_url: thumbnailUrl || undefined,
-          poster_url: thumbnailUrl || undefined
-        }}
-        cardType={cardType}
-        shouldAutoplay={shouldAutoplay}
-        onMediaClick={onMediaClick}
-        className="w-full h-full"
-        showFeaturedBadge={showFeaturedBadge}
-      />
+      <div 
+        className="relative h-full w-full"
+        {...(isDiscoverPage && isVideo ? discoverPreview : {})}
+      >
+        <SmartCardMedia
+          media={{
+            ...media,
+            thumbnail_url: thumbnailUrl || undefined,
+            poster_url: thumbnailUrl || undefined
+          }}
+          cardType={cardType}
+          shouldAutoplay={isDiscoverPage ? discoverPreview.shouldAutoplay : shouldAutoplay}
+          onMediaClick={onMediaClick}
+          className="w-full h-full"
+          showFeaturedBadge={showFeaturedBadge}
+        />
+        
+        {/* Creator overlay for Discover page */}
+        {isDiscoverPage && user && (
+          <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+        )}
+      </div>
     );
   }
   
@@ -158,31 +191,49 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        shouldAutoplay ? (
-          <div className="relative w-full h-full">
-            <EnhancedVideoPlayer
-              src={media.media_url}
-              poster={thumbnailUrl || undefined}
-              autoplay={shouldAutoplay}
-              muted={videoIsMuted} // Use exclusive video audio state
-              loop={loop}
-              className={`w-full h-full pointer-events-none ${fitClass}`}
-              enableHLS={true}
-            />
-            
-            {/* Sound Toggle for autoplaying videos */}
-            <div className="absolute top-3 right-3 z-30">
-              <SoundToggle
-                isMuted={videoIsMuted}
-                onToggle={toggleVideoMute}
-                size="sm"
-                className="rounded-full w-6 h-6 md:w-8 md:h-8"
+        (() => {
+          // Determine if should autoplay based on context
+          const effectiveShouldAutoplay = isDiscoverPage ? discoverPreview.shouldAutoplay : shouldAutoplay;
+          const effectiveMuted = isDiscoverPage ? discoverPreview.shouldMute : videoIsMuted;
+          
+          return effectiveShouldAutoplay ? (
+            <div 
+              className="relative w-full h-full"
+              {...(isDiscoverPage ? discoverPreview : {})}
+            >
+              <EnhancedVideoPlayer
+                src={media.media_url}
+                poster={thumbnailUrl || undefined}
+                autoplay={true}
+                muted={effectiveMuted}
+                loop={loop}
+                className={`w-full h-full pointer-events-none ${fitClass}`}
+                enableHLS={true}
               />
+              
+              {/* Sound Toggle for autoplaying videos - only show if not in Discover preview mode */}
+              {!isDiscoverPage && (
+                <div className="absolute top-3 right-3 z-30">
+                  <SoundToggle
+                    isMuted={videoIsMuted}
+                    onToggle={toggleVideoMute}
+                    size="sm"
+                    className="rounded-full w-6 h-6 md:w-8 md:h-8"
+                  />
+                </div>
+              )}
+              
+              {/* Creator overlay for Discover page */}
+              {isDiscoverPage && user && (
+                <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+              )}
             </div>
-          </div>
         ) : (
           /* Video thumbnail - ALWAYS use static poster in grid, defer HLS until click */
-          <div className="relative w-full h-full">
+          <div 
+            className="relative w-full h-full"
+            {...(isDiscoverPage ? discoverPreview : {})}
+          >
             {/* Video thumbnail loading state - only for off-screen items */}
             {!isAboveTheFold && !mediaLoaded && (
               <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-0">
@@ -229,20 +280,33 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                 </div>
               </div>
             )}
+            
+            {/* Creator overlay for Discover page */}
+            {isDiscoverPage && user && (
+              <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+            )}
           </div>
-        )
+        );
+        })()
       ) : (
         /* Image display with high quality optimization */
-        <HighQualityImage
-          src={media.media_url}
-          alt={itemTitle || 'Photo'}
-          className={`w-full h-full ${fitClass}`}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-          width={1200}
-          height={1600}
-          isAboveTheFold={isAboveTheFold}
-        />
+        <div className="relative w-full h-full">
+          <HighQualityImage
+            src={media.media_url}
+            alt={itemTitle || 'Photo'}
+            className={`w-full h-full ${fitClass}`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            width={1200}
+            height={1600}
+            isAboveTheFold={isAboveTheFold}
+          />
+          
+          {/* Creator overlay for Discover page */}
+          {isDiscoverPage && user && (
+            <CreatorOverlay user={user} onCreatorClick={onCreatorClick} />
+          )}
+        </div>
       )}
     </div>
   );
