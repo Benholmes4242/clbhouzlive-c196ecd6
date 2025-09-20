@@ -82,11 +82,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold text-gray-900">Suggested for you</h3>
           </div>
-          <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
+          <div className="flex overflow-x-auto scrollbar-hide gap-0.5 pb-2">
             {/* Loading skeletons */}
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 animate-pulse">
-                <div className="w-full h-32 bg-gray-200 rounded-t-xl mb-2"></div>
+              <div key={i} className="flex-shrink-0 w-32 h-48 bg-white border border-gray-200 animate-pulse">
+                <div className="w-full h-32 bg-gray-200 mb-2"></div>
                 <div className="px-2 pb-2">
                   <div className="h-3 bg-gray-200 rounded mb-1"></div>
                   <div className="h-3 bg-gray-200 rounded mb-2"></div>
@@ -113,11 +113,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
         </div>
 
         {/* Horizontal Scrollable Video Cards */}
-        <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
+          <div className="flex overflow-x-auto scrollbar-hide gap-0.5 pb-2">
           {availableUsers.map((user, index) => (
             <div
               key={user.id}
-              className="flex-shrink-0 w-32 h-48 bg-white rounded-xl border border-gray-200 overflow-hidden relative"
+              className="flex-shrink-0 w-32 h-48 bg-white border border-gray-200 overflow-hidden relative cursor-pointer"
             >
               {/* Video/Image Content */}
               <div className="w-full h-32 relative bg-gray-100">
