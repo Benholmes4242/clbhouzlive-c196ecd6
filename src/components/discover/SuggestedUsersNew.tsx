@@ -597,7 +597,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   <div className="flex-1 flex flex-col justify-center px-4 pb-4">
                     {/* Avatar - First in stagger */}
                      <motion.div 
-                       className="flex justify-center mb-3"
+                       className="flex justify-center mb-1.5"
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
