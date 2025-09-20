@@ -127,77 +127,149 @@ const SnapModal = ({
     [videosA, placeholders.videos, seen]
   );
 
-  /**
-   * Keeps all rows the same total width using flex weights.
-   * videos: [1,1,1]   (3 equal rects)
-   * photos: [1,2]     (square + 2x wide rect)
-   * capture:[2,1]     (long + square)
-   */
-  function ThumbStrip({
-    variant,
-    thumbs = [],
-  }: {
-    variant: "videos" | "photos" | "capture";
-    thumbs?: Thumb[];
-  }) {
+  // Dynamic Preview Components
+  const CameraPreview = () => {
     return (
-      <div className="flex items-stretch gap-1.5 h-12 w-32">
-        {variant === "videos" && (
-          <>
-            {thumbs.slice(0, 3).map((t, i) => (
-              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg liquid-glass shadow-sm">
-                <img
-                  src={t.displaySrc}
-                  alt=""
-                  loading="lazy"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.videos[0]; }}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </>
-        )}
-
-        {variant === "photos" && (
-          <>
-            {thumbs.slice(0, 2).map((t, i) => (
-              <div 
-                key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[1.5_0_0] aspect-[3/2]'} overflow-hidden rounded-lg liquid-glass shadow-sm`}
-              >
-                <img
-                  src={t.displaySrc}
-                  alt=""
-                  loading="lazy"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.photos[0]; }}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </>
-        )}
-
-        {variant === "capture" && (
-          <>
-            {thumbs.slice(0, 2).map((t, i) => (
-              <div 
-                key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1.5_0_0] aspect-[3/2]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg liquid-glass shadow-sm`}
-              >
-                <img
-                  src={t.displaySrc}
-                  alt=""
-                  loading="lazy"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.capture[0]; }}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </>
-        )}
+      <div className="relative h-12 w-full rounded-lg overflow-hidden bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm">
+        {/* Lens ripple animation */}
+        <motion.div
+          className="absolute inset-0 rounded-lg border-2 border-white/20"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute inset-0 rounded-lg border border-white/10"
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.5, 0.8, 0.5],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.3,
+          }}
+        />
+        {/* Center lens */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20" />
+        </div>
       </div>
     );
-  }
+  };
+
+  const PhotosPreview = ({ images }: { images: Thumb[] }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const displayImages = images.length > 0 ? images.slice(0, 3) : 
+      placeholders.photos.slice(0, 3).map((url, i) => ({ id: `placeholder-${i}`, displaySrc: url }));
+
+    useEffect(() => {
+      if (displayImages.length <= 1) return;
+      
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % displayImages.length);
+      }, 1800);
+
+      return () => clearInterval(interval);
+    }, [displayImages.length]);
+
+    return (
+      <div className="relative h-12 w-full rounded-lg overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentIndex}
+            src={displayImages[currentIndex]?.displaySrc}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = placeholders.photos[0];
+            }}
+          />
+        </AnimatePresence>
+        {/* Subtle overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg" />
+      </div>
+    );
+  };
+
+  const StoryPreview = ({ photos, videos }: { photos: Thumb[]; videos: Thumb[] }) => {
+    const [showVideo, setShowVideo] = useState(false);
+    const displayPhoto = photos.length > 0 ? photos[0] : 
+      { id: 'placeholder-photo', displaySrc: placeholders.photos[0] };
+    const displayVideo = videos.length > 0 ? videos[0] : 
+      { id: 'placeholder-video', displaySrc: placeholders.videos[0] };
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setShowVideo(prev => !prev);
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <div className="relative h-12 w-full rounded-lg overflow-hidden bg-gradient-to-br from-white/5 to-white/10">
+        <div className="flex h-full">
+          {/* Left side - Photo */}
+          <div className="flex-1 relative overflow-hidden">
+            <img
+              src={displayPhoto.displaySrc}
+              alt=""
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = placeholders.photos[0];
+              }}
+            />
+            <motion.div 
+              className="absolute inset-0 bg-brand-orange/20"
+              animate={{ opacity: showVideo ? 0 : 0.3 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          
+          {/* Divider */}
+          <div className="w-px bg-white/20" />
+          
+          {/* Right side - Video */}
+          <div className="flex-1 relative overflow-hidden">
+            <img
+              src={displayVideo.displaySrc}
+              alt=""
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = placeholders.videos[0];
+              }}
+            />
+            <motion.div 
+              className="absolute inset-0 bg-brand-orange/20"
+              animate={{ opacity: showVideo ? 0.3 : 0 }}
+              transition={{ duration: 0.5 }}
+            />
+            {/* Play indicator */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div 
+                className="w-3 h-3 border-l-2 border-white/60"
+                style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}
+                animate={{ opacity: showVideo ? 1 : 0.4 }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Handle mixed media (Tell Your Story) option
   const handleTellYourStory = () => {
@@ -323,15 +395,15 @@ const SnapModal = ({
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
                     >
                       {/* Option Card */}
-                      <div className="flex items-center justify-between p-4 rounded-2xl liquid-glass-subtle border border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10 transition-all duration-300">
-                        <div className="flex items-center gap-4 flex-1">
+                      <div className="p-4 rounded-2xl liquid-glass-subtle border border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10 transition-all duration-300">
+                        <div className="flex items-center gap-4 mb-3">
                           {/* Icon */}
                           <div className="w-12 h-12 rounded-xl liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/30 transition-all duration-300">
                             <Icon className="h-6 w-6 text-white group-hover:text-brand-orange transition-colors duration-300" />
                           </div>
                           
                           {/* Text */}
-                          <div className="text-left">
+                          <div className="text-left flex-1">
                             <h3 className="text-base font-semibold text-white group-hover:text-brand-orange transition-colors duration-300">
                               {label}
                             </h3>
@@ -341,12 +413,11 @@ const SnapModal = ({
                           </div>
                         </div>
                         
-                        {/* Dynamic Preview Strip */}
-                        <div className="ml-4 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                          <ThumbStrip 
-                            variant={key === "capture" ? "capture" : key === "story" ? "videos" : "photos"} 
-                            thumbs={preview} 
-                          />
+                        {/* Dynamic Preview */}
+                        <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                          {key === "capture" && <CameraPreview />}
+                          {key === "media" && <PhotosPreview images={preview} />}
+                          {key === "story" && <StoryPreview photos={photoThumbs} videos={videoThumbs} />}
                         </div>
                       </div>
                       
