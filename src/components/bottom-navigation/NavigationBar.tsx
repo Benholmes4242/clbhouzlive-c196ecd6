@@ -56,10 +56,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               >
                 <Icon 
                   className={cn(
-                    "h-6 w-6 transition-colors duration-200",
-                    // Special handling for camera/post icon
-                    tab.id === 'post' && isActive && "text-accent",
-                    tab.id === 'post' && !isActive && "text-accent/60"
+                    "h-7 w-7 transition-colors duration-200"
                   )}
                 />
               </button>
