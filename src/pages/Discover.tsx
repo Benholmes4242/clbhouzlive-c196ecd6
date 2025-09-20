@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import MediaSearch from '@/components/discover/MediaSearch';
 import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
+import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import SubpillBar from '@/components/discover/SubpillBar';
@@ -23,6 +24,7 @@ const Discover = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const { main, sub } = useDiscoverQuery();
   
@@ -40,6 +42,8 @@ const Discover = () => {
     const newFilter = mainToFilter[main] || FILTER_TYPES.VIDEOS;
     if (newFilter !== activeFilter) {
       setActiveFilter(newFilter);
+      // Reset tags when switching main pill
+      setSelectedTags([]);
     }
   }, [main]);
   
@@ -148,6 +152,11 @@ const Discover = () => {
             />
           </div>
 
+          {/* Trending Tags Bar */}
+          <div className="mt-3">
+            <TrendingTagsBar onTagsChange={setSelectedTags} />
+          </div>
+
           {/* Suggested Users */}
           <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
@@ -165,6 +174,7 @@ const Discover = () => {
               onFollow={handleFollow}
               onMediaClick={handleMediaClick}
               searchQuery={searchQuery}
+              selectedTags={selectedTags}
             />
           </div>
         </main>
