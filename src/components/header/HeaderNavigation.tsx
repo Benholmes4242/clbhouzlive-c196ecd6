@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Bell, CircleUserRound, Settings, Shield } from 'lucide-react';
+import { Bell, User, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -141,7 +141,7 @@ const HeaderNavigation = () => {
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-          <CircleUserRound className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+          <User className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
         </Button>
 
         <DropdownMenu>
@@ -176,7 +176,7 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-        <CircleUserRound className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+        <User className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
       </Button>
 
       <DropdownMenu>
