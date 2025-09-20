@@ -48,7 +48,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
   // Media handlers for camera, image, and video
-  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
+  const { handleCameraClick, handleImageClick, handleVideoClick, handleMixedMediaClick } = useMediaHandlers(closeSnapModal, openComposer);
 
   const handleCloseComposer = () => {
     closeComposer();
@@ -81,6 +81,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         onCameraClick={() => handleCameraClick({})}
         onImageClick={() => handleImageClick({})}
         onVideoClick={() => handleVideoClick({})}
+        onMixedMediaClick={handleMixedMediaClick}
         openComposerWithFiles={openComposerWithFiles}
       />
 

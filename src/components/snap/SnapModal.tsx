@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Images, X, Sparkles } from 'lucide-react';
+import { Camera, Images, X, Sparkles, Zap, Palette } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -33,6 +33,7 @@ interface SnapModalProps {
   onImageClick: () => void;
   onVideoClick: () => void; // Keep for backward compatibility
   openComposerWithFiles: (files: File[]) => void;
+  onMixedMediaClick?: () => void; // NEW: Tell Your Story option
 }
 
 const SnapModal = ({ 
@@ -42,6 +43,7 @@ const SnapModal = ({
   onImageClick, 
   onVideoClick, 
   openComposerWithFiles,
+  onMixedMediaClick,
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
@@ -139,11 +141,11 @@ const SnapModal = ({
     thumbs?: Thumb[];
   }) {
     return (
-      <div className="flex items-stretch gap-2 h-16 w-56">
+      <div className="flex items-stretch gap-1.5 h-12 w-32">
         {variant === "videos" && (
           <>
             {thumbs.slice(0, 3).map((t, i) => (
-              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300">
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg liquid-glass shadow-sm">
                 <img
                   src={t.displaySrc}
                   alt=""
@@ -161,7 +163,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300`}
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[1.5_0_0] aspect-[3/2]'} overflow-hidden rounded-lg liquid-glass shadow-sm`}
               >
                 <img
                   src={t.displaySrc}
@@ -180,7 +182,7 @@ const SnapModal = ({
             {thumbs.slice(0, 2).map((t, i) => (
               <div 
                 key={t.id ?? `ph-${i}`} 
-                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-xl liquid-glass shadow-md hover:scale-105 transition-all duration-300`}
+                className={`${i === 0 ? 'flex-[1.5_0_0] aspect-[3/2]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg liquid-glass shadow-sm`}
               >
                 <img
                   src={t.displaySrc}
@@ -197,18 +199,39 @@ const SnapModal = ({
     );
   }
 
+  // Handle mixed media (Tell Your Story) option
+  const handleTellYourStory = () => {
+    if (onMixedMediaClick) {
+      onMixedMediaClick();
+    } else {
+      handlePickMedia();
+    }
+  };
+
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
       label: "Camera",
       icon: Camera,
       onClick: onCameraClick,
+      preview: captureThumbs,
+      description: "Take a photo or video right now"
     }] : []),
     {
       key: "media",
       label: "Photos",
       icon: Images,
       onClick: handlePickMedia,
+      preview: photoThumbs,
+      description: "Choose from your gallery"
+    },
+    {
+      key: "story",
+      label: "Tell Your Story",
+      icon: Palette,
+      onClick: handleTellYourStory,
+      preview: videoThumbs,
+      description: "Mix photos & videos"
     },
   ];
 
@@ -236,7 +259,7 @@ const SnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[400px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
+              className="w-full max-w-[480px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
@@ -245,39 +268,90 @@ const SnapModal = ({
                 { duration: 0.1 } : 
                 { type: "spring", stiffness: 280, damping: 26, duration: 0.18 }
               }
+              onMouseMove={!prefersReducedMotion ? (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const deltaX = (e.clientX - centerX) / rect.width;
+                const deltaY = (e.clientY - centerY) / rect.height;
+                e.currentTarget.style.setProperty('--parallax-y', `${deltaY * 2}px`);
+              } : undefined}
+              onMouseLeave={!prefersReducedMotion ? (e) => {
+                e.currentTarget.style.setProperty('--parallax-y', '0px');
+              } : undefined}
             >
               {/* Header */}
-              <div className="px-8 pt-8 pb-6 text-center">
+              <motion.div 
+                className="px-8 pt-8 pb-6 text-center"
+                style={{
+                  transform: !prefersReducedMotion ? 'translateY(var(--parallax-y, 0px))' : 'none'
+                }}
+              >
                 <h2 className="text-2xl font-semibold mb-2">Create a Moment</h2>
-                <p className="text-sm text-white/70">Choose how you'd like to share</p>
-              </div>
+                <p className="text-sm text-white/70">Capture and share your golf journey</p>
+                
+                {/* Quick Post shortcut */}
+                <motion.button
+                  onClick={handlePickMedia}
+                  className="mt-3 px-4 py-2 text-xs font-medium text-brand-orange/80 hover:text-brand-orange border border-brand-orange/30 hover:border-brand-orange/50 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-105"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
+                  whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                >
+                  <Zap className="inline h-3 w-3 mr-1" />
+                  Quick Post
+                </motion.button>
+              </motion.div>
 
-              {/* Action Icons */}
-              <div className="px-8 pb-8">
-                <div className={`flex ${isMobile ? 'justify-center gap-12' : 'justify-center gap-16'} items-center`}>
-                  {cardOptions.map(({ key, label, icon: Icon, onClick }, index) => (
+              {/* Action Options with Dynamic Previews */}
+              <div className="px-6 pb-8">
+                <div className="space-y-6">
+                  {cardOptions.map(({ key, label, icon: Icon, onClick, preview, description }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
-                      className="flex flex-col items-center gap-4 group"
-                      initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+                      className="w-full group relative overflow-hidden"
+                      initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
                       animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
                       transition={prefersReducedMotion ? 
                         { delay: 0 } : 
-                        { delay: index * 0.08, type: "spring", stiffness: 300, damping: 20 }
+                        { delay: index * 0.1, type: "spring", stiffness: 280, damping: 25 }
                       }
-                      whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
+                      whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
                     >
-                      {/* Circular Glass Button - Minimum 44px for accessibility */}
-                      <div className="w-16 h-16 rounded-full liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/40 group-hover:shadow-lg group-hover:shadow-brand-orange/20 transition-all duration-300">
-                        <Icon className="h-7 w-7 text-white group-hover:text-brand-orange transition-colors duration-300" />
+                      {/* Option Card */}
+                      <div className="flex items-center justify-between p-4 rounded-2xl liquid-glass-subtle border border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10 transition-all duration-300">
+                        <div className="flex items-center gap-4 flex-1">
+                          {/* Icon */}
+                          <div className="w-12 h-12 rounded-xl liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/30 transition-all duration-300">
+                            <Icon className="h-6 w-6 text-white group-hover:text-brand-orange transition-colors duration-300" />
+                          </div>
+                          
+                          {/* Text */}
+                          <div className="text-left">
+                            <h3 className="text-base font-semibold text-white group-hover:text-brand-orange transition-colors duration-300">
+                              {label}
+                            </h3>
+                            <p className="text-sm text-white/60 group-hover:text-white/80 transition-colors duration-300">
+                              {description}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Dynamic Preview Strip */}
+                        <div className="ml-4 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                          <ThumbStrip 
+                            variant={key === "capture" ? "capture" : key === "story" ? "videos" : "photos"} 
+                            thumbs={preview} 
+                          />
+                        </div>
                       </div>
                       
-                      {/* Label */}
-                      <span className="text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
-                        {label}
-                      </span>
+                      {/* Hover gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
                     </motion.button>
                   ))}
                 </div>
