@@ -517,7 +517,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           )}
           initial={false}
           animate={{
-            height: isDetailExpanded ? "100%" : "80px",
+            height: isDetailExpanded ? "100%" : "90px",
           }}
           style={{
             transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
@@ -596,8 +596,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   {/* Profile Info Section with Stagger */}
                   <div className="flex-1 flex flex-col justify-center px-4 pb-4">
                     {/* Avatar - First in stagger */}
-                    <motion.div 
-                      className="flex justify-center mb-4"
+                     <motion.div 
+                       className="flex justify-center mb-6"
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
@@ -610,8 +610,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         ease: "easeOut"
                       }}
                     >
-                      <div 
-                        className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
+                       <div 
+                         className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/profile/${user.id}`);
@@ -624,8 +624,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <span className="text-white text-2xl font-bold">
+                           <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                             <span className="text-white text-xl font-bold">
                               {user.displayName.charAt(0).toUpperCase()}
                             </span>
                           </div>
@@ -634,8 +634,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     </motion.div>
 
                     {/* User Info - Staggered */}
-                    <motion.div 
-                      className="text-center space-y-2"
+                     <motion.div 
+                       className="text-center space-y-3"
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
@@ -719,7 +719,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             <AnimatePresence>
               {!isDetailExpanded && (
                 <motion.div
-                  className="py-2.5"
+                   className="py-3"
                   style={{ paddingLeft: safeAreaPadding, paddingRight: safeAreaPadding }}
                   initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -761,24 +761,28 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     />
                   </div>
 
-                  {/* Compact User Info - Closer to controls */}
-                  <div className="mt-1.5 flex justify-center">
-                    <div 
-                      className="text-white font-medium text-center text-sm whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
-                      style={{ 
-                        textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                        background: 'hsl(var(--glass-dark))',
-                        backdropFilter: 'blur(12px)',
-                        border: '1px solid hsl(var(--glass-border))'
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/profile/${user.id}`);
-                      }}
-                    >
-                      {user.displayName || user.handle || "User"}
-                    </div>
-                  </div>
+                   {/* Compact User Info - Better spacing and single line clamp */}
+                   <div className="mt-2 flex justify-center px-2">
+                     <div 
+                       className="text-white font-medium text-center text-xs truncate max-w-[calc(100%-1rem)] px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
+                       style={{ 
+                         textShadow: "0 1px 2px rgba(0,0,0,0.5)",
+                         background: "hsl(var(--glass-dark))",
+                         backdropFilter: "blur(12px)",
+                         border: "1px solid hsl(var(--glass-border))",
+                         whiteSpace: "nowrap",
+                         overflow: "hidden",
+                         textOverflow: "ellipsis"
+                       }}
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         navigate(`/profile/${user.id}`);
+                       }}
+                       title={user.displayName || user.handle || "User"}
+                     >
+                       {user.displayName || user.handle || "User"}
+                     </div>
+                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
