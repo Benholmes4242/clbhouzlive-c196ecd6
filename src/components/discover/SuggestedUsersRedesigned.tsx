@@ -61,11 +61,35 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const [isDetailExpanded, setIsDetailExpanded] = useState(false);
   const [panelDragY, setPanelDragY] = useState(0);
   const [isPanelDragging, setIsPanelDragging] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showStaggeredContent, setShowStaggeredContent] = useState(false);
   const FEEDBACK_MS = 1500;
   const COLLAPSE_THRESHOLD = 0.3; // 30% threshold for collapse
+  const DEBOUNCE_MS = 160; // Debounce threshold for interactions
   // Desktop vs mobile gating
   const isDesktop = useMedia('(min-width: 1024px)');
   const enableVerticalSwipe = !isDesktop;
+
+  // Haptic feedback utility
+  const triggerHaptic = (type: 'light' | 'success' | 'warning') => {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      switch (type) {
+        case 'light':
+          navigator.vibrate(10);
+          break;
+        case 'success':
+          navigator.vibrate([50, 30, 50]);
+          break;
+        case 'warning':
+          navigator.vibrate([30, 20, 30]);
+          break;
+      }
+    }
+  };
+
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // DEBUG mount log per card
   useEffect(() => {
@@ -113,9 +137,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (isFollowLoading || isDismissLoading) return;
+    if (isFollowLoading || isDismissLoading || isTransitioning) return;
     
-    // Show feedback overlay
+    // Interrupt expand animation if active
+    if (isDetailExpanded && !showStaggeredContent) {
+      setIsDetailExpanded(false);
+      setIsTransitioning(false);
+    }
+    
+    // Success haptic and show feedback
+    triggerHaptic('success');
     setShowFeedback('follow');
     
     // Analytics
@@ -133,9 +164,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   const handleDismissClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (isDismissLoading || isFollowLoading) return;
+    if (isDismissLoading || isFollowLoading || isTransitioning) return;
     
-    // Show feedback overlay
+    // Interrupt expand animation if active
+    if (isDetailExpanded && !showStaggeredContent) {
+      setIsDetailExpanded(false);
+      setIsTransitioning(false);
+    }
+    
+    // Warning haptic and show feedback
+    triggerHaptic('warning');
     setShowFeedback('dismiss');
     
     // Analytics
@@ -150,9 +188,30 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     }, FEEDBACK_MS);
   };
 
-  const handleDetailClick = (e: React.MouseEvent) => {
+  const handleDetailClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsDetailExpanded(!isDetailExpanded);
+    
+    // Debounce protection
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    triggerHaptic('light');
+    
+    if (isDetailExpanded) {
+      // Collapse sequence - reverse stagger
+      setShowStaggeredContent(false);
+      await new Promise(resolve => setTimeout(resolve, prefersReducedMotion ? 60 : 120));
+      setIsDetailExpanded(false);
+      await new Promise(resolve => setTimeout(resolve, prefersReducedMotion ? 60 : 200));
+    } else {
+      // Expand sequence
+      setIsDetailExpanded(true);
+      await new Promise(resolve => setTimeout(resolve, prefersReducedMotion ? 60 : 220));
+      setShowStaggeredContent(true);
+    }
+    
+    // Release transition lock
+    setTimeout(() => setIsTransitioning(false), DEBOUNCE_MS);
   };
 
   // Handle panel drag for collapse gesture
@@ -167,7 +226,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     setPanelDragY(Math.max(0, dy));
   };
 
-  const handlePanelDragEnd = () => {
+  const handlePanelDragEnd = async () => {
     if (!isDetailExpanded || !isPanelDragging) {
       setPanelDragY(0);
       setIsPanelDragging(false);
@@ -178,7 +237,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     const dragPercentage = panelDragY / cardHeight;
     
     if (dragPercentage >= COLLAPSE_THRESHOLD) {
-      // Collapse the panel
+      // Collapse the panel with haptic feedback
+      triggerHaptic('light');
+      setShowStaggeredContent(false);
+      await new Promise(resolve => setTimeout(resolve, prefersReducedMotion ? 60 : 120));
       setIsDetailExpanded(false);
     }
     
@@ -538,7 +600,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
 
-      {/* Single Liquid Glass Overlay - Expand-in-Place */}
+      {/* Single Liquid Glass Overlay - Expand-in-Place with Stagger */}
       <motion.div
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
@@ -549,8 +611,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`
         }}
         transition={{
-          duration: isPanelDragging ? 0 : 0.3,
-          ease: [0.25, 0.1, 0.25, 1]
+          duration: isPanelDragging ? 0 : (prefersReducedMotion ? 0.12 : 0.22),
+          ease: isDetailExpanded ? "easeOut" : "easeIn"
         }}
         onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
       >
@@ -565,23 +627,36 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           }}
         >
           
-          {/* Expanded Profile Content - Full Height Coverage */}
+          {/* Expanded Profile Content - Staggered Animation */}
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
                 className="absolute inset-0 flex flex-col"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                animate={{ opacity: showStaggeredContent ? 1 : 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ 
-                  duration: 0.2,
+                  duration: prefersReducedMotion ? 0.06 : 0.15,
                   ease: "easeOut"
                 }}
               >
-                {/* Profile Info Section - Top Area */}
+                {/* Profile Info Section - Top Area with Stagger */}
                 <div className="flex-1 flex flex-col justify-center px-4 pt-8 pb-20">
-                  {/* User Avatar */}
-                  <div className="flex justify-center mb-4">
+                  {/* User Avatar - First in stagger */}
+                  <motion.div 
+                    className="flex justify-center mb-4"
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ 
+                      opacity: showStaggeredContent ? 1 : 0,
+                      scale: showStaggeredContent ? 1 : 0.95,
+                      y: showStaggeredContent ? 0 : 20
+                    }}
+                    transition={{ 
+                      duration: prefersReducedMotion ? 0.06 : 0.25,
+                      delay: prefersReducedMotion ? 0 : 0.02,
+                      ease: "easeOut"
+                    }}
+                  >
                     <div 
                       className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={(e) => {
@@ -603,36 +678,85 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         </div>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
 
-                  {/* User Info */}
-                  <div className="text-center space-y-2">
-                    <h3 
+                  {/* User Info - Staggered */}
+                  <motion.div 
+                    className="text-center space-y-2"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ 
+                      opacity: showStaggeredContent ? 1 : 0,
+                      y: showStaggeredContent ? 0 : 15
+                    }}
+                    transition={{ 
+                      duration: prefersReducedMotion ? 0.06 : 0.25,
+                      delay: prefersReducedMotion ? 0 : 0.04,
+                      ease: "easeOut"
+                    }}
+                  >
+                    {/* Display Name - Second in stagger */}
+                    <motion.h3 
                       className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200"
                       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/profile/${user.id}`);
                       }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ 
+                        opacity: showStaggeredContent ? 1 : 0,
+                        y: showStaggeredContent ? 0 : 10
+                      }}
+                      transition={{ 
+                        duration: prefersReducedMotion ? 0.06 : 0.2,
+                        delay: prefersReducedMotion ? 0 : 0.06,
+                        ease: "easeOut"
+                      }}
                     >
                       {user.displayName}
-                    </h3>
+                    </motion.h3>
                     
-                    <p className="text-white/70 text-base"
-                       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                    {/* Handle - Third in stagger */}
+                    <motion.p 
+                      className="text-white/70 text-base"
+                      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ 
+                        opacity: showStaggeredContent ? 1 : 0,
+                        y: showStaggeredContent ? 0 : 10
+                      }}
+                      transition={{ 
+                        duration: prefersReducedMotion ? 0.06 : 0.2,
+                        delay: prefersReducedMotion ? 0 : 0.08,
+                        ease: "easeOut"
+                      }}
+                    >
                       @{user.handle}
-                    </p>
+                    </motion.p>
                     
+                    {/* Home Club & HCP - Fourth in stagger */}
                     {user.homeClub && (
-                      <p className="text-white/80 text-base font-medium mt-3"
-                         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                      <motion.p 
+                        className="text-white/80 text-base font-medium mt-3"
+                        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ 
+                          opacity: showStaggeredContent ? 1 : 0,
+                          y: showStaggeredContent ? 0 : 10
+                        }}
+                        transition={{ 
+                          duration: prefersReducedMotion ? 0.06 : 0.2,
+                          delay: prefersReducedMotion ? 0 : 0.1,
+                          ease: "easeOut"
+                        }}
+                      >
                         {user.homeClub}
                         {user.handicap !== undefined && (
                           <span className="block mt-1 text-sm opacity-90">HCP {user.handicap}</span>
                         )}
-                      </p>
+                      </motion.p>
                     )}
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
             )}
@@ -659,15 +783,23 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               </div>
             )}
             <div className="flex items-center justify-center gap-6">
-              {/* Left: Dismiss Button - Enhanced circular glass */}
+              {/* Left: Dismiss Button - Enhanced micro-interactions */}
               <motion.button
                 aria-label="Dismiss suggestion"
                 onClick={handleDismissClick}
-                disabled={isDismissLoading || isFollowLoading}
+                disabled={isDismissLoading || isFollowLoading || isTransitioning}
                 whileTap={{ scale: 0.98 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0"
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: '0 0 16px hsl(0 67% 56% / 0.4), var(--glass-shadow)'
+                }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  duration: prefersReducedMotion ? 0.1 : 0.25
+                }}
+                className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-0"
                 style={{
                   background: 'hsl(var(--glass-dark))',
                   backdropFilter: 'blur(16px)',
@@ -676,13 +808,13 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   opacity: 0.9
                 }}
               >
-                {/* Glow effects */}
+                {/* Enhanced glow effects */}
                 <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
                              opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                <div className="absolute inset-0 bg-red-500/10 rounded-full scale-100 group-hover:scale-110 
-                             opacity-0 group-hover:opacity-50 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/15 rounded-full scale-100 group-active:scale-110 
-                             opacity-0 group-active:opacity-70 transition-all duration-200" />
+                <div className="absolute inset-0 bg-red-500/15 rounded-full scale-100 group-hover:scale-110 
+                             opacity-0 group-hover:opacity-60 transition-all duration-300" />
+                <div className="absolute inset-0 bg-red-500/30 rounded-full scale-100 group-active:scale-110 
+                             opacity-0 group-active:opacity-80 transition-all duration-200" />
                 
                 {/* Perfect centering with flex */}
                 <div className="relative z-10 flex items-center justify-center w-full h-full">
@@ -693,13 +825,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 <span className="absolute -inset-2" />
               </motion.button>
 
-              {/* Center: Detail Button with enhanced halo */}
+              {/* Center: Detail Button with enhanced interactions */}
               <motion.button
                 aria-label={isDetailExpanded ? "Hide details" : "Show details"}
                 onClick={handleDetailClick}
+                disabled={isTransitioning}
                 whileTap={{ scale: 0.98 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
+                }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  duration: prefersReducedMotion ? 0.1 : 0.25
+                }}
                 className={cn(
                   "group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden",
                   "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0",
@@ -718,16 +859,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 {/* Enhanced glow when expanded or hovered */}
                 <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
                              opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/10 rounded-full scale-100 group-hover:scale-110 
+                <div className="absolute inset-0 bg-accent/15 rounded-full scale-100 group-hover:scale-110 
                              opacity-0 group-hover:opacity-60 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/20 rounded-full scale-100 group-active:scale-110 
+                <div className="absolute inset-0 bg-accent/30 rounded-full scale-100 group-active:scale-110 
                              opacity-0 group-active:opacity-80 transition-all duration-200" />
                 
-                {/* Perfect centering with rotation animation */}
+                {/* Perfect centering with smooth rotation */}
                 <motion.div
                   className="relative z-10 flex items-center justify-center w-full h-full"
                   animate={{ rotate: isDetailExpanded ? 180 : 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  transition={{ 
+                    duration: prefersReducedMotion ? 0.1 : 0.25, 
+                    ease: "easeInOut" 
+                  }}
                 >
                   <BiSolidDetail className="text-white text-base" />
                 </motion.div>
@@ -736,14 +880,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 <span className="absolute -inset-2" />
               </motion.button>
 
-              {/* Right: Follow Button with brand orange accent */}
+              {/* Right: Follow Button with enhanced brand orange accent */}
               <motion.button
                 aria-label="Follow user"
                 onClick={handleFollowClick}
-                disabled={isFollowLoading || isDismissLoading}
+                disabled={isFollowLoading || isDismissLoading || isTransitioning}
                 whileTap={{ scale: 0.98 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
+                }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  duration: prefersReducedMotion ? 0.1 : 0.25
+                }}
                 className="group relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-0"
                 style={{
                   background: 'hsl(var(--glass-dark))',
@@ -753,12 +905,12 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   opacity: 0.9
                 }}
               >
-                {/* Brand orange glow effects */}
+                {/* Enhanced brand orange glow effects */}
                 <div className="absolute inset-0 bg-white/5 rounded-full scale-100 group-hover:scale-110 
                              opacity-0 group-hover:opacity-100 transition-all duration-300" />
                 <div className="absolute inset-0 bg-accent/15 rounded-full scale-100 group-hover:scale-110 
                              opacity-0 group-hover:opacity-60 transition-all duration-300" />
-                <div className="absolute inset-0 bg-accent/25 rounded-full scale-100 group-active:scale-110 
+                <div className="absolute inset-0 bg-accent/30 rounded-full scale-100 group-active:scale-110 
                              opacity-0 group-active:opacity-80 transition-all duration-200" />
                 
                 {/* Perfect centering with flex */}
