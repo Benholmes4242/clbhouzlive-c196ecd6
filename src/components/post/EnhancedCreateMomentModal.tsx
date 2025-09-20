@@ -373,45 +373,32 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   return (
     <>
-      {/* Bottom Sheet Overlay */}
+      {/* Background Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Semi-transparent background */}
+          {/* Semi-translucent blurred background */}
           <div 
-            className="absolute inset-0 bg-black/50 transition-opacity"
+            className="absolute inset-0 bg-gradient-to-br from-black/60 via-gray-800/70 to-black/80 backdrop-blur-lg transition-opacity"
             onClick={onClose}
           />
           
           {/* Modal */}
           <div 
-            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
+            className="relative w-full max-w-[420px] md:max-w-[480px] bg-gray-800/20 backdrop-blur-xl border border-white/10 rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-6 max-h-[90vh] overflow-y-auto animate-fade-in animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            {/* Header with close button */}
             <div className="flex items-center justify-between mb-6">
-              {modalMode === 'upload' && (
-                <button
-                  onClick={handleBackToSelection}
-                  className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label="Back to selection"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-              )}
-              {modalMode === 'selection' && <div className="w-6 h-6" />}
-              <h2 className="text-lg font-bold text-center flex-1">
+              <div className="w-6 h-6" />
+              <h2 className="text-xl font-bold text-center flex-1 text-white">
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
               <button
                 onClick={onClose}
-                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-white/70 hover:text-white/90 transition-colors rounded-full bg-white/10 hover:bg-white/20"
                 aria-label="Close modal"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -481,259 +468,180 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 </div>
               </div>
             ) : (
-              /* Upload View - Reorganized with better hierarchy and spacing */
-              <div className="space-y-6">
+              /* Upload View - Old Layout with Snap Modal Colors */
+              <div className="space-y-5">
 
-                {/* 1. Selected Media Preview - Taller Header */}
-                <div className="mb-6">
-                  {/* Media Header Container - Taller and Better Proportions */}
-                  <div className="relative h-[58vh] max-h-[720px] min-h-[360px] bg-black rounded-xl overflow-hidden mb-4">
-                    {files.length > 0 && (
-                      <>
-                        {files[0].type.startsWith('video') ? (
-                          <video 
-                            src={URL.createObjectURL(files[0])} 
-                            className="h-full w-full object-cover" 
-                            muted 
-                            loop 
-                            autoPlay 
-                          />
-                        ) : (
-                          <img 
-                            src={URL.createObjectURL(files[0])} 
-                            alt="" 
-                            className="h-full w-full object-cover" 
-                          />
-                        )}
-                        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
-                      </>
-                    )}
-                  </div>
+                {/* Media Preview */}
+                <div className="relative h-[280px] bg-black rounded-xl overflow-hidden">
+                  {files.length > 0 && (
+                    <>
+                      {files[0].type.startsWith('video') ? (
+                        <video 
+                          src={URL.createObjectURL(files[0])} 
+                          className="h-full w-full object-cover" 
+                          muted 
+                          loop 
+                          autoPlay 
+                        />
+                      ) : (
+                        <img 
+                          src={URL.createObjectURL(files[0])} 
+                          alt="Selected media" 
+                          className="h-full w-full object-cover" 
+                        />
+                      )}
+                    </>
+                  )}
                   
-                  <EnhancedMediaUpload
-                    onFilesChange={setFiles}
-                    maxFiles={10}
-                    initialFiles={files}
-                    existingMediaUrls={editMode ? existingMediaUrls : []}
-                    acceptedTypes={['image/*', 'video/*']}
-                    disabled={isSubmitting}
-                    autoUpload={true}
-                    data-testid="media-upload"
-                    aria-label="Upload media files"
-                    className={`focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 rounded-xl ${validationErrors.media ? 'animate-shake border-red-300' : ''}`}
-                  />
-                  {/* Validation Error for Media */}
-                  {validationErrors.media && (
-                    <div className="mt-2 animate-fade-in">
-                      <p className="text-sm text-[#d9534f] flex items-center gap-1">
-                        ⚠️ {validationErrors.media}
-                      </p>
+                  {/* Multi-file indicator */}
+                  {files.length > 1 && (
+                    <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+                      {files.length} files
                     </div>
                   )}
                 </div>
 
-                {/* Floating card stack wrapper (reduce overlap) */}
-                <div className="space-y-3 p-4 -mt-4">
-
-                {/* Divider Line */}
-                <div className="border-t border-gray-100 -mx-6" />
-
-                {/* 2. Caption Field - with AI assistant and proper spacing */}
-                <div className="space-y-4 pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Add a caption
-                      </label>
+                {/* Caption Section */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                  <h3 className="text-white text-lg font-medium mb-3">Add a caption</h3>
+                  <div className="relative">
+                    <textarea
+                      value={caption}
+                      onChange={(e) => handleCaptionChange(e.target.value)}
+                      placeholder="Write a caption..."
+                      className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 resize-none focus:outline-none focus:border-orange-400/50 min-h-[80px]"
+                      rows={3}
+                    />
+                    
+                    {/* AI Caption Button */}
+                    <div className="absolute bottom-3 right-3">
                       <button
                         onClick={handleAICaption}
-                        disabled={aiLoading || files.length === 0}
-                        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        aria-label="Write a caption for me"
+                        disabled={files.length === 0 || aiLoading}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/30 text-white rounded-lg text-sm font-medium transition-colors duration-200 focus:outline-none border border-white/20"
                       >
-                        {aiLoading ? "..." : "✨ Write a caption for me"}
+                        {aiLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                        )}
+                        AI Caption
                       </button>
                     </div>
-                    <div className="relative">
-                      <EnhancedRichTextInput
-                        value={caption}
-                        onChange={handleCaptionChange}
-                        onTagsChange={setSelectedTags}
-                        placeholder="Write about your moment..."
-                        selectedTags={selectedTags}
-                        disabled={isSubmitting}
-                        aria-label="Caption input for your moment"
-                        className=""
-                      />
+                  </div>
+                </div>
+
+                {/* Tag Golf Course Section */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                  <h3 className="text-white text-lg font-medium mb-3">Tag a golf course</h3>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Start typing to find a course..."
+                      className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-orange-400/50"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg className="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                     </div>
                   </div>
-
-                  {/* Selected Tags Display */}
-                  {selectedTags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {selectedTags.map((tag) => (
-                        <div
-                          key={tag.id}
-                          className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-                        >
-                          <span>@{tag.username || tag.name}</span>
-                          <button
-                            onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
-                            className="ml-1 text-blue-600 hover:text-blue-800"
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
+                  {selectedCourse && (
+                    <div className="mt-3">
+                      <GolfCoursePin 
+                        courseName={selectedCourse.name}
+                        courseRegion={selectedCourse.region}
+                      />
                     </div>
                   )}
                 </div>
 
-                {/* 3. Golf Course Field - with centered pin and proper z-index */}
-                {onCourseSelect && (
-                  <div className="space-y-4 pt-6 relative z-[300]">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Tag a golf course
-                      <span className="text-gray-400 text-xs ml-1">(Optional)</span>
-                    </label>
-                    <div className="max-w-full overflow-visible">
-                      <CourseTagInput
-                        selectedCourse={selectedCourse || null}
-                        onCourseSelect={onCourseSelect}
-                        placeholder="Start typing to find a course..."
-                      />
+                {/* Background Music Section */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                  <h3 className="text-white text-lg font-medium mb-3">Background music</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/70 text-sm">Popular golf tracks today</span>
+                    <div className="flex items-center gap-3">
+                      <button className="text-orange-400 hover:text-orange-300 transition-colors">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </button>
+                      <button className="text-orange-400 hover:text-orange-300 transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                      </button>
                     </div>
+                  </div>
+                </div>
+
+                {/* Privacy Toggle Section */}
+                <div className="flex bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setVisibility("public")}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center justify-center gap-2 ${
+                      visibility === "public"
+                        ? "bg-white/20 text-white"
+                        : "text-white/70 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Public
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVisibility("private")}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center justify-center gap-2 ${
+                      visibility === "private"
+                        ? "bg-white/20 text-white"
+                        : "text-white/70 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Private Archive
+                  </button>
+                </div>
+
+                {/* Error Display */}
+                {(submitError || Object.keys(validationErrors).length > 0) && (
+                  <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 space-y-2">
+                    {submitError && (
+                      <p className="text-sm text-red-200 font-medium">{submitError}</p>
+                    )}
+                    {Object.entries(validationErrors).map(([field, error]) => (
+                      <p key={field} className="text-sm text-red-200">{error}</p>
+                    ))}
                   </div>
                 )}
 
-                {/* 3.7. Background Music Selector */}
-                <BackgroundMusicSelector
-                  onMusicSelect={setBackgroundMusic}
-                  disabled={isSubmitting}
-                  hasVideo={files.some(file => file.type.startsWith('video/'))}
-                />
-
-                {/* 4. Post Visibility Toggle - Wired Segmented Control */}
-                <div className="space-y-4 pt-6">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Post Visibility
-                  </label>
-                  <div className="space-y-3">
-                    {/* Segmented Control */}
-                    <div className="flex bg-gray-100 rounded-xl p-1 w-full">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setVisibility("public");
-                          setIsPrivate(false);
-                        }}
-                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          visibility === "public"
-                            ? 'text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        style={{
-                          backgroundColor: visibility === "public" ? '#9ca3af' : 'transparent'
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        🟢 Public
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setVisibility("private");
-                          setIsPrivate(true);
-                        }}
-                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          visibility === "private"
-                            ? 'text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        style={{
-                          backgroundColor: visibility === "private" ? '#9ca3af' : 'transparent'
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        👁️ Private Archive
-                      </button>
+                {/* Post Button */}
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || files.length === 0}
+                  className={`w-full px-6 py-4 bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 hover:from-blue-600 hover:via-teal-600 hover:to-green-600 disabled:from-gray-500 disabled:via-gray-600 disabled:to-gray-700 disabled:text-gray-300 text-white rounded-xl font-semibold text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent ${
+                    isButtonShaking ? 'animate-shake' : ''
+                  } ${
+                    isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      {editMode ? 'Updating...' : 'Posting...'}
                     </div>
-                    
-                    {/* Subtext */}
-                    <p className="text-xs text-gray-500">
-                      {visibility === "private"
-                        ? "Private posts are visible only to you." 
-                        : "Public posts are visible on feed and profile."
-                      }
-                    </p>
-                  </div>
-                </div>
-
-                {/* Divider Line before buttons */}
-                <div className="border-t border-gray-100 -mx-6 mt-8" />
-
-                {/* 5. Action Buttons - with enhanced styling and animations */}
-                <div className="flex gap-3 justify-end pt-6">
-                  <Button
-                    variant="outline"
-                    onClick={handleCancel}
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 text-sm font-medium hover-scale"
-                  >
-                    Cancel
-                  </Button>
-                  
-                  {/* Enhanced Post Button with Echo Gradient */}
-                  <div className="relative">
-                    <button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-                      aria-label="Post your moment"
-                      className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 ease-out hover:scale-105 active:scale-95 disabled:hover:scale-100"
-                      style={{ 
-                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
-                        minWidth: '140px'
-                      }}
-                    >
-                      {/* Shimmer animation while submitting */}
-                      {isSubmitting && (
-                        <div 
-                          className="absolute inset-0"
-                          style={{
-                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
-                            animation: 'shimmer 1.1s ease linear infinite',
-                            backgroundSize: '200% 100%'
-                          }}
-                        />
-                      )}
-                      
-                      {isSubmitting ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{editMode ? 'Updating...' : 'Posting...'}</span>
-                        </div>
-                      ) : (
-                        <span className="transition-all duration-200">
-                          {editMode 
-                            ? 'Update' 
-                            : `Post${files.length > 0 ? ` (${files.length} file${files.length > 1 ? 's' : ''})` : ''}`
-                          }
-                        </span>
-                      )}
-                    </button>
-                    
-                    {/* Error message display */}
-                    {submitError && (
-                      <div className="absolute top-full left-0 right-0 mt-2 animate-fade-in">
-                        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
-                          {submitError}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                </div>
+                  ) : (
+                    editMode ? 'Update' : 'Post'
+                  )}
+                </button>
               </div>
             )}
           </div>
