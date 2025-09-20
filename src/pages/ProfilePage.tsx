@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -48,7 +46,6 @@ const ProfilePage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -58,7 +55,6 @@ const ProfilePage = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -66,8 +62,7 @@ const ProfilePage = () => {
   // Show error if there's an issue
   if (error) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        <Header />
+      <div className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading profile</span>
@@ -79,7 +74,6 @@ const ProfilePage = () => {
             </button>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -107,10 +101,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 relative">
-      {/* Header */}
-      <Header />
-      
+    <div className="min-h-screen bg-background relative">
       <HeroProfileHeader 
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
@@ -120,9 +111,6 @@ const ProfilePage = () => {
       />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
-      
-      
-      <BottomNavigation />
     </div>
   );
 };
