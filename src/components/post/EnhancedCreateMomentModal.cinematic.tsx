@@ -52,6 +52,8 @@ export default function EnhancedCreateMomentModalCinematic({
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Update modal context when create moment modal opens/closes
   useEffect(() => {
@@ -219,13 +221,14 @@ export default function EnhancedCreateMomentModalCinematic({
   const subtl = isDark ? "text-white/70" : "text-neutral-600";
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div 
           className="fixed inset-0 z-50" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0.1 : 0.2 }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* backdrop with gradient and click-to-close - Consistent with Clubhouse/Discover */}
@@ -241,10 +244,13 @@ export default function EnhancedCreateMomentModalCinematic({
             <motion.div
               ref={wrapperRef}
               className="w-full max-w-[520px] h-[min(92vh,900px)] liquid-glass rounded-3xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-              initial={{ y: 60, opacity: 0, scale: 0.95 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 40, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.25 }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { y: window.innerHeight, opacity: 0, scale: 0.9 }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { y: -20, opacity: 0, scale: 0.98 }}
+              transition={prefersReducedMotion ? 
+                { duration: 0.1 } : 
+                { type: "spring", stiffness: 280, damping: 32, duration: 0.25 }
+              }
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
@@ -319,9 +325,12 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="relative shrink-0 overflow-y-auto overscroll-contain [--footer-safe:env(safe-area-inset-bottom)]"
                 >
                   {/* CAPTION CARD */}
-                  <div
+                  <motion.div
                     ref={captionRef}
                     className="relative z-10 mx-4 mt-4"
+                    initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                    transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.06, type: "spring", stiffness: 300, damping: 25 }}
                   >
                     <div
                       className="
@@ -362,13 +371,18 @@ export default function EnhancedCreateMomentModalCinematic({
                         />
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Content Pills Row */}
                   <div className="mx-5 pt-4">
                     <div className="flex flex-wrap gap-3">
                       {/* Golf Course Pill */}
-                      <div className={`pill-container ${course ? 'pill-active' : 'pill-inactive'} relative z-[9999]`}>
+                      <motion.div 
+                        className={`pill-container ${course ? 'pill-active' : 'pill-inactive'} relative z-[9999]`}
+                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
+                      >
                         <div className="flex items-center gap-2">
                           <Globe className="h-4 w-4" />
                           <span className="text-sm font-medium">
@@ -382,25 +396,31 @@ export default function EnhancedCreateMomentModalCinematic({
                             placeholder="Start typing to find a course..."
                           />
                         </div>
-                      </div>
+                      </motion.div>
 
                       {/* Music Pill */}
-                      <button
+                      <motion.button
                         onClick={() => {
                           console.log("Music selector clicked");
                         }}
                         className="pill-container pill-inactive group"
+                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.14, type: "spring", stiffness: 300, damping: 20 }}
                       >
                         <div className="flex items-center gap-2">
                           <Play className="h-4 w-4 text-brand-orange group-hover:text-white transition-colors" />
                           <span className="text-sm font-medium">Add music</span>
                         </div>
-                      </button>
+                      </motion.button>
 
                       {/* Visibility Pill */}
-                      <button
+                      <motion.button
                         onClick={() => setVisibility(visibility === "public" ? "private" : "public")}
                         className={`pill-container ${visibility === "private" ? 'pill-active' : 'pill-inactive'}`}
+                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.18, type: "spring", stiffness: 300, damping: 20 }}
                       >
                         <div className="flex items-center gap-2">
                           {visibility === "public" ? (
@@ -412,7 +432,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             {visibility === "public" ? "Public" : "Private"}
                           </span>
                         </div>
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 
@@ -428,12 +448,11 @@ export default function EnhancedCreateMomentModalCinematic({
                           ? 'liquid-glass border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white hover:scale-105 hover:shadow-[0_8px_32px_rgba(247,147,30,0.4)]' 
                           : 'liquid-glass border-white/20 text-white/50'
                       }`}
-                      whileHover={{ scale: !canPost ? 1 : 1.05 }}
-                      whileTap={{ scale: !canPost ? 1 : 0.95 }}
-                      animate={isSubmitting ? { 
-                        boxShadow: ['0 8px 32px rgba(247,147,30,0.4)', '0 12px 40px rgba(247,147,30,0.6)', '0 8px 32px rgba(247,147,30,0.4)']
-                      } : {}}
-                      transition={{ duration: 0.6, repeat: isSubmitting ? Infinity : 0 }}
+                      initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0 }}
+                      animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                      transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.22, type: "spring", stiffness: 300, damping: 25 }}
+                      whileHover={!prefersReducedMotion && canPost ? { scale: 1.02 } : {}}
+                      whileTap={!prefersReducedMotion && canPost ? { scale: 0.98 } : {}}
                     >
                       {/* Shimmer animation while submitting */}
                       {isSubmitting && (

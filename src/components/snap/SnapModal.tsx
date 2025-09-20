@@ -212,15 +212,17 @@ const SnapModal = ({
     },
   ];
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0.1 : 0.18 }}
         >
           {/* Backdrop - Consistent with Discover overlay scrim */}
           <div 
@@ -236,10 +238,13 @@ const SnapModal = ({
               aria-label="Create a Moment"
               className="w-full max-w-[400px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
               onClick={(e) => e.stopPropagation()}
-              initial={{ y: 40, opacity: 0, scale: 0.95 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 280, damping: 26, duration: 0.22 }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0, scale: 0.95 }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { y: -12, opacity: 0, scale: 0.98 }}
+              transition={prefersReducedMotion ? 
+                { duration: 0.1 } : 
+                { type: "spring", stiffness: 280, damping: 26, duration: 0.18 }
+              }
             >
               {/* Header */}
               <div className="px-8 pt-8 pb-6 text-center">
@@ -250,14 +255,19 @@ const SnapModal = ({
               {/* Action Icons */}
               <div className="px-8 pb-8">
                 <div className={`flex ${isMobile ? 'justify-center gap-12' : 'justify-center gap-16'} items-center`}>
-                  {cardOptions.map(({ key, label, icon: Icon, onClick }) => (
+                  {cardOptions.map(({ key, label, icon: Icon, onClick }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
                       className="flex flex-col items-center gap-4 group"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
+                      animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                      transition={prefersReducedMotion ? 
+                        { delay: 0 } : 
+                        { delay: index * 0.08, type: "spring", stiffness: 300, damping: 20 }
+                      }
+                      whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
+                      whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
                     >
                       {/* Circular Glass Button - Minimum 44px for accessibility */}
                       <div className="w-16 h-16 rounded-full liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/40 group-hover:shadow-lg group-hover:shadow-brand-orange/20 transition-all duration-300">
