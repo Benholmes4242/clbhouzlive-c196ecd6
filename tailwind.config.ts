@@ -128,6 +128,10 @@ export default {
 						transform: 'translateY(100%)',
 						opacity: '0'
 					},
+					'80%': {
+						transform: 'translateY(-5px)',
+						opacity: '1'
+					},
 					'100%': {
 						transform: 'translateY(0)',
 						opacity: '1'
@@ -268,7 +272,7 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'slide-in-up': 'slide-in-up 0.3s ease-out',
+				'slide-in-up': 'slide-in-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'slide-out-left': 'slide-out-left 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'slide-in-from-right': 'slide-in-from-right 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
