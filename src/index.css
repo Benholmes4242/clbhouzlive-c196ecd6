@@ -397,6 +397,25 @@ html, body, #root, .app-shell { touch-action: auto; }
     background: rgba(255, 255, 255, 0.3);
   }
 
+  /* Pill Component Classes */
+  .pill-container {
+    @apply px-4 py-3 rounded-full transition-all duration-300 cursor-pointer;
+    @apply flex items-center gap-2 text-sm font-medium;
+    @apply hover:scale-105 active:scale-95;
+  }
+
+  .pill-inactive {
+    background: var(--pill-inactive-bg);
+    color: var(--pill-inactive-text);
+    @apply hover:bg-white/20;
+  }
+
+  .pill-active {
+    background: var(--pill-active-bg);
+    color: var(--pill-active-text);
+    @apply shadow-md hover:shadow-lg;
+  }
+
   :root {
     /* Brand colors for Swing Coach */
     --brand-orange: 32 93% 54%;
@@ -426,6 +445,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     --pill-ring: rgba(0,0,0,0.06);
     --pill-ring-active: rgba(0,0,0,0.10);
     --trend-icon: #FF6A00;
+    
+    /* Pill Component Styles */
+    --pill-inactive-bg: rgba(255, 255, 255, 0.1);
+    --pill-inactive-text: rgba(255, 255, 255, 0.8);
+    --pill-active-bg: hsl(var(--brand-orange));
+    --pill-active-text: #ffffff;
   }
 
   .dark {

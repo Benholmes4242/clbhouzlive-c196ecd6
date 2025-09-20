@@ -10,6 +10,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import CarouselDots from "@/components/posts/CarouselDots";
+import { SuccessOverlay } from "@/components/ui/SuccessOverlay";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -50,6 +51,7 @@ export default function EnhancedCreateMomentModalCinematic({
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
 
   // Update modal context when create moment modal opens/closes
   useEffect(() => {
@@ -194,15 +196,22 @@ export default function EnhancedCreateMomentModalCinematic({
   const handlePost = async () => {
     if (!canPost) return;
     
-    onSubmit({
-      caption,
-      files,
-      selectedCourse: course,
-      visibility,
-      isPrivate: visibility === "private",
-      backgroundMusic: null, // Default for now
-      coverIndex // NEW: thumbnail source for feeds
-    });
+    try {
+      await onSubmit({
+        caption,
+        files,
+        selectedCourse: course,
+        visibility,
+        isPrivate: visibility === "private",
+        backgroundMusic: null, // Default for now
+        coverIndex // NEW: thumbnail source for feeds
+      });
+      
+      // Show success overlay
+      setShowSuccessOverlay(true);
+    } catch (error) {
+      console.error('Post submission failed:', error);
+    }
   };
 
   const panel = isDark ? "bg-black/60" : "bg-white/70";
@@ -219,9 +228,9 @@ export default function EnhancedCreateMomentModalCinematic({
           exit={{ opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop with gradient and click-to-close */}
+          {/* backdrop with gradient and click-to-close - Consistent with Clubhouse/Discover */}
           <div 
-            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/80 backdrop-blur-xl" 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm" 
             onClick={close}
             role="dialog"
             aria-modal="true"
@@ -232,10 +241,10 @@ export default function EnhancedCreateMomentModalCinematic({
             <motion.div
               ref={wrapperRef}
               className="w-full max-w-[520px] h-[min(92vh,900px)] liquid-glass rounded-3xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
+              initial={{ y: 60, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              exit={{ y: 40, opacity: 0, scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.25 }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
@@ -355,75 +364,70 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   </div>
 
-                  {/* Content sections grouped in a soft card */}
+                  {/* Content Pills Row */}
                   <div className="mx-5 pt-4">
-                    <div className="liquid-glass rounded-3xl p-5 shadow-2xl space-y-5">
-                      {/* Course with High Z-Index */}
-                      <div className="liquid-glass-button rounded-3xl px-5 py-4 relative z-[9999]">
-                        <div className="text-[15px] mb-2 text-white font-medium">Tag a golf course</div>
-                        <CourseTagInput
-                          selectedCourse={course}
-                          onCourseSelect={onCourseSelect || setSelectedCourse}
-                          placeholder="Start typing to find a course..."
-                        />
-                      </div>
-
-                      {/* Enhanced Music Selector */}
-                      <div className="liquid-glass-button rounded-3xl px-5 py-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1">
-                            <div className="text-[15px] mb-1 text-white font-medium">Background music</div>
-                            <div className="text-white/70 text-sm">
-                              Popular golf tracks today
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                // TODO: Preview music
-                                console.log("Music preview clicked");
-                              }}
-                              className="liquid-glass-button p-3 rounded-full hover:scale-110 hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300"
-                              aria-label="Preview music"
-                            >
-                              <Play className="h-4 w-4 text-brand-orange" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                // TODO: Background music selector
-                                console.log("Music selector clicked");
-                              }}
-                              className="liquid-glass-button p-3 rounded-full hover:scale-110 hover:ring-brand-orange/30 hover:ring-2 transition-all duration-300"
-                              aria-label="Select music"
-                            >
-                              <BarChart3 className="h-4 w-4 text-brand-orange" />
-                            </button>
-                          </div>
+                    <div className="flex flex-wrap gap-3">
+                      {/* Golf Course Pill */}
+                      <div className={`pill-container ${course ? 'pill-active' : 'pill-inactive'} relative z-[9999]`}>
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4" />
+                          <span className="text-sm font-medium">
+                            {course ? course.name : 'Add golf course'}
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 opacity-0">
+                          <CourseTagInput
+                            selectedCourse={course}
+                            onCourseSelect={onCourseSelect || setSelectedCourse}
+                            placeholder="Start typing to find a course..."
+                          />
                         </div>
                       </div>
 
-                      {/* Visibility segmented - Wired to state */}
-                      <div className="liquid-glass-button rounded-3xl px-3 py-3">
-                        <Segmented
-                          value={visibility}
-                          onChange={(value) => setVisibility(value as "public" | "private")}
-                          options={[
-                            { value: "public", label: "Public", icon: Globe },
-                            { value: "private", label: "Private Archive", icon: Lock },
-                          ]}
-                        />
-                      </div>
+                      {/* Music Pill */}
+                      <button
+                        onClick={() => {
+                          console.log("Music selector clicked");
+                        }}
+                        className="pill-container pill-inactive group"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Play className="h-4 w-4 text-brand-orange group-hover:text-white transition-colors" />
+                          <span className="text-sm font-medium">Add music</span>
+                        </div>
+                      </button>
+
+                      {/* Visibility Pill */}
+                      <button
+                        onClick={() => setVisibility(visibility === "public" ? "private" : "public")}
+                        className={`pill-container ${visibility === "private" ? 'pill-active' : 'pill-inactive'}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {visibility === "public" ? (
+                            <Globe className="h-4 w-4" />
+                          ) : (
+                            <Lock className="h-4 w-4" />
+                          )}
+                          <span className="text-sm font-medium">
+                            {visibility === "public" ? "Public" : "Private"}
+                          </span>
+                        </div>
+                      </button>
                     </div>
                   </div>
 
-                  {/* FOOTER - Pinned to bottom with proper safe area */}
+                  {/* FOOTER - Accent Pill Post Button */}
                   <div className="sticky bottom-0 left-0 right-0 z-10 pt-6 pb-[calc(env(safe-area-inset-bottom)+20px)] px-5 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm">
                     <motion.button
                       onClick={handlePost}
                       disabled={!canPost}
                       aria-pressed={isSubmitting}
                       aria-busy={isSubmitting}
-                      className="relative w-full h-14 rounded-3xl text-white overflow-hidden disabled:opacity-50 transition-all duration-300 shadow-2xl bg-gradient-to-r from-brand-orange to-brand-orange-light hover:from-brand-orange-hover hover:to-brand-orange hover:scale-105 hover:shadow-[0_8px_32px_rgba(247,147,30,0.4)] active:scale-95"
+                      className={`relative w-full h-14 rounded-full text-center overflow-hidden disabled:opacity-50 transition-all duration-300 shadow-lg font-bold text-lg border-2 ${
+                        canPost 
+                          ? 'liquid-glass border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white hover:scale-105 hover:shadow-[0_8px_32px_rgba(247,147,30,0.4)]' 
+                          : 'liquid-glass border-white/20 text-white/50'
+                      }`}
                       whileHover={{ scale: !canPost ? 1 : 1.05 }}
                       whileTap={{ scale: !canPost ? 1 : 0.95 }}
                       animate={isSubmitting ? { 
@@ -431,13 +435,10 @@ export default function EnhancedCreateMomentModalCinematic({
                       } : {}}
                       transition={{ duration: 0.6, repeat: isSubmitting ? Infinity : 0 }}
                     >
-                      {/* Inner glow effect */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 rounded-3xl" />
-                      
                       {/* Shimmer animation while submitting */}
                       {isSubmitting && (
                         <motion.div
-                          className="absolute inset-0 rounded-3xl"
+                          className="absolute inset-0 rounded-full"
                           initial={{ backgroundPositionX: "0%" }}
                           animate={{ backgroundPositionX: "200%" }}
                           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
@@ -447,7 +448,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           }}
                         />
                       )}
-                      <span className="relative z-10 font-bold text-lg">
+                      <span className="relative z-10">
                         {isSubmitting ? "Posting…" : "Post"}
                       </span>
                     </motion.button>
@@ -456,6 +457,16 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
             </motion.div>
           </div>
+
+          {/* Success Overlay */}
+          <SuccessOverlay 
+            isVisible={showSuccessOverlay} 
+            onClose={() => {
+              setShowSuccessOverlay(false);
+              close();
+            }}
+            message="Moment posted successfully!"
+          />
         </motion.div>
       )}
     </AnimatePresence>
