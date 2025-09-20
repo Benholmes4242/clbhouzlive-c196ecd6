@@ -49,15 +49,14 @@ const ClubhouseHeaderRedesigned: React.FC<ClubhouseHeaderRedesignedProps> = ({
 
   return (
     <>
-      {/* Sentinel for fade-away detection */}
-      <div id="clubhouse-sentinel" className="h-1 w-px" />
-      
       {/* Main Header */}
       <header 
         className={`sticky top-0 z-60 backdrop-blur-md transition-all duration-300 ${className}`}
         data-hides-on-scroll
         style={{ '--header-h-mobile': '60px' } as React.CSSProperties}
       >
+        {/* Sentinel for fade-away detection - positioned at top of content area */}
+        <div id="clubhouse-sentinel" className="absolute top-full h-px w-px" />
         <div className="mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           {/* Logo */}
           <div className="flex items-center gap-2 shrink-0">
