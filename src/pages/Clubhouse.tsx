@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import Header from '@/components/Header';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import ScrollableTabs from '@/components/clubhouse/ScrollableTabs';
@@ -49,7 +50,10 @@ const Clubhouse = () => {
     <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
       minHeight: '100dvh',
     }}>
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Intersection sentinel for header fade-away */}
+      <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
+      
+      <ClubhouseHeaderNew activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">

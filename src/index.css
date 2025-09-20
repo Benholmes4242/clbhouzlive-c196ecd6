@@ -249,11 +249,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     --vh: 1vh; /* Will be set by JS for accurate mobile viewport */
   }
 
-  html {
+    html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
     height: 100vh;
-    height: calc(var(--vh, 1vh) * 100);
+    height: 100svh;
+    height: 100dvh;
 
   /* Ensure no smooth scrolling on carousel containers */
   .no-smooth {
@@ -266,7 +267,8 @@ html, body, #root, .app-shell { touch-action: auto; }
     overscroll-behavior: none; /* Prevent bounce scrolling on iOS */
     position: relative;
     height: 100vh;
-    height: calc(var(--vh, 1vh) * 100);
+    height: 100svh;
+    height: 100dvh;
     background: hsl(var(--background)); /* Ensure background extends behind status bar */
     /* Remove any existing top margins that might create black bars */
     margin-top: 0 !important;
@@ -276,7 +278,8 @@ html, body, #root, .app-shell { touch-action: auto; }
   #root {
     background-color: hsl(var(--background)) !important;
     height: 100vh;
-    height: calc(var(--vh, 1vh) * 100);
+    height: 100svh;
+    height: 100dvh;
     /* Remove any margins that could create gaps */
     margin: 0 !important;
     padding: 0 !important;
@@ -301,8 +304,8 @@ html, body, #root, .app-shell { touch-action: auto; }
     --secondary-foreground: 220.9 39.3% 11%;
     --muted: 220 14.3% 95.9%;
     --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --accent: 32 93% 54%;
+    --accent-foreground: 210 20% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --border: 220 13% 91%;
@@ -314,6 +317,18 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    
+    /* Clubhouse Design Tokens */
+    --hud-bg: rgba(0, 0, 0, 0.45);
+    --hud-border: rgba(255, 255, 255, 0.18);
+    --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+    
+    /* Header Heights */
+    --header-h-mobile: 60px;
+    --header-h-desktop: 72px;
+    
+    /* Spacing */
+    --tag-offset: 8px;
     
     /* Profile Design System Colors */
     --profile-bg: 0 0% 100%;
@@ -388,6 +403,11 @@ html, body, #root, .app-shell { touch-action: auto; }
     --media-loading: 0 0% 0%;
     --media-loading-dark: 0 0% 0%;
     --achv-badge-size: 10rem;
+    
+    /* Video viewport utilities */
+    --vh-small: 1svh;
+    --vh-dynamic: 1dvh;
+    --vh-fallback: 1vh;
     
     /* Apple-Inspired Pill Design Tokens */
     --pill-text: #4A4A4A;

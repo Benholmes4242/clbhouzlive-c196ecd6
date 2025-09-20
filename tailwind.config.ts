@@ -75,7 +75,9 @@ export default {
 				'media-loading': 'hsl(var(--media-loading))',
 				'brand-orange': 'hsl(var(--brand-orange))',
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
-				'brand-black': 'hsl(var(--brand-black))'
+				'brand-black': 'hsl(var(--brand-black))',
+				'hud-bg': 'var(--hud-bg)',
+				'hud-border': 'var(--hud-border)'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -84,6 +86,24 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			spacing: {
+				'header-mobile': 'var(--header-h-mobile)',
+				'header-desktop': 'var(--header-h-desktop)',
+				'tag-offset': 'var(--tag-offset)'
+			},
+			height: {
+				'header-mobile': 'var(--header-h-mobile)',
+				'header-desktop': 'var(--header-h-desktop)',
+				'screen-small': '100svh',
+				'screen-dynamic': '100dvh'
+			},
+			minHeight: {
+				'screen-small': '100svh',
+				'screen-dynamic': '100dvh'
+			},
+			boxShadow: {
+				'hud': 'var(--hud-shadow)'
 			},
 			keyframes: {
 				'accordion-down': {
