@@ -635,7 +635,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
                     {/* User Info - Staggered */}
                      <motion.div 
-                       className="text-center space-y-3"
+                       className="text-center space-y-1.5 px-3"
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ 
                         opacity: showStaggeredContent ? 1 : 0,
@@ -647,45 +647,51 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         ease: "easeOut"
                       }}
                     >
-                      {/* Display Name */}
-                      <motion.h3 
-                        className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200"
-                        style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/profile/${user.id}`);
-                        }}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ 
-                          opacity: showStaggeredContent ? 1 : 0,
-                          y: showStaggeredContent ? 0 : 10
-                        }}
-                        transition={{ 
-                          duration: prefersReducedMotion ? 0.06 : 0.2,
-                          delay: prefersReducedMotion ? 0 : 0.06,
-                          ease: "easeOut"
-                        }}
-                      >
-                        {user.displayName}
-                      </motion.h3>
-                      
-                      {/* Handle */}
-                      <motion.p 
-                        className="text-white/70 text-base"
-                        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ 
-                          opacity: showStaggeredContent ? 1 : 0,
-                          y: showStaggeredContent ? 0 : 10
-                        }}
-                        transition={{ 
-                          duration: prefersReducedMotion ? 0.06 : 0.2,
-                          delay: prefersReducedMotion ? 0 : 0.08,
-                          ease: "easeOut"
-                        }}
-                      >
-                        @{user.handle}
-                      </motion.p>
+                       {/* Display Name */}
+                       <motion.h3 
+                         className="text-white font-bold text-lg cursor-pointer hover:text-white/90 transition-colors duration-200 truncate"
+                         style={{ 
+                           textShadow: "0 2px 4px rgba(0,0,0,0.6)",
+                           whiteSpace: "nowrap",
+                           overflow: "hidden",
+                           textOverflow: "ellipsis"
+                         }}
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           navigate(`/profile/${user.id}`);
+                         }}
+                         initial={{ opacity: 0, y: 10 }}
+                         animate={{ 
+                           opacity: showStaggeredContent ? 1 : 0,
+                           y: showStaggeredContent ? 0 : 10
+                         }}
+                         transition={{ 
+                           duration: prefersReducedMotion ? 0.06 : 0.2,
+                           delay: prefersReducedMotion ? 0 : 0.06,
+                           ease: "easeOut"
+                         }}
+                         title={user.displayName}
+                       >
+                         {user.displayName}
+                       </motion.h3>
+                       
+                       {/* Handle */}
+                       <motion.p 
+                         className="text-white/70 text-base"
+                         style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
+                         initial={{ opacity: 0, y: 10 }}
+                         animate={{ 
+                           opacity: showStaggeredContent ? 1 : 0,
+                           y: showStaggeredContent ? 0 : 10
+                         }}
+                         transition={{ 
+                           duration: prefersReducedMotion ? 0.06 : 0.2,
+                           delay: prefersReducedMotion ? 0 : 0.08,
+                           ease: "easeOut"
+                         }}
+                       >
+                         {user.handle.startsWith("@") ? user.handle : `@${user.handle}`}
+                       </motion.p>
                       
                       {/* Home Club - truncate with ellipsis */}
                       {user.homeClub && (
