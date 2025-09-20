@@ -339,121 +339,133 @@ export default function EnhancedCreateMomentModalCinematic({
                     animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
                     transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.06, type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    <div
-                      className="
-                        rounded-3xl
-                        liquid-glass
-                        shadow-[0_12px_32px_rgba(0,0,0,0.4)]
-                        px-5 py-4
-                      "
-                    >
-                      <div className="flex items-start justify-between mb-1">
-                        <label className="block text-[15px] text-white">Add a caption</label>
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-white text-lg font-medium">Add a caption</h3>
                         <button
                           onClick={handleAICaption}
                           disabled={aiLoading || media.length === 0}
-                          className="liquid-glass-button hover:scale-105 hover:ring-brand-orange/30 hover:ring-2 px-4 py-2 rounded-full shrink-0 transition-all duration-300 text-sm disabled:opacity-50 text-white active:scale-95"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/30 text-white rounded-lg text-sm font-medium transition-colors duration-200 focus:outline-none border border-white/20"
                           aria-label="Write a caption for me"
                         >
                           {aiLoading ? <StarsLoading /> : (
-                            <div className="flex items-center gap-1.5">
-                              <Sparkles className="h-3.5 w-3.5" />
-                              <span className="font-medium">AI Caption</span>
-                            </div>
+                            <>
+                              <Sparkles className="h-4 w-4" />
+                              <span>AI Caption</span>
+                            </>
                           )}
                         </button>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
-                          placeholder="Write a caption…"
-                          value={caption}
-                          onChange={(e) => {
-                            setCaption(e.target.value);
-                            // Auto-expand textarea
-                            e.target.style.height = 'auto';
-                            e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
-                          }}
-                          style={{ height: 'auto' }}
+                      <textarea
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 resize-none focus:outline-none focus:border-orange-400/50 min-h-[80px]"
+                        placeholder="Write a caption..."
+                        value={caption}
+                        onChange={(e) => {
+                          setCaption(e.target.value);
+                          e.target.style.height = 'auto';
+                          e.target.style.height = Math.max(80, e.target.scrollHeight) + 'px';
+                        }}
+                        rows={3}
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* TAG GOLF COURSE CARD */}
+                  <motion.div
+                    className="relative z-10 mx-4 mt-4"
+                    initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                    transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.1, type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <h3 className="text-white text-lg font-medium mb-3">Tag a golf course</h3>
+                      <div className="relative">
+                        <CourseTagInput
+                          selectedCourse={course}
+                          onCourseSelect={onCourseSelect || setSelectedCourse}
+                          placeholder="Start typing to find a course..."
                         />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <svg className="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
 
-                  {/* Content Pills Row */}
-                  <div className="mx-5 pt-4">
-                    <div className="flex flex-wrap gap-3">
-                      {/* Golf Course Pill */}
-                      <motion.div 
-                        className={`pill-container ${course ? 'pill-active' : 'pill-inactive'} relative z-[9999]`}
-                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
-                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
-                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4" />
-                          <span className="text-sm font-medium">
-                            {course ? course.name : 'Add golf course'}
-                          </span>
+                  {/* BACKGROUND MUSIC CARD */}
+                  <motion.div
+                    className="relative z-10 mx-4 mt-4"
+                    initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                    transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.14, type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <h3 className="text-white text-lg font-medium mb-3">Background music</h3>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 text-sm">Popular golf tracks today</span>
+                        <div className="flex items-center gap-3">
+                          <button className="text-orange-400 hover:text-orange-300 transition-colors">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          </button>
+                          <button className="text-orange-400 hover:text-orange-300 transition-colors">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                          </button>
                         </div>
-                        <div className="absolute inset-0 opacity-0">
-                          <CourseTagInput
-                            selectedCourse={course}
-                            onCourseSelect={onCourseSelect || setSelectedCourse}
-                            placeholder="Start typing to find a course..."
-                          />
-                        </div>
-                      </motion.div>
-
-                      {/* Music Pill */}
-                      <motion.button
-                        onClick={() => {
-                          console.log("Music selector clicked");
-                        }}
-                        className="pill-container pill-inactive group"
-                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
-                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
-                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.14, type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Play className="h-4 w-4 text-brand-orange group-hover:text-white transition-colors" />
-                          <span className="text-sm font-medium">Add music</span>
-                        </div>
-                      </motion.button>
-
-                      {/* Visibility Pill */}
-                      <motion.button
-                        onClick={() => setVisibility(visibility === "public" ? "private" : "public")}
-                        className={`pill-container ${visibility === "private" ? 'pill-active' : 'pill-inactive'}`}
-                        initial={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0 }}
-                        animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
-                        transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.18, type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {visibility === "public" ? (
-                            <Globe className="h-4 w-4" />
-                          ) : (
-                            <Lock className="h-4 w-4" />
-                          )}
-                          <span className="text-sm font-medium">
-                            {visibility === "public" ? "Public" : "Private"}
-                          </span>
-                        </div>
-                      </motion.button>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  {/* FOOTER - Accent Pill Post Button */}
-                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-6 pb-[calc(env(safe-area-inset-bottom)+20px)] px-5 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm">
+                  {/* PRIVACY TOGGLE CARD */}
+                  <motion.div
+                    className="relative z-10 mx-4 mt-4"
+                    initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
+                    transition={prefersReducedMotion ? { delay: 0 } : { delay: 0.18, type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <div className="flex bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setVisibility("public")}
+                        className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center justify-center gap-2 ${
+                          visibility === "public"
+                            ? "bg-white/20 text-white"
+                            : "text-white/70 hover:text-white hover:bg-white/10"
+                        }`}
+                      >
+                        <Globe className="w-4 h-4" />
+                        Public
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setVisibility("private")}
+                        className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-200 focus:outline-none flex items-center justify-center gap-2 ${
+                          visibility === "private"
+                            ? "bg-white/20 text-white"
+                            : "text-white/70 hover:text-white hover:bg-white/10"
+                        }`}
+                      >
+                        <Lock className="w-4 h-4" />
+                        Private Archive
+                      </button>
+                    </div>
+                  </motion.div>
+
+                  {/* POST BUTTON */}
+                  <div className="sticky bottom-0 left-0 right-0 z-10 pt-6 pb-[calc(env(safe-area-inset-bottom)+20px)] px-4">
                     <motion.button
                       onClick={handlePost}
                       disabled={!canPost}
                       aria-pressed={isSubmitting}
                       aria-busy={isSubmitting}
-                      className={`relative w-full h-14 rounded-full text-center overflow-hidden disabled:opacity-50 transition-all duration-300 shadow-lg font-bold text-lg border-2 ${
-                        canPost 
-                          ? 'liquid-glass border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white hover:scale-105 hover:shadow-[0_8px_32px_rgba(247,147,30,0.4)]' 
-                          : 'liquid-glass border-white/20 text-white/50'
+                      className={`w-full px-6 py-4 bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 hover:from-blue-600 hover:via-teal-600 hover:to-green-600 disabled:from-gray-500 disabled:via-gray-600 disabled:to-gray-700 disabled:text-gray-300 text-white rounded-xl font-semibold text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent ${
+                        isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'
                       }`}
                       initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0 }}
                       animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
@@ -464,7 +476,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       {/* Shimmer animation while submitting */}
                       {isSubmitting && (
                         <motion.div
-                          className="absolute inset-0 rounded-full"
+                          className="absolute inset-0 rounded-xl"
                           initial={{ backgroundPositionX: "0%" }}
                           animate={{ backgroundPositionX: "200%" }}
                           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
@@ -474,7 +486,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           }}
                         />
                       )}
-                      <span className="relative z-10">
+                      <span className="relative z-10 flex items-center justify-center gap-2">
                         {isSubmitting ? "Posting…" : "Post"}
                       </span>
                     </motion.button>
