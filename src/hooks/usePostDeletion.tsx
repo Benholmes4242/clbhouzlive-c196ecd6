@@ -1,6 +1,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { showToast } from '@/utils/toast';
 
 export const usePostDeletion = () => {
   const { toast } = useToast();
@@ -44,11 +45,8 @@ export const usePostDeletion = () => {
 
       console.log('Post deleted successfully:', postId);
 
-      // Show delete notification
-      toast({
-        title: "Post deleted",
-        duration: 2000
-      });
+      // Show delete toast
+      showToast("Post deleted");
 
       // Broadcast delete event for UI cleanup and feed refresh
       window.dispatchEvent(new CustomEvent('postDeleted', { 

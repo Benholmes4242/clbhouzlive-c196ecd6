@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from "@/components/Header";
+import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { CorsConfigTool } from '@/components/admin/CorsConfigTool';
@@ -44,6 +46,7 @@ const ProfileTestPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
+        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -53,6 +56,7 @@ const ProfileTestPage = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
+        <BottomNavigation />
       </div>
     );
   }
@@ -60,7 +64,8 @@ const ProfileTestPage = () => {
   // Show error if there's an issue
   if (error) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-28">
+        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading profile</span>
@@ -72,6 +77,7 @@ const ProfileTestPage = () => {
             </button>
           </div>
         </div>
+        <BottomNavigation />
       </div>
     );
   }
@@ -82,7 +88,10 @@ const ProfileTestPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background pb-28 relative">
+      {/* Header */}
+      <Header />
+      
       {/* Test Page Banner */}
       <div className="bg-yellow-500/20 border-b border-yellow-500/30 px-4 py-2 text-center">
         <span className="text-yellow-600 font-medium text-sm">TEST PAGE - Profile Clone</span>
@@ -97,6 +106,9 @@ const ProfileTestPage = () => {
       />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
+      
+      
+      <BottomNavigation />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import SnapModal from '@/components/snap/SnapModal';
+import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
@@ -48,7 +49,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
   // Media handlers for camera, image, and video
-  const { handleCameraClick, handleImageClick, handleVideoClick, handleMixedMediaClick } = useMediaHandlers(closeSnapModal, openComposer);
+  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
   const handleCloseComposer = () => {
     closeComposer();
@@ -57,15 +58,11 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
 
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    console.log('[DEBUG] BottomNavigation: handleTabClickWithCamera called with:', tab);
-    
     if (tab.isAction && tab.id === 'post') {
       // Handle camera action
-      console.log('[DEBUG] BottomNavigation: Opening snap modal for camera');
       openSnapModal();
     } else {
       // Handle regular navigation
-      console.log('[DEBUG] BottomNavigation: Handling regular navigation');
       handleTabClick(tab);
     }
   };
@@ -85,7 +82,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         onCameraClick={() => handleCameraClick({})}
         onImageClick={() => handleImageClick({})}
         onVideoClick={() => handleVideoClick({})}
-        onMixedMediaClick={handleMixedMediaClick}
         openComposerWithFiles={openComposerWithFiles}
       />
 
@@ -96,10 +92,16 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
         onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
       />
 
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
+      />
     </>
   );
 };

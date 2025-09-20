@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
+import Header from '@/components/Header';
+import BottomNavigation from '@/components/BottomNavigation';
 import MediaSearch from '@/components/discover/MediaSearch';
 import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
 import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import SuggestedUsersNew from '@/components/discover/SuggestedUsersNew';
+import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { AnnouncementRegion } from '@/components/ui/AnnouncementRegion';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
@@ -131,7 +132,7 @@ const Discover = () => {
 
   return (
       <div className="min-h-screen bg-white">
-        <AnnouncementRegion />
+        <Header />
         
         <main className="pb-20">
           {/* Media Search - Discover Only */}
@@ -155,7 +156,7 @@ const Discover = () => {
 
           {/* Suggested Users */}
           <div className="mt-4">
-            <SuggestedUsersNew onUserFollow={handleUserFollow} />
+            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
           {/* Main Grid with Container */}
@@ -169,6 +170,8 @@ const Discover = () => {
             />
           </div>
         </main>
+        
+        <BottomNavigation />
 
         {/* Conditional Modal/Feed based on feature flag */}
         {USE_MODAL_DISCOVER ? (

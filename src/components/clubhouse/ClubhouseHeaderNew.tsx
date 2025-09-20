@@ -34,8 +34,28 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
     navigate('/clubhouse');
   };
 
-  // No scroll-based hiding for global fixed behavior - remove intersection observer
-  // const [isVisible, setIsVisible] = useState(true);
+  // Add intersection observer for fade-away behavior
+  useEffect(() => {
+    const header = document.querySelector('[data-hides-on-scroll]');
+    const sentinel = document.getElementById('clubhouse-sentinel');
+    
+    if (!header || !sentinel) return;
+
+    const io = new IntersectionObserver(([e]) => {
+      const visible = e.isIntersecting;
+      const currentStyle = header.getAttribute('style') || '';
+      const baseStyle = '--header-h-mobile:60px';
+      
+      header.setAttribute('style', 
+        `${baseStyle};opacity:${visible ? 1 : 0};transform:${visible ? 'translateY(0)' : 'translateY(-12px)'};pointer-events:${visible ? 'auto' : 'none'}`
+      );
+      
+      document.body.classList.toggle('header-hidden', !visible);
+    }, { threshold: 0 });
+
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, []);
 
   // Handle mobile search overlay
   useEffect(() => {
@@ -53,20 +73,18 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
 
   return (
     <>
-      {/* Main Header - Fixed to top for global fixed behavior */}
+      {/* Main Header */}
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-[200] transition-all duration-300",
+          "sticky top-0 z-header transition-all duration-300",
           "h-16 md:h-18", // 64px mobile, 72px desktop
           // Variant-specific backgrounds
           isGlassDark && "backdrop-blur-md bg-black/60",
           isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           className
         )}
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          '--header-h-mobile': '60px'
-        } as any}
+        data-hides-on-scroll
+        style={{ '--header-h-mobile': '60px' } as any}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">
           {/* Logo */}
@@ -119,15 +137,12 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
         <>
           {/* Background overlay */}
           <div 
-            className="fixed inset-0 z-[300] bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] bg-black/20 backdrop-blur-sm"
             onClick={() => setSearchOpen(false)}
           />
           
           {/* Search pill overlay */}
-          <div 
-            className="fixed inset-x-0 z-[300] p-3"
-            style={{ top: 'env(safe-area-inset-top)' }}
-          >
+          <div className="fixed inset-x-0 top-0 z-[70] p-3">
             <div className={cn(
               "rounded-full backdrop-blur-2xl border shadow-hud",
               isGlassDark && "bg-hud-bg border-hud-border",

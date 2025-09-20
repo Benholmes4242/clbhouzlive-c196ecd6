@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Images, X, Sparkles, Zap, Film } from 'lucide-react';
+import { Camera, Images, X, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMedia, useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -33,7 +33,6 @@ interface SnapModalProps {
   onImageClick: () => void;
   onVideoClick: () => void; // Keep for backward compatibility
   openComposerWithFiles: (files: File[]) => void;
-  onMixedMediaClick?: () => void; // NEW: Tell Your Story option
 }
 
 const SnapModal = ({ 
@@ -43,14 +42,11 @@ const SnapModal = ({
   onImageClick, 
   onVideoClick, 
   openComposerWithFiles,
-  onMixedMediaClick,
 }: SnapModalProps) => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
-  const [isModalFocused, setIsModalFocused] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<string>('');
   // using openComposerWithFiles from props
   
   
@@ -129,410 +125,204 @@ const SnapModal = ({
     [videosA, placeholders.videos, seen]
   );
 
-  // Dynamic Preview Components
-  const CameraPreview = () => {
+  /**
+   * Keeps all rows the same total width using flex weights.
+   * videos: [1,1,1]   (3 equal rects)
+   * photos: [1,2]     (square + 2x wide rect)
+   * capture:[2,1]     (long + square)
+   */
+  function ThumbStrip({
+    variant,
+    thumbs = [],
+  }: {
+    variant: "videos" | "photos" | "capture";
+    thumbs?: Thumb[];
+  }) {
     return (
-      <div className="relative h-12 w-full rounded-lg overflow-hidden bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm">
-        {/* Lens ripple animation */}
-        <motion.div
-          className="absolute inset-0 rounded-lg border-2 border-white/20"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute inset-0 rounded-lg border border-white/10"
-          animate={{
-            scale: [1, 1.05, 1],
-            opacity: [0.5, 0.8, 0.5],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.3,
-          }}
-        />
-        {/* Center lens */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20" />
-        </div>
+      <div className="flex items-stretch gap-2 h-16 w-56">
+        {variant === "videos" && (
+          <>
+            {thumbs.slice(0, 3).map((t, i) => (
+              <div key={t.id ?? `ph-${i}`} className="flex-[1_0_0] aspect-square overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity">
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.videos[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </>
+        )}
+
+        {variant === "photos" && (
+          <>
+            {thumbs.slice(0, 2).map((t, i) => (
+              <div 
+                key={t.id ?? `ph-${i}`} 
+                className={`${i === 0 ? 'flex-[1_0_0] aspect-square' : 'flex-[2_0_0] aspect-[8/3]'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
+              >
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.photos[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </>
+        )}
+
+        {variant === "capture" && (
+          <>
+            {thumbs.slice(0, 2).map((t, i) => (
+              <div 
+                key={t.id ?? `ph-${i}`} 
+                className={`${i === 0 ? 'flex-[2_0_0] aspect-[8/3]' : 'flex-[1_0_0] aspect-square'} overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10 shadow-md hover:opacity-80 transition-opacity`}
+              >
+                <img
+                  src={t.displaySrc}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholders.capture[0]; }}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </>
+        )}
       </div>
     );
-  };
-
-  const PhotosPreview = ({ images }: { images: Thumb[] }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const displayImages = images.length > 0 ? images.slice(0, 3) : 
-      placeholders.photos.slice(0, 3).map((url, i) => ({ id: `placeholder-${i}`, displaySrc: url }));
-
-    useEffect(() => {
-      if (displayImages.length <= 1 || !isModalFocused) return;
-      
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % displayImages.length);
-      }, 1800);
-
-      return () => clearInterval(interval);
-    }, [displayImages.length, isModalFocused]);
-
-    return (
-      <div className="relative h-12 w-full rounded-lg overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentIndex}
-            src={displayImages[currentIndex]?.displaySrc}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover rounded-lg"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = placeholders.photos[0];
-            }}
-          />
-        </AnimatePresence>
-        {/* Subtle overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg" />
-      </div>
-    );
-  };
-
-  const StoryPreview = ({ photos, videos }: { photos: Thumb[]; videos: Thumb[] }) => {
-    const [showVideo, setShowVideo] = useState(false);
-    const displayPhoto = photos.length > 0 ? photos[0] : 
-      { id: 'placeholder-photo', displaySrc: placeholders.photos[0] };
-    const displayVideo = videos.length > 0 ? videos[0] : 
-      { id: 'placeholder-video', displaySrc: placeholders.videos[0] };
-
-    useEffect(() => {
-      if (!isModalFocused) return;
-      
-      const interval = setInterval(() => {
-        setShowVideo(prev => !prev);
-      }, 2000);
-
-      return () => clearInterval(interval);
-    }, [isModalFocused]);
-
-    return (
-      <div className="relative h-12 w-full rounded-lg overflow-hidden bg-gradient-to-br from-white/5 to-white/10">
-        <div className="flex h-full">
-          {/* Left side - Photo */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src={displayPhoto.displaySrc}
-              alt=""
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = placeholders.photos[0];
-              }}
-            />
-            <motion.div 
-              className="absolute inset-0 bg-brand-orange/20"
-              animate={{ opacity: showVideo ? 0 : 0.3 }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-          
-          {/* Divider */}
-          <div className="w-px bg-white/20" />
-          
-          {/* Right side - Video */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src={displayVideo.displaySrc}
-              alt=""
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = placeholders.videos[0];
-              }}
-            />
-            <motion.div 
-              className="absolute inset-0 bg-brand-orange/20"
-              animate={{ opacity: showVideo ? 0.3 : 0 }}
-              transition={{ duration: 0.5 }}
-            />
-            {/* Play indicator */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div 
-                className="w-3 h-3 border-l-2 border-white/60"
-                style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}
-                animate={{ opacity: showVideo ? 1 : 0.4 }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Handle mixed media (Tell Your Story) option
-  const handleTellYourStory = () => {
-    setSelectedOption('Tell Your Story');
-    if (onMixedMediaClick) {
-      onMixedMediaClick();
-    } else {
-      handlePickMedia();
-    }
-  };
-
-  const handleOptionClick = (key: string, action: () => void) => {
-    setSelectedOption(key === "capture" ? "Camera" : key === "media" ? "Photos" : "Tell Your Story");
-    action();
-  };
+  }
 
   const cardOptions = [
     ...(isMobile ? [{
       key: "capture",
       label: "Camera",
+      description: "Take photo or video",
       icon: Camera,
-      onClick: () => handleOptionClick("capture", onCameraClick),
-      preview: captureThumbs,
-      description: "Take a photo or video right now"
+      onClick: onCameraClick,
+      variant: "capture" as const,
+      thumbs: captureThumbs,
     }] : []),
     {
       key: "media",
-      label: "Photos",
+      label: "Media",
+      description: "Pick photos & videos",
       icon: Images,
-      onClick: () => handleOptionClick("media", handlePickMedia),
-      preview: photoThumbs,
-      description: "Choose from your gallery"
-    },
-    {
-      key: "story",
-      label: "Tell Your Story",
-      icon: Film,
-      onClick: () => handleOptionClick("story", handleTellYourStory),
-      preview: videoThumbs,
-      description: "Mix photos & videos in one go",
-      isSpecial: true // Flag for special styling
+      onClick: handlePickMedia,
+      variant: "photos" as const, // Reuse photos layout for thumbnails
+      thumbs: photoThumbs,
     },
   ];
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0.1 : 0.18 }}
+          transition={{ duration: 0.2 }}
         >
-          {/* Backdrop - Consistent with Discover overlay scrim */}
+          {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
           
-          {/* ARIA live region for announcements */}
-          <div 
-            role="status" 
-            aria-live="polite" 
-            aria-atomic="true"
-            className="sr-only"
-          >
-            {selectedOption && `Selected ${selectedOption}`}
-          </div>
-          
-          {/* Panel - Light floating sheet */}
-          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={onClose}>
+          {/* Panel */}
+          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
             <motion.div
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-[480px] liquid-glass rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] text-white overflow-hidden"
+              className="w-full max-w-[480px] bg-black/55 backdrop-blur-xl rounded-2xl border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] text-white"
               onClick={(e) => e.stopPropagation()}
-              onFocus={() => setIsModalFocused(true)}
-              onBlur={(e) => {
-                // Only set unfocused if focus is leaving the modal entirely
-                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                  setIsModalFocused(false);
-                }
-              }}
-              initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0, scale: 0.95 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { y: -12, opacity: 0, scale: 0.98 }}
-              transition={prefersReducedMotion ? 
-                { duration: 0.1 } : 
-                { type: "spring", stiffness: 280, damping: 26, duration: 0.18 }
-              }
-              onMouseMove={!prefersReducedMotion ? (e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const deltaX = (e.clientX - centerX) / rect.width;
-                const deltaY = (e.clientY - centerY) / rect.height;
-                // Subtle parallax - max 2px movement
-                e.currentTarget.style.setProperty('--parallax-y', `${Math.max(-2, Math.min(2, deltaY * 2))}px`);
-              } : undefined}
-              onMouseLeave={!prefersReducedMotion ? (e) => {
-                e.currentTarget.style.setProperty('--parallax-y', '0px');
-              } : undefined}
+              initial={{ y: 20, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
             >
-                {/* Header */}
-                <motion.div 
-                  className="px-8 pt-8 pb-6 text-center"
-                  style={{
-                    transform: !prefersReducedMotion ? 'translateY(var(--parallax-y, 0px))' : 'none'
-                  }}
-                >
-                  <h2 className="text-2xl font-semibold mb-2">Create a Moment</h2>
-                  <p className="text-sm text-white/70 mb-1">Capture and share your golf journey</p>
-                  
-                  {/* Helper line */}
-                  <motion.p 
-                    className="text-xs text-white/50"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    Share your golf moment ⛳️
-                  </motion.p>
-                  
-                  {/* Quick Post shortcut */}
-                  <motion.button
-                    onClick={handlePickMedia}
-                    className="mt-3 px-4 py-2 text-xs font-medium text-brand-orange/80 hover:text-brand-orange border border-brand-orange/30 hover:border-brand-orange/50 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-105"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
-                    whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
-                  >
-                    <Zap className="inline h-3 w-3 mr-1" />
-                    Quick Post
-                  </motion.button>
-                </motion.div>
-
-              {/* Action Options with Dynamic Previews */}
-              <div className="px-6 pb-8">
-                <div className="space-y-6">
-                  {cardOptions.map(({ key, label, icon: Icon, onClick, preview, description, isSpecial }, index) => (
-                    <motion.button
-                      key={key}
-                      onClick={onClick}
-                      className="w-full group relative overflow-hidden min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/60 focus:ring-offset-2 focus:ring-offset-black/20 rounded-2xl"
-                      initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0 }}
-                      animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
-                      transition={prefersReducedMotion ? 
-                        { delay: 0 } : 
-                        { delay: index * 0.1, type: "spring", stiffness: 280, damping: 25 }
-                      }
-                      whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
-                      whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
-                      aria-label={`${label}: ${description}`}
-                    >
-                      {/* Option Card */}
-                      <div className={`p-4 rounded-2xl liquid-glass-subtle border transition-all duration-300 ${
-                        isSpecial 
-                          ? 'border-brand-orange/30 group-hover:border-brand-orange/60 group-hover:shadow-lg group-hover:shadow-brand-orange/20 ring-1 ring-brand-orange/20 group-hover:ring-brand-orange/40' 
-                          : 'border-white/10 group-hover:border-white/20 group-hover:shadow-lg group-hover:shadow-brand-orange/10'
-                      }`}>
-                        <div className="flex items-center gap-4 mb-3">
-                          {/* Icon */}
-                          <div className={`w-12 h-12 rounded-xl liquid-glass-button flex items-center justify-center transition-all duration-300 ${
-                            isSpecial 
-                              ? 'group-hover:ring-2 group-hover:ring-brand-orange/50 group-hover:bg-brand-orange/10' 
-                              : 'group-hover:ring-2 group-hover:ring-brand-orange/30'
-                          }`}>
-                            <motion.div
-                              animate={!prefersReducedMotion && isSpecial ? {
-                                filter: ["drop-shadow(0 0 0px rgba(251,146,60,0))", "drop-shadow(0 0 8px rgba(251,146,60,0.4))", "drop-shadow(0 0 0px rgba(251,146,60,0))"]
-                              } : {}}
-                              transition={!prefersReducedMotion && isSpecial ? { 
-                                duration: 2, 
-                                repeat: Infinity, 
-                                ease: "easeInOut" 
-                              } : {}}
-                              whileHover={!prefersReducedMotion ? 
-                                key === "capture" ? { 
-                                  opacity: [1, 0.7, 1], 
-                                  transition: { duration: 0.2, ease: "easeInOut" } 
-                                } :
-                                key === "media" ? { 
-                                  x: [0, 1, -1, 0], 
-                                  transition: { duration: 0.3, ease: "easeInOut" } 
-                                } :
-                                key === "story" ? { 
-                                  scale: [1, 1.05, 1], 
-                                  transition: { duration: 0.2, ease: "easeInOut" } 
-                                } : {}
-                                : {}
-                              }
-                              whileTap={!prefersReducedMotion ? { scale: 0.95 } : {}}
-                            >
-                              <Icon className={`h-6 w-6 transition-colors duration-300 ${
-                                isSpecial 
-                                  ? 'text-brand-orange group-hover:text-brand-orange' 
-                                  : 'text-white group-hover:text-brand-orange'
-                              }`} />
-                            </motion.div>
-                          </div>
-                          
-                          {/* Text */}
-                          <div className="text-left flex-1">
-                            <h3 className={`text-base font-semibold transition-colors duration-300 ${
-                              isSpecial 
-                                ? 'text-brand-orange group-hover:text-brand-orange' 
-                                : 'text-white group-hover:text-brand-orange'
-                            }`}>
-                              {label}
-                            </h3>
-                            <p className="text-sm text-white/60 group-hover:text-white/80 transition-colors duration-300">
-                              {description}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Dynamic Preview */}
-                        <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                          {key === "capture" && <CameraPreview />}
-                          {key === "media" && <PhotosPreview images={preview} />}
-                          {key === "story" && <StoryPreview photos={photoThumbs} videos={videoThumbs} />}
-                        </div>
-                      </div>
-                      
-                      {/* Hover gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out pointer-events-none" />
-                    </motion.button>
-                  ))}
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pt-5 pb-1">
+                <div>
+                  <h2 className="text-2xl font-semibold">Create a Moment</h2>
+                  <p className="text-sm text-white/60 mt-1">Choose how you'd like to share</p>
                 </div>
+                <button 
+                  onClick={onClose} 
+                  aria-label="Close" 
+                  className="h-8 w-8 rounded-full bg-black/30 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="px-4 pb-5 space-y-3">
+                {/* Media Options */}
+                {cardOptions.map(({ key, label, description, icon: Icon, onClick, variant, thumbs }) => (
+                  <motion.button
+                    key={key}
+                    onClick={onClick}
+                    className="w-full h-20 flex items-center justify-between gap-4 px-4 py-4 bg-neutral-900/70 backdrop-blur-md ring-1 ring-white/10 rounded-2xl hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-medium text-white">{label}</div>
+                        {/* Show empty state message if no user media and not loading */}
+                        {!isLoading && !error && photos.length === 0 && videos.length === 0 && key === 'media' && (
+                          <div className="text-sm text-white/60">No posts yet - start creating!</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-l border-white/10 pl-3">
+                      <ThumbStrip variant={variant} thumbs={thumbs} />
+                    </div>
+                  </motion.button>
+                ))}
 
                 {/* Error state with retry */}
                 {error && (
-                  <div className="mt-6 px-5 py-4 bg-red-500/10 backdrop-blur-md ring-1 ring-red-500/30 rounded-2xl">
-                    <div className="text-sm text-red-200 mb-2 text-center">Couldn't load your media</div>
+                  <div className="px-4 py-3 bg-red-900/20 backdrop-blur-md ring-1 ring-red-500/20 rounded-2xl">
+                    <div className="text-sm text-red-300 mb-2">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
-                      className="text-xs text-red-300 hover:text-red-100 underline transition-colors duration-200 block mx-auto"
+                      className="text-xs text-red-400 hover:text-red-300 underline"
                     >
                       Retry
                     </button>
                   </div>
                 )}
 
+                {/* Tell Your Story Card - AT BOTTOM */}
+                <motion.button
+                  onClick={() => {
+                    // Open the same media picker flow
+                    handlePickMedia();
+                  }}
+                  className="w-full h-24 flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl border border-yellow-500/20 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-white">Tell Your Story</span>
+                    <span className="text-sm text-white/60">Mix photos & videos in one go</span>
+                  </div>
+                </motion.button>
               </div>
-
-              {/* Close button - positioned at top right */}
-              <button 
-                onClick={onClose} 
-                aria-label="Close modal" 
-                className="absolute top-4 right-4 h-10 w-10 rounded-full liquid-glass-button hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black/20"
-              >
-                <X className="h-4 w-4 text-white" />
-              </button>
             </motion.div>
           </div>
         </motion.div>

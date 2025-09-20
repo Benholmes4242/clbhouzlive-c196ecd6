@@ -1,9 +1,13 @@
 import React from 'react';
+import Header from '@/components/Header';
+import BottomNavigation from '@/components/BottomNavigation';
 import GlobalTop100Content from '@/components/global-top100/GlobalTop100Content';
 
 const GlobalTop100 = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
+      
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto">
           {/* Page Header */}
@@ -15,6 +19,8 @@ const GlobalTop100 = () => {
           <GlobalTop100Content />
         </div>
       </main>
+      
+      <BottomNavigation />
     </div>
   );
 };

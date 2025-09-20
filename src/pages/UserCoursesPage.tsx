@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import Header from '@/components/Header';
+import BottomNavigation from '@/components/BottomNavigation';
 import CoursesContent from '@/components/courses/CoursesContent';
 import { useUserCoursesData } from '@/components/courses/user/useUserCoursesData';
 
@@ -10,11 +12,15 @@ const UserCoursesPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
+      
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto">
           <CoursesContent username={username} displayName={displayName} />
         </div>
       </main>
+      
+      <BottomNavigation />
     </div>
   );
 };

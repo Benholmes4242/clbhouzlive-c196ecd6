@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { useHeaderVariant } from '@/contexts/HeaderContext';
-import { useHeaderVariantSetter } from '@/hooks/useHeaderVariant';
-import { useBottomNavigationVariant } from '@/hooks/useBottomNavigationVariant';
 import ProfilePage from './ProfilePage';
 
 const ProfileWrapped = () => {
@@ -11,10 +9,6 @@ const ProfileWrapped = () => {
     // Profile pages have hero images, use glass-dark
     setVariant('glass-dark');
   }, [setVariant]);
-
-  // Set header and bottom navigation variants for profile
-  useHeaderVariantSetter('glass-dark');
-  useBottomNavigationVariant('default');
 
   return <ProfilePage />;
 };

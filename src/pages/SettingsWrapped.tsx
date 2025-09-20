@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useHeaderVariant } from '@/contexts/HeaderContext';
-import { useHeaderVariantSetter } from '@/hooks/useHeaderVariant';
 import Settings from './Settings';
 
 const SettingsWrapped = () => {
@@ -10,9 +9,6 @@ const SettingsWrapped = () => {
     // Settings page has white background, use solid-light
     setVariant('solid-light');
   }, [setVariant]);
-
-  // Set header variant for settings
-  useHeaderVariantSetter('solid-light');
 
   return <Settings />;
 };

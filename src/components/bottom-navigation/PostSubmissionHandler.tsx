@@ -12,6 +12,7 @@ interface PostSubmissionHandlerProps {
   selectedCourse: any;
   onCourseSelect: (course: any) => void;
   onClose: () => void;
+  onShowToast: (message: string) => void;
   isSubmitting: boolean;
   setIsSubmitting: (submitting: boolean) => void;
 }
@@ -23,6 +24,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
   selectedCourse,
   onCourseSelect,
   onClose,
+  onShowToast,
   isSubmitting,
   setIsSubmitting
 }) => {
@@ -36,11 +38,13 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       : (selectedFile ? [selectedFile] : []);
     
     if (files.length === 0) {
+      onShowToast('No media selected');
       return;
     }
 
-    // Close modal immediately
+    // Immediate UI feedback - close modal and show success toast
     onClose();
+    onShowToast('Your post is out there!');
     
     // Update recent media cache immediately for instant thumbnail updates
     if (mediaItems.length > 0) {
@@ -71,10 +75,12 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       onError: () => {
         console.error('Post submission failed - background upload failed');
         setIsSubmitting(false);
+        onShowToast('Upload failed. Please try again later.');
       }
     }).catch((error) => {
       console.error('Error in enhanced post submission:', error);
       setIsSubmitting(false);
+      onShowToast('Upload failed. Please try again later.');
     });
   };
 

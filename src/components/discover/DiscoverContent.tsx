@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-import { useOptimisticPostInsert } from '@/hooks/useOptimisticPostInsert';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
 import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
@@ -77,53 +76,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     loadMore 
   } = useInfiniteExploreContent(filterType === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : filterType);
 
-  // Optimistic post insertion with spotlight
-  const {
-    mergedContent,
-    insertOptimisticPost,
-    confirmOptimisticPost,
-    removeOptimisticPost,
-    shouldShowSpotlight
-  } = useOptimisticPostInsert({
-    existingContent: content || [],
-    onContentUpdate: (newContent) => {
-      // This will trigger a re-render with the updated content
-      // The useInfiniteExploreContent hook will handle the state updates
-    }
-  });
-
-  // Listen for post completion events
-  useEffect(() => {
-    const handlePostCompleted = (event: CustomEvent) => {
-      const { optimisticId, realPost } = event.detail;
-      
-      if (optimisticId && realPost) {
-        confirmOptimisticPost(optimisticId, realPost);
-      }
-    };
-
-    window.addEventListener('postCompleted', handlePostCompleted as EventListener);
-    return () => window.removeEventListener('postCompleted', handlePostCompleted as EventListener);
-  }, [confirmOptimisticPost]);
-
-  // Listen for new post submissions to insert optimistically
-  useEffect(() => {
-    const handleNewPost = (event: CustomEvent) => {
-      const postData = event.detail;
-      insertOptimisticPost(postData);
-    };
-
-    window.addEventListener('newPostSubmitted', handleNewPost as EventListener);
-    return () => window.removeEventListener('newPostSubmitted', handleNewPost as EventListener);
-  }, [insertOptimisticPost]);
-
   // Apply sub-filtering, search filtering, and tag filtering whenever content or pills change
   useEffect(() => {
-    // Use merged content (with optimistic posts) as the base
-    const baseContent = mergedContent;
-    
-    if (baseContent.length > 0) {
-      let filtered = applySubFilter(baseContent, main, sub);
+    if (content) {
+      let filtered = applySubFilter(content, main, sub);
       
       // Apply search filter if query exists
       if (searchQuery && searchQuery.trim()) {
@@ -149,7 +105,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     } else {
       setCurrentContent(null);
     }
-  }, [mergedContent, main, sub, searchQuery, selectedTags]);
+  }, [content, main, sub, searchQuery, selectedTags]);
 
 
   const handleCreatorClick = (creator: CreatorHighlight) => {
@@ -174,7 +130,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     );
   }
 
-  // Render content with spotlight support
+  // Render content directly without Creator Spotlight injection
   return (
     <ExploreGrid 
       content={currentContent || []}
@@ -186,7 +142,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
       onLoadMore={loadMore}
       activeFilter={filterType}
       isDiscoverPage={true}
-      shouldShowSpotlight={shouldShowSpotlight}
     />
   );
 }

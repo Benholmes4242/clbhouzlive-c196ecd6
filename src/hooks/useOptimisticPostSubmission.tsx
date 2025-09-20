@@ -191,35 +191,11 @@ export const useOptimisticPostSubmission = () => {
       // Upload is already complete - media files are uploaded before post creation
       console.log('Post created with uploaded media files');
 
-      // First, dispatch optimistic post event for immediate UI feedback
-      window.dispatchEvent(new CustomEvent('newPostSubmitted', {
-        detail: {
-          id: postData.id,
-          user,
-          content,
-          mediaFiles,
-          coverIndex: 0 // Default to first media item
-        }
-      }));
-
-      // Then dispatch completion event for confirmation
+      // Dispatch success event immediately
       window.dispatchEvent(new CustomEvent('postCompleted', {
         detail: { 
-          optimisticId: postData.id,
-          realPost: {
-            id: postData.id,
-            user,
-            content: postData.content,
-            src: '', // Will be filled by the optimistic handler
-            type: mediaFiles[0]?.type.startsWith('video') ? 'video' : 'image',
-            title: content || 'New post',
-            ctaDescription: content || '',
-            created_at: postData.created_at,
-            likes_count: 0,
-            comments_count: 0,
-            is_liked: false,
-            is_following: false
-          }
+          optimisticId: null,
+          realPost: postData 
         }
       }));
 

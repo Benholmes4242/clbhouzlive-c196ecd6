@@ -16,13 +16,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   return (
     <nav 
       className={cn(
-        "w-full relative z-bottom-nav",
+        "fixed bottom-0 left-0 right-0 z-bottom-nav",
         isClubhouse 
           ? "bg-black/60 backdrop-blur-md border-t border-white/10" 
           : "bg-background/95 backdrop-blur-md border-t border-border/50"
       )}
       style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 4px)',
+        ['--safe-bottom' as any]: 'env(safe-area-inset-bottom)',
+        paddingBottom: 'max(var(--safe-bottom, 0px), 4px)',
       }}
     >
       <div className="w-full px-2">

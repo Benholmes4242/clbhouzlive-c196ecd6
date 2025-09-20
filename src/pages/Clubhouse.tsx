@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import SnapModal from '@/components/snap/SnapModal';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
+import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
@@ -106,14 +108,8 @@ const Clubhouse = () => {
       
       <ClubhouseHeaderNew activeTab={headerActiveTab} onTabChange={setHeaderActiveTab} />
 
-      {/* Main Content - Fullscreen Vertical Feed with header offset */}
-      <div 
-        className="clubhouse-scroll" 
-        style={{ 
-          paddingTop: 'calc(64px + env(safe-area-inset-top))', // Header height + safe area
-          marginTop: 'calc(-64px - env(safe-area-inset-top))' // Negative margin to offset padding
-        }}
-      >
+      {/* Main Content - Fullscreen Vertical Feed */}
+      <div className="clubhouse-scroll">
         <ClubhouseVerticalFeed
           posts={posts}
           onLike={handleLike}
@@ -124,7 +120,14 @@ const Clubhouse = () => {
         />
       </div>
       
-      {/* Navigation is now handled globally */}
+      {/* Bottom Navigation */}
+      <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
+        <NavigationBar 
+          activeTab={activeTab} 
+          onTabClick={handleTabClickWithCamera} 
+          variant="clubhouse" 
+        />
+      </div>
       
       {/* Snap Modal and Post Submission Components */}
       <SnapModal
@@ -143,8 +146,15 @@ const Clubhouse = () => {
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
         onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
+      />
+
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
       />
     </div>
   );
