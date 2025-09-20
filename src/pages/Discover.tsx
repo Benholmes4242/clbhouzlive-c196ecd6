@@ -5,7 +5,7 @@ import MediaSearch from '@/components/discover/MediaSearch';
 import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
 import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import SuggestedUsersNew from '@/components/discover/SuggestedUsersNew';
+import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { AnnouncementRegion } from '@/components/ui/AnnouncementRegion';
@@ -158,7 +158,7 @@ const Discover = () => {
 
           {/* Suggested Users */}
           <div className="mt-4">
-            <SuggestedUsersNew onUserFollow={handleUserFollow} />
+            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
           {/* Main Grid with Container */}
