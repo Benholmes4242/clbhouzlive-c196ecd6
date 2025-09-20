@@ -374,19 +374,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   :root {
-    /* Clubhouse Design System */
-    --accent: 32 93% 54%;            /* active icon color (#f7931e) */
-    --hud-bg: 0 0% 0% / 0.45;        /* translucent HUD chips */
-    --hud-border: 0 0% 100% / 0.18;
-    --hud-shadow: 0 6px 30px rgba(0,0,0,.35);
-
-    /* Header heights (adjust if your header differs) */
-    --header-h-mobile: 60px;
-    --header-h-desktop: 72px;
-
-    /* Spacing */
-    --tag-offset: 8px;
-    
     /* Brand colors for Swing Coach */
     --brand-orange: 32 93% 54%;
     --brand-orange-light: 32 93% 64%;

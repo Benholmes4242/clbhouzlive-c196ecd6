@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
+import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ClubhouseHeaderRedesigned from '@/components/clubhouse/ClubhouseHeaderRedesigned';
-import ClubhouseVerticalFeedRedesigned from '@/components/clubhouse/ClubhouseVerticalFeedRedesigned';
+import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import ScrollableTabs from '@/components/clubhouse/ScrollableTabs';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -48,11 +49,11 @@ const Clubhouse = () => {
     <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
       minHeight: '100dvh',
     }}>
-      <ClubhouseHeaderRedesigned activeTab={activeTab} onTabChange={setActiveTab} />
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
-        <ClubhouseVerticalFeedRedesigned
+        <ClubhouseVerticalFeed
           posts={posts}
           onLike={handleLike}
           onLoadMore={loadMore}
@@ -63,7 +64,9 @@ const Clubhouse = () => {
       </div>
       
       {/* Bottom Navigation */}
-      <BottomNavigation variant="clubhouse" />
+      <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
+        <BottomNavigation variant="clubhouse" />
+      </div>
     </div>
   );
 };
