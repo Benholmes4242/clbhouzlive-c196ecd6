@@ -14,55 +14,38 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   
   return (
     <nav 
-      className={`fixed bottom-0 left-0 right-0 z-50 md:z-40 ${
+      className={`fixed inset-x-0 bottom-0 z-50 h-12 md:h-14 px-2 pb-[max(env(safe-area-inset-bottom),6px)] ${
         isClubhouse 
-          ? 'bg-black' 
+          ? 'bg-black/60 backdrop-blur-md border-t border-white/10' 
           : 'bg-background/95 backdrop-blur-md border-t border-border/50'
       }`}
-      style={{
-        // expose safe area to a CSS var so we can use a fallback with var()
-        ['--safe-bottom' as any]: 'env(safe-area-inset-bottom)',
-        // at least 6px padding; if device has a safe inset, use the larger one
-        paddingBottom: 'max(var(--safe-bottom, 0px), 6px)',
-      }}
     >
-      <div className={`w-full px-2 ${isClubhouse ? 'bg-transparent' : ''}`}>
-        {/* Reduce base height on small screens, keep 64px on md+ if you prefer */}
-        <div className={`flex items-center justify-between h-14 md:h-16 relative ${isClubhouse ? 'bg-transparent' : ''}`}>
-          {navigationTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            
-            
-            return (
+      <div className={`mx-auto flex h-full items-center justify-between ${isClubhouse ? 'bg-transparent' : ''}`}>
+        {navigationTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          
+          return (
+            <div 
+              key={tab.id}
+              className="grid place-items-center h-full w-16"
+            >
               <button
-                key={tab.id}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   onTabClick(tab);
                 }}
-                className={`flex items-center justify-center relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
-                  isClubhouse
-                    ? tab.id === 'post'
-                      ? '' // Camera icon gets its own styling
-                      : tab.id === 'clubhouse'
-                        ? 'text-white' // Home icon stays white always on clubhouse
-                        : 'text-white hover:text-white/80'
-                    : tab.id === 'post'
-                      ? '' // Camera icon gets its own styling
-                      : 'text-black'
+                className={`grid place-items-center h-full w-full transition-colors duration-200 ${
+                  isActive ? 'text-[hsl(var(--accent))]' : 'text-white/80 hover:text-white'
                 }`}
                 aria-label={tab.label}
               >
-                <Icon 
-                  className="h-9 w-9 font-normal" 
-                  style={tab.id === 'post' ? { color: '#f7931e' } : undefined}
-                />
+                <Icon className="w-6 h-6" />
               </button>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </nav>
   );
