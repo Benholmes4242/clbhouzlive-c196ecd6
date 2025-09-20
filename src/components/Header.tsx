@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: (tab: string) => void }) => {
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const navigate = useNavigate();
   const location = useLocation();
   const { currentLogo } = useAppLogo();
@@ -33,15 +34,6 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
     console.log("[DEBUG] Header mounted", "pathname:", location.pathname);
   }, [location.pathname]);
 
-  // Hide header when modals are active
-  if (shouldHideHeader) {
-    return null;
-  }
-
-  const handleLogoClick = () => {
-    navigate('/clubhouse');
-  };
-
   // Handle mobile search overlay
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -55,6 +47,16 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
       return () => document.removeEventListener('keydown', handleEscape);
     }
   }, [searchOpen]);
+
+  // NOW WE CAN SAFELY DO CONDITIONAL RETURNS - ALL HOOKS CALLED ABOVE
+  // Hide header when modals are active
+  if (shouldHideHeader) {
+    return null;
+  }
+
+  const handleLogoClick = () => {
+    navigate('/clubhouse');
+  };
 
   // Always sticky on clubhouse page, relative everywhere else  
   const hashPath = location.hash && location.hash.startsWith('#/') ? location.hash.slice(1) : null;
