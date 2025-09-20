@@ -1,59 +1,56 @@
-import React from 'react';
-import { Volume2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from 'react';
+import { Music } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AudioStripProps {
-  audioTrack?: {
-    title: string;
+  audioTrack: {
+    title?: string;
+    name?: string;
     artist?: string;
     isOriginal?: boolean;
   };
   className?: string;
 }
 
-export const AudioStrip: React.FC<AudioStripProps> = ({ 
-  audioTrack, 
-  className = "" 
-}) => {
-  const { toast } = useToast();
-
+export const AudioStrip: React.FC<AudioStripProps> = ({ audioTrack, className }: AudioStripProps) => {
+  const [isPaused, setIsPaused] = useState(false);
+  
   if (!audioTrack) return null;
+  
+  const trackName = audioTrack.title || audioTrack.name || 'Unknown Track';
+  const displayText = audioTrack.artist 
+    ? `${trackName} • ${audioTrack.artist}`
+    : trackName;
 
   const handleClick = () => {
-    // Show "coming soon" toast for now
-    toast({
-      title: "Audio Tagging Coming Soon",
-      description: `Discover more posts using "${audioTrack.title}"`,
-      duration: 3000,
-    });
+    setIsPaused(!isPaused);
   };
 
-  const displayTitle = audioTrack.isOriginal 
-    ? "Original Audio" 
-    : audioTrack.title;
-
-  const displayArtist = audioTrack.artist && !audioTrack.isOriginal 
-    ? ` • ${audioTrack.artist}` 
-    : "";
-
   return (
-    <button
+    <div 
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-3 py-2 max-w-[280px]",
+        "bg-hud-bg backdrop-blur-md border border-hud-border",
+        "text-white cursor-pointer transition-all duration-200",
+        "hover:bg-hud-bg/80",
+        className
+      )}
       onClick={handleClick}
-      className={`
-        flex items-center gap-2 px-3 py-1.5 
-        bg-black/40 backdrop-blur-sm
-        text-white text-xs font-medium
-        rounded-2xl
-        transition-all duration-200
-        hover:bg-black/50 active:scale-95
-        max-w-[200px]
-        ${className}
-      `}
     >
-      <Volume2 size={14} className="flex-shrink-0" />
-      <span className="truncate">
-        {displayTitle}{displayArtist}
-      </span>
-    </button>
+      <Music className="w-4 h-4 flex-shrink-0" />
+      <div className="overflow-hidden min-w-0">
+        <div 
+          className={cn(
+            "text-sm font-medium whitespace-nowrap",
+            !isPaused && displayText.length > 25 && "animate-marquee"
+          )}
+          style={{
+            animationDuration: `${Math.max(displayText.length * 0.2, 3)}s`
+          }}
+        >
+          {displayText}
+        </div>
+      </div>
+    </div>
   );
 };

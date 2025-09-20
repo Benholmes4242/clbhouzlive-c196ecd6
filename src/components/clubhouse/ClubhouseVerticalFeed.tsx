@@ -20,6 +20,8 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
+import PostMetadata from './PostMetadata';
+import EngagementRail from './EngagementRail';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -639,120 +641,38 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 />
               )}
 
-              {/* User Profile and Caption - Bottom Left */}
-              <div className="absolute bottom-24 left-3 right-20 z-20">
-                {/* User Profile Section */}
-                {index === currentIndex && (
-                  <div className="mb-3 flex items-end space-x-3">
-                    {/* Profile Photo */}
-                    <div className="relative">
-                      <img
-                        src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                        alt={item.user?.name || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-                        }}
-                      />
-                    </div>
-                     
-                     {/* Username only */}
-                     <div className="flex flex-col">
-                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                         {item.user?.name || 'Unknown User'}
-                       </span>
-                     </div>
-                  </div>
-                )}
+              {/* Post Metadata - Bottom Left */}
+              <PostMetadata
+                title={removeGolfCourseFromContent(item.title)}
+                description={item.ctaDescription}
+                user={{
+                  name: item.user?.name || 'Unknown User',
+                  avatar: item.user?.avatar
+                }}
+              />
 
-                {/* Caption Text */}
-                {item.title && removeGolfCourseFromContent(item.title) && (
-                  <div 
-                    className="text-white text-base font-medium cursor-default"
-                    style={{ 
-                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-                      lineHeight: '1.3',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      marginLeft: '0px',
-                      marginTop: '0px',
-                      wordBreak: 'break-word',
-                      width: '70vw', // 70% of screen width
-                      maxWidth: '70vw'
-                    }}
-                  >
-                    <span className="text-base font-medium">
-                      {removeGolfCourseFromContent(item.title)}
-                    </span>
-                  </div>
-                )}
+              {/* Audio Strip - Only show for video posts with custom audio */}
+              {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
+                <div className="absolute bottom-20 left-4 md:left-8 z-20">
+                  <AudioStrip audioTrack={item.audioTrack} />
+                </div>
+              )}
 
-                {/* Audio Strip - Only show for video posts with custom audio (not original) */}
-                {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
-                  <div className="mt-3">
-                    <AudioStrip audioTrack={item.audioTrack} />
-                  </div>
-                )}
-
-              </div>
-
-              {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
-                {/* Mute/Unmute toggle button - only show for video posts */}
-                {currentMedia.media_type === 'video' && (
-                  <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={() => setGlobalMute(!isGloballyMuted)}
-                  >
-                    {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
-                    ) : (
-                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
-                    )}
-                  </button>
-                )}
-
-                {/* Heart/Reaction Button */}
-                <button
-                  onTouchStart={(e) => handleLongPressStart(e, item.id)}
-                  onTouchEnd={() => handleLongPressEnd(item.id)}
-                  onMouseDown={(e) => handleLongPressStart(e, item.id)}
-                  onMouseUp={() => handleLongPressEnd(item.id)}
-                  onMouseLeave={() => {
-                    if (longPressTimer.current) {
-                      clearTimeout(longPressTimer.current);
-                      longPressTimer.current = null;
-                    }
-                  }}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  {getUserReaction(item.id) ? (
-                    <span className="text-2xl">
-                      {getUserReaction(item.id)}
-                    </span>
-                  ) : (
-                    <HeartIcon className="h-8 w-8 text-white" />
-                  )}
-                </button>
-
-                {/* Message Button */}
-                <button
-                  onClick={() => handleComment(item.id)}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
-                </button>
-
-                {/* Share Button */}
-                <button
-                  onClick={handleShare}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  <PaperAirplaneIcon className="h-8 w-8 text-white" />
-                </button>
-              </div>
+              {/* Engagement Rail - Bottom Right */}
+              <EngagementRail
+                postId={item.id}
+                stats={{
+                  likes: item.likes || 0,
+                  comments: item.comments || 0,
+                  shares: item.shares || 0,
+                  bookmarks: 0
+                }}
+                isLiked={likedPosts?.includes(item.id)}
+                onLike={() => handleLike(item.id)}
+                onComment={() => handleComment(item.id)}
+                onShare={handleShare}
+                onBookmark={() => {/* TODO: implement bookmark */}}
+              />
             </div>
           );
         })}
