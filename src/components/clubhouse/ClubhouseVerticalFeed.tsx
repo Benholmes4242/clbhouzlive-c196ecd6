@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import ClubTagPill from './ClubTagPill';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -46,7 +47,16 @@ const VideoWithAutoplay: React.FC<{
   const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 
   return (
-    <div className="bg-black flex items-center justify-center w-full h-full">
+    <div className="bg-black flex items-center justify-center w-full h-full relative">
+      {/* Readability gradient - 35% height from bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+        style={{
+          height: '35vh',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
+        }}
+      />
+      
       {hlsUrl ? (
         <HLSVideoCard
           hlsUrl={hlsUrl}
@@ -59,7 +69,7 @@ const VideoWithAutoplay: React.FC<{
           shouldAttach={shouldAttach}
           showMuteButton={false}
           externallyManaged={true}
-          fit="contain"
+          fit="cover"
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -566,10 +576,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+                    {/* Readability gradient for images too */}
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+                      style={{
+                        height: '35vh',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
+                      }}
+                    />
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
@@ -610,19 +628,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              
-              {/* Golf Course Tag - Top Right */}
+              {/* Club Tag Pill - Positioned above content */}
               {item.golfCourse && (
-                <div className={`absolute ${isMobile ? (index === 0 ? 'top-32' : 'top-4') : 'top-1/2 -translate-y-[26rem]'} right-4 z-30`}>
-                  <CoursePostBadge 
-                    course={{
-                      id: item.golfCourse.id,
-                      name: item.golfCourse.name,
-                      country: item.golfCourse.country
-                    }}
-                    isClubhouse={true}
-                  />
-                </div>
+                <ClubTagPill 
+                  course={{
+                    id: item.golfCourse.id,
+                    name: item.golfCourse.name,
+                    country: item.golfCourse.country
+                  }}
+                />
               )}
 
               {/* User Profile and Caption - Bottom Left */}
