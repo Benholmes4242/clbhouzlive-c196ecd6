@@ -8,7 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 export const useTrendingFeed = () => {
   const { user } = useSupabaseSession();
-  const { posts: userPosts, loading: userPostsLoading, refetch: refetchUserPosts } = useUserPosts(user?.id || '', !!user?.id);
+  const { posts: userPosts, loading: userPostsLoading, refetch: refetchUserPosts } = useUserPosts();
   const { optimisticPosts } = useOptimisticPosts();
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
