@@ -28,6 +28,7 @@ html, body {
   --safe-bottom: 0px; 
   --safe-left: 0px; 
   --safe-right: 0px;
+  --nav-height: 56px; /* Default navigation height */
 }
 
 /* Modern safe area inset support */
@@ -50,15 +51,18 @@ html, body {
   }
 }
 
-/* App shell applies safe-area padding and guarantees edge-to-edge */
+  /* App shell applies safe-area padding and guarantees edge-to-edge */
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
   width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
   padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
+  /* Remove bottom padding to allow fixed nav to handle safe areas */
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   box-sizing: border-box;
+  /* Add bottom padding for nav space using dynamic nav height */
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
 }
 
 /* Clubhouse specific: remove global safe-area top padding and hide standard header */

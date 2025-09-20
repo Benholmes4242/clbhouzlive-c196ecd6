@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
-import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import SnapModal from '@/components/snap/SnapModal';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
@@ -119,14 +118,7 @@ const Clubhouse = () => {
         />
       </div>
       
-      {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
-        <NavigationBar 
-          activeTab={activeTab} 
-          onTabClick={handleTabClickWithCamera} 
-          variant="clubhouse" 
-        />
-      </div>
+      {/* Navigation is now handled globally */}
       
       {/* Snap Modal and Post Submission Components */}
       <SnapModal

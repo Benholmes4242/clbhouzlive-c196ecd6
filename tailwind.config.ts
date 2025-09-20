@@ -106,6 +106,11 @@ export default {
 			boxShadow: {
 				'hud': 'var(--hud-shadow)'
 			},
+			zIndex: {
+				'bottom-nav': '100',
+				'modal': '1000',
+				'toast': '1100',
+			},
 			keyframes: {
 				'accordion-down': {
 					from: {
