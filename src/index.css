@@ -402,6 +402,9 @@ html, body, #root, .app-shell { touch-action: auto; }
     @apply px-4 py-3 rounded-full transition-all duration-300 cursor-pointer;
     @apply flex items-center gap-2 text-sm font-medium;
     @apply hover:scale-105 active:scale-95;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange/50;
+    min-height: 44px; /* Accessibility: minimum tap target */
+    min-width: 44px;
   }
 
   .pill-inactive {
@@ -414,6 +417,20 @@ html, body, #root, .app-shell { touch-action: auto; }
     background: var(--pill-active-bg);
     color: var(--pill-active-text);
     @apply shadow-md hover:shadow-lg;
+  }
+
+  /* Enhanced accessibility for liquid glass buttons */
+  .liquid-glass-button {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange/50;
+    min-height: 44px; /* Ensure minimum tap target */
+    min-width: 44px;
+  }
+
+  /* Focus states for interactive elements */
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--brand-orange));
+    outline-offset: 2px;
   }
 
   :root {

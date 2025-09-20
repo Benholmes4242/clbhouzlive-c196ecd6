@@ -259,7 +259,7 @@ const SnapModal = ({
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     >
-                      {/* Circular Glass Button */}
+                      {/* Circular Glass Button - Minimum 44px for accessibility */}
                       <div className="w-16 h-16 rounded-full liquid-glass-button flex items-center justify-center group-hover:ring-2 group-hover:ring-brand-orange/40 group-hover:shadow-lg group-hover:shadow-brand-orange/20 transition-all duration-300">
                         <Icon className="h-7 w-7 text-white group-hover:text-brand-orange transition-colors duration-300" />
                       </div>
