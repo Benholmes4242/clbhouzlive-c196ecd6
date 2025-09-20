@@ -137,17 +137,17 @@ const HeaderNavigation = () => {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleNotificationsClick}>
-          <Bell className={`h-14 w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+          <Bell className={`h-5 w-5 ${getIconColorClass()}`} />
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-          <User className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+          <User className={`h-5 w-5 ${getIconColorClass()}`} />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3">
-              <Settings className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+              <Settings className={`h-5 w-5 ${getIconColorClass()}`} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -167,7 +167,7 @@ const HeaderNavigation = () => {
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
       <Button variant="ghost" className="relative p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleNotificationsClick}>
-        <Bell className={`h-14 w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+        <Bell className={`h-5 w-5 ${getIconColorClass()}`} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -176,13 +176,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-        <User className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+        <User className={`h-5 w-5 ${getIconColorClass()}`} />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3">
-            <Settings className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
+            <Settings className={`h-5 w-5 ${getIconColorClass()}`} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -191,7 +191,7 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
           {hasAdminAccess && (
             <DropdownMenuItem onClick={handleAdminClick}>
-              <Shield className="h-11 w-11 mr-2" />
+              <Shield className="h-4 w-4 mr-2" />
               Admin Dashboard
             </DropdownMenuItem>
           )}

@@ -122,9 +122,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
             </button>
             
             {/* Navigation Icons */}
-            <div className="scale-50 md:scale-75 origin-right -mt-3">
-              <HeaderNavigation />
-            </div>
+            <HeaderNavigation />
           </nav>
         </div>
       </header>

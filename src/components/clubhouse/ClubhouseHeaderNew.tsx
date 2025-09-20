@@ -105,9 +105,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
             </button>
             
             {/* Navigation Icons */}
-            <div className="scale-50 md:scale-75 origin-right -mt-3">
-              <HeaderNavigation />
-            </div>
+            <HeaderNavigation />
           </nav>
         </div>
       </header>
