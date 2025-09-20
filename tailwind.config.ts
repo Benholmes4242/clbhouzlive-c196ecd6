@@ -75,28 +75,10 @@ export default {
 				'media-loading': 'hsl(var(--media-loading))',
 				'brand-orange': 'hsl(var(--brand-orange))',
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
-				'brand-black': 'hsl(var(--brand-black))',
-				'hud-bg': 'var(--hud-bg)',
-				'hud-border': 'var(--hud-border)'
+				'brand-black': 'hsl(var(--brand-black))'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-			},
-			boxShadow: {
-				'hud': 'var(--hud-shadow)',
-			},
-			spacing: {
-				'header-mobile': 'var(--header-h-mobile)',
-				'header-desktop': 'var(--header-h-desktop)',
-				'tag-offset': 'var(--tag-offset)',
-			},
-			height: {
-				'dvh': '100dvh',
-				'svh': '100svh',
-			},
-			minHeight: {
-				'dvh': '100dvh',
-				'svh': '100svh',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
