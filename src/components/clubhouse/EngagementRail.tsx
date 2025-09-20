@@ -106,7 +106,7 @@ const EngagementRail = ({
 
   return (
     <div className={cn(
-      "fixed right-4 bottom-32 z-20 flex flex-col items-center",
+      "fixed right-4 bottom-32 z-overlay flex flex-col items-center",
       gap,
       className
     )}>

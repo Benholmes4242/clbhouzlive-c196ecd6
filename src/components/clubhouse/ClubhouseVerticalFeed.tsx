@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
+import MiniProfileSheet from './MiniProfileSheet';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -49,10 +50,10 @@ const VideoWithAutoplay: React.FC<{
   const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 
   return (
-    <div className="bg-black flex items-center justify-center w-full h-full relative">
+    <div className="bg-black flex items-center justify-center w-full h-full relative z-video">
       {/* Readability gradient - 35% height from bottom */}
       <div 
-        className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+        className="absolute bottom-0 left-0 right-0 pointer-events-none z-gradient"
         style={{
           height: '35vh',
           background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
@@ -99,6 +100,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [miniProfileUser, setMiniProfileUser] = useState<any>(null);
+  const [showMiniProfile, setShowMiniProfile] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   // Removed isTextExpanded state as mouse handlers were removed to prevent re-renders
@@ -577,10 +580,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     autoplay={!!autoplayMap[item.id]}
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden z-video">
                     {/* Readability gradient for images too */}
                     <div 
-                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-gradient"
                       style={{
                         height: '35vh',
                         background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
@@ -588,7 +591,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     />
                     <img
                       src={currentMedia.media_url}
-                      alt={item.title}
+                      alt={item.title || 'Content image'}
                       className="w-full h-full object-cover"
                       loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
@@ -648,6 +651,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 user={{
                   name: item.user?.name || 'Unknown User',
                   avatar: item.user?.avatar
+                }}
+                onUserClick={() => {
+                  setMiniProfileUser({
+                    id: item.user?.id || '',
+                    name: item.user?.name || 'Unknown User',
+                    avatar: item.user?.avatar,
+                    username: item.user?.username,
+                    homeClub: 'Example Golf Club',
+                    handicap: 12,
+                    isFollowing: false
+                  });
+                  setShowMiniProfile(true);
                 }}
               />
 
@@ -738,6 +753,33 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           }
         }
       `}</style>
+
+      {/* Comments Modal */}
+      {commentsModalOpen && selectedPostId && (
+        <CommentsModal
+          isOpen={commentsModalOpen}
+          postId={selectedPostId}
+          onClose={() => {
+            setCommentsModalOpen(false);
+            setSelectedPostId('');
+          }}
+        />
+      )}
+
+      {/* Mini Profile Sheet */}
+      <MiniProfileSheet
+        user={miniProfileUser}
+        isOpen={showMiniProfile}
+        onClose={() => setShowMiniProfile(false)}
+        onFollow={() => {
+          if (miniProfileUser) {
+            setMiniProfileUser({
+              ...miniProfileUser,
+              isFollowing: !miniProfileUser.isFollowing
+            });
+          }
+        }}
+      />
     </div>
   );
 };

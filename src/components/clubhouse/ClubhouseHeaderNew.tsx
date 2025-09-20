@@ -64,7 +64,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
       {/* Main Header */}
       <header
         className={cn(
-          "sticky top-0 z-[60] backdrop-blur-md transition-all duration-300",
+          "sticky top-0 z-header backdrop-blur-md transition-all duration-300",
           "h-16 md:h-18", // 64px mobile, 72px desktop
           className
         )}
