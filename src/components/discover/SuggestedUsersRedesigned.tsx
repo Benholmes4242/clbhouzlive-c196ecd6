@@ -430,162 +430,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Enhanced Gradient overlay for AA contrast compliance */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
 
-      {/* Edge-contained Controls Rail */}
-      <div 
-        className={cn(
-          "absolute left-3 right-3 z-30 transition-all duration-220 ease-out",
-          isDetailExpanded 
-            ? "top-3" 
-            : "bottom-3"
-        )}
-      >
-        <div className="flex items-center justify-center gap-2">
-          {/* Dismiss Button */}
-          <button
-            onClick={handleDismissClick}
-            disabled={isDismissLoading || isFollowLoading || isTransitioning}
-            className={cn(
-              "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-              "bg-background/20 backdrop-blur-sm border border-white/20",
-              "shadow-sm transition-all duration-150",
-              "hover:bg-background/30 hover:scale-105",
-              "active:scale-95 active:bg-background/40",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
-              "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
-              (isDismissLoading || isFollowLoading || isTransitioning) && "opacity-50 cursor-not-allowed"
-            )}
-            aria-label="Not interested"
-          >
-            <FaThumbsDown className="w-4 h-4 text-foreground/80" />
-          </button>
-
-          {/* Details Button */}
-          <button
-            onClick={handleDetailClick}
-            disabled={isTransitioning}
-            className={cn(
-              "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-              "bg-background/20 backdrop-blur-sm border border-white/20",
-              "shadow-sm transition-all duration-150",
-              "hover:bg-background/30 hover:scale-105",
-              "active:scale-95 active:bg-background/40",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
-              "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
-              isTransitioning && "opacity-50 cursor-not-allowed"
-            )}
-            aria-label={isDetailExpanded ? "Hide details" : "Show details"}
-          >
-            <BiSolidDetail className={cn(
-              "w-4 h-4 text-foreground/80 transition-transform duration-150",
-              isDetailExpanded && "rotate-180"
-            )} />
-          </button>
-
-          {/* Follow Button */}
-          <button
-            onClick={handleFollowClick}
-            disabled={isFollowLoading || isDismissLoading || isTransitioning}
-            data-follow-button
-            className={cn(
-              "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-              "bg-primary/20 backdrop-blur-sm border border-primary/30",
-              "shadow-sm transition-all duration-150",
-              "hover:bg-primary/30 hover:scale-105 hover:shadow-lg hover:shadow-primary/25",
-              "active:scale-95 active:bg-primary/40",
-              "focus:outline-none focus:ring-2 focus:ring-primary/50",
-              "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
-              (isFollowLoading || isDismissLoading || isTransitioning) && "opacity-50 cursor-not-allowed"
-            )}
-            aria-label="Follow user"
-          >
-            <FaThumbsUp className="w-4 h-4 text-primary" />
-          </button>
-        </div>
-      </div>
-
-      {/* Maximized Content Panel - Top-anchored with staggered content */}
-      <AnimatePresence>
-        {isDetailExpanded && (
-          <motion.div 
-            className="absolute inset-0 top-16 bg-background/90 backdrop-blur-md border-t border-border/20 rounded-b-xl z-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: panelDragY,
-              transition: { 
-                duration: prefersReducedMotion ? 0.1 : 0.22,
-                ease: [0.25, 0.46, 0.45, 0.94]
-              }
-            }}
-            exit={{ 
-              opacity: 0, 
-              y: 20,
-              transition: { 
-                duration: prefersReducedMotion ? 0.1 : 0.2 
-              }
-            }}
-            onPointerDown={handlePanelDragStart}
-          >
-            <div className="p-4 space-y-1.5 text-center">
-              {/* Avatar */}
-              <motion.div 
-                className="flex justify-center"
-                initial={showStaggeredContent ? {} : { opacity: 0, y: 10 }}
-                animate={showStaggeredContent ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.02, duration: prefersReducedMotion ? 0.1 : 0.15 }}
-              >
-                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center overflow-hidden">
-                  {user.profilePhotoUrl ? (
-                    <img 
-                      src={user.profilePhotoUrl} 
-                      alt={user.displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-lg font-semibold text-muted-foreground">
-                      {user.displayName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-
-              {/* Display Name */}
-              <motion.div
-                initial={showStaggeredContent ? {} : { opacity: 0, y: 10 }}
-                animate={showStaggeredContent ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.04, duration: prefersReducedMotion ? 0.1 : 0.15 }}
-              >
-                <h4 className="text-sm font-bold text-foreground leading-tight">
-                  {user.displayName}
-                </h4>
-              </motion.div>
-
-              {/* Handle */}
-              <motion.div
-                initial={showStaggeredContent ? {} : { opacity: 0, y: 10 }}
-                animate={showStaggeredContent ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.06, duration: prefersReducedMotion ? 0.1 : 0.15 }}
-              >
-                <p className="text-xs text-muted-foreground">
-                  @{user.handle}
-                </p>
-              </motion.div>
-
-              {/* Home Club */}
-              <motion.div
-                initial={showStaggeredContent ? {} : { opacity: 0, y: 10 }}
-                animate={showStaggeredContent ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.08, duration: prefersReducedMotion ? 0.1 : 0.15 }}
-              >
-                <p className="text-xs text-muted-foreground truncate">
-                  {user.homeClub || 'Golf enthusiast'}
-                </p>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
 
       {/* Liquid Glass Feedback Overlay */}
       <AnimatePresence>
@@ -771,21 +615,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
       {/* Swipe Feedback Bubble - Remove duplicate since it's handled above */}
 
 
-      {/* Single Liquid Glass Overlay - Performance Optimized */}
+      {/* Single Liquid Glass Overlay - Edge Contained with Top Anchoring */}
       <motion.div
-        className="absolute inset-x-0 bottom-0 z-30"
+        className={cn(
+          "absolute z-30 transition-all duration-220 ease-out",
+          isDetailExpanded 
+            ? "inset-x-3 top-3 bottom-3" 
+            : "inset-x-3 bottom-3 h-16"
+        )}
         initial={false}
-        animate={{
-          height: isDetailExpanded ? "100%" : "64px",
-        }}
         style={{
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
           // Performance: Optimize GPU layers and prevent repaints
-          willChange: isPanelDragging || isDetailExpanded ? 'height, transform' : 'auto'
-        }}
-        transition={{
-          duration: isPanelDragging ? 0 : (prefersReducedMotion ? 0.12 : 0.22),
-          ease: isDetailExpanded ? "easeOut" : "easeIn"
+          willChange: isPanelDragging || isDetailExpanded ? 'transform' : 'auto'
         }}
         onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
       >
@@ -936,13 +778,19 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Always at Bottom */}
+          {/* Glass Control Bar - Now with edge containment and top anchoring */}
           <motion.div 
-            className="absolute bottom-0 inset-x-0 px-4 py-4"
+            className={cn(
+              "absolute inset-x-0 px-3 py-3 transition-all duration-220 ease-out",
+              isDetailExpanded 
+                ? "top-0" 
+                : "bottom-0"
+            )}
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
-              borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
+              borderTop: isDetailExpanded ? 'none' : '1px solid hsl(var(--glass-border))',
+              borderBottom: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
             {/* Swipe indicator for expanded state */}
@@ -956,7 +804,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-2">{/* Reduced gap for edge containment */}
               {/* Left: Dismiss Button - Accessible & Performance Optimized */}
               <motion.button
                 aria-label={`Dismiss suggestion for ${user.displayName}`}
