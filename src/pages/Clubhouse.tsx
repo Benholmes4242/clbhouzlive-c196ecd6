@@ -3,6 +3,12 @@ import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import SnapModal from '@/components/snap/SnapModal';
+import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
+import SnapToast from '@/components/snap/SnapToast';
+import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
+import { useSnapModal } from '@/hooks/useSnapModal';
+import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,8 +21,37 @@ const Clubhouse = () => {
     isLoadingMore
   } = useInfiniteFollowedPosts();
 
-  const [activeTab, setActiveTab] = useState('Following');
+  // Navigation handlers
+  const { activeTab, handleTabClick } = useNavigationHandlers();
+  
+  // Snap modal for camera functionality
+  const {
+    isSnapModalOpen,
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    caption,
+    setCaption,
+    isSubmitting,
+    showToast,
+    toastMessage,
+    selectedCourse,
+    setSelectedCourse,
+    openSnapModal,
+    closeSnapModal,
+    openComposer,
+    openComposerWithFiles,
+    closeComposer,
+    showConfirmationToast,
+    hideToast
+  } = useSnapModal();
+
+  // Media handlers for camera, image, and video
+  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
+
+  const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
   const isMobile = useIsMobile();
 
   const handleLike = (contentId: string) => {
@@ -29,10 +64,30 @@ const Clubhouse = () => {
     setCurrentPostIndex(index);
   };
 
+  // Handle tab clicks including camera action
+  const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
+    
+    if (tab.isAction && tab.id === 'post') {
+      // Handle camera action
+      console.log('[DEBUG] Clubhouse: Opening snap modal for camera');
+      openSnapModal();
+    } else {
+      // Handle regular navigation
+      console.log('[DEBUG] Clubhouse: Handling regular navigation');
+      handleTabClick(tab);
+    }
+  };
+
+  const handleCloseComposer = () => {
+    closeComposer();
+    setLocalSelectedTags([]);
+  };
+
   // Debug logging for Clubhouse page
   useEffect(() => {
-    console.log("[DEBUG] Clubhouse page mounted, activeTab:", activeTab);
-  }, [activeTab]);
+    console.log("[DEBUG] Clubhouse page mounted, headerActiveTab:", headerActiveTab);
+  }, [headerActiveTab]);
 
   // Mark body for Clubhouse-specific CSS overrides
   useEffect(() => {
@@ -51,7 +106,7 @@ const Clubhouse = () => {
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
-      <ClubhouseHeaderNew activeTab={activeTab} onTabChange={setActiveTab} />
+      <ClubhouseHeaderNew activeTab={headerActiveTab} onTabChange={setHeaderActiveTab} />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
@@ -68,11 +123,39 @@ const Clubhouse = () => {
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
         <NavigationBar 
-          activeTab="clubhouse" 
-          onTabClick={() => {}} 
+          activeTab={activeTab} 
+          onTabClick={handleTabClickWithCamera} 
           variant="clubhouse" 
         />
       </div>
+      
+      {/* Snap Modal and Post Submission Components */}
+      <SnapModal
+        isOpen={isSnapModalOpen}
+        onClose={closeSnapModal}
+        onCameraClick={() => handleCameraClick({})}
+        onImageClick={() => handleImageClick({})}
+        onVideoClick={() => handleVideoClick({})}
+        openComposerWithFiles={openComposerWithFiles}
+      />
+
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+      />
+
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
+      />
     </div>
   );
 };
