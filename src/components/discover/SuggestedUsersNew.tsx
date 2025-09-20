@@ -522,7 +522,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           }}
           transition={{
             duration: isPanelDragging ? 0 : (prefersReducedMotion ? 0.12 : 0.22),
-            ease: "easeOut"
+            ease: isDetailExpanded ? "easeOut" : "easeOut"
           }}
           onTouchStart={isDetailExpanded ? handlePanelDragStart : undefined}
         >
