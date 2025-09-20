@@ -56,7 +56,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               >
                 <Icon 
                   className={cn(
-                    "h-7 w-7 transition-colors duration-200"
+                    "h-8 w-8 transition-colors duration-200"
                   )}
                 />
               </button>
