@@ -506,13 +506,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Main Control Overlay - Edge Contained with Top-Anchored when Expanded */}
+        {/* Main Control Overlay - Reduced Height for More Media Visibility */}
         <motion.div
-          className="absolute inset-x-0 z-30"
+          className="absolute inset-x-2 bottom-2 z-30 max-h-[32%]"
           initial={false}
           animate={{
-            top: isDetailExpanded ? "0" : "auto",
-            bottom: isDetailExpanded ? "auto" : "0",
             height: isDetailExpanded ? "100%" : "auto",
           }}
           style={{
@@ -527,7 +525,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         >
           {/* Glass Container with Proper Safe Areas */}
           <div 
-            className="relative w-full h-full overflow-hidden"
+            className="relative w-full h-full overflow-hidden rounded-2xl"
             style={{
               background: 'hsl(var(--glass-dark) / 0.85)', 
               backdropFilter: 'blur(16px) saturate(1.2)',
@@ -715,20 +713,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             <AnimatePresence>
               {!isDetailExpanded && (
                 <motion.div
-                  className="py-4"
+                  className="py-2.5"
                   style={{ paddingLeft: safeAreaPadding, paddingRight: safeAreaPadding }}
                   initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.15 }}
                 >
-                  {/* Swipe indicator for expanded state */}
-                  <div className="flex justify-center mb-3">
-                    <div 
-                      className="w-8 h-1 rounded-full bg-white/30"
-                      style={{ opacity: 0.3 }}
-                    />
-                  </div>
+                  {/* Handle/line removed - more space for content */}
                   
                   <div 
                     className="flex items-center justify-center"
@@ -763,8 +755,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     />
                   </div>
 
-                  {/* Compact User Info */}
-                  <div className="mt-3 flex justify-center">
+                  {/* Compact User Info - Closer to controls */}
+                  <div className="mt-1.5 flex justify-center">
                     <div 
                       className="text-white font-medium text-center text-sm whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
                       style={{ 
