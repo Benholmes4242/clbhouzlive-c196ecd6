@@ -36,10 +36,10 @@ const HeaderNavigation = () => {
   // Get variant-specific icon colors with liquid glass hover effects
   const getIconColorClass = () => {
     if (variant === 'glass-dark') {
-      return 'text-white/80 hover:text-discover-orange-light transition-all duration-300 hover:bg-discover-orange/20 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/30 rounded-full';
+      return 'text-white/80 hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/30 hover:backdrop-blur-sm hover:shadow-lg hover:shadow-discover-orange/30 rounded-full';
     }
     if (variant === 'solid-light') {
-      return 'text-black/70 hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/10 hover:backdrop-blur-sm hover:shadow-lg hover:border hover:border-discover-orange/20 rounded-full';
+      return 'text-black/70 hover:text-discover-orange transition-all duration-300 hover:bg-discover-orange/20 hover:backdrop-blur-sm hover:shadow-lg hover:shadow-discover-orange/20 rounded-full';
     }
     // Fallback to adaptive detection for specific pages
     if (isProfilePage) {

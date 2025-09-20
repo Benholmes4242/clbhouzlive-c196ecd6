@@ -260,36 +260,40 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                 <p className="text-white/70 text-sm truncate">@{user.username}</p>
               )}
               
-              {/* Metadata line */}
-              <div className="flex items-center gap-2 mt-1 text-xs text-white/60">
-                {user.homeClub && (
-                  <div className="flex items-center gap-1 truncate">
-                    <MapPin className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{user.homeClub}</span>
-                  </div>
-                )}
-                {user.handicap !== undefined && (
-                  <div className="flex items-center gap-1 flex-shrink-0">
+              {/* Metadata line - only show if data exists */}
+              {(user.homeClub || user.handicap !== undefined) && (
+                <div className="flex items-center gap-2 mt-1 text-xs text-white/60">
+                  {user.homeClub && (
+                    <div className="flex items-center gap-1 truncate">
+                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{user.homeClub}</span>
+                    </div>
+                  )}
+                  {user.homeClub && user.handicap !== undefined && (
                     <span>•</span>
-                    <Target className="w-3 h-3" />
-                    <span>{user.handicap} HCP</span>
-                  </div>
-                )}
-              </div>
+                  )}
+                  {user.handicap !== undefined && (
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Target className="w-3 h-3" />
+                      <span>{user.handicap} HCP</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </button>
           </div>
 
-          {/* Subtle Orange Follow Button */}
+          {/* Orange Follow Button */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleFollowClick}
               disabled={isFollowLoading}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px] border",
-                "focus:outline-none focus:ring-2 focus:ring-white/30",
+                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px]",
+                "focus:outline-none focus:ring-2 focus:ring-discover-orange/50",
                 followingState
-                  ? "bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/40"
-                  : "bg-discover-orange/20 text-discover-orange border-discover-orange/40 hover:bg-discover-orange/30 hover:border-discover-orange/60 hover:shadow-lg hover:shadow-discover-orange/20",
+                  ? "bg-white/10 text-white border border-white/30 hover:bg-white/20 hover:border-white/40"
+                  : "bg-discover-orange text-white hover:bg-discover-orange/90 hover:shadow-lg hover:shadow-discover-orange/30",
                 isFollowLoading && "opacity-50 cursor-not-allowed"
               )}
             >

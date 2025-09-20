@@ -57,7 +57,7 @@ const SearchPill = ({
           // Variant-specific styling
           isGlassDark && [
             "bg-white/10 backdrop-blur-md border border-white/20",
-            isFocused && "bg-white/15 border-discover-orange/60 ring-2 ring-discover-orange/30 shadow-lg shadow-discover-orange/10"
+            isFocused && "bg-white/15 border-discover-orange ring-2 ring-discover-orange/50 shadow-lg shadow-discover-orange/20"
           ],
           isSolidLight && [
             "bg-gray-100/80 border border-gray-200/60",
