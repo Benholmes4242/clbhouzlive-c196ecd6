@@ -353,30 +353,40 @@ const SnapModal = ({
                 e.currentTarget.style.setProperty('--parallax-y', '0px');
               } : undefined}
             >
-              {/* Header */}
-              <motion.div 
-                className="px-8 pt-8 pb-6 text-center"
-                style={{
-                  transform: !prefersReducedMotion ? 'translateY(var(--parallax-y, 0px))' : 'none'
-                }}
-              >
-                <h2 className="text-2xl font-semibold mb-2">Create a Moment</h2>
-                <p className="text-sm text-white/70">Capture and share your golf journey</p>
-                
-                {/* Quick Post shortcut */}
-                <motion.button
-                  onClick={handlePickMedia}
-                  className="mt-3 px-4 py-2 text-xs font-medium text-brand-orange/80 hover:text-brand-orange border border-brand-orange/30 hover:border-brand-orange/50 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-105"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
-                  whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                {/* Header */}
+                <motion.div 
+                  className="px-8 pt-8 pb-6 text-center"
+                  style={{
+                    transform: !prefersReducedMotion ? 'translateY(var(--parallax-y, 0px))' : 'none'
+                  }}
                 >
-                  <Zap className="inline h-3 w-3 mr-1" />
-                  Quick Post
-                </motion.button>
-              </motion.div>
+                  <h2 className="text-2xl font-semibold mb-2">Create a Moment</h2>
+                  <p className="text-sm text-white/70 mb-1">Capture and share your golf journey</p>
+                  
+                  {/* Helper line */}
+                  <motion.p 
+                    className="text-xs text-white/50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    Share your golf moment ⛳️
+                  </motion.p>
+                  
+                  {/* Quick Post shortcut */}
+                  <motion.button
+                    onClick={handlePickMedia}
+                    className="mt-3 px-4 py-2 text-xs font-medium text-brand-orange/80 hover:text-brand-orange border border-brand-orange/30 hover:border-brand-orange/50 rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-105"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
+                    whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                  >
+                    <Zap className="inline h-3 w-3 mr-1" />
+                    Quick Post
+                  </motion.button>
+                </motion.div>
 
               {/* Action Options with Dynamic Previews */}
               <div className="px-6 pb-8">
@@ -408,11 +418,21 @@ const SnapModal = ({
                               ? 'group-hover:ring-2 group-hover:ring-brand-orange/50 group-hover:bg-brand-orange/10' 
                               : 'group-hover:ring-2 group-hover:ring-brand-orange/30'
                           }`}>
-                            <Icon className={`h-6 w-6 transition-colors duration-300 ${
-                              isSpecial 
-                                ? 'text-brand-orange group-hover:text-brand-orange' 
-                                : 'text-white group-hover:text-brand-orange'
-                            }`} />
+                            <motion.div
+                              whileHover={!prefersReducedMotion ? 
+                                key === "capture" ? { scale: [1, 0.9, 1], transition: { duration: 0.2 } } :
+                                key === "media" ? { x: [0, 1, -1, 0], transition: { duration: 0.3 } } :
+                                key === "story" ? { scale: [1, 1.05, 1], transition: { duration: 0.2 } } : {}
+                                : {}
+                              }
+                              whileTap={!prefersReducedMotion ? { scale: 0.95 } : {}}
+                            >
+                              <Icon className={`h-6 w-6 transition-colors duration-300 ${
+                                isSpecial 
+                                  ? 'text-brand-orange group-hover:text-brand-orange' 
+                                  : 'text-white group-hover:text-brand-orange'
+                              } ${key === "story" ? 'group-hover:drop-shadow-[0_0_4px_rgba(251,146,60,0.6)]' : ''}`} />
+                            </motion.div>
                           </div>
                           
                           {/* Text */}
