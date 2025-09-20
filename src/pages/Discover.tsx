@@ -6,7 +6,6 @@ import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
 import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
-import SubpillBar from '@/components/discover/SubpillBar';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
@@ -158,11 +157,6 @@ const Discover = () => {
           {/* Suggested Users */}
           <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
-          </div>
-
-          {/* Dynamic Subpill Bar */}
-          <div className="mt-4">
-            <SubpillBar />
           </div>
 
           {/* Main Grid with Container */}
