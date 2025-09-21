@@ -281,6 +281,9 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
           // Glass surface styling
           "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none"
         )}
+        style={{
+          paddingBottom: 'var(--bottom-nav-height)'
+        }}
         onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on the sheet
       >
         {/* Close Button - moved further to top right and smaller */}
