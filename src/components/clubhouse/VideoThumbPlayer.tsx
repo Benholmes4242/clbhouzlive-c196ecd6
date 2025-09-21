@@ -133,16 +133,22 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     };
 
     const handleTimeUpdate = () => {
-      if (video.duration) {
-        setProgress((video.currentTime / video.duration) * 100);
+      if (video.duration && video.currentTime !== undefined) {
+        const progressPercent = (video.currentTime / video.duration) * 100;
+        setProgress(progressPercent);
       }
     };
 
     const handleProgress = () => {
       if (video.buffered.length > 0 && video.duration) {
         const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-        setBuffered((bufferedEnd / video.duration) * 100);
+        const bufferedPercent = (bufferedEnd / video.duration) * 100;
+        setBuffered(bufferedPercent);
       }
+    };
+
+    const handleVolumeChange = () => {
+      setMuted(video.muted);
     };
 
     video.addEventListener('loadstart', handleLoadStart);
@@ -152,6 +158,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     video.addEventListener('error', handleError);
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('progress', handleProgress);
+    video.addEventListener('volumechange', handleVolumeChange);
 
     return () => {
       video.removeEventListener('loadstart', handleLoadStart);
@@ -161,6 +168,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('progress', handleProgress);
+      video.removeEventListener('volumechange', handleVolumeChange);
     };
   }, []);
 
@@ -186,8 +194,9 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = !video.muted;
-    setMuted(video.muted);
+    const newMutedState = !video.muted;
+    video.muted = newMutedState;
+    setMuted(newMutedState);
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -218,6 +227,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         preload="metadata"
         className="w-full h-full object-cover"
         style={{ backgroundColor: 'transparent' }}
+        onVolumeChange={() => setMuted(videoRef.current?.muted ?? true)}
       />
 
       {/* Center Play/Pause Button */}
@@ -240,32 +250,32 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         </div>
       </div>
 
-      {/* Mute Toggle */}
+      {/* Mute Toggle - Repositioned */}
       <button
         onClick={toggleMute}
-        className="absolute bottom-1 right-1 p-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
+        className="absolute bottom-2 left-2 p-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
         aria-pressed={!muted}
         aria-label={muted ? 'Unmute video' : 'Mute video'}
       >
         {muted ? (
-          <VolumeX className="w-3 h-3 text-white" />
+          <VolumeX className="w-3.5 h-3.5 text-white" />
         ) : (
-          <Volume2 className="w-3 h-3 text-white" />
+          <Volume2 className="w-3.5 h-3.5 text-white" />
         )}
       </button>
 
-      {/* Progress Bar */}
+      {/* Progress Bar - Smoother Updates */}
       {!error && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
           {/* Buffered */}
           <div
-            className="absolute top-0 left-0 h-full bg-white/20 transition-all duration-100"
-            style={{ width: `${buffered}%` }}
+            className="absolute top-0 left-0 h-full bg-white/20 transition-all duration-200 ease-linear"
+            style={{ width: `${Math.min(100, Math.max(0, buffered))}%` }}
           />
           {/* Progress */}
           <div
-            className="absolute top-0 left-0 h-full bg-white/60 transition-all duration-100"
-            style={{ width: `${progress}%` }}
+            className="absolute top-0 left-0 h-full bg-white/60 transition-all duration-150 ease-linear"
+            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
           />
         </div>
       )}
