@@ -15,7 +15,6 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
-import { discoverAnalytics } from '@/utils/discoverAnalytics';
 
 const Discover = () => {
   // Use vertical feed for consistency with Activity tab
@@ -42,14 +41,11 @@ const Discover = () => {
     };
     const newFilter = mainToFilter[main] || FILTER_TYPES.VIDEOS;
     if (newFilter !== activeFilter) {
-      const previousFilter = activeFilter;
       setActiveFilter(newFilter);
       // Reset tags when switching main pill
       setSelectedTags([]);
-      // Analytics for filter change
-      discoverAnalytics.filterChanged(newFilter, previousFilter);
     }
-  }, [main, activeFilter]);
+  }, [main]);
   
   // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
   const { 
@@ -105,8 +101,6 @@ const Discover = () => {
 
   const handleUserFollow = (userId: string) => {
     console.log('User followed:', userId);
-    // Analytics for suggested user interaction
-    discoverAnalytics.suggestedInteraction('follow', userId);
     // In real app: API call to follow user
   };
 
@@ -147,62 +141,40 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
-        {/* Suggested Users - Top Section */}
-        {(!searchQuery || searchQuery.trim() === '') && (
-          <div className="mt-2">
+          {/* Media Search - Discover Only */}
+          <div className="px-4 md:container md:mx-auto md:px-6 pt-4">
+            <MediaSearch 
+              placeholder="Search videos and photos..." 
+              onSearchChange={setSearchQuery}
+            />
+          </div>
+
+          {/* Filter Pills Row */}
+          <div className="mt-3 mb-1">
+            <DiscoverPillRow 
+              activeFilter={activeFilter} 
+              onFilterChange={setActiveFilter}
+            />
+          </div>
+
+          {/* Trending Tags Bar */}
+          <TrendingTagsBar onTagsChange={setSelectedTags} />
+
+          {/* Suggested Users */}
+          <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
-        )}
 
-        {/* Divider Block - Search + Pills */}
-        <div className={`
-          px-3 md:px-0 
-          ${(!searchQuery || searchQuery.trim() === '') ? 'mt-4' : 'mt-0'}
-        `}>
-          <div className={`
-            backdrop-blur-md bg-white/60 dark:bg-white/7
-            border border-white/20 dark:border-black/5
-            rounded-2xl md:rounded-3xl
-            pt-3 pb-2 md:pt-4 md:pb-3
-            px-4 md:px-6
-            md:container md:mx-auto md:max-w-[1200px]
-          `}
-          style={{ 
-            boxShadow: 'var(--hud-shadow, 0 4px 16px hsl(var(--shadow) / 0.15))' 
-          }}>
-            {/* Search */}
-            <div className="mb-3">
-              <MediaSearch 
-                placeholder="Search videos and photos..." 
-                onSearchChange={setSearchQuery}
-              />
-            </div>
-
-            {/* Main Pills (ExploreFilters) */}
-            <div className="mb-[10px]">
-              <DiscoverPillRow 
-                activeFilter={activeFilter} 
-                onFilterChange={setActiveFilter}
-              />
-            </div>
-
-            {/* Hashtag Pills (SubpillBar) */}
-            <div className="mb-2">
-              <TrendingTagsBar onTagsChange={setSelectedTags} />
-            </div>
+          {/* Main Grid with Container */}
+          <div className="md:container md:mx-auto md:px-0 mt-4">
+            <DiscoverContent
+              onLike={handleLike}
+              onFollow={handleFollow}
+              onMediaClick={handleMediaClick}
+              searchQuery={searchQuery}
+              selectedTags={selectedTags}
+            />
           </div>
-        </div>
-
-        {/* Main Grid with Container */}
-        <div className="md:container md:mx-auto md:px-0 mt-4">
-          <DiscoverContent
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            searchQuery={searchQuery}
-            selectedTags={selectedTags}
-          />
-        </div>
       </main>
         
         

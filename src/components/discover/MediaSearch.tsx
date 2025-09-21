@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, Clock, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMediaSearch } from '@/hooks/useMediaSearch';
-import { discoverAnalytics } from '@/utils/discoverAnalytics';
 
 interface MediaSearchProps {
   className?: string;
@@ -66,27 +65,18 @@ const MediaSearch = ({
     executeRecentSearch(searchQuery);
     setShowSuggestions(false);
     inputRef.current?.blur();
-    // Analytics for search usage
-    discoverAnalytics.dividerSearchUsed(searchQuery.length, true);
   };
 
   const handleTrendingClick = (searchQuery: string) => {
     executeTrendingSearch(searchQuery);
     setShowSuggestions(false);
     inputRef.current?.blur();
-    // Analytics for search usage
-    discoverAnalytics.dividerSearchUsed(searchQuery.length, true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setShowSuggestions(false);
       inputRef.current?.blur();
-    } else if (e.key === 'Enter' && query.trim()) {
-      // User pressed Enter to search directly (no suggestion selected)
-      setShowSuggestions(false);
-      inputRef.current?.blur();
-      discoverAnalytics.dividerSearchUsed(query.length, false);
     }
     // Prevent event bubbling to avoid unwanted behaviors
     e.stopPropagation();
@@ -107,14 +97,14 @@ const MediaSearch = ({
   const hasContent = query.length > 0 || recentSearches.length > 0 || trendingQueries.length > 0;
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)}>
+    <div ref={containerRef} className={cn("relative w-full max-w-2xl", className)}>
       {/* Search Input */}
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
-          "bg-white/80 border border-white/30 backdrop-blur-sm",
-          "h-10 px-4 gap-3",
-          isFocused && "bg-white border-white/50 ring-2 ring-white/40"
+          "bg-gray-100/80 border border-gray-200/60",
+          "h-12 px-4 gap-3",
+          isFocused && "bg-white border-gray-300 ring-2 ring-brand-orange/50"
         )}
       >
         <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />

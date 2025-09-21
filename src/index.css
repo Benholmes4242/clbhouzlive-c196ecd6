@@ -28,10 +28,6 @@ html, body {
   --safe-bottom: 0px; 
   --safe-left: 0px; 
   --safe-right: 0px;
-  
-  /* Header height constants for search dropdown positioning */
-  --header-h-mobile: 64px;
-  --header-h-desktop: 72px;
 }
 
 /* Modern safe area inset support */
