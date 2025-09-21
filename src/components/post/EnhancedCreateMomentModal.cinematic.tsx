@@ -488,50 +488,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   </motion.div>
 
-                  {/* Visibility Card */}
-                  <motion.div
-                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 400, 
-                      damping: 30,
-                      delay: 0.24
-                    }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
-                        {visibility === "public" ? (
-                          <Globe className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
-                        ) : (
-                          <Lock className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-base text-white">Visibility</h3>
-                        </div>
-                        <p className="text-sm text-white/70 mb-3">Choose who can see your moment</p>
-                        <Segmented
-                          options={[
-                            {
-                              value: "public",
-                              label: "Public",
-                              icon: Globe,
-                            },
-                            {
-                              value: "private",
-                              label: "Private Archive",
-                              icon: Lock,
-                            },
-                          ]}
-                          value={visibility}
-                          onChange={(value) => setVisibility(value as "public" | "private")}
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
 
                   {/* Post button - Quick Post style from Snap Modal */}
                   <motion.div
