@@ -1832,6 +1832,24 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 }
 
+/* Line clamp utilities */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Marquee animation for overflowing text */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee-if-needed {
+  animation: marquee 10s linear infinite;
+}
+
 /* Enhanced aurora animation for 300+ courses */
 .aurora-theme {
   animation: aurora-glow 4s ease-in-out infinite alternate;

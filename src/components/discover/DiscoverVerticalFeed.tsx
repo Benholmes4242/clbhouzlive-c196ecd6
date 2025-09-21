@@ -13,6 +13,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 import EngagementRail from '@/components/clubhouse/EngagementRail';
+import FeedMeta from './FeedMeta';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
@@ -746,56 +747,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* User Profile and Caption - Bottom Left */}
-              <div className="absolute bottom-6 left-3 right-20 z-20">
-                {/* User Profile Section */}
-                {index === currentIndex && (
-                  <div className="mb-3 flex items-end space-x-3">
-                    {/* Profile Photo */}
-                    <div className="relative">
-                      <img
-                        src={item.user?.avatar || '/placeholder.svg'}
-                        alt={item.user?.name || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </div>
-                    
-                    {/* Username */}
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                        {item.user?.name || 'Unknown User'}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Caption Text */}
-                {item.title && removeGolfCourseFromContent(item.title) && (
-                  <div 
-                    className="text-white text-base font-medium cursor-default"
-                    style={{ 
-                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-                      lineHeight: '1.3',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      marginLeft: '0px',
-                      marginTop: '0px',
-                      wordBreak: 'break-word',
-                      width: '70vw', // 70% of screen width
-                      maxWidth: '70vw'
-                    }}
-                  >
-                    <span className="text-base font-medium">
-                      {removeGolfCourseFromContent(item.title)}
-                    </span>
-                  </div>
-                )}
-              </div>
+              {/* Feed Metadata - Bottom Left Glass Card */}
+              <FeedMeta
+                user={item.user}
+                caption={item.title}
+                audioTrack={item.audioTrack}
+              />
 
               {/* Engagement Rail - Bottom Right */}
               <EngagementRail
