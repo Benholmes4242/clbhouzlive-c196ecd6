@@ -751,6 +751,26 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     >
                       {user.handle}
                     </motion.p>
+                    
+                    {/* Handicap - Fourth in stagger - Only show if user has one */}
+                    {user.handicap !== undefined && (
+                      <motion.p 
+                        className="text-white/80 text-sm mt-1"
+                        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ 
+                          opacity: showStaggeredContent ? 1 : 0,
+                          y: showStaggeredContent ? 0 : 10
+                        }}
+                        transition={{ 
+                          duration: prefersReducedMotion ? 0.06 : 0.2,
+                          delay: prefersReducedMotion ? 0 : 0.1,
+                          ease: "easeOut"
+                        }}
+                      >
+                        HCP {user.handicap}
+                      </motion.p>
+                    )}
                   </motion.div>
                 </div>
               </motion.div>
