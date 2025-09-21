@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useSoundPreference } from '@/hooks/useSoundPreference';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface EngagementRailProps {
   postId: string;
@@ -99,10 +99,10 @@ const EngagementRail = ({
 }: EngagementRailProps) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
-  const { isMuted, setMuted } = useSoundPreference();
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
 
   const handleAudioToggle = () => {
-    setMuted(!isMuted);
+    toggleGlobalMute();
   };
 
   return (
@@ -131,14 +131,10 @@ const EngagementRail = ({
       />
       
       <EngagementButton
-        icon={isMuted ? VolumeX : Volume2}
+        icon={isGloballyMuted ? VolumeX : Volume2}
         count={0}
-        isActive={!isMuted}
+        isActive={!isGloballyMuted}
         onClick={handleAudioToggle}
-        className={cn(
-          !isMuted && "border-accent/50",
-          !isMuted && "bg-accent/10"
-        )}
       />
     </div>
   );
