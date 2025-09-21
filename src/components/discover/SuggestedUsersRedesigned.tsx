@@ -800,7 +800,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-3">
               {/* Left: Dismiss Button - Accessible & Performance Optimized */}
               <motion.button
                 aria-label={`Dismiss suggestion for ${user.displayName}`}
