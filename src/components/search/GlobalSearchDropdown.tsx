@@ -46,6 +46,7 @@ interface GlobalSearchDropdownProps {
   onActiveIndexChange: (index: number) => void;
   anchorRef?: React.RefObject<HTMLElement>;
   highlightQuery?: string;
+  isMobilePortal?: boolean;
 }
 
 const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
@@ -62,7 +63,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   activeIndex,
   onActiveIndexChange,
   anchorRef,
-  highlightQuery = query
+  highlightQuery = query,
+  isMobilePortal = false
 }) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -336,6 +338,44 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
 
   if (!isOpen) return null;
 
+  // For mobile portal, use a simpler container
+  if (isMobilePortal) {
+    return (
+      <div
+        ref={dropdownRef}
+        className="rounded-2xl border border-white/15 backdrop-blur-xl bg-black/80 shadow-xl text-left max-h-[60vh] overflow-auto overscroll-contain w-full"
+      >
+        {isLoading && query.trim() && <LoadingShimmer />}
+        {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
+        {!isLoading && query.trim() && results.length > 0 && (
+          <>
+            <ResultSection 
+              title="People" 
+              items={groupedResults.people} 
+              icon={<User className="h-3 w-3" />}
+            />
+            <ResultSection 
+              title="Clubs & Courses" 
+              items={groupedResults.clubs_courses} 
+              icon={<MapPin className="h-3 w-3" />}
+            />
+            <ResultSection 
+              title="Pages & Channels" 
+              items={groupedResults.pages_channels} 
+              icon={<Building className="h-3 w-3" />}
+            />
+          </>
+        )}
+        {!isLoading && !query.trim() && (
+          <>
+            {recentSearches.length > 0 && <RecentSearchesSection />}
+            {popularItems.length > 0 && <TrendingSection />}
+          </>
+        )}
+      </div>
+    );
+  }
+
   const dropdownContent = (
     <div
       ref={dropdownRef}
@@ -343,8 +383,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[9999]",
         "rounded-2xl border border-white/15 backdrop-blur-xl bg-black/80 shadow-xl",
         "text-left max-h-[70vh] overflow-auto",
-        "md:max-h-[72vh] md:rounded-2xl",
-        isMobile && "hidden" // Hide when mobile - will use portal instead
+        "md:max-h-[72vh] md:rounded-2xl"
       )}
       style={{
         width: dropdownWidth,

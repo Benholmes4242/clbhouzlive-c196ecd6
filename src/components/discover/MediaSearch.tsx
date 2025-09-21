@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, Clock, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMediaSearch } from '@/hooks/useMediaSearch';
+import { discoverAnalytics } from '@/utils/discoverAnalytics';
 
 interface MediaSearchProps {
   className?: string;
@@ -65,18 +66,27 @@ const MediaSearch = ({
     executeRecentSearch(searchQuery);
     setShowSuggestions(false);
     inputRef.current?.blur();
+    // Analytics for search usage
+    discoverAnalytics.dividerSearchUsed(searchQuery.length, true);
   };
 
   const handleTrendingClick = (searchQuery: string) => {
     executeTrendingSearch(searchQuery);
     setShowSuggestions(false);
     inputRef.current?.blur();
+    // Analytics for search usage
+    discoverAnalytics.dividerSearchUsed(searchQuery.length, true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setShowSuggestions(false);
       inputRef.current?.blur();
+    } else if (e.key === 'Enter' && query.trim()) {
+      // User pressed Enter to search directly (no suggestion selected)
+      setShowSuggestions(false);
+      inputRef.current?.blur();
+      discoverAnalytics.dividerSearchUsed(query.length, false);
     }
     // Prevent event bubbling to avoid unwanted behaviors
     e.stopPropagation();
@@ -97,17 +107,17 @@ const MediaSearch = ({
   const hasContent = query.length > 0 || recentSearches.length > 0 || trendingQueries.length > 0;
 
   return (
-    <div ref={containerRef} className={cn("relative w-full max-w-2xl", className)}>
+    <div ref={containerRef} className={cn("relative w-full", className)}>
       {/* Search Input */}
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
-          "bg-gray-100/80 border border-gray-200/60",
-          "h-12 px-4 gap-3",
-          isFocused && "bg-white border-gray-300 ring-2 ring-brand-orange/50"
+          "bg-white/5 hover:bg-white/10 border border-white/15 text-white placeholder-white/70",
+          "h-10 px-4 gap-3",
+          isFocused && "bg-white/10 border-white/20 ring-2 ring-white/20"
         )}
       >
-        <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
+        <Search className="h-5 w-5 text-white/80 flex-shrink-0" />
         
         <input
           ref={inputRef}
@@ -120,26 +130,26 @@ const MediaSearch = ({
           onKeyDown={handleKeyDown}
           className={cn(
             "flex-1 bg-transparent border-none outline-none text-base",
-            "text-gray-900 placeholder:text-gray-500",
+            "text-white placeholder:text-white/70",
             "placeholder:transition-colors duration-200",
-            isFocused && "placeholder:text-gray-600"
+            isFocused && "placeholder:text-white/80"
           )}
         />
 
         {query && (
           <button
             onClick={handleClear}
-            className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200 focus:bg-gray-200 
+            className="flex-shrink-0 p-1 rounded-full hover:bg-white/10 focus:bg-white/10 
                      focus:outline-none transition-colors"
             aria-label="Clear search"
           >
-            <X className="h-4 w-4 text-gray-500" />
+            <X className="h-4 w-4 text-white/80" />
           </button>
         )}
 
         {loading && (
           <div className="flex-shrink-0 w-5 h-5">
-            <div className="w-4 h-4 border-2 border-brand-orange border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
           </div>
         )}
       </div>

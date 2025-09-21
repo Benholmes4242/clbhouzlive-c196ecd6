@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
+import { useFloating, offset, size, autoUpdate, Placement } from '@floating-ui/react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult } from '@/hooks/useGlobalEntitySearch';
@@ -8,6 +10,7 @@ import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { createSearchRouter } from '@/utils/searchRouting';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SearchResult {
   id: string;
@@ -48,6 +51,7 @@ const SearchPill = ({
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   // Create search router for consistent navigation
   const searchRouter = createSearchRouter(navigate);
@@ -55,6 +59,40 @@ const SearchPill = ({
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  // Mobile-specific placement strategy to prevent upward opening
+  const placement: Placement = 'bottom-start';
+  
+  // Floating UI setup for proper dropdown positioning
+  const { refs, floatingStyles, update } = useFloating({
+    placement,
+    middleware: isMobile
+      ? [
+          // Mobile: never flip upward, provide internal scrolling
+          offset(8),
+          size({
+            apply({ elements, rects, availableHeight }) {
+              Object.assign(elements.floating.style, {
+                width: `${rects.reference.width}px`,
+                maxHeight: `min(${availableHeight - 20}px, 60vh)`,
+              });
+            },
+          }),
+        ]
+      : [
+          // Desktop: allow more flexibility but prefer bottom
+          offset(8),
+          size({
+            apply({ elements, rects, availableHeight }) {
+              Object.assign(elements.floating.style, {
+                width: `${rects.reference.width}px`,
+                maxHeight: `min(${availableHeight}px, 70vh)`,
+              });
+            },
+          }),
+        ],
+    whileElementsMounted: autoUpdate,
+  });
   
   const debouncedQuery = useDebounce(query, 250); // Optimized 250ms debounce
   
@@ -72,8 +110,8 @@ const SearchPill = ({
     enabled: true
   });
 
-  const isGlassDark = variant === 'glass-dark';
-  const isSolidLight = variant === 'solid-light';
+  // Always use glass-dark styles
+  const isGlassDark = true;
 
   // Convert hook results to SearchResult format for compatibility
   const results: SearchResult[] = [
@@ -214,6 +252,36 @@ const SearchPill = ({
     }
   };
 
+  // Handle visual viewport changes on mobile (soft keyboard)
+  useEffect(() => {
+    if (!isMobile || !('visualViewport' in window)) return;
+    
+    const vv = (window as any).visualViewport as VisualViewport;
+    const onResize = () => {
+      if (isOpen) update();
+    };
+    
+    vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
+    
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
+    };
+  }, [isOpen, update, isMobile]);
+
+  // Body scroll lock on mobile when dropdown is open
+  useEffect(() => {
+    if (!isMobile || !isOpen) return;
+    
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, isMobile]);
+
   // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -230,26 +298,17 @@ const SearchPill = ({
   return (
     <div className={cn("relative w-full", className)} ref={dropdownRef}>
       <div 
+        ref={refs.setReference}
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
-           // Variant-specific styling
-           isGlassDark && [
-             "bg-white/10 backdrop-blur-md border border-white/20",
-             isOpen && "bg-white/15 border-white/30"
-           ],
-           isSolidLight && [
-             "bg-gray-100/80 border border-gray-200/60",
-             isOpen && "bg-white border-gray-300"
-           ]
+          // Always use glass-dark styling
+          "bg-white/10 backdrop-blur-md border border-white/20",
+          isOpen && "bg-white/15 border-white/30"
         )}
       >
         {/* Search Icon */}
-        <Search className={cn(
-          "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-          isGlassDark && "text-white/70",
-          isSolidLight && "text-gray-500"
-        )} />
+        <Search className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0 text-white/70" />
 
         {/* Input with enhanced accessibility */}
         <input
@@ -266,14 +325,9 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            isGlassDark && [
-              "text-white placeholder:text-white/50",
-              isOpen && "placeholder:text-white/70"
-            ],
-            isSolidLight && [
-              "text-gray-900 placeholder:text-gray-500",
-              isOpen && "placeholder:text-gray-600"
-            ]
+            // Always use glass-dark text styling
+            "text-white placeholder:text-white/50",
+            isOpen && "placeholder:text-white/70"
           )}
           aria-label={placeholder}
           aria-expanded={isOpen}
@@ -290,40 +344,78 @@ const SearchPill = ({
             onClick={handleClear}
             className={cn(
               "flex-shrink-0 p-1 rounded-full transition-colors focus:outline-none",
-              isGlassDark && "hover:bg-white/10 focus:bg-white/10",
-              isSolidLight && "hover:bg-gray-200 focus:bg-gray-200"
+              "hover:bg-white/10 focus:bg-white/10"
             )}
             aria-label="Clear search"
           >
-            <X className={cn(
-              "h-3 w-3 md:h-4 md:w-4",
-              isGlassDark && "text-white/70",
-              isSolidLight && "text-gray-500"
-            )} />
+            <X className="h-3 w-3 md:h-4 md:w-4 text-white/70" />
           </button>
         )}
       </div>
 
-      {/* Results Dropdown */}
-      <GlobalSearchDropdown
-        isOpen={showResults}
-        onClose={() => {
-          setIsOpen(false);
-          setActiveIndex(-1);
-        }}
-        query={query}
-        results={results}
-        isLoading={isLoading}
-        recentSearches={recent}
-        popularItems={popularItems}
-        onResultSelect={handleResultSelect}
-        onRecentSearchClick={handleRecentSearchClick}
-        onClearRecentSearches={clearRecentSearches}
-        activeIndex={activeIndex}
-        onActiveIndexChange={setActiveIndex}
-        anchorRef={{ current: dropdownRef.current }}
-        highlightQuery={query}
-      />
+      {/* Results Dropdown - Use portal for mobile to ensure downward opening */}
+      {showResults && isMobile && (
+        createPortal(
+          <div
+            ref={refs.setFloating}
+            style={{
+              position: 'fixed',
+              top: `${floatingStyles.top ?? 0}px`,
+              left: `${floatingStyles.left ?? 0}px`,
+              zIndex: 300,
+              transformOrigin: 'top left',
+              ...floatingStyles,
+            }}
+            className="w-full"
+          >
+            <GlobalSearchDropdown
+              isOpen={showResults}
+              onClose={() => {
+                setIsOpen(false);
+                setActiveIndex(-1);
+              }}
+              query={query}
+              results={results}
+              isLoading={isLoading}
+              recentSearches={recent}
+              popularItems={popularItems}
+              onResultSelect={handleResultSelect}
+              onRecentSearchClick={handleRecentSearchClick}
+              onClearRecentSearches={clearRecentSearches}
+              activeIndex={activeIndex}
+              onActiveIndexChange={setActiveIndex}
+              anchorRef={{ current: refs.reference.current as HTMLElement | null }}
+              highlightQuery={query}
+              isMobilePortal={true}
+            />
+          </div>,
+          document.body
+        )
+      )}
+
+      {/* Desktop dropdown */}
+      {showResults && !isMobile && (
+        <GlobalSearchDropdown
+          isOpen={showResults}
+          onClose={() => {
+            setIsOpen(false);
+            setActiveIndex(-1);
+          }}
+          query={query}
+          results={results}
+          isLoading={isLoading}
+          recentSearches={recent}
+          popularItems={popularItems}
+          onResultSelect={handleResultSelect}
+          onRecentSearchClick={handleRecentSearchClick}
+          onClearRecentSearches={clearRecentSearches}
+          activeIndex={activeIndex}
+          onActiveIndexChange={setActiveIndex}
+          anchorRef={{ current: dropdownRef.current }}
+          highlightQuery={query}
+          isMobilePortal={false}
+        />
+      )}
     </div>
   );
 };
