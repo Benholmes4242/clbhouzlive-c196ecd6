@@ -125,6 +125,9 @@ html, body, #root, .app-shell { touch-action: auto; }
   bottom: 0;
   left: 0;
   right: 0;
+  
+  /* Extend content to fill safe area properly */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Ensure pages have bottom padding for the nav when needed */
@@ -132,12 +135,7 @@ html, body, #root, .app-shell { touch-action: auto; }
   padding-bottom: var(--bottom-nav-height);
 }
 
-/* Support for keyboard visibility on mobile */
-@supports (height: 100dvh) {
-  .global-bottom-nav {
-    bottom: var(--safe-bottom);
-  }
-}
+/* Support for keyboard visibility on mobile - removed conflicting bottom positioning */
 
 /* Prevent nav from being affected by page transforms */
 .no-transform-context .global-bottom-nav {

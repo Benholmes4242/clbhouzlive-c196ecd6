@@ -157,8 +157,6 @@ const GlobalBottomNavigation: React.FC = () => {
               duration: 0.3 
             }}
             style={{
-              // Extend background to very bottom but pad content for safe area
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               // Hardware acceleration
               transform: 'translate3d(0, 0, 0)',
               willChange: 'transform',
