@@ -8,9 +8,6 @@ import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { createSearchRouter } from '@/utils/searchRouting';
-import { useFloating, offset, flip, size, Placement } from '@floating-ui/react';
-import { createPortal } from 'react-dom';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SearchResult {
   id: string;
@@ -51,7 +48,6 @@ const SearchPill = ({
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
   
   // Create search router for consistent navigation
   const searchRouter = createSearchRouter(navigate);
@@ -61,40 +57,6 @@ const SearchPill = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   
   const debouncedQuery = useDebounce(query, 250); // Optimized 250ms debounce
-
-  // Floating UI setup for better dropdown positioning
-  const placement: Placement = "bottom-start";
-  
-  const floating = useFloating({
-    placement,
-    middleware: isMobile
-      ? [
-          // mobile: never flip upward, force downward
-          offset(8),
-          size({
-            apply({ elements, rects, availableHeight }) {
-              Object.assign(elements.floating.style, {
-                width: `${rects.reference.width}px`,
-                maxHeight: `min(${availableHeight}px, 60vh)`,
-              });
-            },
-          }),
-        ]
-      : [
-          // desktop: allow flip if truly needed
-          offset(8),
-          flip({ fallbackPlacements: ["bottom-start"] }),
-          size({
-            apply({ elements, rects, availableHeight }) {
-              Object.assign(elements.floating.style, {
-                width: `${rects.reference.width}px`,
-                maxHeight: `min(${availableHeight}px, 70vh)`,
-              });
-            },
-          }),
-        ],
-    open: isOpen,
-  });
   
   // Use the new global entity search hook
   const {
@@ -183,36 +145,6 @@ const SearchPill = ({
     setIsOpen(false);
   }, []);
 
-  // Handle visual viewport changes for iOS keyboard
-  useEffect(() => {
-    if (!isMobile || typeof window === 'undefined' || !('visualViewport' in window)) return;
-    
-    const vv = (window as any).visualViewport as VisualViewport;
-    const onResize = () => {
-      if (isOpen) floating.update();
-    };
-    
-    vv.addEventListener("resize", onResize);
-    vv.addEventListener("scroll", onResize);
-    
-    return () => {
-      vv.removeEventListener("resize", onResize);
-      vv.removeEventListener("scroll", onResize);
-    };
-  }, [isOpen, floating]);
-
-  // Lock body scroll on mobile when dropdown is open
-  useEffect(() => {
-    if (!isMobile || !isOpen) return;
-    
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [isOpen, isMobile]);
-
   // Show dropdown results or recent/trending
   const showResults = isOpen && (query.length >= 1 || (!query && (recent.length > 0 || popularItems.length > 0)));
   const displayItems: DisplayItem[] = query.length >= 1 ? results : [...recent.map(r => ({ id: r.id, type: 'recent' as const, title: r.query, subtitle: 'Recent search' })), ...popularItems.slice(0, 5)];
@@ -296,7 +228,7 @@ const SearchPill = ({
   }, []);
 
   return (
-    <div className={cn("relative w-full", className)} ref={floating.refs.setReference}>
+    <div className={cn("relative w-full", className)} ref={dropdownRef}>
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
@@ -372,69 +304,26 @@ const SearchPill = ({
         )}
       </div>
 
-      {/* Results Dropdown with Portal for Mobile */}
-      {isMobile && showResults ? (
-        createPortal(
-          <div
-            ref={floating.refs.setFloating}
-            style={{
-              position: "fixed",
-              top: `${Math.max(
-                floating.y ?? 0,
-                ((window as any).visualViewport?.offsetTop ?? 0) + 
-                parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-h-mobile")) + 8
-              )}px`,
-              left: `${floating.x ?? 0}px`,
-              zIndex: 300,
-              transformOrigin: "top left",
-              width: `${floating.middlewareData.size?.width ?? 280}px`,
-              maxHeight: `${floating.middlewareData.size?.maxHeight ?? '60vh'}`,
-            }}
-            className="rounded-2xl backdrop-blur-md bg-black/70 text-white shadow-xl overflow-auto overscroll-contain max-h-[60vh]"
-          >
-            <GlobalSearchDropdown
-              isOpen={showResults}
-              onClose={() => {
-                setIsOpen(false);
-                setActiveIndex(-1);
-              }}
-              query={query}
-              results={results}
-              isLoading={isLoading}
-              recentSearches={recent}
-              popularItems={popularItems}
-              onResultSelect={handleResultSelect}
-              onRecentSearchClick={handleRecentSearchClick}
-              onClearRecentSearches={clearRecentSearches}
-              activeIndex={activeIndex}
-              onActiveIndexChange={setActiveIndex}
-              anchorRef={{ current: floating.refs.reference.current as HTMLElement }}
-              highlightQuery={query}
-            />
-          </div>,
-          document.body
-        )
-      ) : !isMobile ? (
-        <GlobalSearchDropdown
-          isOpen={showResults}
-          onClose={() => {
-            setIsOpen(false);
-            setActiveIndex(-1);
-          }}
-          query={query}
-          results={results}
-          isLoading={isLoading}
-          recentSearches={recent}
-          popularItems={popularItems}
-          onResultSelect={handleResultSelect}
-          onRecentSearchClick={handleRecentSearchClick}
-          onClearRecentSearches={clearRecentSearches}
-          activeIndex={activeIndex}
-          onActiveIndexChange={setActiveIndex}
-          anchorRef={{ current: floating.refs.reference.current as HTMLElement }}
-          highlightQuery={query}
-        />
-      ) : null}
+      {/* Results Dropdown */}
+      <GlobalSearchDropdown
+        isOpen={showResults}
+        onClose={() => {
+          setIsOpen(false);
+          setActiveIndex(-1);
+        }}
+        query={query}
+        results={results}
+        isLoading={isLoading}
+        recentSearches={recent}
+        popularItems={popularItems}
+        onResultSelect={handleResultSelect}
+        onRecentSearchClick={handleRecentSearchClick}
+        onClearRecentSearches={clearRecentSearches}
+        activeIndex={activeIndex}
+        onActiveIndexChange={setActiveIndex}
+        anchorRef={{ current: dropdownRef.current }}
+        highlightQuery={query}
+      />
     </div>
   );
 };
