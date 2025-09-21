@@ -55,15 +55,15 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   };
 
   const handleAvatarClick = () => {
-    if (user?.username) {
-      navigate(`/${user.username}`);
+    if (user?.id) {
+      navigate(`/profile/${user.id}`);
       onClose();
     }
   };
 
   const handleNameClick = () => {
-    if (user?.username) {
-      navigate(`/${user.username}`);
+    if (user?.id) {
+      navigate(`/profile/${user.id}`);
       onClose();
     }
   };
@@ -142,19 +142,19 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           <div className="w-12 h-1.5 bg-white/30 rounded-full" />
         </div>
 
-        {/* Close Button */}
-        <div className="absolute top-4 right-4 z-10">
+        {/* Close Button - moved further to top right and smaller */}
+        <div className="absolute top-2 right-2 z-10">
           <button
             onClick={onClose}
             className={cn(
-              "p-2 rounded-full transition-all duration-200",
+              "p-1.5 rounded-full transition-all duration-200",
               "bg-black/20 backdrop-blur-sm border border-white/10",
               "hover:bg-white/10 hover:scale-105",
               "focus:ring-2 focus:ring-white/30 focus:outline-none"
             )}
             aria-label="Close profile"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-4 h-4 text-white" />
           </button>
         </div>
 
@@ -168,9 +168,9 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                 className={cn(
                   "flex-shrink-0 transition-transform duration-200",
                   "hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-full",
-                  user?.username ? "cursor-pointer" : "cursor-default"
+                  user?.id ? "cursor-pointer" : "cursor-default"
                 )}
-                disabled={!user?.username}
+                disabled={!user?.id}
               >
                 <OptimizedAvatar
                   src={user.avatar}
@@ -189,9 +189,9 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                     className={cn(
                       "text-left transition-colors duration-200",
                       "hover:text-white/80 focus:text-white/80 focus:outline-none",
-                      user?.username ? "cursor-pointer" : "cursor-default"
+                      user?.id ? "cursor-pointer" : "cursor-default"
                     )}
-                    disabled={!user?.username}
+                    disabled={!user?.id}
                   >
                     <h3 className="font-semibold text-lg text-white truncate">
                       {user.name}
@@ -206,23 +206,21 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                   <p className="text-white/60 text-sm mb-2">@{user.username}</p>
                 )}
                 
-                {/* Conditional Metadata */}
-                {(user.homeClub || user.handicap !== undefined) && (
-                  <div className="flex items-center gap-4 text-sm text-white/60">
-                    {user.homeClub && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        <span className="truncate">{user.homeClub}</span>
-                      </div>
-                    )}
-                    {user.handicap !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <Target className="w-4 h-4" />
-                        <span>{user.handicap} HCP</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Conditional Metadata - only show if data exists */}
+                <div className="flex items-center gap-4 text-sm text-white/60">
+                  {user.homeClub && user.homeClub !== 'Example Golf Club' && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      <span className="truncate">{user.homeClub}</span>
+                    </div>
+                  )}
+                  {user.handicap !== undefined && user.handicap !== null && (
+                    <div className="flex items-center gap-1">
+                      <Target className="w-4 h-4" />
+                      <span>{user.handicap} HCP</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Subtle Orange Follow Button */}

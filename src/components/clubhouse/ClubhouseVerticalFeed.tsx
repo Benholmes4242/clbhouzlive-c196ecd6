@@ -12,7 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
-import MiniProfileSheet from './MiniProfileSheet';
+import MiniProfileSheetWithData from './MiniProfileSheetWithData';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -23,6 +23,7 @@ import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
 import PostMetadata from './PostMetadata';
 import EngagementRail from './EngagementRail';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -100,7 +101,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
-  const [miniProfileUser, setMiniProfileUser] = useState<any>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showMiniProfile, setShowMiniProfile] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
@@ -653,15 +654,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   avatar: item.user?.avatar
                 }}
                 onUserClick={() => {
-                  setMiniProfileUser({
-                    id: item.user?.id || '',
-                    name: item.user?.name || 'Unknown User',
-                    avatar: item.user?.avatar,
-                    username: item.user?.username,
-                    homeClub: 'Example Golf Club',
-                    handicap: 12,
-                    isFollowing: false
-                  });
+                  setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
                 }}
               />
@@ -767,17 +760,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       )}
 
       {/* Mini Profile Sheet */}
-      <MiniProfileSheet
-        user={miniProfileUser}
+      <MiniProfileSheetWithData
+        userId={selectedUserId}
         isOpen={showMiniProfile}
         onClose={() => setShowMiniProfile(false)}
         onFollow={() => {
-          if (miniProfileUser) {
-            setMiniProfileUser({
-              ...miniProfileUser,
-              isFollowing: !miniProfileUser.isFollowing
-            });
-          }
+          // Handle follow action - could update local state or refetch
         }}
       />
     </div>
