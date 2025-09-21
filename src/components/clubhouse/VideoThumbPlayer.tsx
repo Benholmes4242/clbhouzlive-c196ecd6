@@ -35,6 +35,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
   const [error, setError] = useState(false);
   const [progress, setProgress] = useState(0);
   const [buffered, setBuffered] = useState(0);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   // Register with exclusive playback controller
   useEffect(() => {
@@ -148,7 +149,9 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    const handleLoadStart = () => setLoading(true);
+    const handleLoadStart = () => {
+      if (hasUserInteracted) setLoading(true);
+    };
     const handleCanPlay = () => setLoading(false);
     const handlePlay = () => {
       setPlaying(true);
@@ -236,6 +239,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
     try {
       if (video.paused) {
+        setHasUserInteracted(true);
         requestPlay(id); // Pause other videos
         await video.play();
       } else {
