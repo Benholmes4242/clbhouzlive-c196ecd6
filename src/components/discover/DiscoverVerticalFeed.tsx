@@ -25,6 +25,8 @@ import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
 import FeedActions from './FeedActions';
 import FeedMeta from './FeedMeta';
+import { useSwipeGestures } from '@/hooks/useSwipeGestures';
+import { useDoubleTap, HeartBurst } from '@/hooks/useDoubleTap';
 
 
 interface DiscoverVerticalFeedProps {
@@ -188,6 +190,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [shouldAttach, setShouldAttach] = useState<Record<string, boolean>>({});
   const [autoplay, setAutoplay] = useState<Record<string, boolean>>({});
   const [swipeDisabled, setSwipeDisabled] = useState(false);
+  const [heartBursts, setHeartBursts] = useState<Array<{ id: string; x: number; y: number }>>([]);
+  const [likeCountChanged, setLikeCountChanged] = useState<Record<string, boolean>>({});
+  const [shareSuccess, setShareSuccess] = useState(false);
+  const [commentSuccess, setCommentSuccess] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const nearObserverRef = useRef<IntersectionObserver | null>(null);
@@ -402,6 +408,11 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   const handleLike = useCallback((postId: string) => {
     onLike(postId);
+    // Trigger like count animation
+    setLikeCountChanged(prev => ({ ...prev, [postId]: true }));
+    setTimeout(() => {
+      setLikeCountChanged(prev => ({ ...prev, [postId]: false }));
+    }, 200);
   }, [onLike]);
 
   const handleFollow = useCallback(() => {
@@ -417,6 +428,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const handleComment = useCallback((postId: string) => {
     setSelectedPostId(postId);
     setCommentsModalOpen(true);
+    // Trigger comment success animation
+    setCommentSuccess(true);
+    setTimeout(() => setCommentSuccess(false), 200);
   }, []);
 
   const handleShare = useCallback(() => {
@@ -424,10 +438,17 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       navigator.share({
         title: 'Check out this post!',
         url: window.location.href,
+      }).then(() => {
+        // Trigger share success animation
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 200);
       }).catch(console.error);
     } else {
       // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 200);
+      });
     }
   }, []);
 
@@ -508,6 +529,30 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       setCurrentIndex(index);
     }
   }, [posts.length]);
+
+  // Swipe gesture handling
+  const { gestureHandlers } = useSwipeGestures({
+    onSwipeUp: () => {
+      if (currentIndex < posts.length - 1) {
+        navigateToIndex(currentIndex + 1);
+      }
+    },
+    onSwipeDown: () => {
+      if (currentIndex > 0) {
+        navigateToIndex(currentIndex - 1);
+      }
+    },
+    onSwipeLeft: () => {
+      // TODO: Implement browsing more from same creator
+      console.log('Swipe left - browse more from creator');
+    },
+    onSwipeRight: () => {
+      // TODO: Implement browsing more from same creator  
+      console.log('Swipe right - browse more from creator');
+    },
+    disabled: swipeDisabled,
+    preventVerticalScroll: true
+  });
 
   // Keyboard navigation
   useEffect(() => {
@@ -648,6 +693,28 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
           const touchHandlers = hasMultipleMedia ? createTouchHandlers() : {};
 
+          // Double tap handling for likes
+          const { handleTap } = useDoubleTap({
+            onDoubleTap: (e) => {
+              const rect = (e.target as HTMLElement).getBoundingClientRect();
+              const x = 'clientX' in e ? e.clientX : (e as any).touches?.[0]?.clientX || rect.left + rect.width / 2;
+              const y = 'clientY' in e ? e.clientY : (e as any).touches?.[0]?.clientY || rect.top + rect.height / 2;
+              
+              // Add heart burst
+              const burstId = `${item.id}-${Date.now()}`;
+              setHeartBursts(prev => [...prev, { id: burstId, x, y }]);
+              
+              // Remove heart burst after animation
+              setTimeout(() => {
+                setHeartBursts(prev => prev.filter(burst => burst.id !== burstId));
+              }, 800);
+              
+              // Trigger like
+              handleLike(item.id);
+            },
+            disabled: currentMedia.media_type !== 'video'
+          });
+
           return (
             <div 
               key={item.id}
@@ -659,14 +726,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   playObserverRef.current?.observe(el);
                 }
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center bg-black"
+              className="relative w-full snap-start snap-always flex items-center justify-center bg-black animate-slide-enter-video"
               style={{ 
                 height: '100dvh',
                 minHeight: '100dvh',
                 maxHeight: '100dvh',
                 width: '100vw'
               }}
+              {...gestureHandlers}
               {...touchHandlers}
+              onClick={handleTap}
             >
               {/* Close Button - Top Left */}
               <button
@@ -679,7 +748,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Right Glass Pill */}
               {item.golfCourse && (
-                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-fade-in">
+                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-slide-enter-pill">
                   <div 
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl cursor-pointer hover:bg-black/30 transition-all duration-200"
                     style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
@@ -773,10 +842,25 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 onShare={handleShare}
                 onToggleMute={toggleGlobalMute}
                 isLiking={likeMutation.isPending}
+                likeCountChanged={likeCountChanged[item.id] || false}
+                shareSuccess={shareSuccess}
+                commentSuccess={commentSuccess}
               />
             </div>
           );
         })}
+
+        {/* Heart burst effects */}
+        {heartBursts.map(burst => (
+          <HeartBurst
+            key={burst.id}
+            x={burst.x}
+            y={burst.y}
+            onComplete={() => {
+              setHeartBursts(prev => prev.filter(b => b.id !== burst.id));
+            }}
+          />
+        ))}
       </div>
 
       {/* Comments Modal */}

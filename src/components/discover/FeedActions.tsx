@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
+import { CountPop, SuccessPulse } from '@/hooks/useDoubleTap';
 
 interface FeedActionsProps {
   isLiked: boolean;
@@ -13,6 +14,9 @@ interface FeedActionsProps {
   onShare: () => void;
   onToggleMute: () => void;
   isLiking?: boolean;
+  likeCountChanged?: boolean;
+  shareSuccess?: boolean;
+  commentSuccess?: boolean;
 }
 
 const FeedActions: React.FC<FeedActionsProps> = ({
@@ -25,7 +29,10 @@ const FeedActions: React.FC<FeedActionsProps> = ({
   onComment,
   onShare,
   onToggleMute,
-  isLiking = false
+  isLiking = false,
+  likeCountChanged = false,
+  shareSuccess = false,
+  commentSuccess = false
 }) => {
   const ActionButton: React.FC<{
     icon: React.ReactNode;
@@ -60,20 +67,19 @@ const FeedActions: React.FC<FeedActionsProps> = ({
         <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-150 active:opacity-100" />
       </button>
       
-      {/* Count display */}
+      {/* Count display with pop animation */}
       {count !== undefined && (
-        <span 
-          className="text-white/90 text-xs font-medium min-w-[20px] text-center"
-          style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
-        >
-          {count >= 1000 ? `${Math.floor(count / 1000)}k` : count}
-        </span>
+        <CountPop isActive={isActive && count > 0} className="text-white/90 text-xs font-medium min-w-[20px] text-center">
+          <span style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+            {count >= 1000 ? `${Math.floor(count / 1000)}k` : count}
+          </span>
+        </CountPop>
       )}
     </div>
   );
 
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-6">
+    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-6 animate-slide-enter-ui">
       {/* Like Button */}
       <ActionButton
         icon={
@@ -86,22 +92,26 @@ const FeedActions: React.FC<FeedActionsProps> = ({
         }
         count={likeCount}
         onClick={onLike}
-        isActive={isLiked}
+        isActive={likeCountChanged}
         disabled={isLiking}
       />
 
       {/* Comment Button */}
-      <ActionButton
-        icon={<ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white" />}
-        count={commentCount}
-        onClick={onComment}
-      />
+      <SuccessPulse isActive={commentSuccess}>
+        <ActionButton
+          icon={<ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white" />}
+          count={commentCount}
+          onClick={onComment}
+        />
+      </SuccessPulse>
 
       {/* Share Button */}
-      <ActionButton
-        icon={<PaperAirplaneIcon className="w-6 h-6 text-white" />}
-        onClick={onShare}
-      />
+      <SuccessPulse isActive={shareSuccess}>
+        <ActionButton
+          icon={<PaperAirplaneIcon className="w-6 h-6 text-white" />}
+          onClick={onShare}
+        />
+      </SuccessPulse>
 
       {/* Mute Button - only show for videos */}
       {mediaType === 'video' && (

@@ -286,6 +286,63 @@ html, body, #root, .app-shell { touch-action: auto; }
   animation: marquee 8s linear infinite;
 }
 
+.animate-heart-burst {
+  animation: heart-burst 300ms ease-out;
+}
+
+.animate-burst-gradient {
+  animation: burst-gradient 400ms ease-out;
+}
+
+.animate-float-heart {
+  animation: float-heart 800ms ease-out forwards;
+}
+
+.animate-count-pop {
+  animation: count-pop 200ms ease-out;
+}
+
+.animate-success-pulse {
+  animation: success-pulse 200ms ease-out;
+}
+
+/* Motion Animations */
+.animate-slide-enter-video {
+  animation: slide-enter-video 150ms ease-out;
+}
+
+.animate-slide-enter-pill {
+  animation: slide-enter-pill 170ms ease-out;
+}
+
+.animate-slide-enter-ui {
+  animation: slide-enter-ui 210ms ease-out;
+}
+
+.animate-slide-exit {
+  animation: slide-exit 140ms ease-out forwards;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-heart-burst,
+  .animate-burst-gradient,
+  .animate-float-heart,
+  .animate-count-pop,
+  .animate-success-pulse,
+  .animate-slide-enter-video,
+  .animate-slide-enter-pill,
+  .animate-slide-enter-ui,
+  .animate-slide-exit {
+    animation: simple-fade 120ms ease-out;
+  }
+  
+  @keyframes simple-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+}
+
 /* One-shot ping animation for swipe feedback */
 @keyframes pingonce {
   0% { 
@@ -346,6 +403,117 @@ html, body, #root, .app-shell { touch-action: auto; }
   100% {
     transform: translateY(100%);
     opacity: 0;
+  }
+}
+
+/* Feedback & Delight Animations */
+@keyframes heart-burst {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+@keyframes burst-gradient {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes float-heart {
+  0% {
+    transform: rotate(var(--rotation, 0deg)) translateY(-20px) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--rotation, 0deg)) translateY(-60px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes count-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes success-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Slide Enter/Exit Animations */
+@keyframes slide-enter-video {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-enter-pill {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-enter-ui {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
   }
 }
 

@@ -33,7 +33,7 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
   return (
     <div 
       className={cn(
-        "fixed left-4 right-20 z-20",
+        "fixed left-4 right-20 z-20 animate-slide-enter-ui",
         "pb-[env(safe-area-inset-bottom,0px)]",
         className
       )}
