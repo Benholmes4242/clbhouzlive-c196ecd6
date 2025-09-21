@@ -703,8 +703,8 @@ const HeroProfileHeader = ({
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
         <div className="relative -mt-16 bg-black fullbleed">
-          <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden recently-played-section">
+          <section className="relative w-full overflow-visible fullbleed">
+            <div className="relative h-[55vh] md:h-[56vh] w-[100vw] overflow-hidden fullbleed">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-900 animate-pulse" />
               
@@ -712,18 +712,20 @@ const HeroProfileHeader = ({
                 <img
                   src={profile.profile_photo_url}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
-                  style={{ 
-                    objectPosition: getMobileCropPosition(profile),
-                    objectFit: 'cover',
-                    minWidth: '100%',
-                    minHeight: '100%'
-                  }}
+                   className="h-full w-full object-cover block"
+                   style={{ 
+                     objectPosition: getMobileCropPosition(profile),
+                     objectFit: 'cover',
+                     minWidth: '100%',
+                     minHeight: '100%'
+                   }}
                   loading="eager"
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.previousElementSibling?.remove();
-                  }}
+                   onLoad={(e) => {
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     console.log('Hero mobile media loaded', { imgW: rect.width, vw: window.innerWidth });
+                     e.currentTarget.style.opacity = '1';
+                     e.currentTarget.previousElementSibling?.remove();
+                   }}
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder.svg';
                   }}
@@ -780,8 +782,8 @@ const HeroProfileHeader = ({
        ) : (
          /* Desktop layout - cinematic glass design */
          <div className="relative -mt-16 bg-black fullbleed">
-           <section className="relative w-full overflow-visible">
-             <div className="relative h-[56vh] w-full overflow-hidden recently-played-section">
+           <section className="relative w-full overflow-visible fullbleed">
+             <div className="relative h-[56vh] w-[100vw] overflow-hidden fullbleed">
                {/* Loading state */}
                <div className="absolute inset-0 bg-gray-900 animate-pulse" />
                
@@ -789,15 +791,17 @@ const HeroProfileHeader = ({
                 <img
                   src={profile.profile_photo_url}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
+                   className="h-full w-full object-cover block"
                   style={{ 
                     objectPosition: 'center center',
                     objectFit: 'cover',
                     minWidth: '100%',
-                    minHeight: '100%'
+                    minHeight: '100%',
                   }}
                   loading="eager"
                   onLoad={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    console.log('Hero desktop media loaded', { imgW: rect.width, vw: window.innerWidth });
                     e.currentTarget.style.opacity = '1';
                     e.currentTarget.previousElementSibling?.remove();
                   }}
