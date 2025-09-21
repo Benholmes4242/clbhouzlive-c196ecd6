@@ -747,7 +747,7 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-24px] md:bottom-[-32px]
+                bottom-[-8px] md:bottom-[-16px]
                 w-full z-20 mb-4 md:mb-5
               ">
               <GlassProfileCard
@@ -834,9 +834,9 @@ const HeroProfileHeader = ({
              <div 
                ref={profileCardRef}
                className="
-                absolute left-1/2 -translate-x-1/2
-                bottom-[-28px] md:bottom-[-36px]
-                w-[90%] md:w-[80%] max-w-[800px]
+                 absolute left-1/2 -translate-x-1/2
+                 bottom-[-14px] md:bottom-[-18px]
+                 w-[90%] md:w-[80%] max-w-[800px]
                  rounded-2xl border border-white/35
                  bg-white/35 backdrop-blur-xl
                  shadow-[0_10px_40px_rgba(0,0,0,0.45)] z-10 mb-4 md:mb-5
