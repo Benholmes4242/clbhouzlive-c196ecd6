@@ -52,7 +52,7 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
                 ref={(el) => (tabsRef.current[index] = el)}
                 onClick={() => onSectionChange(tab.id)}
                 className={`
-                  flex-1 flex items-center justify-center gap-2 py-3 px-2
+                  flex-1 flex items-center justify-center py-3 px-2
                   text-sm font-medium transition-colors duration-200
                   ${isActive 
                     ? 'text-white' 
@@ -60,8 +60,7 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
                   }
                 `}
               >
-                <Icon size={18} />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}
