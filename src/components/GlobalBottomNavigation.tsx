@@ -136,6 +136,11 @@ const GlobalBottomNavigation: React.FC = () => {
               "global-bottom-nav",
               "fixed bottom-0 left-0 right-0 w-full",
               "z-[100]",
+              // Background extends to very bottom
+              "backdrop-blur-md",
+              isClubhouseRoute 
+                ? "bg-black/60" 
+                : "bg-background/95",
               // Top border/shadow for separation
               "before:absolute before:inset-x-0 before:top-0 before:h-px",
               isClubhouseRoute 
@@ -152,8 +157,8 @@ const GlobalBottomNavigation: React.FC = () => {
               duration: 0.3 
             }}
             style={{
-              // Safe area and keyboard handling
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 4px)',
+              // Extend background to very bottom but pad content for safe area
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               // Hardware acceleration
               transform: 'translate3d(0, 0, 0)',
               willChange: 'transform',
@@ -164,20 +169,11 @@ const GlobalBottomNavigation: React.FC = () => {
               }),
             }}
           >
-            <div 
-              className={cn(
-                "backdrop-blur-md",
-                isClubhouseRoute 
-                  ? "bg-black/60" 
-                  : "bg-background/95"
-              )}
-            >
-              <NavigationBar
-                activeTab={activeTab}
-                onTabClick={handleTabClickWithCamera}
-                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-              />
-            </div>
+            <NavigationBar
+              activeTab={activeTab}
+              onTabClick={handleTabClickWithCamera}
+              variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+            />
           </motion.div>
         )}
       </AnimatePresence>
