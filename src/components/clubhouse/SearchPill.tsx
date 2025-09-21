@@ -228,7 +228,7 @@ const SearchPill = ({
   }, []);
 
   return (
-    <div className={cn("relative", className)} ref={dropdownRef}>
+    <div className={cn("relative w-full", className)} ref={dropdownRef}>
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",

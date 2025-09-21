@@ -67,7 +67,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [dropdownWidth, setDropdownWidth] = useState<number | undefined>();
   
   // Check for reduced motion preference
   const prefersReducedMotion = useMemo(() => {
@@ -107,31 +107,22 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     }
   }, [query, groupedResults, recentSearches, popularItems]);
 
-  // Update position when anchor changes
-  useEffect(() => {
-    if (!isMobile && anchorRef?.current && isOpen) {
-      const updatePosition = () => {
-        const anchor = anchorRef.current;
-        if (!anchor) return;
+  // Measure anchor width for matching dropdown width
+  React.useLayoutEffect(() => {
+    const el = anchorRef?.current;
+    if (!el || isMobile) return;
 
-        const rect = anchor.getBoundingClientRect();
-        setPosition({
-          top: rect.bottom + window.scrollY + 8,
-          left: rect.left + window.scrollX,
-          width: rect.width
-        });
-      };
+    // Set immediately
+    setDropdownWidth(el.getBoundingClientRect().width);
 
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      window.addEventListener('scroll', updatePosition);
+    // Keep in sync on resize
+    const ro = new ResizeObserver(() => {
+      setDropdownWidth(el.getBoundingClientRect().width);
+    });
+    ro.observe(el);
 
-      return () => {
-        window.removeEventListener('resize', updatePosition);
-        window.removeEventListener('scroll', updatePosition);
-      };
-    }
-  }, [isOpen, anchorRef, isMobile]);
+    return () => ro.disconnect();
+  }, [anchorRef, isMobile]);
 
   // Highlight matching text
   const highlightText = (text: string, highlight: string) => {
@@ -349,35 +340,19 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     <div
       ref={dropdownRef}
       className={cn(
-        "bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden",
-        "max-h-[70vh] overflow-y-auto",
-        isMobile ? "mx-4 mb-safe" : "min-w-[400px] max-w-[500px]"
+        "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[9999]",
+        "rounded-2xl border border-white/15 backdrop-blur-xl bg-black/80 shadow-xl",
+        "text-left max-h-[70vh] overflow-auto",
+        "md:max-h-[72vh] md:rounded-2xl",
+        isMobile && "hidden" // Hide when mobile - will use portal instead
       )}
-      style={isMobile ? {} : {
-        position: 'absolute',
-        top: position.top,
-        left: position.left,
-        width: Math.max(position.width, 400),
-        zIndex: 9999
+      style={{
+        width: dropdownWidth,
+        maxWidth: '90vw'
       }}
     >
-      {/* Mobile header */}
-      {isMobile && (
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <h2 className="text-lg font-semibold text-white">Search</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="h-5 w-5 text-white/70" />
-          </button>
-        </div>
-      )}
-
       {isLoading && query.trim() && <LoadingShimmer />}
-
       {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
-
       {!isLoading && query.trim() && results.length > 0 && (
         <>
           <ResultSection 
@@ -397,7 +372,6 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
           />
         </>
       )}
-
       {!isLoading && !query.trim() && (
         <>
           {recentSearches.length > 0 && <RecentSearchesSection />}
@@ -411,7 +385,46 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     return (
       <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm">
         <div className="absolute inset-x-0 top-safe-or-16 bottom-0 flex flex-col">
-          {dropdownContent}
+          <div className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden mx-4 mb-safe max-h-[70vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+            {/* Mobile header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <h2 className="text-lg font-semibold text-white">Search</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5 text-white/70" />
+              </button>
+            </div>
+
+            {isLoading && query.trim() && <LoadingShimmer />}
+            {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
+            {!isLoading && query.trim() && results.length > 0 && (
+              <>
+                <ResultSection 
+                  title="People" 
+                  items={groupedResults.people} 
+                  icon={<User className="h-3 w-3" />}
+                />
+                <ResultSection 
+                  title="Clubs & Courses" 
+                  items={groupedResults.clubs_courses} 
+                  icon={<MapPin className="h-3 w-3" />}
+                />
+                <ResultSection 
+                  title="Pages & Channels" 
+                  items={groupedResults.pages_channels} 
+                  icon={<Building className="h-3 w-3" />}
+                />
+              </>
+            )}
+            {!isLoading && !query.trim() && (
+              <>
+                {recentSearches.length > 0 && <RecentSearchesSection />}
+                {popularItems.length > 0 && <TrendingSection />}
+              </>
+            )}
+          </div>
         </div>
       </div>
     );
