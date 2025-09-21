@@ -45,11 +45,6 @@ const GlobalHeader: React.FC = () => {
   // Final visibility state
   const showHeader = isVisible && !shouldHideForRoute && !shouldHideHeader;
 
-  // Update body class for global CSS hooks
-  useEffect(() => {
-    document.body.classList.toggle('ui-header-hidden', !showHeader);
-  }, [showHeader]);
-
   // Handle mobile search overlay
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -84,7 +79,6 @@ const GlobalHeader: React.FC = () => {
       <AnimatePresence>
         {showHeader && (
           <motion.header
-            data-header-visible={showHeader}
             className={cn(
               "global-header",
               "fixed top-0 left-0 right-0 w-full",
@@ -102,7 +96,7 @@ const GlobalHeader: React.FC = () => {
               type: "spring", 
               stiffness: 300, 
               damping: 30,
-              duration: 0.18 
+              duration: 0.25 
             }}
             style={{
               // Safe area support

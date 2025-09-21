@@ -345,18 +345,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 }
 
-/* Smooth hide/show for the header */
-.global-header {
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.ui-header-hidden .global-header,
-.global-header[data-header-visible="false"] {
-  opacity: 0;
-  transform: translateY(-12px);
-  pointer-events: none;
-}
-
 @layer base {
   /* Feed card video styles to reduce flash */
   .feed-card-video {

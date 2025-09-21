@@ -57,13 +57,6 @@ export default function EnhancedCreateMomentModalCinematic({
   // Update modal context when create moment modal opens/closes
   useEffect(() => {
     setCreateMomentModalOpen(isOpen);
-    
-    // Cleanup: ensure header is restored on unmount
-    return () => {
-      if (isOpen) {
-        setCreateMomentModalOpen(false);
-      }
-    };
   }, [isOpen, setCreateMomentModalOpen]);
 
   // Media carousel state - use mediaItems if available, fallback to initialFiles
