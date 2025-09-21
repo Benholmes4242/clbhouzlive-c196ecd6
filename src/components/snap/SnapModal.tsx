@@ -226,7 +226,7 @@ const SnapModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
+          transition={{ duration: 0.18, ease: "easeIn" }}
         >
           {/* Liquid Glass Backdrop */}
           <div 
@@ -244,12 +244,12 @@ const SnapModal = ({
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 30, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: -20, opacity: 0, scale: 0.95 }}
+              exit={{ y: 12, opacity: 0, scale: 0.98 }}
               transition={{ 
                 type: "spring", 
                 stiffness: 300, 
                 damping: 25,
-                duration: 0.22
+                duration: 0.18
               }}
             >
               {/* Header */}
@@ -267,16 +267,23 @@ const SnapModal = ({
                 </button>
               </div>
 
-              {/* Circular Glass Action Buttons */}
+                {/* Circular Glass Action Buttons */}
               <div className="px-6 pb-8">
                 <div className="flex justify-center items-center gap-8 mb-6">
-                  {cardOptions.map(({ key, label, icon: Icon, onClick }) => (
+                  {cardOptions.map(({ key, label, icon: Icon, onClick }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
                       className="flex flex-col items-center gap-3 min-w-[44px]"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 30,
+                        delay: index * 0.04
+                      }}
                       whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     >
                       {/* Circular Glass Button */}
                       <div className="w-16 h-16 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-brand-orange/30 border border-white/20 hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-[0_0_20px_rgba(247,147,30,0.3)]">

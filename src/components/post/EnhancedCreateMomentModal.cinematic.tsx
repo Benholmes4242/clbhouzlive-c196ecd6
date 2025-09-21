@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
@@ -50,6 +50,7 @@ export default function EnhancedCreateMomentModalCinematic({
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const prefersReducedMotion = useReducedMotion();
 
   // Update modal context when create moment modal opens/closes
   useEffect(() => {
@@ -217,6 +218,11 @@ export default function EnhancedCreateMomentModalCinematic({
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
+          transition={{ 
+            duration: 0.2, 
+            ease: "easeIn",
+            when: "beforeChildren"
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* backdrop with gradient and click-to-close */}
@@ -232,33 +238,55 @@ export default function EnhancedCreateMomentModalCinematic({
             <motion.div
               ref={wrapperRef}
               className="w-full max-w-[520px] h-[min(92vh,900px)] rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-              initial={{ y: 20, opacity: 0, scale: 0.98 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0, scale: 0.95 }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.98 }}
+              transition={prefersReducedMotion ? 
+                { duration: 0.15 } : 
+                { 
+                  type: "spring", 
+                  stiffness: 320, 
+                  damping: 28,
+                  duration: 0.25
+                }
+              }
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION */}
                 <section id="media" className="relative flex-1 overflow-hidden">
 
-                  <MediaCarousel
-                    items={media.map(item => ({
-                      id: item.id,
-                      type: item.type,
-                      previewUrl: item.previewUrl,
-                      url: item.url,
-                      file: item.file,
-                      alt: `Media item ${item.id}`
-                    }))}
-                    initialIndex={0}
-                    onIndexChange={setActiveIndex}
-                    onSetCover={setCoverIndex}
-                    coverIndex={coverIndex}
-                    enableSwipe
-                    loop={false}
-                    className="h-full w-full rounded-b-xl"
-                  />
+                  <motion.div
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                    transition={prefersReducedMotion ? 
+                      { delay: 0.05, duration: 0.15 } : 
+                      { 
+                        delay: 0.1, 
+                        duration: 0.3,
+                        staggerChildren: 0.04
+                      }
+                    }
+                    className="h-full w-full"
+                  >
+                    <MediaCarousel
+                      items={media.map((item, index) => ({
+                        id: item.id,
+                        type: item.type,
+                        previewUrl: item.previewUrl,
+                        url: item.url,
+                        file: item.file,
+                        alt: `Media item ${item.id}`
+                      }))}
+                      initialIndex={0}
+                      onIndexChange={setActiveIndex}
+                      onSetCover={setCoverIndex}
+                      coverIndex={coverIndex}
+                      enableSwipe
+                      loop={false}
+                      className="h-full w-full rounded-b-xl"
+                    />
+                  </motion.div>
 
                   {/* Media metadata pills - bottom left */}
                   <div className="absolute bottom-4 left-4 flex items-center gap-2">
