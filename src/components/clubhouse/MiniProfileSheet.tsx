@@ -85,16 +85,11 @@ function RecentPostTile({
       />
 
       {isVideo && (
-        <>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-              <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
-            </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+            <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
           </div>
-          <div className="absolute bottom-1 right-1 px-2 py-1 rounded-full text-[11px] bg-black/50 text-white backdrop-blur-sm">
-            ▶︎
-          </div>
-        </>
+        </div>
       )}
       {/* Gradient overlay for better contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
