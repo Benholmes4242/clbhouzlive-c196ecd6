@@ -236,7 +236,7 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center p-6 pt-20" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
