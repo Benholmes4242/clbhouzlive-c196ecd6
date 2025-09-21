@@ -760,8 +760,8 @@ const HeroProfileHeader = ({
               />
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-8 md:h-12" />
+              {/* Spacer below to avoid clipping the panel */}
+              <div className="h-4 md:h-8" />
            </section>
            
            {/* Dark Rail for Stats Pills */}
