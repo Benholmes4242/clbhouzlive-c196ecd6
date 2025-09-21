@@ -39,8 +39,8 @@ interface GlobalSearchDropdownProps {
   isLoading: boolean;
   recentSearches: RecentSearch[];
   popularItems: SearchResult[];
-  onResultSelect: (result: SearchResult) => void;
-  onRecentSearchClick: (query: string) => void;
+  onResultSelect: (result: SearchResult, position?: number) => void;
+  onRecentSearchClick: (query: string, position?: number) => void;
   onClearRecentSearches: () => void;
   activeIndex: number;
   onActiveIndexChange: (index: number) => void;
@@ -221,10 +221,10 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         </button>
       </div>
       <div className="flex flex-wrap gap-2">
-        {recentSearches.slice(0, 8).map((search) => (
+        {recentSearches.slice(0, 8).map((search, index) => (
           <button
             key={search.id}
-            onClick={() => onRecentSearchClick(search.query)}
+            onClick={() => onRecentSearchClick(search.query, index)}
             className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white/80 rounded-full transition-colors"
           >
             {search.query}

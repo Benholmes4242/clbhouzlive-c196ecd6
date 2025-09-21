@@ -1,5 +1,7 @@
 import { useQuery, useQueries } from '@tanstack/react-query';
+import { useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { searchAnalytics } from '@/utils/searchAnalytics';
 
 // Types for search results
 export interface PersonResult {
@@ -181,6 +183,15 @@ export const useGlobalEntitySearch = ({
   enabled = true,
   limits = { people: 6, clubs: 6, pages: 6 }
 }: UseGlobalEntitySearchProps): GlobalSearchResults => {
+  // Track query changes for analytics
+  const prevQuery = useRef<string>('');
+  useEffect(() => {
+    if (query !== prevQuery.current && query.trim()) {
+      searchAnalytics.searchQueryChanged(query);
+      prevQuery.current = query;
+    }
+  }, [query]);
+
   const hasQuery = query.trim().length > 0;
 
   // Get recent searches (doesn't need React Query since it's localStorage)
@@ -236,6 +247,15 @@ export const useGlobalEntitySearch = ({
     : trendingQuery.error;
 
   const trending = trendingQuery.data || [];
+
+  const allResultsEmpty = people.length === 0 && clubs.length === 0 && pages.length === 0;
+  
+  // Track no results for analytics
+  useEffect(() => {
+    if (query.trim() && !isLoading && allResultsEmpty) {
+      searchAnalytics.searchNoResults(query);
+    }
+  }, [query, isLoading, allResultsEmpty]);
 
   return {
     people,

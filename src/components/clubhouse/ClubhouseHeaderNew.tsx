@@ -105,7 +105,10 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
 
           {/* Desktop Search Pill */}
           <div className="hidden md:flex flex-1 justify-center px-4">
-            <SearchPill className="w-full max-w-xl" variant={variant} />
+            <SearchPill 
+              className="w-full max-w-xl" 
+              variant={variant}
+            />
           </div>
 
           {/* Right Utilities */}

@@ -6,6 +6,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult } from '@/hooks/useGlobalEntitySearch';
 import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
+import { searchAnalytics } from '@/utils/searchAnalytics';
+import { createSearchRouter } from '@/utils/searchRouting';
 
 interface SearchResult {
   id: string;
@@ -46,6 +48,9 @@ const SearchPill = ({
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Create search router for consistent navigation
+  const searchRouter = createSearchRouter(navigate);
   
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -104,23 +109,24 @@ const SearchPill = ({
   }, [autoFocus]);
 
   // Handle route navigation
-  const handleResultSelect = useCallback((result: SearchResult) => {
+  const handleResultSelect = useCallback((result: SearchResult, position?: number) => {
+    // Save to recent searches if there's a query
     if (query.trim()) {
       saveRecentSearch(query);
     }
 
-    // Custom onSelect handler
+    // Track analytics
+    searchAnalytics.searchResultSelected(result.type, result.id, position || 0, query);
+
+    // Custom onSelect handler takes precedence
     if (onSelect) {
       onSelect(result);
     } else {
-      // Default navigation
-      if (result.type === 'user') {
-        navigate(`/profile/${result.username || result.id}`);
-      } else if (result.type === 'course') {
-        navigate(`/course/${result.id}`);
-      }
+      // Use search router for consistent navigation
+      searchRouter.navigateToResult(result);
     }
 
+    // Reset search state
     setQuery('');
     setIsOpen(false);
     setActiveIndex(-1);
@@ -128,10 +134,13 @@ const SearchPill = ({
     if (onClose) {
       onClose();
     }
-  }, [query, onSelect, navigate, onClose]);
+  }, [query, onSelect, searchRouter, onClose]);
 
   // Handle recent search execution
-  const handleRecentSearchClick = useCallback((searchQuery: string) => {
+  const handleRecentSearchClick = useCallback((searchQuery: string, position?: number) => {
+    // Track analytics
+    searchAnalytics.searchRecentClicked(searchQuery, position || 0);
+    
     setQuery(searchQuery);
     setIsOpen(false);
   }, []);
@@ -168,9 +177,9 @@ const SearchPill = ({
         if (activeIndex >= 0 && displayItems[activeIndex]) {
           const item = displayItems[activeIndex];
           if (item.type === 'recent') {
-            handleRecentSearchClick(item.title);
+            handleRecentSearchClick(item.title, activeIndex);
           } else {
-            handleResultSelect(item as SearchResult);
+            handleResultSelect(item as SearchResult, activeIndex);
           }
         }
         break;
@@ -184,6 +193,8 @@ const SearchPill = ({
 
   const handleInputFocus = () => {
     setIsOpen(true);
+    // Track search opened analytics
+    searchAnalytics.searchOpened('header');
   };
 
   const handleInputBlur = () => {
