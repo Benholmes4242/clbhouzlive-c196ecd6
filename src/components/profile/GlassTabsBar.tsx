@@ -38,7 +38,7 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
         <div className="relative flex">
           {/* Sliding Indicator */}
           <div
-            className="absolute bottom-0 h-1 bg-white/30 rounded-full"
+            className="absolute bottom-0 h-1 bg-orange-500 rounded-full"
             style={indicatorStyle}
           />
           
