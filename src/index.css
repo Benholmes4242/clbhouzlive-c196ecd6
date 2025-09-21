@@ -495,6 +495,51 @@ html, body, #root, .app-shell { touch-action: auto; }
     display: none;
   }
 
+  /* Glass Card System */
+  .glass-card {
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-border);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--hud-shadow);
+  }
+
+  .glow-hover {
+    transition: all 0.2s ease-out;
+  }
+
+  .glow-hover:hover,
+  .glow-hover:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--hud-shadow), 0 0 0 1px hsl(var(--accent) / 0.3);
+  }
+
+  /* Overlay gradient for readability */
+  .overlay-gradient {
+    background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.8) 100%);
+  }
+
+  /* Stats count-up animation */
+  @keyframes count-up {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-count-up {
+    animation: count-up 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+  }
+
+  /* Profile entrance animation */
+  .profile-entrance {
+    animation: fade-in 0.22s ease-out, translateY(8px) to translateY(0) 0.22s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-count-up,
+    .profile-entrance {
+      animation: none;
+    }
+  }
+
   /* Liquid Glass Effect for Suggested Users */
   .liquid-glass {
     backdrop-filter: blur(12px);

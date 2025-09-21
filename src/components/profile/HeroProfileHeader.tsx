@@ -46,7 +46,9 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
-
+import GlassProfileCard from './GlassProfileCard';
+import StatsGlassPills from './StatsGlassPills';
+import GlassTabsBar from './GlassTabsBar';
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
@@ -700,11 +702,11 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16 bg-white">
+        <div className="relative -mt-16 bg-black">
           <section className="relative w-full overflow-visible">
             <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              <div className="absolute inset-0 bg-gray-900 animate-pulse" />
               
               {profile?.profile_photo_url ? (
                 <img
@@ -713,7 +715,9 @@ const HeroProfileHeader = ({
                   className="h-full w-full object-cover"
                   style={{ 
                     objectPosition: getMobileCropPosition(profile),
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    minWidth: '100%',
+                    minHeight: '100%'
                   }}
                   loading="eager"
                   onLoad={(e) => {
@@ -725,7 +729,7 @@ const HeroProfileHeader = ({
                   }}
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-center text-gray-400">
                   <Camera className="w-16 h-16 mb-4 opacity-50" />
                   <p className="text-lg font-medium mb-2">No Profile Photo</p>
                   <p className="text-sm text-center px-4">
@@ -734,119 +738,54 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
-                              bg-gradient-to-t from-white via-white/60 to-transparent
-                              pointer-events-none z-[5]" />
+              {/* Overlay Gradient for readability */}
+              <div className="absolute bottom-0 left-0 w-full h-32 overlay-gradient pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            {/* Glass Profile Card positioned to float over bottom edge */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-14px] md:bottom-[-18px]
-                w-[90%] md:w-[80%] max-w-[800px]
-                rounded-2xl border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-              "
-            >
-               <div className="px-5 py-2 flex flex-col items-center relative">
-                 {/* Three dots menu - positioned absolutely */}
-                 {isOwnProfile && (
-                   <div className="absolute top-4 right-5">
-                     <DropdownMenu>
-                       <DropdownMenuTrigger asChild>
-                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                           <MoreVertical size={20} />
-                         </button>
-                       </DropdownMenuTrigger>
-                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                           Edit Profile
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                           Media Manager
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => previewImmersive()}>
-                           Immersive Preview
-                         </DropdownMenuItem>
-                       </DropdownMenuContent>
-                     </DropdownMenu>
-                   </div>
-                 )}
-
-                 {/* Name + Handle - centered */}
-                 <div className="text-center">
-                   <h1 className="text-2xl font-semibold text-gray-900">
-                     {displayName}
-                   </h1>
-                   <p className="mt-1 text-sm text-gray-700">
-                     @{username}
-                   </p>
-                 </div>
-
-                {/* Club + Handicap - centered */}
-                <div className="mt-4 w-full max-w-sm mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="text-center">
-                       <div className="text-xs text-gray-700">Home Club</div>
-                        <div className="mt-1 text-base font-medium text-gray-900">
-                          {homeClubLines.map((line, index) => (
-                            <div key={index}>{line}</div>
-                          ))}
-                        </div>
-                     </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Handicap</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
+                bottom-[-24px] md:bottom-[-32px]
+                w-full z-20
+              ">
+              <GlassProfileCard
+                profile={profile}
+                isOwnProfile={isOwnProfile}
+                onEditProfile={() => setEditDialogOpen(true)}
+                onMediaManager={() => setMediaManagerOpen(true)}
+                onPreviewImmersive={() => previewImmersive()}
+                hasImmersiveMedia={hasImmersiveMedia}
+              />
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-12 md:h-16" />
+             <div className="h-8 md:h-12" />
            </section>
            
-           {/* Glass Chips Stats */}
-           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Posts</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Following</div>
-             </div>
-             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
-                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Followers</div>
-             </div>
+           {/* Glass Stats Pills */}
+           <div className="mt-6 mb-4">
+             <StatsGlassPills
+               stats={{
+                 posts: postsCount,
+                 totalXP: 2500, // Placeholder - can be computed from progress data
+                 following: followingCount,
+                 followers: followersCount
+               }}
+               onStatClick={handleStatClick}
+             />
            </div>
         </div>
-      ) : (
-        /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative -mt-16 bg-white">
-          <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
-              {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-              
-              {profile?.profile_photo_url ? (
+       ) : (
+         /* Desktop layout - cinematic glass design */
+         <div className="relative -mt-16 bg-black">
+           <section className="relative w-full overflow-visible">
+             <div className="relative h-[56vh] w-full overflow-hidden">
+               {/* Loading state */}
+               <div className="absolute inset-0 bg-gray-900 animate-pulse" />
+               
+               {profile?.profile_photo_url ? (
                 <img
                   src={profile.profile_photo_url}
                   alt={profile?.display_name || 'Profile'}
@@ -991,8 +930,14 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Underline Animation - Brand accent styling */}
-      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+      {/* Glass Tabs Bar */}
+      <GlassTabsBar
+        activeSection={activeSection}
+        onSectionChange={onSectionChange}
+      />
+
+      {/* Hidden original tab navigation for compatibility */}
+      <div style={{ display: 'none', borderColor: 'hsl(var(--profile-border-card))' }} className="relative z-40 bg-white/95 backdrop-blur-lg border-b">
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
