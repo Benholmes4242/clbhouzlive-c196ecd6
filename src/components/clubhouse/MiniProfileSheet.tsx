@@ -261,6 +261,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   return (
     <div 
       className="fixed inset-0 z-[70] flex items-end justify-center"
+      style={{ paddingBottom: 'var(--bottom-nav-height)' }}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
