@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Images, X, Sparkles, Zap } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { Camera, Images, X, Sparkles, Zap, Film } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -44,6 +44,15 @@ const EnhancedSnapModal = ({
   const { user } = useSupabaseSession();
   const { setSnapModalOpen } = useModalContext();
   const { photos, videos, isLoading, error } = useSnapModalUserMedia(user?.id);
+  
+  // Motion values for subtle parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useTransform(mouseY, [-300, 300], [2, -2]);
+  const rotateY = useTransform(mouseX, [-300, 300], [-2, 2]);
+
+  // Check for reduced motion preference
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Media picker handler
   const handlePickMedia = () => {
@@ -56,6 +65,19 @@ const EnhancedSnapModal = ({
       console.log('[snapmodal] picker returned:', files?.length);
       openComposerWithFiles(files);
     });
+  };
+
+  // Handle mouse movement for parallax
+  const handleMouseMove = (event: React.MouseEvent) => {
+    if (prefersReducedMotion) return;
+    
+    const { clientX, clientY } = event;
+    const { left, top, width, height } = event.currentTarget.getBoundingClientRect();
+    const x = clientX - left - width / 2;
+    const y = clientY - top - height / 2;
+    
+    mouseX.set(x);
+    mouseY.set(y);
   };
 
   // Update modal context
@@ -102,24 +124,28 @@ const EnhancedSnapModal = ({
       onClick: onCameraClick,
       previewVariant: "camera" as const,
       previewImages: [],
+      microInteraction: "shutter",
     }] : []),
     {
       key: "photos",
-      label: "Photos",
+      label: "Photos", 
       description: "Pick from gallery",
       icon: Images,
       onClick: handlePickMedia,
       previewVariant: "photos" as const,
       previewImages: photoUrls,
+      microInteraction: "fan",
     },
     {
       key: "story",
       label: "Tell Your Story",
-      description: "Mix photos & videos",
-      icon: Sparkles,
+      description: "Mix photos & videos in one go",
+      icon: Film,
       onClick: handlePickMedia,
       previewVariant: "story" as const,
       previewImages: storyUrls,
+      microInteraction: "glow",
+      isSpecial: true, // Orange accent styling
     },
   ];
 
@@ -140,7 +166,17 @@ const EnhancedSnapModal = ({
           />
           
           {/* Modal Panel with subtle parallax */}
-          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={onClose}>
+          <div 
+            className="absolute inset-0 flex items-center justify-center p-6" 
+            onClick={onClose}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => {
+              if (!prefersReducedMotion) {
+                mouseX.set(0);
+                mouseY.set(0);
+              }
+            }}
+          >
             <motion.div
               role="dialog"
               aria-modal="true"
@@ -157,7 +193,10 @@ const EnhancedSnapModal = ({
                 duration: 0.18
               }}
               style={{
-                transform: isOpen ? 'translateZ(0)' : undefined, // Enable hardware acceleration
+                transform: isOpen ? 'translateZ(0)' : undefined,
+                rotateX: prefersReducedMotion ? 0 : rotateX,
+                rotateY: prefersReducedMotion ? 0 : rotateY,
+                transformStyle: 'preserve-3d',
               }}
             >
               {/* Header with contextual helper */}
@@ -169,23 +208,33 @@ const EnhancedSnapModal = ({
                   <button 
                     onClick={onClose} 
                     aria-label="Close" 
-                    className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
                 </div>
                 {/* Contextual helper line */}
-                <p className="text-sm text-white/70">Share your golf moments with the community</p>
+                <div 
+                  className="text-sm text-white/70"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Share your golf moment with the community ⛳️
+                </div>
               </div>
 
               {/* Action Options */}
               <div className="px-6 pb-6">
                 <div className="space-y-3">
-                  {actionOptions.map(({ key, label, description, icon: Icon, onClick, previewVariant, previewImages }, index) => (
+                  {actionOptions.map(({ key, label, description, icon: Icon, onClick, previewVariant, previewImages, microInteraction, isSpecial }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
-                      className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group"
+                      className={`w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 ${
+                        isSpecial 
+                          ? 'bg-brand-orange/5 hover:bg-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 hover:shadow-[0_0_20px_rgba(247,147,30,0.2)]'
+                          : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30'
+                      }`}
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ 
@@ -194,19 +243,49 @@ const EnhancedSnapModal = ({
                         damping: 30,
                         delay: index * 0.08
                       }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ 
+                        scale: prefersReducedMotion ? 1 : 1.02,
+                        ...(isSpecial && !prefersReducedMotion && {
+                          boxShadow: '0 0 24px rgba(247,147,30,0.3)'
+                        })
+                      }}
+                      whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
+                      aria-label={`${label}: ${description}`}
                     >
                       <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
-                          <Icon className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
-                        </div>
+                        {/* Icon with micro-interactions */}
+                        <motion.div 
+                          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 ${
+                            isSpecial
+                              ? 'bg-brand-orange/10 group-hover:bg-brand-orange/20 border border-brand-orange/30 group-hover:border-brand-orange/50'
+                              : 'bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40'
+                          }`}
+                          whileHover={!prefersReducedMotion ? {
+                            ...(microInteraction === 'shutter' && { opacity: [1, 0.5, 1] }),
+                            ...(microInteraction === 'fan' && { x: [0, 1, 0], y: [0, -1, 0] }),
+                            ...(microInteraction === 'glow' && { 
+                              boxShadow: '0 0 16px rgba(247,147,30,0.6)',
+                              scale: 1.05
+                            })
+                          } : {}}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Icon className={`w-5 h-5 transition-colors duration-200 ${
+                            isSpecial 
+                              ? 'text-brand-orange' 
+                              : 'text-white group-hover:text-brand-orange'
+                          }`} />
+                        </motion.div>
                         
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-semibold text-white text-base">{label}</h3>
+                            <h3 className={`font-semibold text-base ${
+                              isSpecial ? 'text-brand-orange' : 'text-white'
+                            }`}>
+                              {label}
+                              {isSpecial && <span className="ml-2 text-brand-orange/70">🎞️</span>}
+                            </h3>
                           </div>
                           <p className="text-sm text-white/70 mb-3">{description}</p>
                           
@@ -229,15 +308,27 @@ const EnhancedSnapModal = ({
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <button
+                  <motion.button
                     onClick={handlePickMedia}
-                    className="w-full px-4 py-2 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group"
+                    className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                    whileHover={{ scale: prefersReducedMotion ? 1 : 1.02 }}
+                    whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
+                    aria-label="Quick Post - fastest way to share"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <Zap className="w-4 h-4 text-brand-orange group-hover:scale-110 transition-transform duration-200" />
+                      <motion.div
+                        whileHover={!prefersReducedMotion ? { 
+                          scale: 1.1,
+                          rotate: 15,
+                          boxShadow: '0 0 12px rgba(247,147,30,0.5)'
+                        } : {}}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Zap className="w-4 h-4 text-brand-orange" />
+                      </motion.div>
                       <span className="text-sm font-medium text-brand-orange">Quick Post</span>
                     </div>
-                  </button>
+                  </motion.button>
                 </motion.div>
 
                 {/* Error state */}
