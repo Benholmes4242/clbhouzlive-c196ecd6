@@ -278,14 +278,14 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           <button
             onClick={handleClose}
             className={cn(
-              "p-1.5 rounded-full transition-all duration-200",
+              "p-1 rounded-full transition-all duration-200",
               "bg-black/20 backdrop-blur-sm border border-white/10",
               "hover:bg-white/10 hover:scale-105",
               "focus:ring-2 focus:ring-white/30 focus:outline-none"
             )}
             aria-label="Close profile"
           >
-            <X className="w-4 h-4 text-white" />
+            <X className="w-3 h-3 text-white" />
           </button>
         </div>
 
