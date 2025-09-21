@@ -77,12 +77,18 @@ const VideoWithAutoplay: React.FC<{
   const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-black">
+    <div className="relative w-full h-full flex items-center justify-center bg-black overflow-hidden">
+      {/* Top gradient for readability */}
+      <div className="absolute inset-x-0 top-0 z-10 h-[28vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      
+      {/* Bottom gradient for readability */}
+      <div className="absolute inset-x-0 bottom-0 z-10 h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      
       {hlsUrl ? (
         <HLSVideoCard
           hlsUrl={hlsUrl}
           poster={poster}
-          className="w-full h-full fullscreenVideoStage"
+          className="absolute inset-0 w-full h-full fullscreenVideoStage"
           aspectRatio="auto"
           muted={muted}
           loop={true}
@@ -90,10 +96,10 @@ const VideoWithAutoplay: React.FC<{
           autoplay={autoplay}
           externallyManaged={true}
           showMuteButton={false}
-          fit={isDesktop ? 'contain' : 'cover'}
+          fit={objectFit}
         />
       ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
+        <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
           <span className="text-muted-foreground text-sm">Invalid video source</span>
         </div>
       )}
@@ -119,7 +125,13 @@ const ImageWithPinchZoom: React.FC<{
   }, [currentScale, onSwipeDisabled]);
 
   return (
-    <div className="relative w-full h-full bg-black">
+    <div className="relative w-full h-full bg-black overflow-hidden">
+      {/* Top gradient for readability */}
+      <div className="absolute inset-x-0 top-0 z-10 h-[20vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      
+      {/* Bottom gradient for readability */}
+      <div className="absolute inset-x-0 bottom-0 z-10 h-[28vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      
       <div
         ref={ref}
         style={FLAGS.USE_PINCH_ZOOM ? style : undefined}
@@ -129,7 +141,7 @@ const ImageWithPinchZoom: React.FC<{
           ref={imgRef}
           src={src}
           alt={alt}
-          className="max-h-[80vh] max-w-[90vw] object-contain select-none pinch-zoom-image"
+          className="w-full h-full object-contain select-none pinch-zoom-image"
           draggable={false}
           loading="eager"
           onError={(e) => {
@@ -645,11 +657,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   playObserverRef.current?.observe(el);
                 }
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center"
+              className="relative w-full snap-start snap-always flex items-center justify-center bg-black"
               style={{ 
-                height: '100vh',
-                minHeight: '100vh',
-                maxHeight: '100vh'
+                height: '100dvh',
+                minHeight: '100dvh',
+                maxHeight: '100dvh',
+                width: '100vw'
               }}
               {...touchHandlers}
             >
@@ -662,23 +675,24 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 <Minimize2 className="w-6 h-6" />
               </button>
 
-              {/* Golf Course Tag - Top Right */}
+              {/* Golf Course Tag - Top Right Glass Pill */}
               {item.golfCourse && (
-                <div className="absolute top-6 right-6 z-30">
-                  <CoursePostBadge 
-                    course={{
-                      id: item.golfCourse.id,
-                      name: item.golfCourse.name,
-                      country: item.golfCourse.country
-                    }}
-                    isClubhouse={true}
-                  />
+                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-fade-in">
+                  <div 
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl cursor-pointer hover:bg-black/30 transition-all duration-200"
+                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-white/90" />
+                    <span className="text-sm font-medium truncate max-w-[150px]">
+                      {item.golfCourse.name}
+                    </span>
+                  </div>
                 </div>
               )}
 
-              {/* Media Content */}
+              {/* Media Content - Full viewport */}
               <div 
-                className="relative w-full h-full flex items-center justify-center"
+                className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden"
               >
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
