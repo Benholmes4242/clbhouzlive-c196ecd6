@@ -443,6 +443,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
     
     /* Header Heights */
+    --header-h: 64px; /* mobile header height */
     --header-h-mobile: 60px;
     --header-h-desktop: 72px;
     
