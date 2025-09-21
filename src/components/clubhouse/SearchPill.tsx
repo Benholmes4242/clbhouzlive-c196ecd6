@@ -292,7 +292,7 @@ const SearchPill = ({
         }}
         query={query}
         results={results}
-        loading={isLoading}
+        isLoading={isLoading}
         recentSearches={recent}
         popularItems={popularItems}
         onResultSelect={handleResultSelect}

@@ -36,7 +36,7 @@ interface GlobalSearchDropdownProps {
   onClose: () => void;
   query: string;
   results: SearchResult[];
-  loading: boolean;
+  isLoading: boolean;
   recentSearches: RecentSearch[];
   popularItems: SearchResult[];
   onResultSelect: (result: SearchResult) => void;
@@ -53,7 +53,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   onClose,
   query,
   results,
-  loading,
+  isLoading,
   recentSearches,
   popularItems,
   onResultSelect,
@@ -368,11 +368,11 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         </div>
       )}
 
-      {loading && query.trim() && <LoadingShimmer />}
+      {isLoading && query.trim() && <LoadingShimmer />}
 
-      {!loading && query.trim() && results.length === 0 && <EmptyState />}
+      {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
 
-      {!loading && query.trim() && results.length > 0 && (
+      {!isLoading && query.trim() && results.length > 0 && (
         <>
           <ResultSection 
             title="People" 
@@ -392,7 +392,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         </>
       )}
 
-      {!loading && !query.trim() && (
+      {!isLoading && !query.trim() && (
         <>
           {recentSearches.length > 0 && <RecentSearchesSection />}
           {popularItems.length > 0 && <TrendingSection />}
