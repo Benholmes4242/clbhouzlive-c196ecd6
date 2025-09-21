@@ -50,7 +50,7 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Always use glass-dark styles
+  // Use black logo for light glass styling
   const logoSrc = "/assets/clbhouz-white-logo.png";
 
   return (
@@ -98,7 +98,7 @@ const GlobalHeader: React.FC = () => {
                 <img
                   src={logoSrc}
                   alt="clbhouz Logo"
-                  className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
+                  className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity filter invert"
                   onClick={handleLogoClick}
                 />
               </div>
