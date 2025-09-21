@@ -736,7 +736,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     
                     {/* Handle - Third in stagger */}
                     <motion.p 
-                      className="text-white/70 text-base mt-1"
+                      className="text-white/70 text-base mt-0.5"
                       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ 
@@ -755,7 +755,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     {/* Handicap - Fourth in stagger - Only show if user has one */}
                     {user.handicap !== undefined && (
                       <motion.p 
-                        className="text-white/80 text-sm mt-1"
+                        className="text-white/80 text-sm mt-0.5"
                         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ 
