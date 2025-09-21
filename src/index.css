@@ -478,7 +478,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     --sheet-edge-gap: 16px;
     
     /* Sheet scroll bottom padding for safe area and breathing room */
-    --sheet-scroll-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px) + 8px);
+    --sheet-scroll-pad-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
   }
 
   @media (min-width: 768px) {
