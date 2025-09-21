@@ -26,7 +26,7 @@ import { FLAGS } from '@/config/flags';
 import FeedActions from './FeedActions';
 import FeedMeta from './FeedMeta';
 import { useSwipeGestures } from '@/hooks/useSwipeGestures';
-import { useDoubleTap, HeartBurst } from '@/hooks/useDoubleTap';
+import { HeartBurst } from '@/hooks/useDoubleTap';
 
 
 interface DiscoverVerticalFeedProps {
@@ -554,6 +554,25 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     preventVerticalScroll: true
   });
 
+  // Double tap handling for likes - moved outside of map to follow Rules of Hooks
+  const handleDoubleTapLike = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const x = 'clientX' in e ? e.clientX : (e as any).touches?.[0]?.clientX || rect.left + rect.width / 2;
+    const y = 'clientY' in e ? e.clientY : (e as any).touches?.[0]?.clientY || rect.top + rect.height / 2;
+    
+    // Add heart burst
+    const burstId = `${postId}-${Date.now()}`;
+    setHeartBursts(prev => [...prev, { id: burstId, x, y }]);
+    
+    // Remove heart burst after animation
+    setTimeout(() => {
+      setHeartBursts(prev => prev.filter(burst => burst.id !== burstId));
+    }, 800);
+    
+    // Trigger like
+    handleLike(postId);
+  }, [handleLike]);
+
   // Keyboard navigation with accessibility
   useEffect(() => {
     if (!isOpen) return;
@@ -701,27 +720,41 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
           const touchHandlers = hasMultipleMedia ? createTouchHandlers() : {};
 
-          // Double tap handling for likes
-          const { handleTap } = useDoubleTap({
-            onDoubleTap: (e) => {
-              const rect = (e.target as HTMLElement).getBoundingClientRect();
-              const x = 'clientX' in e ? e.clientX : (e as any).touches?.[0]?.clientX || rect.left + rect.width / 2;
-              const y = 'clientY' in e ? e.clientY : (e as any).touches?.[0]?.clientY || rect.top + rect.height / 2;
+          // Create double tap handler for this specific post
+          const createDoubleTapHandler = () => {
+            let tapCount = 0;
+            let lastTap = 0;
+            let timeoutRef: NodeJS.Timeout;
+
+            return (e: React.MouseEvent | React.TouchEvent) => {
+              if (currentMedia.media_type !== 'video') return;
               
-              // Add heart burst
-              const burstId = `${item.id}-${Date.now()}`;
-              setHeartBursts(prev => [...prev, { id: burstId, x, y }]);
+              const now = Date.now();
+              const delay = 300;
               
-              // Remove heart burst after animation
-              setTimeout(() => {
-                setHeartBursts(prev => prev.filter(burst => burst.id !== burstId));
-              }, 800);
-              
-              // Trigger like
-              handleLike(item.id);
-            },
-            disabled: currentMedia.media_type !== 'video'
-          });
+              if (timeoutRef) {
+                clearTimeout(timeoutRef);
+              }
+
+              if (now - lastTap < delay && tapCount === 1) {
+                // Double tap detected
+                tapCount = 0;
+                lastTap = 0;
+                handleDoubleTapLike(item.id, e);
+              } else {
+                // First tap
+                tapCount = 1;
+                lastTap = now;
+                
+                timeoutRef = setTimeout(() => {
+                  tapCount = 0;
+                  lastTap = 0;
+                }, delay);
+              }
+            };
+          };
+
+          const handleTap = createDoubleTapHandler();
 
           return (
             <div 
