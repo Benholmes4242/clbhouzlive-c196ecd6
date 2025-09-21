@@ -402,8 +402,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   }, [isGloballyMuted, setGlobalMute]);
 
   const handleLike = useCallback((postId: string) => {
-    onLike(postId);
-  }, [onLike]);
+    if (!user?.id) return;
+    
+    const isCurrentlyLiked = likedPosts?.includes(postId) || false;
+    const action = isCurrentlyLiked ? 'unlike' : 'like';
+    
+    likeMutation.mutate({ postId, action });
+  }, [user?.id, likedPosts, likeMutation]);
 
   const handleFollow = useCallback(() => {
     const targetUser = posts[currentIndex]?.user;
