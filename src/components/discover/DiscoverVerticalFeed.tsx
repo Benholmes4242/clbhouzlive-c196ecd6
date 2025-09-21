@@ -772,39 +772,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
+                isOwnPost={user && item.user?.id === user.id}
+                onEdit={() => handleEditPost(item.id)}
+                onDelete={() => handleDeletePost(item.id)}
                 className="absolute bottom-[50px] right-4 z-35"
               />
 
-              {/* Three dots menu - only show for own posts */}
-              {user && item.user?.id === user.id && (
-                <div className="absolute bottom-6 right-4 z-10" style={{ transform: 'translateY(-280px)' }}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button 
-                        className="cursor-pointer hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="w-8 h-8 text-white" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end" 
-                      className="w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border border-white/10 shadow-xl z-[1000000]"
-                    >
-                      <DropdownMenuItem onClick={() => handleEditPost(item.id)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit Post
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleDeletePost(item.id)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Post
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
             </div>
           );
         })}
