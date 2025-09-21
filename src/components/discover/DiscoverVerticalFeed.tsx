@@ -678,7 +678,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Right Glass Pill */}
               {item.golfCourse && (
-                <div className="absolute top-[env(safe-area-inset-top,12px)] z-30 animate-fade-in">
+                <div className="absolute top-6 right-6 z-30 animate-fade-in">
                   <ClubTagPill 
                     course={{
                       id: item.golfCourse.id,
