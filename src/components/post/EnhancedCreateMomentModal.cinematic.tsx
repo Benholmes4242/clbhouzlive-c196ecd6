@@ -316,8 +316,8 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-                  {/* Media metadata pills - bottom left */}
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                  {/* Media metadata pills - top left, aligned with cover pill */}
+                  <div className="absolute top-2 left-20 flex items-center gap-2">
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
