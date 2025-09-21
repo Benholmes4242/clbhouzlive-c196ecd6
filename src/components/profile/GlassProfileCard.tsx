@@ -32,7 +32,6 @@ const GlassProfileCard: React.FC<GlassProfileCardProps> = ({
   hasImmersiveMedia
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     // Entrance animation
@@ -46,34 +45,14 @@ const GlassProfileCard: React.FC<GlassProfileCardProps> = ({
   const handicap = profile?.eg_handicap_index;
 
   return (
-    <div 
-      className={`
-        glass-card rounded-2xl p-5 md:p-6 mx-auto
-        max-w-[680px] w-[92vw] md:w-full
-        transition-all duration-300 ease-out cursor-pointer relative
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
-        ${focused ? 'shadow-[0_0_40px_rgba(110,146,119,0.6)]' : ''}
-      `}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      onTouchStart={() => setFocused(true)}
-      onTouchEnd={() => setTimeout(() => setFocused(false), 300)}
-      onClick={() => setFocused(!focused)}
-      tabIndex={0}
-    >
-      {/* Echo accent glow overlay when focused */}
-      {focused && (
-        <div 
-          className="absolute inset-0 rounded-2xl animate-echo-pulse pointer-events-none z-0"
-          style={{
-            background: 'rgba(110,146,119,0.2)',
-            border: '1px solid rgba(110,146,119,0.4)'
-          }}
-        />
-      )}
-      
+    <div className={`
+      glass-card rounded-2xl p-5 md:p-6 mx-auto
+      max-w-[680px] w-[92vw] md:w-full
+      transition-all duration-300 ease-out
+      ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}
+    `}>
       {/* Profile Content - Perfect Centering */}
-      <div className="flex flex-col items-center text-center relative z-10">
+      <div className="flex flex-col items-center text-center relative">
         {/* Overflow Menu - positioned absolutely */}
         {isOwnProfile && (
           <div className="absolute top-0 right-0">
