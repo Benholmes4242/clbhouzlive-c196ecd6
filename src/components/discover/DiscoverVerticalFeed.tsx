@@ -772,7 +772,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
-                className="absolute bottom-20 right-4 z-35"
+                className="absolute bottom-[50px] right-4 z-35"
               />
 
               {/* Three dots menu - only show for own posts */}
