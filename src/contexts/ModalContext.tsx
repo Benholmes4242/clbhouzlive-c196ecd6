@@ -27,6 +27,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isCreateMomentModalOpen, setIsCreateMomentModalOpen] = useState(false);
 
   const shouldHideHeader = isSnapModalOpen || isCreateMomentModalOpen;
+  
+  // Debug logging
+  console.log('[ModalContext] shouldHideHeader:', shouldHideHeader, { isSnapModalOpen, isCreateMomentModalOpen });
 
   const setSnapModalOpen = useCallback((open: boolean) => {
     setIsSnapModalOpen(open);
