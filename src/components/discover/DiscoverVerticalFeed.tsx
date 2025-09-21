@@ -82,11 +82,11 @@ const VideoWithAutoplay: React.FC<{
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black overflow-hidden">
-      {/* Top gradient for readability */}
-      <div className="absolute inset-x-0 top-0 z-10 h-[28vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Top gradient for readability - z-1 */}
+      <div className="absolute inset-x-0 top-0 z-[1] h-[28vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
       
-      {/* Bottom gradient for readability */}
-      <div className="absolute inset-x-0 bottom-0 z-10 h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Bottom gradient for readability - z-1 */}
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
       
       {hlsUrl ? (
         <HLSVideoCard
@@ -130,11 +130,11 @@ const ImageWithPinchZoom: React.FC<{
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
-      {/* Top gradient for readability */}
-      <div className="absolute inset-x-0 top-0 z-10 h-[20vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Top gradient for readability - z-1 */}
+      <div className="absolute inset-x-0 top-0 z-[1] h-[20vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
       
-      {/* Bottom gradient for readability */}
-      <div className="absolute inset-x-0 bottom-0 z-10 h-[28vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Bottom gradient for readability - z-1 */}
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-[28vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
       
       <div
         ref={ref}
@@ -554,37 +554,45 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     preventVerticalScroll: true
   });
 
-  // Keyboard navigation
+  // Keyboard navigation with accessibility
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case 'Escape':
+          event.preventDefault();
           onClose();
           break;
         case 'ArrowUp':
+        case 'k': // Vim-style navigation
           event.preventDefault();
           if (currentIndex > 0) {
             navigateToIndex(currentIndex - 1);
           }
           break;
         case 'ArrowDown':
+        case 'j': // Vim-style navigation
           event.preventDefault();
           if (currentIndex < posts.length - 1) {
             navigateToIndex(currentIndex + 1);
           }
           break;
         case ' ':
+        case 'm': // 'm' for mute
           event.preventDefault();
           toggleGlobalMute();
+          break;
+        case 'l': // 'l' for like
+          event.preventDefault();
+          handleLike(posts[currentIndex]?.id);
           break;
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, currentIndex, posts.length, navigateToIndex, toggleGlobalMute]);
+  }, [isOpen, onClose, currentIndex, posts.length, navigateToIndex, toggleGlobalMute, handleLike, posts]);
 
   if (!isOpen) return null;
 
@@ -737,27 +745,43 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               {...touchHandlers}
               onClick={handleTap}
             >
-              {/* Close Button - Top Left */}
+              {/* Close Button - Top Left with safe area */}
               <button
                 onClick={onClose}
-                className="absolute top-6 left-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
-                aria-label="Close"
+                className="absolute z-30 p-3 rounded-full text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                style={{
+                  top: `calc(env(safe-area-inset-top, 0px) + 12px)`,
+                  left: '16px',
+                  minWidth: '44px',
+                  minHeight: '44px'
+                }}
+                aria-label="Close feed"
               >
                 <Minimize2 className="w-6 h-6" />
               </button>
 
-              {/* Golf Course Tag - Top Right Glass Pill */}
+              {/* Golf Course Tag - Top Right Glass Pill with safe area - z-30 */}
               {item.golfCourse && (
-                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-slide-enter-pill">
-                  <div 
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl cursor-pointer hover:bg-black/30 transition-all duration-200"
-                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                <div 
+                  className="absolute z-30 animate-slide-enter-pill"
+                  style={{
+                    top: `calc(env(safe-area-inset-top, 0px) + 12px)`,
+                    right: '16px'
+                  }}
+                >
+                  <button
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl hover:bg-black/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    style={{ 
+                      backdropFilter: 'blur(40px) saturate(180%)',
+                      minHeight: '44px'
+                    }}
+                    aria-label={`Golf course: ${item.golfCourse.name}`}
                   >
                     <MapPin className="w-3.5 h-3.5 text-white/90" />
                     <span className="text-sm font-medium truncate max-w-[150px]">
                       {item.golfCourse.name}
                     </span>
-                  </div>
+                  </button>
                 </div>
               )}
 
@@ -784,13 +808,15 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   />
                 )}
                 
-                {/* Navigation arrows for multiple media */}
+                {/* Navigation arrows for multiple media with proper tap targets */}
                 {hasMultipleMedia && (
                   <>
                     {/* Left Arrow */}
                     <button
                       onClick={(e) => handlePrevMedia(item.id, mediaItems.length, e)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-white/50"
+                      style={{ minWidth: '44px', minHeight: '44px' }}
+                      aria-label="Previous media"
                     >
                       <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
                     </button>
@@ -798,16 +824,21 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     {/* Right Arrow */}
                     <button
                       onClick={(e) => handleNextMedia(item.id, mediaItems.length, e)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-white/50"
+                      style={{ minWidth: '44px', minHeight: '44px' }}
+                      aria-label="Next media"
                     >
                       <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                     </button>
                   </>
                 )}
                 
-                {/* Media navigation dots for multiple media */}
+                {/* Media navigation dots for multiple media - z-20 */}
                 {hasMultipleMedia && (
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+                  <div 
+                    className="absolute left-1/2 -translate-x-1/2 z-20"
+                    style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + 24px)` }}
+                  >
                     <MediaNavigationDots
                       mediaCount={mediaItems.length}
                       currentIndex={currentMediaIndex}

@@ -41,16 +41,19 @@ const FeedActions: React.FC<FeedActionsProps> = ({
     isActive?: boolean;
     disabled?: boolean;
     className?: string;
-  }> = ({ icon, count, onClick, isActive = false, disabled = false, className }) => (
+    'aria-label'?: string;
+  }> = ({ icon, count, onClick, isActive = false, disabled = false, className, 'aria-label': ariaLabel }) => (
     <div className="flex flex-col items-center gap-1">
       <button
         onClick={onClick}
         disabled={disabled}
+        aria-label={ariaLabel}
         className={cn(
-          "relative w-12 h-12 rounded-full flex items-center justify-center",
+          "relative rounded-full flex items-center justify-center",
           "backdrop-blur-md border shadow-lg",
           "text-white transition-all duration-200",
           "hover:scale-105 active:scale-95",
+          "focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent",
           "bg-[var(--hud-bg)] border-[var(--hud-border)]",
           isActive && "bg-red-500/20 border-red-400/40",
           disabled && "opacity-50 cursor-not-allowed",
@@ -58,7 +61,11 @@ const FeedActions: React.FC<FeedActionsProps> = ({
         )}
         style={{
           boxShadow: 'var(--hud-shadow)',
-          backdropFilter: 'blur(40px) saturate(180%)'
+          backdropFilter: 'blur(40px) saturate(180%)',
+          minWidth: '48px',
+          minHeight: '48px',
+          width: '48px',
+          height: '48px'
         }}
       >
         {icon}
@@ -79,7 +86,7 @@ const FeedActions: React.FC<FeedActionsProps> = ({
   );
 
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-6 animate-slide-enter-ui">
+    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[35] flex flex-col gap-6 animate-slide-enter-ui">{/* z-35 for action rail */}
       {/* Like Button */}
       <ActionButton
         icon={
@@ -94,6 +101,7 @@ const FeedActions: React.FC<FeedActionsProps> = ({
         onClick={onLike}
         isActive={likeCountChanged}
         disabled={isLiking}
+        aria-label={isLiked ? "Unlike post" : "Like post"}
       />
 
       {/* Comment Button */}
@@ -102,6 +110,7 @@ const FeedActions: React.FC<FeedActionsProps> = ({
           icon={<ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white" />}
           count={commentCount}
           onClick={onComment}
+          aria-label="Comment on post"
         />
       </SuccessPulse>
 
@@ -110,6 +119,7 @@ const FeedActions: React.FC<FeedActionsProps> = ({
         <ActionButton
           icon={<PaperAirplaneIcon className="w-6 h-6 text-white" />}
           onClick={onShare}
+          aria-label="Share post"
         />
       </SuccessPulse>
 
@@ -125,6 +135,7 @@ const FeedActions: React.FC<FeedActionsProps> = ({
           }
           onClick={onToggleMute}
           isActive={!isMuted}
+          aria-label={isMuted ? "Unmute video" : "Mute video"}
         />
       )}
     </div>

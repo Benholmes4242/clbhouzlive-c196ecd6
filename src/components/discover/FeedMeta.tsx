@@ -33,7 +33,7 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
   return (
     <div 
       className={cn(
-        "fixed left-4 right-20 z-20 animate-slide-enter-ui",
+        "fixed left-4 right-20 z-30 animate-slide-enter-ui", /* z-30 for metadata */
         "pb-[env(safe-area-inset-bottom,0px)]",
         className
       )}
@@ -98,12 +98,17 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
               {displayCaption}
             </p>
             
-            {/* Expand/collapse button */}
+            {/* Expand/collapse button with proper tap target */}
             {needsClamping && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-white/80 text-sm font-medium hover:text-white transition-colors"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+                className="text-white/80 text-sm font-medium hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 py-1"
+                style={{ 
+                  textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                  minHeight: '44px',
+                  minWidth: '44px'
+                }}
+                aria-label={isExpanded ? 'Show less caption' : 'Show more caption'}
               >
                 {isExpanded ? 'less' : 'more'}
               </button>
