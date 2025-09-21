@@ -65,8 +65,9 @@ const GlobalHeader: React.FC = () => {
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-all duration-300",
-              // Always use glass-dark styling
-              "backdrop-blur-md bg-black/60"
+              // Light glass styling
+              "backdrop-blur-md",
+              "bg-white/15 border-b border-white/25"
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

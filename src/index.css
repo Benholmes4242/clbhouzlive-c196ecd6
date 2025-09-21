@@ -437,20 +437,20 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     
-    /* Clubhouse Design Tokens */
-    --hud-bg: rgba(0, 0, 0, 0.45);
-    --hud-border: rgba(255, 255, 255, 0.18);
-    --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+    /* Clubhouse Design Tokens - Light Glass */
+    --hud-bg: rgba(255, 255, 255, 0.12);
+    --hud-border: rgba(255, 255, 255, 0.25);
+    --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
     
     /* Header Heights */
     --header-h: 64px; /* mobile header height */
     --header-h-mobile: 60px;
     --header-h-desktop: 72px;
     
-    /* Header Design Tokens - Glass Dark Only */
-    --header-bg: rgba(0, 0, 0, 0.60);
-    --header-border: rgba(255, 255, 255, 0.10);
-    --header-icon: rgba(255, 255, 255, 0.92);
+    /* Header Design Tokens - Light Glass */
+    --header-bg: rgba(255, 255, 255, 0.15);
+    --header-border: rgba(255, 255, 255, 0.25);
+    --header-icon: rgba(255, 255, 255, 0.95);
     --header-icon-hover: #fff;
     
     /* Spacing */

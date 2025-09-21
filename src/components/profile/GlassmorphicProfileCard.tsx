@@ -21,11 +21,11 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
   const isMobile = useIsMobile();
 
   const glassmorphicStyle = {
-    background: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px) saturate(1.8)',
-    WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+    background: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: 'blur(24px) saturate(1.8)',
+    WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 8px 32px 0 rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
   };
 
   return (
