@@ -464,6 +464,11 @@ html, body, #root, .app-shell { touch-action: auto; }
     /* Profile Shadows */
     --profile-shadow-card: 0 6px 16px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.06);
     --profile-shadow-tile: 0 2px 8px rgba(16,24,40,0.06);
+    
+    /* Mini Profile Sheet Dimensions */
+    --sheet-header-h: 72px;
+    --sheet-footer-h: 0px;
+    --sheet-vpad: 16px;
 }
 
 /* Hide scrollbars for Netflix-style carousels */
@@ -498,6 +503,54 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   .liquid-glass-button:hover {
     background: rgba(255, 255, 255, 1);
+  }
+
+  /* Recent Posts Scroll Container */
+  .recent-posts-scroll {
+    max-height: calc(75dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Scroll shadows for affordance */
+  .recent-posts-scroll.is-scrollable::before,
+  .recent-posts-scroll.is-scrollable::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 14px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .recent-posts-scroll.is-scrollable::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,.15), transparent);
+  }
+
+  .recent-posts-scroll.is-scrollable::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.15), transparent);
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  .recent-posts-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .recent-posts-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .recent-posts-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+
+  .recent-posts-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
   }
 
   .liquid-glass-button.following {
@@ -567,7 +620,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
   }
-}
 
 /* Scrollbar hiding utility */
 .scrollbar-hide {

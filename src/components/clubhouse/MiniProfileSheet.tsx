@@ -347,65 +347,73 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           <div className="mx-6 mb-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
           {/* Recent Posts Section */}
-          <div className="px-6">
-            <h4 className="font-medium text-white mb-4">Recent Posts</h4>
+          <section aria-labelledby="recent-posts-title" className="px-6">
+            <h4 id="recent-posts-title" className="font-medium text-white mb-4">Recent Posts</h4>
             
-            {/* Loading State */}
-            {postsLoading && (
-              <div className={cn(
-                "grid gap-2",
-                isMobile ? "grid-cols-2" : "grid-cols-3"
-              )}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="aspect-square bg-white/5 rounded-2xl animate-pulse"
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Error State */}
-            {postsError && !postsLoading && (
-              <div className="text-center py-8 text-white/60">
-                <p className="mb-2">Couldn't load posts</p>
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="text-sm text-orange-300 hover:text-orange-200 transition-colors"
-                >
-                  Retry
-                </button>
-              </div>
-            )}
-
-            {/* Empty State */}
-            {isEmpty && !postsLoading && !postsError && (
-              <div className="text-center py-8 text-white/60">
-                <p>No posts yet</p>
-              </div>
-            )}
-
-            {/* Posts Grid */}
-            {!postsLoading && !postsError && posts.length > 0 && (
-              <div className={cn(
-                "grid gap-2",
-                isMobile ? "grid-cols-2" : "grid-cols-3"
-              )}>
-                {posts.slice(0, isMobile ? 6 : 9).map((post) => {
-                  const media = post.post_media[0];
-                  if (!media) return null;
-
-                  return (
-                    <RecentPostTile
-                      key={post.id}
-                      media={media}
-                      onTileClick={() => handlePostClick(post)}
+            <div
+              id="recent-posts-scroll"
+              role="region"
+              aria-label="Recent Posts, scrollable"
+              tabIndex={0}
+              className="recent-posts-scroll relative overflow-y-auto overscroll-contain"
+            >
+              {/* Loading State */}
+              {postsLoading && (
+                <div className={cn(
+                  "grid gap-2 p-2",
+                  isMobile ? "grid-cols-2" : "grid-cols-3"
+                )}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square bg-white/5 rounded-2xl animate-pulse"
                     />
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Error State */}
+              {postsError && !postsLoading && (
+                <div className="text-center py-8 text-white/60">
+                  <p className="mb-2">Couldn't load posts</p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="text-sm text-orange-300 hover:text-orange-200 transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {isEmpty && !postsLoading && !postsError && (
+                <div className="text-center py-8 text-white/60">
+                  <p>No posts yet</p>
+                </div>
+              )}
+
+              {/* Posts Grid */}
+              {!postsLoading && !postsError && posts.length > 0 && (
+                <div className={cn(
+                  "grid gap-2 p-2",
+                  isMobile ? "grid-cols-2" : "grid-cols-3"
+                )}>
+                  {posts.slice(0, isMobile ? 6 : 9).map((post) => {
+                    const media = post.post_media[0];
+                    if (!media) return null;
+
+                    return (
+                      <RecentPostTile
+                        key={post.id}
+                        media={media}
+                        onTileClick={() => handlePostClick(post)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </div>
