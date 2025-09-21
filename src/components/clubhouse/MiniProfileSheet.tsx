@@ -59,10 +59,8 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
     }, 300); // Match animation duration
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
+  const handleBackdropClick = () => {
+    handleClose();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -141,12 +139,14 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   return (
     <div 
       className="fixed inset-0 z-[70] flex items-end justify-center"
-      onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      {/* Enhanced Backdrop with more dimming */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      {/* Enhanced Backdrop with more dimming - make it clickable */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" 
+        onClick={handleBackdropClick}
+      />
       
       {/* Liquid Glass Sheet */}
       <div 
@@ -160,6 +160,7 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none"
         )}
         style={{ maxWidth: isMobile ? '100%' : '480px' }}
+        onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on the sheet
       >
         {/* Handle */}
         <div className="flex justify-center pt-4 pb-2">
