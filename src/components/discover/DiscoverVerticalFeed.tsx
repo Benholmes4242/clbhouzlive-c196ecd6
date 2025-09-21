@@ -23,10 +23,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
-import FeedActions from './FeedActions';
-import FeedMeta from './FeedMeta';
-import { useSwipeGestures } from '@/hooks/useSwipeGestures';
-import { HeartBurst } from '@/hooks/useDoubleTap';
 
 
 interface DiscoverVerticalFeedProps {
@@ -82,11 +78,11 @@ const VideoWithAutoplay: React.FC<{
 
   return (
     <div className="relative w-full h-full flex items-center justify-center bg-black overflow-hidden">
-      {/* Top gradient for readability - z-1 */}
-      <div className="absolute inset-x-0 top-0 z-[1] h-[28vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Top gradient for readability */}
+      <div className="absolute inset-x-0 top-0 z-10 h-[28vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
       
-      {/* Bottom gradient for readability - z-1 */}
-      <div className="absolute inset-x-0 bottom-0 z-[1] h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Bottom gradient for readability */}
+      <div className="absolute inset-x-0 bottom-0 z-10 h-[35vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
       
       {hlsUrl ? (
         <HLSVideoCard
@@ -130,11 +126,11 @@ const ImageWithPinchZoom: React.FC<{
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
-      {/* Top gradient for readability - z-1 */}
-      <div className="absolute inset-x-0 top-0 z-[1] h-[20vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Top gradient for readability */}
+      <div className="absolute inset-x-0 top-0 z-10 h-[20vh] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
       
-      {/* Bottom gradient for readability - z-1 */}
-      <div className="absolute inset-x-0 bottom-0 z-[1] h-[28vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Bottom gradient for readability */}
+      <div className="absolute inset-x-0 bottom-0 z-10 h-[28vh] bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
       
       <div
         ref={ref}
@@ -190,10 +186,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [shouldAttach, setShouldAttach] = useState<Record<string, boolean>>({});
   const [autoplay, setAutoplay] = useState<Record<string, boolean>>({});
   const [swipeDisabled, setSwipeDisabled] = useState(false);
-  const [heartBursts, setHeartBursts] = useState<Array<{ id: string; x: number; y: number }>>([]);
-  const [likeCountChanged, setLikeCountChanged] = useState<Record<string, boolean>>({});
-  const [shareSuccess, setShareSuccess] = useState(false);
-  const [commentSuccess, setCommentSuccess] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const nearObserverRef = useRef<IntersectionObserver | null>(null);
@@ -408,11 +400,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   const handleLike = useCallback((postId: string) => {
     onLike(postId);
-    // Trigger like count animation
-    setLikeCountChanged(prev => ({ ...prev, [postId]: true }));
-    setTimeout(() => {
-      setLikeCountChanged(prev => ({ ...prev, [postId]: false }));
-    }, 200);
   }, [onLike]);
 
   const handleFollow = useCallback(() => {
@@ -428,9 +415,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const handleComment = useCallback((postId: string) => {
     setSelectedPostId(postId);
     setCommentsModalOpen(true);
-    // Trigger comment success animation
-    setCommentSuccess(true);
-    setTimeout(() => setCommentSuccess(false), 200);
   }, []);
 
   const handleShare = useCallback(() => {
@@ -438,17 +422,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       navigator.share({
         title: 'Check out this post!',
         url: window.location.href,
-      }).then(() => {
-        // Trigger share success animation
-        setShareSuccess(true);
-        setTimeout(() => setShareSuccess(false), 200);
       }).catch(console.error);
     } else {
       // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        setShareSuccess(true);
-        setTimeout(() => setShareSuccess(false), 200);
-      });
+      navigator.clipboard.writeText(window.location.href);
     }
   }, []);
 
@@ -530,88 +507,37 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     }
   }, [posts.length]);
 
-  // Swipe gesture handling
-  const { gestureHandlers } = useSwipeGestures({
-    onSwipeUp: () => {
-      if (currentIndex < posts.length - 1) {
-        navigateToIndex(currentIndex + 1);
-      }
-    },
-    onSwipeDown: () => {
-      if (currentIndex > 0) {
-        navigateToIndex(currentIndex - 1);
-      }
-    },
-    onSwipeLeft: () => {
-      // TODO: Implement browsing more from same creator
-      console.log('Swipe left - browse more from creator');
-    },
-    onSwipeRight: () => {
-      // TODO: Implement browsing more from same creator  
-      console.log('Swipe right - browse more from creator');
-    },
-    disabled: swipeDisabled,
-    preventVerticalScroll: true
-  });
-
-  // Double tap handling for likes - moved outside of map to follow Rules of Hooks
-  const handleDoubleTapLike = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const x = 'clientX' in e ? e.clientX : (e as any).touches?.[0]?.clientX || rect.left + rect.width / 2;
-    const y = 'clientY' in e ? e.clientY : (e as any).touches?.[0]?.clientY || rect.top + rect.height / 2;
-    
-    // Add heart burst
-    const burstId = `${postId}-${Date.now()}`;
-    setHeartBursts(prev => [...prev, { id: burstId, x, y }]);
-    
-    // Remove heart burst after animation
-    setTimeout(() => {
-      setHeartBursts(prev => prev.filter(burst => burst.id !== burstId));
-    }, 800);
-    
-    // Trigger like
-    handleLike(postId);
-  }, [handleLike]);
-
-  // Keyboard navigation with accessibility
+  // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case 'Escape':
-          event.preventDefault();
           onClose();
           break;
         case 'ArrowUp':
-        case 'k': // Vim-style navigation
           event.preventDefault();
           if (currentIndex > 0) {
             navigateToIndex(currentIndex - 1);
           }
           break;
         case 'ArrowDown':
-        case 'j': // Vim-style navigation
           event.preventDefault();
           if (currentIndex < posts.length - 1) {
             navigateToIndex(currentIndex + 1);
           }
           break;
         case ' ':
-        case 'm': // 'm' for mute
           event.preventDefault();
           toggleGlobalMute();
-          break;
-        case 'l': // 'l' for like
-          event.preventDefault();
-          handleLike(posts[currentIndex]?.id);
           break;
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, currentIndex, posts.length, navigateToIndex, toggleGlobalMute, handleLike, posts]);
+  }, [isOpen, onClose, currentIndex, posts.length, navigateToIndex, toggleGlobalMute]);
 
   if (!isOpen) return null;
 
@@ -720,42 +646,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
           const touchHandlers = hasMultipleMedia ? createTouchHandlers() : {};
 
-          // Create double tap handler for this specific post
-          const createDoubleTapHandler = () => {
-            let tapCount = 0;
-            let lastTap = 0;
-            let timeoutRef: NodeJS.Timeout;
-
-            return (e: React.MouseEvent | React.TouchEvent) => {
-              if (currentMedia.media_type !== 'video') return;
-              
-              const now = Date.now();
-              const delay = 300;
-              
-              if (timeoutRef) {
-                clearTimeout(timeoutRef);
-              }
-
-              if (now - lastTap < delay && tapCount === 1) {
-                // Double tap detected
-                tapCount = 0;
-                lastTap = 0;
-                handleDoubleTapLike(item.id, e);
-              } else {
-                // First tap
-                tapCount = 1;
-                lastTap = now;
-                
-                timeoutRef = setTimeout(() => {
-                  tapCount = 0;
-                  lastTap = 0;
-                }, delay);
-              }
-            };
-          };
-
-          const handleTap = createDoubleTapHandler();
-
           return (
             <div 
               key={item.id}
@@ -767,54 +657,36 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   playObserverRef.current?.observe(el);
                 }
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center bg-black animate-slide-enter-video"
+              className="relative w-full snap-start snap-always flex items-center justify-center bg-black"
               style={{ 
                 height: '100dvh',
                 minHeight: '100dvh',
                 maxHeight: '100dvh',
                 width: '100vw'
               }}
-              {...gestureHandlers}
               {...touchHandlers}
-              onClick={handleTap}
             >
-              {/* Close Button - Top Left with safe area */}
+              {/* Close Button - Top Left */}
               <button
                 onClick={onClose}
-                className="absolute z-30 p-3 rounded-full text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-                style={{
-                  top: `calc(env(safe-area-inset-top, 0px) + 12px)`,
-                  left: '16px',
-                  minWidth: '44px',
-                  minHeight: '44px'
-                }}
-                aria-label="Close feed"
+                className="absolute top-6 left-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
+                aria-label="Close"
               >
                 <Minimize2 className="w-6 h-6" />
               </button>
 
-              {/* Golf Course Tag - Top Right Glass Pill with safe area - z-30 */}
+              {/* Golf Course Tag - Top Right Glass Pill */}
               {item.golfCourse && (
-                <div 
-                  className="absolute z-30 animate-slide-enter-pill"
-                  style={{
-                    top: `calc(env(safe-area-inset-top, 0px) + 12px)`,
-                    right: '16px'
-                  }}
-                >
-                  <button
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl hover:bg-black/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                    style={{ 
-                      backdropFilter: 'blur(40px) saturate(180%)',
-                      minHeight: '44px'
-                    }}
-                    aria-label={`Golf course: ${item.golfCourse.name}`}
+                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-fade-in">
+                  <div 
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl cursor-pointer hover:bg-black/30 transition-all duration-200"
+                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                   >
                     <MapPin className="w-3.5 h-3.5 text-white/90" />
                     <span className="text-sm font-medium truncate max-w-[150px]">
                       {item.golfCourse.name}
                     </span>
-                  </button>
+                  </div>
                 </div>
               )}
 
@@ -841,15 +713,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   />
                 )}
                 
-                {/* Navigation arrows for multiple media with proper tap targets */}
+                {/* Navigation arrows for multiple media */}
                 {hasMultipleMedia && (
                   <>
                     {/* Left Arrow */}
                     <button
                       onClick={(e) => handlePrevMedia(item.id, mediaItems.length, e)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-white/50"
-                      style={{ minWidth: '44px', minHeight: '44px' }}
-                      aria-label="Previous media"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
                     >
                       <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
                     </button>
@@ -857,21 +727,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     {/* Right Arrow */}
                     <button
                       onClick={(e) => handleNextMedia(item.id, mediaItems.length, e)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-white/50"
-                      style={{ minWidth: '44px', minHeight: '44px' }}
-                      aria-label="Next media"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
                     >
                       <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                     </button>
                   </>
                 )}
                 
-                {/* Media navigation dots for multiple media - z-20 */}
+                {/* Media navigation dots for multiple media */}
                 {hasMultipleMedia && (
-                  <div 
-                    className="absolute left-1/2 -translate-x-1/2 z-20"
-                    style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + 24px)` }}
-                  >
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
                     <MediaNavigationDots
                       mediaCount={mediaItems.length}
                       currentIndex={currentMediaIndex}
@@ -880,51 +745,142 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* New FeedMeta component - Bottom Left */}
-              {index === currentIndex && (
-                <FeedMeta
-                  user={{
-                    id: item.user?.id || '',
-                    name: item.user?.name || 'Unknown User',
-                    username: item.user?.username,
-                    avatar: item.user?.avatar || '/placeholder.svg'
-                  }}
-                  caption={item.title ? removeGolfCourseFromContent(item.title) : undefined}
-                  musicTrack={undefined} // TODO: Add music data to ExploreContentItem type
-                />
-              )}
+              {/* User Profile and Caption - Bottom Left */}
+              <div className="absolute bottom-6 left-3 right-20 z-20">
+                {/* User Profile Section */}
+                {index === currentIndex && (
+                  <div className="mb-3 flex items-end space-x-3">
+                    {/* Profile Photo */}
+                    <div className="relative">
+                      <img
+                        src={item.user?.avatar || '/placeholder.svg'}
+                        alt={item.user?.name || 'User'}
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Username */}
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                        {item.user?.name || 'Unknown User'}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
-              {/* New FeedActions component - Right Rail */}
-              <FeedActions
-                isLiked={likedPosts?.includes(item.id) || false}
-                likeCount={Math.floor(Math.random() * 1000) + 10} // Replace with real data
-                commentCount={Math.floor(Math.random() * 50) + 5} // Replace with real data
-                isMuted={isGloballyMuted}
-                mediaType={currentMedia.media_type}
-                onLike={() => handleLike(item.id)}
-                onComment={() => handleComment(item.id)}
-                onShare={handleShare}
-                onToggleMute={toggleGlobalMute}
-                isLiking={likeMutation.isPending}
-                likeCountChanged={likeCountChanged[item.id] || false}
-                shareSuccess={shareSuccess}
-                commentSuccess={commentSuccess}
-              />
+                {/* Caption Text */}
+                {item.title && removeGolfCourseFromContent(item.title) && (
+                  <div 
+                    className="text-white text-base font-medium cursor-default"
+                    style={{ 
+                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+                      lineHeight: '1.3',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      marginLeft: '0px',
+                      marginTop: '0px',
+                      wordBreak: 'break-word',
+                      width: '70vw', // 70% of screen width
+                      maxWidth: '70vw'
+                    }}
+                  >
+                    <span className="text-base font-medium">
+                      {removeGolfCourseFromContent(item.title)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons - Bottom Right */}
+              <div className="absolute bottom-6 right-4 z-10 flex flex-col space-y-6">
+                {/* Mute/Unmute toggle button - only show for video posts */}
+                {currentMedia.media_type === 'video' && (
+                  <button 
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    onClick={toggleGlobalMute}
+                  >
+                    {isGloballyMuted ? (
+                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
+                    ) : (
+                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
+                    )}
+                  </button>
+                )}
+
+                {/* Heart Button with Like Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleLike(item.id)}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    disabled={likeMutation.isPending}
+                  >
+                    <HeartIcon 
+                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
+                    />
+                  </button>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                    {Math.floor(Math.random() * 1000) + 10}
+                  </span>
+                </div>
+
+                {/* Message Button with Comment Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleComment(item.id)}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                  >
+                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
+                  </button>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                    {Math.floor(Math.random() * 50) + 5}
+                  </span>
+                </div>
+
+                {/* Share Button */}
+                <button
+                  onClick={handleShare}
+                  className="cursor-pointer hover:opacity-100 transition-opacity"
+                >
+                  <PaperAirplaneIcon className="h-8 w-8 text-white" />
+                </button>
+
+                {/* Three dots menu - only show for own posts */}
+                {user && item.user?.id === user.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button 
+                        className="cursor-pointer hover:opacity-100 transition-opacity"
+                      >
+                        <MoreHorizontal className="w-8 h-8 text-white" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border border-white/10 shadow-xl z-[1000000]"
+                    >
+                      <DropdownMenuItem onClick={() => handleEditPost(item.id)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Post
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDeletePost(item.id)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Post
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             </div>
           );
         })}
-
-        {/* Heart burst effects */}
-        {heartBursts.map(burst => (
-          <HeartBurst
-            key={burst.id}
-            x={burst.x}
-            y={burst.y}
-            onComplete={() => {
-              setHeartBursts(prev => prev.filter(b => b.id !== burst.id));
-            }}
-          />
-        ))}
       </div>
 
       {/* Comments Modal */}
