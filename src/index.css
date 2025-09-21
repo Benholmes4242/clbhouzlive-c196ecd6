@@ -526,12 +526,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     max-height: calc(75dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    padding-bottom: var(--sheet-scroll-pad-bottom);
-  }
-
-  /* Recent post tiles with scroll margin for accessibility */
-  .recent-post-tile {
-    scroll-margin-bottom: var(--sheet-scroll-pad-bottom);
   }
 
   /* Mini Profile Sheet Styles */
