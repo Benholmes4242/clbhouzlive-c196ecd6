@@ -232,7 +232,7 @@ const SearchPill = ({
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
-          "h-11 md:h-[48px] px-4 md:px-6 gap-3",
+          "h-11 md:h-12 px-4 md:px-6 gap-3",
            // Variant-specific styling
            isGlassDark && [
              "bg-white/10 backdrop-blur-md border border-white/20",
