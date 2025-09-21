@@ -282,6 +282,10 @@ html, body, #root, .app-shell { touch-action: auto; }
   animation: subtle-bounce 2s ease-in-out infinite;
 }
 
+.animate-marquee {
+  animation: marquee 8s linear infinite;
+}
+
 /* One-shot ping animation for swipe feedback */
 @keyframes pingonce {
   0% { 
@@ -342,6 +346,15 @@ html, body, #root, .app-shell { touch-action: auto; }
   100% {
     transform: translateY(100%);
     opacity: 0;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }
 

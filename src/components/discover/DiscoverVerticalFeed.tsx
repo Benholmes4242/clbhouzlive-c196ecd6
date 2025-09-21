@@ -23,6 +23,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
+import FeedActions from './FeedActions';
+import FeedMeta from './FeedMeta';
 
 
 interface DiscoverVerticalFeedProps {
@@ -745,139 +747,33 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* User Profile and Caption - Bottom Left */}
-              <div className="absolute bottom-6 left-3 right-20 z-20">
-                {/* User Profile Section */}
-                {index === currentIndex && (
-                  <div className="mb-3 flex items-end space-x-3">
-                    {/* Profile Photo */}
-                    <div className="relative">
-                      <img
-                        src={item.user?.avatar || '/placeholder.svg'}
-                        alt={item.user?.name || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </div>
-                    
-                    {/* Username */}
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                        {item.user?.name || 'Unknown User'}
-                      </span>
-                    </div>
-                  </div>
-                )}
+              {/* New FeedMeta component - Bottom Left */}
+              {index === currentIndex && (
+                <FeedMeta
+                  user={{
+                    id: item.user?.id || '',
+                    name: item.user?.name || 'Unknown User',
+                    username: item.user?.username,
+                    avatar: item.user?.avatar || '/placeholder.svg'
+                  }}
+                  caption={item.title ? removeGolfCourseFromContent(item.title) : undefined}
+                  musicTrack={undefined} // TODO: Add music data to ExploreContentItem type
+                />
+              )}
 
-                {/* Caption Text */}
-                {item.title && removeGolfCourseFromContent(item.title) && (
-                  <div 
-                    className="text-white text-base font-medium cursor-default"
-                    style={{ 
-                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-                      lineHeight: '1.3',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      marginLeft: '0px',
-                      marginTop: '0px',
-                      wordBreak: 'break-word',
-                      width: '70vw', // 70% of screen width
-                      maxWidth: '70vw'
-                    }}
-                  >
-                    <span className="text-base font-medium">
-                      {removeGolfCourseFromContent(item.title)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-6 right-4 z-10 flex flex-col space-y-6">
-                {/* Mute/Unmute toggle button - only show for video posts */}
-                {currentMedia.media_type === 'video' && (
-                  <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={toggleGlobalMute}
-                  >
-                    {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
-                    ) : (
-                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
-                    )}
-                  </button>
-                )}
-
-                {/* Heart Button with Like Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    disabled={likeMutation.isPending}
-                  >
-                    <HeartIcon 
-                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
-                    />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 1000) + 10}
-                  </span>
-                </div>
-
-                {/* Message Button with Comment Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleComment(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                  >
-                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 50) + 5}
-                  </span>
-                </div>
-
-                {/* Share Button */}
-                <button
-                  onClick={handleShare}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  <PaperAirplaneIcon className="h-8 w-8 text-white" />
-                </button>
-
-                {/* Three dots menu - only show for own posts */}
-                {user && item.user?.id === user.id && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button 
-                        className="cursor-pointer hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="w-8 h-8 text-white" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end" 
-                      className="w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border border-white/10 shadow-xl z-[1000000]"
-                    >
-                      <DropdownMenuItem onClick={() => handleEditPost(item.id)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit Post
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleDeletePost(item.id)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Post
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
+              {/* New FeedActions component - Right Rail */}
+              <FeedActions
+                isLiked={likedPosts?.includes(item.id) || false}
+                likeCount={Math.floor(Math.random() * 1000) + 10} // Replace with real data
+                commentCount={Math.floor(Math.random() * 50) + 5} // Replace with real data
+                isMuted={isGloballyMuted}
+                mediaType={currentMedia.media_type}
+                onLike={() => handleLike(item.id)}
+                onComment={() => handleComment(item.id)}
+                onShare={handleShare}
+                onToggleMute={toggleGlobalMute}
+                isLiking={likeMutation.isPending}
+              />
             </div>
           );
         })}
