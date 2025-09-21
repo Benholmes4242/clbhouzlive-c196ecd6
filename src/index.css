@@ -535,7 +535,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
     max-width: var(--sheet-max-width);
     margin-inline: auto;
-    margin-bottom: var(--sheet-edge-gap);
+    margin-bottom: 0; /* flush with top of bottom nav */
     /* Only animate transform and opacity, never width */
     transition: transform 240ms ease-out, opacity 240ms ease-out;
   }
@@ -547,7 +547,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
     max-width: var(--sheet-max-width);
     margin-inline: auto;
-    margin-bottom: var(--sheet-edge-gap);
+    margin-bottom: 0; /* flush with top of bottom nav */
   }
 
   /* Sheet header with fixed height to prevent layout shift */
