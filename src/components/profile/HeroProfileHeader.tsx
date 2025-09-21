@@ -747,7 +747,7 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-24px] md:bottom-[-32px]
+                bottom-[-8px] md:bottom-[-16px]
                 w-full z-20 mb-4 md:mb-5
               ">
               <GlassProfileCard
@@ -761,7 +761,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-12 md:h-16" />
+             <div className="h-8 md:h-12" />
            </section>
            
            {/* Dark Rail for Stats Pills */}
@@ -835,7 +835,7 @@ const HeroProfileHeader = ({
                ref={profileCardRef}
                className="
                  absolute left-1/2 -translate-x-1/2
-                 bottom-[-28px] md:bottom-[-36px]
+                 bottom-[-14px] md:bottom-[-18px]
                  w-[90%] md:w-[80%] max-w-[800px]
                  rounded-2xl border border-white/35
                  bg-white/35 backdrop-blur-xl
@@ -890,7 +890,7 @@ const HeroProfileHeader = ({
              </div>
               
               {/* Spacer below to avoid clipping the panel */}
-              <div className="h-16 md:h-20" />
+              <div className="h-12 md:h-16" />
             </section>
             
             {/* Dark Rail for Stats */}
