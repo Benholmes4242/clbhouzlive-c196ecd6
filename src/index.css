@@ -325,6 +325,28 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 }
 
+@keyframes slide-in-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-down {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
 @layer base {
   /* Feed card video styles to reduce flash */
   .feed-card-video {
@@ -645,9 +667,20 @@ html, body, #root, .app-shell { touch-action: auto; }
     animation: marquee linear infinite;
   }
 
+  /* Slide animations for modals */
+  .animate-slide-in-up {
+    animation: slide-in-up 0.3s ease-out;
+  }
+
+  .animate-slide-out-down {
+    animation: slide-out-down 0.3s ease-out;
+  }
+
   /* Respect prefers-reduced-motion */
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee {
+    .animate-marquee,
+    .animate-slide-in-up,
+    .animate-slide-out-down {
       animation: none;
     }
   }

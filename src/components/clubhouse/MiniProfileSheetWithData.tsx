@@ -17,6 +17,7 @@ const MiniProfileSheetWithData: React.FC<MiniProfileSheetWithDataProps> = ({
 }) => {
   const { data: profileData, isLoading } = useUserProfile(userId);
 
+  // Always render the component when open or when there's data to show during closing animation
   if (!isOpen || !userId) return null;
 
   if (isLoading) {

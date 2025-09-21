@@ -34,37 +34,60 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   const { openMedia } = useFullscreenMedia();
   const [isFollowing, setIsFollowing] = useState(user?.isFollowing || false);
   const [optimisticFollowing, setOptimisticFollowing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   // Update following state when user prop changes
   useEffect(() => {
     setIsFollowing(user?.isFollowing || false);
   }, [user?.isFollowing]);
 
-  if (!isOpen) return null;
+  // Reset closing state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsClosing(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen && !isClosing) return null;
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Wait for slide-out animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 300); // Match animation duration
+  };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose();
+      handleClose();
     }
   };
 
   const handleAvatarClick = () => {
     if (user?.id) {
-      navigate(`/profile/${user.id}`);
-      onClose();
+      handleClose();
+      // Small delay to ensure modal closes before navigation
+      setTimeout(() => {
+        navigate(`/profile/${user.id}`);
+      }, 100);
     }
   };
 
   const handleNameClick = () => {
     if (user?.id) {
-      navigate(`/profile/${user.id}`);
-      onClose();
+      handleClose();
+      // Small delay to ensure modal closes before navigation
+      setTimeout(() => {
+        navigate(`/profile/${user.id}`);
+      }, 100);
     }
   };
 
@@ -131,7 +154,8 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           "relative w-full max-h-[75vh] overflow-hidden",
           "bg-black/20 backdrop-blur-xl border border-white/10",
           "rounded-t-3xl shadow-2xl shadow-black/50",
-          "animate-slide-in-up motion-reduce:animate-none",
+          "transition-transform duration-300 ease-out",
+          isClosing ? "animate-slide-out-down" : "animate-slide-in-up",
           // Glass surface styling
           "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none"
         )}
@@ -145,7 +169,7 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
         {/* Close Button - moved further to top right and smaller */}
         <div className="absolute top-2 right-2 z-10">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className={cn(
               "p-1.5 rounded-full transition-all duration-200",
               "bg-black/20 backdrop-blur-sm border border-white/10",
