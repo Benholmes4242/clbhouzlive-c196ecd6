@@ -7,6 +7,7 @@ import { useFollowUser } from '@/hooks/useFollowUser';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 
 interface UserProfile {
   id: string;
@@ -24,6 +25,81 @@ interface MiniProfileSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onFollow?: () => void;
+}
+
+function bumpPosterTime(url: string, nextTime = '2s') {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('time', nextTime);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+function RecentPostTile({ 
+  media, 
+  onTileClick 
+}: { 
+  media: { type: 'image' | 'video'; url: string; posterUrl?: string };
+  onTileClick: () => void;
+}) {
+  const isVideo = media.type === 'video';
+
+  // build retry poster for video (e.g., 2s frame), only if we used 1s above
+  const retryPoster = isVideo && media.posterUrl
+    ? bumpPosterTime(media.posterUrl, '2s')
+    : undefined;
+
+  const srcForImg = isVideo ? (media.posterUrl ?? '') : media.url;
+
+  return (
+    <div
+      onClick={onTileClick}
+      className={cn(
+        "relative aspect-square bg-white/5 rounded-2xl overflow-hidden cursor-pointer",
+        "transition-all duration-200 hover:scale-105 hover:bg-white/10",
+        "focus:outline-none focus:ring-2 focus:ring-white/30"
+      )}
+      tabIndex={0}
+      role="button"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onTileClick();
+        }
+      }}
+    >
+      <ImageWithFallback
+        src={srcForImg}
+        retrySrc={retryPoster}
+        placeholderSrc="/placeholders/post-tile.jpg"
+        className="w-full h-full object-cover"
+        alt="User post"
+        onHardFail={() => {
+          // optional: breadcrumb, not console spam
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[MiniProfileSheet] poster hard-fail', media);
+          }
+        }}
+      />
+
+      {isVideo && (
+        <>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+              <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
+            </div>
+          </div>
+          <div className="absolute bottom-1 right-1 px-2 py-1 rounded-full text-[11px] bg-black/50 text-white backdrop-blur-sm">
+            ▶︎
+          </div>
+        </>
+      )}
+      {/* Gradient overlay for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+    </div>
+  );
 }
 
 const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetProps) => {
@@ -120,9 +196,11 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   const handlePostClick = (post: any) => {
     if (post.post_media?.length > 0) {
       const media = post.post_media[0];
+      // For videos, use the original HLS URL, for images use the image URL
+      const mediaUrl = media.type === 'video' ? media.url : media.url;
       openMedia(
-        media.media_url,
-        media.media_type,
+        mediaUrl,
+        media.type,
         'User post',
         undefined,
         {
@@ -318,39 +396,11 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                   if (!media) return null;
 
                   return (
-                    <div
+                    <RecentPostTile
                       key={post.id}
-                      onClick={() => handlePostClick(post)}
-                      className={cn(
-                        "relative aspect-square bg-white/5 rounded-2xl overflow-hidden cursor-pointer",
-                        "transition-all duration-200 hover:scale-105 hover:bg-white/10",
-                        "focus:outline-none focus:ring-2 focus:ring-white/30"
-                      )}
-                      tabIndex={0}
-                      role="button"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handlePostClick(post);
-                        }
-                      }}
-                    >
-                      <img
-                        src={media.poster_url || media.media_url}
-                        alt="User post"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      {media.media_type === 'video' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                            <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
-                          </div>
-                        </div>
-                      )}
-                      {/* Gradient overlay for better contrast */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    </div>
+                      media={media}
+                      onTileClick={() => handlePostClick(post)}
+                    />
                   );
                 })}
               </div>

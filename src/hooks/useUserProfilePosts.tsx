@@ -1,18 +1,42 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 
-interface PostMedia {
+type RawMedia = {
   id: string;
   media_type: 'image' | 'video';
-  media_url: string;
-  poster_url?: string;
-}
+  media_url: string | null;
+  poster_url: string | null;
+  post_id: string;
+};
+
+type NormalizedMedia = {
+  id: string;
+  type: 'image' | 'video';
+  url: string;          // image url for images, hls/mp4 url for videos
+  posterUrl?: string;   // ALWAYS present for videos after normalization
+  postId: string;
+};
 
 interface UserPost {
   id: string;
   content: string | null;
   created_at: string;
-  post_media: PostMedia[];
+  post_media: NormalizedMedia[];
+}
+
+/** Ensure videos always get a posterUrl (1s frame) */
+function ensurePosterForVideo(m: RawMedia): string | undefined {
+  if (m.media_type !== 'video') return undefined;
+  // try DB poster first
+  if (m.poster_url) return m.poster_url;
+
+  // derive from stream url/id using existing utils
+  const id = getStreamIdFromUrl(m.media_url ?? '');
+  if (!id) return undefined;
+
+  // 1s is what's used elsewhere in the app
+  return getStreamPoster(id, '1s'); // returns stable jpeg thumbnail url
 }
 
 export const useUserProfilePosts = (userId: string | null) => {
@@ -66,18 +90,37 @@ export const useUserProfilePosts = (userId: string | null) => {
           // Still show posts even if media fails
         }
 
-        // Combine posts with their media
-        const formattedPosts = postsData.map(post => ({
-          id: post.id,
-          content: post.content,
-          created_at: post.created_at,
-          post_media: mediaData?.filter(m => m.post_id === post.id).map(m => ({
-            id: m.id,
-            media_type: m.media_type as 'image' | 'video',
-            media_url: m.media_url,
-            poster_url: m.poster_url || undefined
-          })) || []
-        }));
+        // Combine posts with their media using normalization
+        const formattedPosts = postsData.map(post => {
+          const medias: NormalizedMedia[] = (mediaData?.filter(m => m.post_id === post.id) || []).map((m: any) => {
+            const rawMedia: RawMedia = {
+              id: m.id,
+              media_type: m.media_type as 'image' | 'video',
+              media_url: m.media_url,
+              poster_url: m.poster_url,
+              post_id: m.post_id
+            };
+
+            const posterUrl = rawMedia.media_type === 'video'
+              ? ensurePosterForVideo(rawMedia)
+              : undefined;
+
+            return {
+              id: rawMedia.id,
+              type: rawMedia.media_type,
+              url: rawMedia.media_url ?? '',       // image src for images, hls/mp4 url for videos (not used by <img>)
+              posterUrl,                           // populated for videos
+              postId: rawMedia.post_id,
+            };
+          });
+
+          return {
+            id: post.id,
+            content: post.content,
+            created_at: post.created_at,
+            post_media: medias
+          };
+        });
 
         // Only include posts that have media
         const postsWithMedia = formattedPosts.filter(post => post.post_media.length > 0);
