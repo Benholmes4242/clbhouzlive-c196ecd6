@@ -34,7 +34,7 @@ interface HeaderProviderProps {
 
 export const HeaderProvider: React.FC<HeaderProviderProps> = ({ 
   children, 
-  defaultVariant = 'solid-light' 
+  defaultVariant = 'glass-dark' 
 }) => {
   const [variant, setVariant] = useState<HeaderVariant>(defaultVariant);
   const [isVisible, setIsVisible] = useState(true);
