@@ -56,7 +56,7 @@ const SearchPill = ({
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, 250); // Optimized 250ms debounce
   
   // Use the new global entity search hook
   const {

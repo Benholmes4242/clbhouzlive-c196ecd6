@@ -67,7 +67,7 @@ export interface UseGlobalEntitySearchProps {
   };
 }
 
-// Search functions
+// Search functions with optimized queries and limits
 const searchPeople = async (query: string, limit: number = 6): Promise<PersonResult[]> => {
   if (!query.trim()) return [];
 
@@ -84,7 +84,7 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
     .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
     .eq('is_public', true)
     .order('display_name')
-    .limit(limit);
+    .limit(Math.min(limit, 8)); // Performance: cap each section at 8 items
 
   if (error) {
     console.error('Error searching people:', error);
@@ -116,7 +116,7 @@ const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult
     `)
     .ilike('name', `%${query}%`)
     .order('global_rank', { ascending: true, nullsFirst: false })
-    .limit(limit);
+    .limit(Math.min(limit, 8)); // Performance: cap each section at 8 items
 
   if (error) {
     console.error('Error searching clubs:', error);
@@ -193,13 +193,14 @@ export const useGlobalEntitySearch = ({
   }, [query]);
 
   const hasQuery = query.trim().length > 0;
+  const normalizedQuery = query.trim().toLowerCase();
 
   // Get recent searches (doesn't need React Query since it's localStorage)
   const recent = getRecentSearches();
 
   // Get trending items
   const trendingQuery = useQuery({
-    queryKey: ['trending-items'],
+    queryKey: ['global-search', 'trending'],
     queryFn: getTrendingItems,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v4+)
@@ -208,24 +209,24 @@ export const useGlobalEntitySearch = ({
 
   // Individual search queries - more predictable than useQueries
   const peopleQuery = useQuery({
-    queryKey: ['search-people', query, limits.people],
-    queryFn: () => searchPeople(query, limits.people || 6),
+    queryKey: ['global-search', 'people', normalizedQuery],
+    queryFn: () => searchPeople(normalizedQuery, limits.people || 6),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     enabled: enabled && hasQuery
   });
 
   const clubsQuery = useQuery({
-    queryKey: ['search-clubs', query, limits.clubs],
-    queryFn: () => searchClubs(query, limits.clubs || 6),
+    queryKey: ['global-search', 'clubs', normalizedQuery],
+    queryFn: () => searchClubs(normalizedQuery, limits.clubs || 6),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     enabled: enabled && hasQuery
   });
 
   const pagesQuery = useQuery({
-    queryKey: ['search-pages', query, limits.pages],
-    queryFn: () => searchPages(query, limits.pages || 6),
+    queryKey: ['global-search', 'pages', normalizedQuery],
+    queryFn: () => searchPages(normalizedQuery, limits.pages || 6),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     enabled: enabled && hasQuery
