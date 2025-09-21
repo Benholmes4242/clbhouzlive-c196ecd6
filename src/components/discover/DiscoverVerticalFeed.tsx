@@ -685,6 +685,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       name: item.golfCourse.name,
                       country: item.golfCourse.country
                     }}
+                    className="!static !right-auto"
                   />
                 </div>
               )}
