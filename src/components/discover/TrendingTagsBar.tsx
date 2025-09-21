@@ -45,7 +45,8 @@ const TrendingTagsBar: React.FC<TrendingTagsBarProps> = ({ onTagsChange, classNa
           {selectedTags.length > 0 && (
             <button
               onClick={clearTags}
-              className="flex items-center gap-1 px-3 py-1.5 bg-discover-orange text-white text-xs font-medium rounded-full hover:bg-discover-orange-dark transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-discover-orange/50"
+              className="discover-pill discover-pill--active flex items-center gap-1 text-xs font-medium transition-colors flex-shrink-0 focus:outline-none focus:ring-2"
+              style={{ backgroundColor: 'hsl(var(--discover-orange))', borderColor: 'hsl(var(--discover-orange))' }}
               aria-label="Clear all selected tags"
             >
               <X className="w-3 h-3" />
@@ -62,11 +63,8 @@ const TrendingTagsBar: React.FC<TrendingTagsBarProps> = ({ onTagsChange, classNa
                 key={tag.tag}
                 onClick={() => toggleTag(tag.tag)}
                 className={`
-                  flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex-shrink-0 border min-h-[44px] focus:outline-none focus:ring-2
-                  ${isSelected 
-                    ? 'bg-discover-orange text-white border-discover-orange shadow-sm focus:ring-discover-orange/50' 
-                    : 'bg-white/70 backdrop-blur-sm text-foreground border-border hover:border-discover-orange/30 hover:bg-discover-orange/5 focus:ring-discover-orange/30'
-                  }
+                  discover-pill ${isSelected ? 'discover-pill--active' : ''}
+                  flex items-center gap-1.5 text-xs font-medium transition-all duration-200 flex-shrink-0 focus:outline-none focus:ring-2
                 `}
                 aria-label={`${isSelected ? 'Remove' : 'Add'} ${tag.tag} tag filter`}
               >
