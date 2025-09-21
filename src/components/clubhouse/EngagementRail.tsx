@@ -133,7 +133,6 @@ const EngagementRail = ({
       <EngagementButton
         icon={isGloballyMuted ? VolumeX : Volume2}
         count={0}
-        isActive={!isGloballyMuted}
         onClick={handleAudioToggle}
       />
     </div>
