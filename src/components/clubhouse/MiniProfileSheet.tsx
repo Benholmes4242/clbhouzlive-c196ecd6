@@ -273,11 +273,6 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
         )}
         onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on the sheet
       >
-        {/* Handle */}
-        <div className="flex justify-center pt-4 pb-2">
-          <div className="w-12 h-1.5 bg-white/30 rounded-full" />
-        </div>
-
         {/* Close Button - moved further to top right and smaller */}
         <div className="absolute top-2 right-2 z-10">
           <button
@@ -297,7 +292,7 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
         <div className="flex flex-col h-full">
           {/* Header Section with Fixed Height */}
           <div ref={headerRef} className="sheet-header flex-shrink-0">
-            {/* Handle */}
+            {/* Single Handle */}
             <div className="flex justify-center pt-4 pb-2">
               <div className="w-12 h-1.5 bg-white/30 rounded-full" />
             </div>
@@ -323,21 +318,21 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                   />
                 </button>
                 
-                <div className="flex-1 min-w-0">
-                  {/* Clickable Name - Single Line with Ellipsis */}
-                  <div className="flex items-center gap-2 mb-1">
-                    <button
-                      onClick={handleNameClick}
-                      className={cn(
-                        "text-left transition-colors duration-200 flex-1 min-w-0",
-                        "hover:text-white/80 focus:text-white/80 focus:outline-none",
-                        user?.id ? "cursor-pointer" : "cursor-default"
-                      )}
-                      disabled={!user?.id}
-                    >
-                      <h3 className="font-semibold text-lg text-white truncate">
-                        {user.name}
-                      </h3>
+                  <div className="flex-1 min-w-0">
+                    {/* Clickable Name - Single Line with Ellipsis */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        onClick={handleNameClick}
+                        className={cn(
+                          "text-left transition-colors duration-200 flex-1 min-w-0",
+                          "hover:text-white/80 focus:text-white/80 focus:outline-none",
+                          user?.id ? "cursor-pointer" : "cursor-default"
+                        )}
+                        disabled={!user?.id}
+                      >
+                        <h3 className="sheet-title font-semibold text-lg text-white">
+                          {user.name}
+                        </h3>
                     </button>
                     {user.isVerified && (
                       <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
@@ -370,7 +365,7 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                   onClick={handleFollowClick}
                   disabled={followLoading || optimisticFollowing}
                   className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px] flex-shrink-0",
+                    "follow-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px] flex-shrink-0",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     isFollowing
                       ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"

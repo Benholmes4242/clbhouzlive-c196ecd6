@@ -22,9 +22,22 @@ const MiniProfileSheetWithData: React.FC<MiniProfileSheetWithDataProps> = ({
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-[70] flex items-center justify-center">
+      <div className="fixed inset-0 z-[70] flex items-end justify-center">
+        {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-        <div className="text-white">Loading...</div>
+        
+        {/* Loading Sheet with Same Dimensions */}
+        <div className="mini-profile-sheet-loading relative flex flex-col overflow-hidden bg-black/20 backdrop-blur-xl border border-white/10 rounded-t-3xl shadow-2xl shadow-black/50">
+          {/* Handle */}
+          <div className="flex justify-center pt-4 pb-2">
+            <div className="w-12 h-1.5 bg-white/30 rounded-full" />
+          </div>
+          
+          {/* Loading Content */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-white">Loading...</div>
+          </div>
+        </div>
       </div>
     );
   }

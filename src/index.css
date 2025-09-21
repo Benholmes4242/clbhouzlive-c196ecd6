@@ -482,6 +482,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     :root {
       --sheet-height-mobile: var(--sheet-height-desktop);
     }
+  }
 
 /* Hide scrollbars for Netflix-style carousels */
 .scrollbar-hide {
@@ -528,8 +529,21 @@ html, body, #root, .app-shell { touch-action: auto; }
   .mini-profile-sheet {
     height: var(--sheet-height-mobile);
     min-height: var(--sheet-min-height);
+    width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
     max-width: var(--sheet-max-width);
-    margin-inline: var(--sheet-edge-gap);
+    margin-inline: auto;
+    margin-bottom: var(--sheet-edge-gap);
+    /* Only animate transform and opacity, never width */
+    transition: transform 240ms ease-out, opacity 240ms ease-out;
+  }
+
+  /* Loading sheet uses same constraints */
+  .mini-profile-sheet-loading {
+    height: var(--sheet-height-mobile);
+    min-height: var(--sheet-min-height);
+    width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
+    max-width: var(--sheet-max-width);
+    margin-inline: auto;
     margin-bottom: var(--sheet-edge-gap);
   }
 
@@ -537,6 +551,17 @@ html, body, #root, .app-shell { touch-action: auto; }
   .sheet-header {
     min-height: 120px;
     flex-shrink: 0;
+  }
+
+  /* Prevent text wrapping from affecting layout */
+  .sheet-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .follow-btn {
+    white-space: nowrap;
   }
 
   /* Sheet scroll region fills remaining space */
@@ -679,7 +704,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
   }
-}
 
 /* Scrollbar hiding utility */
 .scrollbar-hide {
