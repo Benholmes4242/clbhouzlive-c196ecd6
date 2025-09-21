@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Clubhouse from './Clubhouse';
 
 const ClubhouseWrapped = () => {
-  const { setVariant } = useHeaderVariant();
+  const { setVariant } = useHeader();
 
   useEffect(() => {
     setVariant('glass-dark');

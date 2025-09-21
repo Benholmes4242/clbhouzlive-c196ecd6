@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import ProfilePage from './ProfilePage';
 
 const ProfileWrapped = () => {
-  const { setVariant } = useHeaderVariant();
+  const { setVariant } = useHeader();
 
   useEffect(() => {
     // Profile pages have hero images, use glass-dark

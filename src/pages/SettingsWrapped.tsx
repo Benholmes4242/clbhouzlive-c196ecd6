@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Settings from './Settings';
 
 const SettingsWrapped = () => {
-  const { setVariant } = useHeaderVariant();
+  const { setVariant } = useHeader();
 
   useEffect(() => {
     // Settings page has white background, use solid-light

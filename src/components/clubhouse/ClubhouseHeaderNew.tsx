@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAppLogo } from '@/hooks/useAppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import SearchPill from './SearchPill';
 import HeaderNavigation from '@/components/header/HeaderNavigation';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ interface ClubhouseHeaderNewProps {
 const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHeaderNewProps) => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
-  const { variant } = useHeaderVariant();
+  const { variant } = useHeader();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
 

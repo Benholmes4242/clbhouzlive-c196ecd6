@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { HeaderVariant } from '@/contexts/HeaderContext';
+import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 
 interface SearchPillProps {
   className?: string;

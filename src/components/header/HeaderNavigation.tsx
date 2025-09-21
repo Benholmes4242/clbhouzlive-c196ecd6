@@ -8,7 +8,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
-import { useHeaderVariant } from "@/contexts/HeaderContext";
+import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ const HeaderNavigation = () => {
   const location = useLocation();
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
-  const { variant } = useHeaderVariant();
+  const { variant } = useHeader();
   
   // Create refs for adaptive text color detection
   const navigationRef = useRef<HTMLDivElement>(null);

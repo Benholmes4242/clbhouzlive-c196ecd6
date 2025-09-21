@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Discover from './Discover';
 
 const DiscoverWrapped = () => {
-  const { setVariant } = useHeaderVariant();
+  const { setVariant } = useHeader();
 
   useEffect(() => {
     setVariant('solid-light');

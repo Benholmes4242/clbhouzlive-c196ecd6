@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useModalContext } from '@/contexts/ModalContext';
-import { useHeaderVariant } from '@/contexts/HeaderContext';
+import { useHeader } from '@/contexts/GlobalHeaderContext';
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
 import CompactHeader from './clubhouse/CompactHeader';
@@ -19,7 +19,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   const location = useLocation();
   const { currentLogo } = useAppLogo();
   const { shouldHideHeader } = useModalContext();
-  const { variant } = useHeaderVariant();
+  const { variant } = useHeader();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
 
