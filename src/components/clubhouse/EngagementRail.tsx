@@ -12,6 +12,7 @@ interface EngagementRailProps {
     shares: number;
   };
   isLiked?: boolean;
+  isVideo?: boolean; // New prop to indicate if current post is a video
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -92,6 +93,7 @@ const EngagementRail = ({
   postId,
   stats,
   isLiked = false,
+  isVideo = false,
   onLike,
   onComment,
   onShare,
@@ -130,11 +132,14 @@ const EngagementRail = ({
         onClick={onShare}
       />
       
-      <EngagementButton
-        icon={isGloballyMuted ? VolumeX : Volume2}
-        count={0}
-        onClick={handleAudioToggle}
-      />
+      {/* Only show audio control for video posts */}
+      {isVideo && (
+        <EngagementButton
+          icon={isGloballyMuted ? VolumeX : Volume2}
+          count={0}
+          onClick={handleAudioToggle}
+        />
+      )}
     </div>
   );
 };
