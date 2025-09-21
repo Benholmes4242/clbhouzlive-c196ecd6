@@ -1,9 +1,11 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMediaListener';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface PostSubmissionHandlerProps {
   isComposerOpen: boolean;
@@ -30,6 +32,9 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
+  const { addOptimisticPost } = useOptimisticPostInsertion();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (data: any) => {
     // Get files from mediaItems or fallback to selectedFile for backward compatibility
@@ -42,46 +47,69 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       return;
     }
 
-    // Immediate UI feedback - close modal and show success toast
-    onClose();
-    onShowToast('Your post is out there!');
-    
-    // Update recent media cache immediately for instant thumbnail updates
-    if (mediaItems.length > 0) {
-      await updateRecentMediaFromItems(mediaItems);
-    }
-    
-    // Background upload - don't await, don't block UI
-    setIsSubmitting(true);
-    
-    // Dispatch post completion event with media items for cache update
-    const dispatchPostCompleted = () => {
-      window.dispatchEvent(new CustomEvent('postCompleted', {
-        detail: { mediaItems }
-      }));
-    };
-    
-    submitPost({
-      user,
-      content: data.caption,
-      mediaFiles: files,
-      selectedTags: data.tags ?? [],
-      courseInfo: data.selectedCourse ?? data.course,
-      onSuccess: () => {
-        console.log('Post submission successful - background upload completed');
-        setIsSubmitting(false);
-        dispatchPostCompleted();
-      },
-      onError: () => {
-        console.error('Post submission failed - background upload failed');
+    try {
+      setIsSubmitting(true);
+
+      // Add optimistic post immediately for better UX
+      if (user) {
+        const optimisticId = addOptimisticPost({
+          caption: data.caption,
+          files: files,
+          selectedCourse: data.selectedCourse,
+          visibility: data.visibility || 'public',
+          coverIndex: data.coverIndex,
+          userId: user.id,
+          userProfile: {
+            id: user.id,
+            display_name: user.user_metadata?.display_name || user.user_metadata?.full_name,
+            username: user.user_metadata?.username,
+            profile_photo_url: user.user_metadata?.avatar_url
+          }
+        });
+      }
+
+      // Navigate to discover if not already there
+      if (location.pathname !== '/discover') {
+        navigate('/discover');
+      }
+
+      // Update recent media cache
+      if (mediaItems.length > 0) {
+        await updateRecentMediaFromItems(mediaItems);
+      }
+
+      // Background upload
+      submitPost({
+        user,
+        content: data.caption,
+        mediaFiles: files,
+        selectedTags: data.tags ?? [],
+        courseInfo: data.selectedCourse ?? data.course,
+        onSuccess: () => {
+          console.log('Post submission successful - background upload completed');
+          setIsSubmitting(false);
+          
+          // Dispatch post completion event
+          window.dispatchEvent(new CustomEvent('postCompleted', {
+            detail: { mediaItems }
+          }));
+        },
+        onError: () => {
+          console.error('Post submission failed - background upload failed');
+          setIsSubmitting(false);
+          onShowToast('Upload failed. Please try again later.');
+        }
+      }).catch((error) => {
+        console.error('Error in enhanced post submission:', error);
         setIsSubmitting(false);
         onShowToast('Upload failed. Please try again later.');
-      }
-    }).catch((error) => {
+      });
+      
+    } catch (error) {
       console.error('Error in enhanced post submission:', error);
       setIsSubmitting(false);
       onShowToast('Upload failed. Please try again later.');
-    });
+    }
   };
 
   return (

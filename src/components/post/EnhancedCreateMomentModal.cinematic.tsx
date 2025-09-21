@@ -4,7 +4,7 @@ import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } 
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import PostSuccessOverlay from './PostSuccessOverlay';
 import { useModalContext } from '@/contexts/ModalContext';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
@@ -46,10 +46,10 @@ export default function EnhancedCreateMomentModalCinematic({
   onCourseSelect
 }: Props) {
   const isDark = theme === "dark";
-  const { toast } = useToast();
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   // Update modal context when create moment modal opens/closes
@@ -182,11 +182,7 @@ export default function EnhancedCreateMomentModalCinematic({
       }
     } catch (error) {
       console.error('AI caption error:', error);
-      toast({
-        title: "Caption Generation Failed",
-        description: "Please try writing a caption manually.",
-        variant: "destructive"
-      });
+      // No toast here anymore - keep it simple
     } finally {
       setAiLoading(false);
     }
@@ -194,6 +190,9 @@ export default function EnhancedCreateMomentModalCinematic({
 
   const handlePost = async () => {
     if (!canPost) return;
+    
+    // Show success overlay immediately for better UX
+    setShowSuccessOverlay(true);
     
     onSubmit({
       caption,
@@ -204,6 +203,14 @@ export default function EnhancedCreateMomentModalCinematic({
       backgroundMusic: null, // Default for now
       coverIndex // NEW: thumbnail source for feeds
     });
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccessOverlay(false);
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      onClose();
+    }, 100);
   };
 
   const panel = isDark ? "bg-black/60" : "bg-white/70";
@@ -500,6 +507,12 @@ export default function EnhancedCreateMomentModalCinematic({
               </div>
             </motion.div>
           </div>
+
+          {/* Success Overlay */}
+          <PostSuccessOverlay
+            isVisible={showSuccessOverlay}
+            onComplete={handleSuccessComplete}
+          />
         </motion.div>
       )}
     </AnimatePresence>

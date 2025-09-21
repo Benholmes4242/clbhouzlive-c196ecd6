@@ -13,6 +13,7 @@ import { MediaItem } from '@/types/media';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
@@ -63,6 +64,13 @@ const Discover = () => {
     setPosts
   } = useVerticalMediaFeed();
 
+  const { optimisticPosts } = useOptimisticPostInsertion();
+
+  // Combine optimistic posts with regular content
+  const allContent = React.useMemo(() => {
+    return [...optimisticPosts, ...(content || [])];
+  }, [optimisticPosts, content]);
+
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
@@ -85,8 +93,8 @@ const Discover = () => {
         setModalOpen(true);
       }
     } else {
-      // Use vertical feed - set posts and open feed
-      setPosts(content || []);
+      // Use vertical feed - set posts and open feed, using allContent instead of content
+      setPosts(allContent || []);
       openFeed(item);
     }
   };
@@ -96,9 +104,9 @@ const Discover = () => {
     // In real app: API call to follow user
   };
 
-  // Transform content to MediaItem[] for FullscreenMediaModal
+  // Transform content to MediaItem[] for FullscreenMediaModal - use allContent
   const mediaItems: MediaItem[] = useMemo(() => {
-    const currentContent = content || [];
+    const currentContent = allContent || [];
     return currentContent.flatMap((post, postIndex) => {
       // Handle posts with media array vs single media
       const mediaArray = post.media && post.media.length > 0 ? post.media : [{ 
@@ -127,7 +135,7 @@ const Discover = () => {
         };
       });
     });
-  }, [content]);
+  }, [allContent]);
 
 
   return (
