@@ -121,34 +121,34 @@ const DiscoverPillRow: React.FC<DiscoverPillRowProps> = ({
   };
 
   return (
-    <div className="sticky top-16 z-sticky-pills bg-background/95 backdrop-blur-sm">{/* Updated z-index */}
-      <div className="px-4 md:container md:mx-auto md:px-6">
-        {/* Single Row Horizontal Scroll */}
-        <div className="relative py-3">
-          <div 
-            ref={scrollContainerRef}
-            className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide"
-            onScroll={handleScroll}
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch',
-              scrollBehavior: 'smooth',
-              scrollSnapType: 'x mandatory'
-            }}
-          >
-            {availableFilters.map(renderFilterButton)}
-          </div>
-          
-          {/* Gradient overlays for visual scroll indication */}
+    <div className="relative">
+      {/* Single Row Horizontal Scroll */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide md:flex-wrap"
+        onScroll={handleScroll}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth',
+          scrollSnapType: 'x mandatory'
+        }}
+      >
+        {availableFilters.map(renderFilterButton)}
+      </div>
+      
+      {/* Gradient overlays for visual scroll indication - only on mobile */}
+      {!isMobile ? null : (
+        <>
           {!isAtStart && (
-            <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" />
+            <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white/60 to-transparent pointer-events-none z-10" />
           )}
           {!isAtEnd && (
-            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/60 to-transparent pointer-events-none z-10" />
           )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
