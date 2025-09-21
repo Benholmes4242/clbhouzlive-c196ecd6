@@ -672,14 +672,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 stats={{
                   likes: item.likes || 0,
                   comments: item.comments || 0,
-                  shares: item.shares || 0,
-                  bookmarks: 0
+                  shares: item.shares || 0
                 }}
                 isLiked={likedPosts?.includes(item.id)}
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
-                onBookmark={() => {/* TODO: implement bookmark */}}
               />
             </div>
           );

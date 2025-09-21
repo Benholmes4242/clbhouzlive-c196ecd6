@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Share, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
 
 interface EngagementRailProps {
   postId: string;
@@ -9,14 +10,11 @@ interface EngagementRailProps {
     likes: number;
     comments: number;
     shares: number;
-    bookmarks?: number;
   };
   isLiked?: boolean;
-  isBookmarked?: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
-  onBookmark: () => void;
   className?: string;
 }
 
@@ -94,15 +92,18 @@ const EngagementRail = ({
   postId,
   stats,
   isLiked = false,
-  isBookmarked = false,
   onLike,
   onComment,
   onShare,
-  onBookmark,
   className
 }: EngagementRailProps) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
+  const { isMuted, setMuted } = useSoundPreference();
+
+  const handleAudioToggle = () => {
+    setMuted(!isMuted);
+  };
 
   return (
     <div className={cn(
@@ -130,10 +131,14 @@ const EngagementRail = ({
       />
       
       <EngagementButton
-        icon={Bookmark}
-        count={stats.bookmarks || 0}
-        isActive={isBookmarked}
-        onClick={onBookmark}
+        icon={isMuted ? VolumeX : Volume2}
+        count={0}
+        isActive={!isMuted}
+        onClick={handleAudioToggle}
+        className={cn(
+          !isMuted && "border-accent/50",
+          !isMuted && "bg-accent/10"
+        )}
       />
     </div>
   );
