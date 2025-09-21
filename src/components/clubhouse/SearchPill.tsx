@@ -1,7 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, X, Clock, TrendingUp, User, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useSearch } from '@/hooks/useSearch';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
+
+interface SearchResult {
+  id: string;
+  type: 'user' | 'course';
+  title: string;
+  subtitle: string;
+  image?: string;
+  username?: string;
+}
+
+interface RecentSearchItem {
+  id: string;
+  type: 'recent';
+  title: string;
+  subtitle: string;
+  image?: never;
+}
+
+type DisplayItem = SearchResult | RecentSearchItem;
 
 interface SearchPillProps {
   className?: string;
@@ -9,21 +31,46 @@ interface SearchPillProps {
   onClose?: () => void;
   placeholder?: string;
   variant?: HeaderVariant;
+  onSelect?: (result: SearchResult) => void;
 }
 
 const SearchPill = ({ 
   className, 
   autoFocus = false, 
   onClose,
-  placeholder = "Search...",
-  variant = 'glass-dark'
+  placeholder = "Search players, courses...",
+  variant = 'glass-dark',
+  onSelect
 }: SearchPillProps) => {
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const [query, setQuery] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  
+  const debouncedQuery = useDebounce(query, 300);
+  
+  const {
+    results,
+    loading,
+    recentSearches,
+    popularClubs,
+    saveRecentSearch,
+    clearRecentSearches,
+    executeRecentSearch
+  } = useSearch();
 
   const isGlassDark = variant === 'glass-dark';
   const isSolidLight = variant === 'solid-light';
+
+  // Set search query for useSearch hook
+  const { setQuery: setSearchQuery } = useSearch();
+  
+  useEffect(() => {
+    setSearchQuery(debouncedQuery);
+  }, [debouncedQuery, setSearchQuery]);
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -31,25 +78,114 @@ const SearchPill = ({
     }
   }, [autoFocus]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape' && onClose) {
+  // Handle route navigation
+  const handleResultSelect = useCallback((result: SearchResult) => {
+    if (query.trim()) {
+      saveRecentSearch(query);
+    }
+
+    // Custom onSelect handler
+    if (onSelect) {
+      onSelect(result);
+    } else {
+      // Default navigation
+      if (result.type === 'user') {
+        navigate(`/profile/${result.username || result.id}`);
+      } else if (result.type === 'course') {
+        navigate(`/course/${result.id}`);
+      }
+    }
+
+    setQuery('');
+    setIsOpen(false);
+    setActiveIndex(-1);
+    
+    if (onClose) {
       onClose();
+    }
+  }, [query, saveRecentSearch, onSelect, navigate, onClose]);
+
+  // Show dropdown results or recent/trending
+  const showResults = isOpen && (query.length >= 1 || (!query && (recentSearches.length > 0 || popularClubs.length > 0)));
+  const displayItems: DisplayItem[] = query.length >= 1 ? results : [...recentSearches.map(r => ({ id: r.id, type: 'recent' as const, title: r.query, subtitle: 'Recent search' })), ...popularClubs.slice(0, 5)];
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showResults) {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'Escape':
+        setIsOpen(false);
+        setActiveIndex(-1);
+        if (onClose) onClose();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setActiveIndex(prev => Math.min(prev + 1, displayItems.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActiveIndex(prev => Math.max(prev - 1, -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (activeIndex >= 0 && displayItems[activeIndex]) {
+          const item = displayItems[activeIndex];
+          if (item.type === 'recent') {
+            executeRecentSearch(item.title);
+          } else {
+            handleResultSelect(item as SearchResult);
+          }
+        }
+        break;
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setActiveIndex(-1);
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
+
+  const handleInputBlur = () => {
+    // Delay to allow clicks on dropdown items
+    setTimeout(() => {
+      setIsOpen(false);
+      setActiveIndex(-1);
+    }, 200);
   };
 
   const handleClear = () => {
     setQuery('');
+    setActiveIndex(-1);
     if (onClose) {
       onClose();
     }
   };
 
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setActiveIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} ref={dropdownRef}>
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
@@ -57,11 +193,11 @@ const SearchPill = ({
            // Variant-specific styling
            isGlassDark && [
              "bg-white/10 backdrop-blur-md border border-white/20",
-             isFocused && "bg-white/15 border-white/30"
+             isOpen && "bg-white/15 border-white/30"
            ],
            isSolidLight && [
              "bg-gray-100/80 border border-gray-200/60",
-             isFocused && "bg-white border-gray-300"
+             isOpen && "bg-white border-gray-300"
            ]
         )}
       >
@@ -80,18 +216,18 @@ const SearchPill = ({
           placeholder={placeholder}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           className={cn(
             "flex-1 bg-transparent border-none outline-none text-sm md:text-base",
             "placeholder:transition-colors duration-200",
             isGlassDark && [
               "text-white placeholder:text-white/50",
-              isFocused && "placeholder:text-white/70"
+              isOpen && "placeholder:text-white/70"
             ],
             isSolidLight && [
               "text-gray-900 placeholder:text-gray-500",
-              isFocused && "placeholder:text-gray-600"
+              isOpen && "placeholder:text-gray-600"
             ]
           )}
         />
@@ -115,6 +251,133 @@ const SearchPill = ({
           </button>
         )}
       </div>
+
+      {/* Results Dropdown */}
+      {showResults && (
+        <div className={cn(
+          "absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-lg z-50",
+          "max-h-96 overflow-y-auto",
+          isGlassDark && "bg-black/90 backdrop-blur-xl border-white/20",
+          isSolidLight && "bg-white border-gray-200"
+        )}>
+          {loading && query.length >= 1 && (
+            <div className={cn(
+              "p-4 text-center text-sm",
+              isGlassDark && "text-white/60",
+              isSolidLight && "text-gray-500"
+            )}>
+              Searching...
+            </div>
+          )}
+
+          {!loading && query.length >= 1 && results.length === 0 && (
+            <div className={cn(
+              "p-4 text-center text-sm",
+              isGlassDark && "text-white/60",
+              isSolidLight && "text-gray-500"
+            )}>
+              No results found for "{query}"
+            </div>
+          )}
+
+          {/* Recent searches header */}
+          {!query && recentSearches.length > 0 && (
+            <div className={cn(
+              "px-4 py-2 text-xs font-medium border-b",
+              isGlassDark && "text-white/60 border-white/10",
+              isSolidLight && "text-gray-500 border-gray-200"
+            )}>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Clock className="h-3 w-3" />
+                  Recent searches
+                </span>
+                <button
+                  onClick={clearRecentSearches}
+                  className={cn(
+                    "text-xs hover:underline",
+                    isGlassDark && "text-white/40 hover:text-white/60",
+                    isSolidLight && "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Trending header */}
+          {!query && recentSearches.length === 0 && popularClubs.length > 0 && (
+            <div className={cn(
+              "px-4 py-2 text-xs font-medium border-b",
+              isGlassDark && "text-white/60 border-white/10",
+              isSolidLight && "text-gray-500 border-gray-200"
+            )}>
+              <span className="flex items-center gap-2">
+                <TrendingUp className="h-3 w-3" />
+                Popular courses
+              </span>
+            </div>
+          )}
+
+          {/* Results */}
+          <div className="py-2">
+            {displayItems.map((item, index) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.type === 'recent') {
+                    executeRecentSearch(item.title);
+                  } else {
+                    handleResultSelect(item as SearchResult);
+                  }
+                }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors",
+                  activeIndex === index && (isGlassDark ? "bg-white/10" : "bg-gray-100"),
+                  isGlassDark && "hover:bg-white/5",
+                  isSolidLight && "hover:bg-gray-50"
+                )}
+              >
+                {/* Icon */}
+                <div className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                  isGlassDark && "bg-white/10",
+                  isSolidLight && "bg-gray-100"
+                )}>
+                  {(item as SearchResult).image ? (
+                    <img src={(item as SearchResult).image} alt="" className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <>
+                      {item.type === 'user' && <User className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
+                      {item.type === 'course' && <MapPin className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
+                      {item.type === 'recent' && <Clock className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
+                    </>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className={cn(
+                    "font-medium text-sm truncate",
+                    isGlassDark && "text-white",
+                    isSolidLight && "text-gray-900"
+                  )}>
+                    {item.title}
+                  </div>
+                  <div className={cn(
+                    "text-xs truncate",
+                    isGlassDark && "text-white/60",
+                    isSolidLight && "text-gray-500"
+                  )}>
+                    {item.subtitle}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
