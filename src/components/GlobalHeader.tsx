@@ -96,7 +96,7 @@ const GlobalHeader: React.FC = () => {
               type: "spring", 
               stiffness: 300, 
               damping: 30,
-              duration: 0.3 
+              duration: 0.25 
             }}
             style={{
               // Safe area support

@@ -5,6 +5,7 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { useModalContext } from '@/contexts/ModalContext';
 import SnapModal from '@/components/snap/SnapModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
@@ -30,6 +31,7 @@ const CLUBHOUSE_ROUTES = [
 const GlobalBottomNavigation: React.FC = () => {
   const location = useLocation();
   const { isVisible } = useBottomNavigation();
+  const { shouldHideBottomNav } = useModalContext();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -38,8 +40,8 @@ const GlobalBottomNavigation: React.FC = () => {
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
-  // Final visibility state
-  const showNavigation = isVisible && !shouldHideForRoute;
+  // Final visibility state - hide for routes, modals, or manual control
+  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
   
   // Snap modal state management
   const {
@@ -154,7 +156,7 @@ const GlobalBottomNavigation: React.FC = () => {
               type: "spring", 
               stiffness: 300, 
               damping: 30,
-              duration: 0.3 
+              duration: 0.25 
             }}
             style={{
               // Hardware acceleration
