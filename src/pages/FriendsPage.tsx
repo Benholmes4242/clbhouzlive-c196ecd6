@@ -1,7 +1,5 @@
 
 import React from 'react';
-import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,19 +55,16 @@ const FriendsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        <Header />
+      <div className="min-h-screen bg-background page-with-header">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="text-center">Loading following...</div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      <Header />
+    <div className="min-h-screen bg-background page-with-header">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">
           <UserCheck className="h-6 w-6" />
@@ -114,7 +109,6 @@ const FriendsPage = () => {
           </div>
         )}
       </div>
-      <BottomNavigation />
     </div>
   );
 };
