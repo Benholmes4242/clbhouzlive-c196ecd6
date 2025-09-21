@@ -8,6 +8,8 @@ import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
+import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
+import { VideoThumbPlayer } from './VideoThumbPlayer';
 
 interface UserProfile {
   id: string;
@@ -39,12 +41,29 @@ function bumpPosterTime(url: string, nextTime = '2s') {
 
 function RecentPostTile({ 
   media, 
-  onTileClick 
+  onTileClick,
+  ioRoot
 }: { 
   media: { type: 'image' | 'video'; url: string; posterUrl?: string };
   onTileClick: () => void;
+  ioRoot?: Element | null;
 }) {
   const isVideo = media.type === 'video';
+
+  if (isVideo) {
+    return (
+      <div className="relative aspect-square bg-white/5 rounded-2xl overflow-hidden">
+        <VideoThumbPlayer
+          url={media.url}
+          poster={media.posterUrl ?? ''}
+          ioRoot={ioRoot}
+          className="w-full h-full"
+        />
+        {/* Gradient overlay for better contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+      </div>
+    );
+  }
 
   // build retry poster for video (e.g., 2s frame), only if we used 1s above
   const retryPoster = isVideo && media.posterUrl
@@ -83,21 +102,13 @@ function RecentPostTile({
           }
         }}
       />
-
-      {isVideo && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-            <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
-          </div>
-        </div>
-      )}
       {/* Gradient overlay for better contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
     </div>
   );
 }
 
-const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetProps) => {
+const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
@@ -108,7 +119,9 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   const [isClosing, setIsClosing] = useState(false);
   
   const headerRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
   const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
+  const { setSheetClosing } = useSheetPlayback();
 
   // Update following state when user prop changes
   useEffect(() => {
@@ -157,10 +170,12 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
 
   const handleClose = () => {
     setIsClosing(true);
+    setSheetClosing(true); // Pause all videos
     // Wait for slide-out animation to complete before calling onClose
     setTimeout(() => {
       onClose();
       setIsClosing(false);
+      setSheetClosing(false); // Reset for next time
     }, 300); // Match animation duration
   };
 
@@ -383,6 +398,7 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
               
               <div
                 id="recent-posts-scroll"
+                ref={scrollRef}
                 role="region"
                 aria-label="Recent Posts, scrollable"
                 tabIndex={0}
@@ -434,13 +450,14 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
                       const media = post.post_media[0];
                       if (!media) return null;
 
-                      return (
-                        <RecentPostTile
-                          key={post.id}
-                          media={media}
-                          onTileClick={() => handlePostClick(post)}
-                        />
-                      );
+                    return (
+                      <RecentPostTile
+                        key={post.id}
+                        media={media}
+                        onTileClick={() => handlePostClick(post)}
+                        ioRoot={scrollRef.current}
+                      />
+                    );
                     })}
                   </div>
                 )}
@@ -450,6 +467,16 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
         </div>
       </div>
     </div>
+  );
+};
+
+const MiniProfileSheet = (props: MiniProfileSheetProps) => {
+  if (!props.isOpen) return null;
+  
+  return (
+    <SheetPlaybackProvider>
+      <MiniProfileSheetContent {...props} />
+    </SheetPlaybackProvider>
   );
 };
 

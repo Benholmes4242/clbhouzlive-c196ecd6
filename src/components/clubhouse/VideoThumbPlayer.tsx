@@ -1,0 +1,289 @@
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useSheetPlayback } from './SheetPlaybackContext';
+
+interface VideoThumbPlayerProps {
+  url: string;
+  poster: string;
+  ioRoot?: Element | null;
+  className?: string;
+}
+
+export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
+  url,
+  poster,
+  ioRoot,
+  className
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hlsRef = useRef<any>(null);
+  const { register, requestPlay } = useSheetPlayback();
+  const id = React.useId();
+  
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [buffered, setBuffered] = useState(0);
+
+  // Register with exclusive playback controller
+  useEffect(() => {
+    const pauseFn = () => {
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+      }
+    };
+    
+    return register(id, pauseFn);
+  }, [id, register]);
+
+  // Setup video source and HLS if needed
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const needsHls = url.endsWith('.m3u8') && !video.canPlayType('application/vnd.apple.mpegurl');
+    let mounted = true;
+
+    const setupVideo = async () => {
+      try {
+        if (!needsHls) {
+          video.src = url;
+          return;
+        }
+
+        // Lazy load HLS.js
+        const { default: Hls } = await import('hls.js/dist/hls.light.min.js');
+        if (!mounted) return;
+
+        if (Hls.isSupported()) {
+          const hls = new Hls({
+            maxBufferLength: 10,
+            maxMaxBufferLength: 20,
+          });
+          
+          hlsRef.current = hls;
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              setError(true);
+            }
+          });
+        } else {
+          // Fallback for browsers that don't support HLS.js
+          video.src = url;
+        }
+      } catch (err) {
+        console.error('Error setting up video:', err);
+        setError(true);
+      }
+    };
+
+    setupVideo();
+
+    return () => {
+      mounted = false;
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [url]);
+
+  // Intersection Observer for auto-pause when out of view
+  useEffect(() => {
+    if (!ioRoot || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting && videoRef.current && !videoRef.current.paused) {
+          videoRef.current.pause();
+        }
+      },
+      {
+        root: ioRoot,
+        threshold: 0.25,
+      }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [ioRoot]);
+
+  // Video event handlers
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadStart = () => setLoading(true);
+    const handleCanPlay = () => setLoading(false);
+    const handlePlay = () => setPlaying(true);
+    const handlePause = () => setPlaying(false);
+    const handleError = () => {
+      setError(true);
+      setLoading(false);
+    };
+
+    const handleTimeUpdate = () => {
+      if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    const handleProgress = () => {
+      if (video.buffered.length > 0 && video.duration) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        setBuffered((bufferedEnd / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('loadstart', handleLoadStart);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('error', handleError);
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('progress', handleProgress);
+
+    return () => {
+      video.removeEventListener('loadstart', handleLoadStart);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('progress', handleProgress);
+    };
+  }, []);
+
+  const togglePlayPause = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || error) return;
+
+    try {
+      if (video.paused) {
+        requestPlay(id); // Pause other videos
+        await video.play();
+      } else {
+        video.pause();
+      }
+    } catch (err) {
+      console.error('Error toggling playback:', err);
+      setError(true);
+    }
+  }, [id, requestPlay, error]);
+
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  }, []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      togglePlayPause();
+    }
+  }, [togglePlayPause]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "relative w-full h-full overflow-hidden rounded-[inherit] cursor-pointer",
+        className
+      )}
+      role="button"
+      tabIndex={0}
+      aria-label={playing ? 'Pause video' : 'Play video'}
+      onClick={togglePlayPause}
+      onKeyDown={handleKeyDown}
+    >
+      <video
+        ref={videoRef}
+        poster={poster}
+        muted={muted}
+        playsInline
+        preload="metadata"
+        className="w-full h-full object-cover"
+        style={{ backgroundColor: 'transparent' }}
+      />
+
+      {/* Center Play/Pause Button */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div 
+          className={cn(
+            "w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 transition-opacity duration-200",
+            playing && !loading && !error ? "opacity-0" : "opacity-100"
+          )}
+        >
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : error ? (
+            <span className="text-white text-xs">⚠︎</span>
+          ) : playing ? (
+            <Pause className="w-5 h-5 text-white" fill="currentColor" />
+          ) : (
+            <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />
+          )}
+        </div>
+      </div>
+
+      {/* Mute Toggle */}
+      <button
+        onClick={toggleMute}
+        className="absolute bottom-1 right-1 p-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
+        aria-pressed={!muted}
+        aria-label={muted ? 'Unmute video' : 'Mute video'}
+      >
+        {muted ? (
+          <VolumeX className="w-3 h-3 text-white" />
+        ) : (
+          <Volume2 className="w-3 h-3 text-white" />
+        )}
+      </button>
+
+      {/* Progress Bar */}
+      {!error && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+          {/* Buffered */}
+          <div
+            className="absolute top-0 left-0 h-full bg-white/20 transition-all duration-100"
+            style={{ width: `${buffered}%` }}
+          />
+          {/* Progress */}
+          <div
+            className="absolute top-0 left-0 h-full bg-white/60 transition-all duration-100"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
+
+      {/* Error State Overlay */}
+      {error && (
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+          <div className="text-center text-white/70">
+            <div className="text-lg mb-1">⚠︎</div>
+            <div className="text-xs">Failed to load</div>
+          </div>
+        </div>
+      )}
+
+      {/* Live region for screen readers */}
+      <div className="sr-only" aria-live="polite">
+        {playing ? (muted ? 'Playing, muted' : 'Playing') : 'Paused'}
+      </div>
+    </div>
+  );
+};
