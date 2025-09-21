@@ -714,7 +714,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   >
                     {/* Display Name - Second in stagger */}
                     <motion.h3 
-                      className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200 truncate px-2"
+                      className="text-white font-bold text-lg cursor-pointer hover:text-white/90 transition-colors duration-200 truncate px-1"
                       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
                       onClick={(e) => {
                         e.stopPropagation();
