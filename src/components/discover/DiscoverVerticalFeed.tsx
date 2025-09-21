@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
@@ -677,16 +678,14 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Right Glass Pill */}
               {item.golfCourse && (
-                <div className="absolute top-[env(safe-area-inset-top,12px)] right-4 z-30 animate-fade-in">
-                  <div 
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-xl border border-white/15 rounded-full text-white shadow-2xl cursor-pointer hover:bg-black/30 transition-all duration-200"
-                    style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                  >
-                    <MapPin className="w-3.5 h-3.5 text-white/90" />
-                    <span className="text-sm font-medium truncate max-w-[150px]">
-                      {item.golfCourse.name}
-                    </span>
-                  </div>
+                <div className="absolute top-[env(safe-area-inset-top,12px)] z-30 animate-fade-in">
+                  <ClubTagPill 
+                    course={{
+                      id: item.golfCourse.id,
+                      name: item.golfCourse.name,
+                      country: item.golfCourse.country
+                    }}
+                  />
                 </div>
               )}
 
