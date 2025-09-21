@@ -149,7 +149,7 @@ const Discover = () => {
       <main className="pb-20">
         {/* Suggested Users - Top Section */}
         {(!searchQuery || searchQuery.trim() === '') && (
-          <div className="mt-0">
+          <div className="mt-2">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
         )}
