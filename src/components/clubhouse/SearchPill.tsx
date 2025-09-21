@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useSearch } from '@/hooks/useSearch';
+import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult } from '@/hooks/useGlobalEntitySearch';
 import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 
@@ -53,25 +53,49 @@ const SearchPill = ({
   
   const debouncedQuery = useDebounce(query, 300);
   
+  // Use the new global entity search hook
   const {
-    results,
-    loading,
-    recentSearches,
-    popularClubs,
-    saveRecentSearch,
-    clearRecentSearches,
-    executeRecentSearch
-  } = useSearch();
+    people,
+    clubs,
+    pages,
+    recent,
+    trending,
+    isLoading,
+    error
+  } = useGlobalEntitySearch({
+    query: debouncedQuery,
+    enabled: true
+  });
 
   const isGlassDark = variant === 'glass-dark';
   const isSolidLight = variant === 'solid-light';
 
-  // Set search query for useSearch hook
-  const { setQuery: setSearchQuery } = useSearch();
-  
-  useEffect(() => {
-    setSearchQuery(debouncedQuery);
-  }, [debouncedQuery, setSearchQuery]);
+  // Convert hook results to SearchResult format for compatibility
+  const results: SearchResult[] = [
+    ...people.map(person => ({
+      id: person.id,
+      type: 'user' as const,
+      title: person.display_name,
+      subtitle: person.home_club_name || 'No home club',
+      image: person.avatar_url || undefined,
+      username: person.username || undefined
+    })),
+    ...clubs.map(club => ({
+      id: club.id,
+      type: 'course' as const,
+      title: club.name,
+      subtitle: `${club.region ? `${club.region}, ` : ''}${club.country}${club.global_rank ? ` • #${club.global_rank}` : ''}`,
+      image: club.logo_url || undefined
+    }))
+  ];
+
+  // Convert trending to SearchResult format
+  const popularItems: SearchResult[] = trending.map(item => ({
+    id: item.id || crypto.randomUUID(),
+    type: item.type === 'clubs' ? 'course' as const : 'user' as const,
+    title: item.label,
+    subtitle: item.type === 'clubs' ? 'Popular course' : 'Trending'
+  }));
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -104,11 +128,17 @@ const SearchPill = ({
     if (onClose) {
       onClose();
     }
-  }, [query, saveRecentSearch, onSelect, navigate, onClose]);
+  }, [query, onSelect, navigate, onClose]);
+
+  // Handle recent search execution
+  const handleRecentSearchClick = useCallback((searchQuery: string) => {
+    setQuery(searchQuery);
+    setIsOpen(false);
+  }, []);
 
   // Show dropdown results or recent/trending
-  const showResults = isOpen && (query.length >= 1 || (!query && (recentSearches.length > 0 || popularClubs.length > 0)));
-  const displayItems: DisplayItem[] = query.length >= 1 ? results : [...recentSearches.map(r => ({ id: r.id, type: 'recent' as const, title: r.query, subtitle: 'Recent search' })), ...popularClubs.slice(0, 5)];
+  const showResults = isOpen && (query.length >= 1 || (!query && (recent.length > 0 || popularItems.length > 0)));
+  const displayItems: DisplayItem[] = query.length >= 1 ? results : [...recent.map(r => ({ id: r.id, type: 'recent' as const, title: r.query, subtitle: 'Recent search' })), ...popularItems.slice(0, 5)];
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -138,7 +168,7 @@ const SearchPill = ({
         if (activeIndex >= 0 && displayItems[activeIndex]) {
           const item = displayItems[activeIndex];
           if (item.type === 'recent') {
-            executeRecentSearch(item.title);
+            handleRecentSearchClick(item.title);
           } else {
             handleResultSelect(item as SearchResult);
           }
@@ -262,14 +292,11 @@ const SearchPill = ({
         }}
         query={query}
         results={results}
-        loading={loading}
-        recentSearches={recentSearches}
-        popularItems={popularClubs}
+        loading={isLoading}
+        recentSearches={recent}
+        popularItems={popularItems}
         onResultSelect={handleResultSelect}
-        onRecentSearchClick={(searchQuery) => {
-          executeRecentSearch(searchQuery);
-          setIsOpen(false);
-        }}
+        onRecentSearchClick={handleRecentSearchClick}
         onClearRecentSearches={clearRecentSearches}
         activeIndex={activeIndex}
         onActiveIndexChange={setActiveIndex}
