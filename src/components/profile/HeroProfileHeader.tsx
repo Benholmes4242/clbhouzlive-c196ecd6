@@ -704,7 +704,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-black fullbleed">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden recently-played-section">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-900 animate-pulse" />
               
@@ -781,7 +781,7 @@ const HeroProfileHeader = ({
          /* Desktop layout - cinematic glass design */
          <div className="relative -mt-16 bg-black fullbleed">
            <section className="relative w-full overflow-visible">
-             <div className="relative h-[56vh] w-full overflow-hidden">
+             <div className="relative h-[56vh] w-full overflow-hidden recently-played-section">
                {/* Loading state */}
                <div className="absolute inset-0 bg-gray-900 animate-pulse" />
                
@@ -792,7 +792,9 @@ const HeroProfileHeader = ({
                   className="h-full w-full object-cover"
                   style={{ 
                     objectPosition: 'center center',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    minWidth: '100%',
+                    minHeight: '100%'
                   }}
                   loading="eager"
                   onLoad={(e) => {
