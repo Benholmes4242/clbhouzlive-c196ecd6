@@ -52,7 +52,7 @@ function RecentPostTile({
 
   if (isVideo) {
     return (
-      <div className="relative aspect-square bg-white/5 rounded-2xl overflow-hidden">
+      <div className="recent-post-tile relative aspect-square bg-white/5 rounded-2xl overflow-hidden">
         <VideoThumbPlayer
           url={media.url}
           poster={media.posterUrl ?? ''}
@@ -76,7 +76,7 @@ function RecentPostTile({
     <div
       onClick={onTileClick}
       className={cn(
-        "relative aspect-square bg-white/5 rounded-2xl overflow-hidden cursor-pointer",
+        "recent-post-tile relative aspect-square bg-white/5 rounded-2xl overflow-hidden cursor-pointer",
         "transition-all duration-200 hover:scale-105 hover:bg-white/10",
         "focus:outline-none focus:ring-2 focus:ring-white/30"
       )}
