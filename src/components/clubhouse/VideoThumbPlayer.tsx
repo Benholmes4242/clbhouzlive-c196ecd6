@@ -3,6 +3,13 @@ import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSheetPlayback } from './SheetPlaybackContext';
 
+// Debug flag declaration
+declare global {
+  interface Window {
+    __DEBUG_SHEET__?: boolean;
+  }
+}
+
 interface VideoThumbPlayerProps {
   url: string;
   poster: string;
@@ -43,9 +50,20 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         setMuted(true);
       }
     };
+
+    if (window.__DEBUG_SHEET__) {
+      console.log(`[VideoThumbPlayer] Registering tile:`, {
+        id,
+        url,
+        type: 'video',
+        initialMuted: muted,
+        hlsAttached: !!hlsRef.current,
+        videoElement: !!videoRef.current
+      });
+    }
     
     return register(id, pauseFn, muteFn);
-  }, [id, register]);
+  }, [id, register, url, muted]);
 
   // Setup video source and HLS if needed
   useEffect(() => {
@@ -132,11 +150,36 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
     const handleLoadStart = () => setLoading(true);
     const handleCanPlay = () => setLoading(false);
-    const handlePlay = () => setPlaying(true);
-    const handlePause = () => setPlaying(false);
+    const handlePlay = () => {
+      setPlaying(true);
+      if (window.__DEBUG_SHEET__) {
+        console.log(`[VideoThumbPlayer] Video play event:`, {
+          id,
+          muted: video.muted,
+          videoRefMuted: videoRef.current?.muted
+        });
+      }
+    };
+    const handlePause = () => {
+      setPlaying(false);
+      if (window.__DEBUG_SHEET__) {
+        console.log(`[VideoThumbPlayer] Video pause event:`, {
+          id,
+          muted: video.muted,
+          videoRefMuted: videoRef.current?.muted
+        });
+      }
+    };
     const handleError = () => {
       setError(true);
       setLoading(false);
+      if (window.__DEBUG_SHEET__) {
+        console.log(`[VideoThumbPlayer] Video error event:`, {
+          id,
+          muted: video.muted,
+          videoRefMuted: videoRef.current?.muted
+        });
+      }
     };
 
     const handleTimeUpdate = () => {
@@ -156,6 +199,14 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
     const handleVolumeChange = () => {
       setMuted(video.muted);
+      if (window.__DEBUG_SHEET__) {
+        console.log(`[VideoThumbPlayer] Volume change event:`, {
+          id,
+          videoMuted: video.muted,
+          videoRefMuted: videoRef.current?.muted,
+          stateBeforeUpdate: muted
+        });
+      }
     };
 
     video.addEventListener('loadstart', handleLoadStart);
@@ -177,7 +228,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, []);
+  }, [id, muted]);
 
   const togglePlayPause = useCallback(async () => {
     const video = videoRef.current;
@@ -201,6 +252,8 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
+    const previousMuted = video.muted;
+    
     if (video.muted) {
       // Request exclusive unmute (mutes all other videos)
       requestUnmute(id);
@@ -210,7 +263,17 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       video.muted = true;
       setMuted(true);
     }
-  }, [id, requestUnmute]);
+
+    if (window.__DEBUG_SHEET__) {
+      console.log(`[VideoThumbPlayer] Mute button clicked:`, {
+        id,
+        previousMuted,
+        newMuted: video.muted,
+        videoRefMuted: videoRef.current?.muted,
+        stateAfterToggle: muted
+      });
+    }
+  }, [id, requestUnmute, muted]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
