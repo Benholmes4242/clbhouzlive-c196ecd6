@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
+import EngagementRail from '@/components/clubhouse/EngagementRail';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
@@ -796,61 +797,25 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-6 right-4 z-10 flex flex-col space-y-6">
-                {/* Mute/Unmute toggle button - only show for video posts */}
-                {currentMedia.media_type === 'video' && (
-                  <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={toggleGlobalMute}
-                  >
-                    {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
-                    ) : (
-                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
-                    )}
-                  </button>
-                )}
+              {/* Engagement Rail - Bottom Right */}
+              <EngagementRail
+                postId={item.id}
+                stats={{
+                  likes: item.likes || 0,
+                  comments: item.comments || 0,
+                  shares: item.shares || 0
+                }}
+                isLiked={likedPosts?.includes(item.id)}
+                isVideo={currentMedia.media_type === 'video'}
+                onLike={() => handleLike(item.id)}
+                onComment={() => handleComment(item.id)}
+                onShare={handleShare}
+                className="absolute bottom-6 right-4 z-35"
+              />
 
-                {/* Heart Button with Like Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    disabled={likeMutation.isPending}
-                  >
-                    <HeartIcon 
-                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
-                    />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 1000) + 10}
-                  </span>
-                </div>
-
-                {/* Message Button with Comment Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleComment(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                  >
-                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 50) + 5}
-                  </span>
-                </div>
-
-                {/* Share Button */}
-                <button
-                  onClick={handleShare}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  <PaperAirplaneIcon className="h-8 w-8 text-white" />
-                </button>
-
-                {/* Three dots menu - only show for own posts */}
-                {user && item.user?.id === user.id && (
+              {/* Three dots menu - only show for own posts */}
+              {user && item.user?.id === user.id && (
+                <div className="absolute bottom-6 right-4 z-10" style={{ transform: 'translateY(-280px)' }}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button 
@@ -876,8 +841,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
