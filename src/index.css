@@ -477,8 +477,8 @@ html, body, #root, .app-shell { touch-action: auto; }
     --sheet-min-height: 420px;
     --sheet-edge-gap: 16px;
     
-    /* Sheet scroll bottom padding for breathing room */
-    --sheet-scroll-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    /* Sheet scroll bottom padding for safe area and breathing room */
+    --sheet-scroll-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px) + 8px);
   }
 
   @media (min-width: 768px) {
@@ -526,6 +526,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     max-height: calc(75dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    padding-bottom: var(--sheet-scroll-pad-bottom);
+  }
+
+  /* Recent post tiles with scroll margin for accessibility */
+  .recent-post-tile {
+    scroll-margin-bottom: var(--sheet-scroll-pad-bottom);
   }
 
   /* Mini Profile Sheet Styles */
@@ -535,7 +541,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
     max-width: var(--sheet-max-width);
     margin-inline: auto;
-    margin-bottom: 0; /* flush with top of bottom nav */
+    margin-bottom: var(--sheet-edge-gap);
     /* Only animate transform and opacity, never width */
     transition: transform 240ms ease-out, opacity 240ms ease-out;
   }
@@ -547,7 +553,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     width: min(var(--sheet-max-width), calc(100vw - (var(--sheet-edge-gap) * 2)));
     max-width: var(--sheet-max-width);
     margin-inline: auto;
-    margin-bottom: 0; /* flush with top of bottom nav */
+    margin-bottom: var(--sheet-edge-gap);
   }
 
   /* Sheet header with fixed height to prevent layout shift */
