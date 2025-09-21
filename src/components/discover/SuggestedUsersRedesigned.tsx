@@ -921,11 +921,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Ensure minimum 44px touch target
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  minHeight: '44px',
+                  // Smaller size: 36px instead of 44px
+                  width: '36px',
+                  height: '36px',
+                  minWidth: '36px',
+                  minHeight: '36px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
