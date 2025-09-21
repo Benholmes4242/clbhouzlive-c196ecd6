@@ -198,11 +198,12 @@ const SearchPill = ({
   };
 
   const handleInputBlur = () => {
-    // Delay to allow clicks on dropdown items
+    // Delay to allow clicks on dropdown items - longer on mobile for better UX
+    const delay = 300; // Increased for mobile taps
     setTimeout(() => {
       setIsOpen(false);
       setActiveIndex(-1);
-    }, 200);
+    }, delay);
   };
 
   const handleClear = () => {
@@ -250,7 +251,7 @@ const SearchPill = ({
           isSolidLight && "text-gray-500"
         )} />
 
-        {/* Input */}
+        {/* Input with enhanced accessibility */}
         <input
           ref={inputRef}
           type="text"
@@ -263,6 +264,8 @@ const SearchPill = ({
           className={cn(
             "flex-1 bg-transparent border-none outline-none text-sm md:text-base",
             "placeholder:transition-colors duration-200",
+            // Enhanced focus styles for accessibility
+            "focus:ring-0 focus:outline-none",
             isGlassDark && [
               "text-white placeholder:text-white/50",
               isOpen && "placeholder:text-white/70"
@@ -272,6 +275,13 @@ const SearchPill = ({
               isOpen && "placeholder:text-gray-600"
             ]
           )}
+          aria-label={placeholder}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+          autoComplete="off"
+          spellCheck="false"
+          role="combobox"
         />
 
         {/* Clear/Close button */}

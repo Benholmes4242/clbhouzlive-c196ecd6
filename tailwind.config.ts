@@ -19,7 +19,10 @@ export default {
 				lg: '2rem',
 				xl: '2rem',
 				'2xl': '2rem'
-			},
+      },
+      spacing: {
+        'safe-area-inset-bottom': 'var(--safe-area-inset-bottom)',
+      },
 			screens: {
 				'2xl': '1400px'
 			}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -68,6 +68,12 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   const isMobile = useIsMobile();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  
+  // Check for reduced motion preference
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
 
   // Group results by category
   const groupedResults = React.useMemo(() => {
