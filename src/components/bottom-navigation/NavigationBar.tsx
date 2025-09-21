@@ -45,12 +45,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 className={cn(
                   "flex items-center justify-center relative focus:outline-none",
                   "min-h-[44px] min-w-[44px] p-2 transition-colors duration-200",
-                  // Active state uses accent color for all tabs
-                  isActive && "text-accent",
+                  // Active state uses accent color for all tabs except camera (post)
+                  isActive && tab.id !== 'post' && "text-accent",
+                  // Camera (post) stays grey when clicked/active
+                  tab.id === 'post' && "text-foreground/60",
                   // Inactive state
-                  !isActive && (isClubhouse ? "text-white/80" : "text-foreground/60"),
-                  // Hover state
-                  !isActive && "hover:text-foreground"
+                  !isActive && tab.id !== 'post' && (isClubhouse ? "text-white/80" : "text-foreground/60"),
+                  // Subtle orange hover state for all tabs
+                  "hover:text-orange-400"
                 )}
                 aria-label={tab.label}
                 style={{ minWidth: '44px', minHeight: '44px' }}
