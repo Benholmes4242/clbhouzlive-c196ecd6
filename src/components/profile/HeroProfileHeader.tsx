@@ -704,10 +704,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-black">
           <section className="relative w-full overflow-visible">
-            <div 
-              className="relative w-full overflow-hidden"
-              style={{ minHeight: 'var(--profile-hero-min-h)' }}
-            >
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-900 animate-pulse" />
               
@@ -745,14 +742,14 @@ const HeroProfileHeader = ({
               <div className="absolute bottom-0 left-0 w-full h-32 overlay-gradient pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass Profile Card positioned lower to reveal more header */}
+            {/* Glass Profile Card positioned to float over bottom edge */}
             <div 
               ref={profileCardRef}
-              className="relative z-20 mx-4"
-              style={{
-                marginTop: 'calc(-1 * var(--profile-card-offset))'
-              }}
-            >
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-8px] md:bottom-[-16px]
+                w-full z-20 mb-4 md:mb-5
+              ">
               <GlassProfileCard
                 profile={profile}
                 isOwnProfile={isOwnProfile}
@@ -767,11 +764,8 @@ const HeroProfileHeader = ({
              <div className="h-8 md:h-12" />
            </section>
            
-           {/* Stats Pills with proper spacing */}
-           <div 
-             className="mx-4 md:mx-auto max-w-4xl"
-             style={{ marginTop: 'var(--profile-stats-gap)' }}
-           >
+           {/* Dark Rail for Stats Pills */}
+           <div className="mx-4 md:mx-auto max-w-4xl mb-2">
              <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
                <div className="grid grid-cols-4 gap-2 md:gap-3">
                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
@@ -798,10 +792,7 @@ const HeroProfileHeader = ({
          /* Desktop layout - cinematic glass design */
          <div className="relative -mt-16 bg-black">
            <section className="relative w-full overflow-visible">
-             <div 
-               className="relative w-full overflow-hidden"
-               style={{ minHeight: 'var(--profile-hero-min-h)' }}
-             >
+             <div className="relative h-[56vh] w-full overflow-hidden">
                {/* Loading state */}
                <div className="absolute inset-0 bg-gray-900 animate-pulse" />
                
@@ -839,19 +830,17 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-             {/* Glass panel positioned lower to reveal more header */}
+             {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
              <div 
                ref={profileCardRef}
                className="
-                 relative mx-auto
+                 absolute left-1/2 -translate-x-1/2
+                 bottom-[-14px] md:bottom-[-18px]
                  w-[90%] md:w-[80%] max-w-[800px]
                  rounded-2xl border border-white/35
                  bg-white/35 backdrop-blur-xl
-                 shadow-[0_10px_40px_rgba(0,0,0,0.45)] z-10
+                 shadow-[0_10px_40px_rgba(0,0,0,0.45)] z-10 mb-4 md:mb-5
                "
-               style={{
-                 marginTop: 'calc(-1 * var(--profile-card-offset))'
-               }}
              >
                 <div className="px-8 py-6 flex flex-col items-center text-center relative">
                   {/* Three dots menu - positioned absolutely */}
@@ -904,11 +893,8 @@ const HeroProfileHeader = ({
               <div className="h-12 md:h-16" />
             </section>
             
-            {/* Stats Pills with proper spacing */}
-            <div 
-              className="w-[90%] md:w-[80%] max-w-[800px] mx-auto"
-              style={{ marginTop: 'var(--profile-stats-gap)' }}
-            >
+            {/* Dark Rail for Stats */}
+            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 mb-0">
               <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
                 <div className="grid grid-cols-4 gap-2 md:gap-3">
                   <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
@@ -946,19 +932,11 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Glass Tabs Bar with proper spacing and sticky positioning */}
-      <div 
-        className="sticky z-40"
-        style={{ 
-          top: 'var(--header-height)',
-          marginTop: 'var(--profile-tabs-gap)'
-        }}
-      >
-        <GlassTabsBar
-          activeSection={activeSection}
-          onSectionChange={onSectionChange}
-        />
-      </div>
+      {/* Glass Tabs Bar */}
+      <GlassTabsBar
+        activeSection={activeSection}
+        onSectionChange={onSectionChange}
+      />
 
       {/* Hidden original tab navigation for compatibility */}
       <div style={{ display: 'none', borderColor: 'hsl(var(--profile-border-card))' }} className="relative z-40 bg-white/95 backdrop-blur-lg border-b">
@@ -1127,11 +1105,8 @@ const HeroProfileHeader = ({
         )}
       </div>
 
-      {/* Content sections with slide transitions and safe bottom padding */}
-      <div 
-        className="relative overflow-hidden"
-        style={{ paddingBottom: 'var(--profile-bottom-safe)' }}
-      >
+      {/* Content sections with slide transitions */}
+      <div className="relative overflow-hidden">
         {/* During transition, both sections are visible with absolute positioning */}
         {transitionState === 'transitioning' ? (
           <>

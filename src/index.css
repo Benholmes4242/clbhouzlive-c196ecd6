@@ -484,14 +484,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     
     /* Sheet scroll bottom padding for safe area and breathing room */
     --sheet-scroll-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px) + 8px);
-    
-    /* Profile Layout Variables - Reveal More Header Photo */
-    --header-height: 64px;                       /* actual header h on mobile */
-    --profile-hero-min-h: clamp(280px, 48vh, 420px);
-    --profile-card-offset: clamp(48px, 10vh, 96px);   /* how far card sits below hero top */
-    --profile-stats-gap: 16px;                   /* gap between card and stats row */
-    --profile-tabs-gap: 16px;                    /* gap between stats row and tabs */
-    --profile-bottom-safe: max(env(safe-area-inset-bottom,0px), 12px);
   }
 
   @media (min-width: 768px) {
