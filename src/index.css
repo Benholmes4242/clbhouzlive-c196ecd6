@@ -1012,24 +1012,24 @@ html, body, #root, .app-shell { touch-action: auto; }
 
   /* Apple-Inspired Pill Components */
   .pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
-           select-none whitespace-nowrap text-sm font-medium
-           backdrop-blur-md bg-transparent text-black
-           border border-gray-300 shadow-none
-           transition-colors transition-shadow duration-150;
-    line-height: 1.2;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
+           select-none whitespace-nowrap min-h-[44px]
+           transition-all duration-200 cursor-pointer
+           bg-white/80 text-black border border-white/50;
+    line-height: 1;
+    touch-action: manipulation;
   }
 
   .pill:hover { 
-    @apply bg-gray-50 border-gray-400; 
+    @apply bg-white border-white; 
   }
-  
+
   .pill:active { 
-    @apply scale-[0.99] bg-gray-100; 
+    @apply scale-[0.99]; 
   }
 
   .pill--active {
-    @apply bg-gray-100 text-black border-gray-400;
+    @apply bg-white text-black border-white shadow;
   }
 
   .pill:focus-visible {
@@ -1042,31 +1042,29 @@ html, body, #root, .app-shell { touch-action: auto; }
     line-height: 1;
   }
 
-  /* Discover Page Specific Pills with Subtle Orange */
+  /* Discover Page Specific Pills with Dark Glass Contrast */
   .discover-pill {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5
            select-none whitespace-nowrap min-h-[44px]
-           backdrop-blur-md bg-gray-50/80 text-gray-700
-           border border-gray-200/60 shadow-none
+           bg-white/90 text-black border border-white/60
            transition-all duration-200;
     line-height: 1;
     scroll-snap-align: start;
   }
 
   .discover-pill:hover {
-    border-color: hsl(var(--discover-orange) / 0.3);
-    background-color: hsl(var(--discover-orange) / 0.05);
+    @apply bg-white border-white;
   }
 
   .discover-pill:focus-visible {
     @apply outline-none ring-2 ring-offset-2;
-    ring-color: hsl(var(--discover-orange));
+    ring-color: hsl(var(--accent));
   }
 
   .discover-pill--active {
-    background-color: hsl(var(--discover-orange));
+    background-color: hsl(var(--accent));
     color: white;
-    border-color: hsl(var(--discover-orange));
+    border-color: hsl(var(--accent));
     @apply shadow-md;
   }
 
@@ -1077,10 +1075,9 @@ html, body, #root, .app-shell { touch-action: auto; }
   .discover-pill__label {
     @apply font-medium;
   }
-  }
 
   .pill--sm { 
-    @apply px-3 py-1.5 text-[15px]; 
+    @apply px-3 py-1.5 text-[15px] min-h-[36px]; 
   }
 
   /* Echo label styling - perfectly centered both ways */
@@ -1425,37 +1422,8 @@ html, body, #root, .app-shell { touch-action: auto; }
   }
 
   .container { @apply max-w-6xl; }
+}
 
-  /* Discover Page Specific Pills with Brand Orange */
-  .discover-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
-           select-none whitespace-nowrap
-           backdrop-blur-md bg-gray-50/80 text-gray-700
-           border border-gray-200/60 shadow-none
-           transition-all duration-200;
-    line-height: 1;
-    scroll-snap-align: start;
-  }
-
-  .discover-pill:hover {
-    @apply border-brand-orange/30 bg-brand-orange/5;
-  }
-
-  .discover-pill:focus-visible {
-    @apply outline-none ring-2 ring-brand-orange ring-offset-2;
-  }
-
-  .discover-pill--active {
-    @apply bg-brand-orange text-white border-brand-orange shadow-md;
-  }
-
-  .discover-pill__icon {
-    @apply w-4 h-4 flex-shrink-0;
-  }
-
-  .discover-pill__label {
-    @apply font-medium;
-  }
 
 @media (max-width: 960px) {
   .container {

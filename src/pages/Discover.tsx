@@ -154,24 +154,23 @@ const Discover = () => {
           </div>
         )}
 
-        {/* Divider Block - Search + Pills */}
+        {/* Divider Block - Search + Pills with Dark Glass */}
         <div className={`
           px-3 md:px-0 
           ${(!searchQuery || searchQuery.trim() === '') ? 'mt-4' : 'mt-0'}
         `}>
           <div className={`
-            backdrop-blur-md bg-white/60 dark:bg-white/7
-            border border-white/20 dark:border-black/5
-            rounded-2xl md:rounded-3xl
-            pt-3 pb-2 md:pt-4 md:pb-3
-            px-4 md:px-6
+            rounded-2xl
+            backdrop-blur-md
+            bg-black/60
+            border border-white/15
+            shadow-[0_8px_40px_rgba(0,0,0,0.35)]
+            text-white
+            p-4 md:p-5 lg:p-6 space-y-3 md:space-y-4
             md:container md:mx-auto md:max-w-[1200px]
-          `}
-          style={{ 
-            boxShadow: 'var(--hud-shadow, 0 4px 16px hsl(var(--shadow) / 0.15))' 
-          }}>
+          `}>
             {/* Search */}
-            <div className="mb-3">
+            <div>
               <MediaSearch 
                 placeholder="Search videos and photos..." 
                 onSearchChange={setSearchQuery}
@@ -179,7 +178,7 @@ const Discover = () => {
             </div>
 
             {/* Main Pills (ExploreFilters) */}
-            <div className="mb-[10px]">
+            <div>
               <DiscoverPillRow 
                 activeFilter={activeFilter} 
                 onFilterChange={setActiveFilter}
@@ -187,7 +186,7 @@ const Discover = () => {
             </div>
 
             {/* Hashtag Pills (SubpillBar) */}
-            <div className="mb-2">
+            <div>
               <TrendingTagsBar onTagsChange={setSelectedTags} />
             </div>
           </div>
