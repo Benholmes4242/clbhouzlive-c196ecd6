@@ -659,10 +659,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
               >
                 {/* Profile Info Section - Top Area with Stagger */}
-                <div className="flex-1 flex flex-col justify-center px-4 pt-8 pb-20">
+                <div className="flex-1 flex flex-col px-4 pt-1 pb-20">
                   {/* User Avatar - First in stagger */}
                   <motion.div 
-                    className="flex justify-center mb-4"
+                    className="flex justify-center mb-1"
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ 
                       opacity: showStaggeredContent ? 1 : 0,
@@ -676,7 +676,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     }}
                   >
                     <div 
-                      className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
+                      className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/profile/${user.id}`);
@@ -690,7 +690,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-white text-2xl font-bold">
+                          <span className="text-white text-xl font-bold">
                             {user.displayName.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -700,7 +700,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
                   {/* User Info - Staggered */}
                   <motion.div 
-                    className="text-center space-y-2"
+                    className="text-center"
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ 
                       opacity: showStaggeredContent ? 1 : 0,
@@ -714,7 +714,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   >
                     {/* Display Name - Second in stagger */}
                     <motion.h3 
-                      className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200"
+                      className="text-white font-bold text-xl cursor-pointer hover:text-white/90 transition-colors duration-200 truncate px-2"
                       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -736,7 +736,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     
                     {/* Handle - Third in stagger */}
                     <motion.p 
-                      className="text-white/70 text-base"
+                      className="text-white/70 text-base mt-1"
                       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ 
@@ -749,31 +749,8 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         ease: "easeOut"
                       }}
                     >
-                      @{user.handle}
+                      {user.handle}
                     </motion.p>
-                    
-                    {/* Home Club & HCP - Fourth in stagger */}
-                    {user.homeClub && (
-                      <motion.p 
-                        className="text-white/80 text-base font-medium mt-3"
-                        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ 
-                          opacity: showStaggeredContent ? 1 : 0,
-                          y: showStaggeredContent ? 0 : 10
-                        }}
-                        transition={{ 
-                          duration: prefersReducedMotion ? 0.06 : 0.2,
-                          delay: prefersReducedMotion ? 0 : 0.1,
-                          ease: "easeOut"
-                        }}
-                      >
-                        {user.homeClub}
-                        {user.handicap !== undefined && (
-                          <span className="block mt-1 text-sm opacity-90">HCP {user.handicap}</span>
-                        )}
-                      </motion.p>
-                    )}
                   </motion.div>
                 </div>
               </motion.div>
