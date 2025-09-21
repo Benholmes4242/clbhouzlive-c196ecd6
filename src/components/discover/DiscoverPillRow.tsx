@@ -142,10 +142,10 @@ const DiscoverPillRow: React.FC<DiscoverPillRowProps> = ({
       {!isMobile ? null : (
         <>
           {!isAtStart && (
-            <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-black/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white/60 to-transparent pointer-events-none z-10" />
           )}
           {!isAtEnd && (
-            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/60 to-transparent pointer-events-none z-10" />
           )}
         </>
       )}

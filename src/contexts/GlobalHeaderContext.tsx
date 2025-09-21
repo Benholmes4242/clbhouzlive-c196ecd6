@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type HeaderVariant = 'glass-dark';
+export type HeaderVariant = 'glass-dark' | 'solid-light';
 
 interface HeaderContextType {
   variant: HeaderVariant;
@@ -32,21 +32,12 @@ interface HeaderProviderProps {
   defaultVariant?: HeaderVariant;
 }
 
-const DEFAULT_VARIANT: HeaderVariant = 'glass-dark';
-
 export const HeaderProvider: React.FC<HeaderProviderProps> = ({ 
   children, 
-  defaultVariant = 'glass-dark' 
+  defaultVariant = 'solid-light' 
 }) => {
-  const [variant] = useState<HeaderVariant>(DEFAULT_VARIANT);
+  const [variant, setVariant] = useState<HeaderVariant>(defaultVariant);
   const [isVisible, setIsVisible] = useState(true);
-
-  // No-op setter to prevent pages from attempting to change variant
-  const forceGlassDark = useCallback((v?: any) => {
-    if (process.env.NODE_ENV !== 'production' && v && v !== 'glass-dark') {
-      console.warn('[Header] Variant is locked to glass-dark. Ignoring:', v);
-    }
-  }, []);
 
   const setVisible = useCallback((visible: boolean) => {
     setIsVisible(visible);
@@ -64,7 +55,7 @@ export const HeaderProvider: React.FC<HeaderProviderProps> = ({
     <HeaderContext.Provider 
       value={{ 
         variant, 
-        setVariant: forceGlassDark, 
+        setVariant, 
         isVisible, 
         setVisible, 
         hideHeader, 

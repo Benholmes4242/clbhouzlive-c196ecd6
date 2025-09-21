@@ -3,7 +3,12 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Discover from './Discover';
 
 const DiscoverWrapped = () => {
-  // No need to set variant anymore - it's locked to glass-dark
+  const { setVariant } = useHeader();
+
+  useEffect(() => {
+    setVariant('solid-light');
+  }, [setVariant]);
+
   return <Discover />;
 };
 

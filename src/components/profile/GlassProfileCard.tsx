@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, MapPin, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -91,10 +91,12 @@ const GlassProfileCard: React.FC<GlassProfileCardProps> = ({
 
         {/* Meta Row - Club and Handicap */}
         <div className="mt-3 md:mt-4 grid grid-cols-2 gap-x-6 place-items-center text-white/85 text-sm">
-          <div>
+          <div className="flex items-center gap-2">
+            <MapPin className="opacity-80" size={16} />
             {homeClub || 'No Club'}
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <Target className="opacity-80" size={16} />
             {handicap !== null && handicap !== undefined ? handicap.toFixed(1) : 'N/A'}
           </div>
         </div>

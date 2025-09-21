@@ -3,7 +3,13 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Auth from './Auth';
 
 const AuthWrapped = () => {
-  // No need to set variant anymore - it's locked to glass-dark
+  const { setVariant } = useHeader();
+
+  useEffect(() => {
+    // Auth pages have white background, use solid-light
+    setVariant('solid-light');
+  }, [setVariant]);
+
   return <Auth />;
 };
 

@@ -80,8 +80,14 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
   // Standard header for other pages
   console.log("[DEBUG] Rendering standard header for path:", pathname, "useCompactMode:", useCompactMode);
 
-  // Always use glass-dark styles
-  const logoSrc = "/assets/clbhouz-white-logo.png";
+  // Get variant-specific styles
+  const isGlassDark = variant === 'glass-dark';
+  const isSolidLight = variant === 'solid-light';
+  
+  // Logo source based on variant
+  const logoSrc = isGlassDark 
+    ? "/assets/clbhouz-white-logo.png" 
+    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
 
   // Standard header for other pages
   return (
@@ -91,8 +97,9 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
         className={cn(
           "sticky top-0 z-header transition-all duration-300",
           "h-16 md:h-18", // 64px mobile, 72px desktop
-          // Always use glass-dark background
-          "backdrop-blur-md bg-black/60",
+          // Variant-specific backgrounds
+          isGlassDark && "backdrop-blur-md bg-black/60",
+          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           headerClasses
         )}
         style={{ '--header-h-mobile': '60px' } as any}
@@ -118,7 +125,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
           <div className="hidden md:flex flex-1 justify-center px-4">
             <SearchPill 
               className="w-full max-w-xl" 
-              variant="glass-dark"
+              variant={variant}
             />
           </div>
 
@@ -126,10 +133,18 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
           <nav className="flex items-center space-x-2">
             {/* Mobile Search Button */}
             <button 
-              className="md:hidden p-2 rounded-full transition-colors hover:bg-white/10"
+              className={cn(
+                "md:hidden p-2 rounded-full transition-colors",
+                isGlassDark && "hover:bg-white/10",
+                isSolidLight && "hover:bg-black/10"
+              )}
               onClick={() => setSearchOpen(true)}
             >
-              <Search className="h-5 w-5 text-white" />
+              <Search className={cn(
+                "h-5 w-5",
+                isGlassDark && "text-white",
+                isSolidLight && "text-black"
+              )} />
             </button>
             
             {/* Navigation Icons */}
@@ -149,12 +164,16 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
           
           {/* Search pill overlay */}
           <div className="fixed inset-x-0 top-0 z-[70] p-3">
-            <div className="rounded-full backdrop-blur-2xl border shadow-hud bg-hud-bg border-hud-border">
+            <div className={cn(
+              "rounded-full backdrop-blur-2xl border shadow-hud",
+              isGlassDark && "bg-hud-bg border-hud-border",
+              isSolidLight && "bg-white/95 border-gray-200"
+            )}>
               <SearchPill 
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
-                variant="glass-dark"
+                variant={variant}
               />
             </div>
           </div>
