@@ -111,6 +111,34 @@ html, body, #root, .app-shell { touch-action: auto; }
   --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
 }
 
+/* Activity Grid Thumbnail Enhancements */
+.activity-thumbnail {
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.activity-thumbnail:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+/* Desktop video auto-preview on hover */
+@media (min-width: 768px) {
+  .activity-video-thumbnail:hover video {
+    opacity: 1;
+  }
+  
+  .activity-video-thumbnail video {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
+
+/* Safe area padding for profile content */
+.profile-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+
 /* Global bottom navigation styling */
 .global-bottom-nav {
   /* Ensure it's above all content but below toasts/modals */
@@ -302,7 +330,7 @@ html, body, #root, .app-shell { touch-action: auto; }
   animation: pingonce 340ms ease-out both;
 }
 
-/* Echo Avatar Waveform Animation */
+  /* Echo Avatar Waveform Animation */
 @keyframes echoWave {
   0%, 100% {
     transform: scaleY(0.3);
@@ -311,6 +339,40 @@ html, body, #root, .app-shell { touch-action: auto; }
   50% {
     transform: scaleY(1);
     opacity: 1;
+  }
+}
+
+/* Ken Burns zoom effect for hero images */
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+/* Echo accent glow pulse animation */
+@keyframes echoPulse {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+/* Counter animation for stats */
+@keyframes countUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -409,6 +471,9 @@ html, body, #root, .app-shell { touch-action: auto; }
     --brand-orange-light: 30 90 70; /* Lighter subtle variant */
     --discover-orange: 28 85 65; /* Match subtle orange */
     --discover-orange-dark: 25 80 60; /* Darker subtle hover */
+    
+    /* Echo Accent Color */
+    --echo-accent: 141 15% 57%; /* #6e9277 */
     
     /* Design System Colors */
     --background: 0 0% 100%;
@@ -517,7 +582,7 @@ html, body, #root, .app-shell { touch-action: auto; }
   .glow-hover:hover,
   .glow-hover:focus-visible {
     transform: translateY(-2px);
-    box-shadow: var(--hud-shadow), 0 0 0 1px hsl(var(--accent) / 0.3);
+    box-shadow: var(--hud-shadow), 0 0 20px hsl(var(--echo-accent) / 0.3);
   }
 
   /* Overlay gradient for readability */

@@ -712,7 +712,7 @@ const HeroProfileHeader = ({
                 <img
                   src={profile.profile_photo_url}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover animate-ken-burns"
                   style={{ 
                     objectPosition: getMobileCropPosition(profile),
                     objectFit: 'cover',
@@ -738,8 +738,18 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Overlay Gradient for readability */}
-              <div className="absolute bottom-0 left-0 w-full h-32 overlay-gradient pointer-events-none z-[5]" />
+              {/* Multi-stop Echo Accent Gradient Overlay */}
+              <div 
+                className="absolute inset-0 pointer-events-none z-[5]"
+                style={{
+                  background: `linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,0.7) 0%,
+                    rgba(110,146,119,0.35) 50%,
+                    transparent 100%
+                  )`
+                }}
+              />
             </div>
 
             {/* Glass Profile Card positioned to float over bottom edge */}
@@ -796,24 +806,24 @@ const HeroProfileHeader = ({
                {/* Loading state */}
                <div className="absolute inset-0 bg-gray-900 animate-pulse" />
                
-               {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
-                  style={{ 
-                    objectPosition: 'center center',
-                    objectFit: 'cover'
-                  }}
-                  loading="eager"
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.previousElementSibling?.remove();
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
+                {profile?.profile_photo_url ? (
+                 <img
+                   src={profile.profile_photo_url}
+                   alt={profile?.display_name || 'Profile'}
+                   className="h-full w-full object-cover animate-ken-burns"
+                   style={{ 
+                     objectPosition: 'center center',
+                     objectFit: 'cover'
+                   }}
+                   loading="eager"
+                   onLoad={(e) => {
+                     e.currentTarget.style.opacity = '1';
+                     e.currentTarget.previousElementSibling?.remove();
+                   }}
+                   onError={(e) => {
+                     e.currentTarget.src = '/placeholder.svg';
+                   }}
+                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
                   <Camera className="w-16 h-16 mb-4 opacity-50" />
@@ -824,10 +834,18 @@ const HeroProfileHeader = ({
                 </div>
               )}
 
-              {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
-                              bg-gradient-to-t from-white via-white/60 to-transparent
-                              pointer-events-none z-[5]" />
+               {/* Multi-stop Echo Accent Gradient Overlay */}
+               <div 
+                 className="absolute inset-0 pointer-events-none z-[5]"
+                 style={{
+                   background: `linear-gradient(
+                     to bottom,
+                     rgba(0,0,0,0.7) 0%,
+                     rgba(110,146,119,0.35) 50%,
+                     transparent 100%
+                   )`
+                 }}
+               />
             </div>
 
              {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}

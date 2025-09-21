@@ -81,7 +81,8 @@ export default {
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
 				'brand-black': 'hsl(var(--brand-black))',
 				'hud-bg': 'var(--hud-bg)',
-				'hud-border': 'var(--hud-border)'
+				'hud-border': 'var(--hud-border)',
+				'echo-accent': 'hsl(var(--echo-accent))'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -270,6 +271,34 @@ export default {
 					'100%': {
 						transform: 'translateX(100%)'
 					}
+				},
+				'ken-burns': {
+					'0%': {
+						transform: 'scale(1)'
+					},
+					'100%': {
+						transform: 'scale(1.05)'
+					}
+				},
+				'echo-pulse': {
+					'0%, 100%': {
+						opacity: '0',
+						transform: 'scale(1)'
+					},
+					'50%': {
+						opacity: '0.6',
+						transform: 'scale(1.05)'
+					}
+				},
+				'count-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
@@ -288,7 +317,10 @@ export default {
 				'shimmer': 'shimmer 2s infinite',
 				'slow-spin': 'slow-spin 20s linear infinite',
 				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
-				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out'
+				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out',
+				'ken-burns': 'ken-burns 4s ease-in-out infinite alternate',
+				'echo-pulse': 'echo-pulse 1s ease-in-out',
+				'count-up': 'count-up 0.8s ease-out'
 			}
 		}
 	},

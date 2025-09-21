@@ -36,9 +36,9 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
     <div className="w-full mt-2">
       <div className="bg-black/65 backdrop-blur-md border-y border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
         <div className="relative flex">
-          {/* Sliding Indicator */}
+          {/* Sliding Echo Accent Glow Bar */}
           <div
-            className="absolute bottom-0 h-1 bg-white/30 rounded-full"
+            className="absolute bottom-0 h-1 bg-echo-accent rounded-full shadow-[0_0_12px_rgba(110,146,119,0.8)]"
             style={indicatorStyle}
           />
           
@@ -53,11 +53,12 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
                 onClick={() => onSectionChange(tab.id)}
                 className={`
                   flex-1 flex items-center justify-center py-3 px-2
-                  text-sm font-medium transition-colors duration-200
+                  text-sm font-medium transition-all duration-200
                   ${isActive 
                     ? 'text-white' 
-                    : 'text-white/60 hover:text-white/80'
+                    : 'text-white/60 hover:text-white/80 hover:bg-white/5'
                   }
+                  hover:backdrop-blur-sm rounded-lg
                 `}
               >
                 <span>{tab.label}</span>
