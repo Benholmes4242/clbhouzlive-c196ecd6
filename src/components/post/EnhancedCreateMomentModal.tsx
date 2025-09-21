@@ -614,61 +614,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   hasVideo={files.some(file => file.type.startsWith('video/'))}
                 />
 
-                {/* 4. Post Visibility Toggle - Wired Segmented Control */}
-                <div className="space-y-4 pt-6">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Post Visibility
-                  </label>
-                  <div className="space-y-3">
-                    {/* Segmented Control */}
-                    <div className="flex bg-gray-100 rounded-xl p-1 w-full">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setVisibility("public");
-                          setIsPrivate(false);
-                        }}
-                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          visibility === "public"
-                            ? 'text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        style={{
-                          backgroundColor: visibility === "public" ? '#9ca3af' : 'transparent'
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        🟢 Public
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setVisibility("private");
-                          setIsPrivate(true);
-                        }}
-                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          visibility === "private"
-                            ? 'text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                        style={{
-                          backgroundColor: visibility === "private" ? '#9ca3af' : 'transparent'
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        👁️ Private Archive
-                      </button>
-                    </div>
-                    
-                    {/* Subtext */}
-                    <p className="text-xs text-gray-500">
-                      {visibility === "private"
-                        ? "Private posts are visible only to you." 
-                        : "Public posts are visible on feed and profile."
-                      }
-                    </p>
-                  </div>
-                </div>
 
                 {/* Divider Line before buttons */}
                 <div className="border-t border-gray-100 -mx-6 mt-8" />
