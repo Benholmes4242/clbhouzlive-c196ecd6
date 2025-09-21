@@ -110,8 +110,8 @@ const SearchPill = ({
     enabled: true
   });
 
-  const isGlassDark = variant === 'glass-dark';
-  const isSolidLight = variant === 'solid-light';
+  // Always use glass-dark styles
+  const isGlassDark = true;
 
   // Convert hook results to SearchResult format for compatibility
   const results: SearchResult[] = [
@@ -302,23 +302,13 @@ const SearchPill = ({
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
-           // Variant-specific styling
-           isGlassDark && [
-             "bg-white/10 backdrop-blur-md border border-white/20",
-             isOpen && "bg-white/15 border-white/30"
-           ],
-           isSolidLight && [
-             "bg-gray-100/80 border border-gray-200/60",
-             isOpen && "bg-white border-gray-300"
-           ]
+          // Always use glass-dark styling
+          "bg-white/10 backdrop-blur-md border border-white/20",
+          isOpen && "bg-white/15 border-white/30"
         )}
       >
         {/* Search Icon */}
-        <Search className={cn(
-          "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-          isGlassDark && "text-white/70",
-          isSolidLight && "text-gray-500"
-        )} />
+        <Search className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0 text-white/70" />
 
         {/* Input with enhanced accessibility */}
         <input
@@ -335,14 +325,9 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            isGlassDark && [
-              "text-white placeholder:text-white/50",
-              isOpen && "placeholder:text-white/70"
-            ],
-            isSolidLight && [
-              "text-gray-900 placeholder:text-gray-500",
-              isOpen && "placeholder:text-gray-600"
-            ]
+            // Always use glass-dark text styling
+            "text-white placeholder:text-white/50",
+            isOpen && "placeholder:text-white/70"
           )}
           aria-label={placeholder}
           aria-expanded={isOpen}
@@ -359,16 +344,11 @@ const SearchPill = ({
             onClick={handleClear}
             className={cn(
               "flex-shrink-0 p-1 rounded-full transition-colors focus:outline-none",
-              isGlassDark && "hover:bg-white/10 focus:bg-white/10",
-              isSolidLight && "hover:bg-gray-200 focus:bg-gray-200"
+              "hover:bg-white/10 focus:bg-white/10"
             )}
             aria-label="Clear search"
           >
-            <X className={cn(
-              "h-3 w-3 md:h-4 md:w-4",
-              isGlassDark && "text-white/70",
-              isSolidLight && "text-gray-500"
-            )} />
+            <X className="h-3 w-3 md:h-4 md:w-4 text-white/70" />
           </button>
         )}
       </div>

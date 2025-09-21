@@ -3,12 +3,7 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Clubhouse from './Clubhouse';
 
 const ClubhouseWrapped = () => {
-  const { setVariant } = useHeader();
-
-  useEffect(() => {
-    setVariant('glass-dark');
-  }, [setVariant]);
-
+  // No need to set variant anymore - it's locked to glass-dark
   return <Clubhouse />;
 };
 

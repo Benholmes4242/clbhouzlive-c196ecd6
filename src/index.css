@@ -447,6 +447,12 @@ html, body, #root, .app-shell { touch-action: auto; }
     --header-h-mobile: 60px;
     --header-h-desktop: 72px;
     
+    /* Header Design Tokens - Glass Dark Only */
+    --header-bg: rgba(0, 0, 0, 0.60);
+    --header-border: rgba(255, 255, 255, 0.10);
+    --header-icon: rgba(255, 255, 255, 0.92);
+    --header-icon-hover: #fff;
+    
     /* Spacing */
     --tag-offset: 8px;
     

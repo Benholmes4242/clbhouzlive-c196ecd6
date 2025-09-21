@@ -3,13 +3,7 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import ProfilePage from './ProfilePage';
 
 const ProfileWrapped = () => {
-  const { setVariant } = useHeader();
-
-  useEffect(() => {
-    // Profile pages have hero images, use glass-dark
-    setVariant('glass-dark');
-  }, [setVariant]);
-
+  // No need to set variant anymore - it's locked to glass-dark
   return <ProfilePage />;
 };
 

@@ -3,13 +3,7 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import Settings from './Settings';
 
 const SettingsWrapped = () => {
-  const { setVariant } = useHeader();
-
-  useEffect(() => {
-    // Settings page has white background, use solid-light
-    setVariant('solid-light');
-  }, [setVariant]);
-
+  // No need to set variant anymore - it's locked to glass-dark
   return <Settings />;
 };
 
