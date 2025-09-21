@@ -469,7 +469,19 @@ html, body, #root, .app-shell { touch-action: auto; }
     --sheet-header-h: 72px;
     --sheet-footer-h: 0px;
     --sheet-vpad: 16px;
-}
+    
+    /* Mini Profile Sheet Height Tokens */
+    --sheet-height-mobile: 68svh;
+    --sheet-height-desktop: 56svh;
+    --sheet-max-width: 720px;
+    --sheet-min-height: 420px;
+    --sheet-edge-gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --sheet-height-mobile: var(--sheet-height-desktop);
+    }
 
 /* Hide scrollbars for Netflix-style carousels */
 .scrollbar-hide {
@@ -510,6 +522,53 @@ html, body, #root, .app-shell { touch-action: auto; }
     max-height: calc(75dvh - var(--sheet-header-h) - var(--sheet-footer-h) - var(--sheet-vpad));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+  }
+
+  /* Mini Profile Sheet Styles */
+  .mini-profile-sheet {
+    height: var(--sheet-height-mobile);
+    min-height: var(--sheet-min-height);
+    max-width: var(--sheet-max-width);
+    margin-inline: var(--sheet-edge-gap);
+    margin-bottom: var(--sheet-edge-gap);
+  }
+
+  /* Sheet header with fixed height to prevent layout shift */
+  .sheet-header {
+    min-height: 120px;
+    flex-shrink: 0;
+  }
+
+  /* Sheet scroll region fills remaining space */
+  .sheet-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Consistent sheet animations */
+  .sheet-enter {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+
+  .sheet-enter-active,
+  .sheet-open {
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 240ms ease-out, opacity 240ms ease-out;
+  }
+
+  .sheet-exit {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .sheet-exit-active {
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 220ms ease-in, opacity 220ms ease-in;
   }
 
   /* Scroll shadows for affordance */
@@ -620,6 +679,7 @@ html, body, #root, .app-shell { touch-action: auto; }
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
   }
+}
 
 /* Scrollbar hiding utility */
 .scrollbar-hide {

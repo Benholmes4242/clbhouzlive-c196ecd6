@@ -111,6 +111,9 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   const [isFollowing, setIsFollowing] = useState(user?.isFollowing || false);
   const [optimisticFollowing, setOptimisticFollowing] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  
+  const headerRef = React.useRef<HTMLDivElement>(null);
+  const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
 
   // Update following state when user prop changes
   useEffect(() => {
@@ -121,6 +124,37 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
   useEffect(() => {
     if (isOpen) {
       setIsClosing(false);
+    }
+  }, [isOpen]);
+
+  // Measure header height to calculate scroll region height
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      const sheet = document.querySelector<HTMLElement>('.mini-profile-sheet');
+      const header = headerRef.current;
+      if (!sheet || !header) return;
+      
+      const sheetHeight = sheet.getBoundingClientRect().height;
+      const headerHeight = header.getBoundingClientRect().height;
+      const verticalPadding = 24; // Total internal vertical padding
+      
+      setScrollMaxHeight(Math.max(160, sheetHeight - headerHeight - verticalPadding));
+    };
+
+    if (isOpen) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(measure, 100);
+      
+      const resizeObserver = new ResizeObserver(measure);
+      resizeObserver.observe(document.documentElement);
+      if (headerRef.current) {
+        resizeObserver.observe(headerRef.current);
+      }
+      
+      return () => {
+        clearTimeout(timer);
+        resizeObserver.disconnect();
+      };
     }
   }, [isOpen]);
 
@@ -226,10 +260,10 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
         onClick={handleBackdropClick}
       />
       
-      {/* Liquid Glass Sheet */}
+      {/* Liquid Glass Sheet with Fixed Height */}
       <div 
         className={cn(
-          "relative w-full max-h-[75vh] overflow-hidden",
+          "mini-profile-sheet relative flex flex-col overflow-hidden",
           "bg-black/20 backdrop-blur-xl border border-white/10",
           "rounded-t-3xl shadow-2xl shadow-black/50",
           "transition-transform duration-300 ease-out",
@@ -237,7 +271,6 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           // Glass surface styling
           "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none"
         )}
-        style={{ maxWidth: isMobile ? '100%' : '480px' }}
         onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on the sheet
       >
         {/* Handle */}
@@ -261,159 +294,169 @@ const MiniProfileSheet = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetP
           </button>
         </div>
 
-        <div className="overflow-y-auto max-h-full pb-6">
-          {/* User Info Header */}
-          <div className="px-6 pt-2 pb-6">
-            <div className="flex items-start gap-4">
-              {/* Clickable Avatar */}
-              <button
-                onClick={handleAvatarClick}
-                className={cn(
-                  "flex-shrink-0 transition-transform duration-200",
-                  "hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-full",
-                  user?.id ? "cursor-pointer" : "cursor-default"
-                )}
-                disabled={!user?.id}
-              >
-                <OptimizedAvatar
-                  src={user.avatar}
-                  alt={user.name}
-                  size={64}
-                  fallback={user.name?.charAt(0)}
-                  className="ring-2 ring-white/20"
-                />
-              </button>
-              
-              <div className="flex-1 min-w-0">
-                {/* Clickable Name */}
-                <div className="flex items-center gap-2 mb-1">
-                  <button
-                    onClick={handleNameClick}
-                    className={cn(
-                      "text-left transition-colors duration-200",
-                      "hover:text-white/80 focus:text-white/80 focus:outline-none",
-                      user?.id ? "cursor-pointer" : "cursor-default"
-                    )}
-                    disabled={!user?.id}
-                  >
-                    <h3 className="font-semibold text-lg text-white truncate">
-                      {user.name}
-                    </h3>
-                  </button>
-                  {user.isVerified && (
-                    <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                  )}
-                </div>
-                
-                {user.username && (
-                  <p className="text-white/60 text-sm mb-2">@{user.username}</p>
-                )}
-                
-                {/* Conditional Metadata - only show if data exists */}
-                <div className="flex items-center gap-4 text-sm text-white/60">
-                  {user.homeClub && user.homeClub !== 'Example Golf Club' && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span className="truncate">{user.homeClub}</span>
-                    </div>
-                  )}
-                  {user.handicap !== undefined && user.handicap !== null && (
-                    <div className="flex items-center gap-1">
-                      <Target className="w-4 h-4" />
-                      <span>{user.handicap} HCP</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Subtle Orange Follow Button */}
-              <button
-                onClick={handleFollowClick}
-                disabled={followLoading || optimisticFollowing}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px]",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  isFollowing
-                    ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-                    : "border border-orange-400/50 text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 hover:border-orange-400/70"
-                )}
-              >
-                {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
-              </button>
+        <div className="flex flex-col h-full">
+          {/* Header Section with Fixed Height */}
+          <div ref={headerRef} className="sheet-header flex-shrink-0">
+            {/* Handle */}
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1.5 bg-white/30 rounded-full" />
             </div>
+            {/* User Info */}
+            <div className="px-6 pt-2 pb-6">
+              <div className="flex items-start gap-4">
+                {/* Clickable Avatar */}
+                <button
+                  onClick={handleAvatarClick}
+                  className={cn(
+                    "flex-shrink-0 transition-transform duration-200",
+                    "hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-full",
+                    user?.id ? "cursor-pointer" : "cursor-default"
+                  )}
+                  disabled={!user?.id}
+                >
+                  <OptimizedAvatar
+                    src={user.avatar}
+                    alt={user.name}
+                    size={64}
+                    fallback={user.name?.charAt(0)}
+                    className="ring-2 ring-white/20"
+                  />
+                </button>
+                
+                <div className="flex-1 min-w-0">
+                  {/* Clickable Name - Single Line with Ellipsis */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <button
+                      onClick={handleNameClick}
+                      className={cn(
+                        "text-left transition-colors duration-200 flex-1 min-w-0",
+                        "hover:text-white/80 focus:text-white/80 focus:outline-none",
+                        user?.id ? "cursor-pointer" : "cursor-default"
+                      )}
+                      disabled={!user?.id}
+                    >
+                      <h3 className="font-semibold text-lg text-white truncate">
+                        {user.name}
+                      </h3>
+                    </button>
+                    {user.isVerified && (
+                      <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    )}
+                  </div>
+                  
+                  {user.username && (
+                    <p className="text-white/60 text-sm mb-2 truncate">@{user.username}</p>
+                  )}
+                  
+                  {/* Conditional Metadata - Single Line */}
+                  <div className="flex items-center gap-4 text-sm text-white/60">
+                    {user.homeClub && user.homeClub !== 'Example Golf Club' && (
+                      <div className="flex items-center gap-1 flex-1 min-w-0">
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{user.homeClub}</span>
+                      </div>
+                    )}
+                    {user.handicap !== undefined && user.handicap !== null && (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Target className="w-4 h-4" />
+                        <span>{user.handicap} HCP</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Follow Button - Fixed Width */}
+                <button
+                  onClick={handleFollowClick}
+                  disabled={followLoading || optimisticFollowing}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px] flex-shrink-0",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    isFollowing
+                      ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                      : "border border-orange-400/50 text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 hover:border-orange-400/70"
+                  )}
+                >
+                  {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
+                </button>
+              </div>
+            </div>
+
+            {/* Subtle Divider */}
+            <div className="mx-6 mb-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
 
-          {/* Subtle Divider */}
-          <div className="mx-6 mb-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-          {/* Recent Posts Section */}
-          <section aria-labelledby="recent-posts-title" className="px-6">
-            <h4 id="recent-posts-title" className="font-medium text-white mb-4">Recent Posts</h4>
-            
-            <div
-              id="recent-posts-scroll"
-              role="region"
-              aria-label="Recent Posts, scrollable"
-              tabIndex={0}
-              className="recent-posts-scroll relative overflow-y-auto overscroll-contain"
-            >
-              {/* Loading State */}
-              {postsLoading && (
-                <div className={cn(
-                  "grid gap-2 p-2",
-                  isMobile ? "grid-cols-2" : "grid-cols-3"
-                )}>
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square bg-white/5 rounded-2xl animate-pulse"
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Error State */}
-              {postsError && !postsLoading && (
-                <div className="text-center py-8 text-white/60">
-                  <p className="mb-2">Couldn't load posts</p>
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="text-sm text-orange-300 hover:text-orange-200 transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
-              )}
-
-              {/* Empty State */}
-              {isEmpty && !postsLoading && !postsError && (
-                <div className="text-center py-8 text-white/60">
-                  <p>No posts yet</p>
-                </div>
-              )}
-
-              {/* Posts Grid */}
-              {!postsLoading && !postsError && posts.length > 0 && (
-                <div className={cn(
-                  "grid gap-2 p-2",
-                  isMobile ? "grid-cols-2" : "grid-cols-3"
-                )}>
-                  {posts.slice(0, isMobile ? 6 : 9).map((post) => {
-                    const media = post.post_media[0];
-                    if (!media) return null;
-
-                    return (
-                      <RecentPostTile
-                        key={post.id}
-                        media={media}
-                        onTileClick={() => handlePostClick(post)}
+          {/* Recent Posts Section - Scrollable */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <section aria-labelledby="recent-posts-title" className="px-6 flex-1 flex flex-col min-h-0">
+              <h4 id="recent-posts-title" className="font-medium text-white mb-4 flex-shrink-0">Recent Posts</h4>
+              
+              <div
+                id="recent-posts-scroll"
+                role="region"
+                aria-label="Recent Posts, scrollable"
+                tabIndex={0}
+                className="sheet-scroll flex-1"
+                style={scrollMaxHeight ? { maxHeight: `${scrollMaxHeight}px` } : undefined}
+              >
+                {/* Loading State */}
+                {postsLoading && (
+                  <div className={cn(
+                    "grid gap-2 p-2",
+                    isMobile ? "grid-cols-2" : "grid-cols-3"
+                  )}>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="aspect-square bg-white/5 rounded-2xl animate-pulse"
                       />
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
+                    ))}
+                  </div>
+                )}
+
+                {/* Error State */}
+                {postsError && !postsLoading && (
+                  <div className="text-center py-8 text-white/60">
+                    <p className="mb-2">Couldn't load posts</p>
+                    <button 
+                      onClick={() => window.location.reload()}
+                      className="text-sm text-orange-300 hover:text-orange-200 transition-colors"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+
+                {/* Empty State */}
+                {isEmpty && !postsLoading && !postsError && (
+                  <div className="text-center py-8 text-white/60">
+                    <p>No posts yet</p>
+                  </div>
+                )}
+
+                {/* Posts Grid */}
+                {!postsLoading && !postsError && posts.length > 0 && (
+                  <div className={cn(
+                    "grid gap-2 p-2",
+                    isMobile ? "grid-cols-2" : "grid-cols-3"
+                  )}>
+                    {posts.slice(0, isMobile ? 6 : 9).map((post) => {
+                      const media = post.post_media[0];
+                      if (!media) return null;
+
+                      return (
+                        <RecentPostTile
+                          key={post.id}
+                          media={media}
+                          onTileClick={() => handlePostClick(post)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </div>
