@@ -42,7 +42,7 @@ const FeedMeta: React.FC<FeedMetaProps> = ({
   return (
     <div 
       className={cn(
-        "absolute bottom-[env(safe-area-inset-bottom,20px)] left-4 right-28 z-20",
+        "absolute bottom-32 left-4 right-28 z-20",
         "bg-black/20 backdrop-blur-xl border border-white/15 rounded-2xl",
         "p-4 shadow-2xl transition-all duration-300",
         className
