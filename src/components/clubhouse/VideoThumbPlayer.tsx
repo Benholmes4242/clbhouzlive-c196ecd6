@@ -19,7 +19,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
-  const { register, requestPlay } = useSheetPlayback();
+  const { register, requestPlay, requestUnmute } = useSheetPlayback();
   const id = React.useId();
   
   const [playing, setPlaying] = useState(false);
@@ -36,8 +36,15 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         videoRef.current.pause();
       }
     };
+
+    const muteFn = () => {
+      if (videoRef.current) {
+        videoRef.current.muted = true;
+        setMuted(true);
+      }
+    };
     
-    return register(id, pauseFn);
+    return register(id, pauseFn, muteFn);
   }, [id, register]);
 
   // Setup video source and HLS if needed
@@ -194,10 +201,16 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    const newMutedState = !video.muted;
-    video.muted = newMutedState;
-    setMuted(newMutedState);
-  }, []);
+    if (video.muted) {
+      // Request exclusive unmute (mutes all other videos)
+      requestUnmute(id);
+      video.muted = false;
+      setMuted(false);
+    } else {
+      video.muted = true;
+      setMuted(true);
+    }
+  }, [id, requestUnmute]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -250,10 +263,10 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         </div>
       </div>
 
-      {/* Mute Toggle - Repositioned */}
+      {/* Mute Toggle - Repositioned to Right */}
       <button
         onClick={toggleMute}
-        className="absolute bottom-2 left-2 p-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
+        className="absolute bottom-2 right-2 p-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
         aria-pressed={!muted}
         aria-label={muted ? 'Unmute video' : 'Mute video'}
       >
