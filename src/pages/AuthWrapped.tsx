@@ -6,8 +6,8 @@ const AuthWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Auth pages now use dark header
-    setVariant('glass-dark');
+    // Auth pages have white background, use solid-light
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <Auth />;

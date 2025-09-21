@@ -6,8 +6,8 @@ const SettingsWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Settings page now uses dark header
-    setVariant('glass-dark');
+    // Settings page has white background, use solid-light
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <Settings />;

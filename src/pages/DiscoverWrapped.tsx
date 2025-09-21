@@ -6,7 +6,7 @@ const DiscoverWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    setVariant('glass-dark');
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <Discover />;

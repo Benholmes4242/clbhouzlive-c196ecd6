@@ -130,7 +130,6 @@ const App: React.FC = () => {
                           <VideoPlaybackManagerProvider>
                             <TopTenProvider>
                               <AuthWrapper>
-                                <GlobalHeader />
                                 <Suspense fallback={<ClubhouzLoading />}>
                         <Routes>
                           <Route path="/" element={<ClubhouseWrapped />} />
@@ -173,6 +172,7 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <AIChat />
+                      <GlobalHeader />
                       <GlobalBottomNavigation />
                     </BrowserRouter>
                   </UIProvider>
