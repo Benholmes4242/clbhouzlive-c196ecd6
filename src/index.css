@@ -138,6 +138,52 @@ html, body, #root, .app-shell { touch-action: auto; }
   position: fixed !important;
 }
 
+/* Global header enhancements */
+:root {
+  /* Header height including safe area */
+  --header-height: calc(64px + env(safe-area-inset-top, 0px));
+  --header-height-desktop: calc(72px + env(safe-area-inset-top, 0px));
+}
+
+/* Global header styling */
+.global-header {
+  /* Ensure it's above all content but below toasts/modals */
+  z-index: 200 !important;
+  
+  /* Hardware acceleration for smooth performance */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  
+  /* Ensure it never breaks from transforms in parent elements */
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Ensure pages have top padding for the header */
+.page-with-header {
+  padding-top: var(--header-height);
+}
+
+@media (min-width: 768px) {
+  .page-with-header {
+    padding-top: var(--header-height-desktop);
+  }
+}
+
+/* Support for safe areas on header */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .global-header {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Prevent header from being affected by page transforms */
+.no-transform-context .global-header {
+  position: fixed !important;
+}
+
 /* Compact Mode Helpers (≤375px) */
 @media (max-width: 375px) {
   .compact-header-padding {

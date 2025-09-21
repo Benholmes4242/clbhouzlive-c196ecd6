@@ -11,8 +11,12 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 
 const Clubhouse = () => {
+  // Set header variant for clubhouse (glass-dark)
+  useHeaderVariant('glass-dark');
+  
   const {
     posts,
     isLoading,

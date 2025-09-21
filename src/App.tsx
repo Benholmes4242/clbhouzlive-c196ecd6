@@ -30,7 +30,8 @@ import AppShell from '@/components/AppShell';
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
 import ProfilePage from "./pages/ProfilePage";
 import Discover from "./pages/Discover";
-import { HeaderProvider } from '@/contexts/HeaderContext';
+import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
+import GlobalHeader from '@/components/GlobalHeader';
 
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
@@ -171,6 +172,7 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <AIChat />
+                      <GlobalHeader />
                       <GlobalBottomNavigation />
                     </BrowserRouter>
                   </UIProvider>

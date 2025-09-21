@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import Header from '@/components/Header';
+
 
 import MediaSearch from '@/components/discover/MediaSearch';
 import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
@@ -139,10 +139,8 @@ const Discover = () => {
 
 
   return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        
-        <main className="pb-20">
+    <div className="min-h-screen bg-background text-foreground page-with-header">
+      <main className="pb-20">
           {/* Media Search - Discover Only */}
           <div className="px-4 md:container md:mx-auto md:px-6 pt-4">
             <MediaSearch 
@@ -177,7 +175,7 @@ const Discover = () => {
               selectedTags={selectedTags}
             />
           </div>
-        </main>
+      </main>
         
         
 
@@ -208,7 +206,6 @@ const Discover = () => {
           )
         )}
 
-
         <style>{`
           .scrollbar-hide {
             -ms-overflow-style: none;
@@ -226,7 +223,7 @@ const Discover = () => {
           }
         `}</style>
       </div>
-  );
-};
+    );
+  };
 
 export default Discover;
