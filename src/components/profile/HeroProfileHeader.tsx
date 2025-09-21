@@ -867,9 +867,7 @@ const HeroProfileHeader = ({
                   className="h-full w-full object-cover"
                   style={{ 
                     objectPosition: 'center center',
-                    objectFit: 'cover',
-                    minWidth: '100%',
-                    minHeight: '100%'
+                    objectFit: 'cover'
                   }}
                   loading="eager"
                   onLoad={(e) => {
