@@ -46,7 +46,7 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
-import AdaptiveGlassHeader from './AdaptiveGlassHeader';
+
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
@@ -697,20 +697,6 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Adaptive Glass Header for both desktop and mobile */}
-      <AdaptiveGlassHeader
-        isVisible={showStickyHeader && !isImmersiveOpen}
-        profile={profile}
-        stats={{
-          handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-          posts: postsCount,
-          followers: followersCount,
-          following: followingCount,
-          ratedCoursesCount,
-          averageRating
-        }}
-        onStatClick={handleStatClick}
-      />
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
