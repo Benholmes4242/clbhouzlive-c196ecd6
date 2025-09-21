@@ -800,152 +800,159 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-6">
-              {/* Left: Dismiss Button - Accessible & Performance Optimized */}
-              <motion.button
-                aria-label={`Dismiss suggestion for ${user.displayName}`}
-                onClick={handleDismissClick}
-                disabled={isDismissLoading || isFollowLoading || isTransitioning}
-                whileTap={{ scale: 0.98 }}
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: '0 0 16px hsl(0 67% 56% / 0.4), var(--glass-shadow)'
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 25,
-                  duration: prefersReducedMotion ? 0.1 : 0.25
-                }}
-                className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-transparent"
-                style={{
-                  // Ensure minimum 44px touch target
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  minHeight: '44px',
-                  background: 'hsl(var(--glass-dark) / 0.9)', 
-                  backdropFilter: 'blur(16px) saturate(1.2)',
-                  border: '1px solid hsl(var(--glass-border) / 0.4)',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                {/* Enhanced glow effects with performance optimization */}
-                <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
-                             group-hover:bg-white/10 group-active:bg-white/15" />
-                <div className="absolute inset-0 bg-red-500/10 rounded-full transition-all duration-300 
-                             group-hover:bg-red-500/20 group-active:bg-red-500/30" />
-                
-                {/* Icon with enhanced contrast */}
-                <div className="relative z-10 flex items-center justify-center w-full h-full">
-                  <FaThumbsDown 
-                    className="text-white text-base drop-shadow-sm" 
-                    style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
-                  />
-                </div>
-              </motion.button>
+            {/* Safe Controls Rail Container - Ensures circles stay within card */}
+            <div className="flex items-center justify-center px-4 min-h-[56px]">
+              <div className="flex items-center justify-center w-full max-w-[200px] relative">
+                {/* Dynamic gap and button sizes based on available space */}
+                <div className="flex items-center justify-between w-full">
+                  
+                  {/* Left: Dismiss Button - Accessible & Performance Optimized */}
+                  <motion.button
+                    aria-label={`Dismiss suggestion for ${user.displayName}`}
+                    onClick={handleDismissClick}
+                    disabled={isDismissLoading || isFollowLoading || isTransitioning}
+                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: '0 0 16px hsl(0 67% 56% / 0.4), var(--glass-shadow)'
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      duration: prefersReducedMotion ? 0.1 : 0.25
+                    }}
+                    className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-transparent shrink-0"
+                    style={{
+                      // Responsive sizing with minimum 44px touch target
+                      width: 'min(44px, 18vw)',
+                      height: 'min(44px, 18vw)',
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      background: 'hsl(var(--glass-dark) / 0.9)', 
+                      backdropFilter: 'blur(16px) saturate(1.2)',
+                      border: '1px solid hsl(var(--glass-border) / 0.4)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                    }}
+                  >
+                    {/* Enhanced glow effects with performance optimization */}
+                    <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
+                                 group-hover:bg-white/10 group-active:bg-white/15" />
+                    <div className="absolute inset-0 bg-red-500/10 rounded-full transition-all duration-300 
+                                 group-hover:bg-red-500/20 group-active:bg-red-500/30" />
+                    
+                    {/* Icon with enhanced contrast */}
+                    <div className="relative z-10 flex items-center justify-center w-full h-full">
+                      <FaThumbsDown 
+                        className="text-white text-base drop-shadow-sm" 
+                        style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
+                      />
+                    </div>
+                  </motion.button>
 
-              {/* Center: Detail Button - Accessible & Optimized */}
-              <motion.button
-                aria-label={`${isDetailExpanded ? "Hide" : "Show"} details for ${user.displayName}`}
-                aria-expanded={isDetailExpanded}
-                onClick={handleDetailClick}
-                disabled={isTransitioning}
-                whileTap={{ scale: 0.98 }}
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 25,
-                  duration: prefersReducedMotion ? 0.1 : 0.25
-                }}
-                className={cn(
-                  "group relative rounded-full flex items-center justify-center overflow-hidden",
-                  "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent",
-                  isDetailExpanded && "ring-1 ring-accent/30"
-                )}
-                style={{
-                  // Ensure minimum 44px touch target
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  minHeight: '44px',
-                  background: 'hsl(var(--glass-dark) / 0.9)', 
-                  backdropFilter: 'blur(16px) saturate(1.2)',
-                  border: '1px solid hsl(var(--glass-border) / 0.4)',
-                  boxShadow: isDetailExpanded 
-                    ? '0 0 20px hsl(var(--accent) / 0.3), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                    : '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                {/* Enhanced glow effects with performance optimization */}
-                <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
-                             group-hover:bg-white/10 group-active:bg-white/15" />
-                <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-300 
-                             group-hover:bg-accent/20 group-active:bg-accent/30" />
-                
-                {/* Icon with smooth rotation and enhanced contrast */}
-                <motion.div
-                  className="relative z-10 flex items-center justify-center w-full h-full"
-                  animate={{ rotate: isDetailExpanded ? 180 : 0 }}
-                  transition={{ 
-                    duration: prefersReducedMotion ? 0.1 : 0.25, 
-                    ease: "easeInOut" 
-                  }}
-                >
-                  <BiSolidDetail 
-                    className="text-white text-base" 
-                    style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
-                  />
-                </motion.div>
-              </motion.button>
+                  {/* Center: Detail Button - Accessible & Optimized */}
+                  <motion.button
+                    aria-label={`${isDetailExpanded ? "Hide" : "Show"} details for ${user.displayName}`}
+                    aria-expanded={isDetailExpanded}
+                    onClick={handleDetailClick}
+                    disabled={isTransitioning}
+                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      duration: prefersReducedMotion ? 0.1 : 0.25
+                    }}
+                    className={cn(
+                      "group relative rounded-full flex items-center justify-center overflow-hidden shrink-0",
+                      "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent",
+                      isDetailExpanded && "ring-1 ring-accent/30"
+                    )}
+                    style={{
+                      // Responsive sizing with minimum 44px touch target
+                      width: 'min(44px, 18vw)',
+                      height: 'min(44px, 18vw)',
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      background: 'hsl(var(--glass-dark) / 0.9)', 
+                      backdropFilter: 'blur(16px) saturate(1.2)',
+                      border: '1px solid hsl(var(--glass-border) / 0.4)',
+                      boxShadow: isDetailExpanded 
+                        ? '0 0 20px hsl(var(--accent) / 0.3), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        : '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                    }}
+                  >
+                    {/* Enhanced glow effects with performance optimization */}
+                    <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
+                                 group-hover:bg-white/10 group-active:bg-white/15" />
+                    <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-300 
+                                 group-hover:bg-accent/20 group-active:bg-accent/30" />
+                    
+                    {/* Icon with smooth rotation and enhanced contrast */}
+                    <motion.div
+                      className="relative z-10 flex items-center justify-center w-full h-full"
+                      animate={{ rotate: isDetailExpanded ? 180 : 0 }}
+                      transition={{ 
+                        duration: prefersReducedMotion ? 0.1 : 0.25, 
+                        ease: "easeInOut" 
+                      }}
+                    >
+                      <BiSolidDetail 
+                        className="text-white text-base" 
+                        style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
+                      />
+                    </motion.div>
+                  </motion.button>
 
-              {/* Right: Follow Button - Accessible & Optimized */}
-              <motion.button
-                aria-label={`Follow ${user.displayName}`}
-                onClick={handleFollowClick}
-                disabled={isFollowLoading || isDismissLoading || isTransitioning}
-                whileTap={{ scale: 0.98 }}
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 25,
-                  duration: prefersReducedMotion ? 0.1 : 0.25
-                }}
-                className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
-                style={{
-                  // Ensure minimum 44px touch target
-                  width: '44px',
-                  height: '44px',
-                  minWidth: '44px',
-                  minHeight: '44px',
-                  background: 'hsl(var(--glass-dark) / 0.9)', 
-                  backdropFilter: 'blur(16px) saturate(1.2)',
-                  border: '1px solid hsl(var(--glass-border) / 0.4)',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                {/* Enhanced glow effects with performance optimization */}
-                <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
-                             group-hover:bg-white/10 group-active:bg-white/15" />
-                <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-300 
-                             group-hover:bg-accent/20 group-active:bg-accent/30" />
-                
-                {/* Icon with enhanced contrast */}
-                <div className="relative z-10 flex items-center justify-center w-full h-full">
-                  <FaThumbsUp 
-                    className="text-white text-base" 
-                    style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
-                  />
+                  {/* Right: Follow Button - Accessible & Optimized */}
+                  <motion.button
+                    aria-label={`Follow ${user.displayName}`}
+                    onClick={handleFollowClick}
+                    disabled={isFollowLoading || isDismissLoading || isTransitioning}
+                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: '0 0 20px hsl(var(--accent) / 0.4), var(--glass-shadow)'
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      duration: prefersReducedMotion ? 0.1 : 0.25
+                    }}
+                    className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent shrink-0"
+                    style={{
+                      // Responsive sizing with minimum 44px touch target
+                      width: 'min(44px, 18vw)',
+                      height: 'min(44px, 18vw)',
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      background: 'hsl(var(--glass-dark) / 0.9)', 
+                      backdropFilter: 'blur(16px) saturate(1.2)',
+                      border: '1px solid hsl(var(--glass-border) / 0.4)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                    }}
+                  >
+                    {/* Enhanced glow effects with performance optimization */}
+                    <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-300 
+                                 group-hover:bg-white/10 group-active:bg-white/15" />
+                    <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-300 
+                                 group-hover:bg-accent/20 group-active:bg-accent/30" />
+                    
+                    {/* Icon with enhanced contrast */}
+                    <div className="relative z-10 flex items-center justify-center w-full h-full">
+                      <FaThumbsUp 
+                        className="text-white text-base" 
+                        style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }}
+                      />
+                    </div>
+                  </motion.button>
                 </div>
-              </motion.button>
+              </div>
             </div>
           </motion.div>
 
