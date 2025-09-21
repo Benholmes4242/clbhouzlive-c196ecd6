@@ -33,8 +33,8 @@ const GlassTabsBar: React.FC<GlassTabsBarProps> = ({ activeSection, onSectionCha
   }, [activeSection]);
 
   return (
-    <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-2">
-      <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
+    <div className="w-full mt-2">
+      <div className="bg-black/65 backdrop-blur-md border-y border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
         <div className="relative flex">
           {/* Sliding Indicator */}
           <div
