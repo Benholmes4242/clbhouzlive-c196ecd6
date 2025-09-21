@@ -99,6 +99,45 @@ img, video, canvas {
 /* Allow gestures globally */
 html, body, #root, .app-shell { touch-action: auto; }
 
+/* Global bottom navigation enhancements */
+:root {
+  /* Bottom navigation height including safe area */
+  --bottom-nav-height: calc(44px + var(--safe-bottom));
+}
+
+/* Global bottom navigation styling */
+.global-bottom-nav {
+  /* Ensure it's above all content but below toasts/modals */
+  z-index: 100 !important;
+  
+  /* Hardware acceleration for smooth performance */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  
+  /* Ensure it never breaks from transforms in parent elements */
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Ensure pages have bottom padding for the nav when needed */
+.page-with-bottom-nav {
+  padding-bottom: var(--bottom-nav-height);
+}
+
+/* Support for keyboard visibility on mobile */
+@supports (height: 100dvh) {
+  .global-bottom-nav {
+    bottom: var(--safe-bottom);
+  }
+}
+
+/* Prevent nav from being affected by page transforms */
+.no-transform-context .global-bottom-nav {
+  position: fixed !important;
+}
+
 /* Compact Mode Helpers (≤375px) */
 @media (max-width: 375px) {
   .compact-header-padding {

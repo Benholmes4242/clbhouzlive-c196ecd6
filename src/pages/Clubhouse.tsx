@@ -120,14 +120,6 @@ const Clubhouse = () => {
         />
       </div>
       
-      {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
-        <NavigationBar 
-          activeTab={activeTab} 
-          onTabClick={handleTabClickWithCamera} 
-          variant="clubhouse" 
-        />
-      </div>
       
       {/* Snap Modal and Post Submission Components */}
       <SnapModal

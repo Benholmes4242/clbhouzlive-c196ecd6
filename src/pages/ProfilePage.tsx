@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
-import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -58,7 +57,6 @@ const ProfilePage = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -78,10 +76,9 @@ const ProfilePage = () => {
               Try refreshing the page
             </button>
           </div>
-        </div>
-        <BottomNavigation />
       </div>
-    );
+    </div>
+  );
   }
 
   // Handle section changes with URL sync
@@ -122,7 +119,7 @@ const ProfilePage = () => {
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
       
       
-      <BottomNavigation />
+      
     </div>
   );
 };

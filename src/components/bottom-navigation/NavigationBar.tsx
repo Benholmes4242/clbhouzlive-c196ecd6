@@ -16,14 +16,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   return (
     <nav 
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-bottom-nav",
+        "w-full",
+        // Remove fixed positioning - parent handles it now
         isClubhouse 
-          ? "bg-black/60 backdrop-blur-md border-t border-white/10" 
-          : "bg-background/95 backdrop-blur-md border-t border-border/50"
+          ? "text-white" 
+          : "text-foreground"
       )}
       style={{
-        ['--safe-bottom' as any]: 'env(safe-area-inset-bottom)',
-        paddingBottom: 'max(var(--safe-bottom, 0px), 4px)',
+        // Safe area handling moved to parent
+        minHeight: '44px',
       }}
     >
       <div className="w-full px-2">

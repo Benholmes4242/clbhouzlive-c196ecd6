@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
 import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
-import BottomNavigation from "@/components/BottomNavigation";
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import type { AuthChangeEvent } from "@supabase/supabase-js";
 
@@ -23,6 +23,9 @@ const Auth: React.FC = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const lastResendEmail = useRef(""); // to avoid spamming resend if email field is empty
+  
+  // Hide bottom navigation on auth pages
+  useHideBottomNav();
 
   // Helper to check if a profile exists for a user
   async function checkProfileExists(userId: string): Promise<boolean> {
@@ -95,7 +98,7 @@ const Auth: React.FC = () => {
           />
         )}
       </AuthLayout>
-      <BottomNavigation />
+      
     </>
   );
 };

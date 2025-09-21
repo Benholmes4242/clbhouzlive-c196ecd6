@@ -19,6 +19,8 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
+import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
+import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
@@ -118,7 +120,8 @@ const App: React.FC = () => {
             <SiteAccessControl>
               <HeaderProvider>
                 <ModalProvider>
-                  <UIProvider>
+                  <BottomNavigationProvider>
+                    <UIProvider>
                     <BrowserRouter>
                       <ScrollToTop />
                       <GlobalAudioProvider>
@@ -168,8 +171,10 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <AIChat />
+                      <GlobalBottomNavigation />
                     </BrowserRouter>
                   </UIProvider>
+                </BottomNavigationProvider>
                 </ModalProvider>
               </HeaderProvider>
             </SiteAccessControl>
