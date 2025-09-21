@@ -163,7 +163,7 @@ const HeaderSearch = () => {
           <input
             type="text"
             placeholder="Search players, courses, or content..."
-            className={`w-full pl-12 pr-10 py-0.5 pt-2 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-lg ${getTextColorClasses()}`}
+            className={`w-full pl-12 pr-10 py-0 md:py-0 pt-1.5 md:pt-1.5 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-lg ${getTextColorClasses()}`}
             style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -224,7 +224,7 @@ const HeaderSearch = () => {
               ref={inputRef}
               type="text"
               placeholder="Search players, courses, or content..."
-              className={`w-full pl-12 pr-10 py-2 pt-3 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-lg ${getTextColorClasses()}`} 
+              className={`w-full pl-12 pr-10 py-1.5 pt-2.5 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-lg ${getTextColorClasses()}`} 
               style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               value={query}
               onChange={(e) => {
