@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Clock, TrendingUp, User, MapPin } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useSearch } from '@/hooks/useSearch';
+import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 
 interface SearchResult {
@@ -253,131 +254,28 @@ const SearchPill = ({
       </div>
 
       {/* Results Dropdown */}
-      {showResults && (
-        <div className={cn(
-          "absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-lg z-50",
-          "max-h-96 overflow-y-auto",
-          isGlassDark && "bg-black/90 backdrop-blur-xl border-white/20",
-          isSolidLight && "bg-white border-gray-200"
-        )}>
-          {loading && query.length >= 1 && (
-            <div className={cn(
-              "p-4 text-center text-sm",
-              isGlassDark && "text-white/60",
-              isSolidLight && "text-gray-500"
-            )}>
-              Searching...
-            </div>
-          )}
-
-          {!loading && query.length >= 1 && results.length === 0 && (
-            <div className={cn(
-              "p-4 text-center text-sm",
-              isGlassDark && "text-white/60",
-              isSolidLight && "text-gray-500"
-            )}>
-              No results found for "{query}"
-            </div>
-          )}
-
-          {/* Recent searches header */}
-          {!query && recentSearches.length > 0 && (
-            <div className={cn(
-              "px-4 py-2 text-xs font-medium border-b",
-              isGlassDark && "text-white/60 border-white/10",
-              isSolidLight && "text-gray-500 border-gray-200"
-            )}>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Clock className="h-3 w-3" />
-                  Recent searches
-                </span>
-                <button
-                  onClick={clearRecentSearches}
-                  className={cn(
-                    "text-xs hover:underline",
-                    isGlassDark && "text-white/40 hover:text-white/60",
-                    isSolidLight && "text-gray-400 hover:text-gray-600"
-                  )}
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Trending header */}
-          {!query && recentSearches.length === 0 && popularClubs.length > 0 && (
-            <div className={cn(
-              "px-4 py-2 text-xs font-medium border-b",
-              isGlassDark && "text-white/60 border-white/10",
-              isSolidLight && "text-gray-500 border-gray-200"
-            )}>
-              <span className="flex items-center gap-2">
-                <TrendingUp className="h-3 w-3" />
-                Popular courses
-              </span>
-            </div>
-          )}
-
-          {/* Results */}
-          <div className="py-2">
-            {displayItems.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.type === 'recent') {
-                    executeRecentSearch(item.title);
-                  } else {
-                    handleResultSelect(item as SearchResult);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors",
-                  activeIndex === index && (isGlassDark ? "bg-white/10" : "bg-gray-100"),
-                  isGlassDark && "hover:bg-white/5",
-                  isSolidLight && "hover:bg-gray-50"
-                )}
-              >
-                {/* Icon */}
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                  isGlassDark && "bg-white/10",
-                  isSolidLight && "bg-gray-100"
-                )}>
-                  {(item as SearchResult).image ? (
-                    <img src={(item as SearchResult).image} alt="" className="w-8 h-8 rounded-full object-cover" />
-                  ) : (
-                    <>
-                      {item.type === 'user' && <User className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
-                      {item.type === 'course' && <MapPin className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
-                      {item.type === 'recent' && <Clock className={cn("h-4 w-4", isGlassDark && "text-white/70", isSolidLight && "text-gray-500")} />}
-                    </>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className={cn(
-                    "font-medium text-sm truncate",
-                    isGlassDark && "text-white",
-                    isSolidLight && "text-gray-900"
-                  )}>
-                    {item.title}
-                  </div>
-                  <div className={cn(
-                    "text-xs truncate",
-                    isGlassDark && "text-white/60",
-                    isSolidLight && "text-gray-500"
-                  )}>
-                    {item.subtitle}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <GlobalSearchDropdown
+        isOpen={showResults}
+        onClose={() => {
+          setIsOpen(false);
+          setActiveIndex(-1);
+        }}
+        query={query}
+        results={results}
+        loading={loading}
+        recentSearches={recentSearches}
+        popularItems={popularClubs}
+        onResultSelect={handleResultSelect}
+        onRecentSearchClick={(searchQuery) => {
+          executeRecentSearch(searchQuery);
+          setIsOpen(false);
+        }}
+        onClearRecentSearches={clearRecentSearches}
+        activeIndex={activeIndex}
+        onActiveIndexChange={setActiveIndex}
+        anchorRef={{ current: dropdownRef.current }}
+        highlightQuery={query}
+      />
     </div>
   );
 };
