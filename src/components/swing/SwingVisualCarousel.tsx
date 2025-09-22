@@ -1,23 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Download, Copy, Plus, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SwingVisual } from '@/types/swing';
+import { SwingVisualizer } from '@/services/swing/visualizer';
 
 interface SwingVisualCarouselProps {
-  visuals: SwingVisual[];
+  visuals?: SwingVisual[];
+  analysisId?: string;
   onExport?: () => void;
   isLoading?: boolean;
+  lazy?: boolean;
 }
 
 export const SwingVisualCarousel: React.FC<SwingVisualCarouselProps> = ({
-  visuals,
+  visuals: propVisuals,
+  analysisId,
   onExport,
-  isLoading = false
+  isLoading: propIsLoading = false,
+  lazy = false
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [visuals, setVisuals] = useState<SwingVisual[]>(propVisuals || []);
+  const [isLoading, setIsLoading] = useState(propIsLoading);
   const { toast } = useToast();
+
+  // Load visuals from analysisId if provided
+  useEffect(() => {
+    if (analysisId && !propVisuals && !lazy) {
+      loadVisuals();
+    }
+  }, [analysisId, propVisuals, lazy]);
+
+  const loadVisuals = async () => {
+    if (!analysisId) return;
+    
+    setIsLoading(true);
+    try {
+      const visualPack = await SwingVisualizer.createOrGetPack(analysisId);
+      setVisuals(visualPack.visuals);
+    } catch (error) {
+      console.error('Error loading visuals:', error);
+      toast({
+        title: "Error loading visuals",
+        description: "Could not load visual pack",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev - 1 + visuals.length) % visuals.length);

@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin } from 'lucide-react';
+import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin, HelpCircle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -18,6 +19,9 @@ import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
 import { SwingVisualizer } from '@/services/swing/visualizer';
 import { SwingVisual } from '@/types/swing';
 import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
+import { AiFeedbackBlock } from '@/components/swing/AiFeedbackBlock';
+import { ProgressStrip } from '@/components/swing/ProgressStrip';
+import { CoachCta } from '@/components/swing/CoachCta';
 
 interface SwingAnalysis {
   id: string;
