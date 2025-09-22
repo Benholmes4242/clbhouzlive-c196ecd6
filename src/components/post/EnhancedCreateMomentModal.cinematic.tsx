@@ -237,13 +237,13 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center p-6 pt-20" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[90vh] max-h-[700px] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
+              className="w-full max-w-md h-[calc(100vh-2rem)] max-h-none liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -258,9 +258,9 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex h-full flex-col">
-                {/* MEDIA SECTION - takes up ~75% of modal height */}
-                <section id="media" className="relative h-[75vh] max-h-[500px] min-h-[400px] overflow-hidden">
+              <div className="flex h-full flex-col relative">
+                {/* MEDIA SECTION - takes up most of modal height and overflows top border */}
+                <section id="media" className="relative flex-1 min-h-[60vh] overflow-hidden -mt-6 pt-6">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -297,14 +297,14 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button 
                     onClick={close} 
                     aria-label="Close" 
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    className="absolute top-10 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
 
                   {/* Video duration pill - top left */}
                   {media[activeIndex]?.type === 'video' && (
-                    <div className="absolute top-6 left-6">
+                    <div className="absolute top-12 left-6">
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
@@ -312,7 +312,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   )}
 
                   {/* Media counter - top right, aligned with cover badge */}
-                  <div className="absolute top-6 right-16">
+                  <div className="absolute top-12 right-16">
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
