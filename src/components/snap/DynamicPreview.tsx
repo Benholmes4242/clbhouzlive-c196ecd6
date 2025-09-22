@@ -40,7 +40,7 @@ const DynamicPreview: React.FC<DynamicPreviewProps> = ({
           }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-3 h-3 rounded-full bg-white/20 animate-pulse" />
+          <span className="text-lg">📷</span>
         </div>
       </div>
     );
@@ -99,10 +99,6 @@ const DynamicPreview: React.FC<DynamicPreviewProps> = ({
             className="h-full w-full object-cover"
             loading="lazy"
           />
-          {/* Video play indicator */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-white/60 border border-white/40" />
-          </div>
         </motion.div>
       </div>
     );
