@@ -36,11 +36,10 @@ const GlobalHeader: React.FC = () => {
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
   const isClubhousePage = location.pathname === '/' || location.pathname === '/clubhouse';
   
-  // Set header variant based on route
+  // Set header variant - always use glass-dark now (liquid glass everywhere)
   useEffect(() => {
-    const isDarkRoute = GLASS_DARK_ROUTES.includes(location.pathname);
-    setVariant(isDarkRoute ? 'glass-dark' : 'solid-light');
-  }, [location.pathname, setVariant]);
+    setVariant('glass-dark');
+  }, [setVariant]);
 
   // Final visibility state
   const showHeader = isVisible && !shouldHideForRoute && !shouldHideHeader;
@@ -64,14 +63,8 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Get variant-specific styles
-  const isGlassDark = variant === 'glass-dark';
-  const isSolidLight = variant === 'solid-light';
-  
-  // Logo source based on variant
-  const logoSrc = isGlassDark 
-    ? "/assets/clbhouz-white-logo.png" 
-    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
+  // Always use white logo for liquid glass
+  const logoSrc = "/assets/clbhouz-white-logo.png";
 
   return (
     <>
@@ -84,10 +77,8 @@ const GlobalHeader: React.FC = () => {
               "fixed top-0 left-0 right-0 w-full",
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
-              "transition-all duration-300",
-              // Variant-specific backgrounds
-              isGlassDark && "backdrop-blur-md bg-black/60",
-              isSolidLight && "bg-white/10 backdrop-blur-2xl border-b border-white/20"
+              "transition-colors duration-300",
+              "liquid-glass liquid-glass--elevated"
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -135,19 +126,11 @@ const GlobalHeader: React.FC = () => {
               <nav className="flex items-center space-x-2">
                 {/* Mobile Search Button */}
                 <button 
-                  className={cn(
-                    "md:hidden p-2 rounded-full transition-colors min-h-[44px] min-w-[44px]",
-                    isGlassDark && "hover:bg-white/10",
-                    isSolidLight && "hover:bg-black/10"
-                  )}
+                  className="md:hidden p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] hover:bg-white/10"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Open search"
                 >
-                  <Search className={cn(
-                    "h-5 w-5",
-                    isGlassDark && "text-white",
-                    isSolidLight && "text-black"
-                  )} />
+                  <Search className="h-5 w-5 text-white" />
                 </button>
                 
                 {/* Navigation Icons */}
@@ -185,16 +168,12 @@ const GlobalHeader: React.FC = () => {
                 paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
               }}
             >
-              <div className={cn(
-                "rounded-full backdrop-blur-2xl border shadow-hud",
-                isGlassDark && "bg-hud-bg border-hud-border",
-                isSolidLight && "bg-white/95 border-gray-200"
-              )}>
+              <div className="rounded-full liquid-glass liquid-glass--elevated">
                 <SearchPill 
                   autoFocus 
                   onClose={() => setSearchOpen(false)}
                   placeholder="Search clbhouz..."
-                  variant={variant}
+                  variant="glass-dark"
                 />
               </div>
             </motion.div>

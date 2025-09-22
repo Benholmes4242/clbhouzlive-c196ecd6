@@ -341,9 +341,10 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
       ref={dropdownRef}
       className={cn(
         "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[9999]",
-        "rounded-2xl border border-white/15 backdrop-blur-xl bg-black/80 shadow-xl",
+        "rounded-2xl liquid-glass liquid-glass--elevated liquid-glass--dropdown",
         "text-left max-h-[70vh] overflow-auto",
         "md:max-h-[72vh] md:rounded-2xl",
+        "w-full md:min-w-[480px] max-h-[60vh]",
         isMobile && "hidden" // Hide when mobile - will use portal instead
       )}
       style={{
@@ -385,7 +386,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     return (
       <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm">
         <div className="absolute inset-x-0 top-[4rem] bottom-0 flex flex-col">
-          <div className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-t-2xl shadow-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">{/* Changed positioning to start from 4rem (64px) from top */}
+          <div className="liquid-glass liquid-glass--elevated rounded-t-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">{/* Changed positioning to start from 4rem (64px) from top */}
             {/* Mobile header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <h2 className="text-lg font-semibold text-white">Search</h2>
