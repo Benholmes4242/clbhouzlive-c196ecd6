@@ -44,14 +44,14 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
         setup: {
           phase: 'setup',
           metrics: {
-            shaftLeanDeg: 7.2,
-            shoulderTurnDeg: 15.5,
-            weightTransferPct: 45.0,
-            headStability: 1.8
+            spineAngleDeg: 36.2,
+            shoulderTiltDeg: 12.5,
+            pelvisSwayCm: 2.1,
+            headStabilityCm: 1.8
           },
           tips: {
-            primary: "Good setup position with slight forward shaft lean",
-            secondary: ["Keep feet shoulder-width apart", "Maintain spine angle"]
+            primary: "Excellent setup position with proper spine angle",
+            secondary: ["Maintain shoulder tilt at address", "Keep minimal lateral movement"]
           },
           confidence: 0.85,
           status: 'done',
@@ -60,14 +60,14 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
         takeaway: {
           phase: 'takeaway',
           metrics: {
-            shoulderTurnDeg: 32.8,
-            weightTransferPct: 48.0,
-            headStability: 2.1,
-            clubFaceAngleDeg: 1.5
+            handPathDepthCm: 15.8,
+            tempoRatio: 3.1,
+            headStabilityCm: 2.1,
+            clubFaceDeg: 1.5
           },
           tips: {
-            primary: "Smooth one-piece takeaway maintaining triangle",
-            secondary: ["Keep club low and wide", "Avoid early wrist hinge"]
+            primary: "Smooth one-piece takeaway with good depth",
+            secondary: ["Maintain tempo ratio", "Keep club on plane"]
           },
           confidence: 0.78,
           status: 'done',
@@ -76,14 +76,14 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
         backswing: {
           phase: 'backswing',
           metrics: {
-            shoulderTurnDeg: 67.3,
-            weightTransferPct: 52.0,
-            headStability: 2.8,
-            swingPathDeg: -1.2
+            swingPlaneDeg: 45.3,
+            handPathDepthCm: 18.2,
+            headStabilityCm: 2.8,
+            tempoRatio: 3.0
           },
           tips: {
-            primary: "Good shoulder turn creating width and power",
-            secondary: ["Complete the hip turn", "Maintain posture"]
+            primary: "Good swing plane and hand depth at top",
+            secondary: ["Complete the shoulder turn", "Maintain posture"]
           },
           confidence: 0.82,
           status: 'done',
@@ -92,13 +92,13 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
         top: {
           phase: 'top',
           metrics: {
-            shoulderTurnDeg: 95.5,
-            weightTransferPct: 60.0,
-            headStability: 3.2,
-            tempoRatio: 3.1
+            handPathDepthCm: 19.5,
+            tempoRatio: 3.1,
+            headStabilityCm: 3.2,
+            swingPlaneDeg: 44.8
           },
           tips: {
-            primary: "Excellent shoulder turn at the top of backswing",
+            primary: "Excellent position at the top of backswing",
             secondary: ["Maintain lag angle", "Start downswing with lower body"]
           },
           confidence: 0.91,
@@ -110,8 +110,8 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
           metrics: {
             shaftLeanDeg: 12.8,
             hipOpenDeg: 35.2,
-            weightTransferPct: 75.0,
-            clubFaceAngleDeg: 0.8
+            clubFaceDeg: 0.8,
+            headStabilityCm: 2.5
           },
           tips: {
             primary: "Strong impact position with forward shaft lean",
@@ -125,9 +125,9 @@ export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn
           phase: 'followThrough',
           metrics: {
             hipOpenDeg: 85.0,
-            shoulderTurnDeg: 110.0,
-            weightTransferPct: 90.0,
-            headStability: 2.5
+            headStabilityCm: 2.5,
+            pelvisSwayCm: 1.8,
+            tempoRatio: 3.0
           },
           tips: {
             primary: "Complete follow-through with balanced finish",
