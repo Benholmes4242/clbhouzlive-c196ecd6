@@ -362,9 +362,15 @@ export const SwingCoach: React.FC<SwingCoachProps> = ({ onClose }) => {
                     </Button>
                   </div>
                   
-                  <Button onClick={analyzeSwing} className="w-full">
-                    Analyze Swing
-                  </Button>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Video loaded and ready for analysis
+                    </div>
+                    <Button onClick={analyzeSwing} className="gap-2">
+                      <HelpCircle className="h-4 w-4" />
+                      Analyze Swing
+                    </Button>
+                  </div>
                 </div>
               </Card>
             )}
