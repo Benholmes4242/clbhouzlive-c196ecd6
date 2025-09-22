@@ -132,7 +132,10 @@ const GlobalHeader: React.FC = () => {
                   onClick={() => setSearchOpen(true)}
                   aria-label="Open search"
                 >
-                  <Search className="h-5 w-5 text-white" />
+                  <Search className={cn(
+                    "h-5 w-5",
+                    isClubhousePage ? "text-white" : "text-black"
+                  )} />
                 </button>
                 
                 {/* Navigation Icons */}
