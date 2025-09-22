@@ -897,65 +897,25 @@ const HeroProfileHeader = ({
               <div className="h-12 md:h-16" />
             </section>
             
-            {/* Frosted White Glass Stats */}
+            {/* Dark Rail for Stats */}
             <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 mb-0">
-              <div 
-                className="rounded-2xl border border-white/10 px-3 md:px-4 py-2 md:py-3"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.75)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-                }}
-              >
+              <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
                 <div className="grid grid-cols-4 gap-2 md:gap-3">
-                  <div 
-                    className="rounded-xl border border-white/10 py-2.5 md:py-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.75)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="text-gray-900 font-semibold">{postsCount}</div>
-                    <div className="text-gray-600 text-xs mt-0.5">Posts</div>
+                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
+                    <div className="text-white font-semibold">{postsCount}</div>
+                    <div className="text-white/70 text-xs mt-0.5">Posts</div>
                   </div>
-                  <div 
-                    className="rounded-xl border border-white/10 py-2.5 md:py-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.75)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="text-gray-900 font-semibold">2.5K</div>
-                    <div className="text-gray-600 text-xs mt-0.5">Total XP</div>
+                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
+                    <div className="text-white font-semibold">2.5K</div>
+                    <div className="text-white/70 text-xs mt-0.5">Total XP</div>
                   </div>
-                  <div 
-                    className="rounded-xl border border-white/10 py-2.5 md:py-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.75)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="text-gray-900 font-semibold">{followingCount}</div>
-                    <div className="text-gray-600 text-xs mt-0.5">Following</div>
+                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
+                    <div className="text-white font-semibold">{followingCount}</div>
+                    <div className="text-white/70 text-xs mt-0.5">Following</div>
                   </div>
-                  <div 
-                    className="rounded-xl border border-white/10 py-2.5 md:py-3 flex flex-col items-center transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.75)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="text-gray-900 font-semibold">{followersCount}</div>
-                    <div className="text-gray-600 text-xs mt-0.5">Followers</div>
+                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
+                    <div className="text-white font-semibold">{followersCount}</div>
+                    <div className="text-white/70 text-xs mt-0.5">Followers</div>
                   </div>
                 </div>
               </div>
