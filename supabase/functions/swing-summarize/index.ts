@@ -96,19 +96,19 @@ serve(async (req) => {
       });
     }
 
-    // Build compose prompt
-    const systemPrompt = `You are Echo, a professional golf instructor with expertise in biomechanics and swing analysis. 
-
-Analyze the provided swing phase data and return a structured JSON response with:
-- summary: A concise 2-3 sentence overview of the swing
-- keyFindings: Array of 3-4 most important observations
-- byPhase: Object with detailed analysis for each phase
-- drills: Array of 2-3 specific practice recommendations
-- confidence: Numerical confidence score (0.0-1.0)
-
-Keep observations specific, actionable, and biomechanically accurate. Focus on the most impactful improvements.
-
-Return ONLY valid JSON, no other text.`;
+    // Build summarize prompt (strict JSON)
+    const systemPrompt = `Compose a concise golf swing review. Return STRICT JSON only:
+{
+  "summary": string,
+  "keyFindings": string[],
+  "byPhase": {
+    "setup": string, "takeaway": string, "backswing": string, "top": string,
+    "downswing": string, "impact": string, "followThrough": string
+  },
+  "drills": string[],
+  "confidence": number
+}
+No extra text.`;
 
     // Format phase data for the prompt
     const phaseData = completedPhases.map(phase => ({
@@ -120,12 +120,15 @@ Return ONLY valid JSON, no other text.`;
     }));
 
     const userPrompt = {
-      sessionInfo: {
-        club: 'driver', // Could be extracted from context
-        cameraAngle: 'face-on', // Could be extracted
-        missPattern: 'unknown' // Could be extracted
-      },
-      phaseData
+      club: null,
+      cameraAngle: null,
+      miss: null,
+      phases: phaseData.map((p: any) => ({
+        phase: p.phase,
+        metrics: p.metrics ?? {},
+        tips: p.tips ?? [],
+        usedFrameIndex: p.usedFrameIndex
+      }))
     };
 
     console.log('Calling OpenAI with phase data for session:', sessionId);
@@ -143,7 +146,7 @@ Return ONLY valid JSON, no other text.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: JSON.stringify(userPrompt) }
         ],
-        max_completion_tokens: 1500,
+        max_completion_tokens: 700,
         response_format: { type: 'json_object' }
       }),
     });

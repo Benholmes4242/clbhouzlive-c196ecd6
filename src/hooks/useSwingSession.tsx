@@ -7,6 +7,7 @@ interface UseSwingSessionReturn {
   sessionState: SessionState | null;
   isLoading: boolean;
   error: string | null;
+  analysisId: string | undefined;
   startSession: (params: { uploadId?: string; videoUrl?: string }) => Promise<void>;
   disconnect: () => void;
 }
@@ -15,9 +16,11 @@ export function useSwingSession(): UseSwingSessionReturn {
   const [sessionState, setSessionState] = useState<SessionState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | undefined>();
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
+  const summarizingRef = useRef(false);
   const { toast } = useToast();
 
   const disconnect = useCallback(() => {
@@ -210,11 +213,65 @@ export function useSwingSession(): UseSwingSessionReturn {
           break;
 
         case 'complete':
-          // Call summarization when analysis is complete
-          if (!updated.summary) {
+          // If backend already provided analysisId, use it
+          if (data.summaryReady && data.analysisId) {
+            setAnalysisId(data.analysisId);
+            return updated;
+          }
+          
+          // Otherwise call summarize ONCE
+          if (!summarizingRef.current) {
+            summarizingRef.current = true;
             // Use setTimeout to make this async without blocking the message handler
-            setTimeout(() => {
-              handleSummarization(updated.sessionId);
+            setTimeout(async () => {
+              try {
+                const result = await AnalysisSessionService.summarize(updated.sessionId);
+                setAnalysisId(result.analysisId);
+                setSessionState(prev => prev ? {
+                  ...prev,
+                  summary: {
+                    text: result.text,
+                    createdAt: new Date().toISOString(),
+                    analysisId: result.analysisId,
+                    analysisResults: result.analysisResults
+                  }
+                } : prev);
+                
+                toast({
+                  title: "Analysis Complete",
+                  description: "Your swing analysis is ready with personalized recommendations",
+                });
+              } catch (err: any) {
+                console.error('Summarization failed:', err);
+                if (err?.message?.includes('Insufficient phase data')) {
+                  // Retry once after server hint
+                  setTimeout(async () => {
+                    try {
+                      const result = await AnalysisSessionService.summarize(updated.sessionId);
+                      setAnalysisId(result.analysisId);
+                      setSessionState(prev => prev ? {
+                        ...prev,
+                        summary: {
+                          text: result.text,
+                          createdAt: new Date().toISOString(),
+                          analysisId: result.analysisId,
+                          analysisResults: result.analysisResults
+                        }
+                      } : prev);
+                    } catch (retryErr) {
+                      console.error('Retry summarization failed:', retryErr);
+                    }
+                  }, 4000);
+                } else {
+                  toast({
+                    title: "Analysis Summary Failed",
+                    description: err.message || 'Failed to generate summary',
+                    variant: "destructive"
+                  });
+                }
+              } finally {
+                summarizingRef.current = false;
+              }
             }, 100);
           }
           break;
@@ -259,6 +316,7 @@ export function useSwingSession(): UseSwingSessionReturn {
     sessionState,
     isLoading,
     error,
+    analysisId,
     startSession,
     disconnect
   };
