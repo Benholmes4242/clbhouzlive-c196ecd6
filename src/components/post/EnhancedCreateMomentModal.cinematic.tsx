@@ -293,20 +293,33 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-
-                  {/* Media metadata pills - top left */}
-                  <div className="absolute top-4 left-4 flex items-center gap-2">
+                  {/* Top right controls - X icon, cover badge, and media counter */}
+                  <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
+                    {/* Cover badge */}
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                      <span>Cover</span>
+                    </div>
                     {/* Media counter */}
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
-                    {/* Video duration if applicable */}
-                    {media[activeIndex]?.type === 'video' && (
+                    {/* Close button */}
+                    <button 
+                      onClick={close} 
+                      aria-label="Close" 
+                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  {/* Video duration pill - top left */}
+                  {media[activeIndex]?.type === 'video' && (
+                    <div className="absolute top-4 left-4">
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {/* Navigation arrows */}
                   {canSlide && (
@@ -342,9 +355,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   )}
                 </section>
 
-                {/* CONTROLS SECTION - can overlap media slightly */}
-                <section className="flex-shrink-0 px-6 pb-6 space-y-3 relative -mt-4">
-                  {/* SLIDING CARDS CONTAINER - can extend upward */}
+                {/* CONTROLS SECTION - no overlap */}
+                <section className="flex-shrink-0 px-6 pb-6 space-y-3">
+                  {/* SLIDING CARDS CONTAINER */}
                   <div className="relative h-[120px] overflow-hidden">
                     {/* CAPTION CARD */}
                     <motion.div
