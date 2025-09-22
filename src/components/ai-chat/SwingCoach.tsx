@@ -1080,11 +1080,14 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         </p>
                       </div>
 
-                      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="mt-3">
                         <Button
                           onClick={analyzeSwing}
                           disabled={uploading || isAnalyzing}
-                          className="w-full sm:w-auto gap-2"
+                          className="w-full gap-2 text-white"
+                          style={{ 
+                            background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
+                          }}
                           aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
                         >
                           {isAnalyzing ? (
@@ -1098,16 +1101,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                               Analyze Swing
                             </>
                           )}
-                        </Button>
-
-                        <Button
-                          variant="link"
-                          className="px-0 text-xs sm:px-2"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={isAnalyzing}
-                          aria-label="Replace video"
-                        >
-                          Replace {uploadedVideo.type.startsWith('video/') ? 'video' : 'image'}
                         </Button>
                       </div>
                     </div>
