@@ -3,7 +3,7 @@
  * Handles readyState gating, iOS black frame fix, retry logic, and visibility handling
  */
 
-import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
+// Removed feature flag - safe autoplay always enabled
 import { logVideoTelemetry } from './videoTelemetry';
 
 interface SafePlayOptions {
@@ -16,10 +16,7 @@ export async function safePlay(
   video: HTMLVideoElement, 
   options: SafePlayOptions = {}
 ): Promise<boolean> {
-  // Feature flag for rollback capability
-  if (!USE_SAFE_AUTOPLAY_V2) {
-    return legacySafePlay(video);
-  }
+  // Safe autoplay v2 always enabled in production
 
   const { maxRetries = 4, baseDelay = 250, maxWaitTime = 1000 } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
