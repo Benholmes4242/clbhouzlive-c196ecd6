@@ -1323,6 +1323,7 @@ export type Database = {
       }
       swing_phase_results: {
         Row: {
+          confidence: number | null
           created_at: string
           error: string | null
           finished_at: string | null
@@ -1337,6 +1338,7 @@ export type Database = {
           visual_plan: Json
         }
         Insert: {
+          confidence?: number | null
           created_at?: string
           error?: string | null
           finished_at?: string | null
@@ -1351,6 +1353,7 @@ export type Database = {
           visual_plan?: Json
         }
         Update: {
+          confidence?: number | null
           created_at?: string
           error?: string | null
           finished_at?: string | null
