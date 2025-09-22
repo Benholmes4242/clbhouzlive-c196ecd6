@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Camera, Star, Users, UserPlus } from 'lucide-react';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StatItem {
   value: string | number;
   label: string;
+  icon?: React.ComponentType<{ className?: string }>;
   onClick?: () => void;
 }
 
@@ -74,34 +75,38 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       )}
       
       
-      {/* Stats container - clean design without liquid glass */}
-      <div className="relative overflow-hidden rounded-full bg-muted border shadow-sm">
+      {/* Stats container - liquid glass pill design */}
+      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 px-6 py-4">
         <div 
           ref={containerRef}
-          className={`flex ${isMobile ? 'gap-2' : 'gap-8'} overflow-x-auto scrollbar-hide ${isMobile ? 'px-2' : 'px-4'} ${isMobile ? '' : 'pr-20'}`}
+          className={`flex ${isMobile ? 'gap-6' : 'gap-8'} overflow-x-auto scrollbar-hide justify-center`}
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',
-            width: isMobile ? '100%' : 'calc(4 * 5rem + 3 * 1rem + 2rem + 0.5 * 5rem)', // Mobile: full width, Desktop: 4 full stats + 3 gaps + padding + half of 5th stat
           }}
         >
-          {stats.map((stat, index) => (
-            <button
-              key={index}
-              onClick={stat.onClick}
-              className={`flex-shrink-0 ${isMobile ? 'w-16' : 'w-20'} flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200`}
-            >
-              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-black`}>
-                {stat.value}
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-600 font-medium`}>
-                {stat.label}
-              </div>
-            </button>
-          ))}
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <button
+                key={index}
+                onClick={stat.onClick}
+                className="flex-shrink-0 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200 min-w-fit"
+              >
+                {IconComponent && (
+                  <IconComponent className="w-4 h-4 text-white/70 mb-1" />
+                )}
+                <div className="text-2xl font-bold text-white mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-white/80 font-normal">
+                  {stat.label}
+                </div>
+              </button>
+            );
+          })}
         </div>
-        
       </div>
     </div>
   );
