@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search, 
   User, 
@@ -65,9 +65,13 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   highlightQuery = query
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownWidth, setDropdownWidth] = useState<number | undefined>();
+  
+  // Check if we're on clubhouse page to determine color scheme
+  const isClubhousePage = location.pathname === '/clubhouse' || location.pathname === '/';
   
   // Check for reduced motion preference
   const prefersReducedMotion = useMemo(() => {
@@ -133,7 +137,10 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <mark key={index} className="bg-primary/20 text-primary font-medium">
+        <mark key={index} className={cn(
+          "font-medium",
+          isClubhousePage ? "bg-primary/20 text-primary" : "bg-[#F58220]/20 text-[#F58220]"
+        )}>
           {part}
         </mark>
       ) : part
@@ -152,7 +159,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
       );
     }
 
-    const iconClass = "h-5 w-5 text-white/70";
+    const iconClass = isClubhousePage ? "h-5 w-5 text-white/70" : "h-5 w-5 text-black/70";
     switch (result.type) {
       case 'user':
         return <User className={iconClass} />;
@@ -182,10 +189,19 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     <>
       {[...Array(6)].map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-4 py-3">
-          <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+          <div className={cn(
+            "w-10 h-10 rounded-full animate-pulse",
+            isClubhousePage ? "bg-white/10" : "bg-black/10"
+          )} />
           <div className="flex-1">
-            <div className="w-32 h-4 bg-white/10 animate-pulse rounded mb-1" />
-            <div className="w-24 h-3 bg-white/5 animate-pulse rounded" />
+            <div className={cn(
+              "w-32 h-4 animate-pulse rounded mb-1",
+              isClubhousePage ? "bg-white/10" : "bg-black/10"
+            )} />
+            <div className={cn(
+              "w-24 h-3 animate-pulse rounded",
+              isClubhousePage ? "bg-white/5" : "bg-black/5"
+            )} />
           </div>
         </div>
       ))}
@@ -195,8 +211,14 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   // Empty state
   const EmptyState = () => (
     <div className="p-8 text-center">
-      <Search className="h-12 w-12 text-white/30 mx-auto mb-4" />
-      <p className="text-white/60 text-sm">
+      <Search className={cn(
+        "h-12 w-12 mx-auto mb-4",
+        isClubhousePage ? "text-white/30" : "text-black/30"
+      )} />
+      <p className={cn(
+        "text-sm",
+        isClubhousePage ? "text-white/60" : "text-black/60"
+      )}>
         No matches. Try searching by name or club.
       </p>
     </div>
@@ -206,13 +228,21 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   const RecentSearchesSection = () => (
     <div className="p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-medium text-white/60 flex items-center gap-2">
+        <h3 className={cn(
+          "text-xs font-medium flex items-center gap-2",
+          isClubhousePage ? "text-white/60" : "text-black/60"
+        )}>
           <Clock className="h-3 w-3" />
           Recent searches
         </h3>
         <button
           onClick={onClearRecentSearches}
-          className="text-xs text-white/40 hover:text-white/60 transition-colors"
+          className={cn(
+            "text-xs transition-colors",
+            isClubhousePage 
+              ? "text-white/40 hover:text-white/60" 
+              : "text-black/40 hover:text-black/60"
+          )}
         >
           Clear
         </button>
@@ -222,7 +252,12 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
           <button
             key={search.id}
             onClick={() => onRecentSearchClick(search.query, index)}
-            className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white/80 rounded-full transition-colors"
+            className={cn(
+              "px-3 py-1.5 text-xs rounded-full transition-colors",
+              isClubhousePage
+                ? "bg-white/10 hover:bg-white/20 text-white/80"
+                : "bg-black/10 hover:bg-black/20 text-black/80"
+            )}
           >
             {search.query}
           </button>
@@ -234,7 +269,10 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   // Trending section
   const TrendingSection = () => (
     <div className="p-4">
-      <h3 className="text-xs font-medium text-white/60 flex items-center gap-2 mb-3">
+      <h3 className={cn(
+        "text-xs font-medium flex items-center gap-2 mb-3",
+        isClubhousePage ? "text-white/60" : "text-black/60"
+      )}>
         <TrendingUp className="h-3 w-3" />
         Popular courses
       </h3>
@@ -245,18 +283,29 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
             onClick={() => onResultSelect(item)}
             className={cn(
               "w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-left",
-              activeIndex === index + recentSearches.length && "bg-white/10",
-              "hover:bg-white/5"
+              activeIndex === index + recentSearches.length && (
+                isClubhousePage ? "bg-white/10" : "bg-black/10"
+              ),
+              isClubhousePage ? "hover:bg-white/5" : "hover:bg-black/5"
             )}
           >
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+            <div className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+              isClubhousePage ? "bg-white/10" : "bg-black/10"
+            )}>
               {getResultIcon(item)}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white truncate">
+              <div className={cn(
+                "text-sm font-medium truncate",
+                isClubhousePage ? "text-white" : "text-black"
+              )}>
                 {item.title}
               </div>
-              <div className="text-xs text-white/60 truncate">
+              <div className={cn(
+                "text-xs truncate",
+                isClubhousePage ? "text-white/60" : "text-black/60"
+              )}>
                 {item.subtitle}
               </div>
             </div>
@@ -271,14 +320,26 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     if (items.length === 0) return null;
 
     return (
-      <div className="border-t border-white/10 first:border-t-0">
-        <div className="px-4 py-2 bg-white/5">
-          <h3 className="text-xs font-medium text-white/60 flex items-center gap-2">
+      <div className={cn(
+        "border-t first:border-t-0",
+        isClubhousePage ? "border-white/10" : "border-black/10"
+      )}>
+        <div className={cn(
+          "px-4 py-2",
+          isClubhousePage ? "bg-white/5" : "bg-black/5"
+        )}>
+          <h3 className={cn(
+            "text-xs font-medium flex items-center gap-2",
+            isClubhousePage ? "text-white/60" : "text-black/60"
+          )}>
             {icon}
             {title}
           </h3>
         </div>
-        <div className="divide-y divide-white/5">
+        <div className={cn(
+          "divide-y",
+          isClubhousePage ? "divide-white/5" : "divide-black/5"
+        )}>
           {items.map((item, index) => {
             const globalIndex = query.trim() 
               ? results.findIndex(r => r.id === item.id)
@@ -290,12 +351,21 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                 onClick={() => onResultSelect(item)}
                 className={cn(
                   "w-full flex items-center gap-4 p-4 min-h-[56px] transition-colors text-left group",
-                  activeIndex === globalIndex && "bg-white/10 ring-2 ring-primary/30",
-                  "hover:bg-white/5 focus:bg-white/10 focus:ring-2 focus:ring-primary/30 focus:outline-none"
+                  activeIndex === globalIndex && (
+                    isClubhousePage 
+                      ? "bg-white/10 ring-2 ring-primary/30" 
+                      : "bg-black/10 ring-2 ring-[#F58220]/30"
+                  ),
+                  isClubhousePage
+                    ? "hover:bg-white/5 focus:bg-white/10 focus:ring-2 focus:ring-primary/30 focus:outline-none"
+                    : "hover:bg-black/5 focus:bg-black/10 focus:ring-2 focus:ring-[#F58220]/30 focus:outline-none"
                 )}
               >
                 {/* Avatar/Icon */}
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 relative">
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 relative",
+                  isClubhousePage ? "bg-white/10" : "bg-black/10"
+                )}>
                   {item.image ? (
                     <img 
                       src={item.image} 
@@ -303,12 +373,20 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-xs font-medium text-white">
+                    <div className={cn(
+                      "w-full h-full rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
+                      isClubhousePage
+                        ? "from-primary/20 to-primary/10 text-white"
+                        : "from-[#F58220]/20 to-[#F58220]/10 text-black"
+                    )}>
                       {item.title ? getInitials(item.title) : getResultIcon(item)}
                     </div>
                   )}
                   {item.verified && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                    <div className={cn(
+                      "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center",
+                      isClubhousePage ? "bg-primary" : "bg-[#F58220]"
+                    )}>
                       <Verified className="h-2.5 w-2.5 text-white" fill="currentColor" />
                     </div>
                   )}
@@ -316,16 +394,27 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white truncate">
+                  <div className={cn(
+                    "text-sm font-medium truncate",
+                    isClubhousePage ? "text-white" : "text-black"
+                  )}>
                     {highlightText(item.title, highlightQuery)}
                   </div>
-                  <div className="text-xs text-white/60 truncate">
+                  <div className={cn(
+                    "text-xs truncate",
+                    isClubhousePage ? "text-white/60" : "text-black/60"
+                  )}>
                     {item.subtitle}
                   </div>
                 </div>
 
                 {/* Right indicator */}
-                <ChevronRight className="h-4 w-4 text-white/30 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                <ChevronRight className={cn(
+                  "h-4 w-4 transition-colors flex-shrink-0",
+                  isClubhousePage
+                    ? "text-white/30 group-hover:text-white/50"
+                    : "text-black/30 group-hover:text-black/50"
+                )} />
               </button>
             );
           })}
@@ -387,13 +476,27 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
       <div className="fixed inset-x-0 top-16 bottom-0 z-[330] pointer-events-auto">
         <div className="liquid-glass liquid-glass--elevated rounded-t-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">
           {/* Mobile header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <h2 className="text-lg font-semibold text-white">Search</h2>
+          <div className={cn(
+            "flex items-center justify-between p-4 border-b",
+            isClubhousePage ? "border-white/10" : "border-black/10"
+          )}>
+            <h2 className={cn(
+              "text-lg font-semibold",
+              isClubhousePage ? "text-white" : "text-black"
+            )}>Search</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                isClubhousePage
+                  ? "hover:bg-white/10"
+                  : "hover:bg-black/10"
+              )}
             >
-              <X className="h-5 w-5 text-white/70" />
+              <X className={cn(
+                "h-5 w-5",
+                isClubhousePage ? "text-white/70" : "text-black/70"
+              )} />
             </button>
           </div>
 
