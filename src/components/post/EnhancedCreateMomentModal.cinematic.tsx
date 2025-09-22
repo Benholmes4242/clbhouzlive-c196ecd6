@@ -237,13 +237,13 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center p-6 pt-20" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[95vh] max-h-[800px] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
+              className="w-full max-w-md h-[90vh] max-h-[700px] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -260,7 +260,7 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION - takes up ~75% of modal height */}
-                <section id="media" className="relative h-[80vh] max-h-[550px] min-h-[450px] overflow-hidden">
+                <section id="media" className="relative h-[75vh] max-h-[500px] min-h-[400px] overflow-hidden">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -293,33 +293,26 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-                  {/* Top right controls - X icon, cover badge, and media counter */}
-                  <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
-                    {/* Cover badge */}
-                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                      <span>Cover</span>
-                    </div>
-                    {/* Media counter */}
+                  {/* Close button overlay */}
+                  <button 
+                    onClick={close} 
+                    aria-label="Close" 
+                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+
+                  {/* Media metadata pills - top left, aligned with cover pill */}
+                  <div className="absolute top-6 left-6 flex items-center gap-2">
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
-                    {/* Close button */}
-                    <button 
-                      onClick={close} 
-                      aria-label="Close" 
-                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-                  {/* Video duration pill - top left */}
-                  {media[activeIndex]?.type === 'video' && (
-                    <div className="absolute top-4 left-4">
+                    {media[activeIndex]?.type === 'video' && (
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Navigation arrows */}
                   {canSlide && (
@@ -355,9 +348,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   )}
                 </section>
 
-                {/* CONTROLS SECTION - no overlap */}
+                {/* CONTROLS SECTION - compact bottom area */}
                 <section className="flex-shrink-0 px-6 pb-6 space-y-3">
-                  {/* SLIDING CARDS CONTAINER */}
+                  {/* SLIDING CARDS CONTAINER - more compact */}
                   <div className="relative h-[120px] overflow-hidden">
                     {/* CAPTION CARD */}
                     <motion.div

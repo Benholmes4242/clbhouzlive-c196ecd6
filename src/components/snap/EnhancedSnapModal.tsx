@@ -128,7 +128,7 @@ const EnhancedSnapModal = ({
     }] : []),
     {
       key: "photos",
-      label: "Photos and Videos", 
+      label: "Photos", 
       description: "Pick from gallery",
       icon: Images,
       onClick: handlePickMedia,
@@ -219,7 +219,7 @@ const EnhancedSnapModal = ({
                   role="status"
                   aria-live="polite"
                 >
-                  Share your golf moment with the community
+                  Share your golf moment with the community ⛳️
                 </div>
               </div>
 
