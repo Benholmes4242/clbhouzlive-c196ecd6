@@ -44,7 +44,7 @@ export function DownloadPackButton({ analysisId, className }: DownloadPackButton
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Echo_Swing_Pack_${new Date().toISOString().split('T')[0].replace(/-/g, '')}.zip`;
+      a.download = `Echo_Visuals_${new Date().toISOString().split('T')[0].replace(/-/g, '')}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
