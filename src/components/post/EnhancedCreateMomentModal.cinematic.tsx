@@ -237,7 +237,7 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center p-6 pt-20" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center p-6" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
@@ -302,11 +302,17 @@ export default function EnhancedCreateMomentModalCinematic({
                     <X className="w-4 h-4 text-white" />
                   </button>
 
-                  {/* Media metadata pills - top left, aligned with cover pill */}
-                  <div className="absolute top-6 left-6 flex items-center gap-2">
+                  {/* Media metadata pills - top left, with cover badge */}
+                  <div className="absolute top-4 left-4 flex items-center gap-2">
+                    {/* Cover badge */}
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                      <span>Cover</span>
+                    </div>
+                    {/* Media counter */}
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
+                    {/* Video duration if applicable */}
                     {media[activeIndex]?.type === 'video' && (
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
@@ -348,10 +354,10 @@ export default function EnhancedCreateMomentModalCinematic({
                   )}
                 </section>
 
-                {/* CONTROLS SECTION - compact bottom area */}
-                <section className="flex-shrink-0 px-6 pb-6 space-y-3">
-                  {/* SLIDING CARDS CONTAINER - more compact */}
-                  <div className="relative h-[100px] overflow-hidden">
+                {/* CONTROLS SECTION - can overlap media slightly */}
+                <section className="flex-shrink-0 px-6 pb-6 space-y-3 relative -mt-4">
+                  {/* SLIDING CARDS CONTAINER - can extend upward */}
+                  <div className="relative h-[120px] overflow-hidden">
                     {/* CAPTION CARD */}
                     <motion.div
                       ref={captionRef}
