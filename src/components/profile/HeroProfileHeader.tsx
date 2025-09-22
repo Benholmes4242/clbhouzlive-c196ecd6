@@ -747,9 +747,9 @@ const HeroProfileHeader = ({
                 absolute left-0 right-0
                 bottom-[-14px] md:bottom-[-18px]
                 w-full
-                rounded-2xl border border-white/30
-                bg-white/40 backdrop-blur-md
-                shadow-sm z-10
+                rounded-2xl border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
                <div className="px-5 py-2 flex flex-col items-center relative">
@@ -887,9 +887,9 @@ const HeroProfileHeader = ({
                 absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
                 w-[90%] md:w-[80%] max-w-[800px]
-                rounded-2xl border border-white/30
-                bg-white/40 backdrop-blur-md
-                shadow-sm z-10
+                rounded-2xl border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
@@ -991,21 +991,10 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Sliding Glow Bar */}
-      <div className="relative z-40 rounded-xl border border-white/30 bg-white/40 backdrop-blur-md mx-4 mb-4 shadow-sm">
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative" role="tablist" aria-label="Profile sections">
-          <div className="flex relative">
-            {/* Sliding glow bar background */}
-            <div 
-              className="absolute top-0 bottom-0 rounded-lg transition-all duration-250 ease-in-out opacity-20"
-              style={{
-                width: `${100 / tabs.length}%`,
-                left: `${(tabs.findIndex(tab => tab.id === activeSection) * 100) / tabs.length}%`,
-                backgroundColor: '#F58220',
-                transform: 'translateX(0)',
-              }}
-            />
-            
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -1015,20 +1004,33 @@ const HeroProfileHeader = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={activeSection === tab.id ? 0 : -1}
                 className={`
-                  relative py-4 px-4 text-base font-medium transition-colors duration-200
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
                   ${activeSection === tab.id 
                     ? 'focus:outline-none' 
                     : 'hover:opacity-80 focus:outline-none'
                   }
-                  flex-1 text-center z-10
+                  flex-1 text-center
                 `}
                 style={{
                   color: activeSection === tab.id 
-                    ? '#F58220'
+                    ? 'hsl(var(--profile-text-primary))' 
                     : 'hsl(var(--profile-text-secondary))'
                 }}
               >
                 {tab.label}
+                {/* Brand accent underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
+                />
               </button>
             ))}
           </div>
