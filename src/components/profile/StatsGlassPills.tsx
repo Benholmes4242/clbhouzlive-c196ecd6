@@ -46,19 +46,25 @@ const StatPill: React.FC<StatsPillProps> = ({ label, value, delay = 0, onClick }
     <button
       onClick={onClick}
       className={`
-        glass-card glow-hover rounded-xl min-h-[56px] px-4 py-3
+        rounded-xl min-h-[56px] px-4 py-3
         flex flex-col justify-center items-center text-center
         transition-all duration-200 ease-out
         hover:scale-[1.02] focus:scale-[1.02]
         focus:outline-none focus:ring-2 focus:ring-accent/40
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}
       `}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{ 
+        transitionDelay: `${delay}ms`,
+        background: 'rgba(255, 255, 255, 0.75)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
+      }}
     >
-      <div className="text-white font-semibold text-lg md:text-xl leading-tight">
+      <div className="text-gray-900 font-semibold text-lg md:text-xl leading-tight">
         {formatValue(animatedValue)}
       </div>
-      <div className="text-white/70 text-xs md:text-sm leading-tight mt-0.5">
+      <div className="text-gray-600 text-xs md:text-sm leading-tight mt-0.5">
         {label}
       </div>
     </button>
