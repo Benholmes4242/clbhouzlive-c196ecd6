@@ -81,7 +81,8 @@ export default {
 				'brand-orange-light': 'hsl(var(--brand-orange-light))',
 				'brand-black': 'hsl(var(--brand-black))',
 				'hud-bg': 'var(--hud-bg)',
-				'hud-border': 'var(--hud-border)'
+				'hud-border': 'var(--hud-border)',
+				'discover-background': 'hsl(var(--discover-background))'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
