@@ -702,9 +702,7 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16" style={{
-          background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(255, 255, 255, 1) 100%)'
-        }}>
+        <div className="relative -mt-16 bg-black">
           <section className="relative w-full overflow-visible">
             <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
@@ -790,11 +788,9 @@ const HeroProfileHeader = ({
              </div>
            </div>
         </div>
-        ) : (
-          /* Desktop layout - cinematic glass design */
-          <div className="relative -mt-16" style={{
-            background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(255, 255, 255, 1) 100%)'
-          }}>
+       ) : (
+         /* Desktop layout - cinematic glass design */
+         <div className="relative -mt-16 bg-black">
            <section className="relative w-full overflow-visible">
              <div className="relative h-[56vh] w-full overflow-hidden">
                {/* Loading state */}

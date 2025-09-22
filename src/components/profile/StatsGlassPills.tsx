@@ -46,25 +46,19 @@ const StatPill: React.FC<StatsPillProps> = ({ label, value, delay = 0, onClick }
     <button
       onClick={onClick}
       className={`
-        rounded-xl min-h-[56px] px-4 py-3
+        glass-card glow-hover rounded-xl min-h-[56px] px-4 py-3
         flex flex-col justify-center items-center text-center
         transition-all duration-200 ease-out
         hover:scale-[1.02] focus:scale-[1.02]
         focus:outline-none focus:ring-2 focus:ring-accent/40
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}
       `}
-      style={{ 
-        transitionDelay: `${delay}ms`,
-        background: 'rgba(255, 255, 255, 0.75)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)'
-      }}
+      style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="text-gray-900 font-semibold text-lg md:text-xl leading-tight">
+      <div className="text-white font-semibold text-lg md:text-xl leading-tight">
         {formatValue(animatedValue)}
       </div>
-      <div className="text-gray-600 text-xs md:text-sm leading-tight mt-0.5">
+      <div className="text-white/70 text-xs md:text-sm leading-tight mt-0.5">
         {label}
       </div>
     </button>
@@ -83,15 +77,7 @@ interface StatsGlassPillsProps {
 
 const StatsGlassPills: React.FC<StatsGlassPillsProps> = ({ stats, onStatClick }) => {
   return (
-    <div 
-      className="grid grid-cols-4 gap-3 md:gap-4 max-w-[680px] mx-auto px-4 py-3 md:px-5 md:py-4 rounded-2xl border border-white/40"
-      style={{
-        background: 'rgba(255, 255, 255, 0.75)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)'
-      }}
-    >
+    <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-[680px] mx-auto px-4">
       <StatPill
         label="Posts"
         value={stats.posts}

@@ -50,7 +50,7 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Use black logo for light glass styling
+  // Always use glass-dark styles
   const logoSrc = "/assets/clbhouz-white-logo.png";
 
   return (
@@ -65,9 +65,8 @@ const GlobalHeader: React.FC = () => {
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-all duration-300",
-              // Light glass styling
-              "backdrop-blur-md",
-              "bg-white/15 border-b border-white/25"
+              // Always use glass-dark styling
+              "backdrop-blur-md bg-black/60"
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -98,7 +97,7 @@ const GlobalHeader: React.FC = () => {
                 <img
                   src={logoSrc}
                   alt="clbhouz Logo"
-                  className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity filter invert"
+                  className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
                   onClick={handleLogoClick}
                 />
               </div>
