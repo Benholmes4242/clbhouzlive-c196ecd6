@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Download, Loader2 } from 'lucide-react';
+import { Copy, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { DownloadPackButton } from './DownloadPackButton';
 
 interface SwingVisual {
   id: string;
@@ -150,49 +151,6 @@ export const VisualCarousel: React.FC<VisualCarouselProps> = ({
     }
   };
 
-  const downloadPack = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await fetch(
-        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/swing-visuals-export?analysisId=${analysisId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Export failed: ${response.statusText}`);
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `swing-analysis-${analysisId.slice(0, 8)}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Pack Downloaded",
-        description: "Visual pack ZIP file has been downloaded",
-      });
-    } catch (err) {
-      console.error('Error downloading pack:', err);
-      toast({
-        title: "Download Failed",
-        description: "Could not download visual pack",
-        variant: "destructive"
-      });
-    }
-  };
 
   if (isLoading) {
     return (
@@ -248,12 +206,7 @@ export const VisualCarousel: React.FC<VisualCarouselProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Visual Pack</h3>
           {visuals.length > 0 && (
-            <div className="flex gap-2">
-              <Button onClick={downloadPack} variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-1" />
-                Download Pack
-              </Button>
-            </div>
+            <DownloadPackButton analysisId={analysisId} />
           )}
         </div>
 
