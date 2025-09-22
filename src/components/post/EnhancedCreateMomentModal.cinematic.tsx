@@ -258,19 +258,32 @@ export default function EnhancedCreateMomentModalCinematic({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
-                {/* Close button - top right corner */}
-                <div className="absolute top-3 right-3 z-20">
-                  <button 
-                    onClick={close} 
-                    aria-label="Close" 
-                    className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                {/* Header with close button */}
+                <div className="px-6 pt-6 pb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
+                    </div>
+                    <button 
+                      onClick={close} 
+                      aria-label="Close" 
+                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  {/* Contextual helper line */}
+                  <div 
+                    className="text-sm text-white/70"
+                    role="status"
+                    aria-live="polite"
                   >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
+                    Share your golf moment with the community ⛳️
+                  </div>
                 </div>
 
-                {/* MEDIA SECTION - Large at top */}
-                <section id="media" className="relative h-96 overflow-hidden">
+                {/* MEDIA SECTION */}
+                <section id="media" className="relative flex-1 overflow-hidden px-6">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -299,30 +312,21 @@ export default function EnhancedCreateMomentModalCinematic({
                       coverIndex={coverIndex}
                       enableSwipe
                       loop={false}
-                      className="h-full w-full rounded-t-3xl"
+                      className="h-full w-full rounded-b-xl"
                     />
                   </motion.div>
 
-                  {/* Media metadata pills - top left */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-1 flex items-center gap-1 backdrop-blur-sm">
+                  {/* Media metadata pills - top left, aligned with cover pill */}
+                  <div className="absolute top-2 left-20 flex items-center gap-2">
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
                     {media[activeIndex]?.type === 'video' && (
-                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-1 flex items-center gap-1 backdrop-blur-sm">
+                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
                     )}
                   </div>
-
-                  {/* Cover badge - top left */}
-                  {media.length > 1 && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <div className="rounded-full bg-black/60 text-white text-xs px-2 py-1 backdrop-blur-sm">
-                        Cover
-                      </div>
-                    </div>
-                  )}
 
                   {/* Navigation arrows */}
                   {canSlide && (
@@ -359,11 +363,11 @@ export default function EnhancedCreateMomentModalCinematic({
                 </section>
 
                 {/* CONTROLS SECTION */}
-                <section className="px-6 pb-6 pt-4 space-y-4">
+                <section className="px-6 pb-6 space-y-3">
                   {/* CAPTION CARD */}
                   <motion.div
                     ref={captionRef}
-                    className="w-full rounded-xl backdrop-filter backdrop-blur-sm bg-white/5 border border-white/10 transition-all duration-200"
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ 
@@ -373,36 +377,42 @@ export default function EnhancedCreateMomentModalCinematic({
                       delay: 0
                     }}
                   >
-                    <div className="flex items-center justify-between p-4 pb-2">
-                      <h3 className="text-white font-medium">Add a caption</h3>
+                    <div className="flex items-start justify-between mb-1">
+                      <label className="block text-base font-semibold text-white">Add a caption</label>
                       <button
                         onClick={handleAICaption}
                         disabled={aiLoading || media.length === 0}
-                        className="bg-white hover:bg-white/90 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-black font-medium active:scale-95"
-                        aria-label="Generate AI caption"
+                        className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                        aria-label="Write a caption for me"
                       >
-                        {aiLoading ? <StarsLoading /> : 'AI'}
+                        {aiLoading ? <StarsLoading /> : (
+                          <div className="flex items-center gap-1.5">
+                            <Sparkles className="h-3.5 w-3.5" />
+                            <span className="font-medium">AI Caption</span>
+                          </div>
+                        )}
                       </button>
                     </div>
-                    <div className="px-4 pb-4">
+                    <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
+                    <div className="flex items-start gap-2">
                       <textarea
-                        className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[3rem] text-sm"
-                        placeholder="Write a caption..."
+                        className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
+                        placeholder="Write a caption…"
                         value={caption}
                         onChange={(e) => {
                           setCaption(e.target.value);
                           // Auto-expand textarea
                           e.target.style.height = 'auto';
-                          e.target.style.height = Math.max(48, e.target.scrollHeight) + 'px';
+                          e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
                         }}
                         style={{ height: 'auto' }}
                       />
                     </div>
                   </motion.div>
 
-                  {/* Pills Row */}
+                  {/* Course Tag Card */}
                   <motion.div
-                    className="flex gap-3"
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 relative z-[9999]"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ 
@@ -412,46 +422,94 @@ export default function EnhancedCreateMomentModalCinematic({
                       delay: 0.08
                     }}
                   >
-                    {/* Add golf course pill */}
-                    <button 
-                      onClick={() => {
-                        // TODO: Open course selector
-                        console.log("Golf course selector clicked");
-                      }}
-                      className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all duration-200 text-white text-sm"
-                    >
-                      <Globe className="w-4 h-4" />
-                      <span>Add golf course</span>
-                    </button>
-
-                    {/* Add music pill */}
-                    <button 
-                      onClick={() => {
-                        // TODO: Open music selector
-                        console.log("Music selector clicked");
-                      }}
-                      className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all duration-200 text-white text-sm"
-                    >
-                      <Play className="w-4 h-4 text-brand-orange" />
-                      <span>Add music</span>
-                    </button>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
+                        <BarChart3 className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-base text-white">Tag a golf course</h3>
+                        </div>
+                        <p className="text-sm text-white/70 mb-3">Let others know where you played</p>
+                        <CourseTagInput
+                          selectedCourse={course}
+                          onCourseSelect={onCourseSelect || setSelectedCourse}
+                          placeholder="Start typing to find a course..."
+                        />
+                      </div>
+                    </div>
                   </motion.div>
 
-                  {/* Post button */}
+                  {/* Music Card */}
                   <motion.div
-                    className="mt-6"
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 30,
+                      delay: 0.16
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
+                        <Play className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-base text-white">Background music</h3>
+                        </div>
+                        <p className="text-sm text-white/70 mb-3">Popular golf tracks today</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              // TODO: Preview music
+                              console.log("Music preview clicked");
+                            }}
+                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
+                            aria-label="Preview music"
+                          >
+                            Preview
+                          </button>
+                          <span className="text-white/30">•</span>
+                          <button
+                            onClick={() => {
+                              // TODO: Background music selector
+                              console.log("Music selector clicked");
+                            }}
+                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
+                            aria-label="Browse music library"
+                          >
+                            Browse
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+
+                  {/* Post button - Quick Post style from Snap Modal */}
+                  <motion.div
+                    className="mt-4 pt-4 border-t border-white/10"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.16 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <button
+                    <motion.button
                       disabled={!canPost}
                       onClick={handlePost}
-                      className="w-full py-4 rounded-full bg-brand-orange hover:bg-brand-orange/90 transition-all duration-200 text-white font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                      className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                       aria-label="Post your moment"
                     >
-                      {isSubmitting ? "Posting..." : "Post"}
-                    </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-sm font-medium text-brand-orange">
+                          {isSubmitting ? "Posting..." : "Post"}
+                        </span>
+                      </div>
+                    </motion.button>
                   </motion.div>
                 </section>
               </div>
