@@ -259,32 +259,8 @@ export default function EnhancedCreateMomentModalCinematic({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col">
-                {/* Header with close button */}
-                <div className="px-6 pt-6 pb-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
-                    </div>
-                    <button 
-                      onClick={close} 
-                      aria-label="Close" 
-                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-                  {/* Contextual helper line */}
-                  <div 
-                    className="text-sm text-white/70"
-                    role="status"
-                    aria-live="polite"
-                  >
-                    Share your golf moment with the community ⛳️
-                  </div>
-                </div>
-
-                {/* MEDIA SECTION */}
-                <section id="media" className="relative flex-1 overflow-hidden px-6">
+                {/* MEDIA SECTION - starts at top */}
+                <section id="media" className="relative flex-1 overflow-hidden">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -313,12 +289,21 @@ export default function EnhancedCreateMomentModalCinematic({
                       coverIndex={coverIndex}
                       enableSwipe
                       loop={false}
-                      className="h-full w-full rounded-b-xl"
+                      className="h-full w-full rounded-t-3xl"
                     />
                   </motion.div>
 
+                  {/* Close button overlay */}
+                  <button 
+                    onClick={close} 
+                    aria-label="Close" 
+                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+
                   {/* Media metadata pills - top left, aligned with cover pill */}
-                  <div className="absolute top-2 left-20 flex items-center gap-2">
+                  <div className="absolute top-6 left-6 flex items-center gap-2">
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
@@ -335,7 +320,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       <button
                         onClick={prevMedia}
                         disabled={activeIndex === 0}
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 
+                        className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 
                                  h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
                                  border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
                                  flex items-center justify-center hover:bg-white/18 
@@ -349,7 +334,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       <button
                         onClick={nextMedia}
                         disabled={activeIndex === media.length - 1}
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 
                                  h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
                                  border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
                                  flex items-center justify-center hover:bg-white/18 
