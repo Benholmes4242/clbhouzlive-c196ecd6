@@ -35,6 +35,7 @@ interface SearchPillProps {
   placeholder?: string;
   variant?: HeaderVariant;
   onSelect?: (result: SearchResult) => void;
+  isClubhousePage?: boolean;
 }
 
 const SearchPill = ({ 
@@ -43,7 +44,8 @@ const SearchPill = ({
   onClose,
   placeholder = "Search players, courses...",
   variant = 'glass-dark',
-  onSelect
+  onSelect,
+  isClubhousePage = false
 }: SearchPillProps) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,8 +74,8 @@ const SearchPill = ({
     enabled: true
   });
 
-  // Always use liquid glass styling now
-  const isGlassDark = true;
+  // Color scheme based on page
+  const useWhiteScheme = isClubhousePage;
 
   // Convert hook results to SearchResult format for compatibility
   const results: SearchResult[] = [
@@ -233,12 +235,17 @@ const SearchPill = ({
         className={cn(
           "relative flex items-center rounded-full",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
-          "liquid-glass liquid-glass--interactive",
-          isOpen && "ring-2 ring-white/20"
+          "bg-transparent border transition-all duration-200",
+          useWhiteScheme ? "border-white/20" : "border-black/20",
+          isOpen && useWhiteScheme && "border-white/40",
+          isOpen && !useWhiteScheme && "border-black/40"
         )}
       >
         {/* Search Icon */}
-        <Search className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0 text-white/70" />
+        <Search className={cn(
+          "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
+          useWhiteScheme ? "text-white/70" : "text-black/70"
+        )} />
 
         {/* Input with enhanced accessibility */}
         <input
@@ -255,8 +262,9 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            "text-white placeholder:text-white/50",
-            isOpen && "placeholder:text-white/70"
+            useWhiteScheme ? "text-white placeholder:text-white/50" : "text-black placeholder:text-black/50",
+            isOpen && useWhiteScheme && "placeholder:text-white/70",
+            isOpen && !useWhiteScheme && "placeholder:text-black/70"
           )}
           aria-label={placeholder}
           aria-expanded={isOpen}
@@ -271,10 +279,16 @@ const SearchPill = ({
         {(query || onClose) && (
           <button
             onClick={handleClear}
-            className="flex-shrink-0 p-1 rounded-full transition-colors focus:outline-none hover:bg-white/10 focus:bg-white/10"
+            className={cn(
+              "flex-shrink-0 p-1 rounded-full transition-colors focus:outline-none",
+              useWhiteScheme ? "hover:bg-white/10 focus:bg-white/10" : "hover:bg-black/10 focus:bg-black/10"
+            )}
             aria-label="Clear search"
           >
-            <X className="h-3 w-3 md:h-4 md:w-4 text-white/70" />
+            <X className={cn(
+              "h-3 w-3 md:h-4 md:w-4",
+              useWhiteScheme ? "text-white/70" : "text-black/70"
+            )} />
           </button>
         )}
       </div>

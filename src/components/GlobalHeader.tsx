@@ -120,7 +120,8 @@ const GlobalHeader: React.FC = () => {
               <div className="hidden md:flex flex-1 justify-center px-4">
                 <SearchPill 
                   className="w-full max-w-xl" 
-                  variant={variant}
+                  variant="glass-dark"
+                  isClubhousePage={isClubhousePage}
                 />
               </div>
 
@@ -179,6 +180,7 @@ const GlobalHeader: React.FC = () => {
                   onClose={() => setSearchOpen(false)}
                   placeholder="Search clbhouz..."
                   variant="glass-dark"
+                  isClubhousePage={isClubhousePage}
                 />
               </div>
             </motion.div>
