@@ -21,7 +21,7 @@ export const PhaseProgressStrip: React.FC<PhaseProgressStripProps> = ({
   onPhaseClick,
   className = ""
 }) => {
-  const { phases, loading } = usePhaseMetrics(sessionId);
+  const { data: phases, loading } = usePhaseMetrics(sessionId);
 
   const phaseOrder = [
     'setup',
@@ -34,14 +34,15 @@ export const PhaseProgressStrip: React.FC<PhaseProgressStripProps> = ({
   ];
 
   const getPhaseStatus = (phaseName: string) => {
-    const phase = phases[phaseName];
-    return phase?.status || 'pending';
+    const phase = phases[phaseName as keyof typeof phases];
+    return phase?.status || 'idle';
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'done': return 'bg-emerald-500 text-white';
-      case 'processing': return 'bg-blue-500 text-white';
+      case 'running': return 'bg-blue-500 text-white';
+      case 'queued': return 'bg-yellow-500 text-white';
       case 'error': return 'bg-red-500 text-white';
       default: return 'bg-muted text-muted-foreground';
     }
@@ -49,7 +50,8 @@ export const PhaseProgressStrip: React.FC<PhaseProgressStripProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'processing': return <Loader2 className="h-3 w-3 animate-spin" />;
+      case 'running': return <Loader2 className="h-3 w-3 animate-spin" />;
+      case 'queued': return <Loader2 className="h-3 w-3" />;
       case 'done': return '✓';
       case 'error': return '✗';
       default: return '';
@@ -57,9 +59,9 @@ export const PhaseProgressStrip: React.FC<PhaseProgressStripProps> = ({
   };
 
   const handlePhaseClick = (phaseName: string) => {
-    const phase = phases[phaseName];
+    const phase = phases[phaseName as keyof typeof phases];
     if (phase && phase.status === 'done' && onPhaseClick) {
-      onPhaseClick(phaseName, phase.frameIndex);
+      onPhaseClick(phaseName, phase.usedFrameIndex);
     }
   };
 
@@ -81,10 +83,10 @@ export const PhaseProgressStrip: React.FC<PhaseProgressStripProps> = ({
       <div className="flex items-center gap-1">
         {phaseOrder.map((phaseName) => {
           const status = getPhaseStatus(phaseName);
-          const phase = phases[phaseName];
+          const phase = phases[phaseName as keyof typeof phases];
           const isClickable = status === 'done' && onPhaseClick;
           
-          if (phase && status !== 'pending') {
+          if (phase && status !== 'idle') {
             return (
               <Popover key={phaseName}>
                 <PopoverTrigger asChild>

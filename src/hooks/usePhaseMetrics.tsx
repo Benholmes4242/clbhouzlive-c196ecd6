@@ -1,164 +1,116 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { MetricKey } from "@/config/swingMetrics";
+import { METRIC_INFO, gradeMetric } from "@/config/swingMetrics";
 
-export interface PhaseMetrics {
-  [key: string]: number;
-}
-
-export interface PhaseTips {
-  primary?: string;
-  secondary?: string[];
-}
+type PhaseName = "setup"|"takeaway"|"backswing"|"top"|"downswing"|"impact"|"followThrough";
+type PhaseMetrics = Partial<Record<MetricKey, number>>;
 
 export interface PhaseData {
-  phase: string;
-  metrics: PhaseMetrics;
-  tips: PhaseTips;
-  confidence: number;
-  status: 'pending' | 'processing' | 'done' | 'error';
-  frameIndex?: number;
+  status: "idle"|"queued"|"running"|"done"|"error";
+  usedFrameIndex?: number;
+  metrics?: PhaseMetrics;
+  tips?: string[];
+  conf?: number; // from metrics.conf or separate
+  error?: string;
 }
 
-export interface UsePhaseMetricsReturn {
-  phases: Record<string, PhaseData>;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-}
+export type UsePhaseMetricsResult = Record<PhaseName, PhaseData>;
 
-export function usePhaseMetrics(sessionId: string | null): UsePhaseMetricsReturn {
-  const [phases, setPhases] = useState<Record<string, PhaseData>>({});
+export function usePhaseMetrics(sessionId?: string) {
+  const [data, setData] = useState<UsePhaseMetricsResult>({} as any);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPhaseMetrics = async () => {
-    if (!sessionId) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Mock implementation with realistic swing metrics
-      // In production, this would fetch from swing_phase_results table
-      const mockPhases: Record<string, PhaseData> = {
-        setup: {
-          phase: 'setup',
-          metrics: {
-            spineAngleDeg: 36.2,
-            shoulderTiltDeg: 12.5,
-            pelvisSwayCm: 2.1,
-            headStabilityCm: 1.8
-          },
-          tips: {
-            primary: "Excellent setup position with proper spine angle",
-            secondary: ["Maintain shoulder tilt at address", "Keep minimal lateral movement"]
-          },
-          confidence: 0.85,
-          status: 'done',
-          frameIndex: 2
-        },
-        takeaway: {
-          phase: 'takeaway',
-          metrics: {
-            handPathDepthCm: 15.8,
-            tempoRatio: 3.1,
-            headStabilityCm: 2.1,
-            clubFaceDeg: 1.5
-          },
-          tips: {
-            primary: "Smooth one-piece takeaway with good depth",
-            secondary: ["Maintain tempo ratio", "Keep club on plane"]
-          },
-          confidence: 0.78,
-          status: 'done',
-          frameIndex: 5
-        },
-        backswing: {
-          phase: 'backswing',
-          metrics: {
-            swingPlaneDeg: 45.3,
-            handPathDepthCm: 18.2,
-            headStabilityCm: 2.8,
-            tempoRatio: 3.0
-          },
-          tips: {
-            primary: "Good swing plane and hand depth at top",
-            secondary: ["Complete the shoulder turn", "Maintain posture"]
-          },
-          confidence: 0.82,
-          status: 'done',
-          frameIndex: 8
-        },
-        top: {
-          phase: 'top',
-          metrics: {
-            handPathDepthCm: 19.5,
-            tempoRatio: 3.1,
-            headStabilityCm: 3.2,
-            swingPlaneDeg: 44.8
-          },
-          tips: {
-            primary: "Excellent position at the top of backswing",
-            secondary: ["Maintain lag angle", "Start downswing with lower body"]
-          },
-          confidence: 0.91,
-          status: 'done',
-          frameIndex: 10
-        },
-        impact: {
-          phase: 'impact',
-          metrics: {
-            shaftLeanDeg: 12.8,
-            hipOpenDeg: 35.2,
-            clubFaceDeg: 0.8,
-            headStabilityCm: 2.5
-          },
-          tips: {
-            primary: "Strong impact position with forward shaft lean",
-            secondary: ["Good hip rotation through impact", "Square clubface"]
-          },
-          confidence: 0.88,
-          status: 'done',
-          frameIndex: 14
-        },
-        followThrough: {
-          phase: 'followThrough',
-          metrics: {
-            hipOpenDeg: 85.0,
-            headStabilityCm: 2.5,
-            pelvisSwayCm: 1.8,
-            tempoRatio: 3.0
-          },
-          tips: {
-            primary: "Complete follow-through with balanced finish",
-            secondary: ["Belt buckle facing target", "Weight on front foot"]
-          },
-          confidence: 0.86,
-          status: 'done',
-          frameIndex: 18
-        }
-      };
-
-      // Simulate loading delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setPhases(mockPhases);
-    } catch (err) {
-      console.error('Error fetching phase metrics:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchPhaseMetrics();
+    if (!sessionId) {
+      setData({} as any);
+      return;
+    }
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const { data: rows, error: queryError } = await supabase
+          .from("swing_phase_results")
+          .select("phase, used_frame_index, metrics, tips, status, finished_at, error, confidence")
+          .eq("session_id", sessionId)
+          .order("finished_at", { ascending: true, nullsFirst: false });
+
+        if (queryError) {
+          console.error('Error fetching phase results:', queryError);
+          setError(queryError.message);
+          return;
+        }
+
+        const next: UsePhaseMetricsResult = {} as any;
+        
+        // Initialize all phases with idle status
+        const allPhases: PhaseName[] = ["setup", "takeaway", "backswing", "top", "downswing", "impact", "followThrough"];
+        allPhases.forEach(phase => {
+          next[phase] = { status: "idle" };
+        });
+
+        // Update with actual data from database
+        rows?.forEach((r: any) => {
+          // Normalize metrics keys to MetricKey if needed
+          const metrics = r.metrics as Record<string, number> | null;
+          const normalized: PhaseMetrics = {};
+          
+          if (metrics) {
+            Object.keys(metrics).forEach(k => {
+              if (k in METRIC_INFO) {
+                normalized[k as MetricKey] = metrics[k];
+              }
+            });
+          }
+
+          const phase = r.phase as PhaseName;
+          if (phase in next) {
+            next[phase] = {
+              status: r.status || "idle",
+              usedFrameIndex: r.used_frame_index ?? undefined,
+              metrics: normalized,
+              tips: Array.isArray(r.tips) ? r.tips : (r.tips ? [r.tips] : []),
+              conf: r.confidence ?? metrics?.conf ?? undefined,
+              error: r.error ?? undefined,
+            };
+          }
+        });
+
+        setData(next);
+      } catch (err) {
+        console.error('Error in usePhaseMetrics:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+    
+    // Light polling to keep data fresh (SSE handles real-time updates, this keeps History in sync)
+    const pollInterval = setInterval(load, 5000);
+    return () => clearInterval(pollInterval);
   }, [sessionId]);
 
-  return {
-    phases,
-    loading,
-    error,
-    refetch: fetchPhaseMetrics
+  // Helper functions for UI
+  const grade = (k: MetricKey, v?: number) => gradeMetric(k, v);
+  const info = METRIC_INFO;
+
+  return { 
+    data, 
+    loading, 
+    error, 
+    grade, 
+    info,
+    refetch: () => {
+      if (sessionId) {
+        // Trigger a manual refetch
+        setData({} as any);
+      }
+    }
   };
 }
