@@ -35,17 +35,15 @@ const HeaderNavigation = () => {
   
   // Get variant-specific icon colors
   const getIconColorClass = () => {
-    if (variant === 'glass-dark') {
+    const isClubhousePage = location.pathname === '/clubhouse' || location.pathname === '/';
+    
+    // White icons only on clubhouse page
+    if (isClubhousePage) {
       return 'text-white/80 hover:text-white';
     }
-    if (variant === 'solid-light') {
-      return 'text-black/70 hover:text-black';
-    }
-    // Fallback to adaptive detection for specific pages
-    if (isProfilePage) {
-      return shouldUseDarkText ? 'text-black hover:text-black' : 'text-white hover:text-white';
-    }
-    return isDiscoverPage ? 'text-black hover:text-black' : 'text-white hover:text-white';
+    
+    // Black icons on all other pages
+    return 'text-black/70 hover:text-black';
   };
 
   // Check if user is admin or limited admin
