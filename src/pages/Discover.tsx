@@ -147,8 +147,8 @@ const Discover = () => {
           </div>
 
           {/* Search + Filter Pills Divider */}
-          <div className="px-3 md:px-0 md:max-w-[1200px] md:mx-auto pt-3 pb-2 md:pt-4 md:pb-3">
-            <div className="backdrop-blur-md bg-white/60 border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-3 md:space-y-4"
+          <div className="pt-3 pb-2 md:pt-4 md:pb-3">
+            <div className="backdrop-blur-md bg-white/60 border-l-0 border-r-0 border-white/20 px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4"
                  style={{ boxShadow: 'var(--hud-shadow, 0 4px 20px rgba(0, 0, 0, 0.1))' }}>
               
               {/* Search */}
