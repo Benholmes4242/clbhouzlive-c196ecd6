@@ -34,12 +34,21 @@ export class AnalysisSessionService {
 
     // Extract real frames if video file is provided
     let frames = data.frames;
+    let activeFrameIndex = 1;
+    
     if (params.videoFile) {
       try {
         console.log('Extracting frames from uploaded video...');
         const extractedFrames = await extractFramesFromVideo(params.videoFile, 20);
         frames = extractedFrames;
-        console.log(`Successfully extracted ${frames.length} frames for analysis`);
+        
+        // Find first non-black frame for initial selection
+        const firstNonBlackFrame = extractedFrames.find(frame => !frame.isBlack);
+        if (firstNonBlackFrame) {
+          activeFrameIndex = firstNonBlackFrame.index;
+        }
+        
+        console.log(`Successfully extracted ${frames.length} frames for analysis, starting with frame ${activeFrameIndex}`);
       } catch (error) {
         console.warn('Failed to extract frames, using server frames:', error);
         // Fall back to server-provided frames (placeholders)
@@ -51,6 +60,7 @@ export class AnalysisSessionService {
       phases,
       order: data.phases,
       frames,
+      activeFrameIndex,
     };
   }
 

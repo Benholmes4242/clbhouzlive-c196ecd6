@@ -94,7 +94,7 @@ serve(async (req) => {
               sessionId, 
               summaryReady: false, 
               doneCount, 
-              totalPhases: phases.length 
+              totalPhases: 7 
             }, 'complete');
             
             clearInterval(keepaliveInterval);

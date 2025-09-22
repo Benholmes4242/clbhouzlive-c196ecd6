@@ -7,6 +7,7 @@ export interface ExtractedFrame {
   width: number;
   height: number;
   hash: string;
+  isBlack?: boolean;
 }
 
 const once = (element: HTMLElement, event: string): Promise<Event> => {
@@ -17,6 +18,37 @@ const once = (element: HTMLElement, event: string): Promise<Event> => {
     };
     element.addEventListener(event, handler);
   });
+};
+
+const seekAndPaint = async (
+  video: HTMLVideoElement, 
+  targetTime: number, 
+  ctx: CanvasRenderingContext2D
+): Promise<void> => {
+  // Avoid exact zero; Safari can return black at t=0
+  video.currentTime = Math.max(0.01, Math.min(video.duration - 0.01, targetTime));
+  await once(video, 'seeked');
+
+  // Wait for a paint – two RAFs is a simple & reliable trick
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  // Ensure we have data
+  if (video.readyState < video.HAVE_CURRENT_DATA) {
+    await once(video, 'timeupdate').catch(() => {});
+  }
+
+  ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+};
+
+const isBlackFrame = (ctx: CanvasRenderingContext2D): boolean => {
+  const { width, height } = ctx.canvas;
+  const imageData = ctx.getImageData(0, 0, Math.min(32, width), Math.min(32, height)).data;
+  let sum = 0;
+  for (let i = 0; i < imageData.length; i += 4) {
+    sum += (imageData[i] + imageData[i + 1] + imageData[i + 2]) / 3;
+  }
+  const avg = sum / (imageData.length / 4);
+  return avg < 5; // Very dark
 };
 
 export const extractFramesFromVideo = async (
@@ -56,11 +88,11 @@ export const extractFramesFromVideo = async (
           const ratio = timeRatios[i];
           const targetTime = ratio * duration;
           
-          video.currentTime = targetTime;
-          await once(video, 'seeked');
+          // Use robust capture for better frame quality
+          await seekAndPaint(video, targetTime, ctx);
           
-          // Draw current frame to canvas
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          // Check if frame is black
+          const isBlack = isBlackFrame(ctx);
           
           // Convert to data URL
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
@@ -71,10 +103,11 @@ export const extractFramesFromVideo = async (
             url: dataUrl,
             width: canvas.width,
             height: canvas.height,
-            hash: `frame-${i + 1}-${Date.now()}`
+            hash: `frame-${i + 1}-${Date.now()}`,
+            isBlack
           });
           
-          console.log(`Extracted frame ${i + 1}/${frameCount} at ${targetTime.toFixed(2)}s`);
+          console.log(`Extracted frame ${i + 1}/${frameCount} at ${targetTime.toFixed(2)}s${isBlack ? ' (black)' : ''}`);
         }
         
         console.log(`Successfully extracted ${frames.length} frames`);

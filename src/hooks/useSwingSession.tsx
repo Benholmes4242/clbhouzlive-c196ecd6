@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { AnalysisSessionService } from '@/services/swing/analysisSession';
 import { SessionState, PhaseName } from '@/types/swingSession';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UseSwingSessionReturn {
   sessionState: SessionState | null;
@@ -226,7 +227,7 @@ export function useSwingSession(): UseSwingSessionReturn {
           console.log(`Complete event: doneCount=${data.doneCount}, seenDoneEvents=${seenDoneEvents.current.size}, canSummarize=${canSummarize}`);
           
           if (canSummarize && !summarizingRef.current) {
-            attemptSummarizeWithBackoff(updated.sessionId);
+            summarizeOnce(updated.sessionId);
           }
           break;
       }
@@ -236,7 +237,7 @@ export function useSwingSession(): UseSwingSessionReturn {
   }, [toast, handleSummarization]);
 
   // Enhanced summarization with exponential backoff
-  const attemptSummarizeWithBackoff = useCallback(async (sessionId: string) => {
+  const summarizeOnce = useCallback(async (sessionId: string) => {
     if (summarizingRef.current) return;
     summarizingRef.current = true;
     
@@ -244,46 +245,58 @@ export function useSwingSession(): UseSwingSessionReturn {
     for (let attempt = 0; attempt < 4; attempt++) {
       try {
         console.log(`Summarization attempt ${attempt + 1}/4`);
-        const result = await AnalysisSessionService.summarize(sessionId);
-        
-        setAnalysisId(result.analysisId);
-        setSessionState(prev => prev ? {
-          ...prev,
-          summary: {
-            text: result.text,
-            createdAt: new Date().toISOString(),
-            analysisId: result.analysisId,
-            analysisResults: result.analysisResults
-          }
-        } : prev);
-        
-        toast({
-          title: "Analysis Complete",
-          description: "Your swing analysis is ready with personalized recommendations",
+        const response = await fetch('/functions/v1/swing-summarize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          },
+          body: JSON.stringify({ sessionId })
         });
-        break; // Success, exit retry loop
+        
+        if (response.ok) {
+          const result = await response.json();
+          setAnalysisId(result.analysisId);
+          setSessionState(prev => prev ? {
+            ...prev,
+            summary: {
+              text: result.text || 'Analysis completed successfully',
+              createdAt: new Date().toISOString(),
+              analysisId: result.analysisId,
+              analysisResults: result.analysisResults
+            }
+          } : prev);
+          
+          toast({
+            title: "Analysis Complete",
+            description: "Your swing analysis is ready with personalized recommendations",
+          });
+          break; // Success, exit retry loop
+        }
+        
+        if (response.status !== 409) {
+          // Non-retryable error
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
+        // 409 - retry with exponential backoff
+        if (attempt < 3) {
+          console.log(`409 Insufficient phase data, retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay = Math.round(delay * 1.75);
+        } else {
+          throw new Error('Failed to generate summary after multiple attempts');
+        }
         
       } catch (err: any) {
         console.error(`Summarization attempt ${attempt + 1} failed:`, err);
         
-        if (err?.message?.includes('Insufficient phase data') && attempt < 3) {
-          // Retry with exponential backoff for 409 errors
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          delay = Math.floor(delay * 1.75);
-        } else if (attempt === 3) {
+        if (attempt === 3) {
           // Final attempt failed
           toast({
             title: "Analysis Summary Failed",
             description: err.message || 'Failed to generate summary after multiple attempts',
-            variant: "destructive"
-          });
-          break;
-        } else {
-          // Non-retryable error
-          toast({
-            title: "Analysis Summary Failed", 
-            description: err.message || 'Failed to generate summary',
             variant: "destructive"
           });
           break;
