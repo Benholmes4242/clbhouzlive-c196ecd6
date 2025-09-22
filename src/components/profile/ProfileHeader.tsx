@@ -101,11 +101,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
         )}
         
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80" />
-        
-        {/* Optional radial vignette */}
-        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/10" />
+        {/* Light-only overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/80" />
       </div>
 
       {/* Main Content Container */}

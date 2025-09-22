@@ -286,7 +286,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         )}
         
         {/* Gradient overlay for smooth transition to page content */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent via-60% to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent via-60% to-white" />
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent" />
       </div>
 
