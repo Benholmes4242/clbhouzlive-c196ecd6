@@ -460,9 +460,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     --profile-border-button: 220 13% 91%;
     --profile-accent: 141 15% 57%;
     
-    /* Discover Page Colors */
-    --discover-background: 0 0% 85%;
-    
     /* Profile Shadows */
     --profile-shadow-card: 0 6px 16px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.06);
     --profile-shadow-tile: 0 2px 8px rgba(16,24,40,0.06);

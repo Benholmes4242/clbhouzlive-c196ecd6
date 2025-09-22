@@ -30,7 +30,7 @@ const OptimizedProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-discover-background">
+    <div className="min-h-screen bg-background">
       {/* Optimized Profile Header - loads instantly with all data */}
       <OptimizedProfileLoader
         userId={userId!}
