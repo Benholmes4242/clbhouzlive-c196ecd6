@@ -417,10 +417,10 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
 
                   {/* PILL BUTTONS */}
-                  <div className="flex gap-2">
+                  <div className="flex justify-between w-full">
                     <button
                       onClick={() => setActiveCard('caption')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 mr-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'caption'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -430,7 +430,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('course')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 mx-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'course'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -440,7 +440,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('music')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 ml-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'music'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -555,15 +555,6 @@ const EnhancedMediaCarousel = ({
 
   return (
     <div className="relative w-full h-full bg-black rounded-xl overflow-hidden">
-      {/* Close button */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 flex items-center justify-center transition-all duration-200"
-        >
-          <X className="w-4 h-4 text-white" />
-        </button>
-      )}
 
       {/* Media display */}
       <div className="w-full h-full flex items-center justify-center">
