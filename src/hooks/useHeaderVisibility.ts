@@ -43,15 +43,16 @@ export const useHideHeader = () => {
 };
 
 /**
- * Hook to set header variant for specific routes (deprecated - variant is now locked)
+ * Hook to set header variant for specific routes
  */
-export const useHeaderVariant = (variant?: 'glass-dark') => {
-  const { variant: currentVariant } = useHeader();
+export const useHeaderVariant = (variant?: 'glass-dark' | 'solid-light') => {
+  const { setVariant, variant: currentVariant } = useHeader();
 
-  // Variant is now locked to glass-dark, no need to set
-  if (process.env.NODE_ENV !== 'production' && variant && variant !== 'glass-dark') {
-    console.warn('[useHeaderVariant] Variant is locked to glass-dark. Ignoring:', variant);
-  }
+  useEffect(() => {
+    if (variant) {
+      setVariant(variant);
+    }
+  }, [variant, setVariant]);
 
-  return { variant: currentVariant };
+  return { variant: currentVariant, setVariant };
 };

@@ -747,8 +747,8 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-8px] md:bottom-[-16px]
-                w-full z-20 mb-4 md:mb-5
+                bottom-[-24px] md:bottom-[-32px]
+                w-full z-20
               ">
               <GlassProfileCard
                 profile={profile}
@@ -764,28 +764,17 @@ const HeroProfileHeader = ({
              <div className="h-8 md:h-12" />
            </section>
            
-           {/* Dark Rail for Stats Pills */}
-           <div className="mx-4 md:mx-auto max-w-4xl mb-2">
-             <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
-               <div className="grid grid-cols-4 gap-2 md:gap-3">
-                 <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                   <div className="text-white font-semibold">{postsCount}</div>
-                   <div className="text-white/70 text-xs mt-0.5">Posts</div>
-                 </div>
-                 <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                   <div className="text-white font-semibold">2.5K</div>
-                   <div className="text-white/70 text-xs mt-0.5">Total XP</div>
-                 </div>
-                 <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                   <div className="text-white font-semibold">{followingCount}</div>
-                   <div className="text-white/70 text-xs mt-0.5">Following</div>
-                 </div>
-                 <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                   <div className="text-white font-semibold">{followersCount}</div>
-                   <div className="text-white/70 text-xs mt-0.5">Followers</div>
-                 </div>
-               </div>
-             </div>
+           {/* Glass Stats Pills */}
+           <div className="mt-6 mb-4">
+             <StatsGlassPills
+               stats={{
+                 posts: postsCount,
+                 totalXP: 2500, // Placeholder - can be computed from progress data
+                 following: followingCount,
+                 followers: followersCount
+               }}
+               onStatClick={handleStatClick}
+             />
            </div>
         </div>
        ) : (
@@ -830,92 +819,101 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-             {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
-             <div 
-               ref={profileCardRef}
-               className="
-                 absolute left-1/2 -translate-x-1/2
-                 bottom-[-14px] md:bottom-[-18px]
-                 w-[90%] md:w-[80%] max-w-[800px]
-                 rounded-2xl border border-white/35
-                 bg-white/35 backdrop-blur-xl
-                 shadow-[0_10px_40px_rgba(0,0,0,0.45)] z-10 mb-4 md:mb-5
-               "
-             >
-                <div className="px-8 py-6 flex flex-col items-center text-center relative">
-                  {/* Three dots menu - positioned absolutely */}
-                  {isOwnProfile && (
-                    <div className="absolute top-6 right-8">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={24} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-[80%] max-w-[800px]
+                rounded-2xl border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-6 right-8">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-3xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-base text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-5 w-full max-w-md mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Home Club</div>
+                       <div className="mt-1 text-lg font-medium text-gray-900">
+                         {homeClub}
+                       </div>
                     </div>
-                  )}
-
-                  {/* Name + Handle - centered */}
-                  <div className="flex flex-col items-center text-center">
-                    <h1 className="text-gray-900 text-xl md:text-2xl font-semibold leading-tight">
-                      {displayName}
-                    </h1>
-                    <div className="mt-1 text-gray-700 text-sm">@{username}</div>
-
-                    <div className="mt-3 md:mt-4 grid grid-cols-2 gap-x-6 place-items-center text-gray-700 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="opacity-80 w-4 h-4" />
-                        {homeClub}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="opacity-80 w-4 h-4" />
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Handicap</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
                         {handicap}
                       </div>
                     </div>
                   </div>
-
-               </div>
-             </div>
-              
-              {/* Spacer below to avoid clipping the panel */}
-              <div className="h-12 md:h-16" />
-            </section>
-            
-            {/* Dark Rail for Stats */}
-            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-4 mb-0">
-              <div className="rounded-2xl bg-black/65 backdrop-blur-md border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] px-3 md:px-4 py-2 md:py-3">
-                <div className="grid grid-cols-4 gap-2 md:gap-3">
-                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                    <div className="text-white font-semibold">{postsCount}</div>
-                    <div className="text-white/70 text-xs mt-0.5">Posts</div>
-                  </div>
-                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                    <div className="text-white font-semibold">2.5K</div>
-                    <div className="text-white/70 text-xs mt-0.5">Total XP</div>
-                  </div>
-                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                    <div className="text-white font-semibold">{followingCount}</div>
-                    <div className="text-white/70 text-xs mt-0.5">Following</div>
-                  </div>
-                  <div className="rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-sm py-2.5 md:py-3 flex flex-col items-center">
-                    <div className="text-white font-semibold">{followersCount}</div>
-                    <div className="text-white/70 text-xs mt-0.5">Followers</div>
-                  </div>
                 </div>
+
               </div>
             </div>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
+           </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 

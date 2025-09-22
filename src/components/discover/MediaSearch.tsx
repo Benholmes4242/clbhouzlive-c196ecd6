@@ -112,12 +112,12 @@ const MediaSearch = ({
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
-          "bg-white/5 hover:bg-white/10 border border-white/15 text-white placeholder-white/70",
+          "bg-white/80 border border-white/30 backdrop-blur-sm",
           "h-10 px-4 gap-3",
-          isFocused && "bg-white/10 border-white/20 ring-2 ring-white/20"
+          isFocused && "bg-white border-white/50 ring-2 ring-white/40"
         )}
       >
-        <Search className="h-5 w-5 text-white/80 flex-shrink-0" />
+        <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
         
         <input
           ref={inputRef}
@@ -130,26 +130,26 @@ const MediaSearch = ({
           onKeyDown={handleKeyDown}
           className={cn(
             "flex-1 bg-transparent border-none outline-none text-base",
-            "text-white placeholder:text-white/70",
+            "text-gray-900 placeholder:text-gray-500",
             "placeholder:transition-colors duration-200",
-            isFocused && "placeholder:text-white/80"
+            isFocused && "placeholder:text-gray-600"
           )}
         />
 
         {query && (
           <button
             onClick={handleClear}
-            className="flex-shrink-0 p-1 rounded-full hover:bg-white/10 focus:bg-white/10 
+            className="flex-shrink-0 p-1 rounded-full hover:bg-gray-200 focus:bg-gray-200 
                      focus:outline-none transition-colors"
             aria-label="Clear search"
           >
-            <X className="h-4 w-4 text-white/80" />
+            <X className="h-4 w-4 text-gray-500" />
           </button>
         )}
 
         {loading && (
           <div className="flex-shrink-0 w-5 h-5">
-            <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-brand-orange border-t-transparent rounded-full animate-spin" />
           </div>
         )}
       </div>

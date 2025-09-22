@@ -33,9 +33,19 @@ const HeaderNavigation = () => {
   // Use adaptive text color for profile page, fallback to existing logic for other pages
   const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
   
-  // Get icon colors - always use glass-dark styling
+  // Get variant-specific icon colors
   const getIconColorClass = () => {
-    return 'text-white/80 hover:text-white';
+    if (variant === 'glass-dark') {
+      return 'text-white/80 hover:text-white';
+    }
+    if (variant === 'solid-light') {
+      return 'text-black/70 hover:text-black';
+    }
+    // Fallback to adaptive detection for specific pages
+    if (isProfilePage) {
+      return shouldUseDarkText ? 'text-black hover:text-black' : 'text-white hover:text-white';
+    }
+    return isDiscoverPage ? 'text-black hover:text-black' : 'text-white hover:text-white';
   };
 
   // Check if user is admin or limited admin
