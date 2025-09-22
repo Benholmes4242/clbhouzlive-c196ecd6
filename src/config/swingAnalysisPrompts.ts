@@ -3,29 +3,11 @@
 
 export const SWING_ANALYSIS_PROMPTS = {
   
-  // Per-Phase Analysis System Prompt
-  perPhaseSystem: `You are Echo, a professional golf instructor and biomechanics expert with deep knowledge of golf swing fundamentals. You analyze swing videos frame by frame to provide technical feedback.
-
-Your task is to analyze a specific phase of a golf swing and return detailed metrics, actionable tips, and visual overlay plans.
-
-CRITICAL: Return ONLY valid JSON. No explanations, no markdown, no text outside the JSON structure.
-
-For metrics, use these standard measurements:
-- shaftLeanDeg: Forward shaft lean in degrees (-30 to +30, positive = forward lean)
-- hipOpenDeg: Hip rotation relative to target line (0-90 degrees)
-- shoulderTurnDeg: Shoulder rotation from address (0-120 degrees)
-- headStability: Head movement rating (0-10, lower is better)
-- weightTransferPct: Weight on front foot percentage (0-100%)
-- clubFaceAngleDeg: Club face angle relative to target (-15 to +15, negative = closed)
-- swingPathDeg: Swing path relative to target line (-15 to +15, negative = in-to-out)
-- tempoRatio: Backswing to downswing ratio (2.0-4.0)
-
-For visual overlays:
-- lines: Draw swing plane, shaft lean, hip line, shoulder line
-- angles: Show hip rotation, shoulder turn, club face
-- keypoints: Mark lead wrist, trail elbow, head position, hip position
-
-Confidence should reflect data quality and phase clarity (0.0-1.0).`,
+  // Per-Phase Analysis System Prompt (Strict JSON)
+  perPhaseSystem: `You are Echo, a professional golf instructor. Return STRICT JSON only.
+Include: phase, usedFrameIndex, metrics (numeric where possible, include 'conf' 0..1),
+tips (string[]), and visualPlan { caption, frameHint, overlays {lines[], angles[], keypoints[]} }.
+No prose outside JSON.`,
 
   // Per-Phase User Prompt Template
   perPhaseUser: (data: {
@@ -41,7 +23,7 @@ Confidence should reflect data quality and phase clarity (0.0-1.0).`,
       ts: number;
     }>;
     request: {
-      metrics: boolean;
+      metrics: string[];
       tips: boolean;
       visualPlan: boolean;
     };
@@ -51,52 +33,38 @@ Confidence should reflect data quality and phase clarity (0.0-1.0).`,
   perPhaseResponse: `{
   "phase": "impact",
   "usedFrameIndex": 7,
-  "metrics": {
-    "shaftLeanDeg": 7.2,
-    "hipOpenDeg": 28.5,
-    "headStability": 2.1,
-    "conf": 0.78
+  "metrics": { 
+    "shaftLeanDeg": 9, 
+    "hipOpenDeg": 26, 
+    "headStabilityCm": 1.8, 
+    "clubFaceDeg": -1, 
+    "conf": 0.82 
   },
   "tips": [
-    "Feel lead wrist flexed into impact for forward shaft lean",
-    "Maintain hip rotation through contact",
-    "Keep head steady behind the ball"
+    "Feel lead wrist flatter approaching impact",
+    "Keep head steady through strike"
   ],
   "visualPlan": {
-    "caption": "Hands slightly ahead at strike; good shaft lean.",
+    "caption": "Good shaft lean; clubface near square.",
     "frameHint": "P7",
     "overlays": {
-      "lines": [
-        {"x1": 320, "y1": 180, "x2": 380, "y2": 160, "label": "shaft"},
-        {"x1": 300, "y1": 300, "x2": 400, "y2": 300, "label": "hip_line"}
-      ],
-      "angles": [
-        {"cx": 340, "cy": 200, "a": 15, "b": 45, "label": "shaft_lean"}
-      ],
-      "keypoints": [
-        {"x": 340, "y": 180, "label": "lead_wrist", "conf": 0.85}
-      ]
+      "lines": [{"x1":100,"y1":220,"x2":240,"y2":120,"label":"shaft"}],
+      "angles": [{"cx":180,"cy":220,"a":28,"b":0,"label":"hip open"}],
+      "keypoints": [{"x":150,"y":180,"label":"lead_wrist","conf":0.8}]
     }
   }
 }`,
 
-  // Summarization System Prompt
-  summarizeSystem: `You are Echo, a professional golf instructor providing a comprehensive swing review. Analyze the complete swing data and compose a motivational yet technical summary.
-
-Your analysis should be:
-- Encouraging but honest about areas for improvement
-- Technically accurate using proper golf terminology
-- Actionable with specific practice recommendations
-- Focused on the most impactful changes
-
-CRITICAL: Return ONLY valid JSON. No explanations, no markdown, no text outside the JSON structure.
-
-Structure your response as:
-- summary: 2-3 sentences covering overall swing quality and primary focus areas
-- keyFindings: 3-5 short bullet points highlighting the most important discoveries
-- byPhase: Object with 1-2 sentences per analyzed phase
-- drills: Maximum 4 specific practice drills addressing the biggest opportunities
-- confidence: Overall analysis confidence (0.0-1.0) based on video quality and completeness`,
+  // Summarization System Prompt (Strict JSON)
+  summarizeSystem: `Compose a concise golf swing review. Return STRICT JSON: 
+{
+  "summary": string,
+  "keyFindings": string[], 
+  "byPhase": { "setup": string, "takeaway": string, "backswing": string, "top": string, "downswing": string, "impact": string, "followThrough": string },
+  "drills": string[],
+  "confidence": number
+}
+No extra text.`,
 
   // Summarization User Prompt Template
   summarizeUser: (data: {
@@ -125,6 +93,7 @@ Structure your response as:
     "takeaway": "Smooth one-piece movement maintaining connection through the triangle.",
     "backswing": "Excellent shoulder turn creating width and power potential.",
     "top": "Good position at the top with proper lag angle maintained.",
+    "downswing": "Good sequencing with room for more aggressive weight shift.",
     "impact": "Solid contact position with forward shaft lean and square clubface.",
     "followThrough": "Complete rotation showing good extension through the ball."
   },
@@ -141,12 +110,12 @@ Structure your response as:
   modelConfig: {
     perPhase: {
       model: "gpt-4.1-2025-04-14", // Good for structured analysis
-      max_completion_tokens: 800,
+      max_completion_tokens: 600,   // Reduced for strict JSON
       // Note: temperature not supported for GPT-4.1+
     },
     summarize: {
       model: "gpt-5-2025-08-07", // Best for comprehensive analysis
-      max_completion_tokens: 1200,
+      max_completion_tokens: 800,  // Reduced for strict JSON
       // Note: temperature not supported for GPT-5
     }
   }
