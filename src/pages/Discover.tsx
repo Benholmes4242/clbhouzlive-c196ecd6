@@ -141,28 +141,37 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
-          {/* Media Search - Discover Only */}
-          <div className="px-4 md:container md:mx-auto md:px-6 pt-4">
-            <MediaSearch 
-              placeholder="Search videos and photos..." 
-              onSearchChange={setSearchQuery}
-            />
-          </div>
-
-          {/* Filter Pills Row */}
-          <div className="mt-3 mb-1">
-            <DiscoverPillRow 
-              activeFilter={activeFilter} 
-              onFilterChange={setActiveFilter}
-            />
-          </div>
-
-          {/* Trending Tags Bar */}
-          <TrendingTagsBar onTagsChange={setSelectedTags} />
-
-          {/* Suggested Users */}
+          {/* Suggested Users - Top Section */}
           <div className="mt-4">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
+          </div>
+
+          {/* Search + Filter Pills Divider */}
+          <div className="px-3 md:px-0 md:max-w-[1200px] md:mx-auto pt-3 pb-2 md:pt-4 md:pb-3">
+            <div className="backdrop-blur-md bg-white/60 border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-3 md:space-y-4"
+                 style={{ boxShadow: 'var(--hud-shadow, 0 4px 20px rgba(0, 0, 0, 0.1))' }}>
+              
+              {/* Search */}
+              <div className="w-full">
+                <MediaSearch 
+                  placeholder="Search videos and photos..." 
+                  onSearchChange={setSearchQuery}
+                />
+              </div>
+
+              {/* Main Filter Pills - larger size */}
+              <div className="space-y-2">
+                <DiscoverPillRow 
+                  activeFilter={activeFilter} 
+                  onFilterChange={setActiveFilter}
+                />
+              </div>
+
+              {/* Hashtag Pills - smaller size */}
+              <div className="space-y-2">
+                <TrendingTagsBar onTagsChange={setSelectedTags} />
+              </div>
+            </div>
           </div>
 
           {/* Main Grid with Container */}
