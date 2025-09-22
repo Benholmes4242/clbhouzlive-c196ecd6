@@ -1,13 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { ChevronLeft, ChevronRight, Camera, Star, Users, UserPlus } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StatItem {
   value: string | number;
   label: string;
-  icon?: React.ComponentType<{ className?: string }>;
   onClick?: () => void;
 }
 
@@ -53,42 +52,56 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
     }
   }, [stats]);
 
-  // Icon mapping for stats
-  const getIconForStat = (label: string) => {
-    switch (label.toLowerCase()) {
-      case 'posts': return '📸';
-      case 'total xp': return '⭐';
-      case 'following': return '👥';
-      case 'followers': return '👤';
-      default: return null;
-    }
-  };
-
   return (
-    <div id="profile-stats" className="mx-4 mt-3 rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_2px_12px_rgba(0,0,0,0.06)] px-3 py-2">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {stats.map((stat, index) => {
-          const iconEmoji = getIconForStat(stat.label);
-          return (
+    <div className={`relative w-full ${isMobile ? 'px-4 py-3' : 'max-w-lg mx-auto py-3'}`}>
+      {/* Desktop scroll buttons */}
+      {isDesktop && canScrollLeft && (
+        <button
+          onClick={() => scroll('left')}
+          className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+        >
+          <ChevronLeft className="w-5 h-5 text-black" />
+        </button>
+      )}
+      
+      {isDesktop && canScrollRight && (
+        <button
+          onClick={() => scroll('right')}
+          className="absolute right-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+        >
+          <ChevronRight className="w-5 h-5 text-black" />
+        </button>
+      )}
+      
+      
+      {/* Stats container - clean design without liquid glass */}
+      <div className="relative overflow-hidden rounded-full bg-muted border shadow-sm">
+        <div 
+          ref={containerRef}
+          className={`flex ${isMobile ? 'gap-2' : 'gap-8'} overflow-x-auto scrollbar-hide ${isMobile ? 'px-2' : 'px-4'} ${isMobile ? '' : 'pr-20'}`}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            width: isMobile ? '100%' : 'calc(4 * 5rem + 3 * 1rem + 2rem + 0.5 * 5rem)', // Mobile: full width, Desktop: 4 full stats + 3 gaps + padding + half of 5th stat
+          }}
+        >
+          {stats.map((stat, index) => (
             <button
               key={index}
               onClick={stat.onClick}
-              className="flex flex-col items-center justify-center text-slate-900/90 hover:opacity-80 transition-opacity duration-200 py-2"
+              className={`flex-shrink-0 ${isMobile ? 'w-16' : 'w-20'} flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200`}
             >
-              {iconEmoji && (
-                <span className="text-[16px] leading-none mb-1">
-                  {iconEmoji}
-                </span>
-              )}
-              <span className="text-xl font-extrabold leading-tight">
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-black`}>
                 {stat.value}
-              </span>
-              <span className="text-xs opacity-80 leading-tight">
+              </div>
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-600 font-medium`}>
                 {stat.label}
-              </span>
+              </div>
             </button>
-          );
-        })}
+          ))}
+        </div>
+        
       </div>
     </div>
   );

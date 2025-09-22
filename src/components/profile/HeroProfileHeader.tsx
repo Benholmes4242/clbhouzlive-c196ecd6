@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical, Star, Zap } from 'lucide-react';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -952,33 +952,29 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-            {/* Liquid Glass Stats Pill */}
-            <div className="w-[95%] md:w-[85%] max-w-[900px] mx-auto mt-7 mb-3">
-              <div className="rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 px-6 py-4">
-                <div className="flex justify-center gap-8">
-                  <div className="flex flex-col items-center">
-                    <Camera className="w-4 h-4 text-white/70 mb-1" />
-                    <div className="text-2xl font-bold text-white mb-1">{postsCount}</div>
-                    <div className="text-sm text-white/80 font-normal">Posts</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Zap className="w-4 h-4 text-white/70 mb-1" />
-                    <div className="text-2xl font-bold text-white mb-1">2,500</div>
-                    <div className="text-sm text-white/80 font-normal">Total XP</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Users className="w-4 h-4 text-white/70 mb-1" />
-                    <div className="text-2xl font-bold text-white mb-1">{followingCount}</div>
-                    <div className="text-sm text-white/80 font-normal">Following</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <UserPlus className="w-4 h-4 text-white/70 mb-1" />
-                    <div className="text-2xl font-bold text-white mb-1">{followersCount}</div>
-                    <div className="text-sm text-white/80 font-normal">Followers</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
@@ -995,22 +991,50 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Liquid Glass and Orange Highlight */}
-      <div id="profile-tabs" className="mt-4 mx-4 rounded-full min-h-[44px] px-1 py-1 bg-white/70 backdrop-blur-xl border border-black/5 shadow-sm flex items-center gap-1 z-30 relative">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabChange(tab.id)}
-            data-active={activeSection === tab.id}
-            className={`px-3 py-2 rounded-full text-slate-900/90 font-medium hover:bg-black/5 focus:bg-black/5 relative transition-all duration-200 ${
-              activeSection === tab.id
-                ? 'text-[#FF6600] font-semibold bg-black/5 after:block'
-                : 'after:hidden'
-            } after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-1 after:h-0.5 after:w-8 after:rounded-full after:bg-[#FF6600]`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+        <div className="relative" role="tablist" aria-label="Profile sections">
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+                style={{
+                  color: activeSection === tab.id 
+                    ? 'hsl(var(--profile-text-primary))' 
+                    : 'hsl(var(--profile-text-secondary))'
+                }}
+              >
+                {tab.label}
+                {/* Brand accent underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Legacy ProfileTabs for content rendering */}
