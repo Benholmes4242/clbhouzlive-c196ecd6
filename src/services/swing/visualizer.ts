@@ -286,6 +286,24 @@ export class SwingVisualizer {
     }));
   }
 
+  static async exportZip(analysisId: string): Promise<Blob> {
+    // Call the export edge function
+    const { data, error } = await supabase.functions.invoke('swing-visuals-export', {
+      body: { analysisId }
+    });
+
+    if (error) {
+      throw new Error(`Export failed: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('No export data received');
+    }
+
+    // Convert the response to a blob for download
+    return new Blob([data], { type: 'application/zip' });
+  }
+
   static async generateExportPack(analysisId: string): Promise<string | null> {
     // This would generate a ZIP file containing all visuals
     // For now, return a placeholder URL

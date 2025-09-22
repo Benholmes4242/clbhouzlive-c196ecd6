@@ -460,25 +460,27 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   
   const handleExportPack = async (analysisId: string) => {
     try {
-      const exportUrl = await SwingVisualizer.generateExportPack(analysisId);
-      if (exportUrl) {
-        window.open(exportUrl, '_blank');
-        toast({
-          title: "Export started",
-          description: "Your visual pack export is being prepared",
-        });
-      } else {
-        toast({
-          title: "Export failed",
-          description: "Could not generate visual pack export",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error('Error exporting pack:', error);
+      const zipBlob = await SwingVisualizer.exportZip(analysisId);
+      
+      // Create download link
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `swing-analysis-${analysisId.slice(0, 8)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
       toast({
-        title: "Export failed", 
-        description: "Could not generate visual pack export",
+        title: "Export started",
+        description: "Your Visual Pack is downloading.",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export failed",
+        description: "Please try again.",
         variant: "destructive"
       });
     }
@@ -1056,6 +1058,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                    onExportPack={handleExportPack}
                                   />
                                 ))}
                               </div>
@@ -1084,6 +1087,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                    onExportPack={handleExportPack}
                                   />
                                 ))}
                               </div>
