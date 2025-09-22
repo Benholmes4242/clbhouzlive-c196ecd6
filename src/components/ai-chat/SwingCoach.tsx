@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin, HelpCircle, Camera } from 'lucide-react';
+import { Upload, Video, Play, Trash2, Send, BookOpen, MoreHorizontal, Share2, Plus, Mic, MapPin, HelpCircle, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -1064,22 +1064,53 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                        )}
                      </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-medium truncate">{uploadedVideo.name}</p>
-                      <Button variant="ghost" size="sm" onClick={discardVideo}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-medium truncate">{uploadedVideo.name}</p>
+                        <Button variant="ghost" size="sm" onClick={discardVideo}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
+                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
+                        </p>
+                      </div>
+
+                      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <Button
+                          onClick={analyzeSwing}
+                          disabled={uploading || isAnalyzing}
+                          className="w-full sm:w-auto gap-2"
+                          aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
+                        >
+                          {isAnalyzing ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Analyzing…
+                            </>
+                          ) : (
+                            <>
+                              <HelpCircle className="h-4 w-4" />
+                              Analyze Swing
+                            </>
+                          )}
+                        </Button>
+
+                        <Button
+                          variant="link"
+                          className="px-0 text-xs sm:px-2"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isAnalyzing}
+                          aria-label="Replace video"
+                        >
+                          Replace {uploadedVideo.type.startsWith('video/') ? 'video' : 'image'}
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">
-                        {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
