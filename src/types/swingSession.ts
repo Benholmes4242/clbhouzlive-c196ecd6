@@ -32,5 +32,13 @@ export interface SessionState {
     text: string;
     createdAt: string;
     analysisId?: string;
+    analysisResults?: {
+      summary: string;
+      keyFindings: string[];
+      byPhase: Record<string, any>;
+      drills: string[];
+      confidence: number;
+      metadata?: any;
+    };
   };
 }

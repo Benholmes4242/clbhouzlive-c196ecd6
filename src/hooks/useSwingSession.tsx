@@ -109,6 +109,41 @@ export function useSwingSession(): UseSwingSessionReturn {
     }
   }, [disconnect, toast]);
 
+  // Separate function for handling summarization
+  const handleSummarization = useCallback(async (sessionId: string) => {
+    console.log('Analysis complete, starting summarization...');
+    
+    try {
+      const result = await AnalysisSessionService.summarize(sessionId);
+      setSessionState(prev => prev ? {
+        ...prev,
+        summary: {
+          text: result.text,
+          createdAt: new Date().toISOString(),
+          analysisId: result.analysisId,
+          analysisResults: result.analysisResults
+        }
+      } : prev);
+      
+      toast({
+        title: "Analysis Complete",
+        description: "Your swing analysis is ready with personalized recommendations",
+      });
+    } catch (err) {
+      console.error('Summarization failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate summary';
+      
+      // If it's a retry error (409), don't show as failure - just wait
+      if (!errorMessage.includes('Insufficient phase data')) {
+        toast({
+          title: "Analysis Summary Failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
+    }
+  }, [toast]);
+
   const handleSSEMessage = useCallback((data: any) => {
     console.log('SSE message received:', data);
 
@@ -175,33 +210,19 @@ export function useSwingSession(): UseSwingSessionReturn {
           break;
 
         case 'complete':
-          // Only call summarize if feature is enabled and no summary exists
-          if (!data.summaryReady && !updated.summary) {
-            // Feature gated summarization
-            const ENABLE_SUMMARIZE = false; // Feature flag
-            if (ENABLE_SUMMARIZE) {
-              AnalysisSessionService.summarize(updated.sessionId)
-                .then(result => {
-                  setSessionState(prev => prev ? {
-                    ...prev,
-                    summary: {
-                      text: result.text,
-                      createdAt: new Date().toISOString(),
-                      analysisId: result.analysisId
-                    }
-                  } : prev);
-                })
-                .catch(err => {
-                  console.error('Summarization failed:', err);
-                });
-            }
+          // Call summarization when analysis is complete
+          if (!updated.summary) {
+            // Use setTimeout to make this async without blocking the message handler
+            setTimeout(() => {
+              handleSummarization(updated.sessionId);
+            }, 100);
           }
           break;
       }
 
       return updated;
     });
-  }, [toast]);
+  }, [toast, handleSummarization]);
 
   const startSession = useCallback(async (params: { uploadId?: string; videoUrl?: string }) => {
     setIsLoading(true);

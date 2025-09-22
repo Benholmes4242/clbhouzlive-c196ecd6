@@ -56,17 +56,35 @@ export class AnalysisSessionService {
     return { id: sessionId, status: 'mock' };
   }
 
-  static async summarize(sessionId: string): Promise<{ analysisId: string; text: string }> {
-    // Feature gated - return mock for now
-    const mockAnalysisId = crypto.randomUUID();
-    const mockText = "Analysis summary will be available soon...";
-    
-    // TODO: Implement actual summarization endpoint
-    console.log('Summarization requested for session:', sessionId);
+  static async summarize(sessionId: string): Promise<{ analysisId: string; text: string; analysisResults: any }> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      throw new Error('Not authenticated');
+    }
+
+    const response = await fetch(`${this.PROJECT_URL}/functions/v1/swing-summarize`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sessionId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      if (response.status === 409) {
+        throw new Error(`Insufficient phase data. ${errorData.completedPhases || 0} phases completed. Please wait for more phases to finish.`);
+      }
+      throw new Error(`Summarization failed: ${errorData.error || response.statusText}`);
+    }
+
+    const data = await response.json();
     
     return {
-      analysisId: mockAnalysisId,
-      text: mockText
+      analysisId: data.analysisId,
+      text: data.analysisResults?.summary || 'Analysis complete',
+      analysisResults: data.analysisResults
     };
   }
 }

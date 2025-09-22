@@ -22,6 +22,9 @@ import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
 import { AiFeedbackBlock } from '@/components/swing/AiFeedbackBlock';
 import { ProgressStrip } from '@/components/swing/ProgressStrip';
 import { CoachCta } from '@/components/swing/CoachCta';
+import { useSwingSession } from '@/hooks/useSwingSession';
+import { PhaseProgressStrip } from '@/components/swing/PhaseProgressStrip';
+import { SwingFrameViewer } from '@/components/swing/SwingFrameViewer';
 
 interface SwingAnalysis {
   id: string;
@@ -87,6 +90,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [currentGolfClub, setCurrentGolfClub] = useState<string>('');
   const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
   const [visuals, setVisuals] = useState<SwingVisual[]>([]);
+  
+  // Multi-phase analysis state
+  const { sessionState, isLoading: isSessionLoading, error: sessionError, startSession } = useSwingSession();
+  const [useMultiPhase, setUseMultiPhase] = useState(true); // Feature flag
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -552,6 +559,32 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     });
 
     setIsAnalyzing(true);
+    
+    // Check if we should use multi-phase analysis
+    if (useMultiPhase && uploadedVideo?.type.startsWith('video/')) {
+      try {
+        // Start multi-phase session
+        await startSession({ 
+          videoUrl: videoPreview,
+          // TODO: Add uploadId when implementing actual file upload
+        });
+        
+        toast({
+          title: "Analysis Started",
+          description: "Starting phase-by-phase swing analysis...",
+        });
+        
+        return; // Multi-phase handles the rest
+      } catch (error) {
+        console.error('Failed to start multi-phase analysis:', error);
+        toast({
+          title: "Multi-phase analysis failed",
+          description: "Falling back to single analysis mode",
+          variant: "destructive"
+        });
+        // Continue with legacy single analysis
+      }
+    }
     
     try {
       let extractedFrames: string[] = [];
@@ -1198,8 +1231,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+          </div>
+        )}
           </div>
         )}
 
