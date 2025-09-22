@@ -260,7 +260,7 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION - takes up ~75% of modal height */}
-                <section id="media" className="relative h-[85vh] max-h-[600px] min-h-[500px] overflow-hidden">
+                <section id="media" className="relative h-[80vh] max-h-[550px] min-h-[450px] overflow-hidden">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -293,21 +293,9 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-                  {/* Close button overlay */}
-                  <button 
-                    onClick={close} 
-                    aria-label="Close" 
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
 
-                  {/* Media metadata pills - top left, with cover badge */}
+                  {/* Media metadata pills - top left */}
                   <div className="absolute top-4 left-4 flex items-center gap-2">
-                    {/* Cover badge */}
-                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                      <span>Cover</span>
-                    </div>
                     {/* Media counter */}
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
