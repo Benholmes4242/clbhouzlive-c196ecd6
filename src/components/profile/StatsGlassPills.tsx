@@ -83,7 +83,15 @@ interface StatsGlassPillsProps {
 
 const StatsGlassPills: React.FC<StatsGlassPillsProps> = ({ stats, onStatClick }) => {
   return (
-    <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-[680px] mx-auto px-4">
+    <div 
+      className="grid grid-cols-4 gap-3 md:gap-4 max-w-[680px] mx-auto px-4 py-3 md:px-5 md:py-4 rounded-2xl border border-white/40"
+      style={{
+        background: 'rgba(255, 255, 255, 0.75)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)'
+      }}
+    >
       <StatPill
         label="Posts"
         value={stats.posts}
