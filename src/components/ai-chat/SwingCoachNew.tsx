@@ -331,18 +331,26 @@ export const SwingCoach: React.FC<SwingCoachProps> = ({ onClose }) => {
               </Card>
             )}
 
-            {/* Video Preview */}
+            {/* Media Preview */}
             {uploadedVideo && !isAnalyzing && !analysis && (
               <Card className="p-4">
                 <div className="space-y-4">
                   <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-                    <video
-                      src={videoPreview}
-                      controls
-                      className="w-full h-full"
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+                    {uploadedVideo.type.startsWith('video/') ? (
+                      <video
+                        src={videoPreview}
+                        controls
+                        className="w-full h-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={videoPreview}
+                        alt="Uploaded swing image"
+                        className="w-full h-full object-contain"
+                      />
+                    )}
                     
                     <Button
                       variant="ghost"
