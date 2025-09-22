@@ -114,8 +114,13 @@ serve(async (req) => {
                     metrics: generateMockMetrics(phase),
                     tips: [`Improve your ${phase} position by...`],
                     visualPlan: {
-                      overlays: { lines: [], angles: [] },
-                      caption: `${phase} analysis complete`
+                      caption: `${phase.charAt(0).toUpperCase() + phase.slice(1)} analysis shows good form`,
+                      frameHint: getFrameHint(phase),
+                      overlays: {
+                        lines: generateMockLines(phase),
+                        angles: generateMockAngles(phase),
+                        keypoints: generateMockKeypoints(phase)
+                      }
                     }
                   }, 'done');
 
@@ -218,5 +223,54 @@ function generateMockMetrics(phase: string): Record<string, any> {
       return { ...baseMetrics, balance: 'stable', rotation: 'complete' };
     default:
       return baseMetrics;
+  }
+}
+
+function getFrameHint(phase: string): string {
+  const frameHints: Record<string, string> = {
+    setup: 'P1',
+    takeaway: 'P2', 
+    backswing: 'P3',
+    top: 'P4',
+    downswing: 'P5',
+    impact: 'P6',
+    followThrough: 'P7'
+  };
+  return frameHints[phase] || 'P1';
+}
+
+function generateMockLines(phase: string): any[] {
+  switch (phase) {
+    case 'setup':
+      return [{ x1: 640, y1: 200, x2: 640, y2: 600, label: 'spine_angle' }];
+    case 'impact':
+      return [{ x1: 600, y1: 300, x2: 800, y2: 250, label: 'shaft_lean' }];
+    default:
+      return [];
+  }
+}
+
+function generateMockAngles(phase: string): any[] {
+  switch (phase) {
+    case 'top':
+      return [{ cx: 500, cy: 300, a: 45, b: 135, label: 'shoulder_turn' }];
+    case 'impact':
+      return [{ cx: 550, cy: 400, a: 0, b: 30, label: 'hip_rotation' }];
+    default:
+      return [];
+  }
+}
+
+function generateMockKeypoints(phase: string): any[] {
+  switch (phase) {
+    case 'setup':
+      return [{ x: 520, y: 350, label: 'ball_position', conf: 0.9 }];
+    case 'impact':
+      return [
+        { x: 480, y: 280, label: 'lead_wrist', conf: 0.85 },
+        { x: 500, y: 350, label: 'club_head', conf: 0.92 }
+      ];
+    default:
+      return [];
   }
 }

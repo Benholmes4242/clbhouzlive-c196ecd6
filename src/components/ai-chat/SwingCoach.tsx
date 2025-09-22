@@ -25,6 +25,7 @@ import { CoachCta } from '@/components/swing/CoachCta';
 import { useSwingSession } from '@/hooks/useSwingSession';
 import { PhaseProgressStrip } from '@/components/swing/PhaseProgressStrip';
 import { SwingFrameViewer } from '@/components/swing/SwingFrameViewer';
+import { VisualCarousel } from '@/components/swing/VisualCarousel';
 
 interface SwingAnalysis {
   id: string;
@@ -1190,6 +1191,80 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 )}
               </div>
             ))}
+
+            {/* Multi-Phase Analysis UI */}
+            {sessionState && (
+              <div className="space-y-6 p-4 bg-card border rounded-lg">
+                <div className="text-center">
+                  <h3 className="text-lg font-medium mb-2">
+                    Phase-by-Phase Analysis
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Real-time analysis of your swing mechanics
+                  </p>
+                </div>
+
+                {/* Phase Progress Strip */}
+                <PhaseProgressStrip 
+                  phases={sessionState.phases}
+                  order={sessionState.order}
+                />
+
+                {/* Frame Viewer */}
+                <SwingFrameViewer 
+                  frames={sessionState.frames}
+                  activeFrameIndex={sessionState.activeFrameIndex}
+                />
+
+                {/* Analysis Results */}
+                {sessionState.summary && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-card border rounded-lg">
+                      <h4 className="font-medium mb-2">Analysis Complete</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {sessionState.summary.analysisResults?.summary || sessionState.summary.text}
+                      </p>
+                    </div>
+                    
+                    {sessionState.summary.analysisId && (
+                      <VisualCarousel 
+                        analysisId={sessionState.summary.analysisId}
+                        className="mt-4"
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* Phase Details */}
+                {Object.entries(sessionState.phases).some(([_, phase]) => phase.status === 'done') && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium">Phase Details</h4>
+                    {sessionState.order.map((phaseName) => {
+                      const phase = sessionState.phases[phaseName];
+                      if (phase.status !== 'done') return null;
+                      
+                      return (
+                        <Card key={phaseName} className="p-4">
+                          <h5 className="font-medium capitalize mb-2">{phaseName}</h5>
+                          {phase.tips && phase.tips.length > 0 && (
+                            <div className="space-y-1">
+                              {phase.tips.map((tip, idx) => (
+                                <p key={idx} className="text-sm text-muted-foreground">• {tip}</p>
+                              ))}
+                            </div>
+                          )}
+                          {phase.metrics && (
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              Confidence: {Math.round((phase.metrics.conf || 0) * 100)}%
+                            </div>
+                          )}
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Show inline coach recommendations after swing analysis is complete */}
             {currentAnalysis && (
