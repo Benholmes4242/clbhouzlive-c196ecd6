@@ -52,8 +52,10 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       eventSource.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
+          if (event.data && event.data !== 'undefined') {
+            const data = JSON.parse(event.data);
+            handleSSEMessage(data);
+          }
         } catch (err) {
           console.error('Error parsing SSE message:', err);
         }
@@ -61,8 +63,10 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       eventSource.addEventListener('status', (event: any) => {
         try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
+          if (event.data && event.data !== 'undefined') {
+            const data = JSON.parse(event.data);
+            handleSSEMessage(data);
+          }
         } catch (err) {
           console.error('Error parsing status event:', err);
         }
@@ -70,8 +74,10 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       eventSource.addEventListener('done', (event: any) => {
         try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
+          if (event.data && event.data !== 'undefined') {
+            const data = JSON.parse(event.data);
+            handleSSEMessage(data);
+          }
         } catch (err) {
           console.error('Error parsing done event:', err);
         }
@@ -79,10 +85,23 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       eventSource.addEventListener('error', (event: any) => {
         try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
+          if (event.data && event.data !== 'undefined') {
+            const data = JSON.parse(event.data);
+            handleSSEMessage(data);
+          }
         } catch (err) {
           console.error('Error parsing error event:', err);
+        }
+      });
+
+      eventSource.addEventListener('complete', (event: any) => {
+        try {
+          if (event.data && event.data !== 'undefined') {
+            const data = JSON.parse(event.data);
+            handleSSEMessage(data);
+          }
+        } catch (err) {
+          console.error('Error parsing complete event:', err);
         }
       });
 
