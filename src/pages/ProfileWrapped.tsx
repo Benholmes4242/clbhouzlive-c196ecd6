@@ -6,8 +6,8 @@ const ProfileWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Profile pages have hero images, use glass-dark
-    setVariant('glass-dark');
+    // Profile pages now use light frosted glass
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <ProfilePage />;
