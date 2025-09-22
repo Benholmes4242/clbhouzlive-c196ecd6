@@ -109,21 +109,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   
   /* Bottom navigation height including safe area */
   --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
-
-  /* Glass tokens */
-  --glass-bg: rgba(255,255,255,0.14);
-  --glass-border: rgba(255,255,255,0.45);
-  --glass-shadow: 0 8px 24px rgba(0,0,0,0.18);
-
-  /* Echo gradient (text/icon) */
-  --echo-grad: linear-gradient(180deg, #1FE2C1 0%, #0BB58F 100%);
-
-  /* Echo ring gradient */
-  --echo-ring: conic-gradient(from 0deg, #1FE2C1, #0BB58F, #1FE2C1);
-
-  /* Motion */
-  --echo-pulse-duration: 2.8s;
-  --echo-press-scale: 0.98;
 }
 
 /* Global bottom navigation styling */
@@ -327,12 +312,6 @@ html, body, #root, .app-shell { touch-action: auto; }
     transform: scaleY(1);
     opacity: 1;
   }
-}
-
-@keyframes echoPulse {
-  0%   { opacity: 0.0; transform: scale(1); }
-  40%  { opacity: 0.50; transform: scale(1.35); }
-  100% { opacity: 0; transform: scale(1.6); }
 }
 
 @keyframes shimmer {
@@ -2053,12 +2032,4 @@ html, body, #root, .app-shell { touch-action: auto; }
 
 .recently-played-carousel .shrink-0:last-child {
   margin-right: 0 !important;
-}
-
-/* Reduced motion guard for Echo FAB */
-@media (prefers-reduced-motion: reduce) {
-  .echo-pulse, .echo-press { 
-    animation: none !important; 
-    transition: none !important; 
-  }
 }

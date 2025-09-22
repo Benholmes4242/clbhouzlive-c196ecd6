@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
-import EchoFab from '@/components/echo/EchoFab';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -110,9 +109,6 @@ const ProfilePage = () => {
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
-
-      {/* Echo FAB */}
-      <EchoFab onClick={() => console.log('Echo clicked')} />
       
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
     </div>

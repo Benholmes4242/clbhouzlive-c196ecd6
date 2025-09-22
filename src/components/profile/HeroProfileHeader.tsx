@@ -744,9 +744,9 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
+                absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
-                w-full
+                w-[90%] md:w-[80%] max-w-[800px]
                 rounded-2xl border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
@@ -884,9 +884,9 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
+                absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
-                w-full
+                w-[90%] md:w-[80%] max-w-[800px]
                 rounded-2xl border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
