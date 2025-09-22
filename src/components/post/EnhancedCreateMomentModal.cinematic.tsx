@@ -302,54 +302,26 @@ export default function EnhancedCreateMomentModalCinematic({
                     <X className="w-4 h-4 text-white" />
                   </button>
 
-                  {/* Media metadata pills - top left, aligned with cover pill */}
-                  <div className="absolute top-6 left-6 flex items-center gap-2">
-                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                      <span>{activeIndex + 1}/{media.length}</span>
-                    </div>
-                    {media[activeIndex]?.type === 'video' && (
+                  {/* Video duration pill - top left */}
+                  {media[activeIndex]?.type === 'video' && (
+                    <div className="absolute top-6 left-6">
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
-                    )}
+                    </div>
+                  )}
+
+                  {/* Media counter - top right, aligned with cover badge */}
+                  <div className="absolute top-6 right-16">
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                      <span>{activeIndex + 1}/{media.length}</span>
+                    </div>
                   </div>
 
-                  {/* Navigation arrows */}
-                  {canSlide && (
-                    <>
-                      <button
-                        onClick={prevMedia}
-                        disabled={activeIndex === 0}
-                        className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 
-                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                 flex items-center justify-center hover:bg-white/18 
-                                 active:scale-[0.98] transition-all duration-200
-                                 ${activeIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        aria-label="Previous media"
-                      >
-                        <ChevronLeft className="h-5 w-5 text-white" />
-                      </button>
-
-                      <button
-                        onClick={nextMedia}
-                        disabled={activeIndex === media.length - 1}
-                        className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 
-                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                 flex items-center justify-center hover:bg-white/18 
-                                 active:scale-[0.98] transition-all duration-200
-                                 ${activeIndex === media.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        aria-label="Next media"
-                      >
-                        <ChevronRight className="h-5 w-5 text-white" />
-                      </button>
-                    </>
-                  )}
                 </section>
 
                 {/* CONTROLS SECTION - compact bottom area */}
-                <section className="flex-shrink-0 px-6 pb-6 space-y-3">
+                <section className="flex-shrink-0 px-6 pb-6 pt-4 space-y-3">
                   {/* SLIDING CARDS CONTAINER - more compact */}
                   <div className="relative h-[120px] overflow-hidden">
                     {/* CAPTION CARD */}
@@ -448,7 +420,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <div className="flex gap-2">
                     <button
                       onClick={() => setActiveCard('caption')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'caption'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -458,23 +430,23 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('course')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'course'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
                       }`}
                     >
-                      🌍 Add golf course
+                      Tag a course
                     </button>
                     <button
                       onClick={() => setActiveCard('music')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         activeCard === 'music'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
                       }`}
                     >
-                      ▶ Add music
+                      Add music
                     </button>
                   </div>
 
