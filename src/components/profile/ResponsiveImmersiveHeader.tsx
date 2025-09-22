@@ -67,18 +67,7 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
         />
       )}
 
-
-      {/* Desktop: Minimal overlay removed for liquid glass header */}
-
-      {/* Mobile: Subtle overlay */}
-      {isMobile && (
-        <div className="absolute inset-0 bg-black/20" />
-      )}
-
-      {/* Blur overlay for desktop when collapsed */}
-      {!isMobile && isCollapsed && (
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/20" />
-      )}
+      {/* All dark overlays removed for liquid glass header */}
     </div>
   );
 };
