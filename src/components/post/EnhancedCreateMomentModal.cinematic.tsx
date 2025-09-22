@@ -125,6 +125,28 @@ export default function EnhancedCreateMomentModalCinematic({
     startX.current = null;
   };
 
+  // Measure and set media height so it ends just beneath the caption,
+  // leaving only a small CAPTION_OVERLAP_PX overlap.
+  useLayoutEffect(() => {
+    const el = wrapperRef.current;
+    const cap = captionRef.current;
+    if (!el || !cap) return;
+
+    const measure = () => {
+      const wrapperH = el.clientHeight;
+      const captionH = cap.clientHeight;
+      // media area should be wrapper height minus caption height + small overlap
+      const h = Math.max(120, wrapperH - (captionH - CAPTION_OVERLAP_PX));
+      setMediaHeight(h);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    ro.observe(cap);
+    return () => ro.disconnect();
+  }, []);
+
   // Keyboard handlers
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -213,14 +235,14 @@ export default function EnhancedCreateMomentModalCinematic({
             onClick={close}
           />
 
-          {/* Modal Container */}
-          <div className="absolute inset-0 flex items-center justify-center p-4" onClick={close}>
+          {/* shell */}
+          <div className="absolute inset-0 flex items-center justify-center p-6 pt-20" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="mx-auto w-full max-w-[680px] bg-[var(--cm-surface)] rounded-xl shadow-sm overflow-hidden"
+              className="w-full max-w-md liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -234,29 +256,47 @@ export default function EnhancedCreateMomentModalCinematic({
                 }
               }
               onClick={(e) => e.stopPropagation()}
-              style={{
-                '--cm-surface': 'hsl(var(--surface-light))',
-                '--cm-card': 'hsl(var(--card-light))',
-                '--cm-border': 'hsl(var(--border-soft-light))',
-                '--cm-text': 'hsl(var(--text-primary))',
-                '--cm-muted': 'hsl(var(--text-secondary))',
-                '--cm-accent': 'hsl(var(--accent-orange))',
-                '--cm-accent-contrast': 'hsl(var(--on-accent))'
-              } as React.CSSProperties}
             >
-              <div className="space-y-6 px-4 pb-6">
-                {/* Close button - positioned absolute top-right */}
-                <button 
-                  onClick={close} 
-                  aria-label="Close" 
-                  className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-[var(--cm-card)] border border-[var(--cm-border)] hover:bg-[var(--cm-border)] active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-[var(--cm-accent)] focus:outline-none"
-                >
-                  <X className="w-4 h-4 text-[var(--cm-text)]" />
-                </button>
+              <div className="flex h-full flex-col">
+                {/* Header with close button */}
+                <div className="px-6 pt-6 pb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
+                    </div>
+                    <button 
+                      onClick={close} 
+                      aria-label="Close" 
+                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  {/* Contextual helper line */}
+                  <div 
+                    className="text-sm text-white/70"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    Share your golf moment with the community ⛳️
+                  </div>
+                </div>
 
-                {/* Media Strip */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="relative">
+                {/* MEDIA SECTION */}
+                <section id="media" className="relative flex-1 overflow-hidden px-6">
+                  <motion.div
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                    transition={prefersReducedMotion ? 
+                      { delay: 0.05, duration: 0.15 } : 
+                      { 
+                        delay: 0.1, 
+                        duration: 0.3,
+                        staggerChildren: 0.04
+                      }
+                    }
+                    className="h-full w-full"
+                  >
                     <MediaCarousel
                       items={media.map((item, index) => ({
                         id: item.id,
@@ -272,153 +312,206 @@ export default function EnhancedCreateMomentModalCinematic({
                       coverIndex={coverIndex}
                       enableSwipe
                       loop={false}
-                      className="h-80 w-full rounded-xl"
+                      className="h-full w-full rounded-b-xl"
                     />
-                    
-                    {/* Media metadata pills */}
-                    <div className="absolute top-2 left-2 flex items-center gap-2">
-                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                        <span>{activeIndex + 1}/{media.length}</span>
-                      </div>
+                  </motion.div>
+
+                  {/* Media metadata pills - top left, aligned with cover pill */}
+                  <div className="absolute top-2 left-20 flex items-center gap-2">
+                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                      <span>{activeIndex + 1}/{media.length}</span>
                     </div>
-
-                    {/* Navigation arrows */}
-                    {canSlide && (
-                      <>
-                        <button
-                          onClick={prevMedia}
-                          disabled={activeIndex === 0}
-                          className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 
-                                     h-10 w-10 rounded-full bg-white/80 backdrop-blur-md 
-                                     border border-[var(--cm-border)] shadow-sm
-                                     flex items-center justify-center hover:bg-white
-                                     active:scale-[0.98] transition-all duration-200
-                                     ${activeIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          aria-label="Previous media"
-                        >
-                          <ChevronLeft className="h-5 w-5 text-[var(--cm-text)]" />
-                        </button>
-
-                        <button
-                          onClick={nextMedia}
-                          disabled={activeIndex === media.length - 1}
-                          className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 
-                                     h-10 w-10 rounded-full bg-white/80 backdrop-blur-md 
-                                     border border-[var(--cm-border)] shadow-sm
-                                     flex items-center justify-center hover:bg-white
-                                     active:scale-[0.98] transition-all duration-200
-                                     ${activeIndex === media.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          aria-label="Next media"
-                        >
-                          <ChevronRight className="h-5 w-5 text-[var(--cm-text)]" />
-                        </button>
-                      </>
+                    {media[activeIndex]?.type === 'video' && (
+                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
+                        <span>00:09</span>
+                      </div>
                     )}
                   </div>
+
+                  {/* Navigation arrows */}
+                  {canSlide && (
+                    <>
+                      <button
+                        onClick={prevMedia}
+                        disabled={activeIndex === 0}
+                        className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 
+                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
+                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+                                 flex items-center justify-center hover:bg-white/18 
+                                 active:scale-[0.98] transition-all duration-200
+                                 ${activeIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        aria-label="Previous media"
+                      >
+                        <ChevronLeft className="h-5 w-5 text-white" />
+                      </button>
+
+                      <button
+                        onClick={nextMedia}
+                        disabled={activeIndex === media.length - 1}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 
+                                 h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
+                                 border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
+                                 flex items-center justify-center hover:bg-white/18 
+                                 active:scale-[0.98] transition-all duration-200
+                                 ${activeIndex === media.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        aria-label="Next media"
+                      >
+                        <ChevronRight className="h-5 w-5 text-white" />
+                      </button>
+                    </>
+                  )}
                 </section>
 
-                {/* Add a caption card */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[var(--cm-text)] font-medium">Add a caption</h3>
-                    <button
-                      onClick={handleAICaption}
-                      disabled={aiLoading || media.length === 0}
-                      className="h-8 px-3 rounded-full border border-[var(--cm-border)] text-[var(--cm-text)]/80 hover:text-[var(--cm-text)] hover:border-[var(--cm-accent)] transition-all duration-200 text-sm disabled:opacity-50"
-                      aria-label="Generate AI caption"
-                    >
-                      {aiLoading ? <StarsLoading /> : (
-                        <div className="flex items-center gap-1.5">
-                          <Sparkles className="h-3.5 w-3.5" />
-                          <span>AI Caption</span>
+                {/* CONTROLS SECTION */}
+                <section className="px-6 pb-6 space-y-3">
+                  {/* CAPTION CARD */}
+                  <motion.div
+                    ref={captionRef}
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 30,
+                      delay: 0
+                    }}
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <label className="block text-base font-semibold text-white">Add a caption</label>
+                      <button
+                        onClick={handleAICaption}
+                        disabled={aiLoading || media.length === 0}
+                        className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                        aria-label="Write a caption for me"
+                      >
+                        {aiLoading ? <StarsLoading /> : (
+                          <div className="flex items-center gap-1.5">
+                            <Sparkles className="h-3.5 w-3.5" />
+                            <span className="font-medium">AI Caption</span>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
+                    <div className="flex items-start gap-2">
+                      <textarea
+                        className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
+                        placeholder="Write a caption…"
+                        value={caption}
+                        onChange={(e) => {
+                          setCaption(e.target.value);
+                          // Auto-expand textarea
+                          e.target.style.height = 'auto';
+                          e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
+                        }}
+                        style={{ height: 'auto' }}
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* Course Tag Card */}
+                  <motion.div
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 relative z-[9999]"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 30,
+                      delay: 0.08
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
+                        <BarChart3 className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-base text-white">Tag a golf course</h3>
                         </div>
-                      )}
-                    </button>
-                  </div>
-                  <textarea
-                    className="w-full h-12 bg-transparent border-none outline-none resize-none placeholder-[var(--cm-muted)] text-[var(--cm-text)] text-sm leading-relaxed"
-                    placeholder="What's happening in your golf moment?"
-                    value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
-                  />
-                </section>
-
-                {/* Tag a golf course card */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm relative z-[9999]">
-                  <h3 className="text-[var(--cm-text)] font-medium mb-3">Tag a golf course</h3>
-                  <div className="relative">
-                    <CourseTagInput
-                      selectedCourse={course}
-                      onCourseSelect={onCourseSelect || setSelectedCourse}
-                      placeholder="Start typing to find a course..."
-                    />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--cm-muted)]">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Background music card */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[var(--cm-border)] border border-[var(--cm-border)] flex items-center justify-center">
-                      <Play className="w-5 h-5 text-[var(--cm-text)]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-[var(--cm-text)] font-medium mb-1">Background music</h3>
-                      <p className="text-sm text-[var(--cm-muted)] mb-3">Popular golf tracks today</p>
-                      <div className="flex items-center gap-2 text-sm">
-                        <button className="text-[var(--cm-accent)] hover:underline">Preview</button>
-                        <span className="text-[var(--cm-muted)]">·</span>
-                        <button className="text-[var(--cm-accent)] hover:underline">Browse</button>
+                        <p className="text-sm text-white/70 mb-3">Let others know where you played</p>
+                        <CourseTagInput
+                          selectedCourse={course}
+                          onCourseSelect={onCourseSelect || setSelectedCourse}
+                          placeholder="Start typing to find a course..."
+                        />
                       </div>
                     </div>
-                  </div>
-                </section>
+                  </motion.div>
 
-                {/* Visibility segment control */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="rounded-full border border-[var(--cm-border)] p-1 flex">
-                    <button
-                      onClick={() => setVisibility("public")}
-                      className={`flex-1 h-10 rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                        visibility === "public"
-                          ? "bg-[var(--cm-accent)] text-[var(--cm-accent-contrast)]"
-                          : "bg-transparent text-[var(--cm-text)] opacity-70 hover:opacity-100"
-                      }`}
+                  {/* Music Card */}
+                  <motion.div
+                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 30,
+                      delay: 0.16
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
+                        <Play className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-base text-white">Background music</h3>
+                        </div>
+                        <p className="text-sm text-white/70 mb-3">Popular golf tracks today</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              // TODO: Preview music
+                              console.log("Music preview clicked");
+                            }}
+                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
+                            aria-label="Preview music"
+                          >
+                            Preview
+                          </button>
+                          <span className="text-white/30">•</span>
+                          <button
+                            onClick={() => {
+                              // TODO: Background music selector
+                              console.log("Music selector clicked");
+                            }}
+                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
+                            aria-label="Browse music library"
+                          >
+                            Browse
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+
+                  {/* Post button - Quick Post style from Snap Modal */}
+                  <motion.div
+                    className="mt-4 pt-4 border-t border-white/10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <motion.button
+                      disabled={!canPost}
+                      onClick={handlePost}
+                      className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                      aria-label="Post your moment"
                     >
                       <div className="flex items-center justify-center gap-2">
-                        <Globe className="w-4 h-4" />
-                        <span>Public</span>
+                        <span className="text-sm font-medium text-brand-orange">
+                          {isSubmitting ? "Posting..." : "Post"}
+                        </span>
                       </div>
-                    </button>
-                    <button
-                      onClick={() => setVisibility("private")}
-                      className={`flex-1 h-10 rounded-full px-4 text-sm font-medium transition-all duration-200 ${
-                        visibility === "private"
-                          ? "bg-[var(--cm-accent)] text-[var(--cm-accent-contrast)]"
-                          : "bg-transparent text-[var(--cm-text)] opacity-70 hover:opacity-100"
-                      }`}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <Lock className="w-4 h-4" />
-                        <span>Private Archive</span>
-                      </div>
-                    </button>
-                  </div>
+                    </motion.button>
+                  </motion.div>
                 </section>
-
-                {/* Post button */}
-                <button
-                  onClick={handlePost}
-                  disabled={!canPost}
-                  className="w-full h-14 rounded-xl bg-[var(--cm-accent)] text-[var(--cm-accent-contrast)] font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Posting...' : 'Post'}
-                </button>
               </div>
             </motion.div>
           </div>
@@ -433,3 +526,119 @@ export default function EnhancedCreateMomentModalCinematic({
     </AnimatePresence>
   );
 }
+
+// Segmented Control Component - matches Snap Modal style
+interface SegmentedOption {
+  value: string;
+  label: string;
+  icon: React.ComponentType<any>;
+}
+
+interface SegmentedProps {
+  options: SegmentedOption[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const Segmented = ({ options, value, onChange }: SegmentedProps) => {
+  return (
+    <div className="flex rounded-lg bg-white/5 border border-white/10 p-1">
+      {options.map((option) => {
+        const isActive = value === option.value;
+        const Icon = option.icon;
+        
+        return (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/30'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            <span>{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+// Enhanced Media Carousel Component - simplified for this modal
+interface EnhancedMediaCarouselProps {
+  items: Array<{
+    id: string;
+    type: 'image' | 'video';
+    previewUrl?: string;
+    url?: string;
+    file?: File;
+  }>;
+  activeIndex: number;
+  onIndexChange: (index: number) => void;
+  onClose?: () => void;
+}
+
+const EnhancedMediaCarousel = ({ 
+  items, 
+  activeIndex, 
+  onIndexChange, 
+  onClose 
+}: EnhancedMediaCarouselProps) => {
+  const currentItem = items[activeIndex];
+  
+  if (!currentItem) return null;
+
+  const imageUrl = currentItem.previewUrl || currentItem.url || (currentItem.file ? URL.createObjectURL(currentItem.file) : '');
+
+  return (
+    <div className="relative w-full h-full bg-black rounded-xl overflow-hidden">
+      {/* Close button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 flex items-center justify-center transition-all duration-200"
+        >
+          <X className="w-4 h-4 text-white" />
+        </button>
+      )}
+
+      {/* Media display */}
+      <div className="w-full h-full flex items-center justify-center">
+        {currentItem.type === 'video' ? (
+          <video
+            src={imageUrl}
+            className="max-w-full max-h-full object-contain"
+            controls
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={`Media item ${currentItem.id}`}
+            className="max-w-full max-h-full object-contain"
+          />
+        )}
+      </div>
+
+      {/* Navigation dots */}
+      {items.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+          {items.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => onIndexChange(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                index === activeIndex
+                  ? 'bg-white'
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

@@ -382,34 +382,53 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
             onClick={onClose}
           />
           
-          {/* Modal - V1 Layout with New Colors */}
+          {/* Modal */}
           <div 
-            className="relative mx-auto w-full max-w-[680px] bg-[var(--cm-surface)] rounded-xl shadow-sm pb-6 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
-            style={{
-              '--cm-surface': '#ffffff',
-              '--cm-card': '#ffffff', 
-              '--cm-border': '#e5e7eb',
-              '--cm-text': '#111827',
-              '--cm-muted': '#6b7280',
-              '--cm-accent': '#f97316',
-              '--cm-accent-contrast': '#ffffff'
-            } as React.CSSProperties}
+            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              {modalMode === 'upload' && (
+                <button
+                  onClick={handleBackToSelection}
+                  className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Back to selection"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+              {modalMode === 'selection' && <div className="w-6 h-6" />}
+              <h2 className="text-lg font-bold text-center flex-1">
+                {editMode ? 'Edit Moment' : 'Create a Moment'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close modal"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
             {modalMode === 'selection' ? (
               /* Action Selection View */
-              <div className="px-4 space-y-6">
+              <div className="space-y-6">
                 
                 {/* Capture Photo or Video - Mobile Only */}
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 p-5 bg-[var(--cm-card)] border border-[var(--cm-border)] hover:bg-gray-50 text-[var(--cm-text)] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--cm-accent)] focus:ring-offset-2 cursor-pointer shadow-sm"
+                    className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                     disabled={isSubmitting}
                     aria-label="Open camera to record in real-time"
                     tabIndex={0}
                   >
-                    <Camera className="h-6 w-6 text-[var(--cm-text)] flex-shrink-0" />
+                    <Camera className="h-6 w-6 text-[#222222] flex-shrink-0" />
                     <div className="text-left flex-1">
                       <div className="text-base font-medium">Capture Photo or Video</div>
                     </div>
@@ -419,12 +438,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 p-5 bg-[var(--cm-card)] border border-[var(--cm-border)] hover:bg-gray-50 text-[var(--cm-text)] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--cm-accent)] focus:ring-offset-2 cursor-pointer shadow-sm"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Choose saved images from your gallery"
                   tabIndex={0}
                 >
-                  <Image className="h-6 w-6 text-[var(--cm-text)] flex-shrink-0" />
+                  <Image className="h-6 w-6 text-[#222222] flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Photos from Gallery</div>
                   </div>
@@ -433,27 +452,27 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 p-5 bg-[var(--cm-card)] border border-[var(--cm-border)] hover:bg-gray-50 text-[var(--cm-text)] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--cm-accent)] focus:ring-offset-2 cursor-pointer shadow-sm"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Upload pre-recorded golf clips"
                   tabIndex={0}
                 >
-                  <Video className="h-6 w-6 text-[var(--cm-text)] flex-shrink-0" />
+                  <Video className="h-6 w-6 text-[#222222] flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Videos from Gallery</div>
                   </div>
                 </button>
 
                 {/* Helper Text */}
-                <p className="text-xs text-[var(--cm-muted)] mt-4 px-1 text-center">
+                <p className="text-xs text-gray-500 mt-4 px-1 text-center">
                   Select multiple files to create a carousel post with swipeable media.
                 </p>
 
                 {/* Cancel Button */}
-                <div className="mt-6 pt-4 border-t border-[var(--cm-border)]">
+                <div className="mt-6 pt-4 border-t border-gray-100">
                   <button
                     onClick={onClose}
-                    className="w-full text-center py-3 text-[var(--cm-text)] text-base font-medium hover:text-[var(--cm-muted)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--cm-accent)] focus:ring-offset-2 rounded-lg"
+                    className="w-full text-center py-3 text-black text-base font-medium hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded-lg"
                     tabIndex={0}
                     aria-label="Cancel and close modal"
                   >
@@ -462,11 +481,36 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 </div>
               </div>
             ) : (
-              /* Upload View - V1 Layout Structure */
-              <div className="space-y-4 px-4">
+              /* Upload View - Reorganized with better hierarchy and spacing */
+              <div className="space-y-6">
 
-                {/* 1. Media Strip with 1/1 Badge */}
-                <div className="mb-4">
+                {/* 1. Selected Media Preview - Taller Header */}
+                <div className="mb-6">
+                  {/* Media Header Container - Taller and Better Proportions */}
+                  <div className="relative h-[58vh] max-h-[720px] min-h-[360px] bg-black rounded-xl overflow-hidden mb-4">
+                    {files.length > 0 && (
+                      <>
+                        {files[0].type.startsWith('video') ? (
+                          <video 
+                            src={URL.createObjectURL(files[0])} 
+                            className="h-full w-full object-cover" 
+                            muted 
+                            loop 
+                            autoPlay 
+                          />
+                        ) : (
+                          <img 
+                            src={URL.createObjectURL(files[0])} 
+                            alt="" 
+                            className="h-full w-full object-cover" 
+                          />
+                        )}
+                        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+                      </>
+                    )}
+                  </div>
+                  
                   <EnhancedMediaUpload
                     onFilesChange={setFiles}
                     maxFiles={10}
@@ -477,47 +521,57 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     autoUpload={true}
                     data-testid="media-upload"
                     aria-label="Upload media files"
-                    className={`focus:outline-none focus:ring-2 focus:ring-[var(--cm-accent)] focus:ring-offset-2 rounded-xl ${validationErrors.media ? 'animate-shake border-red-300' : ''}`}
+                    className={`focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 rounded-xl ${validationErrors.media ? 'animate-shake border-red-300' : ''}`}
                   />
                   {/* Validation Error for Media */}
                   {validationErrors.media && (
                     <div className="mt-2 animate-fade-in">
-                      <p className="text-sm text-red-600 flex items-center gap-1">
+                      <p className="text-sm text-[#d9534f] flex items-center gap-1">
                         ⚠️ {validationErrors.media}
                       </p>
                     </div>
                   )}
                 </div>
 
-                {/* 2. Add a Caption Card */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-[var(--cm-text)]">
-                      Add a caption
-                    </label>
-                    <button
-                      onClick={handleAICaption}
-                      disabled={aiLoading || files.length === 0}
-                      className="h-8 px-3 rounded-full border border-[var(--cm-border)] text-[var(--cm-text)]/80 hover:text-[var(--cm-text)] transition-colors disabled:opacity-50 text-sm"
-                      aria-label="AI Caption"
-                    >
-                      {aiLoading ? "..." : "AI Caption"}
-                    </button>
+                {/* Floating card stack wrapper (reduce overlap) */}
+                <div className="space-y-3 p-4 -mt-4">
+
+                {/* Divider Line */}
+                <div className="border-t border-gray-100 -mx-6" />
+
+                {/* 2. Caption Field - with AI assistant and proper spacing */}
+                <div className="space-y-4 pt-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Add a caption
+                      </label>
+                      <button
+                        onClick={handleAICaption}
+                        disabled={aiLoading || files.length === 0}
+                        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        aria-label="Write a caption for me"
+                      >
+                        {aiLoading ? "..." : "✨ Write a caption for me"}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <EnhancedRichTextInput
+                        value={caption}
+                        onChange={handleCaptionChange}
+                        onTagsChange={setSelectedTags}
+                        placeholder="Write about your moment..."
+                        selectedTags={selectedTags}
+                        disabled={isSubmitting}
+                        aria-label="Caption input for your moment"
+                        className=""
+                      />
+                    </div>
                   </div>
-                  <EnhancedRichTextInput
-                    value={caption}
-                    onChange={handleCaptionChange}
-                    onTagsChange={setSelectedTags}
-                    placeholder="Write about your moment..."
-                    selectedTags={selectedTags}
-                    disabled={isSubmitting}
-                    aria-label="Caption input for your moment"
-                    className="min-h-[48px]"
-                  />
-                  
+
                   {/* Selected Tags Display */}
                   {selectedTags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
+                    <div className="flex flex-wrap gap-2 mt-4">
                       {selectedTags.map((tag) => (
                         <div
                           key={tag.id}
@@ -534,95 +588,96 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       ))}
                     </div>
                   )}
-                </section>
+                </div>
 
-                {/* 3. Tag a Golf Course Card */}
+                {/* 3. Golf Course Field - with centered pin and proper z-index */}
                 {onCourseSelect && (
-                  <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm relative z-[300]">
-                    <label className="text-sm font-medium text-[var(--cm-text)] mb-3 block">
+                  <div className="space-y-4 pt-6 relative z-[300]">
+                    <label className="block text-sm font-medium text-gray-700">
                       Tag a golf course
+                      <span className="text-gray-400 text-xs ml-1">(Optional)</span>
                     </label>
-                    <div className="relative">
+                    <div className="max-w-full overflow-visible">
                       <CourseTagInput
                         selectedCourse={selectedCourse || null}
                         onCourseSelect={onCourseSelect}
                         placeholder="Start typing to find a course..."
                       />
                     </div>
-                  </section>
+                  </div>
                 )}
 
-                {/* 4. Background Music Card */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <BackgroundMusicSelector
-                    onMusicSelect={setBackgroundMusic}
+                {/* 3.7. Background Music Selector */}
+                <BackgroundMusicSelector
+                  onMusicSelect={setBackgroundMusic}
+                  disabled={isSubmitting}
+                  hasVideo={files.some(file => file.type.startsWith('video/'))}
+                />
+
+
+                {/* Divider Line before buttons */}
+                <div className="border-t border-gray-100 -mx-6 mt-8" />
+
+                {/* 5. Action Buttons - with enhanced styling and animations */}
+                <div className="flex gap-3 justify-end pt-6">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
                     disabled={isSubmitting}
-                    hasVideo={files.some(file => file.type.startsWith('video/'))}
-                  />
-                </section>
-
-                {/* 5. Visibility Segment Control */}
-                <section className="rounded-xl bg-[var(--cm-card)] border border-[var(--cm-border)] p-4 shadow-sm">
-                  <div className="rounded-full border border-[var(--cm-border)] p-1 bg-gray-50">
-                    <div className="flex">
-                      <button
-                        onClick={() => setVisibility("public")}
-                        className={`flex-1 h-10 rounded-full text-sm font-medium transition-all ${
-                          visibility === "public" 
-                            ? 'bg-[var(--cm-accent)] text-[var(--cm-accent-contrast)] shadow-sm' 
-                            : 'text-[var(--cm-text)]/70 hover:text-[var(--cm-text)]'
-                        }`}
-                      >
-                        Public
-                      </button>
-                      <button
-                        onClick={() => setVisibility("private")}
-                        className={`flex-1 h-10 rounded-full text-sm font-medium transition-all ${
-                          visibility === "private" 
-                            ? 'bg-[var(--cm-accent)] text-[var(--cm-accent-contrast)] shadow-sm' 
-                            : 'text-[var(--cm-text)]/70 hover:text-[var(--cm-text)]'
-                        }`}
-                      >
-                        Private Archive
-                      </button>
-                    </div>
-                  </div>
-                </section>
-
-                {/* 6. Post Button */}
-                <div className="pt-2">
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-                    aria-label="Post your moment"
-                    className="w-full h-14 rounded-xl text-[var(--cm-accent-contrast)] font-semibold transition-all duration-200 disabled:opacity-40"
-                    style={{ 
-                      backgroundColor: 'var(--cm-accent)'
-                    }}
+                    className="px-6 py-2.5 text-sm font-medium hover-scale"
                   >
-                    {isSubmitting ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>{editMode ? 'Updating...' : 'Posting...'}</span>
-                      </div>
-                    ) : (
-                      <span>
-                        {editMode 
-                          ? 'Update' 
-                          : `Post${files.length > 0 ? ` (${files.length} file${files.length > 1 ? 's' : ''})` : ''}`
-                        }
-                      </span>
-                    )}
-                  </button>
+                    Cancel
+                  </Button>
                   
-                  {/* Error message display */}
-                  {submitError && (
-                    <div className="mt-2 animate-fade-in">
-                      <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
-                        {submitError}
-                      </p>
-                    </div>
-                  )}
+                  {/* Enhanced Post Button with Echo Gradient */}
+                  <div className="relative">
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
+                      aria-label="Post your moment"
+                      className="relative w-full h-12 rounded-2xl text-white overflow-hidden disabled:opacity-50 transition-all duration-200 ease-out hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                      style={{ 
+                        background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))',
+                        minWidth: '140px'
+                      }}
+                    >
+                      {/* Shimmer animation while submitting */}
+                      {isSubmitting && (
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
+                            animation: 'shimmer 1.1s ease linear infinite',
+                            backgroundSize: '200% 100%'
+                          }}
+                        />
+                      )}
+                      
+                      {isSubmitting ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>{editMode ? 'Updating...' : 'Posting...'}</span>
+                        </div>
+                      ) : (
+                        <span className="transition-all duration-200">
+                          {editMode 
+                            ? 'Update' 
+                            : `Post${files.length > 0 ? ` (${files.length} file${files.length > 1 ? 's' : ''})` : ''}`
+                          }
+                        </span>
+                      )}
+                    </button>
+                    
+                    {/* Error message display */}
+                    {submitError && (
+                      <div className="absolute top-full left-0 right-0 mt-2 animate-fade-in">
+                        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                          {submitError}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 </div>
               </div>
             )}
