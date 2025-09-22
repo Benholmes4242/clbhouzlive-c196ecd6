@@ -87,7 +87,7 @@ const GlobalHeader: React.FC = () => {
               "transition-all duration-300",
               // Variant-specific backgrounds
               isGlassDark && "backdrop-blur-md bg-black/60",
-              isSolidLight && "backdrop-blur-md bg-white/30 border-b border-white/20"
+              isSolidLight && "bg-white/10 backdrop-blur-2xl border-b border-white/20"
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
