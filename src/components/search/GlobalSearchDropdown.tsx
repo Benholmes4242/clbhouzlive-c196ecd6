@@ -340,7 +340,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     <div
       ref={dropdownRef}
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[9999]",
+        "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[330]",
         "rounded-2xl liquid-glass liquid-glass--elevated liquid-glass--dropdown",
         "text-left max-h-[70vh] overflow-auto",
         "md:max-h-[72vh] md:rounded-2xl",
@@ -384,48 +384,46 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
 
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm">
-        <div className="absolute inset-x-0 top-[4rem] bottom-0 flex flex-col">
-          <div className="liquid-glass liquid-glass--elevated rounded-t-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">{/* Changed positioning to start from 4rem (64px) from top */}
-            {/* Mobile header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white">Search</h2>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
-              >
-                <X className="h-5 w-5 text-white/70" />
-              </button>
-            </div>
-
-            {isLoading && query.trim() && <LoadingShimmer />}
-            {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
-            {!isLoading && query.trim() && results.length > 0 && (
-              <>
-                <ResultSection 
-                  title="People" 
-                  items={groupedResults.people} 
-                  icon={<User className="h-3 w-3" />}
-                />
-                <ResultSection 
-                  title="Clubs & Courses" 
-                  items={groupedResults.clubs_courses} 
-                  icon={<MapPin className="h-3 w-3" />}
-                />
-                <ResultSection 
-                  title="Pages & Channels" 
-                  items={groupedResults.pages_channels} 
-                  icon={<Building className="h-3 w-3" />}
-                />
-              </>
-            )}
-            {!isLoading && !query.trim() && (
-              <>
-                {recentSearches.length > 0 && <RecentSearchesSection />}
-                {popularItems.length > 0 && <TrendingSection />}
-              </>
-            )}
+      <div className="fixed inset-x-0 top-16 bottom-0 z-[330] pointer-events-auto">
+        <div className="liquid-glass liquid-glass--elevated rounded-t-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">
+          {/* Mobile header */}
+          <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <h2 className="text-lg font-semibold text-white">Search</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <X className="h-5 w-5 text-white/70" />
+            </button>
           </div>
+
+          {isLoading && query.trim() && <LoadingShimmer />}
+          {!isLoading && query.trim() && results.length === 0 && <EmptyState />}
+          {!isLoading && query.trim() && results.length > 0 && (
+            <>
+              <ResultSection 
+                title="People" 
+                items={groupedResults.people} 
+                icon={<User className="h-3 w-3" />}
+              />
+              <ResultSection 
+                title="Clubs & Courses" 
+                items={groupedResults.clubs_courses} 
+                icon={<MapPin className="h-3 w-3" />}
+              />
+              <ResultSection 
+                title="Pages & Channels" 
+                items={groupedResults.pages_channels} 
+                icon={<Building className="h-3 w-3" />}
+              />
+            </>
+          )}
+          {!isLoading && !query.trim() && (
+            <>
+              {recentSearches.length > 0 && <RecentSearchesSection />}
+              {popularItems.length > 0 && <TrendingSection />}
+            </>
+          )}
         </div>
       </div>
     );

@@ -165,7 +165,7 @@ const GlobalHeader: React.FC = () => {
             
             {/* Search pill overlay */}
             <motion.div 
-              className="absolute inset-x-0 top-0 p-3"
+              className="absolute inset-x-0 top-0 p-3 z-[320]"
               initial={{ y: -100 }}
               animate={{ y: 0 }}
               exit={{ y: -100 }}
@@ -174,15 +174,13 @@ const GlobalHeader: React.FC = () => {
                 paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
               }}
             >
-              <div className="rounded-full liquid-glass liquid-glass--elevated">
-                <SearchPill 
-                  autoFocus 
-                  onClose={() => setSearchOpen(false)}
-                  placeholder="Search clbhouz..."
-                  variant="glass-dark"
-                  isClubhousePage={isClubhousePage}
-                />
-              </div>
+              <SearchPill 
+                autoFocus 
+                onClose={() => setSearchOpen(false)}
+                placeholder="Search clbhouz..."
+                variant="glass-dark"
+                isClubhousePage={isClubhousePage}
+              />
             </motion.div>
           </motion.div>
         )}
