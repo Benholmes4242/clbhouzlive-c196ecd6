@@ -564,9 +564,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     // Check if we should use multi-phase analysis
     if (useMultiPhase && uploadedVideo?.type.startsWith('video/')) {
       try {
-        // Start multi-phase session
+        // Start multi-phase session with video file for frame extraction
         await startSession({ 
           videoUrl: videoPreview,
+          videoFile: uploadedVideo, // Pass the actual video file
           // TODO: Add uploadId when implementing actual file upload
         });
         

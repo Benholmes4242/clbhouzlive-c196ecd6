@@ -1,10 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { SessionState, PhaseName } from '@/types/swingSession';
+import { extractFramesFromVideo, ExtractedFrame } from '@/utils/videoFrameExtraction';
 
 export class AnalysisSessionService {
   private static PROJECT_URL = 'https://ybxkehyomcakqjvuhnna.supabase.co';
 
-  static async startSession(params: { uploadId?: string; videoUrl?: string }): Promise<SessionState> {
+  static async startSession(params: { uploadId?: string; videoUrl?: string; videoFile?: File }): Promise<SessionState> {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
       throw new Error('Not authenticated');
@@ -31,11 +32,25 @@ export class AnalysisSessionService {
       phases[phase] = { status: 'idle' };
     });
 
+    // Extract real frames if video file is provided
+    let frames = data.frames;
+    if (params.videoFile) {
+      try {
+        console.log('Extracting frames from uploaded video...');
+        const extractedFrames = await extractFramesFromVideo(params.videoFile, 20);
+        frames = extractedFrames;
+        console.log(`Successfully extracted ${frames.length} frames for analysis`);
+      } catch (error) {
+        console.warn('Failed to extract frames, using server frames:', error);
+        // Fall back to server-provided frames (placeholders)
+      }
+    }
+
     return {
       sessionId: data.sessionId,
       phases,
       order: data.phases,
-      frames: data.frames,
+      frames,
     };
   }
 

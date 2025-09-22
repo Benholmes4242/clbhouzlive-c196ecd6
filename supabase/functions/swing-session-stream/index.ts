@@ -77,9 +77,26 @@ serve(async (req) => {
         // Simulate phase processing with realistic timing
         let phaseIndex = 0;
         
-        const processNextPhase = () => {
+        const processNextPhase = async () => {
           if (phaseIndex >= phases.length) {
-            send({ type: 'complete', sessionId, summaryReady: false }, 'complete');
+            // Verify DB shows completion before emitting complete event
+            const { data: rows } = await supabase
+              .from('swing_phase_results')
+              .select('status')
+              .eq('session_id', sessionId);
+
+            const doneCount = (rows ?? []).filter(r => r.status === 'done').length;
+            console.log(`Session ${sessionId}: ${doneCount}/${phases.length} phases completed in DB`);
+            
+            // Only emit complete when DB reflects completion
+            send({ 
+              type: 'complete', 
+              sessionId, 
+              summaryReady: false, 
+              doneCount, 
+              totalPhases: phases.length 
+            }, 'complete');
+            
             clearInterval(keepaliveInterval);
             controller.close();
             return;
@@ -104,41 +121,49 @@ serve(async (req) => {
               }, 'partial');
 
               // Complete phase after brief delay
-              setTimeout(() => {
+              setTimeout(async () => {
                 try {
+                  const metrics = generateMockMetrics(phase);
+                  const tips = [`Improve your ${phase} position by...`];
+                  const visualPlan = {
+                    caption: `${phase.charAt(0).toUpperCase() + phase.slice(1)} analysis shows good form`,
+                    frameHint: getFrameHint(phase),
+                    overlays: {
+                      lines: generateMockLines(phase),
+                      angles: generateMockAngles(phase),
+                      keypoints: generateMockKeypoints(phase)
+                    }
+                  };
+
+                  // 1) Persist to database FIRST
+                  const { error } = await supabase
+                    .from('swing_phase_results')
+                    .update({ 
+                      status: 'done',
+                      used_frame_index: frameIndex,
+                      metrics,
+                      tips,
+                      visual_plan: visualPlan,
+                      finished_at: new Date().toISOString()
+                    })
+                    .eq('session_id', sessionId)
+                    .eq('phase', phase);
+
+                  if (error) {
+                    console.error(`Error updating ${phase}:`, error);
+                    throw error;
+                  }
+
+                  // 2) THEN notify client (after DB write is complete)
                   send({
                     type: 'done',
                     sessionId,
                     phase,
                     frameIndex,
-                    metrics: generateMockMetrics(phase),
-                    tips: [`Improve your ${phase} position by...`],
-                    visualPlan: {
-                      caption: `${phase.charAt(0).toUpperCase() + phase.slice(1)} analysis shows good form`,
-                      frameHint: getFrameHint(phase),
-                      overlays: {
-                        lines: generateMockLines(phase),
-                        angles: generateMockAngles(phase),
-                        keypoints: generateMockKeypoints(phase)
-                      }
-                    }
+                    metrics,
+                    tips,
+                    visualPlan
                   }, 'done');
-
-                  // Update database
-                  supabase
-                    .from('swing_phase_results')
-                    .update({ 
-                      status: 'done',
-                      used_frame_index: frameIndex,
-                      metrics: generateMockMetrics(phase),
-                      tips: [`Improve your ${phase} position by...`],
-                      finished_at: new Date().toISOString()
-                    })
-                    .eq('session_id', sessionId)
-                    .eq('phase', phase)
-                    .then(({ error }) => {
-                      if (error) console.error(`Error updating ${phase}:`, error);
-                    });
 
                   phaseIndex++;
                   setTimeout(processNextPhase, 500); // Brief pause between phases
@@ -161,10 +186,10 @@ serve(async (req) => {
         // Start processing phases
         setTimeout(processNextPhase, 1000);
 
-        // Keepalive every 15 seconds
+        // Keepalive every 15 seconds with no-transform header
         const keepaliveInterval = setInterval(() => {
           try {
-            controller.enqueue(`event: keepalive\ndata: {}\n\n`);
+            controller.enqueue(`event: keepalive\ndata: {"timestamp":"${new Date().toISOString()}"}\n\n`);
           } catch (error) {
             console.error('Error sending keepalive:', error);
             clearInterval(keepaliveInterval);
@@ -189,6 +214,7 @@ serve(async (req) => {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no', // Disable proxy buffering
       }
     });
 

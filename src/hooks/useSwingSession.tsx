@@ -8,7 +8,7 @@ interface UseSwingSessionReturn {
   isLoading: boolean;
   error: string | null;
   analysisId: string | undefined;
-  startSession: (params: { uploadId?: string; videoUrl?: string }) => Promise<void>;
+  startSession: (params: { uploadId?: string; videoUrl?: string; videoFile?: File }) => Promise<void>;
   disconnect: () => void;
 }
 
@@ -21,6 +21,7 @@ export function useSwingSession(): UseSwingSessionReturn {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
   const summarizingRef = useRef(false);
+  const seenDoneEvents = useRef(new Set<string>());
   const { toast } = useToast();
 
   const disconnect = useCallback(() => {
@@ -194,6 +195,7 @@ export function useSwingSession(): UseSwingSessionReturn {
               visualPlan: data.visualPlan
             };
             updated.activeFrameIndex = data.frameIndex;
+            seenDoneEvents.current.add(data.phase);
           }
           break;
 
@@ -219,60 +221,12 @@ export function useSwingSession(): UseSwingSessionReturn {
             return updated;
           }
           
-          // Otherwise call summarize ONCE
-          if (!summarizingRef.current) {
-            summarizingRef.current = true;
-            // Use setTimeout to make this async without blocking the message handler
-            setTimeout(async () => {
-              try {
-                const result = await AnalysisSessionService.summarize(updated.sessionId);
-                setAnalysisId(result.analysisId);
-                setSessionState(prev => prev ? {
-                  ...prev,
-                  summary: {
-                    text: result.text,
-                    createdAt: new Date().toISOString(),
-                    analysisId: result.analysisId,
-                    analysisResults: result.analysisResults
-                  }
-                } : prev);
-                
-                toast({
-                  title: "Analysis Complete",
-                  description: "Your swing analysis is ready with personalized recommendations",
-                });
-              } catch (err: any) {
-                console.error('Summarization failed:', err);
-                if (err?.message?.includes('Insufficient phase data')) {
-                  // Retry once after server hint
-                  setTimeout(async () => {
-                    try {
-                      const result = await AnalysisSessionService.summarize(updated.sessionId);
-                      setAnalysisId(result.analysisId);
-                      setSessionState(prev => prev ? {
-                        ...prev,
-                        summary: {
-                          text: result.text,
-                          createdAt: new Date().toISOString(),
-                          analysisId: result.analysisId,
-                          analysisResults: result.analysisResults
-                        }
-                      } : prev);
-                    } catch (retryErr) {
-                      console.error('Retry summarization failed:', retryErr);
-                    }
-                  }, 4000);
-                } else {
-                  toast({
-                    title: "Analysis Summary Failed",
-                    description: err.message || 'Failed to generate summary',
-                    variant: "destructive"
-                  });
-                }
-              } finally {
-                summarizingRef.current = false;
-              }
-            }, 100);
+          // Check if we can summarize based on server doneCount or client-side done events
+          const canSummarize = (data.doneCount ?? seenDoneEvents.current.size) >= 3;
+          console.log(`Complete event: doneCount=${data.doneCount}, seenDoneEvents=${seenDoneEvents.current.size}, canSummarize=${canSummarize}`);
+          
+          if (canSummarize && !summarizingRef.current) {
+            attemptSummarizeWithBackoff(updated.sessionId);
           }
           break;
       }
@@ -281,9 +235,69 @@ export function useSwingSession(): UseSwingSessionReturn {
     });
   }, [toast, handleSummarization]);
 
-  const startSession = useCallback(async (params: { uploadId?: string; videoUrl?: string }) => {
+  // Enhanced summarization with exponential backoff
+  const attemptSummarizeWithBackoff = useCallback(async (sessionId: string) => {
+    if (summarizingRef.current) return;
+    summarizingRef.current = true;
+    
+    let delay = 2000;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        console.log(`Summarization attempt ${attempt + 1}/4`);
+        const result = await AnalysisSessionService.summarize(sessionId);
+        
+        setAnalysisId(result.analysisId);
+        setSessionState(prev => prev ? {
+          ...prev,
+          summary: {
+            text: result.text,
+            createdAt: new Date().toISOString(),
+            analysisId: result.analysisId,
+            analysisResults: result.analysisResults
+          }
+        } : prev);
+        
+        toast({
+          title: "Analysis Complete",
+          description: "Your swing analysis is ready with personalized recommendations",
+        });
+        break; // Success, exit retry loop
+        
+      } catch (err: any) {
+        console.error(`Summarization attempt ${attempt + 1} failed:`, err);
+        
+        if (err?.message?.includes('Insufficient phase data') && attempt < 3) {
+          // Retry with exponential backoff for 409 errors
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay = Math.floor(delay * 1.75);
+        } else if (attempt === 3) {
+          // Final attempt failed
+          toast({
+            title: "Analysis Summary Failed",
+            description: err.message || 'Failed to generate summary after multiple attempts',
+            variant: "destructive"
+          });
+          break;
+        } else {
+          // Non-retryable error
+          toast({
+            title: "Analysis Summary Failed", 
+            description: err.message || 'Failed to generate summary',
+            variant: "destructive"
+          });
+          break;
+        }
+      }
+    }
+    
+    summarizingRef.current = false;
+  }, [toast]);
+
+  const startSession = useCallback(async (params: { uploadId?: string; videoUrl?: string; videoFile?: File }) => {
     setIsLoading(true);
     setError(null);
+    seenDoneEvents.current.clear(); // Reset done events tracker
     
     try {
       const session = await AnalysisSessionService.startSession(params);

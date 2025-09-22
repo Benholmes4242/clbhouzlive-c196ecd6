@@ -86,9 +86,11 @@ serve(async (req) => {
     // Check if we have enough completed phases
     const completedPhases = phaseResults?.filter(p => p.status === 'done') || [];
     if (completedPhases.length < 3) {
+      console.log(`Session ${sessionId}: Insufficient phase data - ${completedPhases.length}/7 phases completed`);
       return new Response(JSON.stringify({ 
         error: 'Insufficient phase data', 
-        retryAfterMs: 4000,
+        retryAfterMs: 3000,
+        doneCount: completedPhases.length,
         completedPhases: completedPhases.length 
       }), {
         status: 409,
