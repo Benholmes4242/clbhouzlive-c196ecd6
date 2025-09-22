@@ -86,6 +86,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
   const [currentGolfClub, setCurrentGolfClub] = useState<string>('');
   const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
+  const [visuals, setVisuals] = useState<SwingVisual[]>([]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -286,6 +287,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceRecording({
     onTranscriptionComplete: handleVoiceNoteComplete
   });
+
 
   const generateVideoPoster = async (videoFile: File): Promise<string> => {
     return new Promise((resolve) => {
