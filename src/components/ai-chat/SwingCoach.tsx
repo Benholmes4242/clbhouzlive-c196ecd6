@@ -1206,8 +1206,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
                 {/* Phase Progress Strip */}
                 <PhaseProgressStrip 
-                  phases={sessionState.phases}
-                  order={sessionState.order}
+                  sessionId={sessionState.sessionId}
+                  onPhaseClick={(phase, frameIndex) => {
+                    if (frameIndex !== undefined) {
+                      // Handle phase click to show specific frame
+                      console.log(`Clicked phase ${phase} at frame ${frameIndex}`);
+                    }
+                  }}
                 />
 
                 {/* Frame Viewer */}
