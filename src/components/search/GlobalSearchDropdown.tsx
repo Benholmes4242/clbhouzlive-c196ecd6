@@ -384,8 +384,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   if (isMobile) {
     return (
       <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm">
-        <div className="absolute inset-x-0 top-safe-or-16 bottom-0 flex flex-col">
-          <div className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden mx-4 mb-safe max-h-[70vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+        <div className="absolute inset-x-0 top-[4rem] bottom-0 flex flex-col">
+          <div className="bg-black/90 backdrop-blur-xl border border-white/20 rounded-t-2xl shadow-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">{/* Changed positioning to start from 4rem (64px) from top */}
             {/* Mobile header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <h2 className="text-lg font-semibold text-white">Search</h2>

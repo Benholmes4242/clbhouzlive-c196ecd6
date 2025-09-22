@@ -142,7 +142,7 @@ const Discover = () => {
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
           {/* Suggested Users - Top Section */}
-          <div className="mt-4">
+          <div className="mt-2">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
