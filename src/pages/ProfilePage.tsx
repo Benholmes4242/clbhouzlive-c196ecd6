@@ -45,7 +45,7 @@ const ProfilePage = () => {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-background page-with-header">
+      <div className="min-h-screen bg-discover-background page-with-header">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -62,7 +62,7 @@ const ProfilePage = () => {
   // Show error if there's an issue
   if (error) {
     return (
-      <div className="min-h-screen bg-background page-with-header">
+      <div className="min-h-screen bg-discover-background page-with-header">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading profile</span>
@@ -101,7 +101,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background page-with-header relative">
+    <div className="min-h-screen bg-discover-background page-with-header relative">
       <HeroProfileHeader 
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
