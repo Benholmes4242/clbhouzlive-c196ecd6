@@ -63,8 +63,10 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Always use white logo for liquid glass
-  const logoSrc = "/assets/clbhouz-white-logo.png";
+  // Use white logo only on clubhouse page, black logo everywhere else
+  const logoSrc = isClubhousePage 
+    ? "/assets/clbhouz-white-logo.png"
+    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
 
   return (
     <>
