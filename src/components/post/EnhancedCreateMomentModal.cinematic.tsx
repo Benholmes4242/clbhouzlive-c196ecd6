@@ -49,6 +49,7 @@ export default function EnhancedCreateMomentModalCinematic({
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  const [activeCard, setActiveCard] = useState<'caption' | 'course' | 'music'>('caption');
   const prefersReducedMotion = useReducedMotion();
 
   // Check for reduced motion preference
@@ -364,132 +365,135 @@ export default function EnhancedCreateMomentModalCinematic({
 
                 {/* CONTROLS SECTION */}
                 <section className="px-6 pb-6 space-y-3">
-                  {/* CAPTION CARD */}
-                  <motion.div
-                    ref={captionRef}
-                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 400, 
-                      damping: 30,
-                      delay: 0
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-1">
-                      <label className="block text-base font-semibold text-white">Add a caption</label>
-                      <button
-                        onClick={handleAICaption}
-                        disabled={aiLoading || media.length === 0}
-                        className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
-                        aria-label="Write a caption for me"
-                      >
-                        {aiLoading ? <StarsLoading /> : (
-                          <div className="flex items-center gap-1.5">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            <span className="font-medium">AI Caption</span>
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
-                    <div className="flex items-start gap-2">
-                      <textarea
-                        className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
-                        placeholder="Write a caption…"
-                        value={caption}
-                        onChange={(e) => {
-                          setCaption(e.target.value);
-                          // Auto-expand textarea
-                          e.target.style.height = 'auto';
-                          e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
-                        }}
-                        style={{ height: 'auto' }}
-                      />
-                    </div>
-                  </motion.div>
-
-                  {/* Course Tag Card */}
-                  <motion.div
-                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 relative z-[9999]"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 400, 
-                      damping: 30,
-                      delay: 0.08
-                    }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
-                        <BarChart3 className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
+                  {/* SLIDING CARDS CONTAINER */}
+                  <div className="relative h-[200px] overflow-hidden">
+                    {/* CAPTION CARD */}
+                    <motion.div
+                      ref={captionRef}
+                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      initial={{ x: 0 }}
+                      animate={{ 
+                        x: activeCard === 'caption' ? 0 : '-100%',
+                        opacity: activeCard === 'caption' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <label className="block text-base font-semibold text-white">Add a caption</label>
+                        <button
+                          onClick={handleAICaption}
+                          disabled={aiLoading || media.length === 0}
+                          className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                          aria-label="Write a caption for me"
+                        >
+                          {aiLoading ? <StarsLoading /> : (
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span className="font-medium">AI Caption</span>
+                            </div>
+                          )}
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-base text-white">Tag a golf course</h3>
-                        </div>
-                        <p className="text-sm text-white/70 mb-3">Let others know where you played</p>
-                        <CourseTagInput
-                          selectedCourse={course}
-                          onCourseSelect={onCourseSelect || setSelectedCourse}
-                          placeholder="Start typing to find a course..."
+                      <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
+                      <div className="flex items-start gap-2">
+                        <textarea
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
+                          placeholder="Write a caption…"
+                          value={caption}
+                          onChange={(e) => {
+                            setCaption(e.target.value);
+                            // Auto-expand textarea
+                            e.target.style.height = 'auto';
+                            e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
+                          }}
+                          style={{ height: 'auto' }}
                         />
                       </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
 
-                  {/* Music Card */}
-                  <motion.div
-                    className="w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 400, 
-                      damping: 30,
-                      delay: 0.16
-                    }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40 flex items-center justify-center transition-all duration-200 shrink-0">
-                        <Play className="w-5 h-5 text-white group-hover:text-brand-orange transition-colors duration-200" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-base text-white">Background music</h3>
-                        </div>
-                        <p className="text-sm text-white/70 mb-3">Popular golf tracks today</p>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              // TODO: Preview music
-                              console.log("Music preview clicked");
-                            }}
-                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
-                            aria-label="Preview music"
-                          >
-                            Preview
-                          </button>
-                          <span className="text-white/30">•</span>
-                          <button
-                            onClick={() => {
-                              // TODO: Background music selector
-                              console.log("Music selector clicked");
-                            }}
-                            className="text-sm text-brand-orange hover:text-brand-orange-light transition-colors duration-200"
-                            aria-label="Browse music library"
-                          >
-                            Browse
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                    {/* COURSE CARD */}
+                    <motion.div
+                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      initial={{ x: '100%' }}
+                      animate={{ 
+                        x: activeCard === 'course' ? 0 : '100%',
+                        opacity: activeCard === 'course' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
+                    >
+                      <CourseTagInput
+                        onCourseSelect={onCourseSelect}
+                        selectedCourse={course}
+                      />
+                    </motion.div>
 
+                    {/* MUSIC CARD */}
+                    <motion.div
+                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      initial={{ x: '100%' }}
+                      animate={{ 
+                        x: activeCard === 'music' ? 0 : '100%',
+                        opacity: activeCard === 'music' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
+                    >
+                      <BackgroundMusicSelector 
+                        onMusicSelect={(music) => {
+                          // Handle music selection
+                          console.log('Selected music:', music);
+                        }}
+                        hasVideo={media.some(item => item.type === 'video')}
+                      />
+                    </motion.div>
+                  </div>
 
-                  {/* Post button - Quick Post style from Snap Modal */}
+                  {/* PILL BUTTONS */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveCard('caption')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'caption'
+                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
+                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
+                      }`}
+                    >
+                      Caption
+                    </button>
+                    <button
+                      onClick={() => setActiveCard('course')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'course'
+                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
+                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
+                      }`}
+                    >
+                      🌍 Add golf course
+                    </button>
+                    <button
+                      onClick={() => setActiveCard('music')}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'music'
+                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
+                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
+                      }`}
+                    >
+                      ▶ Add music
+                    </button>
+                  </div>
+
+                  {/* POST BUTTON */}
                   <motion.div
                     className="mt-4 pt-4 border-t border-white/10"
                     initial={{ opacity: 0 }}
