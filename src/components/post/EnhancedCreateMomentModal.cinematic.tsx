@@ -243,7 +243,7 @@ export default function EnhancedCreateMomentModalCinematic({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[90vh] max-h-[700px] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
+              className="w-full max-w-md h-[95vh] max-h-[800px] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -260,7 +260,7 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               <div className="flex h-full flex-col">
                 {/* MEDIA SECTION - takes up ~75% of modal height */}
-                <section id="media" className="relative h-[75vh] max-h-[500px] min-h-[400px] overflow-hidden">
+                <section id="media" className="relative h-[85vh] max-h-[600px] min-h-[500px] overflow-hidden">
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -351,7 +351,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* CONTROLS SECTION - compact bottom area */}
                 <section className="flex-shrink-0 px-6 pb-6 space-y-3">
                   {/* SLIDING CARDS CONTAINER - more compact */}
-                  <div className="relative h-[120px] overflow-hidden">
+                  <div className="relative h-[100px] overflow-hidden">
                     {/* CAPTION CARD */}
                     <motion.div
                       ref={captionRef}
