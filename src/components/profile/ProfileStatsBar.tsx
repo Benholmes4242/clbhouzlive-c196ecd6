@@ -53,60 +53,42 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
     }
   }, [stats]);
 
+  // Icon mapping for stats
+  const getIconForStat = (label: string) => {
+    switch (label.toLowerCase()) {
+      case 'posts': return '📸';
+      case 'total xp': return '⭐';
+      case 'following': return '👥';
+      case 'followers': return '👤';
+      default: return null;
+    }
+  };
+
   return (
-    <div className={`relative w-full ${isMobile ? 'px-4 py-3' : 'max-w-lg mx-auto py-3'}`}>
-      {/* Desktop scroll buttons */}
-      {isDesktop && canScrollLeft && (
-        <button
-          onClick={() => scroll('left')}
-          className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
-        >
-          <ChevronLeft className="w-5 h-5 text-black" />
-        </button>
-      )}
-      
-      {isDesktop && canScrollRight && (
-        <button
-          onClick={() => scroll('right')}
-          className="absolute right-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
-        >
-          <ChevronRight className="w-5 h-5 text-black" />
-        </button>
-      )}
-      
-      
-      {/* Stats container - liquid glass pill design */}
-      <div className="relative overflow-hidden rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 px-6 py-4">
-        <div 
-          ref={containerRef}
-          className={`flex ${isMobile ? 'gap-6' : 'gap-8'} overflow-x-auto scrollbar-hide justify-center`}
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch',
-          }}
-        >
-          {stats.map((stat, index) => {
-            const IconComponent = stat.icon;
-            return (
-              <button
-                key={index}
-                onClick={stat.onClick}
-                className="flex-shrink-0 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200 min-w-fit"
-              >
-                {IconComponent && (
-                  <IconComponent className="w-4 h-4 text-white/70 mb-1" />
-                )}
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-white/80 font-normal">
-                  {stat.label}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+    <div id="profile-stats" className="mx-4 mt-3 rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_2px_12px_rgba(0,0,0,0.06)] px-3 py-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {stats.map((stat, index) => {
+          const iconEmoji = getIconForStat(stat.label);
+          return (
+            <button
+              key={index}
+              onClick={stat.onClick}
+              className="flex flex-col items-center justify-center text-slate-900/90 hover:opacity-80 transition-opacity duration-200 py-2"
+            >
+              {iconEmoji && (
+                <span className="text-[16px] leading-none mb-1">
+                  {iconEmoji}
+                </span>
+              )}
+              <span className="text-xl font-extrabold leading-tight">
+                {stat.value}
+              </span>
+              <span className="text-xs opacity-80 leading-tight">
+                {stat.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

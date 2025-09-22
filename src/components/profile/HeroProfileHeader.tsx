@@ -996,43 +996,21 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Tab Navigation with Liquid Glass and Orange Highlight */}
-      <div className="relative z-40 bg-white/10 backdrop-blur-xl border-t border-white/20">
-        <div className="relative" role="tablist" aria-label="Profile sections">
-          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                role="tab"
-                aria-selected={activeSection === tab.id}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={activeSection === tab.id ? 0 : -1}
-                className={`
-                  relative py-4 px-4 text-base transition-all duration-200 ease-in-out
-                  ${activeSection === tab.id 
-                    ? 'font-bold text-white focus:outline-none' 
-                    : 'font-normal text-white/80 hover:bg-white/20 focus:outline-none'
-                  }
-                  flex-1 text-center rounded-lg mx-1
-                `}
-              >
-                {tab.label}
-                {/* Orange sliding glow bar */}
-                <div 
-                  className={`
-                    absolute bottom-1 left-1/2 -translate-x-1/2
-                    h-1 rounded-full bg-[#F58220]
-                    transition-all duration-250 ease-in-out
-                    ${activeSection === tab.id 
-                      ? 'w-12 opacity-100 shadow-[0_0_8px_#F58220]' 
-                      : 'w-0 opacity-0'
-                    }
-                  `}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
+      <div id="profile-tabs" className="mt-4 mx-4 rounded-full min-h-[44px] px-1 py-1 bg-white/70 backdrop-blur-xl border border-black/5 shadow-sm flex items-center gap-1 z-30 relative">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            data-active={activeSection === tab.id}
+            className={`px-3 py-2 rounded-full text-slate-900/90 font-medium hover:bg-black/5 focus:bg-black/5 relative transition-all duration-200 ${
+              activeSection === tab.id
+                ? 'text-[#FF6600] font-semibold bg-black/5 after:block'
+                : 'after:hidden'
+            } after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-1 after:h-0.5 after:w-8 after:rounded-full after:bg-[#FF6600]`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Legacy ProfileTabs for content rendering */}
