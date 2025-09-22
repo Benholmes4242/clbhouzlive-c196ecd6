@@ -17,6 +17,7 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
 import { SwingVisualizer } from '@/services/swing/visualizer';
 import { SwingVisual } from '@/types/swing';
+import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
 
 interface SwingAnalysis {
   id: string;
@@ -920,6 +921,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     analyzeSwing();
   };
 
+  const handleGetCoachReview = (analysisId: string) => {
+    setCurrentAnalysis(null); // Use existing state for now
+    // setShowCoachPicker(true);
+  };
+
+  const handleCoachShareComplete = (shareId: string) => {
+    // Could navigate to share tracking or show confirmation
+    toast({
+      title: "Shared successfully",
+      description: "Your analysis has been sent to the coach for review"
+    });
+  };
+
   const handleExportPack = async (analysisId: string) => {
     try {
       const exportUrl = await SwingVisualizer.generateExportPack(analysisId);
@@ -1083,12 +1097,32 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 {message.type === 'ai' && 
                  message.id === messages[messages.length - 1]?.id && 
                  message.metadata?.category === 'swing_analysis' && (
-                  <div className="mt-4 ml-12">
+                  <div className="mt-4 ml-12 space-y-4">
                     <SwingVisualCarousel
                       visuals={[]}
                       isLoading={false}
                       onExport={() => handleExportPack(message.id)}
                     />
+                    
+                    {/* Coach Review CTA */}
+                    <div className="p-4 bg-muted/20 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-sm">Want a pro's perspective?</h4>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Get your swing reviewed by a local PGA professional
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleGetCoachReview(message.id)}
+                          className="shrink-0"
+                        >
+                          Find Local Coach
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1155,6 +1189,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         onChange={handleFileUpload}
         className="hidden"
       />
+
+      {/* Coach Picker Modal - Temporarily disabled */}
+      {false && (
+        <div>Coach picker will go here</div>
+      )}
     </div>
   );
 };

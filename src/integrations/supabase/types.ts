@@ -200,6 +200,129 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_feedback: {
+        Row: {
+          attachments: Json | null
+          author: string
+          coach_id: string
+          created_at: string
+          id: string
+          message: string
+          share_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          author?: string
+          coach_id: string
+          created_at?: string
+          id?: string
+          message: string
+          share_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          author?: string
+          coach_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          share_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_coach_feedback_coach"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_coach_feedback_share"
+            columns: ["share_id"]
+            isOneToOne: false
+            referencedRelation: "swing_shares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          phone: string | null
+          pricing_note: string | null
+          region_code: string
+          specialties: string[] | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          phone?: string | null
+          pricing_note?: string | null
+          region_code: string
+          specialties?: string[] | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          phone?: string | null
+          pricing_note?: string | null
+          region_code?: string
+          specialties?: string[] | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      coach_regions: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          region_code: string
+        }
+        Insert: {
+          country?: string
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          region_code: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          region_code?: string
+        }
+        Relationships: []
+      }
       coach_service_areas: {
         Row: {
           coach_id: string
@@ -1191,6 +1314,60 @@ export type Database = {
             columns: ["outreach_id"]
             isOneToOne: false
             referencedRelation: "swing_coach_outreach"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      swing_shares: {
+        Row: {
+          access_token: string | null
+          analysis_id: string
+          coach_id: string
+          consent_flags: Json
+          created_at: string
+          id: string
+          status: string
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          analysis_id: string
+          coach_id: string
+          consent_flags?: Json
+          created_at?: string
+          id?: string
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          analysis_id?: string
+          coach_id?: string
+          consent_flags?: Json
+          created_at?: string
+          id?: string
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_swing_shares_analysis"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "pro_ai_analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_swing_shares_coach"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
             referencedColumns: ["id"]
           },
         ]
