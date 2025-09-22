@@ -14,6 +14,9 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
 import { CoachPromptInline } from '@/components/swing/CoachPromptInline';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
+import { SwingVisualizer } from '@/services/swing/visualizer';
+import { SwingVisual } from '@/types/swing';
 
 interface SwingAnalysis {
   id: string;
@@ -48,6 +51,7 @@ interface ChatMessageData {
   type: 'user' | 'ai';
   content: string;
   timestamp: Date;
+  category?: string;
   metadata?: any;
   videoPreview?: string;
   videoFileName?: string;
@@ -916,6 +920,33 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     analyzeSwing();
   };
 
+  const handleExportPack = async (analysisId: string) => {
+    try {
+      const exportUrl = await SwingVisualizer.generateExportPack(analysisId);
+      if (exportUrl) {
+        // Open download URL
+        window.open(exportUrl, '_blank');
+        toast({
+          title: "Export started",
+          description: "Your visual coaching pack is being prepared"
+        });
+      } else {
+        toast({
+          title: "Export failed",
+          description: "Could not generate visual pack",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error exporting pack:', error);
+      toast({
+        title: "Export failed",
+        description: "Could not generate visual pack",
+        variant: "destructive"
+      });
+    }
+  };
+
   const deleteAnalysis = async (analysisId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -1036,17 +1067,31 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             )}
 
             {messages.map((message) => (
-              <ChatMessageComponent
-                key={message.id}
-                message={message}
-                onSaveToInsights={saveToSwingInsights}
-                onRequestDetail={requestMoreDetail}
-                onAskEcho={(prompt) => {
-                  // Open Echo with the specific prompt
-                  // This would integrate with the main Echo system
-                  console.log('Ask Echo:', prompt);
-                }}
-              />
+              <div key={message.id}>
+                <ChatMessageComponent
+                  message={message}
+                  onSaveToInsights={saveToSwingInsights}
+                  onRequestDetail={requestMoreDetail}
+                  onAskEcho={(prompt) => {
+                    // Open Echo with the specific prompt
+                    // This would integrate with the main Echo system
+                    console.log('Ask Echo:', prompt);
+                  }}
+                />
+                
+                {/* Show visual pack if this is the latest AI message with analysis */}
+                {message.type === 'ai' && 
+                 message.id === messages[messages.length - 1]?.id && 
+                 message.metadata?.category === 'swing_analysis' && (
+                  <div className="mt-4 ml-12">
+                    <SwingVisualCarousel
+                      visuals={[]}
+                      isLoading={false}
+                      onExport={() => handleExportPack(message.id)}
+                    />
+                  </div>
+                )}
+              </div>
             ))}
 
             {/* Show inline coach recommendations after swing analysis is complete */}

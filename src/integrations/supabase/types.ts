@@ -1195,6 +1195,45 @@ export type Database = {
           },
         ]
       }
+      swing_visuals: {
+        Row: {
+          analysis_id: string
+          created_at: string
+          frame_index: number
+          height: number
+          id: string
+          label: string
+          overlay: Json
+          updated_at: string
+          url: string
+          width: number
+        }
+        Insert: {
+          analysis_id: string
+          created_at?: string
+          frame_index: number
+          height: number
+          id?: string
+          label: string
+          overlay?: Json
+          updated_at?: string
+          url: string
+          width: number
+        }
+        Update: {
+          analysis_id?: string
+          created_at?: string
+          frame_index?: number
+          height?: number
+          id?: string
+          label?: string
+          overlay?: Json
+          updated_at?: string
+          url?: string
+          width?: number
+        }
+        Relationships: []
+      }
       taggable_entities: {
         Row: {
           created_at: string

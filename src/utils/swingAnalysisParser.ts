@@ -1,4 +1,5 @@
 import { SwingAnalysisSummary, SwingPhase, SwingDrill } from '@/components/swing-review/SwingReview';
+import { VisualPlanItem } from '@/types/swing';
 
 // Parse markdown content to extract structured swing analysis data
 export function parseSwingAnalysis(content: string, videoUrl?: string): {
@@ -6,6 +7,7 @@ export function parseSwingAnalysis(content: string, videoUrl?: string): {
   phases: SwingPhase[];
   priorityFix: { title: string; why: string; howToFeel: string; microTask: string; };
   drills: SwingDrill[];
+  visualPlan?: VisualPlanItem[];
 } | null {
   try {
     // Extract club from content
@@ -32,6 +34,9 @@ export function parseSwingAnalysis(content: string, videoUrl?: string): {
 
     // Generate drills
     const drills = generateDrills(content, recommendedDrill);
+    
+    // Extract visual plan if present
+    const visualPlan = extractVisualPlan(content);
 
     const summary: SwingAnalysisSummary = {
       club,
@@ -46,7 +51,8 @@ export function parseSwingAnalysis(content: string, videoUrl?: string): {
       summary,
       phases,
       priorityFix,
-      drills
+      drills,
+      visualPlan
     };
   } catch (error) {
     console.error('Failed to parse swing analysis:', error);
@@ -246,4 +252,114 @@ function generateDrills(content: string, recommendedDrill: string): SwingDrill[]
 
 function capitalizeFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Extract visual plan for keyframe annotation
+function extractVisualPlan(content: string): VisualPlanItem[] {
+  const visualPlan: VisualPlanItem[] = [];
+  
+  // Look for visual plan section in the content
+  const visualPlanMatch = content.match(/visual.?plan[:\s]*\n([\s\S]*?)(?:\n\n|\n[A-Z]|$)/i);
+  
+  if (visualPlanMatch) {
+    const planContent = visualPlanMatch[1];
+    
+    // Parse individual keyframes
+    const frameMatches = planContent.match(/P[1-9][:\s]+(.*?)(?=P[1-9]|$)/gi);
+    
+    if (frameMatches) {
+      frameMatches.forEach(match => {
+        const phaseMatch = match.match(/P([1-9])/);
+        const captionMatch = match.match(/:\s*(.+?)(?:\n|$)/);
+        
+        if (phaseMatch && captionMatch) {
+          const phase = `P${phaseMatch[1]}` as VisualPlanItem['frameHint'];
+          const caption = captionMatch[1].trim();
+          
+          // Generate basic overlays based on phase
+          const overlays = generateBasicOverlays(phase);
+          
+          visualPlan.push({
+            frameHint: phase,
+            caption,
+            overlays
+          });
+        }
+      });
+    }
+  }
+  
+  // If no visual plan found, generate default plan
+  if (visualPlan.length === 0) {
+    const defaultPhases: VisualPlanItem['frameHint'][] = ['P1', 'P4', 'P7'];
+    
+    defaultPhases.forEach(phase => {
+      visualPlan.push({
+        frameHint: phase,
+        caption: getDefaultCaption(phase),
+        overlays: generateBasicOverlays(phase)
+      });
+    });
+  }
+  
+  return visualPlan;
+}
+
+function generateBasicOverlays(phase: VisualPlanItem['frameHint']) {
+  const overlays: any = {};
+  
+  switch (phase) {
+    case 'P1': // Setup
+      overlays.keypoints = [
+        { x: 0.5, y: 0.7, label: 'Ball Position' },
+        { x: 0.45, y: 0.4, label: 'Head' }
+      ];
+      overlays.lines = [
+        { x1: 0.45, y1: 0.2, x2: 0.45, y2: 0.8, label: 'Spine Angle' }
+      ];
+      break;
+      
+    case 'P4': // Top of Swing
+      overlays.keypoints = [
+        { x: 0.4, y: 0.15, label: 'Club Position' },
+        { x: 0.45, y: 0.4, label: 'Head' }
+      ];
+      overlays.lines = [
+        { x1: 0.45, y1: 0.4, x2: 0.4, y2: 0.15, label: 'Swing Plane' }
+      ];
+      break;
+      
+    case 'P7': // Impact
+      overlays.keypoints = [
+        { x: 0.5, y: 0.7, label: 'Impact Zone' },
+        { x: 0.45, y: 0.4, label: 'Head' }
+      ];
+      overlays.lines = [
+        { x1: 0.4, y1: 0.6, x2: 0.6, y2: 0.6, label: 'Impact Line' }
+      ];
+      break;
+      
+    default:
+      overlays.keypoints = [
+        { x: 0.45, y: 0.4, label: 'Reference Point' }
+      ];
+  }
+  
+  return overlays;
+}
+
+function getDefaultCaption(phase: VisualPlanItem['frameHint']): string {
+  const captions = {
+    P1: 'Setup position with proper alignment',
+    P2: 'Takeaway path and club position',
+    P3: 'Backswing plane and shoulder turn',
+    P4: 'Top of swing position',
+    P5: 'Transition and sequence',
+    P6: 'Downswing approach',
+    P7: 'Impact position and ball contact',
+    P8: 'Follow through extension',
+    P9: 'Finish position and balance'
+  };
+  
+  return captions[phase] || 'Key swing position';
 }
