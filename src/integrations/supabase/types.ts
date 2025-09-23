@@ -1011,7 +1011,6 @@ export type Database = {
           analysis_results: Json
           created_at: string
           id: string
-          session_id: string | null
           swing_context: string | null
           updated_at: string
           user_id: string
@@ -1021,7 +1020,6 @@ export type Database = {
           analysis_results?: Json
           created_at?: string
           id?: string
-          session_id?: string | null
           swing_context?: string | null
           updated_at?: string
           user_id: string
@@ -1031,7 +1029,6 @@ export type Database = {
           analysis_results?: Json
           created_at?: string
           id?: string
-          session_id?: string | null
           swing_context?: string | null
           updated_at?: string
           user_id?: string
@@ -1320,90 +1317,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      swing_phase_results: {
-        Row: {
-          confidence: number | null
-          created_at: string
-          error: string | null
-          finished_at: string | null
-          id: string
-          metrics: Json
-          phase: string
-          session_id: string
-          started_at: string | null
-          status: string
-          tips: Json
-          used_frame_index: number | null
-          visual_plan: Json
-        }
-        Insert: {
-          confidence?: number | null
-          created_at?: string
-          error?: string | null
-          finished_at?: string | null
-          id?: string
-          metrics?: Json
-          phase: string
-          session_id: string
-          started_at?: string | null
-          status?: string
-          tips?: Json
-          used_frame_index?: number | null
-          visual_plan?: Json
-        }
-        Update: {
-          confidence?: number | null
-          created_at?: string
-          error?: string | null
-          finished_at?: string | null
-          id?: string
-          metrics?: Json
-          phase?: string
-          session_id?: string
-          started_at?: string | null
-          status?: string
-          tips?: Json
-          used_frame_index?: number | null
-          visual_plan?: Json
-        }
-        Relationships: []
-      }
-      swing_sessions: {
-        Row: {
-          created_at: string
-          expires_at: string
-          frames: Json
-          id: string
-          status: string
-          updated_at: string
-          upload_id: string | null
-          user_id: string
-          video_url: string | null
-        }
-        Insert: {
-          created_at?: string
-          expires_at?: string
-          frames?: Json
-          id?: string
-          status?: string
-          updated_at?: string
-          upload_id?: string | null
-          user_id: string
-          video_url?: string | null
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string
-          frames?: Json
-          id?: string
-          status?: string
-          updated_at?: string
-          upload_id?: string | null
-          user_id?: string
-          video_url?: string | null
-        }
-        Relationships: []
       }
       swing_shares: {
         Row: {

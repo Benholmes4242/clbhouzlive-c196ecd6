@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { useVideoPreloader } from '@/hooks/useVideoPreloader';
-// Removed feature flag - progress sync always enabled
+import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
 
 import { MediaItem } from '@/types/media';
 
@@ -465,12 +465,12 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
               style={{
                 width: item.isUploading 
                   ? `${item.uploadProgress || 0}%`
-                  : index === activeIndex && segmentProgress.length > 0
+                  : USE_VIDEO_PROGRESS_SYNC_V1 && index === activeIndex && segmentProgress.length > 0
                     ? `${segmentProgress[index] * 100}%`
                     : index < activeIndex 
                       ? '100%' 
                       : index === activeIndex 
-                        ? `${syncedProgress}%`
+                        ? USE_VIDEO_PROGRESS_SYNC_V1 ? `${syncedProgress}%` : `${progress}%`
                         : '0%'
               }}
             />

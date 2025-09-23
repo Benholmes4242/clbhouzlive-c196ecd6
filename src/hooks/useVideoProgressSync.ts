@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-// Removed feature flag - progress sync always enabled
+import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 
 interface VideoProgressSyncOptions {
@@ -21,7 +21,7 @@ export function useVideoProgressSync(
 
   // Calculate segment progress from video time
   const calculateProgress = useCallback(() => {
-    if (!videoElement) return;
+    if (!videoElement || !USE_VIDEO_PROGRESS_SYNC_V1) return;
 
     const currentTime = videoElement.currentTime;
     const duration = videoElement.duration;
@@ -58,7 +58,7 @@ export function useVideoProgressSync(
 
   // rAF sync loop
   const startSyncLoop = useCallback(() => {
-    if (isActiveRef.current) return;
+    if (!USE_VIDEO_PROGRESS_SYNC_V1 || isActiveRef.current) return;
     
     isActiveRef.current = true;
     
@@ -83,7 +83,7 @@ export function useVideoProgressSync(
 
   // Stop sync loop
   const stopSyncLoop = useCallback((reason?: string) => {
-    // Stop sync loop
+    if (!USE_VIDEO_PROGRESS_SYNC_V1) return;
     
     isActiveRef.current = false;
     
@@ -99,7 +99,7 @@ export function useVideoProgressSync(
 
   // Complete all segments
   const completeProgress = useCallback(() => {
-    // Complete all segments
+    if (!USE_VIDEO_PROGRESS_SYNC_V1) return;
     
     const segmentCount = segments?.length || totalSegments;
     setSegmentProgress(Array(segmentCount).fill(1));
@@ -109,7 +109,7 @@ export function useVideoProgressSync(
 
   // Video event handlers with src change detection
   useEffect(() => {
-    if (!videoElement) return;
+    if (!videoElement || !USE_VIDEO_PROGRESS_SYNC_V1) return;
 
     // Reset progress when src changes
     const currentSrc = videoElement.src;
@@ -163,7 +163,7 @@ export function useVideoProgressSync(
 
   // Visibility handling
   useEffect(() => {
-    // Handle visibility changes
+    if (!USE_VIDEO_PROGRESS_SYNC_V1) return;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {

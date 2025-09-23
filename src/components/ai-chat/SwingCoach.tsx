@@ -22,10 +22,6 @@ import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
 import { AiFeedbackBlock } from '@/components/swing/AiFeedbackBlock';
 import { ProgressStrip } from '@/components/swing/ProgressStrip';
 import { CoachCta } from '@/components/swing/CoachCta';
-import { useSwingSession } from '@/hooks/useSwingSession';
-import { PhaseProgressStrip } from '@/components/swing/PhaseProgressStrip';
-import { SwingFrameViewer } from '@/components/swing/SwingFrameViewer';
-import { VisualCarousel } from '@/components/swing/VisualCarousel';
 
 interface SwingAnalysis {
   id: string;
@@ -91,10 +87,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [currentGolfClub, setCurrentGolfClub] = useState<string>('');
   const [isVoiceNoteRecording, setIsVoiceNoteRecording] = useState(false);
   const [visuals, setVisuals] = useState<SwingVisual[]>([]);
-  
-  // Multi-phase analysis state
-  const { sessionState, isLoading: isSessionLoading, error: sessionError, startSession } = useSwingSession();
-  const [useMultiPhase, setUseMultiPhase] = useState(true); // Feature flag
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -560,33 +552,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     });
 
     setIsAnalyzing(true);
-    
-    // Check if we should use multi-phase analysis
-    if (useMultiPhase && uploadedVideo?.type.startsWith('video/')) {
-      try {
-        // Start multi-phase session with video file for frame extraction
-        await startSession({ 
-          videoUrl: videoPreview,
-          videoFile: uploadedVideo, // Pass the actual video file
-          // TODO: Add uploadId when implementing actual file upload
-        });
-        
-        toast({
-          title: "Analysis Started",
-          description: "Starting phase-by-phase swing analysis...",
-        });
-        
-        return; // Multi-phase handles the rest
-      } catch (error) {
-        console.error('Failed to start multi-phase analysis:', error);
-        toast({
-          title: "Multi-phase analysis failed",
-          description: "Falling back to single analysis mode",
-          variant: "destructive"
-        });
-        // Continue with legacy single analysis
-      }
-    }
     
     try {
       let extractedFrames: string[] = [];
@@ -1193,129 +1158,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </div>
             ))}
 
-            
-            {/* Error state for SSE auth issues */}
-            {sessionError && (
-              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-destructive/20 rounded-full flex items-center justify-center">
-                    ⚠️
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-destructive mb-1">
-                      {sessionError === 'session-expired' ? 'Session Expired' : 
-                       sessionError === 'connection-failed' ? 'Connection Failed' :
-                       'Analysis Error'}
-                    </h4>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {sessionError === 'session-expired' 
-                        ? 'Your session has expired. Please refresh the page and try again.'
-                        : sessionError === 'connection-failed'
-                        ? 'Unable to connect to the analysis service. Please check your connection and try again.'
-                        : sessionError}
-                    </p>
-                    <button 
-                      onClick={() => window.location.reload()}
-                      className="text-sm bg-destructive text-destructive-foreground px-3 py-1 rounded hover:bg-destructive/90 transition-colors"
-                    >
-                      Refresh Page
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Multi-Phase Analysis UI */}
-            {sessionState && (
-              <div className="space-y-6 p-4 bg-card border rounded-lg">
-                <div className="text-center">
-                  <h3 className="text-lg font-medium mb-2">
-                    {sessionState.analyzing ? 'Phase-by-Phase Analysis' : 'Analysis Complete'}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {sessionState.analyzing 
-                      ? 'Real-time analysis of your swing mechanics'
-                      : 'Your swing analysis is ready'}
-                  </p>
-                </div>
-
-                {/* Show progress loader only while analyzing */}
-                {sessionState.analyzing && (
-                  <SwingAnalysisLoader isAnalyzing={true} />
-                )}
-
-                {/* Phase Progress Strip */}
-                <PhaseProgressStrip 
-                  sessionId={sessionState.sessionId}
-                  onPhaseClick={(phase, frameIndex) => {
-                    if (frameIndex !== undefined) {
-                      // Handle phase click to show specific frame
-                      console.log(`Clicked phase ${phase} at frame ${frameIndex}`);
-                    }
-                  }}
-                />
-
-                {/* Frame Viewer */}
-                <SwingFrameViewer 
-                  frames={sessionState.frames}
-                  activeFrameIndex={sessionState.activeFrameIndex}
-                  sseConnected={!sessionError && !!sessionState}
-                  onFrameClick={(frameIndex) => {
-                    console.log(`User clicked frame ${frameIndex}`);
-                    // Could update local state or trigger effects here if needed
-                  }}
-                />
-
-                {/* Analysis Results */}
-                {sessionState.summary && (
-                  <div className="space-y-4">
-                    <div className="p-4 bg-card border rounded-lg">
-                      <h4 className="font-medium mb-2">Analysis Complete</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {sessionState.summary.analysisResults?.summary || sessionState.summary.text}
-                      </p>
-                    </div>
-                    
-                    {sessionState.summary.analysisId && (
-                      <VisualCarousel 
-                        analysisId={sessionState.summary.analysisId}
-                        className="mt-4"
-                      />
-                    )}
-                  </div>
-                )}
-
-                {/* Phase Details */}
-                {Object.entries(sessionState.phases).some(([_, phase]) => phase.status === 'done') && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium">Phase Details</h4>
-                    {sessionState.order.map((phaseName) => {
-                      const phase = sessionState.phases[phaseName];
-                      if (phase.status !== 'done') return null;
-                      
-                      return (
-                        <Card key={phaseName} className="p-4">
-                          <h5 className="font-medium capitalize mb-2">{phaseName}</h5>
-                          {phase.tips && phase.tips.length > 0 && (
-                            <div className="space-y-1">
-                              {phase.tips.map((tip, idx) => (
-                                <p key={idx} className="text-sm text-muted-foreground">• {tip}</p>
-                              ))}
-                            </div>
-                          )}
-                          {phase.metrics && (
-                            <div className="mt-2 text-xs text-muted-foreground">
-                              Confidence: {Math.round((phase.metrics.conf || 0) * 100)}%
-                            </div>
-                          )}
-                        </Card>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Show inline coach recommendations after swing analysis is complete */}
             {currentAnalysis && (
               <CoachPromptInline
@@ -1356,8 +1198,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     </div>
                   ))}
                 </div>
-          </div>
-        )}
+              </div>
+            )}
           </div>
         )}
 
