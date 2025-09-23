@@ -294,10 +294,10 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Three static images preview */}
+                              {/* Two images preview */}
                               {previewImages && previewImages.length > 0 && (
                                 <div className="flex gap-1 shrink-0">
-                                  {previewImages.slice(0, 3).map((imageUrl, index) => (
+                                  {previewImages.slice(0, 2).map((imageUrl, index) => (
                                     <div 
                                       key={index}
                                       className={`${index === 0 ? 'w-16' : 'w-12'} h-16 rounded-lg overflow-hidden`}
@@ -328,21 +328,16 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Three static images preview */}
+                              {/* Single image preview */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="flex gap-1 shrink-0">
-                                  {previewImages.slice(0, 3).map((imageUrl, index) => (
-                                    <div 
-                                      key={index}
-                                      className="w-12 h-16 rounded-lg overflow-hidden"
-                                    >
-                                      <img 
-                                        src={imageUrl} 
-                                        alt={`Story preview ${index + 1}`} 
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  ))}
+                                <div className="shrink-0">
+                                  <div className="w-12 h-16 rounded-lg overflow-hidden">
+                                    <img 
+                                      src={previewImages[2] || previewImages[0]} 
+                                      alt="Story preview" 
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
                                 </div>
                               )}
                             </>
