@@ -339,7 +339,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center justify-between mb-1">
                         <label className="block text-base font-semibold text-white">Add a caption</label>
                         <button
                           onClick={handleAICaption}
