@@ -141,7 +141,7 @@ const EnhancedSnapModal = ({
     {
       key: "photos",
       label: "Photos & Videos", 
-      description: "Pick from gallery",
+      description: "Choose from gallery",
       icon: Images,
       onClick: handlePickMedia,
       previewVariant: "photos" as const,
