@@ -1000,7 +1000,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
 
   return (
-    <div className="h-full min-h-0">
+    <div className="h-full min-h-0 relative">
+      {/* DEBUG: Red circle to verify we are editing the correct Swing Coach tab */}
+      <div id="swingcoach-debug-marker" className="pointer-events-none absolute inset-0 flex items-center justify-center z-50">
+        <div className="w-16 h-16 rounded-full bg-red-500/80 shadow-lg" />
+      </div>
       <ScrollArea 
         ref={messagesAutoScroll.scrollAreaRef}
         className="h-full"
