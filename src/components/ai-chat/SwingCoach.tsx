@@ -1148,10 +1148,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                               Analyzing…
                             </>
                           ) : (
-                            <>
-                              <HelpCircle className="h-4 w-4" />
-                              Analyze Swing
-                            </>
+                            "Analyze Swing"
                           )}
                         </Button>
                       </div>
