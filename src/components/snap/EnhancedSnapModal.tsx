@@ -139,7 +139,7 @@ const EnhancedSnapModal = ({
     {
       key: "story",
       label: "Tell Your Story",
-      description: "Mix photos & videos in one go",
+      description: "Mix photos & videos",
       icon: Film,
       onClick: handlePickMedia,
       previewVariant: "story" as const,
@@ -253,12 +253,12 @@ const EnhancedSnapModal = ({
                       aria-label={`${label}: ${description}`}
                     >
                        <div className="flex items-center gap-2 h-16">
-                          {/* Conditional rendering based on card type */}
+                       {/* Conditional rendering based on card type */}
                           {key === "camera" ? (
-                            // Camera card: text on left, camera icon on right
+                            // Camera card: text on left, centered camera icon, empty right
                             <>
                               <div className="flex items-center flex-1">
-                                {/* Text content - centered vertically */}
+                                {/* Text content */}
                                 <div className="flex-1 min-w-0">
                                   <h3 className="font-semibold text-base text-white">
                                     {label}
@@ -267,38 +267,76 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Camera icon on the right */}
-                              <div className="w-24 h-16 shrink-0 flex items-center justify-center">
+                              {/* Centered camera icon - increased size to match photos preview */}
+                              <div className="flex items-center justify-center flex-1">
                                 <motion.div 
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40"
+                                  className="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40"
                                   whileHover={!prefersReducedMotion ? {
                                     opacity: [1, 0.5, 1]
                                   } : {}}
                                   transition={{ duration: 0.2 }}
                                 >
-                                  <Icon className="w-5 h-5 transition-colors duration-200 text-white group-hover:text-brand-orange" />
+                                  <Icon className="w-7 h-7 transition-colors duration-200 text-white group-hover:text-brand-orange" />
                                 </motion.div>
                               </div>
+                              
+                              {/* Empty right space to balance layout */}
+                              <div className="w-24 h-16 shrink-0"></div>
                             </>
-                          ) : (
-                            // Photos and Story cards: text on left, preview on right (no left icon)
+                          ) : key === "photos" ? (
+                            // Photos card: text on left, small + large preview on right
                             <>
                               <div className="flex items-center flex-1">
-                                {/* Text content - centered vertically */}
+                                {/* Text content */}
                                 <div className="flex-1 min-w-0">
-                                  <h3 className={`font-semibold text-base ${
-                                    isSpecial ? 'text-brand-orange' : 'text-white'
-                                  }`}>
+                                  <h3 className="font-semibold text-base text-white">
                                     {label}
-                                    {isSpecial && <span className="ml-2 text-brand-orange/70">🎞</span>}
                                   </h3>
                                   <p className="text-sm text-white/70">{description}</p>
                                 </div>
                               </div>
                               
-                              {/* Image preview on the right */}
+                              {/* Two-card preview on the right */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
+                                <div className="flex gap-2 shrink-0">
+                                  {/* Smaller card on left */}
+                                  <div className="w-12 h-16 rounded-lg overflow-hidden">
+                                    <img 
+                                      src={previewImages[0]} 
+                                      alt="Preview" 
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  {/* Larger card on right */}
+                                  <div className="w-24 h-16 rounded-lg overflow-hidden">
+                                    <DynamicPreview 
+                                      variant={previewVariant}
+                                      images={previewImages}
+                                      className="w-full h-full"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            // Story card: text on left, wider preview close to emoji on right
+                            <>
+                              <div className="flex items-center flex-1">
+                                {/* Text content */}
+                                <div className="flex-1 min-w-0">
+                                  <h3 className={`font-semibold text-base ${
+                                    isSpecial ? 'text-brand-orange' : 'text-white'
+                                  }`}>
+                                    {label}
+                                    {isSpecial && <span className="ml-1 text-brand-orange/70">🎞</span>}
+                                  </h3>
+                                  <p className="text-sm text-white/70">{description}</p>
+                                </div>
+                              </div>
+                              
+                              {/* Wider image preview on the right, closer to emoji */}
+                              {previewImages && previewImages.length > 0 && (
+                                <div className="w-32 h-16 rounded-lg overflow-hidden shrink-0">
                                   <DynamicPreview 
                                     variant={previewVariant}
                                     images={previewImages}
