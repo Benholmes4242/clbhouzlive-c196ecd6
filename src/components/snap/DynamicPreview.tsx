@@ -48,9 +48,9 @@ const DynamicPreview: React.FC<DynamicPreviewProps> = ({
 
   if (variant === 'photos' && images.length > 0) {
     return (
-      <div className={`h-8 w-full rounded-lg overflow-hidden ${className}`}>
+      <div className={`h-8 w-full rounded-lg overflow-hidden flex items-center justify-end ${className}`}>
         <motion.div 
-          className="flex h-full"
+          className="h-6 w-10 rounded-md overflow-hidden"
           key={currentIndex}
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}

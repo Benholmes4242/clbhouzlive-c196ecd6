@@ -252,7 +252,7 @@ const EnhancedSnapModal = ({
                       whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
                       aria-label={`${label}: ${description}`}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-4">
                         {/* Icon with micro-interactions */}
                         <motion.div 
                           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 ${
@@ -278,16 +278,16 @@ const EnhancedSnapModal = ({
                         </motion.div>
                         
                         {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
+                        <div className="flex-1 min-w-0 flex items-center justify-between">
+                          <div className="flex flex-col justify-center">
                             <h3 className={`font-semibold text-base ${
                               isSpecial ? 'text-brand-orange' : 'text-white'
                             }`}>
                               {label}
                               {isSpecial && <span className="ml-2 text-brand-orange/70">🎞️</span>}
                             </h3>
+                            <p className="text-sm text-white/70">{description}</p>
                           </div>
-                          <p className="text-sm text-white/70 mb-3">{description}</p>
                           
                           {/* Dynamic Preview */}
                           <DynamicPreview 
