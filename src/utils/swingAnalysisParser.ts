@@ -291,7 +291,7 @@ function extractVisualPlan(content: string): VisualPlanItem[] {
   
   // If no visual plan found, generate default plan
   if (visualPlan.length === 0) {
-    const defaultPhases: VisualPlanItem['frameHint'][] = ['P1', 'P4', 'P7'];
+    const defaultPhases: VisualPlanItem['frameHint'][] = ['P1', 'P2', 'P4'];
     
     defaultPhases.forEach(phase => {
       visualPlan.push({
@@ -319,7 +319,7 @@ function generateBasicOverlays(phase: VisualPlanItem['frameHint']) {
       ];
       break;
       
-    case 'P4': // Top of Swing
+    case 'P2': // Backswing Top
       overlays.keypoints = [
         { x: 0.4, y: 0.15, label: 'Club Position' },
         { x: 0.45, y: 0.4, label: 'Head' }
@@ -329,7 +329,7 @@ function generateBasicOverlays(phase: VisualPlanItem['frameHint']) {
       ];
       break;
       
-    case 'P7': // Impact
+    case 'P4': // Impact
       overlays.keypoints = [
         { x: 0.5, y: 0.7, label: 'Impact Zone' },
         { x: 0.45, y: 0.4, label: 'Head' }
@@ -351,14 +351,10 @@ function generateBasicOverlays(phase: VisualPlanItem['frameHint']) {
 function getDefaultCaption(phase: VisualPlanItem['frameHint']): string {
   const captions = {
     P1: 'Setup position with proper alignment',
-    P2: 'Takeaway path and club position',
-    P3: 'Backswing plane and shoulder turn',
-    P4: 'Top of swing position',
-    P5: 'Transition and sequence',
-    P6: 'Downswing approach',
-    P7: 'Impact position and ball contact',
-    P8: 'Follow through extension',
-    P9: 'Finish position and balance'
+    P2: 'Backswing top position',
+    P3: 'Transition and sequence',
+    P4: 'Impact position and ball contact',
+    P5: 'Follow through and finish'
   };
   
   return captions[phase] || 'Key swing position';

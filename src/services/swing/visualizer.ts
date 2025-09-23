@@ -4,14 +4,10 @@ import { SwingVisual, SwingVisualPack, VisualPlanItem, SwingFrameData } from '@/
 export class SwingVisualizer {
   private static readonly PHASE_LABELS = {
     P1: 'Setup',
-    P2: 'Takeaway',
-    P3: 'Backswing',
-    P4: 'Top of Swing',
-    P5: 'Transition',
-    P6: 'Downswing',
-    P7: 'Impact',
-    P8: 'Follow Through',
-    P9: 'Finish'
+    P2: 'Backswing Top',
+    P3: 'Transition', 
+    P4: 'Impact',
+    P5: 'Follow Through'
   };
 
   static async createOrGetPack(analysisId: string, frames?: SwingFrameData[], visualPlan?: VisualPlanItem[]): Promise<SwingVisualPack> {
@@ -123,14 +119,10 @@ export class SwingVisualizer {
   private static mapPhaseToFrameIndex(phase: string, totalFrames: number): number {
     const phaseMapping: Record<string, number> = {
       P1: 0,                                    // Setup
-      P2: Math.floor(totalFrames * 0.15),      // Takeaway
-      P3: Math.floor(totalFrames * 0.3),       // Backswing
-      P4: Math.floor(totalFrames * 0.45),      // Top
-      P5: Math.floor(totalFrames * 0.55),      // Transition
-      P6: Math.floor(totalFrames * 0.7),       // Downswing
-      P7: Math.floor(totalFrames * 0.85),      // Impact
-      P8: Math.floor(totalFrames * 0.92),      // Follow Through
-      P9: totalFrames - 1                      // Finish
+      P2: Math.floor(totalFrames * 0.25),      // Backswing Top (25%)
+      P3: Math.floor(totalFrames * 0.5),       // Transition (50%)
+      P4: Math.floor(totalFrames * 0.75),      // Impact (75%)
+      P5: totalFrames - 1                      // Follow Through (100%)
     };
 
     return phaseMapping[phase] || 0;
