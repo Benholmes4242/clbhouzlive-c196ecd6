@@ -170,8 +170,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
         setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
       }
       
-      // Simulate analysis time (realistic delays)
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+      // Simulate analysis time (optimized delays)
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 400));
       
       // Generate mock analysis for the phase
       const mockAnalysis = generatePhaseAnalysis(phase);
@@ -185,7 +185,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
       onPhaseUpdate?.(updatedPhase);
       
       // Small delay before next phase
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
     
     setAnalysisPhase('complete');
@@ -195,7 +195,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     // Final callback with all completed phases
     setTimeout(() => {
       onAnalysisComplete(phases.map(p => ({ ...p, status: 'complete' as const })));
-    }, 500);
+    }, 300);
   };
 
   const generatePhaseAnalysis = (phase: SwingPhase): string => {
