@@ -103,7 +103,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
         {onSetCover && (
           <button
             aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-            className="absolute top-2 left-16 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            className="absolute top-2 left-12 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
             onClick={(e) => { 
               e.stopPropagation(); 
               if (coverIndex !== index) {
@@ -155,7 +155,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
       {onSetCover && (
         <button
           aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-          className="absolute top-2 left-16 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
+          className="absolute top-2 left-12 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
           onClick={(e) => { 
             e.stopPropagation(); 
             if (coverIndex !== index) {
