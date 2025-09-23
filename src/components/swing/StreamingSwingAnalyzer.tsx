@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -56,7 +56,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
   // Auto-progression through frames during analysis
   useEffect(() => {
-    if (analysisPhase === 'analyzing' && !fallbackMode && swingFrames.length > 0) {
+    if (analysisPhase === 'analyzing' && swingFrames.length > 0) {
       const interval = setInterval(() => {
         setCurrentFrameIndex(prev => {
           const nextIndex = (prev + 1) % 10; // Cycle through 10 frames
@@ -65,11 +65,11 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
           }
           return nextIndex;
         });
-      }, 500); // Change frame every 500ms for smooth progression
+      }, 800); // Slower progression to match analysis phases
 
       return () => clearInterval(interval);
     }
-  }, [analysisPhase, fallbackMode, swingFrames]);
+  }, [analysisPhase, swingFrames]);
 
   // Fallback mode auto-progression
   useEffect(() => {
@@ -88,19 +88,23 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     }
   }, [fallbackMode, isPlaying, swingFrames]);
 
-  // Extract frames when analysis starts
+  // Extract frames immediately when component mounts with video
   useEffect(() => {
-    if (analysisPhase === 'analyzing' && swingFrames.length === 0) {
+    if (videoUrl && swingFrames.length === 0) {
+      setAnalysisPhase('extracting');
       extractFramesFromVideo();
     }
-  }, [analysisPhase]);
+  }, [videoUrl]);
 
-  // Simulate streaming analysis with phase-by-phase progression
+  // Start analysis automatically when frames are ready
   useEffect(() => {
-    if (analysisPhase === 'analyzing' && swingFrames.length > 0) {
-      simulateStreamingAnalysis();
+    if (analysisPhase === 'extracting' && swingFrames.length > 0) {
+      setTimeout(() => {
+        setAnalysisPhase('analyzing');
+        simulateStreamingAnalysis();
+      }, 1000);
     }
-  }, [analysisPhase, swingFrames]);
+  }, [swingFrames]);
 
   const extractFramesFromVideo = async () => {
     const video = videoRef.current;
@@ -137,6 +141,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     setSwingFrames(frames);
     if (frames.length > 0) {
       setCurrentFrameImage(frames[0].imageData);
+      setCurrentFrameIndex(0);
     }
   };
 
@@ -197,21 +202,6 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     return analyses[phase.id as keyof typeof analyses] || "Analysis complete for this phase.";
   };
 
-  const startAnalysis = () => {
-    setAnalysisPhase('extracting');
-    toast({
-      title: "Analysis Started",
-      description: "Extracting frames and preparing for analysis..."
-    });
-    
-    setTimeout(() => {
-      setAnalysisPhase('analyzing');
-      toast({
-        title: "Phase Analysis Beginning",
-        description: "Analyzing swing phase by phase..."
-      });
-    }, 2000);
-  };
 
   const togglePlayback = () => {
     if (analysisPhase === 'complete') {
@@ -284,6 +274,11 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
                 alt={`Swing frame ${currentFrameIndex + 1}`}
                 className="w-full h-full object-contain"
               />
+            ) : analysisPhase === 'extracting' ? (
+              <div className="text-center space-y-3">
+                <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
+                <p className="text-sm text-muted-foreground">Extracting frames from video...</p>
+              </div>
             ) : (
               <div className="text-center space-y-2">
                 <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
@@ -385,14 +380,6 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
         </div>
       </Card>
 
-      {/* Action Buttons */}
-      {analysisPhase === 'extracting' && (
-        <div className="flex gap-2">
-          <Button onClick={startAnalysis} className="flex-1">
-            Start Real-time Analysis
-          </Button>
-        </div>
-      )}
 
       {analysisPhase === 'analyzing' && (
         <div className="flex gap-2">
