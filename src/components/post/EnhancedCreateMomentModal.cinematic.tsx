@@ -355,7 +355,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           )}
                         </button>
                       </div>
-                      <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
+                      
                       <div className="flex items-start gap-2">
                         <textarea
                           className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem] max-h-[4rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
@@ -463,7 +463,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-sm font-medium text-brand-orange">
-                          {isSubmitting ? "Sharing..." : "Share with the community"}
+                          {isSubmitting ? "Sharing..." : "Share"}
                         </span>
                       </div>
                     </motion.button>
