@@ -56,8 +56,11 @@ serve(async (req) => {
     // Create SSE stream with proper headers and format
     const stream = new ReadableStream({
       start(controller) {
+        let eventCounter = 0;
         const send = (obj: any, event?: string) => {
           try {
+            eventCounter++;
+            controller.enqueue(`id: ${eventCounter}\n`);
             if (event) {
               controller.enqueue(`event: ${event}\n`);
             }
@@ -104,6 +107,7 @@ serve(async (req) => {
 
           const phase = phases[phaseIndex];
           const frameIndex = phaseIndex + 1; // Simple mapping for now
+          console.log(`Processing phase ${phase} (#${phaseIndex + 1}) for session ${sessionId}`);
           
           // Send progress updates
           send({ type: 'progress', sessionId, phase, etaMs: 3000 }, 'progress');
@@ -155,6 +159,7 @@ serve(async (req) => {
                   }
 
                   // 2) THEN notify client (after DB write is complete)
+                  console.log(`Phase ${phase} done (session ${sessionId}). Emitting done event.`);
                   send({
                     type: 'done',
                     sessionId,
@@ -189,12 +194,12 @@ serve(async (req) => {
         // Keepalive every 15 seconds with no-transform header
         const keepaliveInterval = setInterval(() => {
           try {
-            controller.enqueue(`event: keepalive\ndata: {"timestamp":"${new Date().toISOString()}"}\n\n`);
+            send({ type: 'heartbeat', timestamp: new Date().toISOString() }, 'heartbeat');
           } catch (error) {
-            console.error('Error sending keepalive:', error);
+            console.error('Error sending heartbeat:', error);
             clearInterval(keepaliveInterval);
           }
-        }, 15000);
+        }, 5000);
 
         // Handle client disconnect
         req.signal?.addEventListener('abort', () => {
