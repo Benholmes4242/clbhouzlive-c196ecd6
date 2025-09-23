@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Video, HelpCircle, Camera, X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Upload, Video, HelpCircle, Camera, X, AlertTriangle, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { SwingReview, SwingPhase, SwingAnalysisSummary, SwingDrill } from '@/com
 import { SwingVisualCarousel } from './SwingVisualCarousel';
 import { SwingVisualizer } from '@/services/swing/visualizer';
 import { motion, AnimatePresence } from 'framer-motion';
+import AIChatHistory from '@/components/ai-chat/AIChatHistory';
 
 interface ReliableSwingCoachProps {
   onClose?: () => void;
@@ -37,6 +38,7 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
   const [retryCount, setRetryCount] = useState(0);
   const [fallbackMode, setFallbackMode] = useState(false);
   const [statusText, setStatusText] = useState<string>("");
+  const [showHistory, setShowHistory] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -314,10 +316,10 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
               </div>
             </Card>
 
-            {/* Analyse Swing button (kept in layout, disabled while running) */}
+            {/* Analyze Swing button (kept in layout, disabled while running) */}
             <div className="flex">
               <Button onClick={startAnalysis} disabled className="ml-auto">
-                Analyse Swing
+                Analyze Swing
               </Button>
             </div>
           </div>
@@ -417,40 +419,50 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
             
             {/* Video Preview (if uploaded but not analyzing) */}
             {uploadedVideo && analysisState.status !== 'analyzing' && analysisState.status !== 'complete' && (
-              <Card className="p-4">
-                <div className="space-y-4">
-                  <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-                    <video
-                      src={videoPreview}
-                      controls
-                      className="w-full h-full"
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+              <div className="space-y-4">
+                {/* File name and size above the media card */}
+                <div className="text-sm text-muted-foreground">
+                  {uploadedVideo.name} • {(uploadedVideo.size / (1024 * 1024)).toFixed(1)}MB
+                </div>
+                
+                <Card className="p-4">
+                  <div className="space-y-4">
+                    <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                      <video
+                        src={videoPreview}
+                        controls
+                        className="w-full h-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white"
-                      onClick={discardVideo}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  {analysisState.status === 'idle' && (
+                    {/* Video status row */}
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-muted-foreground">
-                        Ready for reliable analysis with real-time progression
+                        Video loaded and ready for analysis
                       </div>
-                      <Button onClick={startAnalysis} className="gap-2">
-                        <Video className="h-4 w-4" />
-                        Start Analysis
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={discardVideo}
+                        className="h-8 w-8"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  )}
-                </div>
-              </Card>
+                    
+                    {/* Analyze Swing button */}
+                    {analysisState.status === 'idle' && (
+                      <div className="flex">
+                        <Button onClick={startAnalysis} className="ml-auto">
+                          Analyze Swing
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
             )}
 
             {/* Current State Renderer */}
@@ -467,6 +479,29 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Recent History Bar */}
+        <div className="p-4 border-t">
+          <button
+            className="w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition-colors"
+            onClick={() => setShowHistory(true)}
+            aria-label="Open recent swing coach history"
+          >
+            <span className="flex items-center gap-2">
+              <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+              Recent history
+            </span>
+            <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+          </button>
+        </div>
+
+        {/* History Modal */}
+        <AIChatHistory 
+          isOpen={showHistory} 
+          onClose={() => setShowHistory(false)}
+          onSelectMessage={() => setShowHistory(false)}
+          onNewConversation={() => setShowHistory(false)}
+        />
 
         {/* Hidden file input */}
         <input
