@@ -407,6 +407,14 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             className="w-full h-full aspect-[3/4]"
             objectFit="cover"
             hideControls={true}
+            onEnded={() => {
+              // Ensure loop continues - restart video if it ends
+              const video = videoRef.current;
+              if (video && isVisible) {
+                video.currentTime = 0;
+                video.play().catch(console.warn);
+              }
+            }}
           />
         ) : (
           <img
