@@ -325,7 +325,7 @@ const EnhancedSnapModal = ({
                                     isSpecial ? 'text-brand-orange' : 'text-white'
                                   }`}>
                                     {label}
-                                    {isSpecial && <span className="ml-1 text-brand-orange/70">🎞</span>}
+                                    {isSpecial && <span className="ml-2 text-brand-orange/70">🎞</span>}
                                   </h3>
                                   <p className="text-sm text-white/70">{description}</p>
                                 </div>
