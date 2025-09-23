@@ -301,10 +301,7 @@ const EnhancedSnapModal = ({
                             </div>
                           ) : key === "camera" ? (
                             <div className="w-24 h-16 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
-                              <div className="relative">
-                                <Camera className="w-6 h-6 text-white/70" />
-                                <Flashlight className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1" />
-                              </div>
+                              <span className="text-2xl">📸</span>
                             </div>
                           ) : null}
                        </div>
