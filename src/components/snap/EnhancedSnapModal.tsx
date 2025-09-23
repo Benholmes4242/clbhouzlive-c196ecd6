@@ -280,7 +280,7 @@ const EnhancedSnapModal = ({
                               </div>
                               
                               {/* Camera icon centered between text and right edge */}
-                              <div className="flex items-center justify-center w-40">
+                              <div className="flex items-center justify-center w-36">
                                 <motion.div 
                                   className="w-24 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40"
                                   whileHover={!prefersReducedMotion ? {
