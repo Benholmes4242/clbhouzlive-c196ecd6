@@ -1230,12 +1230,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               <div className="space-y-6 p-4 bg-card border rounded-lg">
                 <div className="text-center">
                   <h3 className="text-lg font-medium mb-2">
-                    Phase-by-Phase Analysis
+                    {sessionState.analyzing ? 'Phase-by-Phase Analysis' : 'Analysis Complete'}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Real-time analysis of your swing mechanics
+                    {sessionState.analyzing 
+                      ? 'Real-time analysis of your swing mechanics'
+                      : 'Your swing analysis is ready'}
                   </p>
                 </div>
+
+                {/* Show progress loader only while analyzing */}
+                {sessionState.analyzing && (
+                  <SwingAnalysisLoader isAnalyzing={true} />
+                )}
 
                 {/* Phase Progress Strip */}
                 <PhaseProgressStrip 

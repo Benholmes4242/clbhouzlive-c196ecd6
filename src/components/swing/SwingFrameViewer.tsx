@@ -115,13 +115,14 @@ export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
         </div>
         
         {frames.length > 1 && (
-          <div className="flex items-center gap-1 overflow-x-auto pb-2">
+          <div className="flex items-center gap-1 overflow-x-auto pb-2 pointer-events-auto">
             {frames.map((frame) => {
               const isFramePlaceholder = isPlaceholderUrl(frame.url);
               return (
-                <div
+                <button
                   key={frame.index}
-                  className={`flex-shrink-0 w-12 h-8 rounded border-2 overflow-hidden cursor-pointer transition-colors ${
+                  type="button"
+                  className={`flex-shrink-0 w-12 h-8 rounded border-2 overflow-hidden cursor-pointer transition-colors pointer-events-auto ${
                     frame.index === currentActiveIndex 
                       ? 'border-primary' 
                       : 'border-border hover:border-primary/50'
@@ -130,12 +131,13 @@ export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
                     setLocalActiveIndex(frame.index);
                     if (onFrameClick) onFrameClick(frame.index);
                   }}
+                  aria-label={`Jump to frame ${frame.index}`}
                 >
                   {!isFramePlaceholder ? (
                     <img
                       src={frame.url}
                       alt={`Frame ${frame.index}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover pointer-events-none"
                       onError={(e) => {
                         // Hide broken thumbnail
                         (e.target as HTMLImageElement).style.display = 'none';
@@ -146,7 +148,7 @@ export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
                       <span className="text-xs text-muted-foreground">{frame.index}</span>
                     </div>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>

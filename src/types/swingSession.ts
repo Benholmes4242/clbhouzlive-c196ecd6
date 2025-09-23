@@ -28,6 +28,11 @@ export interface SessionState {
     hash: string;
   }>;
   activeFrameIndex?: number;
+  analyzing?: boolean;
+  completedAt?: number;
+  doneCount?: number;
+  totalPhases?: number;
+  lastPartialAt?: number;
   summary?: {
     text: string;
     createdAt: string;

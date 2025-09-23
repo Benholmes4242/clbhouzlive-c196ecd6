@@ -11,6 +11,7 @@ interface UseSwingSessionReturn {
   analysisId: string | undefined;
   startSession: (params: { uploadId?: string; videoUrl?: string; videoFile?: File }) => Promise<void>;
   disconnect: () => void;
+  debugState: () => void;
 }
 
 export function useSwingSession(): UseSwingSessionReturn {
@@ -145,27 +146,31 @@ export function useSwingSession(): UseSwingSessionReturn {
   }, [disconnect, toast]);
 
   const handleReconnect = useCallback(() => {
-    // Exponential backoff for reconnection
-    if (reconnectAttempts.current < 5) {
-      const delay = Math.pow(2, reconnectAttempts.current) * 1000;
-      reconnectAttempts.current++;
-      
-      reconnectTimeoutRef.current = setTimeout(async () => {
-        console.log(`Reconnecting SSE (attempt ${reconnectAttempts.current})...`);
-        const currentSessionId = sessionState?.sessionId;
-        if (currentSessionId) {
-          await connectSSE(currentSessionId);
-        }
-      }, delay);
-    } else {
-      setError('connection-failed');
-      toast({
-        title: "Connection lost",
-        description: "Unable to receive real-time updates",
-        variant: "destructive"
-      });
+    // Don't reconnect if we've hit max attempts or analysis is complete
+    if (reconnectAttempts.current >= 5 || (sessionState?.completedAt && sessionState.completedAt > 0)) {
+      if (reconnectAttempts.current >= 5) {
+        setError('connection-failed');
+        toast({
+          title: "Connection lost",
+          description: "Unable to receive real-time updates",
+          variant: "destructive"
+        });
+      }
+      return;
     }
-  }, [connectSSE, sessionState?.sessionId, toast]);
+
+    // Exponential backoff for reconnection
+    const delay = Math.pow(2, reconnectAttempts.current) * 1000;
+    reconnectAttempts.current++;
+    
+    reconnectTimeoutRef.current = setTimeout(async () => {
+      console.log(`Reconnecting SSE (attempt ${reconnectAttempts.current})...`);
+      const currentSessionId = sessionState?.sessionId;
+      if (currentSessionId) {
+        await connectSSE(currentSessionId);
+      }
+    }, delay);
+  }, [connectSSE, sessionState?.sessionId, sessionState?.completedAt, toast]);
 
   // Separate function for handling summarization
   const handleSummarization = useCallback(async (sessionId: string) => {
@@ -212,43 +217,45 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       switch (data.type) {
         case 'status':
-          if (data.phase && updated.phases[data.phase as PhaseName]) {
-            updated.phases[data.phase as PhaseName] = {
-              ...updated.phases[data.phase as PhaseName],
-              status: data.status === 'started' ? 'running' : data.status
-            };
+          // Only update if phase isn't already done and status is 'started'
+          if (data.phase && updated.phases[data.phase as PhaseName] && data.status === 'started') {
+            const currentPhase = updated.phases[data.phase as PhaseName];
+            if (currentPhase.status !== 'done') {
+              updated.phases[data.phase as PhaseName] = {
+                ...currentPhase,
+                status: 'running'
+              };
+            }
           }
           break;
 
         case 'progress':
-          if (data.phase && updated.phases[data.phase as PhaseName]) {
-            updated.phases[data.phase as PhaseName] = {
-              ...updated.phases[data.phase as PhaseName],
-              status: 'running'
-            };
-          }
+          // Ignore progress events to prevent state churn
           break;
 
         case 'partial':
           if (data.phase && updated.phases[data.phase as PhaseName]) {
+            const sanitizedFrameIndex = sanitizeFrameIndex(data.frameIndex, updated.frames?.length || 20);
             updated.phases[data.phase as PhaseName] = {
               ...updated.phases[data.phase as PhaseName],
-              frameIndex: data.frameIndex
+              frameIndex: sanitizedFrameIndex
             };
-            updated.activeFrameIndex = data.frameIndex;
+            updated.activeFrameIndex = sanitizedFrameIndex;
+            updated.lastPartialAt = Date.now();
           }
           break;
 
         case 'done':
           if (data.phase && updated.phases[data.phase as PhaseName]) {
+            const sanitizedFrameIndex = sanitizeFrameIndex(data.frameIndex, updated.frames?.length || 20);
             updated.phases[data.phase as PhaseName] = {
               status: 'done',
-              frameIndex: data.frameIndex,
+              frameIndex: sanitizedFrameIndex,
               metrics: data.metrics,
               tips: data.tips,
               visualPlan: data.visualPlan
             };
-            updated.activeFrameIndex = data.frameIndex;
+            updated.activeFrameIndex = sanitizedFrameIndex;
             seenDoneEvents.current.add(data.phase);
           }
           break;
@@ -261,6 +268,13 @@ export function useSwingSession(): UseSwingSessionReturn {
               error: data.message
             };
           }
+          
+          // Stop reconnecting on unauthorized
+          if (data.code === 'unauthorized') {
+            reconnectAttempts.current = 999; // Prevent further reconnects
+            setError('session-expired');
+          }
+          
           toast({
             title: `Error in ${data.phase} analysis`,
             description: data.message,
@@ -269,25 +283,46 @@ export function useSwingSession(): UseSwingSessionReturn {
           break;
 
         case 'complete':
-          // If backend already provided analysisId, use it
-          if (data.summaryReady && data.analysisId) {
-            setAnalysisId(data.analysisId);
-            return updated;
+          console.log('[SSE] Complete event received, marking analysis done');
+          
+          // Mark analysis complete immediately - don't wait for summary
+          updated.analyzing = false;
+          updated.completedAt = Date.now();
+          updated.doneCount = data.doneCount ?? seenDoneEvents.current.size;
+          updated.totalPhases = data.totalPhases ?? 7;
+          
+          // Stop reconnection attempts
+          reconnectAttempts.current = 999;
+          
+          // Fire-and-forget summarization - don't block UI on it
+          if ((data.doneCount ?? seenDoneEvents.current.size) >= 3 && !summarizingRef.current) {
+            summarizeOnce(updated.sessionId).catch(err => {
+              console.warn('[summarizeOnce] failed (non-blocking):', err);
+            });
           }
           
-          // Check if we can summarize based on server doneCount or client-side done events
-          const canSummarize = (data.doneCount ?? seenDoneEvents.current.size) >= 3;
-          console.log(`Complete event: doneCount=${data.doneCount}, seenDoneEvents=${seenDoneEvents.current.size}, canSummarize=${canSummarize}`);
-          
-          if (canSummarize && !summarizingRef.current) {
-            summarizeOnce(updated.sessionId);
-          }
+          // Disconnect SSE after completion
+          setTimeout(() => disconnect(), 1000);
+          break;
+
+        case 'heartbeat':
+          // Ignore heartbeat events - no state updates, keep alive only
+          break;
+
+        default:
+          console.debug('[SSE] Ignored unknown event:', data.type);
           break;
       }
 
       return updated;
     });
-  }, [toast]);
+  }, [toast, disconnect]);
+
+  // Helper function to sanitize frame index (1-based server → 0-based client, clamped)
+  const sanitizeFrameIndex = (idx: number | undefined, totalFrames: number): number => {
+    const frameIndex = Math.max(1, Math.min(Number(idx ?? 1), totalFrames));
+    return frameIndex; // Keep 1-based for consistency with existing code
+  };
 
   // Enhanced summarization with exponential backoff
   const summarizeOnce = useCallback(async (sessionId: string) => {
@@ -367,7 +402,12 @@ export function useSwingSession(): UseSwingSessionReturn {
     
     try {
       const session = await AnalysisSessionService.startSession(params);
-      setSessionState(session);
+      const sessionWithAnalyzing = {
+        ...session,
+        analyzing: true,
+        lastPartialAt: Date.now()
+      };
+      setSessionState(sessionWithAnalyzing);
       
       // Connect to SSE stream
       await connectSSE(session.sessionId);
@@ -385,6 +425,31 @@ export function useSwingSession(): UseSwingSessionReturn {
     }
   }, [connectSSE, toast]);
 
+  // Local autoplay when SSE is disconnected and no recent partials
+  useEffect(() => {
+    if (!sessionState?.analyzing && sessionState?.frames && sessionState.frames.length > 1) {
+      const autoplayInterval = setInterval(() => {
+        setSessionState(prev => {
+          if (!prev || !prev.frames) return prev;
+          
+          // Only autoplay if no recent partial events (stream is quiet)
+          const timeSinceLastPartial = Date.now() - (prev.lastPartialAt || 0);
+          if (timeSinceLastPartial < 3000) return prev; // Live stream is active
+          
+          const currentIndex = prev.activeFrameIndex || 1;
+          const nextIndex = currentIndex >= prev.frames.length ? 1 : currentIndex + 1;
+          
+          return {
+            ...prev,
+            activeFrameIndex: nextIndex
+          };
+        });
+      }, 1200); // 1.2s interval for autoplay
+      
+      return () => clearInterval(autoplayInterval);
+    }
+  }, [sessionState?.analyzing, sessionState?.frames]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -398,6 +463,20 @@ export function useSwingSession(): UseSwingSessionReturn {
     error,
     analysisId,
     startSession,
-    disconnect
+    disconnect,
+    // Add debugging helper
+    debugState: () => {
+      console.log('[SwingSession Debug]', {
+        analyzing: sessionState?.analyzing,
+        completedAt: sessionState?.completedAt,
+        doneCount: sessionState?.doneCount,
+        totalPhases: sessionState?.totalPhases,
+        phases: Object.entries(sessionState?.phases || {}).map(([name, phase]) => 
+          `${name}: ${phase.status}`
+        ),
+        error,
+        reconnectAttempts: reconnectAttempts.current
+      });
+    }
   };
 }
