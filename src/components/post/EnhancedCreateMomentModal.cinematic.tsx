@@ -237,13 +237,13 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center py-8 px-6" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center py-6 px-6" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-visible"
+              className="w-full max-w-md h-[calc(100vh-3rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-visible"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
