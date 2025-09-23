@@ -99,11 +99,11 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           </button>
         )}
 
-        {/* Cover badge - shows "Cover" on cover image, "Set as cover" on others */}
+        {/* Cover badge - positioned to the right of media counter */}
         {onSetCover && (
           <button
             aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-            className="absolute top-2 left-2 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            className="absolute top-2 left-16 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
             onClick={(e) => { 
               e.stopPropagation(); 
               if (coverIndex !== index) {
@@ -151,11 +151,11 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
         draggable={false}
       />
       
-      {/* Cover badge - shows "Cover" on cover image, "Set as cover" on others */}
+      {/* Cover badge - positioned to the right of media counter */}
       {onSetCover && (
         <button
           aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-          className="absolute top-2 left-2 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
+          className="absolute top-2 left-16 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
           onClick={(e) => { 
             e.stopPropagation(); 
             if (coverIndex !== index) {

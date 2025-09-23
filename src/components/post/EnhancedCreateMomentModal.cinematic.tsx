@@ -303,8 +303,8 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   )}
 
-                  {/* Media counter - positioned to the right of the cover badge */}
-                  <div className="absolute top-2 left-20">
+                  {/* Media counter - positioned on the left */}
+                  <div className="absolute top-2 left-2">
                     <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                       <span>{activeIndex + 1}/{media.length}</span>
                     </div>
