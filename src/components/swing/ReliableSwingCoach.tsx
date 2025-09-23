@@ -92,11 +92,11 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
     setAnalysisState({ status: 'uploading', progress: 10 });
     
     try {
-      // Simulate upload process - optimized timing
-      await simulateProgress('uploading', 30, 1200);
+      // Simulate upload process - ultra-optimized timing
+      await simulateProgress('uploading', 30, 700);
       
       setAnalysisState({ status: 'processing', progress: 30 });
-      await simulateProgress('processing', 50, 800);
+      await simulateProgress('processing', 50, 500);
       
       setAnalysisState({ status: 'analyzing', progress: 50 });
       

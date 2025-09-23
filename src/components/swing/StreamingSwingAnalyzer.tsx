@@ -195,7 +195,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     // Final callback with all completed phases
     setTimeout(() => {
       onAnalysisComplete(phases.map(p => ({ ...p, status: 'complete' as const })));
-    }, 300);
+    }, 150);
   };
 
   const generatePhaseAnalysis = (phase: SwingPhase): string => {
