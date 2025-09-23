@@ -151,7 +151,7 @@ const EnhancedSnapModal = ({
     {
       key: "story",
       label: "Tell Your Story",
-      description: "Mix photos & videos",
+      description: "Turn Moments Into Movies",
       icon: Film,
       onClick: handlePickMedia,
       previewVariant: "story" as const,
