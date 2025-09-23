@@ -21,6 +21,8 @@ interface StreamingSwingAnalyzerProps {
   videoUrl: string;
   onAnalysisComplete: (phases: SwingPhase[]) => void;
   onPhaseUpdate?: (phase: SwingPhase) => void;
+  onStatusChange?: (statusText: string) => void;
+  showOverlayStatus?: boolean;
 }
 
 interface SwingFrame {
@@ -32,7 +34,9 @@ interface SwingFrame {
 export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   videoUrl,
   onAnalysisComplete,
-  onPhaseUpdate
+  onPhaseUpdate,
+  onStatusChange,
+  showOverlayStatus
 }) => {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -92,6 +96,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   useEffect(() => {
     if (videoUrl && swingFrames.length === 0) {
       setAnalysisPhase('extracting');
+      onStatusChange?.('Extracting frames...');
       extractFramesFromVideo();
     }
   }, [videoUrl]);
@@ -101,6 +106,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     if (analysisPhase === 'extracting' && swingFrames.length > 0) {
       setTimeout(() => {
         setAnalysisPhase('analyzing');
+        onStatusChange?.('Analyzing swing...');
         simulateStreamingAnalysis();
       }, 1000);
     }
@@ -149,6 +155,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     for (let i = 0; i < phases.length; i++) {
       const phase = phases[i];
       setCurrentAnalyzingPhase(phase.name);
+      onStatusChange?.(`Analyzing ${phase.name}`);
       
       // Update phase to analyzing
       setPhases(prev => prev.map(p => 
@@ -183,6 +190,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     
     setAnalysisPhase('complete');
     setCurrentAnalyzingPhase(null);
+    onStatusChange?.('Analysis complete');
     
     // Final callback with all completed phases
     setTimeout(() => {
@@ -291,7 +299,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
           {/* Analysis Status Overlay */}
           <AnimatePresence>
-            {analysisPhase === 'analyzing' && currentAnalyzingPhase && (
+            {analysisPhase === 'analyzing' && currentAnalyzingPhase && showOverlayStatus !== false && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -36,6 +36,7 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
   } | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [fallbackMode, setFallbackMode] = useState(false);
+  const [statusText, setStatusText] = useState<string>("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -292,6 +293,7 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
               </Alert>
             )}
             
+            {/* Image card where frames flick through */}
             <StreamingSwingAnalyzer
               videoUrl={videoPreview}
               onAnalysisComplete={handlePhaseAnalysisComplete}
@@ -301,7 +303,23 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
                   currentPhase: phase.name
                 }));
               }}
+              onStatusChange={(text) => setStatusText(text)}
+              showOverlayStatus={false}
             />
+
+            {/* Status text below the image */}
+            <Card className="p-3">
+              <div className="text-sm text-muted-foreground">
+                {statusText || 'Preparing analysis...'}
+              </div>
+            </Card>
+
+            {/* Analyse Swing button (kept in layout, disabled while running) */}
+            <div className="flex">
+              <Button onClick={startAnalysis} disabled className="ml-auto">
+                Analyse Swing
+              </Button>
+            </div>
           </div>
         );
 
