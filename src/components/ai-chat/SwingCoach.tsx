@@ -1150,8 +1150,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                        
                         {/* Analysis status display */}
                         {isAnalyzing && analysisStatus && (
-                          <div className="mb-3 p-2 bg-accent/10 rounded-lg border border-accent/20">
-                            <p className="text-sm text-accent-foreground font-medium">{analysisStatus}</p>
+                          <div className="mb-3 p-2 rounded-lg border" style={{ 
+                            backgroundColor: 'rgba(42, 157, 143, 0.08)', 
+                            borderColor: 'rgba(42, 157, 143, 0.2)',
+                            color: '#1D3557'
+                          }}>
+                            <p className="text-sm font-medium">{analysisStatus}</p>
                           </div>
                         )}
                      </div>
@@ -1249,12 +1253,22 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       {/* Recent History Bar */}
       <div className="p-4 border-t">
         <button
-          className="w-full rounded-[28px] bg-accent/10 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-foreground hover:bg-accent/15 transition-colors"
+          className="w-full rounded-[28px] backdrop-blur shadow flex items-center justify-between px-4 py-2 text-white hover:opacity-90 transition-all"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(29, 53, 87, 0.15), rgba(42, 157, 143, 0.15))',
+            color: '#1D3557'
+          }}
           onClick={() => setShowHistory(true)}
           aria-label="Open recent swing coach history"
         >
           <span className="flex items-center gap-2">
-            <span className="w-10 h-1 rounded-full bg-accent/60" />
+            <span 
+              className="w-10 h-1 rounded-full" 
+              style={{ 
+                background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', 
+                opacity: 0.8 
+              }} 
+            />
             Recent history
           </span>
           <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
