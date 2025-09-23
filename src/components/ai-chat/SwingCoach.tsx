@@ -13,6 +13,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
+import AIChatHistory from './AIChatHistory';
 import { CoachPromptInline } from '@/components/swing/CoachPromptInline';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
@@ -84,6 +85,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [extractedFrames, setExtractedFrames] = useState<string[]>([]);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [analysisStatus, setAnalysisStatus] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
   
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
@@ -1079,6 +1081,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           <div className="space-y-4">
             {uploadedVideo && (
               <div className="bg-muted rounded-lg p-4">
+                {/* File name & size above media card */}
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+                  <p className="truncate">{uploadedVideo.name}</p>
+                  <p>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</p>
+                </div>
                 <div className="flex flex-col gap-4">
                    <div className="w-full">
                      <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
@@ -1226,30 +1233,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </div>
             )}
 
-            {/* Previous analyses */}
-            {analyses.length > 0 && (
-              <div className="border-t pt-4 mt-6">
-                <h4 className="font-medium mb-2 text-sm">Previous Analyses</h4>
-                <div className="space-y-2">
-                  {analyses.slice(0, 5).map((analysis) => (
-                    <div key={analysis.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
-                      <span className="truncate">
-                        {analysis.timestamp.toLocaleDateString()} - 
-                        {analysis.conversation[0]?.content?.slice(0, 30)}...
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deleteAnalysis(analysis.id)}
-                        className="h-6 w-6 p-0"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Previous analyses removed per design */}
           </div>
         )}
 
@@ -1268,6 +1252,30 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         accept="video/*,image/*"
         onChange={handleFileUpload}
         className="hidden"
+      />
+
+      {/* Recent History Bar */}
+      <div className="p-4 border-t">
+        <button
+          className="w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition-colors"
+          onClick={() => setShowHistory(true)}
+          aria-label="Open recent swing coach history"
+        >
+          <span className="flex items-center gap-2">
+            <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+            Recent history
+          </span>
+          <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+        </button>
+      </div>
+
+      {/* History Modal */}
+      <AIChatHistory 
+        isOpen={showHistory} 
+        onClose={() => setShowHistory(false)}
+        onSelectMessage={() => setShowHistory(false)}
+        onNewConversation={() => setShowHistory(false)}
+        defaultCategory="swing"
       />
 
       {/* Coach Picker Modal - Temporarily disabled */}

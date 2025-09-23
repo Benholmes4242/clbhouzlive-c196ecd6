@@ -138,6 +138,7 @@ interface AIChatHistoryProps {
   onClose: () => void;
   onSelectMessage: (message: string) => void;
   onNewConversation?: () => void;
+  defaultCategory?: string;
 }
 
 // Swing Analysis Card Component
@@ -405,9 +406,9 @@ const ErrorState: React.FC<{
   </div>
 );
 
-const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation }) => {
+const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
