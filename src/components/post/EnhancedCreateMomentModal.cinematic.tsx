@@ -243,7 +243,7 @@ export default function EnhancedCreateMomentModalCinematic({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-visible"
+              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -258,9 +258,26 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex h-full flex-col overflow-visible">
-                {/* MEDIA SECTION - takes up ~75% of modal height with bubble protrusion */}
-                <section id="media" className="relative flex-1 -mx-2 -mt-6 rounded-t-3xl overflow-hidden">{/* Minimal protrusion for subtle bubble effect */}
+              <div className="flex h-full flex-col overflow-hidden">
+                {/* Header */}
+                <div className="px-6 pt-6 pb-2 border-b border-white/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
+                    <button 
+                      onClick={close} 
+                      aria-label="Close" 
+                      className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  <div className="text-sm text-white/70">
+                    Share your golf moment with the community
+                  </div>
+                </div>
+
+                {/* MEDIA SECTION - takes up remaining space */}
+                <section id="media" className="relative flex-1 overflow-hidden">{/* Media carousel below header */}
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -293,14 +310,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-                  {/* Close button overlay */}
-                  <button 
-                    onClick={close} 
-                    aria-label="Close" 
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
 
                   {/* Video duration pill - top left */}
                   {media[activeIndex]?.type === 'video' && (
