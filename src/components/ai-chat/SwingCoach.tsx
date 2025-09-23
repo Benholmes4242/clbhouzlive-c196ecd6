@@ -578,15 +578,15 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             throw new Error("Couldn't extract frames from video");
           }
 
-          // Start frame cycling animation - slower to sync with analysis phases
+          // Start frame cycling animation
           setAnalysisStatus('Analyzing swing phases...');
           let frameIndex = 0;
           const frameInterval = setInterval(() => {
             setCurrentFrameIndex(frameIndex % extractedFrames.length);
             frameIndex++;
-          }, 1500); // Slower - change frame every 1.5 seconds to match analysis phases
+          }, 400); // Change frame every 400ms
 
-          // Simulate analysis phases with status updates - sync with frame timing
+          // Simulate analysis phases with status updates
           const analysisPhases = [
             'Examining setup position...',
             'Analyzing takeaway...',
@@ -600,7 +600,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
           for (let i = 0; i < analysisPhases.length; i++) {
             setAnalysisStatus(analysisPhases[i]);
-            await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5s per phase to sync with frames
+            await new Promise(resolve => setTimeout(resolve, 1200)); // 1.2s per phase
           }
 
           // Clear frame cycling
@@ -1116,10 +1116,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         </Button>
                       </div>
                       
+                      {/* Analysis status display */}
+                      {isAnalyzing && analysisStatus && (
+                        <div className="mb-3 p-2 bg-primary/10 rounded-lg">
+                          <p className="text-sm text-primary font-medium">{analysisStatus}</p>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-muted-foreground">
-                          {isAnalyzing && analysisStatus ? analysisStatus : 
-                           uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
