@@ -350,7 +350,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           {aiLoading ? <StarsLoading /> : (
                             <div className="flex items-center gap-1.5">
                               <Sparkles className="h-3.5 w-3.5" />
-                              <span className="font-medium">AI Caption</span>
+                              <span className="font-medium">Inspire Me</span>
                             </div>
                           )}
                         </button>
@@ -358,16 +358,12 @@ export default function EnhancedCreateMomentModalCinematic({
                       <p className="text-sm text-white/70 mb-3">Share your golf moment with the community</p>
                       <div className="flex items-start gap-2">
                         <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem]"
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem] max-h-[4rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
                           placeholder="Write a caption…"
                           value={caption}
                           onChange={(e) => {
                             setCaption(e.target.value);
-                            // Auto-expand textarea
-                            e.target.style.height = 'auto';
-                            e.target.style.height = Math.max(40, e.target.scrollHeight) + 'px';
                           }}
-                          style={{ height: 'auto' }}
                         />
                       </div>
                     </motion.div>
@@ -420,7 +416,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <div className="flex justify-between w-full">
                     <button
                       onClick={() => setActiveCard('caption')}
-                      className={`flex-1 mr-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 mr-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                         activeCard === 'caption'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -430,7 +426,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('course')}
-                      className={`flex-1 mx-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 mx-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                         activeCard === 'course'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -440,7 +436,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('music')}
-                      className={`flex-1 ml-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                      className={`flex-1 ml-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
                         activeCard === 'music'
                           ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
                           : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
@@ -467,7 +463,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-sm font-medium text-brand-orange">
-                          {isSubmitting ? "Posting..." : "Post"}
+                          {isSubmitting ? "Sharing..." : "Share with the community"}
                         </span>
                       </div>
                     </motion.button>

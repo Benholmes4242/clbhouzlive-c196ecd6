@@ -91,7 +91,7 @@ const CourseTagInput = ({
         // Show selected course pill that replaces the search input
         <div className="w-full h-11 flex items-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl text-sm h-full">
-            <span className="text-base" role="img" aria-label="golf">⛳</span>
+            <span className="text-lg -ml-1" role="img" aria-label="golf">⛳</span>
             <span className="font-medium">{selectedCourse.name}</span>
             <span className="text-white/60 text-xs">
               {selectedCourse.region ? `${selectedCourse.region}, ${selectedCourse.country}` : selectedCourse.country}
