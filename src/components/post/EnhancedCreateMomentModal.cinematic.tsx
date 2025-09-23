@@ -260,7 +260,7 @@ export default function EnhancedCreateMomentModalCinematic({
             >
               <div className="flex h-full flex-col overflow-visible">
                 {/* MEDIA SECTION - takes up ~75% of modal height with bubble protrusion */}
-                <section id="media" className="relative flex-1 -mx-8 -mt-6 rounded-t-3xl overflow-hidden">{/* Extended margins for bubble effect */}
+                <section id="media" className="relative flex-1 -mx-6 -mt-6 rounded-t-3xl overflow-hidden">{/* Reduced margins for better spacing */}
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
