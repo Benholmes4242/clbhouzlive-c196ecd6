@@ -116,7 +116,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     const video = videoRef.current;
 
     // FAST TEST MODE: generate lightweight placeholder frames instantly to validate timing (~0.2s)
-    const FAST_TEST = true;
+    const FAST_TEST = false;
     if (FAST_TEST) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d')!;
