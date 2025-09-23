@@ -765,6 +765,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   // TODO: Add user profile navigation
                   console.log('Navigate to user profile:', item.user?.id);
                 }}
+                className="!bottom-[50px]"
               />
 
               {/* Audio Strip - Only show for video posts with custom audio */}
