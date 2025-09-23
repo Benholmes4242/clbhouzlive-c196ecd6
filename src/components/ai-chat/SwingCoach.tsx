@@ -1115,29 +1115,22 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                        )}
                      </div>
                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-medium truncate">{uploadedVideo.name}</p>
-                        <Button variant="ghost" size="sm" onClick={discardVideo}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      
-                      {/* Analysis status display */}
-                      {isAnalyzing && analysisStatus && (
-                        <div className="mb-3 p-2 bg-primary/10 rounded-lg">
-                          <p className="text-sm text-primary font-medium">{analysisStatus}</p>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground">
-                          {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB
-                        </p>
-                      </div>
+                     <div className="flex-1">
+                       <div className="flex items-center justify-between mb-1">
+                         <p className="text-xs text-muted-foreground">
+                           {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
+                         </p>
+                         <Button variant="ghost" size="sm" onClick={discardVideo}>
+                           <Trash2 className="h-4 w-4" />
+                         </Button>
+                       </div>
+                       
+                       {/* Analysis status display */}
+                       {isAnalyzing && analysisStatus && (
+                         <div className="mb-3 p-2 bg-primary/10 rounded-lg">
+                           <p className="text-sm text-primary font-medium">{analysisStatus}</p>
+                         </div>
+                       )}
 
                       <div className="mt-3">
                         <Button
