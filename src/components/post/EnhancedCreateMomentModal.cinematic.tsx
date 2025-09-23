@@ -243,7 +243,7 @@ export default function EnhancedCreateMomentModalCinematic({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
+              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-visible"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -258,9 +258,9 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex h-full flex-col">
+              <div className="flex h-full flex-col overflow-visible">
                 {/* MEDIA SECTION - takes up ~75% of modal height with bubble protrusion */}
-                <section id="media" className="relative flex-1 overflow-hidden -mx-8 -mt-6 rounded-t-3xl">{/* Extended margins for bubble effect */}
+                <section id="media" className="relative flex-1 -mx-8 -mt-6 rounded-t-3xl overflow-hidden">{/* Extended margins for bubble effect */}
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
