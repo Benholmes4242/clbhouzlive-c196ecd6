@@ -1193,6 +1193,38 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </div>
             ))}
 
+            
+            {/* Error state for SSE auth issues */}
+            {sessionError && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-destructive/20 rounded-full flex items-center justify-center">
+                    ⚠️
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-destructive mb-1">
+                      {sessionError === 'session-expired' ? 'Session Expired' : 
+                       sessionError === 'connection-failed' ? 'Connection Failed' :
+                       'Analysis Error'}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {sessionError === 'session-expired' 
+                        ? 'Your session has expired. Please refresh the page and try again.'
+                        : sessionError === 'connection-failed'
+                        ? 'Unable to connect to the analysis service. Please check your connection and try again.'
+                        : sessionError}
+                    </p>
+                    <button 
+                      onClick={() => window.location.reload()}
+                      className="text-sm bg-destructive text-destructive-foreground px-3 py-1 rounded hover:bg-destructive/90 transition-colors"
+                    >
+                      Refresh Page
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Multi-Phase Analysis UI */}
             {sessionState && (
               <div className="space-y-6 p-4 bg-card border rounded-lg">
@@ -1220,6 +1252,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 <SwingFrameViewer 
                   frames={sessionState.frames}
                   activeFrameIndex={sessionState.activeFrameIndex}
+                  sseConnected={!sessionError && !!sessionState}
+                  onFrameClick={(frameIndex) => {
+                    console.log(`User clicked frame ${frameIndex}`);
+                    // Could update local state or trigger effects here if needed
+                  }}
                 />
 
                 {/* Analysis Results */}

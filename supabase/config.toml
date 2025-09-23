@@ -137,5 +137,8 @@ verify_jwt = false
 [functions.generate-map-url]
 verify_jwt = false
 
+[functions.swing-stream-proxy]
+verify_jwt = false
+
 [functions.swing-visuals-export]
 verify_jwt = true

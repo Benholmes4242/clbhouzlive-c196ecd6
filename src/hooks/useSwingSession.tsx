@@ -41,78 +41,131 @@ export function useSwingSession(): UseSwingSessionReturn {
     try {
       disconnect(); // Clean up any existing connection
       
-      const eventSource = await AnalysisSessionService.createEventSource(sessionId);
-      eventSourceRef.current = eventSource;
+      // Create EventSource with custom implementation to support headers
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
 
-      eventSource.onopen = () => {
-        console.log('SSE connected successfully');
-        reconnectAttempts.current = 0;
-        setError(null);
-      };
-
-      eventSource.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
-        } catch (err) {
-          console.error('Error parsing SSE message:', err);
-        }
-      };
-
-      eventSource.addEventListener('status', (event: any) => {
-        try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
-        } catch (err) {
-          console.error('Error parsing status event:', err);
-        }
+      const url = `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/swing-stream-proxy?sessionId=${encodeURIComponent(sessionId)}`;
+      
+      // Use fetch-based EventSource alternative for header support
+      const abortController = new AbortController();
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Accept': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+        },
+        signal: abortController.signal,
       });
 
-      eventSource.addEventListener('done', (event: any) => {
-        try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
-        } catch (err) {
-          console.error('Error parsing done event:', err);
-        }
-      });
-
-      eventSource.addEventListener('error', (event: any) => {
-        try {
-          const data = JSON.parse(event.data);
-          handleSSEMessage(data);
-        } catch (err) {
-          console.error('Error parsing error event:', err);
-        }
-      });
-
-      eventSource.onerror = (event) => {
-        console.error('SSE error:', event);
-        
-        // Exponential backoff for reconnection
-        if (reconnectAttempts.current < 5) {
-          const delay = Math.pow(2, reconnectAttempts.current) * 1000;
-          reconnectAttempts.current++;
-          
-          reconnectTimeoutRef.current = setTimeout(async () => {
-            console.log(`Reconnecting SSE (attempt ${reconnectAttempts.current})...`);
-            await connectSSE(sessionId);
-          }, delay);
-        } else {
-          setError('Lost connection to analysis service');
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('session-expired');
           toast({
-            title: "Connection lost",
-            description: "Unable to receive real-time updates",
+            title: "Session expired",
+            description: "Please refresh and try again",
             variant: "destructive"
           });
+          return;
         }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      if (!response.body) {
+        throw new Error('No response body');
+      }
+
+      console.log('SSE connected successfully via proxy');
+      reconnectAttempts.current = 0;
+      setError(null);
+
+      // Parse SSE stream manually
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      const processSSEData = () => {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            console.log('SSE stream ended');
+            return;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+          let eventType = '';
+          let eventData = '';
+
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.slice(7);
+            } else if (line.startsWith('data: ')) {
+              eventData = line.slice(6);
+            } else if (line === '' && eventData) {
+              // End of event, process it
+              try {
+                if (eventData.trim()) {
+                  const data = JSON.parse(eventData);
+                  handleSSEMessage(data);
+                }
+              } catch (err) {
+                // Don't crash on parse errors - log and continue
+                console.warn('Failed to parse SSE event data:', eventData, err);
+              }
+              eventType = '';
+              eventData = '';
+            }
+          }
+
+          processSSEData(); // Continue reading
+        }).catch(error => {
+          if (error.name !== 'AbortError') {
+            console.error('SSE read error:', error);
+            handleReconnect();
+          }
+        });
       };
+
+      processSSEData();
+
+      // Store cleanup function
+      eventSourceRef.current = {
+        close: () => abortController.abort()
+      } as EventSource;
 
     } catch (err) {
       console.error('Error creating SSE connection:', err);
-      setError('Failed to connect to analysis service');
+      handleReconnect();
     }
   }, [disconnect, toast]);
+
+  const handleReconnect = useCallback(() => {
+    // Exponential backoff for reconnection
+    if (reconnectAttempts.current < 5) {
+      const delay = Math.pow(2, reconnectAttempts.current) * 1000;
+      reconnectAttempts.current++;
+      
+      reconnectTimeoutRef.current = setTimeout(async () => {
+        console.log(`Reconnecting SSE (attempt ${reconnectAttempts.current})...`);
+        const currentSessionId = sessionState?.sessionId;
+        if (currentSessionId) {
+          await connectSSE(currentSessionId);
+        }
+      }, delay);
+    } else {
+      setError('connection-failed');
+      toast({
+        title: "Connection lost",
+        description: "Unable to receive real-time updates",
+        variant: "destructive"
+      });
+    }
+  }, [connectSSE, sessionState?.sessionId, toast]);
 
   // Separate function for handling summarization
   const handleSummarization = useCallback(async (sessionId: string) => {
@@ -234,7 +287,7 @@ export function useSwingSession(): UseSwingSessionReturn {
 
       return updated;
     });
-  }, [toast, handleSummarization]);
+  }, [toast]);
 
   // Enhanced summarization with exponential backoff
   const summarizeOnce = useCallback(async (sessionId: string) => {

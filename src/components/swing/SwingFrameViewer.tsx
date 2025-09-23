@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { isPlaceholderUrl } from '@/utils/videoFrameExtraction';
@@ -14,15 +14,37 @@ interface SwingFrameViewerProps {
   }>;
   activeFrameIndex?: number;
   className?: string;
+  onFrameClick?: (frameIndex: number) => void;
+  sseConnected?: boolean;
 }
 
 export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
   frames = [],
   activeFrameIndex,
-  className = ""
+  className = "",
+  onFrameClick,
+  sseConnected = true
 }) => {
   const [imageError, setImageError] = useState<string | null>(null);
-  const activeFrame = frames.find(f => f.index === activeFrameIndex);
+  const [localActiveIndex, setLocalActiveIndex] = useState(activeFrameIndex || 1);
+  
+  // Auto-advance frames locally if SSE is disconnected and we have frames
+  useEffect(() => {
+    if (!sseConnected && frames.length > 1) {
+      const interval = setInterval(() => {
+        setLocalActiveIndex(prev => {
+          const nextIndex = prev >= frames.length ? 1 : prev + 1;
+          if (onFrameClick) onFrameClick(nextIndex);
+          return nextIndex;
+        });
+      }, 250);
+      return () => clearInterval(interval);
+    }
+  }, [sseConnected, frames.length, onFrameClick]);
+
+  // Use external activeFrameIndex when SSE is connected, local when disconnected
+  const currentActiveIndex = sseConnected ? (activeFrameIndex || 1) : localActiveIndex;
+  const activeFrame = frames.find(f => f.index === currentActiveIndex);
   
   if (!activeFrame && frames.length === 0) {
     return (
@@ -46,9 +68,16 @@ export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium">Swing Frame Analysis</h3>
           {displayFrame && (
-            <Badge variant="outline" className="text-xs">
-              Frame {displayFrame.index} • {displayFrame.t.toFixed(2)}s
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                Frame {displayFrame.index} • {displayFrame.t.toFixed(2)}s
+              </Badge>
+              {!sseConnected && (
+                <Badge variant="secondary" className="text-xs">
+                  Local Preview
+                </Badge>
+              )}
+            </div>
           )}
         </div>
         
@@ -93,10 +122,14 @@ export const SwingFrameViewer: React.FC<SwingFrameViewerProps> = ({
                 <div
                   key={frame.index}
                   className={`flex-shrink-0 w-12 h-8 rounded border-2 overflow-hidden cursor-pointer transition-colors ${
-                    frame.index === activeFrameIndex 
+                    frame.index === currentActiveIndex 
                       ? 'border-primary' 
                       : 'border-border hover:border-primary/50'
                   }`}
+                  onClick={() => {
+                    setLocalActiveIndex(frame.index);
+                    if (onFrameClick) onFrameClick(frame.index);
+                  }}
                 >
                   {!isFramePlaceholder ? (
                     <img

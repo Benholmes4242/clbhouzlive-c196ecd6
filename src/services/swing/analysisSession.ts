@@ -70,8 +70,15 @@ export class AnalysisSessionService {
       throw new Error('Not authenticated');
     }
 
-    const url = `${this.PROJECT_URL}/functions/v1/swing-session-stream?sessionId=${sessionId}&access_token=${session.access_token}`;
-    return new EventSource(url);
+    // Use proxy endpoint that handles auth server-side
+    const url = `${this.PROJECT_URL}/functions/v1/swing-stream-proxy?sessionId=${encodeURIComponent(sessionId)}`;
+    
+    // EventSource with custom headers using a fetch polyfill approach
+    return new EventSource(url, {
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`
+      }
+    } as any);
   }
 
   static async getSession(sessionId: string) {
