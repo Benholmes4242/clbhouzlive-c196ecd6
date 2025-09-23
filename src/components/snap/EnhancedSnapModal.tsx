@@ -301,7 +301,7 @@ const EnhancedSnapModal = ({
                             </div>
                           ) : key === "camera" ? (
                             <div className="w-24 h-16 shrink-0 flex items-center justify-center">
-                              <span className="text-5xl">📸</span>
+                              <span className="text-6xl">📸</span>
                             </div>
                           ) : null}
                        </div>
