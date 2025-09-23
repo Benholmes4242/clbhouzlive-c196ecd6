@@ -662,29 +662,26 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         'Finalizing analysis...'
       ];
 
-      // Fixed timing with 1 second between each analysis phase
+      // Fixed timing with 1 second between each frame and analysis phase
       const startDynamicProgression = () => {
         let currentPhaseIndex = 0;
-        let frameUpdateCounter = 0;
         
         const progressUpdate = () => {
-          // Update frame carousel every 300ms for smooth progression
+          // Update frame carousel every 1000ms (1 second)
           if (extractedFrames.length > 0) {
             setCurrentFrameIndex(frameIdx % extractedFrames.length);
             frameIdx++;
           }
-          frameUpdateCounter++;
           
-          // Update analysis status every 1000ms (1 second)
-          // Since frames update every 300ms, analysis phases update every ~3.33 frame updates
-          if (frameUpdateCounter % 3 === 0 && currentPhaseIndex < analysisPhases.length) {
+          // Update analysis status every 1000ms (1 second) - same timing as frames
+          if (currentPhaseIndex < analysisPhases.length) {
             setAnalysisStatus(analysisPhases[currentPhaseIndex]);
             currentPhaseIndex++;
           }
         };
         
-        // Update frames every 300ms, analysis phases effectively every 1000ms
-        frameInterval = setInterval(progressUpdate, 300);
+        // Update both frames and analysis phases every 1000ms (1 second)
+        frameInterval = setInterval(progressUpdate, 1000);
       };
 
       // Function to adjust timing based on actual API response time
