@@ -148,12 +148,19 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
       return;
     }
 
-    if (!video) return;
+    if (!video) {
+      console.error('Video element not found');
+      return;
+    }
+
+    console.log(`Video URL: ${videoUrl}, duration: ${video.duration}, ready state: ${video.readyState}`);
 
     // Ensure metadata is ready before seeking
     if (!isFinite(video.duration) || video.duration === 0) {
+      console.log('Waiting for video metadata...');
       await new Promise<void>((resolve) => {
         const onMeta = () => {
+          console.log(`Video metadata loaded - duration: ${video.duration}, dimensions: ${video.videoWidth}x${video.videoHeight}`);
           video.removeEventListener('loadedmetadata', onMeta);
           resolve();
         };
@@ -180,10 +187,13 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
         };
         const onSeeked = () => {
           try {
+            console.log(`Extracting frame ${i} at timestamp ${timestamp}, video dimensions: ${video.videoWidth}x${video.videoHeight}`);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            console.log(`Frame ${i} extracted successfully, data length: ${imageData.length}`);
             frames.push({ id: `frame-${i}`, imageData, timestamp });
-          } catch (_) {
+          } catch (error) {
+            console.error(`Failed to extract frame ${i}:`, error);
             // If cross-origin taints the canvas or draw fails, push empty placeholder
             frames.push({ id: `frame-${i}`, imageData: '', timestamp });
           }
