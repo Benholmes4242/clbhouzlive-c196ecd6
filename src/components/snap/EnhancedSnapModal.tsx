@@ -128,7 +128,7 @@ const EnhancedSnapModal = ({
     }] : []),
     {
       key: "photos",
-      label: "Photos", 
+      label: "Photos & Videos", 
       description: "Pick from gallery",
       icon: Images,
       onClick: handlePickMedia,
@@ -219,7 +219,7 @@ const EnhancedSnapModal = ({
                   role="status"
                   aria-live="polite"
                 >
-                  Share your golf moment with the community ⛳️
+                  Share your golf moment with the community
                 </div>
               </div>
 
@@ -292,7 +292,7 @@ const EnhancedSnapModal = ({
                          
                          {/* Image preview - rectangle on the right */}
                          {previewImages && previewImages.length > 0 && (
-                           <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0">
+                           <div className="w-20 h-16 rounded-lg overflow-hidden shrink-0">
                              <DynamicPreview 
                                variant={previewVariant}
                                images={previewImages}
@@ -305,35 +305,6 @@ const EnhancedSnapModal = ({
                   ))}
                 </div>
 
-                {/* Quick Post shortcut */}
-                <motion.div
-                  className="mt-4 pt-4 border-t border-white/10"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <motion.button
-                    onClick={handlePickMedia}
-                    className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
-                    whileHover={{ scale: prefersReducedMotion ? 1 : 1.02 }}
-                    whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
-                    aria-label="Quick Post - fastest way to share"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <motion.div
-                        whileHover={!prefersReducedMotion ? { 
-                          scale: 1.1,
-                          rotate: 15,
-                          boxShadow: '0 0 12px rgba(247,147,30,0.5)'
-                        } : {}}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Zap className="w-4 h-4 text-brand-orange" />
-                      </motion.div>
-                      <span className="text-sm font-medium text-brand-orange">Quick Post</span>
-                    </div>
-                  </motion.button>
-                </motion.div>
 
                 {/* Error state */}
                 {error && (
