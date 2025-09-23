@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { HistorySwingCard } from '@/components/swing/HistorySwingCard';
 import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
@@ -24,16 +25,22 @@ export const SwingCoachHistory: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCoachPicker, setShowCoachPicker] = useState(false);
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<string | null>(null);
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const { toast } = useToast();
 
   useEffect(() => {
-    loadAnalyses();
-  }, []);
+    if (!sessionLoading && user) {
+      loadAnalyses();
+    }
+  }, [user, sessionLoading]);
 
   const loadAnalyses = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('No authenticated user for loading analyses');
+        setIsLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from('pro_ai_analyses')
@@ -128,12 +135,28 @@ export const SwingCoachHistory: React.FC = () => {
     </div>
   );
 
-  if (isLoading) {
+  if (sessionLoading || isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-2">
           <div className="animate-spin h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-sm text-muted-foreground">Loading analyses...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Eye className="h-12 w-12 text-muted-foreground mx-auto" />
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Please sign in</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              You need to be signed in to view your swing analysis history.
+            </p>
+          </div>
         </div>
       </div>
     );
