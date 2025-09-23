@@ -252,51 +252,55 @@ const EnhancedSnapModal = ({
                       whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
                       aria-label={`${label}: ${description}`}
                     >
-                      <div className="flex items-start gap-4">
-                        {/* Icon with micro-interactions */}
-                        <motion.div 
-                          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 ${
-                            isSpecial
-                              ? 'bg-brand-orange/10 group-hover:bg-brand-orange/20 border border-brand-orange/30 group-hover:border-brand-orange/50'
-                              : 'bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40'
-                          }`}
-                          whileHover={!prefersReducedMotion ? {
-                            ...(microInteraction === 'shutter' && { opacity: [1, 0.5, 1] }),
-                            ...(microInteraction === 'fan' && { x: [0, 1, 0], y: [0, -1, 0] }),
-                            ...(microInteraction === 'glow' && { 
-                              boxShadow: '0 0 16px rgba(247,147,30,0.6)',
-                              scale: 1.05
-                            })
-                          } : {}}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Icon className={`w-5 h-5 transition-colors duration-200 ${
-                            isSpecial 
-                              ? 'text-brand-orange' 
-                              : 'text-white group-hover:text-brand-orange'
-                          }`} />
-                        </motion.div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <h3 className={`font-semibold text-base ${
-                              isSpecial ? 'text-brand-orange' : 'text-white'
-                            }`}>
-                              {label}
-                              {isSpecial && <span className="ml-2 text-brand-orange/70">🎞️</span>}
-                            </h3>
-                          </div>
-                          <p className="text-sm text-white/70 mb-3">{description}</p>
-                          
-                          {/* Dynamic Preview */}
-                          <DynamicPreview 
-                            variant={previewVariant}
-                            images={previewImages}
-                            className="relative"
-                          />
-                        </div>
-                      </div>
+                       <div className="flex items-center gap-4 h-16">
+                         {/* Icon and text content - centered vertically */}
+                         <div className="flex items-center gap-4 flex-1">
+                           <motion.div 
+                             className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 ${
+                               isSpecial
+                                 ? 'bg-brand-orange/10 group-hover:bg-brand-orange/20 border border-brand-orange/30 group-hover:border-brand-orange/50'
+                                 : 'bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40'
+                             }`}
+                             whileHover={!prefersReducedMotion ? {
+                               ...(microInteraction === 'shutter' && { opacity: [1, 0.5, 1] }),
+                               ...(microInteraction === 'fan' && { x: [0, 1, 0], y: [0, -1, 0] }),
+                               ...(microInteraction === 'glow' && { 
+                                 boxShadow: '0 0 16px rgba(247,147,30,0.6)',
+                                 scale: 1.05
+                               })
+                             } : {}}
+                             transition={{ duration: 0.2 }}
+                           >
+                             <Icon className={`w-5 h-5 transition-colors duration-200 ${
+                               isSpecial 
+                                 ? 'text-brand-orange' 
+                                 : 'text-white group-hover:text-brand-orange'
+                             }`} />
+                           </motion.div>
+                           
+                           {/* Text content - centered vertically */}
+                           <div className="flex-1 min-w-0">
+                             <h3 className={`font-semibold text-base ${
+                               isSpecial ? 'text-brand-orange' : 'text-white'
+                             }`}>
+                               {label}
+                               {isSpecial && <span className="ml-2 text-brand-orange/70">🎞️</span>}
+                             </h3>
+                             <p className="text-sm text-white/70">{description}</p>
+                           </div>
+                         </div>
+                         
+                         {/* Image preview - rectangle on the right */}
+                         {previewImages && previewImages.length > 0 && (
+                           <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0">
+                             <DynamicPreview 
+                               variant={previewVariant}
+                               images={previewImages}
+                               className="w-full h-full"
+                             />
+                           </div>
+                         )}
+                       </div>
                     </motion.button>
                   ))}
                 </div>
