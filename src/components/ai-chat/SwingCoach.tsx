@@ -1088,7 +1088,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 </div>
                 <div className="flex flex-col gap-4">
                    <div className="w-full">
-                     <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
+                     <div className="relative w-full h-64 overflow-hidden rounded-2xl bg-black">
                        {/* Show cycling frames during analysis, otherwise show video/image preview */}
                        {isAnalyzing && extractedFrames.length > 0 ? (
                          <img 
