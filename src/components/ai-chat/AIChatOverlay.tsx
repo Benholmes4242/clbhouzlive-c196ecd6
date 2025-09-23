@@ -584,7 +584,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
 
             <TabsContent value="swing" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
-              <div className="w-full px-2 py-3">
+              <div className="w-full px-6 py-3">
                 <SwingCoach 
                   onClose={() => setActiveTab('chat')}
                   isRecording={isRecording}
