@@ -425,9 +425,18 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
                   {uploadedVideo.name} • {(uploadedVideo.size / (1024 * 1024)).toFixed(1)}MB
                 </div>
                 
+                {/* Analyze Swing button - moved above media card */}
+                {analysisState.status === 'idle' && (
+                  <div className="flex">
+                    <Button onClick={startAnalysis} className="ml-auto">
+                      Analyze Swing
+                    </Button>
+                  </div>
+                )}
+                
                 <Card className="p-4">
                   <div className="space-y-4">
-                    <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                    <div className="relative h-64 bg-black rounded-lg overflow-hidden">
                       <video
                         src={videoPreview}
                         controls
@@ -451,15 +460,6 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                    
-                    {/* Analyze Swing button */}
-                    {analysisState.status === 'idle' && (
-                      <div className="flex">
-                        <Button onClick={startAnalysis} className="ml-auto">
-                          Analyze Swing
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </Card>
               </div>
@@ -480,15 +480,15 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
           </div>
         </div>
 
-        {/* Recent History Bar */}
+            {/* Recent History Bar */}
         <div className="p-4 border-t">
           <button
-            className="w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition-colors"
+            className="w-full rounded-[28px] bg-accent/10 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-foreground hover:bg-accent/15 transition-colors"
             onClick={() => setShowHistory(true)}
             aria-label="Open recent swing coach history"
           >
             <span className="flex items-center gap-2">
-              <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+              <span className="w-10 h-1 rounded-full bg-accent/60" />
               Recent history
             </span>
             <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>

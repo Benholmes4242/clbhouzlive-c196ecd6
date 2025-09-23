@@ -76,33 +76,31 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
   const primaryDrill = drills[0];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 motion-reduce:transition-none">
+    <div className="space-y-4 motion-reduce:transition-none w-full">
       {/* Summary */}
       <SummaryCard summary={summary} />
 
       {/* Priority Fix */}
       <PriorityFixBar fix={priorityFix} />
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        {/* Left: Video + Timeline */}
-        <div className="space-y-3">
-          <KeyframePlayer 
-            videoUrl={videoUrl} 
-            currentTime={currentVideoTime}
-            onTimeUpdate={setCurrentVideoTime}
-          />
-          <PhaseStepper 
-            phases={phases} 
-            selectedPhase={selectedPhase}
-            onPhaseSelect={handlePhaseSelect}
-          />
-        </div>
+      {/* Video + Timeline - Full Width */}
+      <div className="space-y-3">
+        <KeyframePlayer 
+          videoUrl={videoUrl} 
+          currentTime={currentVideoTime}
+          onTimeUpdate={setCurrentVideoTime}
+        />
+        <PhaseStepper 
+          phases={phases} 
+          selectedPhase={selectedPhase}
+          onPhaseSelect={handlePhaseSelect}
+        />
+      </div>
 
-        {/* Right: Phase + Drill */}
-        <div className="space-y-3">
-          <PhaseCard phase={selectedPhase} />
-          {primaryDrill && <DrillCard drill={primaryDrill} />}
-        </div>
+      {/* Phase + Drill - Full Width */}
+      <div className="space-y-3">
+        <PhaseCard phase={selectedPhase} />
+        {primaryDrill && <DrillCard drill={primaryDrill} />}
       </div>
 
       {/* Coach Recommendations */}
