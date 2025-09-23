@@ -333,7 +333,7 @@ const EnhancedSnapModal = ({
                               
                               {/* Single wider image preview on the right, closer to emoji */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="w-42 h-16 rounded-lg overflow-hidden shrink-0">
+                                <div className="w-36 h-16 rounded-lg overflow-hidden shrink-0">
                                   <img 
                                     src={previewImages[0]} 
                                     alt="Story preview" 
