@@ -364,6 +364,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
   const mediaUrl = user.latestVideo?.url || user.latestPhoto?.url;
   const isVideo = !!user.latestVideo;
+  const isHls = !!user.latestVideo && (/.m3u8(\?|$)/.test(mediaUrl) || mediaUrl.includes('videodelivery.net'));
 
   return (
     <div
@@ -399,7 +400,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             ref={videoRef}
             src={mediaUrl}
             poster={user.latestVideo?.poster}
-            autoplay={false} // Performance: Don't autoplay immediately
+            autoplay={isVisible}
             playsInline={true}
             muted={true}
             loop={true}
@@ -407,6 +408,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             className="w-full h-full aspect-[3/4]"
             objectFit="cover"
             hideControls={true}
+            enableHLS={isHls}
             onEnded={() => {
               // Ensure loop continues - restart video if it ends
               const video = videoRef.current;
