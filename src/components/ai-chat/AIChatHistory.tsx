@@ -648,14 +648,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   // Filter conversations based on search
   const filteredConversations = conversations.filter(conversation =>
-    conversation.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    conversation.messages.some(msg => msg.content.toLowerCase().includes(searchQuery.toLowerCase()))
+    conversation.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conversation.messages.some(msg => msg.content?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // Filter swing analyses based on search
   const filteredSwingAnalyses = swingAnalyses.filter(analysis =>
-    analysis.save_card.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    analysis.content.toLowerCase().includes(searchQuery.toLowerCase())
+    analysis.save_card?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    analysis.content?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
