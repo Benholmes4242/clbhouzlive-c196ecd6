@@ -114,7 +114,52 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
   const extractFramesFromVideo = async () => {
     const video = videoRef.current;
+
+    // FAST TEST MODE: generate lightweight placeholder frames instantly to validate timing (~0.2s)
+    const FAST_TEST = true;
+    if (FAST_TEST) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const frames: SwingFrame[] = [];
+
+      canvas.width = 640;
+      canvas.height = 480;
+
+      for (let i = 0; i < 10; i++) {
+        // simple visual variation per frame
+        ctx.fillStyle = `hsl(${(i * 36) % 360} 30% 18%)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 40px system-ui, -apple-system, Segoe UI, Roboto';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`Frame ${i + 1}`, canvas.width / 2, canvas.height / 2);
+
+        const imageData = canvas.toDataURL('image/jpeg', 0.7);
+        frames.push({ id: `frame-${i}`, imageData, timestamp: i });
+      }
+
+      setSwingFrames(frames);
+      if (frames.length > 0) {
+        setCurrentFrameImage(frames[0].imageData);
+        setCurrentFrameIndex(0);
+      }
+      return;
+    }
+
     if (!video) return;
+
+    // Ensure metadata is ready before seeking
+    if (!isFinite(video.duration) || video.duration === 0) {
+      await new Promise<void>((resolve) => {
+        const onMeta = () => {
+          video.removeEventListener('loadedmetadata', onMeta);
+          resolve();
+        };
+        video.addEventListener('loadedmetadata', onMeta, { once: true });
+      });
+    }
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
@@ -127,20 +172,41 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     // Extract 10 frames
     for (let i = 0; i < 10; i++) {
       const timestamp = (video.duration / 10) * i;
-      video.currentTime = timestamp;
-      
-      await new Promise(resolve => {
-        video.addEventListener('seeked', () => {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = canvas.toDataURL('image/jpeg', 0.8);
-          
-          frames.push({
-            id: `frame-${i}`,
-            imageData,
-            timestamp
-          });
-          resolve(void 0);
-        }, { once: true });
+
+      await new Promise<void>((resolve) => {
+        const cleanup = () => {
+          video.removeEventListener('seeked', onSeeked);
+          video.removeEventListener('error', onError);
+        };
+        const onSeeked = () => {
+          try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            frames.push({ id: `frame-${i}`, imageData, timestamp });
+          } catch (_) {
+            // If cross-origin taints the canvas or draw fails, push empty placeholder
+            frames.push({ id: `frame-${i}`, imageData: '', timestamp });
+          }
+          cleanup();
+          resolve();
+        };
+        const onError = () => {
+          // fail-soft, push placeholder
+          frames.push({ id: `frame-${i}`, imageData: '', timestamp });
+          cleanup();
+          resolve();
+        };
+
+        video.addEventListener('seeked', onSeeked, { once: true });
+        video.addEventListener('error', onError, { once: true });
+        video.currentTime = timestamp;
+
+        // Safety timeout to avoid long stalls
+        setTimeout(() => {
+          if (video.currentTime !== timestamp) {
+            onSeeked();
+          }
+        }, 300);
       });
     }
 
@@ -170,8 +236,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
         setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
       }
       
-      // Simulate analysis time (optimized delays)
-      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 400));
+      // Simulate analysis time (ultra-optimized delays)
+      await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 200));
       
       // Generate mock analysis for the phase
       const mockAnalysis = generatePhaseAnalysis(phase);
@@ -185,7 +251,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
       onPhaseUpdate?.(updatedPhase);
       
       // Small delay before next phase
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
     
     setAnalysisPhase('complete');

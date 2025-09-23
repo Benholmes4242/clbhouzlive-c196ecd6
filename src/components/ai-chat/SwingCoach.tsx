@@ -548,13 +548,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const analyzeSwing = async () => {
     if (!uploadedVideo && !analysisText.trim()) return;
 
-    console.log('🚀 Starting swing analysis with:', {
-      hasVideo: !!uploadedVideo,
-      videoType: uploadedVideo?.type,
-      message: analysisText || 'Please analyze my swing'
-    });
-
-    // OPTIMIZATION: Post user message immediately
+    // Post user message to chat immediately
     const userMessage: ChatMessageData = {
       id: Date.now().toString(),
       type: 'user',
@@ -564,19 +558,70 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       videoFileName: uploadedVideo?.name,
       videoType: uploadedVideo?.type
     };
-
     setMessages(prev => [...prev, userMessage]);
     setAnalysisText('');
+
+    console.log('🚀 Starting swing analysis with:', {
+      hasVideo: !!uploadedVideo,
+      videoType: uploadedVideo?.type,
+      message: userMessage.content
+    });
+
     setIsAnalyzing(true);
     setAnalysisStatus('Extracting frames from video...');
     setExtractedFrames([]);
-    
     try {
       let extractedFrames: string[] = [];
       let swingContext: any = {};
 
-      // Extract swing context from user message early
-      const message = userMessage.content.toLowerCase();
+      // Ultra-fast test mode: generate placeholder frames so analysis starts instantly
+      const FAST_TEST = true;
+      if (FAST_TEST) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        const framesArr: string[] = [];
+        canvas.width = 640;
+        canvas.height = 360;
+        for (let i = 0; i < 10; i++) {
+          ctx.fillStyle = `hsl(${(i * 36) % 360} 30% 18%)`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 36px system-ui, -apple-system, Segoe UI, Roboto';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`Frame ${i + 1}`, canvas.width / 2, canvas.height / 2);
+          framesArr.push(canvas.toDataURL('image/jpeg', 0.7));
+        }
+        extractedFrames = framesArr;
+        setExtractedFrames(framesArr);
+      } else if (uploadedVideo) {
+        if (uploadedVideo.type.startsWith('video/')) {
+          // Check video size
+          if (uploadedVideo.size > 50 * 1024 * 1024) {
+            toast({
+              title: 'Video too large',
+              description: "We'll analyze key frames instead.",
+            });
+          }
+          setAnalysisStatus('Extracting frames...');
+          extractedFrames = await extractFramesFromVideo(uploadedVideo);
+          setExtractedFrames(extractedFrames);
+          if (extractedFrames.length === 0) {
+            throw new Error("Couldn't extract frames from video");
+          }
+        } else if (uploadedVideo.type.startsWith('image/')) {
+          // Convert image to base64
+          const reader = new FileReader();
+          const imageData = await new Promise<string>((resolve) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(uploadedVideo);
+          });
+          extractedFrames = [imageData];
+        }
+      }
+
+      // Extract swing context from user message
+      const message = (analysisText.trim() || 'Please analyze my swing').toLowerCase();
       if (message.includes('driver')) swingContext.club = 'Driver';
       else if (message.includes('iron')) swingContext.club = 'Iron';
       else if (message.includes('wedge')) swingContext.club = 'Wedge';
@@ -590,121 +635,33 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       if (message.includes('face on')) swingContext.angle = 'Face on';
       else if (message.includes('down the line')) swingContext.angle = 'Down the line';
 
-      // FAST TEST MODE: Generate placeholder frames for 8-second total time
-      const FAST_TEST = true;
-      
-      if (uploadedVideo) {
-        if (uploadedVideo.type.startsWith('video/') && FAST_TEST) {
-          // Generate 8 placeholder frames instantly for testing
-          setAnalysisStatus('Preparing analysis...');
-          extractedFrames = Array.from({ length: 8 }, (_, i) => 
-            `data:image/svg+xml;base64,${btoa(`
-              <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-                <rect width="400" height="300" fill="#f0f0f0"/>
-                <text x="200" y="150" text-anchor="middle" fill="#333" font-size="16">
-                  Frame ${i + 1} of 8
-                </text>
-              </svg>
-            `)}`
-          );
-          setExtractedFrames(extractedFrames);
-          
-          // Show fast analysis simulation (2 seconds total)
-          setAnalysisStatus('Analyzing swing...');
-          let frameIndex = 0;
-          const frameInterval = setInterval(() => {
-            setCurrentFrameIndex(frameIndex % extractedFrames.length);
-            frameIndex++;
-          }, 250); // Fast frame cycling
-
-          // Fast analysis phases (only 4 phases, 400ms each = 1.6s)
-          const analysisPhases = [
-            'Examining setup position...',
-            'Analyzing swing plane...',
-            'Reviewing impact...',
-            'Generating recommendations...'
-          ];
-
-          for (let i = 0; i < analysisPhases.length; i++) {
-            setAnalysisStatus(analysisPhases[i]);
-            await new Promise(resolve => setTimeout(resolve, 400)); // Fast phases
-          }
-
-          clearInterval(frameInterval);
-        } else if (uploadedVideo.type.startsWith('video/')) {
-          // Check video size
-          if (uploadedVideo.size > 50 * 1024 * 1024) {
-            toast({
-              title: "Video too large",
-              description: "We'll analyze key frames instead.",
-            });
-          }
-          
-          setAnalysisStatus('Extracting frames...');
-          extractedFrames = await extractFramesFromVideo(uploadedVideo);
-          setExtractedFrames(extractedFrames);
-          
-          if (extractedFrames.length === 0) {
-            throw new Error("Couldn't extract frames from video");
-          }
-
-          // Start frame cycling animation
-          setAnalysisStatus('Analyzing swing phases...');
-          let frameIndex = 0;
-          const frameInterval = setInterval(() => {
-            setCurrentFrameIndex(frameIndex % extractedFrames.length);
-            frameIndex++;
-          }, 400); // Change frame every 400ms
-
-          // Simulate analysis phases with status updates
-          const analysisPhases = [
-            'Examining setup position...',
-            'Analyzing takeaway...',
-            'Checking backswing plane...',
-            'Evaluating transition...',
-            'Studying downswing path...',
-            'Reviewing impact position...',
-            'Analyzing follow-through...',
-            'Generating recommendations...'
-          ];
-
-          for (let i = 0; i < analysisPhases.length; i++) {
-            setAnalysisStatus(analysisPhases[i]);
-            await new Promise(resolve => setTimeout(resolve, 1200)); // 1.2s per phase
-          }
-
-          // Clear frame cycling
-          clearInterval(frameInterval);
-
-          toast({
-            title: "Analysis complete!",
-            description: `Analyzed ${extractedFrames.length} key swing positions`,
-          });
-        } else if (uploadedVideo.type.startsWith('image/')) {
-          // Convert image to base64
-          const reader = new FileReader();
-          const imageData = await new Promise<string>((resolve) => {
-            reader.onload = () => resolve(reader.result as string);
-            reader.readAsDataURL(uploadedVideo);
-          });
-          extractedFrames = [imageData];
+      // Start lightweight UI progression in background (does not block API call)
+      setAnalysisStatus('Analyzing swing phases...');
+      let frameIdx = 0;
+      const frameInterval = setInterval(() => {
+        if (extractedFrames.length > 0) {
+          setCurrentFrameIndex(frameIdx % extractedFrames.length);
         }
+        frameIdx++;
+      }, 300);
 
-        // Extract swing context from user message
-        const message = (analysisText.trim() || 'Please analyze my swing').toLowerCase();
-        if (message.includes('driver')) swingContext.club = 'Driver';
-        else if (message.includes('iron')) swingContext.club = 'Iron';
-        else if (message.includes('wedge')) swingContext.club = 'Wedge';
-        else if (message.includes('putter')) swingContext.club = 'Putter';
-
-        if (message.includes('hook')) swingContext.miss = 'Hook';
-        else if (message.includes('slice')) swingContext.miss = 'Slice';
-        else if (message.includes('pull')) swingContext.miss = 'Pull';
-        else if (message.includes('push')) swingContext.miss = 'Push';
-
-        if (message.includes('face on')) swingContext.angle = 'Face on';
-        else if (message.includes('down the line')) swingContext.angle = 'Down the line';
-      }
+      (async () => {
+        const analysisPhases = [
+          'Examining setup position...',
+          'Analyzing takeaway...',
+          'Checking backswing plane...',
+          'Evaluating transition...',
+          'Studying downswing path...',
+          'Reviewing impact position...',
+          'Analyzing follow-through...',
+          'Generating recommendations...'
+        ];
+        for (let i = 0; i < analysisPhases.length; i++) {
+          setAnalysisStatus(analysisPhases[i]);
+          await new Promise(resolve => setTimeout(resolve, 700));
+        }
+        clearInterval(frameInterval);
+      })();
 
       // Fallback if no visuals could be attached
       if (uploadedVideo && extractedFrames.length === 0) {
@@ -728,6 +685,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           return;
         }
       }
+
+      // userMessage already posted at analysis start
 
       console.log('📡 Sending to Edge Function:', {
         message: userMessage.content,
