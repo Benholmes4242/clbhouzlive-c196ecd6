@@ -293,14 +293,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     />
                   </motion.div>
 
-                  {/* Close button overlay */}
-                  <button 
-                    onClick={close} 
-                    aria-label="Close" 
-                    className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-black/30 hover:bg-black/50 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
 
                   {/* Video duration pill - top left */}
                   {media[activeIndex]?.type === 'video' && (
