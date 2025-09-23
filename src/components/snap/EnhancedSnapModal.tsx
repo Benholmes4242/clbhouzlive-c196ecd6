@@ -103,18 +103,17 @@ const EnhancedSnapModal = ({
   const photosAdapted = useMemo(() => adaptMedia(photos, "image"), [photos]);
   const videosAdapted = useMemo(() => adaptMedia(videos, "video"), [videos]);
 
-  // Get latest 3 media items from user's posts (photos + videos combined)
-  const latestMedia = useMemo(() => {
-    const allMedia = [...photosAdapted, ...videosAdapted];
-    // Sort by creation date if available, otherwise use array order
-    const sortedMedia = allMedia.length > 0 ? allMedia.slice(0, 3) : [];
-    return sortedMedia.length > 0 
-      ? sortedMedia.map(m => m.thumbUrl || m.url).filter(Boolean)
-      : placeholders.photos.slice(0, 3);
-  }, [photosAdapted, videosAdapted]);
+  // Get images for previews - use user's media or fallback to placeholders
+  const photoUrls = photosAdapted.length > 0 
+    ? photosAdapted.slice(0, 3).map(p => p.url).filter(Boolean)
+    : placeholders.photos;
+  
+  const videoUrls = videosAdapted.length > 0 
+    ? videosAdapted.slice(0, 3).map(v => v.thumbUrl || v.url).filter(Boolean)
+    : placeholders.videos;
 
-  // Use latest media for both cards
-  const mediaUrls = latestMedia;
+  // Mixed media for story preview
+  const storyUrls = [...photoUrls.slice(0, 2), ...videoUrls.slice(0, 2)];
 
   const actionOptions = [
     ...(isMobile ? [{
@@ -134,7 +133,7 @@ const EnhancedSnapModal = ({
       icon: Images,
       onClick: handlePickMedia,
       previewVariant: "photos" as const,
-      previewImages: mediaUrls,
+      previewImages: photoUrls,
       microInteraction: "fan",
     },
     {
@@ -144,7 +143,7 @@ const EnhancedSnapModal = ({
       icon: Film,
       onClick: handlePickMedia,
       previewVariant: "story" as const,
-      previewImages: mediaUrls,
+      previewImages: storyUrls,
       microInteraction: "glow",
       isSpecial: true, // Orange accent styling
     },
@@ -294,21 +293,25 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Two images preview */}
+                              {/* Two-card preview on the right */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="flex gap-1 shrink-0">
-                                  {previewImages.slice(0, 2).map((imageUrl, index) => (
-                                    <div 
-                                      key={index}
-                                      className={`${index === 0 ? 'w-16' : 'w-12'} h-16 rounded-lg overflow-hidden`}
-                                    >
-                                      <img 
-                                        src={imageUrl} 
-                                        alt={`Preview ${index + 1}`} 
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  ))}
+                                <div className="flex gap-2 shrink-0">
+                                  {/* Smaller card on left - made wider */}
+                                  <div className="w-16 h-16 rounded-lg overflow-hidden">
+                                    <img 
+                                      src={previewImages[0]} 
+                                      alt="Preview" 
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  {/* Larger card on right */}
+                                  <div className="w-24 h-16 rounded-lg overflow-hidden">
+                                    <DynamicPreview 
+                                      variant={previewVariant}
+                                      images={previewImages}
+                                      className="w-full h-full"
+                                    />
+                                  </div>
                                 </div>
                               )}
                             </>
@@ -328,16 +331,14 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Single image preview */}
+                              {/* Single wider image preview on the right, closer to emoji */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="shrink-0">
-                                  <div className="w-12 h-16 rounded-lg overflow-hidden">
-                                    <img 
-                                      src={previewImages[2] || previewImages[0]} 
-                                      alt="Story preview" 
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
+                                <div className="w-36 h-16 rounded-lg overflow-hidden shrink-0">
+                                  <img 
+                                    src={previewImages[0]} 
+                                    alt="Story preview" 
+                                    className="w-full h-full object-cover"
+                                  />
                                 </div>
                               )}
                             </>
