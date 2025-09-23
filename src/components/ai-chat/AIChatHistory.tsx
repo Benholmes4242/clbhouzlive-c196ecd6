@@ -21,8 +21,6 @@ import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { SlideOver } from '@/components/ui/slide-over';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
-import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
-import { SwingVisualizer } from '@/services/swing/visualizer';
 
 // HLS Video Player Component
 const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -148,8 +146,7 @@ const SwingAnalysisCard: React.FC<{
   onDelete: () => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onExportPack: (analysisId: string) => void;
-}> = ({ analysis, onDelete, isExpanded, onToggleExpand, onExportPack }) => {
+}> = ({ analysis, onDelete, isExpanded, onToggleExpand }) => {
   const [thumbnailError, setThumbnailError] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
@@ -265,97 +262,83 @@ const SwingAnalysisCard: React.FC<{
       {/* Expanded Content */}
       {isExpanded && (
         <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
-          <div className="w-full max-w-[960px] mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <section className="lg:col-span-7">
-                <div className="space-y-4 max-h-80 overflow-y-auto">
-                  {/* Video Section */}
-                  {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
-                    <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                      {isVideoLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-muted-foreground/30"></div>
-                        </div>
-                      )}
-                      <HLSVideoPlayer
-                        src={analysis.videoUrl || analysis.videoSrc}
-                        poster={analysis.videoThumbnail || analysis.videoPoster}
-                        className="w-full h-full"
-                      />
-                    </div>
-                  ) : analysis.videoThumbnail ? (
-                    <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                      <img 
-                        src={analysis.videoThumbnail} 
-                        alt="Swing analysis"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                        <div className="text-white text-center p-4">
-                          <FileText className="h-8 w-8 mx-auto mb-2" />
-                          <p className="text-sm font-medium mb-1">Swing Analysis</p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                      <div className="text-center text-muted-foreground">
-                        <FileText className="h-8 w-8 mx-auto mb-2" />
-                        <p className="text-sm">No video available</p>
-                      </div>
+          <div className="space-y-4 max-h-80 overflow-y-auto">
+            {/* Video Section */}
+             {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
+                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  {isVideoLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-muted-foreground/30"></div>
                     </div>
                   )}
-                  
-                  {/* Analysis Content */}
-                  <div className="space-y-3">
-                    <h5 className="text-sm font-semibold">Analysis Content</h5>
-                    {analysis.conversation && analysis.conversation.length > 0 ? (
-                      <div className="space-y-2">
-                        {analysis.conversation.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`p-3 rounded-lg ${
-                              message.role === 'user' 
-                                ? 'bg-[#3da0a9]/5 border-l-4 border-[#3da0a9]' 
-                                : 'bg-muted border-l-4 border-muted-foreground'
-                            }`}
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <div className={`text-xs px-2 py-1 rounded-full ${
-                                message.role === 'user' ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-gray-100 text-gray-600'
-                              }`}>
-                                {message.role === 'user' ? 'You' : 'Echo Coach'}
-                              </div>
-                              {message.timestamp && (
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                              {message.content}
-                            </div>
-                          </div>
-                        ))}
+                  <HLSVideoPlayer
+                    src={analysis.videoUrl || analysis.videoSrc}
+                    poster={analysis.videoThumbnail || analysis.videoPoster}
+                    className="w-full h-full"
+                  />
+                </div>
+            ) : analysis.videoThumbnail ? (
+              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                <img 
+                  src={analysis.videoThumbnail} 
+                  alt="Swing analysis"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                   <div className="text-white text-center p-4">
+                     <FileText className="h-8 w-8 mx-auto mb-2" />
+                     <p className="text-sm font-medium mb-1">Swing Analysis</p>
+                   </div>
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <FileText className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm">No video available</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Analysis Content */}
+            <div className="space-y-3">
+              <h5 className="text-sm font-semibold">Analysis Content</h5>
+              {analysis.conversation && analysis.conversation.length > 0 ? (
+                <div className="space-y-2">
+                  {analysis.conversation.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg ${
+                        message.role === 'user' 
+                          ? 'bg-[#3da0a9]/5 border-l-4 border-[#3da0a9]' 
+                          : 'bg-muted border-l-4 border-muted-foreground'
+                      }`}
+                    >
+                       <div className="flex justify-between items-start mb-2">
+                         <div className={`text-xs px-2 py-1 rounded-full ${
+                           message.role === 'user' ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-gray-100 text-gray-600'
+                         }`}>
+                           {message.role === 'user' ? 'You' : 'Echo Coach'}
+                         </div>
+                        {message.timestamp && (
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="p-4 rounded-lg bg-muted">
-                        <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {analysis.content}
-                        </div>
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                        {message.content}
                       </div>
-                    )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-muted">
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {analysis.content}
                   </div>
                 </div>
-              </section>
-              <aside className="lg:col-span-5">
-                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Visual Pack</h3>
-                <SwingVisualCarousel 
-                  analysisId={analysis.id}
-                  onExport={() => onExportPack(analysis.id)}
-                  lazy={true}
-                />
-              </aside>
+              )}
             </div>
           </div>
         </div>
@@ -457,34 +440,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [activeTab, setActiveTab] = useState('chat');
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  
-  const handleExportPack = async (analysisId: string) => {
-    try {
-      const zipBlob = await SwingVisualizer.exportZip(analysisId);
-      
-      // Create download link
-      const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `swing-analysis-${analysisId.slice(0, 8)}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Export started",
-        description: "Your Visual Pack is downloading.",
-      });
-    } catch (error) {
-      console.error('Export error:', error);
-      toast({
-        title: "Export failed",
-        description: "Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
   
   // Helper function to handle expansion with scroll management
   const handleExpansion = (type: 'chat' | 'caddie' | 'swing', id: string, element?: HTMLElement) => {
@@ -1028,9 +983,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                     analysis={analysis}
                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                     onExportPack={handleExportPack}
-                                   />
+                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                  />
                                 ))}
                               </div>
                             </div>
@@ -1058,7 +1012,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                    onExportPack={handleExportPack}
                                   />
                                 ))}
                               </div>
@@ -1087,7 +1040,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                    onExportPack={handleExportPack}
                                   />
                                 ))}
                               </div>
