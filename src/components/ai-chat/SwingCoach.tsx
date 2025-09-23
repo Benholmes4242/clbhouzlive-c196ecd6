@@ -638,30 +638,81 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       // Start lightweight UI progression in background (does not block API call)
       setAnalysisStatus('Analyzing swing phases...');
       let frameIdx = 0;
-      const frameInterval = setInterval(() => {
-        if (extractedFrames.length > 0) {
-          setCurrentFrameIndex(frameIdx % extractedFrames.length);
-        }
-        frameIdx++;
-      }, 300);
+      let frameInterval: NodeJS.Timeout;
+      let analysisProgressLoop: NodeJS.Timeout;
+      const analysisStartTime = Date.now();
 
-      (async () => {
-        const analysisPhases = [
-          'Examining setup position...',
-          'Analyzing takeaway...',
-          'Checking backswing plane...',
-          'Evaluating transition...',
-          'Studying downswing path...',
-          'Reviewing impact position...',
-          'Analyzing follow-through...',
-          'Generating recommendations...'
-        ];
-        for (let i = 0; i < analysisPhases.length; i++) {
-          setAnalysisStatus(analysisPhases[i]);
-          await new Promise(resolve => setTimeout(resolve, 700));
+      // Extended analysis phases to keep user engaged
+      const analysisPhases = [
+        'Examining setup position...',
+        'Analyzing stance and posture...',
+        'Studying takeaway mechanics...',
+        'Checking backswing plane...',
+        'Evaluating wrist hinge...',
+        'Analyzing transition timing...',
+        'Studying downswing path...',
+        'Reviewing impact dynamics...',
+        'Checking clubface angle...',
+        'Analyzing ball striking...',
+        'Studying follow-through...',
+        'Evaluating balance and finish...',
+        'Calculating swing metrics...',
+        'Generating detailed insights...',
+        'Preparing recommendations...',
+        'Finalizing analysis...'
+      ];
+
+      // Dynamic timing function that adapts to ensure 80% coverage
+      const startDynamicProgression = () => {
+        let currentPhaseIndex = 0;
+        let totalElapsed = 0;
+        
+        const progressUpdate = () => {
+          const now = Date.now();
+          const elapsed = now - analysisStartTime;
+          
+          // Update frame carousel every 400ms for smoother progression
+          if (extractedFrames.length > 0) {
+            setCurrentFrameIndex(frameIdx % extractedFrames.length);
+            frameIdx++;
+          }
+          
+          // Update analysis status with adaptive timing
+          if (currentPhaseIndex < analysisPhases.length) {
+            setAnalysisStatus(analysisPhases[currentPhaseIndex]);
+            currentPhaseIndex++;
+          }
+          
+          totalElapsed = elapsed;
+        };
+        
+        // Start with faster updates, will be adjusted when API response arrives
+        frameInterval = setInterval(progressUpdate, 400);
+      };
+
+      // Function to adjust timing based on actual API response time
+      const adjustProgressionTiming = (apiResponseTime: number) => {
+        const targetProgressTime = apiResponseTime * 0.8; // Use 80% of API time
+        const remainingTime = Math.max(targetProgressTime - (Date.now() - analysisStartTime), 0);
+        const remainingPhases = analysisPhases.length - (analysisPhases.findIndex(phase => 
+          phase === document.querySelector('[data-analysis-status]')?.textContent
+        ) + 1);
+        
+        if (remainingTime > 0 && remainingPhases > 0) {
+          // Slow down to fill remaining time
+          clearInterval(frameInterval);
+          const newFrameInterval = Math.max(remainingTime / (remainingPhases * 2), 200);
+          
+          frameInterval = setInterval(() => {
+            if (extractedFrames.length > 0) {
+              setCurrentFrameIndex(frameIdx % extractedFrames.length);
+              frameIdx++;
+            }
+          }, newFrameInterval);
         }
-        clearInterval(frameInterval);
-      })();
+      };
+
+      startDynamicProgression();
 
       // Fallback if no visuals could be attached
       if (uploadedVideo && extractedFrames.length === 0) {
@@ -695,6 +746,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         firstFramePreview: extractedFrames[0]?.substring(0, 100) + '...'
       });
 
+      const apiStartTime = Date.now();
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
         body: {
           message: userMessage.content,
@@ -709,7 +761,21 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       });
 
-      console.log('✅ Edge Function response:', { error, hasData: !!data });
+      const apiResponseTime = Date.now() - apiStartTime;
+      console.log('✅ Edge Function response:', { error, hasData: !!data, responseTime: apiResponseTime });
+
+      // Ensure visual progression uses at least 80% of total wait time
+      const minProgressTime = apiResponseTime * 0.8;
+      const actualProgressTime = Date.now() - analysisStartTime;
+      
+      if (actualProgressTime < minProgressTime) {
+        const remainingTime = minProgressTime - actualProgressTime;
+        setAnalysisStatus('Finalizing swing analysis...');
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
+      // Clear intervals when done
+      clearInterval(frameInterval);
 
       if (error) {
         console.error('❌ Edge Function error:', error);

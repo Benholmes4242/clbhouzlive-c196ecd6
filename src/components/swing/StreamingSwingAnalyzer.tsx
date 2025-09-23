@@ -228,6 +228,11 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   };
 
   const simulateStreamingAnalysis = async () => {
+    const analysisStartTime = Date.now();
+    // Extended timing to ensure better user engagement - minimum 8 seconds total
+    const baseDelayPerPhase = 1200; // Increased from 600ms to 1200ms
+    const randomVariation = 400; // Increased variation
+    
     for (let i = 0; i < phases.length; i++) {
       const phase = phases[i];
       setCurrentAnalyzingPhase(phase.name);
@@ -246,8 +251,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
         setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
       }
       
-      // Simulate analysis time (ultra-optimized delays)
-      await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 200));
+      // Extended analysis time for better engagement
+      await new Promise(resolve => setTimeout(resolve, baseDelayPerPhase + Math.random() * randomVariation));
       
       // Generate mock analysis for the phase
       const mockAnalysis = generatePhaseAnalysis(phase);
