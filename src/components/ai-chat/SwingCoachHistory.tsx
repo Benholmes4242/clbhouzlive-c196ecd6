@@ -29,15 +29,17 @@ export const SwingCoachHistory: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('SwingCoachHistory: useEffect triggered, sessionLoading:', sessionLoading, 'user:', user?.id);
     if (!sessionLoading && user) {
       loadAnalyses();
     }
   }, [user, sessionLoading]);
 
   const loadAnalyses = async () => {
+    console.log('SwingCoachHistory: loadAnalyses called, user:', user?.id);
     try {
       if (!user) {
-        console.log('No authenticated user for loading analyses');
+        console.log('SwingCoachHistory: No authenticated user for loading analyses');
         setIsLoading(false);
         return;
       }
@@ -48,8 +50,10 @@ export const SwingCoachHistory: React.FC = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+      console.log('SwingCoachHistory: Query result - data:', data, 'error:', error);
+
       if (error) {
-        console.error('Error loading analyses:', error);
+        console.error('SwingCoachHistory: Error loading analyses:', error);
         return;
       }
 
@@ -79,10 +83,11 @@ export const SwingCoachHistory: React.FC = () => {
             videoThumbnail: swingContext.videoThumbnail || null
           };
         });
+        console.log('SwingCoachHistory: Formatted analyses:', formattedAnalyses);
         setAnalyses(formattedAnalyses);
       }
     } catch (error) {
-      console.error('Error loading analyses:', error);
+      console.error('SwingCoachHistory: Error loading analyses:', error);
       toast({
         title: "Error loading analyses",
         description: "Could not load your swing history",
