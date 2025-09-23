@@ -327,7 +327,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     {/* CAPTION CARD */}
                     <motion.div
                       ref={captionRef}
-                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      className="absolute inset-0 w-full p-3 pt-2 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
                       initial={{ x: 0 }}
                       animate={{ 
                         x: activeCard === 'caption' ? 0 : '-100%',
@@ -339,7 +339,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center justify-between mb-2">
                         <label className="block text-base font-semibold text-white">Add a caption</label>
                         <button
                           onClick={handleAICaption}
