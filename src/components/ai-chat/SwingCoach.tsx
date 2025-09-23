@@ -1221,13 +1221,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
             {/* Hide action buttons completely for Swing Coach - they're not needed */}
 
-            {isAnalyzing && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                  <SwingAnalysisLoader isAnalyzing={isAnalyzing} />
-                </div>
-              </div>
-            )}
 
             {/* Previous analyses removed per design */}
           </div>
