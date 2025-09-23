@@ -267,8 +267,8 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Centered camera icon - increased size to match photos preview */}
-                              <div className="flex items-center justify-center flex-1">
+                              {/* Camera icon centered between text and right edge */}
+                              <div className="flex items-center justify-center w-40">
                                 <motion.div 
                                   className="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40"
                                   whileHover={!prefersReducedMotion ? {
@@ -279,9 +279,6 @@ const EnhancedSnapModal = ({
                                   <Icon className="w-7 h-7 transition-colors duration-200 text-white group-hover:text-brand-orange" />
                                 </motion.div>
                               </div>
-                              
-                              {/* Empty right space to balance layout */}
-                              <div className="w-24 h-16 shrink-0"></div>
                             </>
                           ) : key === "photos" ? (
                             // Photos card: text on left, small + large preview on right
@@ -299,8 +296,8 @@ const EnhancedSnapModal = ({
                               {/* Two-card preview on the right */}
                               {previewImages && previewImages.length > 0 && (
                                 <div className="flex gap-2 shrink-0">
-                                  {/* Smaller card on left */}
-                                  <div className="w-12 h-16 rounded-lg overflow-hidden">
+                                  {/* Smaller card on left - made wider */}
+                                  <div className="w-16 h-16 rounded-lg overflow-hidden">
                                     <img 
                                       src={previewImages[0]} 
                                       alt="Preview" 
@@ -334,13 +331,13 @@ const EnhancedSnapModal = ({
                                 </div>
                               </div>
                               
-                              {/* Wider image preview on the right, closer to emoji */}
+                              {/* Single wider image preview on the right, closer to emoji */}
                               {previewImages && previewImages.length > 0 && (
-                                <div className="w-32 h-16 rounded-lg overflow-hidden shrink-0">
-                                  <DynamicPreview 
-                                    variant={previewVariant}
-                                    images={previewImages}
-                                    className="w-full h-full"
+                                <div className="w-42 h-16 rounded-lg overflow-hidden shrink-0">
+                                  <img 
+                                    src={previewImages[0]} 
+                                    alt="Story preview" 
+                                    className="w-full h-full object-cover"
                                   />
                                 </div>
                               )}
