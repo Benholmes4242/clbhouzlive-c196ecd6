@@ -103,17 +103,28 @@ const EnhancedSnapModal = ({
   const photosAdapted = useMemo(() => adaptMedia(photos, "image"), [photos]);
   const videosAdapted = useMemo(() => adaptMedia(videos, "video"), [videos]);
 
-  // Get images for previews - use user's media or fallback to placeholders
-  const photoUrls = photosAdapted.length > 0 
-    ? photosAdapted.slice(0, 3).map(p => p.url).filter(Boolean)
-    : placeholders.photos;
-  
-  const videoUrls = videosAdapted.length > 0 
-    ? videosAdapted.slice(0, 3).map(v => v.thumbUrl || v.url).filter(Boolean)
-    : placeholders.videos;
+  // Combine all user media and get latest 3 items for static previews
+  const allUserMedia = useMemo(() => {
+    const combined = [
+      ...photosAdapted.map(p => ({ ...p, displayUrl: p.url })),
+      ...videosAdapted.map(v => ({ ...v, displayUrl: v.thumbUrl || v.url }))
+    ].filter(item => item.displayUrl);
+    
+    return combined.slice(0, 3); // Get latest 3 items
+  }, [photosAdapted, videosAdapted]);
 
-  // Mixed media for story preview
-  const storyUrls = [...photoUrls.slice(0, 2), ...videoUrls.slice(0, 2)];
+  // Static image URLs for cards
+  const hasUserMedia = allUserMedia.length > 0;
+  const photosCardImages = hasUserMedia 
+    ? [
+        allUserMedia[0]?.displayUrl || placeholders.photos[0],
+        allUserMedia[1]?.displayUrl || placeholders.photos[1]
+      ]
+    : [placeholders.photos[0], placeholders.photos[1]];
+    
+  const storyCardImage = hasUserMedia 
+    ? allUserMedia[0]?.displayUrl || placeholders.photos[0]
+    : placeholders.photos[0];
 
   const actionOptions = [
     ...(isMobile ? [{
@@ -133,7 +144,7 @@ const EnhancedSnapModal = ({
       icon: Images,
       onClick: handlePickMedia,
       previewVariant: "photos" as const,
-      previewImages: photoUrls,
+      previewImages: photosCardImages,
       microInteraction: "fan",
     },
     {
@@ -143,7 +154,7 @@ const EnhancedSnapModal = ({
       icon: Film,
       onClick: handlePickMedia,
       previewVariant: "story" as const,
-      previewImages: storyUrls,
+      previewImages: [storyCardImage],
       microInteraction: "glow",
       isSpecial: true, // Orange accent styling
     },
@@ -304,14 +315,14 @@ const EnhancedSnapModal = ({
                                       className="w-full h-full object-cover"
                                     />
                                   </div>
-                                  {/* Larger card on right */}
-                                  <div className="w-24 h-16 rounded-lg overflow-hidden">
-                                    <DynamicPreview 
-                                      variant={previewVariant}
-                                      images={previewImages}
-                                      className="w-full h-full"
-                                    />
-                                  </div>
+                                   {/* Larger card on right */}
+                                   <div className="w-24 h-16 rounded-lg overflow-hidden">
+                                     <img 
+                                       src={previewImages[1]} 
+                                       alt="Preview" 
+                                       className="w-full h-full object-cover"
+                                     />
+                                   </div>
                                 </div>
                               )}
                             </>
