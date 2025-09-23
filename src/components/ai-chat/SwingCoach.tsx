@@ -1086,6 +1086,29 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                   <p className="truncate">{uploadedVideo.name}</p>
                   <p>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</p>
                 </div>
+                
+                {/* Analyze Swing button - moved above media card */}
+                <div className="mb-3">
+                  <Button
+                    onClick={analyzeSwing}
+                    disabled={uploading || isAnalyzing}
+                    className="w-full gap-2 text-white"
+                    style={{ 
+                      background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
+                    }}
+                    aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Analyzing…
+                      </>
+                    ) : (
+                      "Analyze Swing"
+                    )}
+                  </Button>
+                </div>
+                
                 <div className="flex flex-col gap-4">
                    <div className="w-full">
                      <div className="relative w-full h-64 overflow-hidden rounded-2xl bg-black">
@@ -1125,34 +1148,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                          </Button>
                        </div>
                        
-                       {/* Analysis status display */}
-                       {isAnalyzing && analysisStatus && (
-                         <div className="mb-3 p-2 bg-primary/10 rounded-lg">
-                           <p className="text-sm text-primary font-medium">{analysisStatus}</p>
-                         </div>
-                       )}
-
-                      <div className="mt-3">
-                        <Button
-                          onClick={analyzeSwing}
-                          disabled={uploading || isAnalyzing}
-                          className="w-full gap-2 text-white"
-                          style={{ 
-                            background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
-                          }}
-                          aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
-                        >
-                          {isAnalyzing ? (
-                            <>
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              Analyzing…
-                            </>
-                          ) : (
-                            "Analyze Swing"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
+                        {/* Analysis status display */}
+                        {isAnalyzing && analysisStatus && (
+                          <div className="mb-3 p-2 bg-accent/10 rounded-lg border border-accent/20">
+                            <p className="text-sm text-accent-foreground font-medium">{analysisStatus}</p>
+                          </div>
+                        )}
+                     </div>
                 </div>
               </div>
             )}
@@ -1247,12 +1249,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       {/* Recent History Bar */}
       <div className="p-4 border-t">
         <button
-          className="w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition-colors"
+          className="w-full rounded-[28px] bg-accent/10 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-foreground hover:bg-accent/15 transition-colors"
           onClick={() => setShowHistory(true)}
           aria-label="Open recent swing coach history"
         >
           <span className="flex items-center gap-2">
-            <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+            <span className="w-10 h-1 rounded-full bg-accent/60" />
             Recent history
           </span>
           <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
