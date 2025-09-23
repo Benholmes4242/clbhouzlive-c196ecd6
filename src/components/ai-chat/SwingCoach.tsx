@@ -575,7 +575,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       let swingContext: any = {};
 
       // Ultra-fast test mode: generate placeholder frames so analysis starts instantly
-      const FAST_TEST = true;
+      const FAST_TEST = false;
       if (FAST_TEST) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
