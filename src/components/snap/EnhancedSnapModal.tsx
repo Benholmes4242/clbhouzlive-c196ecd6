@@ -125,6 +125,7 @@ const EnhancedSnapModal = ({
   const storyCardImage = hasUserMedia 
     ? allUserMedia[0]?.displayUrl || placeholders.photos[0]
     : placeholders.photos[0];
+  // Force rebuild to clear cache
 
   const actionOptions = [
     ...(isMobile ? [{
