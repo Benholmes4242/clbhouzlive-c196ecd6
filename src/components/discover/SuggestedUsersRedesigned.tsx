@@ -368,7 +368,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   return (
     <div
       ref={swipeRef}
-      data-card={user.id}
+      data-card-id={user.id}
       className="relative snap-start overflow-hidden"
       style={{ touchAction: 'auto' }}
     >
