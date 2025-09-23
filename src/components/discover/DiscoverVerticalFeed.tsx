@@ -13,7 +13,8 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 import EngagementRail from '@/components/clubhouse/EngagementRail';
-import FeedMeta from './FeedMeta';
+import PostMetadata from '@/components/clubhouse/PostMetadata';
+import { AudioStrip } from '@/components/clubhouse/AudioStrip';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
@@ -752,12 +753,26 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Feed Metadata - Bottom Left Glass Card */}
-              <FeedMeta
-                user={item.user}
-                caption={item.title}
-                audioTrack={item.audioTrack}
+              {/* Post Metadata - Bottom Left */}
+              <PostMetadata
+                title={removeGolfCourseFromContent(item.title)}
+                description={item.ctaDescription}
+                user={{
+                  name: item.user?.name || 'Unknown User',
+                  avatar: item.user?.avatar
+                }}
+                onUserClick={() => {
+                  // TODO: Add user profile navigation
+                  console.log('Navigate to user profile:', item.user?.id);
+                }}
               />
+
+              {/* Audio Strip - Only show for video posts with custom audio */}
+              {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
+                <div className="absolute bottom-20 left-4 md:left-8 z-20">
+                  <AudioStrip audioTrack={item.audioTrack} />
+                </div>
+              )}
 
               {/* Engagement Rail - Bottom Right */}
               <EngagementRail
