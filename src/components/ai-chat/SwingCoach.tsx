@@ -1186,12 +1186,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                    <div className="w-full">
                      <div className="relative w-full h-64 overflow-hidden rounded-2xl bg-black">
                        {/* Show cycling frames during analysis, otherwise show video/image preview */}
-                       {isAnalyzing && extractedFrames.length > 0 ? (
-                         <img 
-                           src={extractedFrames[currentFrameIndex]} 
-                           alt="Analyzing swing frame"
-                           className="absolute inset-0 h-full w-full object-cover transition-opacity duration-200"
-                         />
+                        {isAnalyzing && extractedFrames.length > 0 ? (
+                          <img 
+                            key={`frame-${currentFrameIndex}`}
+                            src={extractedFrames[currentFrameIndex]} 
+                            alt={`Analyzing swing frame ${currentFrameIndex + 1}`}
+                            className="absolute inset-0 h-full w-full object-cover transition-all duration-500 ease-in-out animate-fade-in"
+                          />
                        ) : uploadedVideo.type.startsWith('video/') ? (
                          <video 
                            src={videoPreview} 
