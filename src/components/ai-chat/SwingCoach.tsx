@@ -81,6 +81,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [analyses, setAnalyses] = useState<SwingAnalysis[]>([]);
+  const [extractedFrames, setExtractedFrames] = useState<string[]>([]);
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
+  const [analysisStatus, setAnalysisStatus] = useState('');
   
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
@@ -550,7 +553,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     });
 
     setIsAnalyzing(true);
-    
+    setAnalysisStatus('Extracting frames from video...');
+    setExtractedFrames([]);
     try {
       let extractedFrames: string[] = [];
       let swingContext: any = {};
@@ -566,15 +570,45 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             });
           }
           
+          setAnalysisStatus('Extracting frames...');
           extractedFrames = await extractFramesFromVideo(uploadedVideo);
+          setExtractedFrames(extractedFrames);
           
           if (extractedFrames.length === 0) {
             throw new Error("Couldn't extract frames from video");
           }
 
+          // Start frame cycling animation
+          setAnalysisStatus('Analyzing swing phases...');
+          let frameIndex = 0;
+          const frameInterval = setInterval(() => {
+            setCurrentFrameIndex(frameIndex % extractedFrames.length);
+            frameIndex++;
+          }, 400); // Change frame every 400ms
+
+          // Simulate analysis phases with status updates
+          const analysisPhases = [
+            'Examining setup position...',
+            'Analyzing takeaway...',
+            'Checking backswing plane...',
+            'Evaluating transition...',
+            'Studying downswing path...',
+            'Reviewing impact position...',
+            'Analyzing follow-through...',
+            'Generating recommendations...'
+          ];
+
+          for (let i = 0; i < analysisPhases.length; i++) {
+            setAnalysisStatus(analysisPhases[i]);
+            await new Promise(resolve => setTimeout(resolve, 1200)); // 1.2s per phase
+          }
+
+          // Clear frame cycling
+          clearInterval(frameInterval);
+
           toast({
-            title: "Analyzing...",
-            description: `Extracted ${extractedFrames.length} key swing positions`,
+            title: "Analysis complete!",
+            description: `Analyzed ${extractedFrames.length} key swing positions`,
           });
         } else if (uploadedVideo.type.startsWith('image/')) {
           // Convert image to base64
@@ -795,6 +829,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsAnalyzing(false);
+      setAnalysisStatus('');
+      setExtractedFrames([]);
+      setCurrentFrameIndex(0);
     }
   };
 
@@ -1000,11 +1037,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
 
   return (
-    <div className="h-full min-h-0 relative">
-      {/* DEBUG: Red circle to verify we are editing the correct Swing Coach tab */}
-      <div id="swingcoach-debug-marker" className="pointer-events-none absolute inset-0 flex items-center justify-center z-50">
-        <div className="w-16 h-16 rounded-full bg-red-500/80 shadow-lg" />
-      </div>
+    <div className="h-full min-h-0">
       <ScrollArea 
         ref={messagesAutoScroll.scrollAreaRef}
         className="h-full"
@@ -1047,12 +1080,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             {uploadedVideo && (
               <div className="bg-muted rounded-lg p-4">
                 <div className="flex flex-col gap-4">
-                  <div className="w-full">
+                   <div className="w-full">
                      <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black">
-                       {uploadedVideo.type.startsWith('video/') ? (
+                       {/* Show cycling frames during analysis, otherwise show video/image preview */}
+                       {isAnalyzing && extractedFrames.length > 0 ? (
+                         <img 
+                           src={extractedFrames[currentFrameIndex]} 
+                           alt="Analyzing swing frame"
+                           className="absolute inset-0 h-full w-full object-cover transition-opacity duration-200"
+                         />
+                       ) : uploadedVideo.type.startsWith('video/') ? (
                          <video 
                            src={videoPreview} 
-                           poster={videoPoster} // Add poster for mobile thumbnail
+                           poster={videoPoster}
                            className="absolute inset-0 h-full w-full object-cover"
                            playsInline
                            muted
@@ -1067,7 +1107,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                          />
                        )}
                      </div>
-                  </div>
+                   </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-sm font-medium truncate">{uploadedVideo.name}</p>
@@ -1075,6 +1115,14 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
+                      
+                      {/* Analysis status display */}
+                      {isAnalyzing && analysisStatus && (
+                        <div className="mb-3 p-2 bg-primary/10 rounded-lg">
+                          <p className="text-sm text-primary font-medium">{analysisStatus}</p>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-muted-foreground">
                           {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
