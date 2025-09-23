@@ -252,7 +252,7 @@ const EnhancedSnapModal = ({
                       whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
                       aria-label={`${label}: ${description}`}
                     >
-                       <div className="flex items-center gap-4 h-16">
+                       <div className="flex items-center gap-2 h-16">
                          {/* Icon and text content - centered vertically */}
                          <div className="flex items-center gap-4 flex-1">
                            <motion.div 
@@ -283,8 +283,8 @@ const EnhancedSnapModal = ({
                              <h3 className={`font-semibold text-base ${
                                isSpecial ? 'text-brand-orange' : 'text-white'
                              }`}>
-                               {label}
-                               {isSpecial && <span className="ml-2 text-brand-orange/70">🎞️</span>}
+                                {label}
+                                {isSpecial && <span className="ml-2 text-brand-orange/70">🎞</span>}
                              </h3>
                              <p className="text-sm text-white/70">{description}</p>
                            </div>
@@ -292,7 +292,7 @@ const EnhancedSnapModal = ({
                          
                          {/* Image preview - rectangle on the right */}
                          {previewImages && previewImages.length > 0 && (
-                           <div className="w-20 h-16 rounded-lg overflow-hidden shrink-0">
+                           <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
                              <DynamicPreview 
                                variant={previewVariant}
                                images={previewImages}
