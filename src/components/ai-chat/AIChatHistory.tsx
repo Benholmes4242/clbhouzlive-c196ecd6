@@ -534,12 +534,60 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   };
 
   const loadSwingAnalyses = async () => {
+    console.log('🔍 Loading swing analyses...');
     setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
-      // For now, just set empty swing analyses since the table doesn't exist
-      setSwingAnalyses([]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('No authenticated user for loading swing analyses');
+        setSwingAnalyses([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('pro_ai_analyses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      console.log('Swing analyses query result - data:', data, 'error:', error);
+
+      if (error) {
+        console.error('Error loading swing analyses:', error);
+        setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
+        return;
+      }
+
+      if (data) {
+        const formattedAnalyses = data.map(analysis => {
+          const analysisResults = analysis.analysis_results as any;
+          const swingContextData = analysis.swing_context as string;
+          
+          let swingContext: any = {};
+          try {
+            if (swingContextData) {
+              swingContext = JSON.parse(swingContextData);
+            }
+          } catch (e) {
+            console.error('Error parsing swing context:', e);
+          }
+
+          return {
+            id: analysis.id,
+            save_card: analysisResults?.metadata?.save_card || 'Swing Analysis',
+            category: analysisResults?.metadata?.category || 'Swing',
+            content: analysisResults?.aiResponse || '',
+            tags: analysisResults?.metadata?.tags || [],
+            videoUrl: analysis.video_url,
+            videoThumbnail: swingContext.videoThumbnail || null,
+            timestamp: new Date(analysis.created_at)
+          };
+        });
+        console.log('Formatted swing analyses:', formattedAnalyses);
+        setSwingAnalyses(formattedAnalyses);
+      }
     } catch (error) {
       console.error('Failed to load swing analyses:', error);
       setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
