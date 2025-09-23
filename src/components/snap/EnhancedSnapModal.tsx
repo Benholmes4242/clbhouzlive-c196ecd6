@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Camera, Images, X, Sparkles, Zap, Film } from 'lucide-react';
+import { Camera, Images, X, Sparkles, Zap, Film, Flashlight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -290,16 +290,23 @@ const EnhancedSnapModal = ({
                            </div>
                          </div>
                          
-                         {/* Image preview - rectangle on the right */}
-                         {previewImages && previewImages.length > 0 && (
-                           <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
-                             <DynamicPreview 
-                               variant={previewVariant}
-                               images={previewImages}
-                               className="w-full h-full"
-                             />
-                           </div>
-                         )}
+                          {/* Image preview or camera icon - rectangle on the right */}
+                          {previewImages && previewImages.length > 0 ? (
+                            <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
+                              <DynamicPreview 
+                                variant={previewVariant}
+                                images={previewImages}
+                                className="w-full h-full"
+                              />
+                            </div>
+                          ) : key === "camera" ? (
+                            <div className="w-24 h-16 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                              <div className="relative">
+                                <Camera className="w-6 h-6 text-white/70" />
+                                <Flashlight className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1" />
+                              </div>
+                            </div>
+                          ) : null}
                        </div>
                     </motion.button>
                   ))}
