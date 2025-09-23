@@ -1070,7 +1070,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs"
+                className="text-xs hover:border-[#2A9D8F] hover:bg-[#2A9D8F]/5 hover:text-[#1D3557] active:bg-[#2A9D8F]/10 focus:border-[#2A9D8F] focus:ring-[#2A9D8F]/20"
               >
                 <Upload className="h-4 w-4 mr-1" />
                 Upload Swing Video
