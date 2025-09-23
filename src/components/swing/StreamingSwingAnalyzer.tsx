@@ -23,6 +23,12 @@ interface StreamingSwingAnalyzerProps {
   onPhaseUpdate?: (phase: SwingPhase) => void;
 }
 
+interface SwingFrame {
+  id: string;
+  imageData: string;
+  timestamp: number;
+}
+
 export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   videoUrl,
   onAnalysisComplete,
@@ -35,6 +41,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   const [analysisPhase, setAnalysisPhase] = useState<'extracting' | 'analyzing' | 'complete'>('extracting');
   const [currentAnalyzingPhase, setCurrentAnalyzingPhase] = useState<string | null>(null);
   const [fallbackMode, setFallbackMode] = useState(false);
+  const [swingFrames, setSwingFrames] = useState<SwingFrame[]>([]);
+  const [currentFrameImage, setCurrentFrameImage] = useState<string>('');
   
   // Predefined swing phases for analysis progression
   const [phases, setPhases] = useState<SwingPhase[]>([
@@ -48,38 +56,89 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
   // Auto-progression through frames during analysis
   useEffect(() => {
-    if (analysisPhase === 'analyzing' && !fallbackMode) {
+    if (analysisPhase === 'analyzing' && !fallbackMode && swingFrames.length > 0) {
       const interval = setInterval(() => {
         setCurrentFrameIndex(prev => {
           const nextIndex = (prev + 1) % 10; // Cycle through 10 frames
+          if (swingFrames[nextIndex]) {
+            setCurrentFrameImage(swingFrames[nextIndex].imageData);
+          }
           return nextIndex;
         });
       }, 500); // Change frame every 500ms for smooth progression
 
       return () => clearInterval(interval);
     }
-  }, [analysisPhase, fallbackMode]);
+  }, [analysisPhase, fallbackMode, swingFrames]);
 
   // Fallback mode auto-progression
   useEffect(() => {
-    if (fallbackMode && isPlaying) {
+    if (fallbackMode && isPlaying && swingFrames.length > 0) {
       const interval = setInterval(() => {
         setCurrentFrameIndex(prev => {
           const nextIndex = (prev + 1) % 10;
+          if (swingFrames[nextIndex]) {
+            setCurrentFrameImage(swingFrames[nextIndex].imageData);
+          }
           return nextIndex;
         });
       }, 400); // Slightly faster for manual playback
 
       return () => clearInterval(interval);
     }
-  }, [fallbackMode, isPlaying]);
+  }, [fallbackMode, isPlaying, swingFrames]);
+
+  // Extract frames when analysis starts
+  useEffect(() => {
+    if (analysisPhase === 'analyzing' && swingFrames.length === 0) {
+      extractFramesFromVideo();
+    }
+  }, [analysisPhase]);
 
   // Simulate streaming analysis with phase-by-phase progression
   useEffect(() => {
-    if (analysisPhase === 'analyzing') {
+    if (analysisPhase === 'analyzing' && swingFrames.length > 0) {
       simulateStreamingAnalysis();
     }
-  }, [analysisPhase]);
+  }, [analysisPhase, swingFrames]);
+
+  const extractFramesFromVideo = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+    const frames: SwingFrame[] = [];
+
+    // Set canvas size based on video
+    canvas.width = 640;
+    canvas.height = 480;
+
+    // Extract 10 frames
+    for (let i = 0; i < 10; i++) {
+      const timestamp = (video.duration / 10) * i;
+      video.currentTime = timestamp;
+      
+      await new Promise(resolve => {
+        video.addEventListener('seeked', () => {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = canvas.toDataURL('image/jpeg', 0.8);
+          
+          frames.push({
+            id: `frame-${i}`,
+            imageData,
+            timestamp
+          });
+          resolve(void 0);
+        }, { once: true });
+      });
+    }
+
+    setSwingFrames(frames);
+    if (frames.length > 0) {
+      setCurrentFrameImage(frames[0].imageData);
+    }
+  };
 
   const simulateStreamingAnalysis = async () => {
     for (let i = 0; i < phases.length; i++) {
@@ -93,6 +152,11 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
       // Focus video on this phase's frame
       setCurrentFrameIndex(phase.frameIndex);
+      
+      // Update displayed frame image
+      if (swingFrames[phase.frameIndex]) {
+        setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
+      }
       
       // Simulate analysis time (realistic delays)
       await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
@@ -157,6 +221,9 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
   const jumpToPhase = (phase: SwingPhase) => {
     setCurrentFrameIndex(phase.frameIndex);
+    if (swingFrames[phase.frameIndex]) {
+      setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
+    }
     if (videoRef.current) {
       videoRef.current.currentTime = phase.timestamp;
     }
@@ -172,11 +239,23 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   };
 
   const nextFrame = () => {
-    setCurrentFrameIndex(prev => Math.min(prev + 1, 9));
+    setCurrentFrameIndex(prev => {
+      const newIndex = Math.min(prev + 1, 9);
+      if (swingFrames[newIndex]) {
+        setCurrentFrameImage(swingFrames[newIndex].imageData);
+      }
+      return newIndex;
+    });
   };
 
   const prevFrame = () => {
-    setCurrentFrameIndex(prev => Math.max(prev - 1, 0));
+    setCurrentFrameIndex(prev => {
+      const newIndex = Math.max(prev - 1, 0);
+      if (swingFrames[newIndex]) {
+        setCurrentFrameImage(swingFrames[newIndex].imageData);
+      }
+      return newIndex;
+    });
   };
 
   const getPhaseProgress = () => {
@@ -198,13 +277,21 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
           />
           
           {/* Frame Display */}
-          <div className="w-full h-full flex items-center justify-center bg-muted/10 rounded-lg">
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-                <span className="text-2xl font-bold text-primary">{currentFrameIndex + 1}</span>
+          <div className="w-full h-full flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden">
+            {currentFrameImage ? (
+              <img 
+                src={currentFrameImage} 
+                alt={`Swing frame ${currentFrameIndex + 1}`}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div className="text-center space-y-2">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl font-bold text-primary">{currentFrameIndex + 1}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">Frame {currentFrameIndex + 1} of 10</p>
               </div>
-              <p className="text-sm text-muted-foreground">Frame {currentFrameIndex + 1} of 10</p>
-            </div>
+            )}
           </div>
 
           {/* Analysis Status Overlay */}

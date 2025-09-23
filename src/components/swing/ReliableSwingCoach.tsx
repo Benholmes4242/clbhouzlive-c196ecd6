@@ -8,6 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/hooks/use-toast';
 import { StreamingSwingAnalyzer } from './StreamingSwingAnalyzer';
 import { SwingReview, SwingPhase, SwingAnalysisSummary, SwingDrill } from '@/components/swing-review/SwingReview';
+import { SwingVisualCarousel } from './SwingVisualCarousel';
+import { SwingVisualizer } from '@/services/swing/visualizer';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ReliableSwingCoachProps {
@@ -30,6 +32,7 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
     summary: SwingAnalysisSummary;
     drills: SwingDrill[];
     priorityFix: { title: string; why: string; howToFeel: string; microTask: string; };
+    analysisId?: string;
   } | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [fallbackMode, setFallbackMode] = useState(false);
@@ -166,7 +169,10 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
     }
   };
 
-  const handlePhaseAnalysisComplete = (phases: any[]) => {
+  const handlePhaseAnalysisComplete = async (phases: any[]) => {
+    // Generate unique analysis ID for this session
+    const analysisId = crypto.randomUUID();
+    
     // Convert streaming analysis to our swing review format
     const swingPhases: SwingPhase[] = phases.map((p, index) => ({
       id: p.id,
@@ -219,7 +225,8 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
       phases: swingPhases,
       summary,
       drills,
-      priorityFix
+      priorityFix,
+      analysisId
     });
 
     setAnalysisState({ status: 'complete', progress: 100 });
@@ -300,15 +307,29 @@ export const ReliableSwingCoach: React.FC<ReliableSwingCoachProps> = ({ onClose 
 
       case 'complete':
         return swingAnalysis && (
-          <SwingReview
-            videoUrl={videoPreview}
-            summary={swingAnalysis.summary}
-            phases={swingAnalysis.phases}
-            priorityFix={swingAnalysis.priorityFix}
-            drills={swingAnalysis.drills}
-            onShare={() => toast({ title: "Sharing feature coming soon!" })}
-            onAddVoiceNote={() => toast({ title: "Voice notes coming soon!" })}
-          />
+          <div className="space-y-6">
+            {/* Visual Pack Section */}
+            {swingAnalysis.analysisId && (
+              <Card className="p-4">
+                <h3 className="font-semibold mb-4">Swing Frame Analysis</h3>
+                <SwingVisualCarousel
+                  analysisId={swingAnalysis.analysisId}
+                  lazy={false}
+                />
+              </Card>
+            )}
+            
+            {/* Detailed Review */}
+            <SwingReview
+              videoUrl={videoPreview}
+              summary={swingAnalysis.summary}
+              phases={swingAnalysis.phases}
+              priorityFix={swingAnalysis.priorityFix}
+              drills={swingAnalysis.drills}
+              onShare={() => toast({ title: "Sharing feature coming soon!" })}
+              onAddVoiceNote={() => toast({ title: "Voice notes coming soon!" })}
+            />
+          </div>
         );
 
       case 'error':
