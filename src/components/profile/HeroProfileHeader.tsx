@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -805,24 +804,22 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
                     
-                    {/* Right side - Mini Profile Card (4:3 aspect ratio) */}
-                    <div className="w-16 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
-                      <div className="w-12 rounded-md overflow-hidden border border-white/40 mb-1">
-                        <AspectRatio ratio={3/4}>
-                          {profile?.profile_photo_url ? (
-                            <img
-                              src={profile.profile_photo_url}
-                              alt="Mini profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                              <span className="text-gray-600 font-bold text-xs">
-                                {displayName?.charAt(0).toUpperCase() || 'U'}
-                              </span>
-                            </div>
-                          )}
-                        </AspectRatio>
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-xs">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -963,24 +960,22 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
                     
-                    {/* Right side - Mini Profile Card (4:3 aspect ratio) */}
-                    <div className="w-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
-                      <div className="w-16 rounded-md overflow-hidden border border-white/40 mb-1">
-                        <AspectRatio ratio={3/4}>
-                          {profile?.profile_photo_url ? (
-                            <img
-                              src={profile.profile_photo_url}
-                              alt="Mini profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                              <span className="text-gray-600 font-bold text-sm">
-                                {displayName?.charAt(0).toUpperCase() || 'U'}
-                              </span>
-                            </div>
-                          )}
-                        </AspectRatio>
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-sm">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
