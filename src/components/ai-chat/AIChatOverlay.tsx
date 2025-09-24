@@ -527,7 +527,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 style={{ overscrollBehavior: 'contain' }}
               >
                 <div className="h-full min-h-0">
-                  <div className="px-6 py-5">
+                  <div className="px-2 py-5">
                     {messages.length === 0 ? (
                       <div className="text-left">
                         <p className="text-gray-800/80 text-base mb-5">
