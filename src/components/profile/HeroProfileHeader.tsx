@@ -747,7 +747,7 @@ const HeroProfileHeader = ({
                 absolute left-0 right-0
                 bottom-[-14px] md:bottom-[-18px]
                 w-full
-                border border-white/35
+                rounded-2xl border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
@@ -816,23 +816,23 @@ const HeroProfileHeader = ({
            
            {/* Glass Chips Stats */}
            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Posts</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Following</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Followers</div>
              </div>
@@ -887,7 +887,7 @@ const HeroProfileHeader = ({
                 absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
                 w-[90%] md:w-[80%] max-w-[800px]
-                border border-white/35
+                rounded-2xl border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
@@ -954,23 +954,23 @@ const HeroProfileHeader = ({
            
            {/* Glass Chips Stats */}
            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Posts</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Following</div>
              </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+             <div className="rounded-xl border border-white/30 bg-white/40 backdrop-blur-md 
+                             px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
                <div className="text-xs md:text-sm text-gray-700">Followers</div>
              </div>
