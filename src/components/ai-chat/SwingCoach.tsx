@@ -1248,7 +1248,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 {message.type === 'ai' && 
                  message.id === messages[messages.length - 1]?.id && 
                  message.metadata?.category === 'swing_analysis' && (
-                  <div className="mt-4 ml-12 space-y-4">
+                  <div className="mt-4 space-y-4">
                     <SwingVisualCarousel
                       visuals={[]}
                       isLoading={false}
