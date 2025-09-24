@@ -776,7 +776,6 @@ const HeroProfileHeader = ({
           <div className="h-16" />
         </div>
       )}
-      )}
 
       {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
       <div style={{ display: 'none' }}>
