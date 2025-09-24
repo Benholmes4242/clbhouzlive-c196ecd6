@@ -265,8 +265,8 @@ export default function EnhancedCreateMomentModalCinematic({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex h-full flex-col overflow-visible">
-                {/* MEDIA SECTION - takes up ~75% of modal height with bubble protrusion */}
-                <section id="media" className="relative flex-1 -mx-2 -mt-6 rounded-t-3xl overflow-hidden">{/* Minimal protrusion for subtle bubble effect */}
+                {/* MEDIA SECTION - reduced to ~65% of modal height */}
+                <section id="media" className="relative flex-[0.65] -mx-2 -mt-6 rounded-t-3xl overflow-hidden">{/* Reduced from flex-1 to flex-[0.65] */}
                   <motion.div
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
@@ -318,10 +318,10 @@ export default function EnhancedCreateMomentModalCinematic({
 
                 </section>
 
-                {/* CONTROLS SECTION - compact bottom area */}
-                <section className="flex-shrink-0 px-6 pb-6 pt-4 space-y-3">
-                  {/* SLIDING CARDS CONTAINER - more compact */}
-                  <div className="relative h-[120px] overflow-hidden">
+                {/* CONTROLS SECTION - expanded bottom area with taller caption */}
+                <section className="flex-[0.35] px-6 pb-6 pt-4 space-y-3">
+                  {/* SLIDING CARDS CONTAINER - taller for better caption area */}
+                  <div className="relative h-[160px] overflow-hidden">{/* Increased from 120px to 160px */}
                     {/* CAPTION CARD */}
                     <motion.div
                       ref={captionRef}
@@ -356,7 +356,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       
                       <div className="flex items-start gap-2">
                         <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[2.5rem] max-h-[4rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[3.5rem] max-h-[5rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
                           placeholder="Write a caption…"
                           value={caption}
                           onChange={(e) => {
