@@ -787,25 +787,48 @@ const HeroProfileHeader = ({
                    </p>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-4 w-full max-w-sm mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
+                 {/* Club + Handicap - moved left with mini profile card on right */}
+                 <div className="mt-4 w-full flex items-center justify-between">
+                   {/* Left side - Club and Handicap */}
+                   <div className="flex-1 flex flex-col items-center gap-3">
                      <div className="text-center">
                        <div className="text-xs text-gray-700">Home Club</div>
-                        <div className="mt-1 text-base font-medium text-gray-900">
+                        <div className="mt-1 text-sm font-medium text-gray-900">
                           {homeClubLines.map((line, index) => (
                             <div key={index}>{line}</div>
                           ))}
                         </div>
                      </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Handicap</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                     <div className="text-center">
+                       <div className="text-xs text-gray-700">Handicap</div>
+                       <div className="mt-1 text-sm font-medium text-gray-900">
+                         {handicap}
+                       </div>
+                     </div>
+                   </div>
+                   
+                   {/* Right side - Mini Profile Card */}
+                   <div className="w-14 h-18 rounded-lg bg-white/20 border border-white/30 flex flex-col items-center justify-center p-2 ml-4">
+                     <div className="w-8 h-8 rounded-full overflow-hidden border border-white/40 mb-1">
+                       {profile?.profile_photo_url ? (
+                         <img
+                           src={profile.profile_photo_url}
+                           alt="Mini profile"
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                           <span className="text-gray-600 font-bold text-xs">
+                             {displayName?.charAt(0).toUpperCase() || 'U'}
+                           </span>
+                         </div>
+                       )}
+                     </div>
+                     <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
+                       {displayName?.split(' ')[0] || 'User'}
+                     </p>
+                   </div>
+                 </div>
 
               </div>
             </div>
@@ -927,23 +950,46 @@ const HeroProfileHeader = ({
                    </p>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-5 w-full max-w-md mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Home Club</div>
+                 {/* Club + Handicap - moved left with mini profile card on right */}
+                 <div className="mt-5 w-full flex items-center justify-between">
+                   {/* Left side - Club and Handicap */}
+                   <div className="flex-1 flex flex-col items-center gap-4">
+                     <div className="text-center">
+                       <div className="text-sm text-gray-700">Home Club</div>
+                        <div className="mt-1 text-lg font-medium text-gray-900">
+                          {homeClub}
+                        </div>
+                     </div>
+                     <div className="text-center">
+                       <div className="text-sm text-gray-700">Handicap</div>
                        <div className="mt-1 text-lg font-medium text-gray-900">
-                         {homeClub}
+                         {handicap}
                        </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Handicap</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                     </div>
+                   </div>
+                   
+                   {/* Right side - Mini Profile Card */}
+                   <div className="w-16 h-20 rounded-lg bg-white/20 border border-white/30 flex flex-col items-center justify-center p-2 ml-6">
+                     <div className="w-10 h-10 rounded-full overflow-hidden border border-white/40 mb-1">
+                       {profile?.profile_photo_url ? (
+                         <img
+                           src={profile.profile_photo_url}
+                           alt="Mini profile"
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                           <span className="text-gray-600 font-bold text-sm">
+                             {displayName?.charAt(0).toUpperCase() || 'U'}
+                           </span>
+                         </div>
+                       )}
+                     </div>
+                     <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
+                       {displayName?.split(' ')[0] || 'User'}
+                     </p>
+                   </div>
+                 </div>
 
               </div>
             </div>
