@@ -24,6 +24,9 @@ import { AiFeedbackBlock } from '@/components/swing/AiFeedbackBlock';
 import { ProgressStrip } from '@/components/swing/ProgressStrip';
 import { CoachCta } from '@/components/swing/CoachCta';
 
+// Single source of truth for SwingCoach mode
+export const SWINGCOACH_MODE: 'live' | 'sim' = 'live';
+
 interface SwingAnalysis {
   id: string;
   save_card: string;
@@ -739,6 +742,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         hasSwingContext: Object.keys(swingContext).length > 0,
         firstFramePreview: extractedFrames[0]?.substring(0, 100) + '...'
       });
+
+      // Canonical trace for debugging
+      console.info(`[SC] Analyze → frames:${extractedFrames.length}, model:gpt-4.1-2025-04-14, route:clbhouz-pro-ai, mode:${SWINGCOACH_MODE}`);
 
       const apiStartTime = Date.now();
       const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
