@@ -427,27 +427,15 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         
         const duration = video.duration;
         
-        // Keep 20 frames for both mobile and desktop for optimal analysis
+        // Optimized to 8 key frames for faster processing
         const framePositions = [
           0.03, // Initial setup/Address (P1)
-          0.08, // Settled address position
-          0.13, // Takeaway initiation
-          0.18, // Early takeaway
-          0.23, // Mid takeaway (P2)
-          0.28, // Late takeaway
-          0.33, // Transition to backswing
-          0.38, // Early backswing
-          0.43, // Shaft parallel back (P3)
+          0.13, // Takeaway initiation 
+          0.28, // Mid takeaway (P2)
           0.48, // Three-quarter back
-          0.53, // Near top of backswing
           0.58, // Top of backswing (P4)
-          0.63, // Transition/Early downswing
-          0.68, // Downswing acceleration
           0.73, // Mid downswing (P5)
-          0.78, // Approaching impact
-          0.83, // Pre-impact position
           0.87, // Impact (P6)
-          0.91, // Early release/follow-through (P7)
           0.95  // Full finish (P8/P9)
         ];
         
@@ -745,6 +733,10 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       // Canonical trace for debugging
       console.info(`[SC] Analyze → frames:${extractedFrames.length}, model:gpt-4o-mini, route:clbhouz-pro-ai, mode:${SWINGCOACH_MODE}`);
+      
+      // Log payload size for performance monitoring
+      const payloadSize = JSON.stringify(extractedFrames).length;
+      console.info(`[SC] Payload size: ${Math.round(payloadSize / 1024)}KB`);
 
       const apiStartTime = Date.now();
       
@@ -774,6 +766,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
         const apiResponseTime = Date.now() - apiStartTime;
         console.log('✅ Edge Function response:', { error, hasData: !!data, responseTime: apiResponseTime });
+        console.info(`[SC] API round-trip: ${apiResponseTime}ms`);
 
       // Ensure visual progression uses at least 80% of total wait time
       const minProgressTime = apiResponseTime * 0.8;
