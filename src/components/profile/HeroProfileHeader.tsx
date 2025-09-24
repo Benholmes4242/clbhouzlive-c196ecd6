@@ -76,7 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -699,81 +698,283 @@ const HeroProfileHeader = ({
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
 
-      {/* Mobile Profile Layout */}
+      {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16">
-          {/* Mobile scenic background */}
-          <div className="relative h-[70vh] w-full overflow-hidden">
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: getMobileCropPosition(profile),
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel positioned relative to OUTER wrapper - Full Width */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: profile?.cover_photo_url 
-                  ? `url(${profile.cover_photo_url})` 
-                  : 'url("https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")'
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
-          </div>
-          
-          {/* Mobile glass profile card */}
-          <div 
-            ref={profileCardRef}
-            className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[90%] max-w-md z-20"
-          >
-            <GlassmorphicProfileCard
-              profile={profile}
-              isOwnProfile={isOwnProfile}
-              onEditProfile={() => setEditDialogOpen(true)}
-              statsData={{
-                postsCount: postsCount,
-                totalXP: 2500,
-                followingCount: followingCount,
-                followersCount: followersCount
-              }}
-            />
-          </div>
-          
-          <div className="h-16" />
+              ref={profileCardRef}
+              className="
+                absolute left-0 right-0
+                bottom-[-14px] md:bottom-[-18px]
+                w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-5 py-2 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-4 right-5">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={20} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-2xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-sm text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-4 w-full max-w-sm mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="text-center">
+                       <div className="text-xs text-gray-700">Home Club</div>
+                        <div className="mt-1 text-base font-medium text-gray-900">
+                          {homeClubLines.map((line, index) => (
+                            <div key={index}>{line}</div>
+                          ))}
+                        </div>
+                     </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-700">Handicap</div>
+                      <div className="mt-1 text-base font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
+           </section>
+           
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       ) : (
-        /* Desktop layout with scenic background and GlassmorphicProfileCard */
-        <div className="relative -mt-16">
-          {/* Scenic background */}
-          <div className="relative h-[70vh] w-full overflow-hidden">
-            {/* Dynamic background based on profile content */}
+        /* Desktop layout - updated to match mobile design pattern */
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: 'center center',
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: profile?.cover_photo_url 
-                  ? `url(${profile.cover_photo_url})` 
-                  : 'url("https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")'
-              }}
-            />
-            
-            {/* Gradient overlay for better text readability */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
-          </div>
-          
-          {/* Glass profile card positioned over the background */}
-          <div 
-            ref={profileCardRef}
-            className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[600px] z-20"
-          >
-            <GlassmorphicProfileCard
-              profile={profile}
-              isOwnProfile={isOwnProfile}
-              onEditProfile={() => setEditDialogOpen(true)}
-              statsData={{
-                postsCount: postsCount,
-                totalXP: 2500,
-                followingCount: followingCount,
-                followersCount: followersCount
-              }}
-            />
-          </div>
-          
-          {/* Spacer to prevent content overlap */}
-          <div className="h-16" />
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-6 right-8">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-3xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-base text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-5 w-full max-w-md mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Home Club</div>
+                       <div className="mt-1 text-lg font-medium text-gray-900">
+                         {homeClub}
+                       </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Handicap</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
+           </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
