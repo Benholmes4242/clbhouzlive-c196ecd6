@@ -47,6 +47,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   const [fallbackMode, setFallbackMode] = useState(false);
   const [swingFrames, setSwingFrames] = useState<SwingFrame[]>([]);
   const [currentFrameImage, setCurrentFrameImage] = useState<string>('');
+  const [nextFrameImage, setNextFrameImage] = useState<string>('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Predefined swing phases for analysis progression
   const [phases, setPhases] = useState<SwingPhase[]>([
@@ -58,22 +60,35 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
     { id: 'followthrough', name: 'Follow Through', frameIndex: 9, status: 'pending', timestamp: 1.5 }
   ]);
 
+  // Smooth frame transition function
+  const transitionToFrame = useCallback((frameIndex: number) => {
+    if (swingFrames[frameIndex] && swingFrames[frameIndex].imageData !== currentFrameImage) {
+      setIsTransitioning(true);
+      setNextFrameImage(swingFrames[frameIndex].imageData);
+      
+      // After a brief moment, swap the images and reset transition
+      setTimeout(() => {
+        setCurrentFrameImage(swingFrames[frameIndex].imageData);
+        setNextFrameImage('');
+        setIsTransitioning(false);
+      }, 300); // Match CSS transition duration
+    }
+  }, [swingFrames, currentFrameImage]);
+
   // Auto-progression through frames during analysis
   useEffect(() => {
     if (analysisPhase === 'analyzing' && swingFrames.length > 0) {
       const interval = setInterval(() => {
         setCurrentFrameIndex(prev => {
           const nextIndex = (prev + 1) % 10; // Cycle through 10 frames
-          if (swingFrames[nextIndex]) {
-            setCurrentFrameImage(swingFrames[nextIndex].imageData);
-          }
+          transitionToFrame(nextIndex);
           return nextIndex;
         });
       }, 800); // Slower progression to match analysis phases
 
       return () => clearInterval(interval);
     }
-  }, [analysisPhase, swingFrames]);
+  }, [analysisPhase, swingFrames, transitionToFrame]);
 
   // Fallback mode auto-progression
   useEffect(() => {
@@ -81,16 +96,14 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
       const interval = setInterval(() => {
         setCurrentFrameIndex(prev => {
           const nextIndex = (prev + 1) % 10;
-          if (swingFrames[nextIndex]) {
-            setCurrentFrameImage(swingFrames[nextIndex].imageData);
-          }
+          transitionToFrame(nextIndex);
           return nextIndex;
         });
       }, 400); // Slightly faster for manual playback
 
       return () => clearInterval(interval);
     }
-  }, [fallbackMode, isPlaying, swingFrames]);
+  }, [fallbackMode, isPlaying, swingFrames, transitionToFrame]);
 
   // Extract frames immediately when component mounts with video
   useEffect(() => {
@@ -246,10 +259,8 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
       // Focus video on this phase's frame
       setCurrentFrameIndex(phase.frameIndex);
       
-      // Update displayed frame image
-      if (swingFrames[phase.frameIndex]) {
-        setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
-      }
+      // Update displayed frame image with smooth transition
+      transitionToFrame(phase.frameIndex);
       
       // Extended analysis time for better engagement
       await new Promise(resolve => setTimeout(resolve, baseDelayPerPhase + Math.random() * randomVariation));
@@ -300,9 +311,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
 
   const jumpToPhase = (phase: SwingPhase) => {
     setCurrentFrameIndex(phase.frameIndex);
-    if (swingFrames[phase.frameIndex]) {
-      setCurrentFrameImage(swingFrames[phase.frameIndex].imageData);
-    }
+    transitionToFrame(phase.frameIndex);
     if (videoRef.current) {
       videoRef.current.currentTime = phase.timestamp;
     }
@@ -320,9 +329,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   const nextFrame = () => {
     setCurrentFrameIndex(prev => {
       const newIndex = Math.min(prev + 1, 9);
-      if (swingFrames[newIndex]) {
-        setCurrentFrameImage(swingFrames[newIndex].imageData);
-      }
+      transitionToFrame(newIndex);
       return newIndex;
     });
   };
@@ -330,9 +337,7 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
   const prevFrame = () => {
     setCurrentFrameIndex(prev => {
       const newIndex = Math.max(prev - 1, 0);
-      if (swingFrames[newIndex]) {
-        setCurrentFrameImage(swingFrames[newIndex].imageData);
-      }
+      transitionToFrame(newIndex);
       return newIndex;
     });
   };
@@ -356,13 +361,28 @@ export const StreamingSwingAnalyzer: React.FC<StreamingSwingAnalyzerProps> = ({
           />
           
           {/* Frame Display */}
-          <div className="w-full h-full flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden">
+          <div className="w-full h-full flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden relative">
             {currentFrameImage ? (
-              <img 
-                src={currentFrameImage} 
-                alt={`Swing frame ${currentFrameIndex + 1}`}
-                className="w-full h-full object-contain"
-              />
+              <>
+                {/* Current Frame */}
+                <img 
+                  src={currentFrameImage} 
+                  alt={`Swing frame ${currentFrameIndex + 1}`}
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                    isTransitioning ? 'opacity-0' : 'opacity-100'
+                  }`}
+                />
+                {/* Next Frame (for smooth transition) */}
+                {nextFrameImage && (
+                  <img 
+                    src={nextFrameImage} 
+                    alt={`Swing frame transition`}
+                    className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                      isTransitioning ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                )}
+              </>
             ) : analysisPhase === 'extracting' ? (
               <div className="text-center space-y-3">
                 <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
