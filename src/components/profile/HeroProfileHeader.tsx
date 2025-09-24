@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -143,6 +143,11 @@ const HeroProfileHeader = ({
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  
+  // Hero height refs for dynamic positioning
+  const mobileHeroRef = useRef<HTMLDivElement>(null);
+  const desktopHeroRef = useRef<HTMLDivElement>(null);
+  const [heroHeight, setHeroHeight] = useState(0);
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -463,6 +468,31 @@ const HeroProfileHeader = ({
     return () => clearTimeout(timer);
   }, [isProfileCardInView]);
 
+  // Measure hero height and set CSS variable
+  useEffect(() => {
+    const measureHeroHeight = () => {
+      const heroRef = isMobile ? mobileHeroRef.current : desktopHeroRef.current;
+      if (heroRef) {
+        const height = heroRef.getBoundingClientRect().height;
+        setHeroHeight(height);
+        // Set CSS variable on the hero container
+        heroRef.style.setProperty('--hero-h', `${height}px`);
+      }
+    };
+
+    // Measure on mount and resize
+    measureHeroHeight();
+    window.addEventListener('resize', measureHeroHeight);
+    
+    // Re-measure after images load
+    const timer = setTimeout(measureHeroHeight, 1000);
+
+    return () => {
+      window.removeEventListener('resize', measureHeroHeight);
+      clearTimeout(timer);
+    };
+  }, [isMobile, profile?.profile_photo_url]);
+
   // Scroll depth tracking for mobile header
   useEffect(() => {
     if (!isMobile || !profile?.id) return;
@@ -703,7 +733,7 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            <div ref={mobileHeroRef} className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -746,13 +776,15 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-6vh]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
                 pb-4
               "
+              style={{
+                top: `clamp(280px, calc(var(--hero-h, 55vh) * 0.85), 520px)`
+              }}
             >
                <div className="px-5 py-4 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
@@ -881,7 +913,7 @@ const HeroProfileHeader = ({
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
+            <div ref={desktopHeroRef} className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -924,12 +956,14 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-6vh]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
+              style={{
+                top: `clamp(320px, calc(var(--hero-h, 56vh) * 0.88), 560px)`
+              }}
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
