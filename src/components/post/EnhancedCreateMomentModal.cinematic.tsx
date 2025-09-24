@@ -354,16 +354,16 @@ export default function EnhancedCreateMomentModalCinematic({
                         </button>
                       </div>
                       
-                      <div className="flex flex-col gap-2 h-full">{/* Changed to flex-col and h-full */}
-                        <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white h-full overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
-                          placeholder="Write a caption…"
-                          value={caption}
-                          onChange={(e) => {
-                            setCaption(e.target.value);
-                          }}
-                        />
-                      </div>
+                       <div className="flex flex-col gap-2 h-full">{/* Changed to flex-col and h-full */}
+                         <textarea
+                           className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white h-[60px] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
+                           placeholder="Write a caption…"
+                           value={caption}
+                           onChange={(e) => {
+                             setCaption(e.target.value);
+                           }}
+                         />
+                       </div>
                     </motion.div>
 
                     {/* COURSE CARD */}
