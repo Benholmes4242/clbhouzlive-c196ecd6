@@ -79,12 +79,9 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
               </button>
             )}
           </div>
-        </div>
 
-        {/* Home Club and Handicap - positioned with mini profile card */}
-        <div className="flex items-start justify-between mt-4">
-          {/* Left side - Home Club and Handicap centered between left edge and mini profile card */}
-          <div className="flex-1 pr-4 flex flex-col items-center gap-2">
+          {/* Home Club and Handicap - directly under username */}
+          <div className="mt-4 flex flex-col items-center gap-2">
             <div className="flex items-center gap-2">
               <Flag className="w-4 h-4 text-white/60" />
               <p className="text-sm text-white/60">
@@ -102,8 +99,10 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
               </p>
             </div>
           </div>
-          
-          {/* Right side - Mini Profile Card, aligned with HomeClub/Handicap top */}
+        </div>
+
+        {/* Mini Profile Card - positioned separately on the right */}
+        <div className="absolute top-6 right-0">
           <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
