@@ -997,12 +997,12 @@ const HeroProfileHeader = ({
 
                     {/* Club + Handicap positioned in 3-column grid */}
                     <div className="absolute w-full mt-[-150px] px-8">
-                      <div className="grid grid-cols-[1fr_1fr_112px] items-start gap-4 pr-6">
+                      <div className="grid grid-cols-[1fr_auto_112px] items-start gap-8 pr-6">
                         <div className="text-left">
                           <div className="text-sm text-gray-700">{homeClub}</div>
                           <div className="mt-1 text-sm text-gray-500">Golf Club</div>
                         </div>
-                        <div className="text-left justify-self-end pr-4">
+                        <div className="text-center">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
