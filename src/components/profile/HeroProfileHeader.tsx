@@ -116,7 +116,7 @@ const HeroProfileHeader = ({
   activeSection = 'activity',
   onSectionChange
 }: HeroProfileHeaderProps) => {
-  console.log('HeroProfileHeader render with profile:', profile?.id);
+  console.log('HeroProfileHeader render with profile:', profile?.id, '- ResponsiveStatsDisplay removed');
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
@@ -487,8 +487,13 @@ const HeroProfileHeader = ({
     }
   };
 
-  // Stats handling
+  // Stats handling - Updated to work with new ProfileStatsRow component
   const handleStatClick = useCallback((statType: string) => {
+    // This function is no longer used since ResponsiveStatsDisplay was removed
+    // Keeping for potential future use with ProfileStatsRow click handling
+    
+    console.log('Stat clicked:', statType);
+    
     // Prevent scroll behavior when switching tabs via stats
     const currentScrollPosition = window.scrollY;
     
