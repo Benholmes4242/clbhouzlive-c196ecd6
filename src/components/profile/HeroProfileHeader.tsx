@@ -1058,73 +1058,69 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-12 md:h-16" />
-            </section>
-          </div>
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Posts</div>
+              </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+              </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Following</div>
+              </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+                <div className="text-xs md:text-sm text-gray-700">Followers</div>
+              </div>
+            </div>
             
-          {/* Glass Chips Stats */}
-          <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-                  <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                                  px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                   <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-                   <div className="text-xs md:text-sm text-gray-700">Posts</div>
-                 </div>
-                  <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                                  px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                   <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-                   <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-                 </div>
-                  <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                                  px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                   <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-                   <div className="text-xs md:text-sm text-gray-700">Following</div>
-                 </div>
-                  <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                                  px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                   <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-                   <div className="text-xs md:text-sm text-gray-700">Followers</div>
-                 </div>
-               </div>
-               {/* Tab Navigation with Orange Underline - Text Only Style */}
-               <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
-                 <div className="relative" role="tablist" aria-label="Profile sections">
-                   <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
-                     {tabs.map((tab) => (
-                       <button
-                         key={tab.id}
-                         onClick={() => handleTabChange(tab.id)}
-                         role="tab"
-                         aria-selected={activeSection === tab.id}
-                         aria-controls={`tabpanel-${tab.id}`}
-                         tabIndex={activeSection === tab.id ? 0 : -1}
-                         className={`
-                           relative py-3 px-4 text-base font-medium transition-colors duration-200
-                           ${activeSection === tab.id 
-                             ? 'text-gray-900 focus:outline-none' 
-                             : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                           }
-                           flex-1 text-center
-                         `}
-                       >
-                         {tab.label}
-                         {/* Orange underline for active tab */}
-                         <div 
-                           className={`
-                             absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                             transition-all duration-300 ease-out
-                             ${activeSection === tab.id 
-                               ? 'scale-x-100 opacity-100' 
-                               : 'scale-x-0 opacity-0'
-                             }
-                             origin-center
-                           `}
-                         />
-                       </button>
-                     ))}
-                   </div>
-                 </div>
-               </div>
+            {/* Tab Navigation with Orange Underline - Text Only Style */}
+            <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
+              <div className="relative" role="tablist" aria-label="Profile sections">
+                <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleTabChange(tab.id)}
+                      role="tab"
+                      aria-selected={activeSection === tab.id}
+                      aria-controls={`tabpanel-${tab.id}`}
+                      tabIndex={activeSection === tab.id ? 0 : -1}
+                      className={`
+                        relative py-3 px-4 text-base font-medium transition-colors duration-200
+                        ${activeSection === tab.id 
+                          ? 'text-gray-900 focus:outline-none' 
+                          : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                        }
+                        flex-1 text-center
+                      `}
+                    >
+                      {tab.label}
+                      {/* Orange underline for active tab */}
+                      <div 
+                        className={`
+                          absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                          transition-all duration-300 ease-out
+                          ${activeSection === tab.id 
+                            ? 'scale-x-100 opacity-100' 
+                            : 'scale-x-0 opacity-0'
+                          }
+                          origin-center
+                        `}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div> {/* Close below-hero content stack */}
         </div>
       )}
