@@ -793,7 +793,7 @@ const HeroProfileHeader = ({
                       </div>
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[60px] flex-shrink-0">
+                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -970,7 +970,7 @@ const HeroProfileHeader = ({
                       </div>
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
-                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[60px] flex-shrink-0">
+                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
