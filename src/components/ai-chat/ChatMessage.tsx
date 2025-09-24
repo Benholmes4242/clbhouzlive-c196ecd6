@@ -59,7 +59,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[80%] ${isUser ? 'order-2' : 'order-1'}`}>
+      <div className={`w-full ${isUser ? 'order-2' : 'order-1'}`}>
         <div className={`flex items-start gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
           <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
             isUser ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-muted'
