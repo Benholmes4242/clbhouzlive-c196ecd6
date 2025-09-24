@@ -47,8 +47,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 
-import ProfileBioBlock from './ProfileBioBlock';
-import ProfileStatsRow from './ProfileStatsRow';
+import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
@@ -741,24 +740,103 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel using GlassmorphicProfileCard component - Full Width */}
+            {/* Glass panel positioned relative to OUTER wrapper - Full Width */}
             <div 
               ref={profileCardRef}
-              className="absolute left-0 right-0 bottom-[-14px] md:bottom-[-18px] w-full z-10"
+              className="
+                absolute left-0 right-0
+                bottom-[-14px] md:bottom-[-18px]
+                w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
             >
-              <GlassmorphicProfileCard
-                profile={profile}
-                isOwnProfile={isOwnProfile}
-                onEditProfile={() => setEditDialogOpen(true)}
-              />
+               <div className="px-5 py-2 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-4 right-5">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={20} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-2xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-sm text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-4 w-full max-w-sm mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="text-center">
+                       <div className="text-xs text-gray-700">Home Club</div>
+                        <div className="mt-1 text-base font-medium text-gray-900">
+                          {homeClubLines.map((line, index) => (
+                            <div key={index}>{line}</div>
+                          ))}
+                        </div>
+                     </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-700">Handicap</div>
+                      <div className="mt-1 text-base font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
              <div className="h-12 md:h-16" />
            </section>
            
-           
-            {/* Stats moved to ProfileStatsRow component below */}
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -802,40 +880,116 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel using GlassmorphicProfileCard component */}
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
             <div 
               ref={profileCardRef}
-              className="absolute left-1/2 -translate-x-1/2 bottom-[-14px] md:bottom-[-18px] w-[90%] md:w-[80%] max-w-[800px] z-10"
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-[80%] max-w-[800px]
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
             >
-              <GlassmorphicProfileCard
-                profile={profile}
-                isOwnProfile={isOwnProfile}
-                onEditProfile={() => setEditDialogOpen(true)}
-              />
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-6 right-8">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
+
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-3xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-base text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-5 w-full max-w-md mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Home Club</div>
+                       <div className="mt-1 text-lg font-medium text-gray-900">
+                         {homeClub}
+                       </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Handicap</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
              <div className="h-12 md:h-16" />
            </section>
            
-            {/* Stats moved to ProfileStatsRow component below */}
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
-      {/* New Profile Bio Block */}
-      <ProfileBioBlock
-        bio={profile?.bio}
-        websiteUrl={undefined} // Website field not yet in UserProfile interface
-        recentlyFollowedBy={[]} // You can populate this with actual data if available
-      />
-
-      {/* New Profile Stats Row */}
-      <ProfileStatsRow
-        posts={postsCount}
-        totalXp="2,500" // Keep existing hardcoded value
-        following={followingCount}
-        followers={followersCount}
-      />
+      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
+      <div style={{ display: 'none' }}>
+        <ResponsiveStatsDisplay
+          primaryStats={{
+            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+            posts: postsCount,
+            followers: followersCount,
+            following: followingCount
+          }}
+          onStatClick={handleStatClick}
+        />
+      </div>
 
       {/* Tab Navigation with Underline Animation - Brand accent styling */}
       <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>

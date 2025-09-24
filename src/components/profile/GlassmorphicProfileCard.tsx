@@ -8,7 +8,6 @@ interface GlassmorphicProfileCardProps {
     display_name?: string;
     username?: string;
     home_club?: string;
-    eg_handicap_index?: number;
   } | null;
   isOwnProfile: boolean;
   onEditProfile: () => void;
@@ -31,13 +30,11 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 rounded-3xl px-5 sm:px-6 md:px-8 py-6 sm:py-7 md:py-8 mb-4 bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_10px_40px_-10px_rgba(0,0,0,.35)] overflow-hidden"
+      className="relative mx-4 md:mx-8 p-6 text-center"
+      style={glassmorphicStyle}
     >
-      {/* gradient fade overlay at the bottom */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent via-white/30 to-white" />
-      
       {/* Profile photo - overlapping top of card */}
-      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-10">
+      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
         <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white/30">
           {profile?.profile_photo_url ? (
             <img
@@ -56,7 +53,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       </div>
 
       {/* Profile content */}
-      <div className="pt-6 space-y-3 relative z-10">
+      <div className="pt-6 space-y-2">
         {/* Name - large, bold */}
         <h2 className="text-2xl font-bold text-white">
           {profile?.display_name || 'User'}
@@ -80,49 +77,12 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           )}
         </div>
 
-        {/* Home Club / Handicap row with profile photo card */}
-        <div className="flex items-start gap-6 mt-4">
-          {/* Left: info columns (home club, handicap) */}
-          <div className="flex-1 grid grid-cols-2 gap-6">
-            {/* Home Club block */}
-            <div className="text-left">
-              <div className="flex items-center gap-2 mb-1">
-                <Flag className="w-4 h-4 text-white/60" />
-                <p className="text-sm text-white/60 font-medium">Home Club</p>
-              </div>
-              <p className="text-base text-white font-semibold">
-                {profile?.home_club || 'No Club'}
-              </p>
-            </div>
-
-            {/* Handicap block */}
-            <div className="text-right">
-              <p className="text-sm text-white/60 font-medium mb-1">Handicap</p>
-              <p className="text-base text-white font-semibold">
-                {profile?.eg_handicap_index || '--'}
-              </p>
-            </div>
-          </div>
-
-          {/* Right: profile photo card */}
-          <div className="hidden xs:block w-24 sm:w-28 md:w-32 shrink-0">
-            <div className="rounded-2xl overflow-hidden border border-white/25 bg-white/10 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,.15)]">
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt={`${profile?.display_name} profile`}
-                  className="w-full aspect-[4/5] object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full aspect-[4/5] bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                  <span className="text-white font-bold text-2xl">
-                    {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
+        {/* Home Club with golf flag icon */}
+        <div className="flex items-center justify-center gap-2">
+          <Flag className="w-4 h-4 text-white/60" />
+          <p className="text-sm text-white/60">
+            {profile?.home_club || 'No Club'}
+          </p>
         </div>
       </div>
     </div>
