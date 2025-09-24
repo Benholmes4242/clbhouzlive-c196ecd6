@@ -450,7 +450,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       >
         {/* Header - Fixed at top (UI only change) */}
         <div
-          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          className="flex items-center justify-between px-2 py-4 flex-shrink-0"
           style={{
             height: window.innerWidth <= 768 ? '56px' : '64px',
             // Use same gradient as EchoAvatar
@@ -486,7 +486,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
         {/* Tabs - Fixed header */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 bg-[rgba(110,146,119,0.06)]">
-          <div className="px-6 pt-4 pb-2 flex-shrink-0">
+          <div className="px-2 pt-4 pb-2 flex-shrink-0">
             <TabsList
               className="
                 w-full h-11 rounded-full
