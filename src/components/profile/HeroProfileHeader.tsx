@@ -76,7 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -778,23 +777,6 @@ const HeroProfileHeader = ({
                    </div>
                  )}
 
-                 {/* Mini profile photo card */}
-                 <div className="absolute top-4 right-12 w-16 h-12 rounded-lg overflow-hidden border-2 border-white/30 bg-white/20 backdrop-blur-sm">
-                   {profile?.profile_photo_url ? (
-                     <img 
-                       src={profile.profile_photo_url}
-                       alt="Profile"
-                       className="w-full h-full object-cover"
-                     />
-                   ) : (
-                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                       <span className="text-white font-bold text-sm">
-                         {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
-                       </span>
-                     </div>
-                   )}
-                 </div>
-
                  {/* Name + Handle - centered */}
                  <div className="text-center">
                    <h1 className="text-2xl font-semibold text-gray-900">
@@ -832,58 +814,27 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-           {/* Bio + Website + Recently Followed Section */}
-           {(profile?.bio || profile?.website || true) && (
-             <div className="px-4 sm:px-6 mt-2">
-               {profile?.bio && (
-                 <p className="text-base leading-6 text-slate-900">{profile.bio}</p>
-               )}
-               
-               {profile?.website && (
-                 <p className="mt-2">
-                   <a
-                     href={profile.website}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="inline-flex items-center gap-2 underline decoration-slate-400 hover:decoration-slate-700 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 rounded"
-                   >
-                     {profile.website.replace(/^https?:\/\//, "")}
-                   </a>
-                 </p>
-               )}
-               
-               {/* Placeholder for recently followed */}
-               <p className="mt-3 text-sm text-slate-500">
-                 Followed by{" "}
-                 <span className="font-medium text-slate-700">
-                   John, Sarah
-                 </span>
-                 {" and others"}
-               </p>
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
              </div>
-           )}
-
-           {/* Slim Stats Row */}
-           <div className="mt-3 px-2 sm:px-6">
-             <div className="w-full rounded-xl border border-slate-200/80 bg-white/70 backdrop-blur-[6px]">
-               <div className="grid grid-cols-4 divide-x divide-slate-200/80">
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{postsCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Posts</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">2,500</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Total XP</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{followingCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Following</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{followersCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Followers</div>
-                 </div>
-               </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
              </div>
            </div>
         </div>
@@ -966,23 +917,6 @@ const HeroProfileHeader = ({
                    </div>
                  )}
 
-                 {/* Mini profile photo card */}
-                 <div className="absolute top-6 right-16 w-20 h-16 rounded-lg overflow-hidden border-2 border-white/30 bg-white/20 backdrop-blur-sm">
-                   {profile?.profile_photo_url ? (
-                     <img 
-                       src={profile.profile_photo_url}
-                       alt="Profile"
-                       className="w-full h-full object-cover"
-                     />
-                   ) : (
-                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                       <span className="text-white font-bold text-base">
-                         {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
-                       </span>
-                     </div>
-                   )}
-                 </div>
-
                  {/* Name + Handle - centered */}
                  <div className="text-center">
                    <h1 className="text-3xl font-semibold text-gray-900">
@@ -1018,58 +952,27 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-           {/* Bio + Website + Recently Followed Section */}
-           {(profile?.bio || profile?.website || true) && (
-             <div className="px-4 sm:px-6 mt-2">
-               {profile?.bio && (
-                 <p className="text-base leading-6 text-slate-900">{profile.bio}</p>
-               )}
-               
-               {profile?.website && (
-                 <p className="mt-2">
-                   <a
-                     href={profile.website}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="inline-flex items-center gap-2 underline decoration-slate-400 hover:decoration-slate-700 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 rounded"
-                   >
-                     {profile.website.replace(/^https?:\/\//, "")}
-                   </a>
-                 </p>
-               )}
-               
-               {/* Placeholder for recently followed */}
-               <p className="mt-3 text-sm text-slate-500">
-                 Followed by{" "}
-                 <span className="font-medium text-slate-700">
-                   John, Sarah
-                 </span>
-                 {" and others"}
-               </p>
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
              </div>
-           )}
-
-           {/* Slim Stats Row */}
-           <div className="mt-3 px-2 sm:px-6">
-             <div className="w-full rounded-xl border border-slate-200/80 bg-white/70 backdrop-blur-[6px]">
-               <div className="grid grid-cols-4 divide-x divide-slate-200/80">
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{postsCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Posts</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">2,500</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Total XP</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{followingCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Following</div>
-                 </div>
-                 <div className="flex flex-col items-center justify-center gap-1 px-3 py-2">
-                   <div className="text-lg font-semibold tracking-tight text-slate-900">{followersCount}</div>
-                   <div className="text-[11px] uppercase tracking-wide text-slate-500">Followers</div>
-                 </div>
-               </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
              </div>
            </div>
         </div>
@@ -1088,32 +991,51 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Text-Only Tabs with Orange Underline */}
-      <nav className="mt-4 px-2 sm:px-6">
-        <div className="flex overflow-x-auto gap-6 border-b border-slate-200/80 pb-1">
-          {tabs.map((tab) => {
-            const isActive = tab.id === activeSection;
-            return (
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+        <div className="relative" role="tablist" aria-label="Profile sections">
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={[
-                  "relative pb-2 text-base whitespace-nowrap transition-colors duration-200",
-                  isActive ? "font-semibold text-slate-900" : "text-slate-500 hover:text-slate-700",
-                ].join(" ")}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+                style={{
+                  color: activeSection === tab.id 
+                    ? 'hsl(var(--profile-text-primary))' 
+                    : 'hsl(var(--profile-text-secondary))'
+                }}
               >
                 {tab.label}
-                <span
-                  className={[
-                    "absolute left-0 right-0 -bottom-[1px] h-[3px] rounded-full transition-all duration-300",
-                    isActive ? "bg-orange-500" : "bg-transparent",
-                  ].join(" ")}
+                {/* Brand accent underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
                 />
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </nav>
+      </div>
 
       {/* Legacy ProfileTabs for content rendering */}
       <div style={{ display: 'none' }}>
