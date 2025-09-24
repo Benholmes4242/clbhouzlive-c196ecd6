@@ -804,7 +804,7 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-14 h-18 rounded-lg bg-white/20 border border-white/30 flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
                       <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
@@ -963,7 +963,7 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-16 h-20 rounded-lg bg-white/20 border border-white/30 flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
                       <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
