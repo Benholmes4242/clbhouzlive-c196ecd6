@@ -740,14 +740,13 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper - Full Width */}
+            {/* Glass panel positioned relative to OUTER wrapper - Full Screen Edge to Edge */}
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
-                bottom-[-14px] md:bottom-[-18px]
-                w-full
-                border border-white/35
+                fixed left-0 right-0 top-0 bottom-0
+                w-full h-full
+                border-0
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
