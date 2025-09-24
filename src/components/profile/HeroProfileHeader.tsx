@@ -545,7 +545,12 @@ const HeroProfileHeader = ({
         >
           {/* Render the responsive immersive header for media-rich backgrounds */}
           <ResponsiveImmersiveHeader 
-            mediaItems={mediaItems || []}
+            mediaItems={mediaItems?.map(item => ({
+              id: item.id,
+              media_type: item.media_type as string,
+              media_url: item.media_url,
+              thumbnail_url: item.poster_url || undefined
+            })) || []}
             isCollapsed={false}
           />
           
@@ -877,11 +882,10 @@ const HeroProfileHeader = ({
                   <div className="max-w-6xl mx-auto">
                     <PinnedAchievements 
                       userId={profile?.id}
+                      isOwnProfile={isOwnProfile}
                       displayName={profile?.display_name || 'User'}
-                      handicap={profile?.eg_handicap_index}
-                      profilePhotoUrl={profile?.profile_photo_url}
-                      isCurrentUser={isOwnProfile}
-                      onViewAllClick={() => {}}
+                      userHandicap={profile?.eg_handicap_index}
+                      userProfilePhotoUrl={profile?.profile_photo_url}
                     />
                   </div>
                 </div>
@@ -895,12 +899,19 @@ const HeroProfileHeader = ({
       <ImmersiveProfileModal
         isOpen={isImmersiveOpen}
         onClose={closeImmersive}
-        profile={profile}
-        mediaItems={mediaItems}
-        currentIndex={currentMediaIndex}
-        setCurrentIndex={setCurrentMediaIndex}
-        onMorphTransition={handleMorphTransition}
-        allowSwipeNavigation={false}
+        userId={profile?.id || ''}
+        mediaItems={mediaItems?.filter(item => item.media_type === 'video').map(item => ({
+          id: item.id,
+          media_type: 'video' as const,
+          media_url: item.media_url,
+          thumbnail_url: item.poster_url || undefined,
+          duration: item.duration || 0,
+          display_order: item.display_order || 0,
+          file_name: item.file_name || undefined,
+          created_at: item.created_at
+        })) || []}
+        initialIndex={currentMediaIndex}
+        onCurrentIndexChange={setCurrentMediaIndex}
       />
 
       {editDialogOpen && (
@@ -920,8 +931,17 @@ const HeroProfileHeader = ({
         <MediaManagerModal
           isOpen={mediaManagerOpen}
           onClose={() => setMediaManagerOpen(false)}
-          profile={profile}
-          refetchMedia={refetchMedia}
+          userId={profile?.id || ''}
+          mediaItems={mediaItems?.map(item => ({
+            id: item.id,
+            media_type: item.media_type as 'image' | 'video',
+            media_url: item.media_url,
+            thumbnail_url: item.poster_url || undefined,
+            duration: item.duration || 0,
+            display_order: item.display_order || 0,
+            file_name: item.file_name || undefined
+          })) || []}
+          onMediaUpdate={refetchMedia}
         />
       )}
     </div>
