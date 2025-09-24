@@ -403,7 +403,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       const timeout = setTimeout(() => {
         console.error('Video frame extraction timed out');
         reject(new Error('Video processing timed out'));
-      }, 45000); // Extended timeout for 20 frames
+      }, 15000); // Reduced timeout for 8 frames
       
       // Enhanced error handling
       video.onerror = (e) => {
@@ -419,9 +419,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           duration: video.duration
         });
         
-        // Mobile-optimized canvas size but keep quality
+        // Optimized canvas size for faster processing
         const isMobile = window.innerWidth <= 768;
-        const maxWidth = isMobile ? 800 : 1280; // Increased mobile resolution
+        const maxWidth = 512; // Reduced for faster processing
         canvas.width = Math.min(video.videoWidth, maxWidth);
         canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
         
@@ -455,8 +455,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         let frameIndex = 0;
         let seekTimeout: NodeJS.Timeout;
         
-        // Mobile optimization: Process frames in batches to prevent memory issues
-        const batchSize = isMobile ? 4 : 20; // Process 4 frames at a time on mobile
+        // Simplified processing: no batching needed with 8 frames
+        const batchSize = positions.length; // Process all frames together for speed
         let currentBatch = 0;
         
         const processBatch = () => {
@@ -513,8 +513,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             if (ctx) {
               try {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                // Optimized quality: slightly lower on mobile but still good
-                const quality = isMobile ? 0.75 : 0.8;
+                // Optimized quality for faster processing
+                const quality = 0.65; // Reduced quality for speed
                 const frameData = canvas.toDataURL('image/jpeg', quality);
                 frames.push(frameData);
                 console.log(`Captured frame ${frameIndex + 1}/${positions.length} (Batch ${currentBatch + 1})`);
@@ -744,25 +744,36 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       });
 
       // Canonical trace for debugging
-      console.info(`[SC] Analyze → frames:${extractedFrames.length}, model:gpt-4.1-2025-04-14, route:clbhouz-pro-ai, mode:${SWINGCOACH_MODE}`);
+      console.info(`[SC] Analyze → frames:${extractedFrames.length}, model:gpt-4o-mini, route:clbhouz-pro-ai, mode:${SWINGCOACH_MODE}`);
 
       const apiStartTime = Date.now();
-      const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
-        body: {
-          message: userMessage.content,
-          conversation: messages.slice(-6).map(msg => ({
-            role: msg.type === 'user' ? 'user' : 'assistant',
-            content: msg.content
-          })),
-          detailMode: false,
-          isEcho: true,
-          images: extractedFrames,
-          swingContext: swingContext
-        }
-      });
+      
+      // Add AbortController for 13s timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.warn('[SC] API call aborted after 13s timeout');
+      }, 13000);
 
-      const apiResponseTime = Date.now() - apiStartTime;
-      console.log('✅ Edge Function response:', { error, hasData: !!data, responseTime: apiResponseTime });
+      try {
+        const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
+          body: {
+            message: userMessage.content,
+            conversation: messages.slice(-3).map(msg => ({ // Reduced history for speed
+              role: msg.type === 'user' ? 'user' : 'assistant',
+              content: msg.content
+            })),
+            detailMode: false,
+            isEcho: true,
+            images: extractedFrames,
+            swingContext: swingContext
+          }
+        });
+        
+        clearTimeout(timeoutId);
+
+        const apiResponseTime = Date.now() - apiStartTime;
+        console.log('✅ Edge Function response:', { error, hasData: !!data, responseTime: apiResponseTime });
 
       // Ensure visual progression uses at least 80% of total wait time
       const minProgressTime = apiResponseTime * 0.8;
@@ -891,6 +902,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         // Auto-save to Supabase even without metadata
         console.log('🤖 Basic analysis complete, auto-saving to Supabase...');
         await autoSaveAnalysisToSupabase(basicAnalysisToSave);
+      }
+
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error('Error analyzing swing:', error);
+        throw error;
       }
 
     } catch (error) {

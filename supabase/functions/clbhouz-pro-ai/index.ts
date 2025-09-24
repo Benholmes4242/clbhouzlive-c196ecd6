@@ -177,18 +177,26 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
         console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
       }
 
+      // Add timeout for faster failure/fallback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 13000); // 13s SLA
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
+        signal: controller.signal,
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14', // Use powerful model for image analysis
+          model: 'gpt-4o-mini', // Fast vision model for swing analysis
           messages: messages,
-          max_tokens: 1500
+          max_tokens: 600, // Reduced for faster response
+          temperature: 0.2
         }),
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorText = await response.text();
