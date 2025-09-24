@@ -667,21 +667,21 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         let currentPhaseIndex = 0;
         
         const progressUpdate = () => {
-          // Update frame carousel every 1000ms (1 second)
+          // Update frame carousel every 2000ms (2 seconds)
           if (extractedFrames.length > 0) {
             setCurrentFrameIndex(frameIdx % extractedFrames.length);
             frameIdx++;
           }
           
-          // Update analysis status every 1000ms (1 second) - same timing as frames
+          // Update analysis status every 2000ms (2 seconds) - same timing as frames
           if (currentPhaseIndex < analysisPhases.length) {
             setAnalysisStatus(analysisPhases[currentPhaseIndex]);
             currentPhaseIndex++;
           }
         };
         
-        // Update both frames and analysis phases every 1000ms (1 second)
-        frameInterval = setInterval(progressUpdate, 1000);
+        // Update both frames and analysis phases every 2000ms (2 seconds)
+        frameInterval = setInterval(progressUpdate, 2000);
       };
 
       // Function to adjust timing based on actual API response time
@@ -1118,7 +1118,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         className="h-full"
         style={{ overscrollBehavior: 'contain' }}
       >
-        <div className="px-6 py-0">
+        <div className="px-2 py-0">
         {messages.length === 0 && !uploadedVideo ? (
           <div className="text-center text-muted-foreground">
             <h3 className="text-lg font-medium mb-2">
@@ -1160,12 +1160,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                   <p>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</p>
                 </div>
                 
-                {/* Analyze Swing button - moved above media card */}
-                <div className="mb-3">
+                {/* Analyze Swing button with trash icon */}
+                <div className="mb-3 flex items-center gap-2">
                   <Button
                     onClick={analyzeSwing}
                     disabled={uploading || isAnalyzing}
-                    className="w-full gap-2 text-white"
+                    className="flex-1 gap-2 text-white"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
                     }}
@@ -1179,6 +1179,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     ) : (
                       "Analyze Swing"
                     )}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={discardVideo}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
                 
@@ -1212,18 +1215,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                        )}
                      </div>
                    </div>
-                     <div className="flex-1">
-                       <div className="flex items-center justify-between mb-1">
-                         <p className="text-xs text-muted-foreground">
-                           {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                         </p>
-                         <Button variant="ghost" size="sm" onClick={discardVideo}>
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </div>
-                       
+                      <div className="flex-1">
                         {/* Analysis status display */}
-                        {isAnalyzing && analysisStatus && (
+                         {isAnalyzing && analysisStatus && (
                           <div className="mb-3 p-2 rounded-lg border" style={{ 
                             backgroundColor: 'rgba(42, 157, 143, 0.08)', 
                             borderColor: 'rgba(42, 157, 143, 0.2)',
@@ -1254,7 +1248,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 {message.type === 'ai' && 
                  message.id === messages[messages.length - 1]?.id && 
                  message.metadata?.category === 'swing_analysis' && (
-                  <div className="mt-4 ml-12 space-y-4">
+                  <div className="mt-4 space-y-4">
                     <SwingVisualCarousel
                       visuals={[]}
                       isLoading={false}
@@ -1318,7 +1312,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       />
 
       {/* Recent History Bar */}
-      <div className="p-4 border-t">
+      <div className="px-2 py-4 border-t">
         <button
           className="w-full rounded-[28px] backdrop-blur shadow flex items-center justify-between px-4 py-2 text-white hover:opacity-90 transition-all"
           style={{ 

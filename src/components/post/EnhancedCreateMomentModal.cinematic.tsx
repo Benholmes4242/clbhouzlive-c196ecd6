@@ -243,7 +243,7 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* shell */}
-          <div className="absolute inset-0 flex items-center justify-center py-8 px-6" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center py-16 px-6" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
@@ -300,9 +300,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   </motion.div>
 
 
-                  {/* Video duration pill - top left */}
+                  {/* Video duration pill - aligned with media counter */}
                   {media[activeIndex]?.type === 'video' && (
-                    <div className="absolute top-6 left-6">
+                    <div className="absolute bottom-6 left-2">
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
@@ -337,7 +337,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-3">{/* Increased bottom margin */}
                         <label className="block text-base font-semibold text-white">Add a caption</label>
                         <button
                           onClick={handleAICaption}
@@ -354,16 +354,16 @@ export default function EnhancedCreateMomentModalCinematic({
                         </button>
                       </div>
                       
-                      <div className="flex items-start gap-2">
-                        <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[3.5rem] max-h-[5rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
-                          placeholder="Write a caption…"
-                          value={caption}
-                          onChange={(e) => {
-                            setCaption(e.target.value);
-                          }}
-                        />
-                      </div>
+                       <div className="flex flex-col gap-2 h-full pb-3">{/* Added pb-3 for bottom padding */}
+                         <textarea
+                           className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white h-[80px] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
+                           placeholder="Write a caption…"
+                           value={caption}
+                           onChange={(e) => {
+                             setCaption(e.target.value);
+                           }}
+                         />
+                       </div>
                     </motion.div>
 
                     {/* COURSE CARD */}

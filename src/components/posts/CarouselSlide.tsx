@@ -55,8 +55,33 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
 
   const handleVideoPlay = () => {
     if (videoRef.current) {
+      videoRef.current.currentTime = 0; // Start from beginning when playing
       videoRef.current.play();
     }
+  };
+
+  // Generate video thumbnail
+  const generateThumbnail = async (videoElement: HTMLVideoElement): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      videoElement.addEventListener('loadeddata', () => {
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        
+        // Seek to 1 second or 10% of duration, whichever is smaller
+        const seekTime = Math.min(1, videoElement.duration * 0.1);
+        videoElement.currentTime = seekTime;
+        
+        videoElement.addEventListener('seeked', () => {
+          if (ctx) {
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+          }
+        }, { once: true });
+      }, { once: true });
+    });
   };
 
   if (item.type === 'video') {
@@ -74,13 +99,22 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           playsInline
           controls={false}
           muted
+          poster={src} // Use the same src as poster to ensure thumbnail shows
           onLoadedMetadata={(e) => {
             const video = e.target as HTMLVideoElement;
             setDuration(formatDuration(video.duration || 0));
+            // Seek to a frame to show a thumbnail
+            video.currentTime = 1;
+          }}
+          onLoadedData={() => {
+            setLoaded(true);
+            // Ensure we show a frame for thumbnail
+            if (videoRef.current && !isPlaying) {
+              videoRef.current.currentTime = 1;
+            }
           }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onLoadedData={() => setLoaded(true)}
           className={`w-full h-full object-cover transition-all duration-300 ${
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm'
           }`}
