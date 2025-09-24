@@ -750,6 +750,7 @@ const HeroProfileHeader = ({
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                pb-8
               "
             >
                <div className="px-5 py-2 flex flex-col items-center relative">
