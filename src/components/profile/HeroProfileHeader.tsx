@@ -804,8 +804,8 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
-                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                    <div className="w-42 h-54 rounded-lg flex flex-col items-center justify-center p-6 ml-4 overflow-hidden">
+                      <div className="w-24 h-24 rounded-md overflow-hidden border border-white/40 mb-3">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -814,13 +814,13 @@ const HeroProfileHeader = ({
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-xs">
+                            <span className="text-gray-600 font-bold text-lg">
                               {displayName?.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
+                      <p className="text-sm text-gray-700 font-medium truncate w-full text-center">
                         {displayName?.split(' ')[0] || 'User'}
                       </p>
                     </div>
@@ -963,8 +963,8 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
-                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                    <div className="w-48 h-60 rounded-lg flex flex-col items-center justify-center p-6 ml-6 overflow-hidden">
+                      <div className="w-30 h-30 rounded-md overflow-hidden border border-white/40 mb-3">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -973,13 +973,13 @@ const HeroProfileHeader = ({
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-sm">
+                            <span className="text-gray-600 font-bold text-xl">
                               {displayName?.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
+                      <p className="text-base text-gray-700 font-medium truncate w-full text-center">
                         {displayName?.split(' ')[0] || 'User'}
                       </p>
                     </div>
