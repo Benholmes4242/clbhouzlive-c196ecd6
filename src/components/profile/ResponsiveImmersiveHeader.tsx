@@ -16,13 +16,13 @@ interface ResponsiveImmersiveHeaderProps {
 }
 
 const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
-  mediaItems,
+  mediaItems = [],
   isCollapsed = false
 }) => {
   const isMobile = useIsMobile();
 
   // Always show immersive header, use default background if no media
-  const primaryMedia = mediaItems.length > 0 ? mediaItems[0] : null;
+  const primaryMedia = mediaItems && mediaItems.length > 0 ? mediaItems[0] : null;
   
   return (
     <div className={`
