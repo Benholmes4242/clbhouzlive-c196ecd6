@@ -782,8 +782,8 @@ const HeroProfileHeader = ({
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
                     <div className="flex items-start justify-between">
-                      {/* Name + Handle - left aligned */}
-                      <div className="text-center flex-1">
+                      {/* Name + Handle - centered within glass panel */}
+                      <div className="text-center flex-1 -mr-[104px]">
                         <h1 className="text-2xl font-semibold text-gray-900">
                           {displayName}
                         </h1>
@@ -809,9 +809,10 @@ const HeroProfileHeader = ({
                         )}
                       </div>
                     </div>
+                  </div>
 
-                    {/* Club + Handicap row */}
-                    <div className="mt-4 flex items-center justify-center gap-12">
+                  {/* Club + Handicap row */}
+                  <div className="mt-4 flex items-center justify-center gap-12">
                       <div className="text-center">
                         <div className="text-xs text-gray-700">{homeClub}</div>
                         <div className="mt-1 text-xs text-gray-500">Golf Club</div>
