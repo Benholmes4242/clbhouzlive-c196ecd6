@@ -779,24 +779,40 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  {/* Header Block - 2-column grid with proper alignment */}
                   <div className="w-full mb-3">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[84px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
+                    <div className="grid grid-cols-[1fr_auto] gap-4 items-start">
+                      {/* Left column - Name + Handle, then Club + Handicap */}
+                      <div className="grid grid-rows-[auto_auto] gap-4">
+                        {/* Row 1: Name + Handle - spans full width and centers */}
+                        <div className="text-center col-span-full">
+                          <h1 className="text-2xl font-semibold text-gray-900">
+                            {displayName}
+                          </h1>
+                          <p className="mt-1 text-sm text-gray-700">
+                            @{username}
+                          </p>
+                        </div>
+                        
+                        {/* Row 2: Club + Handicap in nested grid */}
+                        <div className="grid grid-cols-2 gap-2 items-start">
+                          {/* Home Club - left aligned */}
+                          <div className="text-left">
+                            <div className="text-xs text-gray-700">{homeClub}</div>
+                            <div className="mt-1 text-xs text-gray-500">Golf Club</div>
+                          </div>
+                          {/* Handicap - right aligned */}
+                          <div className="text-right justify-self-end">
+                            <div className="text-xs text-gray-700">Handicap</div>
+                            <div className="mt-1 text-lg font-semibold text-gray-900">
+                              {handicap}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0">
+                      {/* Right column - Mini Profile Card */}
+                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 row-start-2">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -810,22 +826,6 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
-                      </div>
-                    </div>
-
-                    {/* Club + Handicap aligned with mini profile card top edge */}
-                    <div className="absolute top-[0px] left-6 right-[84px] grid grid-cols-2 gap-4 items-start">
-                      {/* Home Club - aligned to left */}
-                      <div className="text-left">
-                        <div className="text-xs text-gray-700">{homeClub}</div>
-                        <div className="mt-1 text-xs text-gray-500">Golf Club</div>
-                      </div>
-                      {/* Handicap - aligned to right */}
-                      <div className="text-right">
-                        <div className="text-xs text-gray-700">Handicap</div>
-                        <div className="mt-1 text-lg font-semibold text-gray-900">
-                          {handicap}
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -961,24 +961,40 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  {/* Header Block - 2-column grid with proper alignment */}
                   <div className="w-full mb-4">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[112px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-base text-gray-700">
-                          @{username}
-                        </p>
+                    <div className="grid grid-cols-[1fr_auto] gap-6 items-start">
+                      {/* Left column - Name + Handle, then Club + Handicap */}
+                      <div className="grid grid-rows-[auto_auto] gap-6">
+                        {/* Row 1: Name + Handle - spans full width and centers */}
+                        <div className="text-center col-span-full">
+                          <h1 className="text-3xl font-semibold text-gray-900">
+                            {displayName}
+                          </h1>
+                          <p className="mt-1 text-base text-gray-700">
+                            @{username}
+                          </p>
+                        </div>
+                        
+                        {/* Row 2: Club + Handicap in nested grid */}
+                        <div className="grid grid-cols-2 gap-6 items-start">
+                          {/* Home Club - left aligned */}
+                          <div className="text-left">
+                            <div className="text-sm text-gray-700">{homeClub}</div>
+                            <div className="mt-1 text-sm text-gray-500">Golf Club</div>
+                          </div>
+                          {/* Handicap - right aligned */}
+                          <div className="text-right justify-self-end">
+                            <div className="text-sm text-gray-700">Handicap</div>
+                            <div className="mt-1 text-2xl font-semibold text-gray-900">
+                              {handicap}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
-                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0">
+                      {/* Right column - Mini Profile Card */}
+                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 row-start-2">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -992,22 +1008,6 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
-                      </div>
-                    </div>
-
-                    {/* Club + Handicap aligned with mini profile card top edge */}
-                    <div className="absolute top-[80px] left-8 right-[118px] grid grid-cols-2 gap-6 items-start">
-                      {/* Home Club - aligned to left */}
-                      <div className="text-left">
-                        <div className="text-sm text-gray-700">{homeClub}</div>
-                        <div className="mt-1 text-sm text-gray-500">Golf Club</div>
-                      </div>
-                      {/* Handicap - aligned to right */}
-                      <div className="text-right">
-                        <div className="text-sm text-gray-700">Handicap</div>
-                        <div className="mt-1 text-2xl font-semibold text-gray-900">
-                          {handicap}
-                        </div>
                       </div>
                     </div>
                   </div>
