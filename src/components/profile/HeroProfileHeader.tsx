@@ -47,7 +47,8 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 
-import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
+import ProfileBioBlock from './ProfileBioBlock';
+import ProfileStatsRow from './ProfileStatsRow';
 import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
@@ -978,18 +979,20 @@ const HeroProfileHeader = ({
         </div>
       )}
 
-      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
-      <div style={{ display: 'none' }}>
-        <ResponsiveStatsDisplay
-          primaryStats={{
-            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
-            posts: postsCount,
-            followers: followersCount,
-            following: followingCount
-          }}
-          onStatClick={handleStatClick}
-        />
-      </div>
+      {/* New Profile Bio Block */}
+      <ProfileBioBlock
+        bio={profile?.bio}
+        websiteUrl={undefined} // Website field not yet in UserProfile interface
+        recentlyFollowedBy={[]} // You can populate this with actual data if available
+      />
+
+      {/* New Profile Stats Row */}
+      <ProfileStatsRow
+        posts={postsCount}
+        totalXp="2,500" // Keep existing hardcoded value
+        following={followingCount}
+        followers={followersCount}
+      />
 
       {/* Tab Navigation with Underline Animation - Brand accent styling */}
       <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
