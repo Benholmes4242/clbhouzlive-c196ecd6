@@ -1118,7 +1118,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         className="h-full"
         style={{ overscrollBehavior: 'contain' }}
       >
-        <div className="px-6 py-0">
+        <div className="px-2 py-0">
         {messages.length === 0 && !uploadedVideo ? (
           <div className="text-center text-muted-foreground">
             <h3 className="text-lg font-medium mb-2">
@@ -1318,7 +1318,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       />
 
       {/* Recent History Bar */}
-      <div className="p-4 border-t">
+      <div className="px-2 py-4 border-t">
         <button
           className="w-full rounded-[28px] backdrop-blur shadow flex items-center justify-between px-4 py-2 text-white hover:opacity-90 transition-all"
           style={{ 
