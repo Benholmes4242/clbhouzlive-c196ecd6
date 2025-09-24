@@ -1002,7 +1002,7 @@ const HeroProfileHeader = ({
                           <div className="text-sm text-gray-700">{homeClub}</div>
                           <div className="mt-1 text-sm text-gray-500">Golf Club</div>
                         </div>
-                        <div className="text-center mr-8">
+                        <div className="text-center mr-16">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
