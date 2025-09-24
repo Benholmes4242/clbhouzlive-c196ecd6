@@ -779,20 +779,21 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle centered with mini profile card positioned absolutely */}
-                  <div className="w-full mb-3 relative">
-                    {/* Name + Handle - centered */}
-                    <div className="text-center">
-                      <h1 className="text-2xl font-semibold text-gray-900">
-                        {displayName}
-                      </h1>
-                      <p className="mt-1 text-sm text-gray-700">
-                        @{username}
-                      </p>
-                    </div>
-                    
-                    {/* Mini Profile Card (3:4 aspect ratio, larger size) - positioned absolutely */}
-                    <div className="absolute top-0 right-0 w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden mt-[60px] flex-shrink-0">
+                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  <div className="w-full mb-3">
+                    <div className="flex items-start justify-between">
+                      {/* Name + Handle - left aligned */}
+                      <div className="text-center flex-1">
+                        <h1 className="text-2xl font-semibold text-gray-900">
+                          {displayName}
+                        </h1>
+                        <p className="mt-1 text-sm text-gray-700">
+                          @{username}
+                        </p>
+                      </div>
+                      
+                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
+                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[60px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -806,8 +807,8 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
+                      </div>
                     </div>
-                  </div>
 
                     {/* Club + Handicap row */}
                     <div className="mt-4 flex items-center justify-center gap-12">
@@ -871,10 +872,10 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-            </div>
-              {/* Spacer below to avoid clipping the panel */}
-              <div className="h-32" />
-            </section>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-32" />
+           </section>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -955,20 +956,21 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle centered with mini profile card positioned absolutely */}
-                  <div className="w-full mb-4 relative">
-                    {/* Name + Handle - centered */}
-                    <div className="text-center">
-                      <h1 className="text-3xl font-semibold text-gray-900">
-                        {displayName}
-                      </h1>
-                      <p className="mt-1 text-base text-gray-700">
-                        @{username}
-                      </p>
-                    </div>
-                    
-                    {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - positioned absolutely */}
-                    <div className="absolute top-0 right-0 w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden mt-[60px] flex-shrink-0">
+                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  <div className="w-full mb-4">
+                    <div className="flex items-start justify-between">
+                      {/* Name + Handle - left aligned */}
+                      <div className="text-center flex-1">
+                        <h1 className="text-3xl font-semibold text-gray-900">
+                          {displayName}
+                        </h1>
+                        <p className="mt-1 text-base text-gray-700">
+                          @{username}
+                        </p>
+                      </div>
+                      
+                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
+                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[60px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -982,8 +984,8 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
+                      </div>
                     </div>
-                  </div>
 
                     {/* Club + Handicap row */}
                     <div className="mt-5 flex items-center justify-center gap-16">
@@ -1047,10 +1049,10 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-            </div>
-              {/* Spacer below to avoid clipping the panel */}
-              <div className="h-40" />
-            </section>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-40" />
+           </section>
         </div>
       )}
 
