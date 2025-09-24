@@ -736,7 +736,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+              <div className="absolute bottom-0 left-0 w-full h-24 sm:h-28 lg:h-32
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -746,7 +746,7 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-14px] md:bottom-[-18px]
+                bottom-[-56px] sm:bottom-[-72px] lg:bottom-[-96px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -918,7 +918,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+              <div className="absolute bottom-0 left-0 w-full h-24 sm:h-28 lg:h-32
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -928,7 +928,7 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-14px] md:bottom-[-18px]
+                bottom-[-56px] sm:bottom-[-72px] lg:bottom-[-96px]
                 w-[90%] md:w-[80%] max-w-[800px]
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
