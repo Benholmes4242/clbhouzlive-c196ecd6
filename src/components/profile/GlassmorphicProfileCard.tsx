@@ -8,6 +8,7 @@ interface GlassmorphicProfileCardProps {
     display_name?: string;
     username?: string;
     home_club?: string;
+    eg_handicap_index?: number;
   } | null;
   isOwnProfile: boolean;
   onEditProfile: () => void;
@@ -30,7 +31,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 p-6 text-center"
+      className="relative mx-4 md:mx-8 p-6 rounded-xl mb-4"
       style={glassmorphicStyle}
     >
       {/* Profile photo - overlapping top of card */}
@@ -53,37 +54,67 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       </div>
 
       {/* Profile content */}
-      <div className="pt-6 space-y-2">
-        {/* Name - large, bold */}
-        <h2 className="text-2xl font-bold text-white">
-          {profile?.display_name || 'User'}
-        </h2>
-
-        {/* Username row with edit button */}
-        <div className="flex items-center justify-center gap-3">
-          <p className="text-base text-white/80">
+      <div className="pt-6">
+        {/* Name and handle centered */}
+        <div className="text-center space-y-1 mb-6">
+          <h2 className="text-2xl font-bold text-slate-900">
+            {profile?.display_name || 'User'}
+          </h2>
+          <p className="text-base text-slate-600">
             @{profile?.username || 'username'}
           </p>
-          
-          {/* Edit Profile button - pill style, subtle */}
-          {isOwnProfile && (
-            <button
-              onClick={onEditProfile}
-              className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1"
-            >
-              <Edit className="w-3 h-3" />
-              Edit
-            </button>
-          )}
         </div>
 
-        {/* Home Club with golf flag icon */}
-        <div className="flex items-center justify-center gap-2">
-          <Flag className="w-4 h-4 text-white/60" />
-          <p className="text-sm text-white/60">
-            {profile?.home_club || 'No Club'}
-          </p>
+        {/* Home club and handicap row */}
+        <div className="flex items-center justify-between">
+          {/* Home Club on left */}
+          <div className="text-left">
+            <p className="text-lg font-semibold text-slate-900">
+              {profile?.home_club?.split(' ').slice(0, -2).join(' ') || 'Sundridge Park'}
+            </p>
+            <p className="text-sm text-slate-600">
+              {profile?.home_club?.split(' ').slice(-2).join(' ') || 'Golf Club'}
+            </p>
+          </div>
+
+          {/* Mini profile photo card on right */}
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-lg font-semibold text-slate-900">Handicap</p>
+              <p className="text-2xl font-bold text-slate-900">
+                {profile?.eg_handicap_index ?? 4}
+              </p>
+            </div>
+            <div className="w-20 h-24 rounded-xl overflow-hidden border-2 border-white/30 shadow-lg">
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">
+                    {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Edit button for own profile */}
+        {isOwnProfile && (
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={onEditProfile}
+              className="px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 border border-white/20 text-slate-700 text-sm font-medium transition-all duration-300 flex items-center gap-2"
+            >
+              <Edit className="w-4 h-4" />
+              Edit Profile
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
