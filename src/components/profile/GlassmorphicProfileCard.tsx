@@ -31,7 +31,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 p-6 text-center mb-4"
+      className="relative mx-4 md:mx-8 p-6 text-center"
       style={glassmorphicStyle}
     >
       {/* Profile photo - overlapping top of card */}

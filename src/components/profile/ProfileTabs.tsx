@@ -40,10 +40,10 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const navigate = useNavigate();
 
   const tabs = [
-    { id: 'activity', label: 'Activity' },
-    { id: 'courses', label: 'Courses' },
-    { id: 'achievements', label: 'Achievements' },
-    { id: 'stats', label: 'Handicap' }
+    { id: 'activity', label: 'Activity', icon: Camera },
+    { id: 'courses', label: 'Courses', icon: MapPin },
+    { id: 'achievements', label: 'Achievements', icon: Trophy },
+    { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
 
   const updateScrollState = () => {
@@ -67,31 +67,48 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
 
   return (
     <div className="w-full">
-      <nav className="mt-4 px-2 sm:px-6">
-        <div className="flex overflow-x-auto gap-6 border-b border-slate-200/80 pb-1">
-          {tabs.map((t) => {
-            const isActive = t.id === activeTab;
-            return (
-              <button
-                key={t.id}
-                onClick={() => onTabChange(t.id)}
-                className={[
-                  "relative pb-2 text-base whitespace-nowrap",
-                  isActive ? "font-semibold text-slate-900" : "text-slate-500 hover:text-slate-700",
-                ].join(" ")}
-              >
-                {t.label}
-                <span
-                  className={[
-                    "absolute left-0 right-0 -bottom-[1px] h-[3px] rounded-full",
-                    isActive ? "bg-[var(--brand-orange,#ff8a00)]" : "bg-transparent",
-                  ].join(" ")}
-                />
-              </button>
-            );
-          })}
+      {/* Tab Bar */}
+      <div className="relative z-50 bg-background backdrop-blur-sm w-full border-b border-border/50">
+        <div className="relative w-full">
+          {/* Left fade gradient */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+          )}
+          
+          {/* Right fade gradient */}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+          )}
+          
+          <div 
+            ref={tabsRef}
+            className="flex w-full"
+          >
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  disabled={transitionState !== 'idle'}
+                  className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 relative ${
+                    isActive 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
+                >
+                  <span className="whitespace-nowrap text-xl md:text-2xl text-black font-medium">{tab.label}</span>
+                  {/* Underline only under text label */}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-muted-foreground/40 w-1/2" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </nav>
+      </div>
 
       {/* Tab Content */}
       <div className={`pt-0 pb-1 ${activeTab === 'activity' ? 'md:px-0' : activeTab === 'achievements' ? 'px-0' : 'px-4 md:px-0'}`}>
@@ -102,7 +119,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           {activeTab === 'stats' && children.stats}
         </div>
       </div>
+
     </div>
+
   );
 };
 

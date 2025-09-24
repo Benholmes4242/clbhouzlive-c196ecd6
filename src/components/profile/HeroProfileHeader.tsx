@@ -47,8 +47,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 
-import ProfileBioBlock from './ProfileBioBlock';
-import ProfileStatsRow from './ProfileStatsRow';
+import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
 
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
@@ -77,8 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
-  recentlyFollowedBy?: string[];
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -701,74 +698,335 @@ const HeroProfileHeader = ({
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
 
-      {/* Immersive Header with Hero Background */}
-      <ResponsiveImmersiveHeader 
-        mediaItems={mediaItems}
-        isCollapsed={showStickyHeader}
-      />
+      {/* Mobile-Only Full Bleed Profile Layout */}
+      {isMobile ? (
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: getMobileCropPosition(profile),
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
 
-      {/* Glass Profile Card */}
-      <div ref={profileCardRef}>
-        <GlassmorphicProfileCard
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          onEditProfile={() => setEditDialogOpen(true)}
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel positioned relative to OUTER wrapper - Full Width */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-0 right-0
+                bottom-[-20px] md:bottom-[-28px]
+                w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                pb-10
+              "
+            >
+               <div className="px-5 py-4 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-4 left-5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={20} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                            Media Manager
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => previewImmersive()}>
+                            Immersive Preview
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
+
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
+
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-4 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-6">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-xs text-gray-500">Golf Club</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-700">Handicap</div>
+                        <div className="mt-1 text-lg font-semibold text-gray-900">
+                          {handicap}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-xs">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-20 md:h-28" />
+           </section>
+           
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
+        </div>
+      ) : (
+        /* Desktop layout - updated to match mobile design pattern */
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: 'center center',
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-20px] md:bottom-[-28px]
+                w-[90%] md:w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-8 py-10 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-6 left-8">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={24} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                            Media Manager
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => previewImmersive()}>
+                            Immersive Preview
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
+
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-base text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
+
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-5 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-12">
+                      <div className="text-center">
+                        <div className="text-sm text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-sm text-gray-500">Golf Club</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm text-gray-700">Handicap</div>
+                        <div className="mt-1 text-2xl font-semibold text-gray-900">
+                          {handicap}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-sm">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-20 md:h-28" />
+           </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
+        </div>
+      )}
+
+      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
+      <div style={{ display: 'none' }}>
+        <ResponsiveStatsDisplay
+          primaryStats={{
+            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+            posts: postsCount,
+            followers: followersCount,
+            following: followingCount
+          }}
+          onStatClick={handleStatClick}
         />
       </div>
 
-      {/* Bio Block */}
-      <ProfileBioBlock
-        bio={profile?.bio}
-        websiteUrl={profile?.website}
-        recentlyFollowedBy={profile?.recentlyFollowedBy || []}
-      />
-
-      {/* Stats Row */}
-      <ProfileStatsRow
-        posts={postsCount}
-        totalXp="2,500"
-        following={followingCount}
-        followers={followersCount}
-      />
-
-      {/* Tabs */}
-      <ProfileTabs
-        activeTab={activeSection}
-        onTabChange={handleTabChange}
-        userId={profile?.id || ''}
-        userDisplayName={profile?.display_name}
-        userHandicap={profile?.eg_handicap_index}
-        userProfilePhotoUrl={profile?.profile_photo_url}
-        isCurrentUser={isOwnProfile}
-        transitionState={transitionState}
-        children={{
-          activity: (
-            <ActivityFeed
-              userId={profile?.id || ''}
-              isOwnProfile={isOwnProfile}
-              profileDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              onAchievementsClick={() => onSectionChange?.('achievements')}
-            />
-          ),
-          courses: (
-            <div></div> // Content will be rendered separately below
-          ),
-          achievements: (
-            <AchievementsPane 
-              userId={profile?.id}
-              userDisplayName={profile?.display_name || 'User'}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
-          ),
-          stats: (
-            <div></div> // Content will be rendered separately below
-          )
-        }}
-        />
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
       <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
