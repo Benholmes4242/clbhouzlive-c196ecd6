@@ -842,12 +842,6 @@ const HeroProfileHeader = ({
                         {profile.website.replace(/^https?:\/\//, '')}
                       </a>
                     )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
-                    )}
                   </div>
 
                   {/* Slim Stats Row */}
@@ -1018,12 +1012,6 @@ const HeroProfileHeader = ({
                       >
                         {profile.website.replace(/^https?:\/\//, '')}
                       </a>
-                    )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
                     )}
                   </div>
 
