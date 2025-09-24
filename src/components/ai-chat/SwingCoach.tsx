@@ -1160,12 +1160,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                   <p>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</p>
                 </div>
                 
-                {/* Analyze Swing button - moved above media card */}
-                <div className="mb-3">
+                {/* Analyze Swing button with trash icon */}
+                <div className="mb-3 flex items-center gap-2">
                   <Button
                     onClick={analyzeSwing}
                     disabled={uploading || isAnalyzing}
-                    className="w-full gap-2 text-white"
+                    className="flex-1 gap-2 text-white"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
                     }}
@@ -1179,6 +1179,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                     ) : (
                       "Analyze Swing"
                     )}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={discardVideo}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
                 
@@ -1212,18 +1215,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                        )}
                      </div>
                    </div>
-                     <div className="flex-1">
-                       <div className="flex items-center justify-between mb-1">
-                         <p className="text-xs text-muted-foreground">
-                           {uploadedVideo.type.startsWith('video/') ? 'Video loaded and ready for analysis' : 'Image loaded and ready for analysis'}
-                         </p>
-                         <Button variant="ghost" size="sm" onClick={discardVideo}>
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </div>
-                       
+                      <div className="flex-1">
                         {/* Analysis status display */}
-                        {isAnalyzing && analysisStatus && (
+                         {isAnalyzing && analysisStatus && (
                           <div className="mb-3 p-2 rounded-lg border" style={{ 
                             backgroundColor: 'rgba(42, 157, 143, 0.08)', 
                             borderColor: 'rgba(42, 157, 143, 0.2)',
