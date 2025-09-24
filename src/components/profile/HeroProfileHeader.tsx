@@ -553,9 +553,6 @@ const HeroProfileHeader = ({
     handleSave,
   } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
-  // Removed scroll event listeners
-
-
   // Achievement ring calculation
   const getAchievementRing = (coursesPlayed: number): AchievementRing => {
     if (coursesPlayed >= 300) {
@@ -665,9 +662,6 @@ const HeroProfileHeader = ({
       toast.error("Failed to save photo to profile");
     }
   };
-
-
-
 
   // Simple refs for animation (removed complex animation hooks)
   const activityRef = React.useRef<HTMLDivElement>(null);
@@ -781,9 +775,13 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    <div className="flex items-start justify-between">
-                      {/* Name + Handle - centered within glass panel */}
-                      <div className="text-center flex-1 -mr-[104px]">
+                    {/* 3-column grid for perfect centering */}
+                    <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
+                      {/* Left: Invisible spacer to balance right side */}
+                      <div className="w-[88px]"></div>
+                      
+                      {/* Center: Name + Handle - perfectly centered */}
+                      <div className="text-center">
                         <h1 className="text-2xl font-semibold text-gray-900">
                           {displayName}
                         </h1>
@@ -791,22 +789,24 @@ const HeroProfileHeader = ({
                           @{username}
                         </p>
                       </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[60px] flex-shrink-0">
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={profile.profile_photo_url}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-2xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
+
+                      {/* Right: Mini profile card with slight downward nudge */}
+                      <div className="flex-shrink-0">
+                        <div className="w-[88px] h-[116px] rounded-2xl border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden mt-2">
+                          {profile?.profile_photo_url ? (
+                            <img
+                              src={profile.profile_photo_url}
+                              alt="Mini profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                              <span className="text-gray-600 font-bold text-2xl">
+                                {displayName?.charAt(0).toUpperCase() || 'U'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -873,10 +873,10 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-             
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-32" />
-           </section>
+            
+            {/* Spacer below to avoid clipping the panel */}
+            <div className="h-32" />
+          </section>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -1050,10 +1050,10 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-             
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-40" />
-           </section>
+            
+            {/* Spacer below to avoid clipping the panel */}
+            <div className="h-40" />
+          </section>
         </div>
       )}
 
@@ -1269,10 +1269,6 @@ const HeroProfileHeader = ({
           </div>
         )}
       </div>
-      
-      {/* Remove FullscreenMediaModal - handled by individual components */}
-
-      {/* Rest of content sections would continue here... */}
       
       {/* Custom Edit Profile Dialog with glass effect trigger */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
