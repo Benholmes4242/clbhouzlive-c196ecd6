@@ -997,18 +997,18 @@ const HeroProfileHeader = ({
 
                     {/* Club + Handicap positioned in 3-column grid */}
                     <div className="absolute w-full mt-[-150px] px-8">
-                      <div className="grid grid-cols-[1fr_auto_112px] items-start gap-8 pr-6">
+                      <div className="grid grid-cols-[max-content_1fr_136px] items-start gap-8">
                         <div className="text-left">
                           <div className="text-sm text-gray-700">{homeClub}</div>
                           <div className="mt-1 text-sm text-gray-500">Golf Club</div>
                         </div>
-                        <div className="text-center">
+                        <div className="justify-self-center text-center">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
                           </div>
                         </div>
-                        <div></div> {/* Spacer for mini profile card */}
+                        <div></div> {/* Spacer for mini profile card (112px card + 24px margin) */}
                       </div>
                     </div>
                   </div>
