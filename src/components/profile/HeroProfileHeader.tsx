@@ -745,15 +745,15 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-20px] md:bottom-[-28px]
+                bottom-[-14px] md:bottom-[-18px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-10
+                pb-8
               "
             >
-               <div className="px-5 py-4 flex flex-col items-center relative">
+               <div className="px-5 py-2 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-4 left-5">
@@ -828,7 +828,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-20 md:h-28" />
+             <div className="h-12 md:h-16" />
            </section>
            
             {/* Glass Chips Stats */}
@@ -902,14 +902,14 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-20px] md:bottom-[-28px]
+                bottom-[-14px] md:bottom-[-18px]
                 w-[90%] md:w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-8 py-10 flex flex-col items-center relative">
+               <div className="px-8 py-6 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-6 left-8">
@@ -984,7 +984,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-20 md:h-28" />
+             <div className="h-12 md:h-16" />
            </section>
            
            {/* Glass Chips Stats */}
