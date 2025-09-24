@@ -81,7 +81,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         {/* Larger Avatar positioned to half overlap header */}
         <div className={`
           relative rounded-full overflow-hidden
-          ${isMobile ? 'w-32 h-32' : 'w-40 h-40'}
+          ${isMobile ? 'w-36 h-36' : 'w-44 h-44'}
           flex-shrink-0
         `}>
           {/* Blur background behind photo */}
