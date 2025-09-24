@@ -736,7 +736,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-20 sm:h-24 lg:h-28
+              <div className="absolute bottom-0 left-0 w-full h-32 sm:h-40 lg:h-48
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -746,7 +746,8 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-8px] sm:bottom-[-12px] lg:bottom-[-16px]
+                bottom-[calc(var(--glass-overlap)*-1)]
+                [--glass-overlap:96px] sm:[--glass-overlap:120px] lg:[--glass-overlap:160px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -877,7 +878,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-12 md:h-16" />
+             <div className="h-32 sm:h-40 lg:h-48" />
            </section>
            
         </div>
@@ -918,7 +919,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-24 sm:h-28 lg:h-32
+              <div className="absolute bottom-0 left-0 w-full h-32 sm:h-40 lg:h-48
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -928,7 +929,8 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-8px] sm:bottom-[-12px] lg:bottom-[-16px]
+                bottom-[calc(var(--glass-overlap)*-1)]
+                [--glass-overlap:96px] sm:[--glass-overlap:120px] lg:[--glass-overlap:160px]
                 w-[90%] md:w-[80%] max-w-[800px]
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -1057,7 +1059,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-12 md:h-16" />
+             <div className="h-32 sm:h-40 lg:h-48" />
            </section>
            
            {/* Glass Chips Stats */}
