@@ -101,7 +101,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           </div>
           
           {/* Right side - Mini Profile Card - positioned with more breathing room */}
-          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2 mt-2">
+          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2 mt-6">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
                 <img
