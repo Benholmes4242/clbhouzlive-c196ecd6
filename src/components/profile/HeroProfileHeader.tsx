@@ -813,18 +813,18 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left of mini profile card */}
-                    <div className="flex justify-end pr-4 mt-[-112px]">
-                      <div className="flex flex-col gap-2 mr-6">
-                        <div className="text-center">
-                          <div className="text-xs text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-xs text-gray-500">Golf Club</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-700">Handicap</div>
-                          <div className="mt-1 text-lg font-semibold text-gray-900">
-                            {handicap}
-                          </div>
+                    {/* Club + Handicap aligned with mini profile card top edge */}
+                    <div className="absolute top-[0px] left-6 right-[84px] grid grid-cols-2 gap-4 items-start">
+                      {/* Home Club - aligned to left */}
+                      <div className="text-left">
+                        <div className="text-xs text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-xs text-gray-500">Golf Club</div>
+                      </div>
+                      {/* Handicap - aligned to right */}
+                      <div className="text-right">
+                        <div className="text-xs text-gray-700">Handicap</div>
+                        <div className="mt-1 text-lg font-semibold text-gray-900">
+                          {handicap}
                         </div>
                       </div>
                     </div>
@@ -995,18 +995,18 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left of mini profile card */}
-                    <div className="flex justify-end pr-6 mt-[-150px]">
-                      <div className="flex flex-col gap-3 mr-8">
-                        <div className="text-center">
-                          <div className="text-sm text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-sm text-gray-500">Golf Club</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm text-gray-700">Handicap</div>
-                          <div className="mt-1 text-2xl font-semibold text-gray-900">
-                            {handicap}
-                          </div>
+                    {/* Club + Handicap aligned with mini profile card top edge */}
+                    <div className="absolute top-[80px] left-8 right-[118px] grid grid-cols-2 gap-6 items-start">
+                      {/* Home Club - aligned to left */}
+                      <div className="text-left">
+                        <div className="text-sm text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-sm text-gray-500">Golf Club</div>
+                      </div>
+                      {/* Handicap - aligned to right */}
+                      <div className="text-right">
+                        <div className="text-sm text-gray-700">Handicap</div>
+                        <div className="mt-1 text-2xl font-semibold text-gray-900">
+                          {handicap}
                         </div>
                       </div>
                     </div>
