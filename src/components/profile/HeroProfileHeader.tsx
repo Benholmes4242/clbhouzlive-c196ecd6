@@ -805,8 +805,8 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
-                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                    <div className="w-16 h-24 rounded-lg flex flex-col items-start justify-start p-2 ml-4 overflow-hidden">
+                      <div className="w-12 h-12 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -815,7 +815,7 @@ const HeroProfileHeader = ({
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-xs">
+                            <span className="text-gray-600 font-bold text-sm">
                               {displayName?.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
@@ -962,8 +962,8 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
-                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                    <div className="w-20 h-28 rounded-lg flex flex-col items-start justify-start p-2 ml-6 overflow-hidden">
+                      <div className="w-16 h-16 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
                             src={profile.profile_photo_url}
@@ -972,7 +972,7 @@ const HeroProfileHeader = ({
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-sm">
+                            <span className="text-gray-600 font-bold text-lg">
                               {displayName?.charAt(0).toUpperCase() || 'U'}
                             </span>
                           </div>
