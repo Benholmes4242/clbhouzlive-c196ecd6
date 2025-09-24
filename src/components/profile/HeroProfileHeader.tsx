@@ -144,7 +144,7 @@ const HeroProfileHeader = ({
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   
-  // Remove hero height measurement - using simpler overlap approach
+  console.log('HeroProfileHeader: refs and state initialized');
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -1377,3 +1377,4 @@ const HeroProfileHeader = ({
 };
 
 export default HeroProfileHeader;
+// Force refresh after removing refs
