@@ -47,8 +47,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 
-import ProfileBioBlock from './ProfileBioBlock';
-import ProfileStatsRow from './ProfileStatsRow';
+import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
@@ -77,7 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -116,7 +114,7 @@ const HeroProfileHeader = ({
   activeSection = 'activity',
   onSectionChange
 }: HeroProfileHeaderProps) => {
-  console.log('HeroProfileHeader render with profile:', profile?.id, '- ResponsiveStatsDisplay removed');
+  console.log('HeroProfileHeader render with profile:', profile?.id);
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
@@ -487,13 +485,8 @@ const HeroProfileHeader = ({
     }
   };
 
-  // Stats handling - Updated to work with new ProfileStatsRow component
+  // Stats handling
   const handleStatClick = useCallback((statType: string) => {
-    // This function is no longer used since ResponsiveStatsDisplay was removed
-    // Keeping for potential future use with ProfileStatsRow click handling
-    
-    console.log('Stat clicked:', statType);
-    
     // Prevent scroll behavior when switching tabs via stats
     const currentScrollPosition = window.scrollY;
     
@@ -887,70 +880,197 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass Profile Card */}
-            <div ref={profileCardRef}>
-              <GlassmorphicProfileCard
-                profile={profile}
-                isOwnProfile={isOwnProfile}
-                onEditProfile={() => setEditDialogOpen(true)}
-              />
-            </div>
-             
-            {/* Profile Bio Block */}
-            <ProfileBioBlock
-              bio={profile?.bio}
-              websiteUrl={profile?.website}
-              recentlyFollowedBy={[]} // Add this data when available
-            />
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
+            <div 
+              ref={profileCardRef}
+              className="
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-14px] md:bottom-[-18px]
+                w-[90%] md:w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                 {/* Three dots menu - positioned absolutely */}
+                 {isOwnProfile && (
+                   <div className="absolute top-6 right-8">
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                           <MoreVertical size={24} />
+                         </button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                           Edit Profile
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                           Media Manager
+                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => previewImmersive()}>
+                           Immersive Preview
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </div>
+                 )}
 
-            {/* Profile Stats Row */}
-            <ProfileStatsRow
-              posts={postsCount}
-              totalXp="2,500"
-              following={followingCount}
-              followers={followersCount}
-            />
+                 {/* Name + Handle - centered */}
+                 <div className="text-center">
+                   <h1 className="text-3xl font-semibold text-gray-900">
+                     {displayName}
+                   </h1>
+                   <p className="mt-1 text-base text-gray-700">
+                     @{username}
+                   </p>
+                 </div>
+
+                {/* Club + Handicap - centered */}
+                <div className="mt-5 w-full max-w-md mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Home Club</div>
+                       <div className="mt-1 text-lg font-medium text-gray-900">
+                         {homeClub}
+                       </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-700">Handicap</div>
+                      <div className="mt-1 text-lg font-medium text-gray-900">
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
              
              {/* Spacer below to avoid clipping the panel */}
              <div className="h-12 md:h-16" />
            </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
+      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
+      <div style={{ display: 'none' }}>
+        <ResponsiveStatsDisplay
+          primaryStats={{
+            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+            posts: postsCount,
+            followers: followersCount,
+            following: followingCount
+          }}
+          onStatClick={handleStatClick}
+        />
+      </div>
 
-      {/* Profile Tabs */}
-      <ProfileTabs
-        activeTab={activeSection}
-        onTabChange={handleTabChange}
-        userId={profile?.id || ''}
-        userDisplayName={profile?.display_name}
-        userHandicap={profile?.eg_handicap_index}
-        userProfilePhotoUrl={profile?.profile_photo_url}
-        isCurrentUser={isOwnProfile}
-        transitionState={transitionState}
-      >
-      {{
-        activity: (
-          <div></div> // Content will be rendered separately below
-        ),
-        courses: (
-          <div></div> // Content will be rendered separately below
-        ),
-        achievements: (
-          <AchievementsPane
-            userId={profile?.id}
-            userDisplayName={profile?.display_name}
-            userHandicap={profile?.eg_handicap_index}
-            userProfilePhotoUrl={profile?.profile_photo_url}
-            isCurrentUser={isOwnProfile}
-          />
-        ),
-        stats: (
-          <div></div> // Content will be rendered separately below
-        )
-      }}
-      </ProfileTabs>
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+        <div className="relative" role="tablist" aria-label="Profile sections">
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+                style={{
+                  color: activeSection === tab.id 
+                    ? 'hsl(var(--profile-text-primary))' 
+                    : 'hsl(var(--profile-text-secondary))'
+                }}
+              >
+                {tab.label}
+                {/* Brand accent underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
+      {/* Legacy ProfileTabs for content rendering */}
+      <div style={{ display: 'none' }}>
+        <ProfileTabs
+          activeTab={activeSection}
+          onTabChange={handleTabChange}
+          userId={profile?.id || ''}
+          userDisplayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
+          transitionState={transitionState}
+        >
+        {{
+          activity: (
+            <div></div> // Content will be rendered separately below
+          ),
+          courses: (
+            <div></div> // Content will be rendered separately below
+          ),
+          achievements: (
+            <AchievementsPane
+              userId={profile?.id}
+              userDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
+          ),
+          stats: (
+            <div></div> // Content will be rendered separately below
+          )
+        }}
+        </ProfileTabs>
+      </div>
 
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
