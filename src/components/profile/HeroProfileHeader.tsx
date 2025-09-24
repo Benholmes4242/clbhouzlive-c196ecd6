@@ -144,10 +144,7 @@ const HeroProfileHeader = ({
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   
-  // Hero height refs for dynamic positioning
-  const mobileHeroRef = useRef<HTMLDivElement>(null);
-  const desktopHeroRef = useRef<HTMLDivElement>(null);
-  const [heroHeight, setHeroHeight] = useState(0);
+  // Remove hero height measurement - using simpler overlap approach
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -468,30 +465,7 @@ const HeroProfileHeader = ({
     return () => clearTimeout(timer);
   }, [isProfileCardInView]);
 
-  // Measure hero height and set CSS variable
-  useEffect(() => {
-    const measureHeroHeight = () => {
-      const heroRef = isMobile ? mobileHeroRef.current : desktopHeroRef.current;
-      if (heroRef) {
-        const height = heroRef.getBoundingClientRect().height;
-        setHeroHeight(height);
-        // Set CSS variable on the hero container
-        heroRef.style.setProperty('--hero-h', `${height}px`);
-      }
-    };
-
-    // Measure on mount and resize
-    measureHeroHeight();
-    window.addEventListener('resize', measureHeroHeight);
-    
-    // Re-measure after images load
-    const timer = setTimeout(measureHeroHeight, 1000);
-
-    return () => {
-      window.removeEventListener('resize', measureHeroHeight);
-      clearTimeout(timer);
-    };
-  }, [isMobile, profile?.profile_photo_url]);
+  // Remove complex hero height measurement - using simpler overlap approach
 
   // Scroll depth tracking for mobile header
   useEffect(() => {
@@ -731,9 +705,15 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16 bg-white">
+        <div 
+          className="relative -mt-16 bg-white md:[--panel-overlap:7vh]"
+          style={{ 
+            ['--panel-overlap' as any]: '6vh',
+            paddingBottom: 'var(--panel-overlap)'
+          }}
+        >
           <section className="relative w-full overflow-visible">
-            <div ref={mobileHeroRef} className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -783,7 +763,7 @@ const HeroProfileHeader = ({
                 pb-4
               "
               style={{
-                top: `clamp(280px, calc(var(--hero-h, 55vh) * 0.85), 520px)`
+                bottom: 'calc(var(--panel-overlap) * -1)'
               }}
             >
                <div className="px-5 py-4 flex flex-col items-center relative">
@@ -905,15 +885,24 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-32" />
+             {/* Spacer to keep content below panel in sync */}
+             <div 
+               aria-hidden
+               style={{ height: 'calc(var(--panel-overlap) + 16px)' }} 
+             />
            </section>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative -mt-16 bg-white">
+        <div 
+          className="relative -mt-16 bg-white md:[--panel-overlap:7vh]"
+          style={{ 
+            ['--panel-overlap' as any]: '6vh',
+            paddingBottom: 'var(--panel-overlap)'
+          }}
+        >
           <section className="relative w-full overflow-visible">
-            <div ref={desktopHeroRef} className="relative h-[56vh] w-full overflow-hidden">
+            <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -962,7 +951,7 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
               style={{
-                top: `clamp(320px, calc(var(--hero-h, 56vh) * 0.88), 560px)`
+                bottom: 'calc(var(--panel-overlap) * -1)'
               }}
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
@@ -1084,8 +1073,11 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-40" />
+             {/* Spacer to keep content below panel in sync */}
+             <div 
+               aria-hidden
+               style={{ height: 'calc(var(--panel-overlap) + 16px)' }} 
+             />
            </section>
         </div>
       )}
