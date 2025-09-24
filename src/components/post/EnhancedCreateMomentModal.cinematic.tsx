@@ -300,9 +300,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   </motion.div>
 
 
-                  {/* Video duration pill - moved to bottom left */}
+                  {/* Video duration pill - aligned with media counter */}
                   {media[activeIndex]?.type === 'video' && (
-                    <div className="absolute bottom-6 left-6">
+                    <div className="absolute bottom-6 left-2">
                       <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
                         <span>00:09</span>
                       </div>
@@ -337,7 +337,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-3">{/* Increased bottom margin */}
                         <label className="block text-base font-semibold text-white">Add a caption</label>
                         <button
                           onClick={handleAICaption}
@@ -354,9 +354,9 @@ export default function EnhancedCreateMomentModalCinematic({
                         </button>
                       </div>
                       
-                      <div className="flex items-start gap-2">
+                      <div className="flex flex-col gap-2 h-full">{/* Changed to flex-col and h-full */}
                         <textarea
-                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white min-h-[4.5rem] max-h-[6.5rem] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
+                          className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white h-full overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
                           placeholder="Write a caption…"
                           value={caption}
                           onChange={(e) => {
