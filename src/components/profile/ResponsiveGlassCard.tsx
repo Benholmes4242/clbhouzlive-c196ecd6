@@ -57,33 +57,25 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         }}
       />
       
-      {/* Outer wrapper for positioning - anchored from top */}
-      <div className={`
-        relative z-20
-        ${isMobile ? 'mx-4' : 'mx-auto max-w-md'}
-      `}>
-        {/* Inner card that scales - transform origin set to top */}
-        <div 
-          className={`
-            relative rounded-2xl transition-all duration-300 ease-out origin-top
-            hover:scale-105 cursor-pointer
-            ${isMobile 
-              ? 'p-4 min-h-[400px] scale-[0.95]' // Mobile: subtle scale
-              : 'p-6 min-h-[480px] scale-100' // Desktop: normal scale
-            }
-          `}
-          style={{
-            ...glassStyles,
-            background: `var(--glass-bg)`,
-            backdropFilter: `var(--glass-blur) saturate(180%)`,
-            WebkitBackdropFilter: `var(--glass-blur) saturate(180%)`,
-            border: `var(--glass-border)`,
-            boxShadow: `var(--glass-shadow)`,
-            color: `var(--glass-text)`,
-            transformOrigin: 'top center',
-          }}
-          data-glass-mode={glassMode}
-        >
+      <div 
+        className={`
+          relative z-20 rounded-2xl transition-all duration-500 ease-out
+          ${isMobile 
+            ? 'mx-4 p-4 scale-90 min-h-[400px]' // Mobile: smaller scale, tighter margins, minimum height
+            : 'mx-auto max-w-md p-6 scale-100 min-h-[480px]' // Desktop: centered with breathing space, minimum height
+          }
+        `}
+        style={{
+          ...glassStyles,
+          background: `var(--glass-bg)`,
+          backdropFilter: `var(--glass-blur) saturate(180%)`,
+          WebkitBackdropFilter: `var(--glass-blur) saturate(180%)`,
+          border: `var(--glass-border)`,
+          boxShadow: `var(--glass-shadow)`,
+          color: `var(--glass-text)`,
+        }}
+        data-glass-mode={glassMode}
+      >
 {/* Profile Photo with Enhanced Blur Background */}
       <div className="relative flex items-center mb-4">
         {/* Larger Avatar positioned to half overlap header */}
@@ -220,8 +212,7 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
           )}
         </div>
       )}
-        </div>
-      </div>
+    </div>
     </>
   );
 };
