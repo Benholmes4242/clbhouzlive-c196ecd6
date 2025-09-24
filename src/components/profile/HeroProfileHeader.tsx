@@ -49,7 +49,7 @@ import SwipeToReturnZone from './SwipeToReturnZone';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
-import ResponsiveGlassCard from './ResponsiveGlassCard';
+
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
