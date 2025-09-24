@@ -813,14 +813,14 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left side and right side */}
+                    {/* Club + Handicap positioned left side and center */}
                     <div className="absolute w-full mt-[-112px] px-4">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start pr-20">
                         <div className="text-left">
                           <div className="text-xs text-gray-700">{homeClub}</div>
                           <div className="mt-1 text-xs text-gray-500">Golf Club</div>
                         </div>
-                        <div className="text-center mr-6">
+                        <div className="text-center">
                           <div className="text-xs text-gray-700">Handicap</div>
                           <div className="mt-1 text-lg font-semibold text-gray-900">
                             {handicap}
@@ -995,14 +995,14 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left side and right side */}
+                    {/* Club + Handicap positioned left side and center */}
                     <div className="absolute w-full mt-[-150px] px-8">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start pr-32">
                         <div className="text-left">
                           <div className="text-sm text-gray-700">{homeClub}</div>
                           <div className="mt-1 text-sm text-gray-500">Golf Club</div>
                         </div>
-                        <div className="text-center mr-8">
+                        <div className="text-center">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
