@@ -744,15 +744,16 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
+                absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
-                w-full
+                w-[95%] md:w-[85%]
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                rounded-2xl
               "
             >
-               <div className="px-5 py-2 flex flex-col items-center relative">
+               <div className="px-8 py-8 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-4 left-5">
@@ -779,10 +780,10 @@ const HeroProfileHeader = ({
 
                   {/* Name + Handle - centered */}
                   <div className="text-center">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="text-3xl font-bold text-gray-900">
                       {displayName}
                     </h1>
-                    <p className="mt-1 text-sm text-gray-700">
+                    <p className="mt-2 text-base text-gray-700">
                       @{username}
                     </p>
                   </div>
@@ -905,13 +906,14 @@ const HeroProfileHeader = ({
               className="
                 absolute left-1/2 -translate-x-1/2
                 bottom-[-14px] md:bottom-[-18px]
-                w-[90%] md:w-full
+                w-[95%] md:w-[85%]
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                rounded-2xl
               "
             >
-               <div className="px-8 py-6 flex flex-col items-center relative">
+               <div className="px-12 py-10 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-6 left-8">
@@ -938,10 +940,10 @@ const HeroProfileHeader = ({
 
                   {/* Name + Handle - centered */}
                   <div className="text-center">
-                    <h1 className="text-3xl font-semibold text-gray-900">
+                    <h1 className="text-4xl font-bold text-gray-900">
                       {displayName}
                     </h1>
-                    <p className="mt-1 text-base text-gray-700">
+                    <p className="mt-2 text-lg text-gray-700">
                       @{username}
                     </p>
                   </div>
