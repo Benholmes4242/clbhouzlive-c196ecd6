@@ -820,9 +820,6 @@ const HeroProfileHeader = ({
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
-                        {displayName?.split(' ')[0] || 'User'}
-                      </p>
                     </div>
                   </div>
 
@@ -979,9 +976,6 @@ const HeroProfileHeader = ({
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-gray-700 font-medium truncate w-full text-center">
-                        {displayName?.split(' ')[0] || 'User'}
-                      </p>
                     </div>
                   </div>
 
