@@ -31,6 +31,26 @@ const GlobalHeader: React.FC = () => {
   const { shouldHideHeader } = useModalContext();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isImmersive, setIsImmersive] = useState(false);
+
+  // Check for data-immersive attribute
+  useEffect(() => {
+    const checkImmersive = () => {
+      setIsImmersive(document.documentElement.hasAttribute('data-immersive'));
+    };
+    
+    // Check initially
+    checkImmersive();
+    
+    // Watch for changes using MutationObserver
+    const observer = new MutationObserver(checkImmersive);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-immersive']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
 
   // Determine if current route should hide header
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
@@ -41,8 +61,19 @@ const GlobalHeader: React.FC = () => {
     setVariant('glass-dark');
   }, [setVariant]);
 
-  // Final visibility state
-  const showHeader = isVisible && !shouldHideForRoute && !shouldHideHeader;
+  // Final visibility state - also check for data-immersive attribute
+  const showHeader = isVisible && !shouldHideForRoute && !shouldHideHeader && !isImmersive;
+  
+  // Debug logging
+  console.log('🔍 GlobalHeader state:', {
+    isVisible,
+    shouldHideForRoute,
+    shouldHideHeader,
+    isImmersive,
+    showHeader,
+    pathname: location.pathname,
+    hasDataImmersive: document.documentElement.hasAttribute('data-immersive')
+  });
 
   // Handle mobile search overlay
   useEffect(() => {

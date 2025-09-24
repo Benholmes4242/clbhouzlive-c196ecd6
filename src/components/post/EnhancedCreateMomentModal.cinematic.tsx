@@ -63,6 +63,8 @@ export default function EnhancedCreateMomentModalCinematic({
 
   // Global header hiding for reliable cross-environment support
   useImmersiveHeader(Boolean(isOpen));
+  
+  console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
   // Media carousel state - use mediaItems if available, fallback to initialFiles
   const media = useMemo(() => {

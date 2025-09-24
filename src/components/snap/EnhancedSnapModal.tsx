@@ -88,6 +88,8 @@ const EnhancedSnapModal = ({
 
   // Global header hiding for reliable cross-environment support
   useImmersiveHeader(Boolean(isOpen));
+  
+  console.log('🔍 EnhancedSnapModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
   // Golf course placeholders
   const placeholders = {
