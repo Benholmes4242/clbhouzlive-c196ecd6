@@ -870,87 +870,7 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-                  {/* Tab Navigation with Brand Orange Underline - Inside Glass Panel */}
-                  <div className="relative border-t border-white/30 pt-4 mt-4 w-full">
-                    <div className="relative" role="tablist" aria-label="Profile sections">
-                      <div className="flex">
-                        {tabs.map((tab) => (
-                          <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
-                            role="tab"
-                            aria-selected={activeSection === tab.id}
-                            aria-controls={`tabpanel-${tab.id}`}
-                            tabIndex={activeSection === tab.id ? 0 : -1}
-                            className={`
-                              relative py-3 px-4 text-sm font-medium transition-colors duration-200
-                              ${activeSection === tab.id 
-                                ? 'text-gray-900 focus:outline-none' 
-                                : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                              }
-                              flex-1 text-center
-                            `}
-                          >
-                            {tab.label}
-                            {/* Brand orange underline animation */}
-                            <div 
-                              className={`
-                                absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                                transition-all duration-300 ease-out
-                                ${activeSection === tab.id 
-                                  ? 'scale-x-100 opacity-100' 
-                                  : 'scale-x-0 opacity-0'
-                                }
-                                origin-center
-                              `}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                   </div>
-
-                  {/* Tab Navigation with Brand Orange Underline - Inside Glass Panel */}
-                  <div className="relative border-t border-white/30 pt-4 mt-4 w-full">
-                    <div className="relative" role="tablist" aria-label="Profile sections">
-                      <div className="flex">
-                        {tabs.map((tab) => (
-                          <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
-                            role="tab"
-                            aria-selected={activeSection === tab.id}
-                            aria-controls={`tabpanel-${tab.id}`}
-                            tabIndex={activeSection === tab.id ? 0 : -1}
-                            className={`
-                              relative py-4 px-4 text-base font-medium transition-colors duration-200
-                              ${activeSection === tab.id 
-                                ? 'text-gray-900 focus:outline-none' 
-                                : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                              }
-                              flex-1 text-center
-                            `}
-                          >
-                            {tab.label}
-                            {/* Brand orange underline animation */}
-                            <div 
-                              className={`
-                                absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                                transition-all duration-300 ease-out
-                                ${activeSection === tab.id 
-                                  ? 'scale-x-100 opacity-100' 
-                                  : 'scale-x-0 opacity-0'
-                                }
-                                origin-center
-                              `}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
+              </div>
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
@@ -1149,6 +1069,45 @@ const HeroProfileHeader = ({
         />
       </div>
 
+      {/* Tab Navigation with Brand Orange Underline */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200 mt-4">
+        <div className="relative" role="tablist" aria-label="Profile sections">
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-4 px-4 text-base font-medium transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'text-gray-900 focus:outline-none' 
+                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+              >
+                {tab.label}
+                {/* Brand orange underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Legacy ProfileTabs for content rendering */}
       <div style={{ display: 'none' }}>
