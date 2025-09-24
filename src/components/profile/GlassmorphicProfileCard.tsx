@@ -12,14 +12,22 @@ interface GlassmorphicProfileCardProps {
   } | null;
   isOwnProfile: boolean;
   onEditProfile: () => void;
+  // New tab props
+  tabs?: Array<{ id: string; label: string }>;
+  activeSection?: string;
+  onTabChange?: (tab: string) => void;
+  isMobile?: boolean;
 }
 
 const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
   profile,
   isOwnProfile,
-  onEditProfile
+  onEditProfile,
+  tabs = [],
+  activeSection = '',
+  onTabChange,
+  isMobile = false
 }) => {
-  const isMobile = useIsMobile();
 
   const glassmorphicStyle = {
     background: 'rgba(255, 255, 255, 0.1)',
@@ -123,6 +131,46 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Tab Navigation - pinned to bottom */}
+      {tabs.length > 0 && (
+        <div className="border-t border-white/20 mt-4 pt-3">
+          <div className="flex" role="tablist" aria-label="Profile sections">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange?.(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-3 px-2 text-sm font-medium transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'text-white focus:outline-none' 
+                    : 'text-white/70 hover:text-white/90 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+              >
+                {tab.label}
+                {/* Brand orange underline animation */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

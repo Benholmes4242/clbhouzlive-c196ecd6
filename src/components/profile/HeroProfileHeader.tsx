@@ -741,141 +741,25 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper - Full Width, overlapping ~20% */}
+            {/* Glass panel with tabs */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-11vh]
+                bottom-[-15vh]
                 w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-4
+                z-10
               "
             >
-               <div className="px-5 py-4 flex flex-col items-center relative">
-                  {/* Three dots menu - positioned absolutely on left */}
-                  {isOwnProfile && (
-                    <div className="absolute top-4 left-5">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={20} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
-
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-3">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[84px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
-                      </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0">
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={profile.profile_photo_url}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-2xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Club + Handicap positioned left side and center */}
-                    <div className="absolute w-full mt-[-112px] px-4">
-                      <div className="flex justify-between items-start pr-20">
-                        <div className="text-left">
-                          <div className="text-xs text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-xs text-gray-500">Golf Club</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-700">Handicap</div>
-                          <div className="mt-1 text-lg font-semibold text-gray-900">
-                            {handicap}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-4 text-center">
-                    {profile?.bio && (
-                      <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-4 text-center">
-                    <div className="flex flex-col">
-                      <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">2,500</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Followers</span>
-                    </div>
-                  </div>
-
-              </div>
+              <GlassmorphicProfileCard
+                profile={profile}
+                isOwnProfile={isOwnProfile}
+                onEditProfile={() => setEditDialogOpen(true)}
+                tabs={tabs}
+                activeSection={activeSection}
+                onTabChange={handleTabChange}
+                isMobile={isMobile}
+              />
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
@@ -924,140 +808,25 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, overlapping ~20% */}
+            {/* Glass panel with tabs */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-11vh]
+                bottom-[-15vh]
                 w-[90%] md:w-full max-w-4xl
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                z-10
               "
             >
-               <div className="px-8 py-6 flex flex-col items-center relative">
-                  {/* Three dots menu - positioned absolutely on left */}
-                  {isOwnProfile && (
-                    <div className="absolute top-6 left-8">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={24} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
-
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-4">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[112px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-base text-gray-700">
-                          @{username}
-                        </p>
-                      </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
-                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0">
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={profile.profile_photo_url}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-3xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Club + Handicap positioned left side and center */}
-                    <div className="absolute w-full mt-[-150px] px-8">
-                      <div className="flex justify-between items-start pr-32">
-                        <div className="text-left">
-                          <div className="text-sm text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-sm text-gray-500">Golf Club</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm text-gray-700">Handicap</div>
-                          <div className="mt-1 text-2xl font-semibold text-gray-900">
-                            {handicap}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-5 text-center">
-                    {profile?.bio && (
-                      <p className="text-base text-gray-700 mb-3 line-clamp-2 max-w-2xl mx-auto">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-6 text-center max-w-2xl mx-auto">
-                    <div className="flex flex-col">
-                      <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">2,500</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Followers</span>
-                    </div>
-                  </div>
-
-              </div>
+              <GlassmorphicProfileCard
+                profile={profile}
+                isOwnProfile={isOwnProfile}
+                onEditProfile={() => setEditDialogOpen(true)}
+                tabs={tabs}
+                activeSection={activeSection}
+                onTabChange={handleTabChange}
+                isMobile={isMobile}
+              />
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
@@ -1079,45 +848,6 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Brand Orange Underline */}
-      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200 mt-4">
-        <div className="relative" role="tablist" aria-label="Profile sections">
-          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                role="tab"
-                aria-selected={activeSection === tab.id}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={activeSection === tab.id ? 0 : -1}
-                className={`
-                  relative py-4 px-4 text-base font-medium transition-colors duration-200
-                  ${activeSection === tab.id 
-                    ? 'text-gray-900 focus:outline-none' 
-                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                  }
-                  flex-1 text-center
-                `}
-              >
-                {tab.label}
-                {/* Brand orange underline animation */}
-                <div 
-                  className={`
-                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                    transition-all duration-300 ease-out
-                    ${activeSection === tab.id 
-                      ? 'scale-x-100 opacity-100' 
-                      : 'scale-x-0 opacity-0'
-                    }
-                    origin-center
-                  `}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* Legacy ProfileTabs for content rendering */}
       <div style={{ display: 'none' }}>
