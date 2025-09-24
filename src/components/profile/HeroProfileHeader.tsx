@@ -49,7 +49,7 @@ import SwipeToReturnZone from './SwipeToReturnZone';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
-import ResponsiveGlassCard from './ResponsiveGlassCard';
+
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
@@ -76,7 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -736,7 +735,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-32 sm:h-40 lg:h-48
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -746,141 +745,115 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[calc(var(--glass-overlap)*-1)]
-                [--glass-overlap:96px] sm:[--glass-overlap:120px] lg:[--glass-overlap:160px]
+                bottom-[-20px] md:bottom-[-28px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                pb-10
               "
             >
-               <div className="px-5 py-6 flex flex-col relative">
-                 {/* Three dots menu - positioned absolutely */}
-                 {isOwnProfile && (
-                   <div className="absolute top-4 right-5">
-                     <DropdownMenu>
-                       <DropdownMenuTrigger asChild>
-                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                           <MoreVertical size={20} />
-                         </button>
-                       </DropdownMenuTrigger>
-                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                           Edit Profile
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                           Media Manager
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => previewImmersive()}>
-                           Immersive Preview
-                         </DropdownMenuItem>
-                       </DropdownMenuContent>
-                     </DropdownMenu>
-                   </div>
-                 )}
+               <div className="px-5 py-4 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-4 left-5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={20} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                            Media Manager
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => previewImmersive()}>
+                            Immersive Preview
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
 
-                 {/* Header Block */}
-                 <div className="flex items-start justify-between">
-                   {/* Left side: Name, Handle, Club, Handicap */}
-                   <div className="flex-1">
-                     {/* Name + Handle - left aligned */}
-                     <div className="text-center">
-                       <h1 className="text-2xl font-semibold text-gray-900">
-                         {displayName}
-                       </h1>
-                       <p className="mt-1 text-sm text-gray-700">
-                         @{username}
-                       </p>
-                     </div>
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
 
-                     {/* Club + Handicap - centered below name */}
-                     <div className="mt-4 w-full max-w-sm mx-auto">
-                       <div className="grid grid-cols-2 gap-4">
-                          <div className="text-center">
-                            <div className="text-xs text-gray-700">Home Club</div>
-                             <div className="mt-1 text-base font-medium text-gray-900">
-                               {homeClubLines.map((line, index) => (
-                                 <div key={index}>{line}</div>
-                               ))}
-                             </div>
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-4 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-6">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-xs text-gray-500">Golf Club</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-700">Handicap</div>
+                        <div className="mt-1 text-lg font-semibold text-gray-900">
+                          {handicap}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-xs">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
                           </div>
-                         <div className="text-center">
-                           <div className="text-xs text-gray-700">Handicap</div>
-                           <div className="mt-1 text-base font-medium text-gray-900">
-                             {handicap}
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-
-                   {/* Mini Profile Card - Top Right */}
-                   <div className="ml-4 flex-shrink-0" style={{ marginTop: '0px' }}>
-                     <div className="w-16 h-20 border border-white/40 bg-white/30 backdrop-blur-sm shadow-sm overflow-hidden" style={{ borderRadius: '8px' }}>
-                       {profile?.profile_photo_url ? (
-                         <img
-                           src={profile.profile_photo_url}
-                           alt={profile?.display_name || 'Profile'}
-                           className="w-full h-full object-cover"
-                           onError={(e) => {
-                             e.currentTarget.src = '/placeholder.svg';
-                           }}
-                         />
-                       ) : (
-                         <div className="w-full h-full bg-gray-200/50 flex items-center justify-center">
-                           <Camera className="w-6 h-6 text-gray-400" />
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 </div>
-
-                 {/* Bio Block */}
-                 <div className="mt-3 text-center">
-                   {profile?.bio && (
-                     <p className="text-sm text-gray-700 line-clamp-2 mb-2">
-                       {profile.bio}
-                     </p>
-                   )}
-                   {profile?.website && (
-                     <a 
-                       href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
-                     >
-                       {profile.website.replace(/^https?:\/\//, '').replace(/^www\./, '')}
-                     </a>
-                   )}
-                 </div>
-
-                 {/* Slim Stats Row */}
-                 <div className="mt-4 grid grid-cols-4 gap-1 text-center">
-                   <div>
-                     <div className="text-base font-semibold text-gray-900">{postsCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Posts</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-1">
-                     <div className="text-base font-semibold text-gray-900">2,500</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Total XP</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-1">
-                     <div className="text-base font-semibold text-gray-900">{followingCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Following</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-1">
-                     <div className="text-base font-semibold text-gray-900">{followersCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Followers</div>
-                   </div>
-                 </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
               </div>
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-32 sm:h-40 lg:h-48" />
+             <div className="h-20 md:h-28" />
            </section>
            
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -919,7 +892,7 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-32 sm:h-40 lg:h-48
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
@@ -929,141 +902,93 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[calc(var(--glass-overlap)*-1)]
-                [--glass-overlap:96px] sm:[--glass-overlap:120px] lg:[--glass-overlap:160px]
-                w-[90%] md:w-[80%] max-w-[800px]
+                bottom-[-20px] md:bottom-[-28px]
+                w-[90%] md:w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-8 py-8 flex flex-col relative">
-                 {/* Three dots menu - positioned absolutely */}
-                 {isOwnProfile && (
-                   <div className="absolute top-6 right-8">
-                     <DropdownMenu>
-                       <DropdownMenuTrigger asChild>
-                         <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                           <MoreVertical size={24} />
-                         </button>
-                       </DropdownMenuTrigger>
-                       <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                         <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                           Edit Profile
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                           Media Manager
-                         </DropdownMenuItem>
-                         <DropdownMenuItem onClick={() => previewImmersive()}>
-                           Immersive Preview
-                         </DropdownMenuItem>
-                       </DropdownMenuContent>
-                     </DropdownMenu>
-                   </div>
-                 )}
+               <div className="px-8 py-10 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-6 left-8">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={24} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
+                            Media Manager
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => previewImmersive()}>
+                            Immersive Preview
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
 
-                 {/* Header Block */}
-                 <div className="flex items-start justify-between">
-                   {/* Left side: Name, Handle, Club, Handicap */}
-                   <div className="flex-1">
-                     {/* Name + Handle - centered */}
-                     <div className="text-center">
-                       <h1 className="text-3xl font-semibold text-gray-900">
-                         {displayName}
-                       </h1>
-                       <p className="mt-1 text-base text-gray-700">
-                         @{username}
-                       </p>
-                     </div>
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-base text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
 
-                     {/* Club + Handicap - centered below name */}
-                     <div className="mt-5 w-full max-w-md mx-auto">
-                       <div className="grid grid-cols-2 gap-4">
-                         <div className="text-center">
-                           <div className="text-sm text-gray-700">Home Club</div>
-                            <div className="mt-1 text-lg font-medium text-gray-900">
-                              {homeClub}
-                            </div>
-                         </div>
-                         <div className="text-center">
-                           <div className="text-sm text-gray-700">Handicap</div>
-                           <div className="mt-1 text-lg font-medium text-gray-900">
-                             {handicap}
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-
-                   {/* Mini Profile Card - Top Right */}
-                   <div className="ml-6 flex-shrink-0" style={{ marginTop: '0px' }}>
-                     <div className="w-20 h-24 border border-white/40 bg-white/30 backdrop-blur-sm shadow-sm overflow-hidden" style={{ borderRadius: '8px' }}>
-                       {profile?.profile_photo_url ? (
-                         <img
-                           src={profile.profile_photo_url}
-                           alt={profile?.display_name || 'Profile'}
-                           className="w-full h-full object-cover"
-                           onError={(e) => {
-                             e.currentTarget.src = '/placeholder.svg';
-                           }}
-                         />
-                       ) : (
-                         <div className="w-full h-full bg-gray-200/50 flex items-center justify-center">
-                           <Camera className="w-8 h-8 text-gray-400" />
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 </div>
-
-                 {/* Bio Block */}
-                 <div className="mt-5 text-center">
-                   {profile?.bio && (
-                     <p className="text-base text-gray-700 line-clamp-2 mb-3">
-                       {profile.bio}
-                     </p>
-                   )}
-                   {profile?.website && (
-                     <a 
-                       href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
-                     >
-                       {profile.website.replace(/^https?:\/\//, '').replace(/^www\./, '')}
-                     </a>
-                   )}
-                 </div>
-
-                 {/* Slim Stats Row */}
-                 <div className="mt-6 grid grid-cols-4 gap-2 text-center">
-                   <div>
-                     <div className="text-lg font-semibold text-gray-900">{postsCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Posts</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-2">
-                     <div className="text-lg font-semibold text-gray-900">2,500</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Total XP</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-2">
-                     <div className="text-lg font-semibold text-gray-900">{followingCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Following</div>
-                   </div>
-                   <div className="border-l border-gray-300/40 pl-2">
-                     <div className="text-lg font-semibold text-gray-900">{followersCount}</div>
-                     <div className="text-xs text-gray-600 uppercase tracking-wide">Followers</div>
-                   </div>
-                 </div>
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-5 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-12">
+                      <div className="text-center">
+                        <div className="text-sm text-gray-700">{homeClub}</div>
+                        <div className="mt-1 text-sm text-gray-500">Golf Club</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm text-gray-700">Handicap</div>
+                        <div className="mt-1 text-2xl font-semibold text-gray-900">
+                          {handicap}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-sm">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
               </div>
             </div>
              
              {/* Spacer below to avoid clipping the panel */}
-             <div className="h-32 sm:h-40 lg:h-48" />
+             <div className="h-20 md:h-28" />
            </section>
            
            {/* Glass Chips Stats */}
-           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
               <div className="border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
@@ -1101,8 +1026,8 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Orange Underline - Text Only Style */}
-      <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
@@ -1114,26 +1039,32 @@ const HeroProfileHeader = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={activeSection === tab.id ? 0 : -1}
                 className={`
-                  relative py-3 px-4 text-base font-medium transition-colors duration-200
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? 'text-gray-900 focus:outline-none' 
-                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
                   }
                   flex-1 text-center
                 `}
+                style={{
+                  color: activeSection === tab.id 
+                    ? 'hsl(var(--profile-text-primary))' 
+                    : 'hsl(var(--profile-text-secondary))'
+                }}
               >
                 {tab.label}
-                {/* Orange underline for active tab */}
+                {/* Brand accent underline animation */}
                 <div 
                   className={`
-                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                    absolute bottom-0 left-0 right-0 h-0.5
                     transition-all duration-300 ease-out
                     ${activeSection === tab.id 
                       ? 'scale-x-100 opacity-100' 
                       : 'scale-x-0 opacity-0'
                     }
                     origin-center
-                  `}
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
                 />
               </button>
             ))}

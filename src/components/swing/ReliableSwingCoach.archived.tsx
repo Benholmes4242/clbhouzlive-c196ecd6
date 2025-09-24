@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { StreamingSwingAnalyzer } from './StreamingSwingAnalyzer';
+import { StreamingSwingAnalyzer } from './StreamingSwingAnalyzer.archived';
 import { SwingReview, SwingPhase, SwingAnalysisSummary, SwingDrill } from '@/components/swing-review/SwingReview';
 import { SwingVisualCarousel } from './SwingVisualCarousel';
 import { SwingVisualizer } from '@/services/swing/visualizer';
