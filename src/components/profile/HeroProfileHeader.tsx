@@ -741,12 +741,12 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper - Full Width, overlapping ~20% */}
+            {/* Glass panel positioned relative to OUTER wrapper - Full Width, overlapping ~10-15% */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-11vh]
+                bottom-[-6vh]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -919,12 +919,12 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, overlapping ~20% */}
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, overlapping ~10-15% */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-11vh]
+                bottom-[-6vh]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
