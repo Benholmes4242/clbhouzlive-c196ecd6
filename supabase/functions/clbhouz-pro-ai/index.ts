@@ -177,77 +177,23 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
         console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
       }
 
-      // Add timeout for faster failure/fallback
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 13000); // 13s SLA
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14', // Use powerful model for image analysis
+          messages: messages,
+          max_tokens: 1500
+        }),
+      });
 
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model: 'gpt-4o-mini', // Fast vision model for swing analysis
-            messages: messages,
-            max_tokens: 600, // Reduced for faster response
-            temperature: 0.2
-          }),
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('OpenAI API error:', response.status, errorText);
-          throw new Error(`OpenAI API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const finalResponse = data.choices[0].message.content.trim();
-        
-        console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
-          responseLength: finalResponse.length,
-          responsePreview: finalResponse.substring(0, 100)
-        });
-
-        console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
-
-        return new Response(JSON.stringify({ 
-          response: finalResponse, 
-          metadata: null 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-
-      } catch (error: any) {
-        clearTimeout(timeoutId);
-        
-        // Handle AbortController timeout gracefully
-        if (error.name === 'AbortError') {
-          console.log('🚨 API call aborted due to 13s timeout - returning quick analysis');
-          const quickAnalysis = `## Quick Swing Analysis
-
-Based on the submitted frames, I can see:
-
-**Setup & Address:** Good foundation position
-**Backswing:** Controlled takeaway motion  
-**Impact Zone:** Solid contact position
-**Follow-through:** Balanced finish
-
-*This is a condensed analysis due to processing time. For detailed breakdown, try uploading a shorter video clip or use the "Refine Details" option.*`;
-
-          return new Response(JSON.stringify({ 
-            response: quickAnalysis,
-            metadata: { timeout: true, quick: true }
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-        
-        throw error;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI API error:', response.status, errorText);
+        throw new Error(`OpenAI API error: ${response.status}`);
       }
 
       const data = await response.json();

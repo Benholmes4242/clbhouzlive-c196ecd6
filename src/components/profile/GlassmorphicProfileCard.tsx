@@ -8,7 +8,6 @@ interface GlassmorphicProfileCardProps {
     display_name?: string;
     username?: string;
     home_club?: string;
-    eg_handicap_index?: number;
   } | null;
   isOwnProfile: boolean;
   onEditProfile: () => void;
@@ -78,49 +77,12 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           )}
         </div>
 
-        {/* Home Club and Handicap - moved left with mini profile card on right */}
-        <div className="flex items-center justify-between gap-4">
-          {/* Left side - Home Club and Handicap centered */}
-          <div className="flex-1 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Flag className="w-4 h-4 text-white/60" />
-              <p className="text-sm text-white/60">
-                {profile?.home_club || 'No Club'}
-              </p>
-            </div>
-            {/* Handicap display */}
-            <div className="text-center">
-              <p className="text-xs text-white/50">Handicap</p>
-              <p className="text-sm font-medium text-white/80">
-                {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined 
-                  ? `${profile.eg_handicap_index > 0 ? '+' : ''}${profile.eg_handicap_index.toFixed(1)}`
-                  : 'Not set'
-                }
-              </p>
-            </div>
-          </div>
-          
-          {/* Right side - Mini Profile Card */}
-          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt="Mini profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                  <span className="text-white font-bold text-xs">
-                    {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-white/70 font-medium truncate w-full text-center">
-              {profile?.display_name?.split(' ')[0] || 'User'}
-            </p>
-          </div>
+        {/* Home Club with golf flag icon */}
+        <div className="flex items-center justify-center gap-2">
+          <Flag className="w-4 h-4 text-white/60" />
+          <p className="text-sm text-white/60">
+            {profile?.home_club || 'No Club'}
+          </p>
         </div>
       </div>
     </div>
