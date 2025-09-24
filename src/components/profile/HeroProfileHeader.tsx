@@ -218,10 +218,10 @@ const HeroProfileHeader = ({
   const getContentTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0';
+    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-20 pb-8' : 'px-4 md:px-0';
     const sectionClasses = `
-      ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
-      ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
+      ${activeSection === 'courses' ? 'pt-20 pb-8' : ''}
+      ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-20 py-8' : ''}
       ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
       ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
     `;
@@ -1262,9 +1262,9 @@ const HeroProfileHeader = ({
         ) : (
           /* Normal state - only show active section */
           <div className={`
-            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
-            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
-            ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-8' : ''}
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-20 pb-8' : 'px-0 md:px-4'}
+            ${activeSection === 'courses' ? 'pt-20 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-20 py-8' : ''}
             ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
             ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
           `}>
