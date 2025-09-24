@@ -808,7 +808,7 @@ const HeroProfileHeader = ({
                     {/* Right side - Mini Profile Card (4:3 aspect ratio) */}
                     <div className="w-16 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
                       <div className="w-12 rounded-md overflow-hidden border border-white/40 mb-1">
-                        <AspectRatio ratio={4/3}>
+                        <AspectRatio ratio={3/4}>
                           {profile?.profile_photo_url ? (
                             <img
                               src={profile.profile_photo_url}
@@ -966,7 +966,7 @@ const HeroProfileHeader = ({
                     {/* Right side - Mini Profile Card (4:3 aspect ratio) */}
                     <div className="w-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
                       <div className="w-16 rounded-md overflow-hidden border border-white/40 mb-1">
-                        <AspectRatio ratio={4/3}>
+                        <AspectRatio ratio={3/4}>
                           {profile?.profile_photo_url ? (
                             <img
                               src={profile.profile_photo_url}
