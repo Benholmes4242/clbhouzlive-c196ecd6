@@ -781,9 +781,12 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    <div className="flex items-start justify-between">
-                      {/* Name + Handle - left aligned */}
-                      <div className="text-center flex-1">
+                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
+                      {/* Left spacer (invisible) */}
+                      <div className="w-[84px]"></div>
+                      
+                      {/* Name + Handle - perfectly centered */}
+                      <div className="text-center">
                         <h1 className="text-2xl font-semibold text-gray-900">
                           {displayName}
                         </h1>
@@ -958,9 +961,12 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-4">
-                    <div className="flex items-start justify-between">
-                      {/* Name + Handle - left aligned */}
-                      <div className="text-center flex-1">
+                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
+                      {/* Left spacer (invisible) */}
+                      <div className="w-[112px]"></div>
+                      
+                      {/* Name + Handle - perfectly centered */}
+                      <div className="text-center">
                         <h1 className="text-3xl font-semibold text-gray-900">
                           {displayName}
                         </h1>
