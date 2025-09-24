@@ -5,6 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSnapModalUserMedia } from '@/hooks/useSnapModalUserMedia';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useModalContext } from '@/contexts/ModalContext';
+import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import { openMediaPicker } from '@/utils/openMediaPicker';
 import DynamicPreview from './DynamicPreview';
 
@@ -84,6 +85,9 @@ const EnhancedSnapModal = ({
   useEffect(() => {
     setSnapModalOpen(isOpen);
   }, [isOpen, setSnapModalOpen]);
+
+  // Global header hiding for reliable cross-environment support
+  useImmersiveHeader(Boolean(isOpen));
 
   // Golf course placeholders
   const placeholders = {

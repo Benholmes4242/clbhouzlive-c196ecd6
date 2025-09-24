@@ -6,6 +6,7 @@ import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission
 import { supabase } from "@/integrations/supabase/client";
 import PostSuccessOverlay from './PostSuccessOverlay';
 import { useModalContext } from '@/contexts/ModalContext';
+import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
@@ -59,6 +60,9 @@ export default function EnhancedCreateMomentModalCinematic({
   useEffect(() => {
     setCreateMomentModalOpen(isOpen);
   }, [isOpen, setCreateMomentModalOpen]);
+
+  // Global header hiding for reliable cross-environment support
+  useImmersiveHeader(Boolean(isOpen));
 
   // Media carousel state - use mediaItems if available, fallback to initialFiles
   const media = useMemo(() => {

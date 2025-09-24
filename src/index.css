@@ -189,6 +189,24 @@ html, body, #root, .app-shell { touch-action: auto; }
   position: fixed !important;
 }
 
+/* Immersive header hiding - ensure header and top spacer collapse when immersive modals are active */
+html[data-immersive="true"] .global-header,
+html[data-immersive="true"] .app-shell--topSpacer {
+  display: none !important;
+}
+
+/* Modal z-index hierarchy - guarantee modals sit above header even if styles fail */
+.modal-root,
+.enhanced-create-moment-modal,
+.snap-modal {
+  z-index: 2000 !important;
+}
+
+/* Ensure header stays below modals */
+.global-header { 
+  z-index: 1000 !important; 
+}
+
 /* Compact Mode Helpers (≤375px) */
 @media (max-width: 375px) {
   .compact-header-padding {
