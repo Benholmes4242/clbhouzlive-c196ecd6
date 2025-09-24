@@ -744,7 +744,7 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
+                absolute left-0 right-0 origin-top
                 bottom-[-20px] md:bottom-[-28px]
                 w-full
                 border border-white/35
@@ -805,7 +805,7 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                    <div className="w-20 h-24 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden origin-top scale-150">
                       <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
@@ -901,7 +901,7 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                absolute left-1/2 -translate-x-1/2
+                absolute left-1/2 -translate-x-1/2 origin-top
                 bottom-[-20px] md:bottom-[-28px]
                 w-[90%] md:w-full
                 border border-white/35
@@ -961,7 +961,7 @@ const HeroProfileHeader = ({
                     </div>
                     
                     {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
-                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                    <div className="w-24 h-28 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden origin-top scale-[1.75]">
                       <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
