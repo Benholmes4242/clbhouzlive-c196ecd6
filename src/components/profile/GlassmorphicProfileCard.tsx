@@ -79,7 +79,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
         </div>
 
         {/* Home Club and Handicap - moved left with mini profile card on right */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           {/* Left side - Home Club and Handicap centered */}
           <div className="flex-1 flex flex-col items-center gap-2">
             <div className="flex items-center gap-2">
@@ -100,8 +100,8 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
             </div>
           </div>
           
-          {/* Right side - Mini Profile Card */}
-          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
+          {/* Right side - Mini Profile Card - positioned with more breathing room */}
+          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2 mt-2">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
                 <img
