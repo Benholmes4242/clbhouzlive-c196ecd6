@@ -814,7 +814,7 @@ const HeroProfileHeader = ({
                     </div>
 
                     {/* Club + Handicap positioned left of mini profile card */}
-                    <div className="flex justify-end pr-4 mt-[-70px]">
+                    <div className="flex justify-end pr-4 mt-[-112px]">
                       <div className="flex flex-col gap-2 mr-6">
                         <div className="text-center">
                           <div className="text-xs text-gray-700">{homeClub}</div>
@@ -996,7 +996,7 @@ const HeroProfileHeader = ({
                     </div>
 
                     {/* Club + Handicap positioned left of mini profile card */}
-                    <div className="flex justify-end pr-6 mt-[-95px]">
+                    <div className="flex justify-end pr-6 mt-[-150px]">
                       <div className="flex flex-col gap-3 mr-8">
                         <div className="text-center">
                           <div className="text-sm text-gray-700">{homeClub}</div>
