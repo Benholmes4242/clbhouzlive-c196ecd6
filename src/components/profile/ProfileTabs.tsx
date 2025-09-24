@@ -67,48 +67,34 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
 
   return (
     <div className="w-full">
-      {/* Tab Bar */}
-      <div className="relative z-50 bg-background backdrop-blur-sm w-full border-b border-border/50">
-        <div className="relative w-full">
-          {/* Left fade gradient */}
-          {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
-          )}
-          
-          {/* Right fade gradient */}
-          {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
-          )}
-          
-          <div 
-            ref={tabsRef}
-            className="flex w-full"
-          >
-            {tabs.map((tab) => {
-              const IconComponent = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  disabled={transitionState !== 'idle'}
-                  className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 relative ${
-                    isActive 
-                      ? 'text-foreground' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
-                >
-                  <span className="whitespace-nowrap text-xl md:text-2xl text-black font-medium">{tab.label}</span>
-                  {/* Underline only under text label */}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-muted-foreground/40 w-1/2" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      {/* Tab Bar - text-only with orange underline */}
+      <nav className="px-6">
+        <div className="flex overflow-x-auto gap-6 border-b border-white/20 pb-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                disabled={transitionState !== 'idle'}
+                className={`
+                  relative pb-2 text-base whitespace-nowrap transition-all duration-200
+                  ${isActive ? 'font-semibold text-white' : 'text-white/70 hover:text-white/90'}
+                  ${transitionState !== 'idle' ? 'pointer-events-none' : ''}
+                `}
+              >
+                {tab.label}
+                <span
+                  className={`
+                    absolute left-0 right-0 -bottom-[1px] h-[3px] rounded-full transition-all duration-200
+                    ${isActive ? 'bg-[#ff8a00]' : 'bg-transparent'}
+                  `}
+                />
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </nav>
 
       {/* Tab Content */}
       <div className={`pt-0 pb-1 ${activeTab === 'activity' ? 'md:px-0' : activeTab === 'achievements' ? 'px-0' : 'px-4 md:px-0'}`}>

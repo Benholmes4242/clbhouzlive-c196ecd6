@@ -1,6 +1,8 @@
 import React from 'react';
 import { Edit, Flag } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ProfileBioBlock from './ProfileBioBlock';
+import ProfileStatsRow from './ProfileStatsRow';
 
 interface GlassmorphicProfileCardProps {
   profile: {
@@ -9,15 +11,29 @@ interface GlassmorphicProfileCardProps {
     username?: string;
     home_club?: string;
     eg_handicap_index?: number;
+    bio?: string;
+    website?: string;
   } | null;
   isOwnProfile: boolean;
   onEditProfile: () => void;
+  followersCount?: number;
+  followingCount?: number;
+  postsCount?: number;
+  totalXp?: number;
+  recentlyFollowedBy?: string[];
+  children?: React.ReactNode;
 }
 
 const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
   profile,
   isOwnProfile,
-  onEditProfile
+  onEditProfile,
+  followersCount = 0,
+  followingCount = 0,
+  postsCount = 0,
+  totalXp = 0,
+  recentlyFollowedBy = [],
+  children
 }) => {
   const isMobile = useIsMobile();
 
@@ -31,7 +47,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 p-6 text-center"
+      className="relative mx-4 md:mx-8 text-center"
       style={glassmorphicStyle}
     >
       {/* Profile photo - overlapping top of card */}
@@ -54,7 +70,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       </div>
 
       {/* Profile content */}
-      <div className="pt-6 space-y-2">
+      <div className="pt-12 pb-6 space-y-4">
         {/* Name - large, bold */}
         <h2 className="text-2xl font-bold text-white">
           {profile?.display_name || 'User'}
@@ -78,50 +94,72 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           )}
         </div>
 
-        {/* Home Club and Handicap - moved left with mini profile card on right */}
-        <div className="flex items-center justify-between gap-4">
-          {/* Left side - Home Club and Handicap centered */}
-          <div className="flex-1 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Flag className="w-4 h-4 text-white/60" />
-              <p className="text-sm text-white/60">
-                {profile?.home_club || 'No Club'}
-              </p>
-            </div>
-            {/* Handicap display */}
-            <div className="text-center">
-              <p className="text-xs text-white/50">Handicap</p>
-              <p className="text-sm font-medium text-white/80">
+        {/* Home Club and Handicap row */}
+        <div className="flex items-center justify-between px-6">
+          {/* Left side - Home Club */}
+          <div className="text-left">
+            <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Home Club</p>
+            <p className="text-sm font-medium text-white">
+              {profile?.home_club || 'Sundridge Park Golf Club'}
+            </p>
+          </div>
+          
+          {/* Center spacing */}
+          <div className="flex-1"></div>
+          
+          {/* Right side - Handicap and mini profile card */}
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Handicap</p>
+              <p className="text-xl font-bold text-white">
                 {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined 
-                  ? `${profile.eg_handicap_index > 0 ? '+' : ''}${profile.eg_handicap_index.toFixed(1)}`
-                  : 'Not set'
+                  ? Math.round(profile.eg_handicap_index)
+                  : '4'
                 }
               </p>
             </div>
-          </div>
-          
-          {/* Right side - Mini Profile Card */}
-          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
-              {profile?.profile_photo_url ? (
-                <img
-                  src={profile.profile_photo_url}
-                  alt="Mini profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                  <span className="text-white font-bold text-xs">
-                    {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-              )}
+            
+            {/* Mini Profile Card - scaled up with 3:4 aspect ratio */}
+            <div className="w-20 h-24 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
+              <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 mb-1">
+                {profile?.profile_photo_url ? (
+                  <img
+                    src={profile.profile_photo_url}
+                    alt="Mini profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">
+                      {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-white/70 font-medium truncate w-full text-center">
+                {profile?.display_name?.split(' ')[0] || 'User'}
+              </p>
             </div>
-            <p className="text-xs text-white/70 font-medium truncate w-full text-center">
-              {profile?.display_name?.split(' ')[0] || 'User'}
-            </p>
           </div>
         </div>
+
+        {/* Bio Block */}
+        <ProfileBioBlock
+          bio={profile?.bio}
+          website={profile?.website}
+          recentlyFollowedBy={recentlyFollowedBy}
+        />
+
+        {/* Stats Row */}
+        <ProfileStatsRow
+          posts={postsCount}
+          totalXp={totalXp}
+          following={followingCount}
+          followers={followersCount}
+        />
+
+        {/* Additional content like tabs */}
+        {children}
       </div>
     </div>
   );
