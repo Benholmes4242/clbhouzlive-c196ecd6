@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -76,7 +76,6 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
-  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -143,8 +142,6 @@ const HeroProfileHeader = ({
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
-  
-  console.log('HeroProfileHeader: refs and state initialized');
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -465,8 +462,6 @@ const HeroProfileHeader = ({
     return () => clearTimeout(timer);
   }, [isProfileCardInView]);
 
-  // Remove complex hero height measurement - using simpler overlap approach
-
   // Scroll depth tracking for mobile header
   useEffect(() => {
     if (!isMobile || !profile?.id) return;
@@ -705,13 +700,7 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div 
-          className="relative -mt-16 bg-white md:[--panel-overlap:7vh]"
-          style={{ 
-            ['--panel-overlap' as any]: '6vh',
-            paddingBottom: 'var(--panel-overlap)'
-          }}
-        >
+        <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
@@ -751,20 +740,18 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper - Full Width, overlapping ~10-15% */}
+            {/* Glass panel positioned relative to OUTER wrapper - Full Width */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
+                bottom-[-20px] md:bottom-[-28px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-4
+                pb-10
               "
-              style={{
-                bottom: 'calc(var(--panel-overlap) * -1)'
-              }}
             >
                <div className="px-5 py-4 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
@@ -791,39 +778,20 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-3">
-                    <div className="flex items-start justify-between">
-                      {/* Name + Handle - left aligned */}
-                      <div className="text-center flex-1">
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
-                      </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 flex-shrink-0">
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={profile.profile_photo_url}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-2xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
 
-                    {/* Club + Handicap row */}
-                    <div className="mt-4 flex items-center justify-center gap-12">
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-4 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-6">
                       <div className="text-center">
                         <div className="text-xs text-gray-700">{homeClub}</div>
                         <div className="mt-1 text-xs text-gray-500">Golf Club</div>
@@ -835,72 +803,61 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-4 text-center">
-                    {profile?.bio && (
-                      <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-4 text-center">
-                    <div className="flex flex-col">
-                      <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">2,500</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-4">
-                      <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Followers</span>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
+                      <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-xs">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
               </div>
             </div>
              
-             {/* Spacer to keep content below panel in sync */}
-             <div 
-               aria-hidden
-               style={{ height: 'calc(var(--panel-overlap) + 16px)' }} 
-             />
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-20 md:h-28" />
            </section>
+           
+            {/* Glass Chips Stats */}
+            <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
-        <div 
-          className="relative -mt-16 bg-white md:[--panel-overlap:7vh]"
-          style={{ 
-            ['--panel-overlap' as any]: '6vh',
-            paddingBottom: 'var(--panel-overlap)'
-          }}
-        >
+        <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
@@ -940,21 +897,19 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, overlapping ~10-15% */}
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-1/2 -translate-x-1/2
-                w-[90%] md:w-full max-w-4xl
+                bottom-[-20px] md:bottom-[-28px]
+                w-[90%] md:w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
-              style={{
-                bottom: 'calc(var(--panel-overlap) * -1)'
-              }}
             >
-               <div className="px-8 py-6 flex flex-col items-center relative">
+               <div className="px-8 py-10 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-6 left-8">
@@ -979,39 +934,20 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-4">
-                    <div className="flex items-start justify-between">
-                      {/* Name + Handle - left aligned */}
-                      <div className="text-center flex-1">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-base text-gray-700">
-                          @{username}
-                        </p>
-                      </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
-                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 flex-shrink-0">
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={profile.profile_photo_url}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-3xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  {/* Name + Handle - centered */}
+                  <div className="text-center">
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                      {displayName}
+                    </h1>
+                    <p className="mt-1 text-base text-gray-700">
+                      @{username}
+                    </p>
+                  </div>
 
-                    {/* Club + Handicap row */}
-                    <div className="mt-5 flex items-center justify-center gap-16">
+                  {/* Club + Handicap side by side with mini profile card on right */}
+                  <div className="mt-5 w-full flex items-center justify-between">
+                    {/* Left side - Club and Handicap side by side */}
+                    <div className="flex items-center gap-12">
                       <div className="text-center">
                         <div className="text-sm text-gray-700">{homeClub}</div>
                         <div className="mt-1 text-sm text-gray-500">Golf Club</div>
@@ -1023,62 +959,57 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-5 text-center">
-                    {profile?.bio && (
-                      <p className="text-base text-gray-700 mb-3 line-clamp-2 max-w-2xl mx-auto">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
-                    {/* Placeholder for "Followed by..." - would need actual data */}
-                    {followersCount > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        Followed by {followersCount} golfer{followersCount !== 1 ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-6 text-center max-w-2xl mx-auto">
-                    <div className="flex flex-col">
-                      <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">2,500</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-6">
-                      <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Followers</span>
+                    
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
+                      <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={profile.profile_photo_url}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-sm">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
               </div>
             </div>
              
-             {/* Spacer to keep content below panel in sync */}
-             <div 
-               aria-hidden
-               style={{ height: 'calc(var(--panel-overlap) + 16px)' }} 
-             />
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-20 md:h-28" />
            </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-full mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
+              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
+                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
@@ -1095,8 +1026,8 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Brand Orange Underline */}
-      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200 mt-4">
+      {/* Tab Navigation with Underline Animation - Brand accent styling */}
+      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
@@ -1108,26 +1039,32 @@ const HeroProfileHeader = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={activeSection === tab.id ? 0 : -1}
                 className={`
-                  relative py-4 px-4 text-base font-medium transition-colors duration-200
+                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? 'text-gray-900 focus:outline-none' 
-                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                    ? 'focus:outline-none' 
+                    : 'hover:opacity-80 focus:outline-none'
                   }
                   flex-1 text-center
                 `}
+                style={{
+                  color: activeSection === tab.id 
+                    ? 'hsl(var(--profile-text-primary))' 
+                    : 'hsl(var(--profile-text-secondary))'
+                }}
               >
                 {tab.label}
-                {/* Brand orange underline animation */}
+                {/* Brand accent underline animation */}
                 <div 
                   className={`
-                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                    absolute bottom-0 left-0 right-0 h-0.5
                     transition-all duration-300 ease-out
                     ${activeSection === tab.id 
                       ? 'scale-x-100 opacity-100' 
                       : 'scale-x-0 opacity-0'
                     }
                     origin-center
-                  `}
+                  `} 
+                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
                 />
               </button>
             ))}
@@ -1377,4 +1314,3 @@ const HeroProfileHeader = ({
 };
 
 export default HeroProfileHeader;
-// Force refresh after removing refs
