@@ -883,7 +883,7 @@ const HeroProfileHeader = ({
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative bg-white">
+        <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             <div className="relative h-[56vh] w-full overflow-hidden">
               {/* Loading state */}
@@ -918,23 +918,21 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-32 sm:h-36 lg:h-48
+              <div className="absolute bottom-0 left-0 w-full h-24 sm:h-28 lg:h-32
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
             </div>
-          </section>
-          
-          {/* Below-hero content stack with reduced overlap */}
-          <div className="-mt-4 sm:-mt-6 lg:-mt-8 relative z-20">
-            {/* Glass panel positioned within the content stack */}
+
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow */}
             <div 
               ref={profileCardRef}
               className="
-                mx-auto mb-8
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-56px] sm:bottom-[-72px] lg:bottom-[-96px]
                 w-[90%] md:w-[80%] max-w-[800px]
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)]
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
                <div className="px-8 py-8 flex flex-col relative">
@@ -1058,70 +1056,33 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-            {/* Glass Chips Stats */}
-            <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
+             {/* Spacer below to avoid clipping the panel */}
+             <div className="h-12 md:h-16" />
+           </section>
+           
+           {/* Glass Chips Stats */}
+           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
               <div className="border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-                <div className="text-xs md:text-sm text-gray-700">Posts</div>
-              </div>
+               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Posts</div>
+             </div>
               <div className="border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-                <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-              </div>
+               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
+               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
+             </div>
               <div className="border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-                <div className="text-xs md:text-sm text-gray-700">Following</div>
-              </div>
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Following</div>
+             </div>
               <div className="border border-white/30 bg-white/40 backdrop-blur-md 
                               px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-                <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-                <div className="text-xs md:text-sm text-gray-700">Followers</div>
-              </div>
-            </div>
-            
-            {/* Tab Navigation with Orange Underline - Text Only Style */}
-            <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
-              <div className="relative" role="tablist" aria-label="Profile sections">
-                <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleTabChange(tab.id)}
-                      role="tab"
-                      aria-selected={activeSection === tab.id}
-                      aria-controls={`tabpanel-${tab.id}`}
-                      tabIndex={activeSection === tab.id ? 0 : -1}
-                      className={`
-                        relative py-3 px-4 text-base font-medium transition-colors duration-200
-                        ${activeSection === tab.id 
-                          ? 'text-gray-900 focus:outline-none' 
-                          : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                        }
-                        flex-1 text-center
-                      `}
-                    >
-                      {tab.label}
-                      {/* Orange underline for active tab */}
-                      <div 
-                        className={`
-                          absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                          transition-all duration-300 ease-out
-                          ${activeSection === tab.id 
-                            ? 'scale-x-100 opacity-100' 
-                            : 'scale-x-0 opacity-0'
-                          }
-                          origin-center
-                        `}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div> {/* Close below-hero content stack */}
+               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
+               <div className="text-xs md:text-sm text-gray-700">Followers</div>
+             </div>
+           </div>
         </div>
       )}
 
@@ -1136,6 +1097,46 @@ const HeroProfileHeader = ({
           }}
           onStatClick={handleStatClick}
         />
+      </div>
+
+      {/* Tab Navigation with Orange Underline - Text Only Style */}
+      <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
+        <div className="relative" role="tablist" aria-label="Profile sections">
+          <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeSection === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={activeSection === tab.id ? 0 : -1}
+                className={`
+                  relative py-3 px-4 text-base font-medium transition-colors duration-200
+                  ${activeSection === tab.id 
+                    ? 'text-gray-900 focus:outline-none' 
+                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                  }
+                  flex-1 text-center
+                `}
+              >
+                {tab.label}
+                {/* Orange underline for active tab */}
+                <div 
+                  className={`
+                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                    transition-all duration-300 ease-out
+                    ${activeSection === tab.id 
+                      ? 'scale-x-100 opacity-100' 
+                      : 'scale-x-0 opacity-0'
+                    }
+                    origin-center
+                  `}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Legacy ProfileTabs for content rendering */}
