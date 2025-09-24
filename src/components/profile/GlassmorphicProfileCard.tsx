@@ -54,34 +54,37 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       </div>
 
       {/* Profile content */}
-      <div className="pt-6 space-y-2">
-        {/* Name - large, bold */}
-        <h2 className="text-2xl font-bold text-white">
-          {profile?.display_name || 'User'}
-        </h2>
+      <div className="pt-6 relative">
+        {/* Center content container - centers between glass panel edges, ignoring mini profile card */}
+        <div className="pr-20"> {/* Add right padding to account for mini profile card */}
+          {/* Name - large, bold, centered */}
+          <h2 className="text-2xl font-bold text-white text-center">
+            {profile?.display_name || 'User'}
+          </h2>
 
-        {/* Username row with edit button */}
-        <div className="flex items-center justify-center gap-3">
-          <p className="text-base text-white/80">
-            @{profile?.username || 'username'}
-          </p>
-          
-          {/* Edit Profile button - pill style, subtle */}
-          {isOwnProfile && (
-            <button
-              onClick={onEditProfile}
-              className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1"
-            >
-              <Edit className="w-3 h-3" />
-              Edit
-            </button>
-          )}
+          {/* Username row with edit button, centered */}
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <p className="text-base text-white/80">
+              @{profile?.username || 'username'}
+            </p>
+            
+            {/* Edit Profile button - pill style, subtle */}
+            {isOwnProfile && (
+              <button
+                onClick={onEditProfile}
+                className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1"
+              >
+                <Edit className="w-3 h-3" />
+                Edit
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Home Club and Handicap - moved left with mini profile card on right */}
-        <div className="flex items-center justify-between gap-4">
-          {/* Left side - Home Club and Handicap centered */}
-          <div className="flex-1 flex flex-col items-center gap-2">
+        {/* Home Club and Handicap - positioned with mini profile card */}
+        <div className="flex items-start justify-between mt-4">
+          {/* Left side - Home Club and Handicap centered between left edge and mini profile card */}
+          <div className="flex-1 pr-4 flex flex-col items-center gap-2">
             <div className="flex items-center gap-2">
               <Flag className="w-4 h-4 text-white/60" />
               <p className="text-sm text-white/60">
@@ -100,7 +103,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
             </div>
           </div>
           
-          {/* Right side - Mini Profile Card */}
+          {/* Right side - Mini Profile Card, aligned with HomeClub/Handicap top */}
           <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
