@@ -49,7 +49,7 @@ import SwipeToReturnZone from './SwipeToReturnZone';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
-
+import ResponsiveGlassCard from './ResponsiveGlassCard';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
@@ -804,8 +804,8 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
                     
-                    {/* Right side - Mini Profile Card (vertical rounded rectangle) - scaled up from bottom */}
-                    <div className="w-16 h-22 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden origin-top scale-150">
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-14 h-18 rounded-lg flex flex-col items-center justify-center p-2 ml-4 overflow-hidden">
                       <div className="w-8 h-8 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
@@ -960,8 +960,8 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
                     
-                    {/* Right side - Mini Profile Card (vertical rounded rectangle) - scaled up from bottom */}
-                    <div className="w-20 h-24 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden origin-top scale-[1.75]">
+                    {/* Right side - Mini Profile Card (vertical rounded rectangle) */}
+                    <div className="w-16 h-20 rounded-lg flex flex-col items-center justify-center p-2 ml-6 overflow-hidden">
                       <div className="w-10 h-10 rounded-md overflow-hidden border border-white/40 mb-1">
                         {profile?.profile_photo_url ? (
                           <img
