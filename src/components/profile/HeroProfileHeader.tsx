@@ -218,12 +218,12 @@ const HeroProfileHeader = ({
   const getContentTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-20' : 'px-4 md:px-0';
+    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-20 pb-8' : 'px-4 md:px-0 pt-20';
     const sectionClasses = `
-      ${activeSection === 'courses' ? 'pt-0 pb-20' : ''}
-      ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-20' : ''}
-      ${isMobile && activeSection === 'activity' ? 'pb-10' : ''}
-      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-10' : ''}
+      ${activeSection === 'courses' ? 'pt-20 pb-8' : ''}
+      ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-20 py-8' : ''}
+      ${isMobile && activeSection === 'activity' ? 'pt-10' : ''}
+      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'pt-10' : ''}
     `;
     
     if (isOutgoing) {
@@ -1252,11 +1252,11 @@ const HeroProfileHeader = ({
         ) : (
           /* Normal state - only show active section */
           <div className={`
-            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-20' : 'px-0 md:px-4'}
-            ${activeSection === 'courses' ? 'pt-0 pb-20' : ''}
-            ${activeSection === 'achievements' || activeSection === 'stats' ? 'py-20' : ''}
-            ${isMobile && activeSection === 'activity' ? 'pb-10' : ''}
-            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-10' : ''}
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-20 pb-8' : 'px-0 md:px-4 pt-20'}
+            ${activeSection === 'courses' ? 'pt-20 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-20 py-8' : ''}
+            ${isMobile && activeSection === 'activity' ? 'pt-10' : ''}
+            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'pt-10' : ''}
           `}>
             <div className={`
               ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
