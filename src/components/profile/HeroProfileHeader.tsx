@@ -816,9 +816,9 @@ const HeroProfileHeader = ({
                     {/* Club + Handicap positioned left side and center */}
                     <div className="absolute w-full mt-[-112px] px-4">
                       <div className="flex justify-between items-start pr-40">
-                        <div className="text-left">
-                          <div className="text-xs text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-xs text-gray-500">Golf Club</div>
+                        <div className="text-center">
+                          <div className="text-xs text-gray-700">Golf Club</div>
+                          <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
                         </div>
                         <div className="text-center">
                           <div className="text-xs text-gray-700">Handicap</div>
@@ -1035,9 +1035,9 @@ const HeroProfileHeader = ({
                     {/* Club + Handicap positioned left side and center */}
                     <div className="absolute w-full mt-[-150px] px-8">
                       <div className="flex justify-between items-start pr-56">
-                        <div className="text-left">
-                          <div className="text-sm text-gray-700">{homeClub}</div>
-                          <div className="mt-1 text-sm text-gray-500">Golf Club</div>
+                        <div className="text-center">
+                          <div className="text-sm text-gray-700">Golf Club</div>
+                          <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
                         </div>
                         <div className="text-center">
                           <div className="text-sm text-gray-700">Handicap</div>
