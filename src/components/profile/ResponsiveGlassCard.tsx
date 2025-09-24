@@ -61,8 +61,8 @@ const ResponsiveGlassCard: React.FC<ResponsiveGlassCardProps> = ({
         className={`
           relative z-20 rounded-2xl transition-all duration-500 ease-out
           ${isMobile 
-            ? 'mx-4 p-4 scale-90' // Mobile: smaller scale, tighter margins
-            : 'mx-auto max-w-md p-6 scale-100' // Desktop: centered with breathing space
+            ? 'mx-4 p-4 scale-90 min-h-[400px]' // Mobile: smaller scale, tighter margins, minimum height
+            : 'mx-auto max-w-md p-6 scale-100 min-h-[480px]' // Desktop: centered with breathing space, minimum height
           }
         `}
         style={{
