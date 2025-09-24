@@ -76,6 +76,7 @@ interface UserProfile {
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
+  website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string;
@@ -752,7 +753,7 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-5 py-2 flex flex-col items-center relative">
+               <div className="px-5 py-6 flex flex-col relative">
                  {/* Three dots menu - positioned absolutely */}
                  {isOwnProfile && (
                    <div className="absolute top-4 right-5">
@@ -777,35 +778,100 @@ const HeroProfileHeader = ({
                    </div>
                  )}
 
-                 {/* Name + Handle - centered */}
-                 <div className="text-center">
-                   <h1 className="text-2xl font-semibold text-gray-900">
-                     {displayName}
-                   </h1>
-                   <p className="mt-1 text-sm text-gray-700">
-                     @{username}
-                   </p>
+                 {/* Header Block */}
+                 <div className="flex items-start justify-between">
+                   {/* Left side: Name, Handle, Club, Handicap */}
+                   <div className="flex-1">
+                     {/* Name + Handle - left aligned */}
+                     <div className="text-center">
+                       <h1 className="text-2xl font-semibold text-gray-900">
+                         {displayName}
+                       </h1>
+                       <p className="mt-1 text-sm text-gray-700">
+                         @{username}
+                       </p>
+                     </div>
+
+                     {/* Club + Handicap - centered below name */}
+                     <div className="mt-4 w-full max-w-sm mx-auto">
+                       <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center">
+                            <div className="text-xs text-gray-700">Home Club</div>
+                             <div className="mt-1 text-base font-medium text-gray-900">
+                               {homeClubLines.map((line, index) => (
+                                 <div key={index}>{line}</div>
+                               ))}
+                             </div>
+                          </div>
+                         <div className="text-center">
+                           <div className="text-xs text-gray-700">Handicap</div>
+                           <div className="mt-1 text-base font-medium text-gray-900">
+                             {handicap}
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+
+                   {/* Mini Profile Card - Top Right */}
+                   <div className="ml-4 flex-shrink-0" style={{ marginTop: '0px' }}>
+                     <div className="w-16 h-20 border border-white/40 bg-white/30 backdrop-blur-sm shadow-sm overflow-hidden" style={{ borderRadius: '8px' }}>
+                       {profile?.profile_photo_url ? (
+                         <img
+                           src={profile.profile_photo_url}
+                           alt={profile?.display_name || 'Profile'}
+                           className="w-full h-full object-cover"
+                           onError={(e) => {
+                             e.currentTarget.src = '/placeholder.svg';
+                           }}
+                         />
+                       ) : (
+                         <div className="w-full h-full bg-gray-200/50 flex items-center justify-center">
+                           <Camera className="w-6 h-6 text-gray-400" />
+                         </div>
+                       )}
+                     </div>
+                   </div>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-4 w-full max-w-sm mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="text-center">
-                       <div className="text-xs text-gray-700">Home Club</div>
-                        <div className="mt-1 text-base font-medium text-gray-900">
-                          {homeClubLines.map((line, index) => (
-                            <div key={index}>{line}</div>
-                          ))}
-                        </div>
-                     </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-700">Handicap</div>
-                      <div className="mt-1 text-base font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* Bio Block */}
+                 <div className="mt-3 text-center">
+                   {profile?.bio && (
+                     <p className="text-sm text-gray-700 line-clamp-2 mb-2">
+                       {profile.bio}
+                     </p>
+                   )}
+                   {profile?.website && (
+                     <a 
+                       href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+                     >
+                       {profile.website.replace(/^https?:\/\//, '').replace(/^www\./, '')}
+                     </a>
+                   )}
+                 </div>
+
+                 {/* Slim Stats Row */}
+                 <div className="mt-4 grid grid-cols-4 gap-1 text-center">
+                   <div>
+                     <div className="text-base font-semibold text-gray-900">{postsCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Posts</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-1">
+                     <div className="text-base font-semibold text-gray-900">2,500</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Total XP</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-1">
+                     <div className="text-base font-semibold text-gray-900">{followingCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Following</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-1">
+                     <div className="text-base font-semibold text-gray-900">{followersCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Followers</div>
+                   </div>
+                 </div>
 
               </div>
             </div>
@@ -814,29 +880,6 @@ const HeroProfileHeader = ({
              <div className="h-12 md:h-16" />
            </section>
            
-           {/* Glass Chips Stats */}
-           <div className="w-[90%] md:w-[80%] max-w-[800px] mx-auto mt-7 mb-3 py-3 grid grid-cols-4 gap-3">
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{postsCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Posts</div>
-             </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">2,500</div>
-               <div className="text-xs md:text-sm text-gray-700">Total XP</div>
-             </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followingCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Following</div>
-             </div>
-              <div className="border border-white/30 bg-white/40 backdrop-blur-md 
-                              px-3 py-2 md:px-4 md:py-3 flex flex-col items-center shadow-sm">
-               <div className="text-base md:text-lg font-semibold text-gray-900">{followersCount}</div>
-               <div className="text-xs md:text-sm text-gray-700">Followers</div>
-             </div>
-           </div>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
@@ -892,7 +935,7 @@ const HeroProfileHeader = ({
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
               "
             >
-               <div className="px-8 py-6 flex flex-col items-center relative">
+               <div className="px-8 py-8 flex flex-col relative">
                  {/* Three dots menu - positioned absolutely */}
                  {isOwnProfile && (
                    <div className="absolute top-6 right-8">
@@ -917,33 +960,98 @@ const HeroProfileHeader = ({
                    </div>
                  )}
 
-                 {/* Name + Handle - centered */}
-                 <div className="text-center">
-                   <h1 className="text-3xl font-semibold text-gray-900">
-                     {displayName}
-                   </h1>
-                   <p className="mt-1 text-base text-gray-700">
-                     @{username}
-                   </p>
+                 {/* Header Block */}
+                 <div className="flex items-start justify-between">
+                   {/* Left side: Name, Handle, Club, Handicap */}
+                   <div className="flex-1">
+                     {/* Name + Handle - centered */}
+                     <div className="text-center">
+                       <h1 className="text-3xl font-semibold text-gray-900">
+                         {displayName}
+                       </h1>
+                       <p className="mt-1 text-base text-gray-700">
+                         @{username}
+                       </p>
+                     </div>
+
+                     {/* Club + Handicap - centered below name */}
+                     <div className="mt-5 w-full max-w-md mx-auto">
+                       <div className="grid grid-cols-2 gap-4">
+                         <div className="text-center">
+                           <div className="text-sm text-gray-700">Home Club</div>
+                            <div className="mt-1 text-lg font-medium text-gray-900">
+                              {homeClub}
+                            </div>
+                         </div>
+                         <div className="text-center">
+                           <div className="text-sm text-gray-700">Handicap</div>
+                           <div className="mt-1 text-lg font-medium text-gray-900">
+                             {handicap}
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+
+                   {/* Mini Profile Card - Top Right */}
+                   <div className="ml-6 flex-shrink-0" style={{ marginTop: '0px' }}>
+                     <div className="w-20 h-24 border border-white/40 bg-white/30 backdrop-blur-sm shadow-sm overflow-hidden" style={{ borderRadius: '8px' }}>
+                       {profile?.profile_photo_url ? (
+                         <img
+                           src={profile.profile_photo_url}
+                           alt={profile?.display_name || 'Profile'}
+                           className="w-full h-full object-cover"
+                           onError={(e) => {
+                             e.currentTarget.src = '/placeholder.svg';
+                           }}
+                         />
+                       ) : (
+                         <div className="w-full h-full bg-gray-200/50 flex items-center justify-center">
+                           <Camera className="w-8 h-8 text-gray-400" />
+                         </div>
+                       )}
+                     </div>
+                   </div>
                  </div>
 
-                {/* Club + Handicap - centered */}
-                <div className="mt-5 w-full max-w-md mx-auto">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Home Club</div>
-                       <div className="mt-1 text-lg font-medium text-gray-900">
-                         {homeClub}
-                       </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-700">Handicap</div>
-                      <div className="mt-1 text-lg font-medium text-gray-900">
-                        {handicap}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* Bio Block */}
+                 <div className="mt-5 text-center">
+                   {profile?.bio && (
+                     <p className="text-base text-gray-700 line-clamp-2 mb-3">
+                       {profile.bio}
+                     </p>
+                   )}
+                   {profile?.website && (
+                     <a 
+                       href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+                     >
+                       {profile.website.replace(/^https?:\/\//, '').replace(/^www\./, '')}
+                     </a>
+                   )}
+                 </div>
+
+                 {/* Slim Stats Row */}
+                 <div className="mt-6 grid grid-cols-4 gap-2 text-center">
+                   <div>
+                     <div className="text-lg font-semibold text-gray-900">{postsCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Posts</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-2">
+                     <div className="text-lg font-semibold text-gray-900">2,500</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Total XP</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-2">
+                     <div className="text-lg font-semibold text-gray-900">{followingCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Following</div>
+                   </div>
+                   <div className="border-l border-gray-300/40 pl-2">
+                     <div className="text-lg font-semibold text-gray-900">{followersCount}</div>
+                     <div className="text-xs text-gray-600 uppercase tracking-wide">Followers</div>
+                   </div>
+                 </div>
 
               </div>
             </div>
@@ -991,8 +1099,8 @@ const HeroProfileHeader = ({
         />
       </div>
 
-      {/* Tab Navigation with Underline Animation - Brand accent styling */}
-      <div className="relative z-40 bg-white/95 backdrop-blur-lg border-b" style={{ borderColor: 'hsl(var(--profile-border-card))' }}>
+      {/* Tab Navigation with Orange Underline - Text Only Style */}
+      <div className="relative z-40 bg-white border-b border-gray-200 mt-4">
         <div className="relative" role="tablist" aria-label="Profile sections">
           <div className={`flex ${isMobile ? 'px-0 mx-3' : 'px-8 max-w-4xl mx-auto'}`}>
             {tabs.map((tab) => (
@@ -1004,32 +1112,26 @@ const HeroProfileHeader = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={activeSection === tab.id ? 0 : -1}
                 className={`
-                  relative py-4 px-4 text-base font-semibold transition-colors duration-200
+                  relative py-3 px-4 text-base font-medium transition-colors duration-200
                   ${activeSection === tab.id 
-                    ? 'focus:outline-none' 
-                    : 'hover:opacity-80 focus:outline-none'
+                    ? 'text-gray-900 focus:outline-none' 
+                    : 'text-gray-600 hover:text-gray-800 focus:outline-none'
                   }
                   flex-1 text-center
                 `}
-                style={{
-                  color: activeSection === tab.id 
-                    ? 'hsl(var(--profile-text-primary))' 
-                    : 'hsl(var(--profile-text-secondary))'
-                }}
               >
                 {tab.label}
-                {/* Brand accent underline animation */}
+                {/* Orange underline for active tab */}
                 <div 
                   className={`
-                    absolute bottom-0 left-0 right-0 h-0.5
+                    absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
                     transition-all duration-300 ease-out
                     ${activeSection === tab.id 
                       ? 'scale-x-100 opacity-100' 
                       : 'scale-x-0 opacity-0'
                     }
                     origin-center
-                  `} 
-                  style={{ backgroundColor: 'hsl(var(--muted-foreground) / 0.4)' }}
+                  `}
                 />
               </button>
             ))}
