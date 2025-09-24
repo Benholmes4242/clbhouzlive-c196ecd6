@@ -871,7 +871,7 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-             
+            </div>
               {/* Spacer below to avoid clipping the panel */}
               <div className="h-32" />
             </section>
@@ -1047,7 +1047,7 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-             
+            </div>
               {/* Spacer below to avoid clipping the panel */}
               <div className="h-40" />
             </section>
