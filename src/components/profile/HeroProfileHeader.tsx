@@ -736,11 +736,11 @@ const HeroProfileHeader = ({
             <div 
               ref={profileCardRef}
               className="
-                relative -mt-28
+                relative -mt-28 isolate
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] z-10
                 pb-0
               "
             >
@@ -922,7 +922,10 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
+               </div>
+               
+               {/* White catch to neutralize shadow falloff */}
+               <div className="pointer-events-none absolute inset-x-0 -bottom-px h-3 bg-gradient-to-b from-white/0 to-white z-20" />
             </div>
              
              {/* Spacer below for 16px gap before tab content */}
@@ -980,19 +983,19 @@ const HeroProfileHeader = ({
               )}
 
               {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
-                              bg-gradient-to-t from-white via-white/60 to-transparent
+              <div className="absolute bottom-0 left-0 w-full h-10
+                              bg-gradient-to-t from-white to-transparent
                               pointer-events-none z-[5]" />
             </div>
 
             {/* Glass panel with fixed 20px overlap (flow-based) */}
             <div 
               className="
-                relative -mt-28
+                relative -mt-28 isolate
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] z-10
               "
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
@@ -1173,7 +1176,10 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
+               </div>
+               
+               {/* White catch to neutralize shadow falloff */}
+               <div className="pointer-events-none absolute inset-x-0 -bottom-px h-3 bg-gradient-to-b from-white/0 to-white z-20" />
             </div>
              
              {/* Spacer below to avoid clipping the panel - 16px gap */}

@@ -99,7 +99,8 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
           "h-16 md:h-18", // 64px mobile, 72px desktop
           // Variant-specific backgrounds
           isGlassDark && "backdrop-blur-md bg-black/60",
-          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
+          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50",
+          "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] relative isolate",
           headerClasses
         )}
         style={{ '--header-h-mobile': '60px' } as any}
@@ -151,6 +152,9 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
             <HeaderNavigation />
           </nav>
         </div>
+        
+        {/* White catch to neutralize shadow falloff */}
+        <div className="pointer-events-none absolute inset-x-0 -bottom-px h-3 bg-gradient-to-b from-white/0 to-white" />
       </header>
 
       {/* Mobile Search Overlay */}

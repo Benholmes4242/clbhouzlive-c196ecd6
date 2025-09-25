@@ -111,7 +111,8 @@ const GlobalHeader: React.FC = () => {
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
-              "liquid-glass liquid-glass--elevated"
+              "liquid-glass liquid-glass--elevated",
+              "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)]"
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -174,6 +175,9 @@ const GlobalHeader: React.FC = () => {
                 <HeaderNavigation />
               </nav>
             </div>
+            
+            {/* White catch to neutralize shadow falloff */}
+            <div className="pointer-events-none absolute inset-x-0 -bottom-px h-3 bg-gradient-to-b from-white/0 to-white" />
           </motion.header>
         )}
       </AnimatePresence>
