@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 
 
 import MediaSearch from '@/components/discover/MediaSearch';
-import DiscoverPillRow from '@/components/discover/DiscoverPillRow';
+import SegmentedControl from '@/components/discover/SegmentedControl';
 import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
@@ -146,24 +146,21 @@ const Discover = () => {
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Search + Filter Pills Divider */}
-          <div className="pt-3 pb-2 md:pt-4 md:pb-3">
-            <div className="backdrop-blur-md bg-white/60 border-l-0 border-r-0 border-white/20 px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4"
-                 style={{ boxShadow: 'var(--hud-shadow, 0 4px 20px rgba(0, 0, 0, 0.1))' }}>
-              
-              {/* Search */}
-              <div className="w-full">
+          {/* Sticky Tabs and Search */}
+          <div className="sticky top-16 z-30 bg-white">
+            {/* Segmented Control Tabs */}
+            <SegmentedControl 
+              activeTab={activeFilter} 
+              onTabChange={setActiveFilter}
+            />
+            
+            {/* Search Bar */}
+            <div className="px-4 py-3 bg-white border-b border-gray-100">
+              <div className="w-[90%] mx-auto">
                 <MediaSearch 
-                  placeholder="Search videos and photos..." 
+                  placeholder="Search" 
                   onSearchChange={setSearchQuery}
-                />
-              </div>
-
-              {/* Main Filter Pills - larger size */}
-              <div className="space-y-2">
-                <DiscoverPillRow 
-                  activeFilter={activeFilter} 
-                  onFilterChange={setActiveFilter}
+                  className="w-full bg-gray-100 border-0 rounded-full px-4 py-3 text-sm placeholder:text-gray-500 focus:bg-white focus:border focus:border-gray-300 focus:shadow-sm transition-all duration-200"
                 />
               </div>
             </div>
