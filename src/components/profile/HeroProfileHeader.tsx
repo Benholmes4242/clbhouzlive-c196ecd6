@@ -813,40 +813,49 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left side and center */}
+                    {/* Club + Handicap + Bio Grid Layout */}
                     <div className="absolute w-full mt-[-112px] px-4">
-                      <div className="flex justify-between items-start pr-44">
+                      <div className="grid grid-cols-3 gap-4 pr-2">
+                        {/* Col 1: Golf Club */}
                         <div className="text-center">
                           <div className="text-xs text-gray-700">Golf Club</div>
                           <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
                         </div>
+                        
+                        {/* Col 2: Handicap */}
                         <div className="text-center">
                           <div className="text-xs text-gray-700">Handicap</div>
                           <div className="mt-1 text-lg font-semibold text-gray-900">
                             {handicap}
                           </div>
                         </div>
+                        
+                        {/* Col 3: Mini profile card space - empty */}
+                        <div></div>
+                      </div>
+                      
+                      {/* Bio spanning cols 1-2, positioned below club/handicap */}
+                      <div className="grid grid-cols-3 gap-4 mt-4 pr-2">
+                        <div className="col-span-2 text-left pr-4">
+                          {profile?.bio && (
+                            <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
+                              {profile.bio}
+                            </p>
+                          )}
+                          {profile?.website && (
+                            <a 
+                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                            >
+                              {profile.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          )}
+                        </div>
+                        <div></div> {/* Empty space for mini profile card */}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-4 text-center">
-                    {profile?.bio && (
-                      <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
                   </div>
 
                   {/* Slim Stats Row */}
@@ -1026,40 +1035,49 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap positioned left side and center */}
+                    {/* Club + Handicap + Bio Grid Layout */}
                     <div className="absolute w-full mt-[-150px] px-8">
-                      <div className="flex justify-between items-start pr-60">
+                      <div className="grid grid-cols-3 gap-6 pr-4">
+                        {/* Col 1: Golf Club */}
                         <div className="text-center">
                           <div className="text-sm text-gray-700">Golf Club</div>
                           <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
                         </div>
+                        
+                        {/* Col 2: Handicap */}
                         <div className="text-center">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
                           </div>
                         </div>
+                        
+                        {/* Col 3: Mini profile card space - empty */}
+                        <div></div>
+                      </div>
+                      
+                      {/* Bio spanning cols 1-2, positioned below club/handicap */}
+                      <div className="grid grid-cols-3 gap-6 mt-5 pr-4">
+                        <div className="col-span-2 text-left pr-6">
+                          {profile?.bio && (
+                            <p className="text-base text-gray-700 mb-3 line-clamp-3 text-left leading-relaxed">
+                              {profile.bio}
+                            </p>
+                          )}
+                          {profile?.website && (
+                            <a 
+                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                            >
+                              {profile.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          )}
+                        </div>
+                        <div></div> {/* Empty space for mini profile card */}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bio Block */}
-                  <div className="w-full mb-5 text-center">
-                    {profile?.bio && (
-                      <p className="text-base text-gray-700 mb-3 line-clamp-2 max-w-2xl mx-auto">
-                        {profile.bio}
-                      </p>
-                    )}
-                    {profile?.website && (
-                      <a 
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
                   </div>
 
                   {/* Slim Stats Row */}
