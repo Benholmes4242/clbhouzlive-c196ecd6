@@ -111,7 +111,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className={`pt-[150px] pb-1 ${activeTab === 'activity' ? 'md:px-0' : activeTab === 'achievements' ? 'px-0' : 'px-4 md:px-0'}`}>
+      <div className={`pt-0 pb-1 ${activeTab === 'activity' ? 'md:px-0' : activeTab === 'achievements' ? 'px-0' : 'px-4 md:px-0'}`}>
         <div className={`${activeTab === 'achievements' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}`}>
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}

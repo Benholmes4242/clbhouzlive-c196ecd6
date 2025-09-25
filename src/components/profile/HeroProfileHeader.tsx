@@ -218,10 +218,10 @@ const HeroProfileHeader = ({
   const getContentTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-[150px] pb-8' : 'px-4 md:px-0';
+    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0';
     const sectionClasses = `
-      ${activeSection === 'courses' ? 'pt-[150px] pb-8' : ''}
-      ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-[150px] py-8' : ''}
+      ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+      ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
       ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
       ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
     `;
@@ -1141,8 +1141,8 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-40" />
+             {/* Spacer below to avoid clipping the panel - 16px gap */}
+             <div className="h-4" />
            </section>
         </div>
       )}
@@ -1304,9 +1304,9 @@ const HeroProfileHeader = ({
         ) : (
           /* Normal state - only show active section */
           <div className={`
-            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-[150px] pb-8' : 'px-0 md:px-4'}
-            ${activeSection === 'courses' ? 'pt-[150px] pb-8' : ''}
-            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-[150px] py-8' : ''}
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
+            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
             ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
             ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
           `}>
