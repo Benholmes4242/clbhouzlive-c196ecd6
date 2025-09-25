@@ -988,8 +988,8 @@ const HeroProfileHeader = ({
             {/* Glass panel with fixed 20px overlap (flow-based) */}
             <div 
               className="
-                relative -mt-28
-                w-full
+                relative -mt-28 mx-auto
+                w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
