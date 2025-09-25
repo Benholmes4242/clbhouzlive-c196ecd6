@@ -965,11 +965,11 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, overlapping ~20% */}
+            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, small overlap at bottom */}
             <div 
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-11vh]
+                bottom-[-2vh]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
