@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 
 import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
-import TrendingTagsBar from '@/components/discover/TrendingTagsBar';
+
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import DiscoverContent from '@/components/discover/DiscoverContent';
