@@ -746,7 +746,7 @@ const HeroProfileHeader = ({
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-0.5vh]
+                bottom-[-20px]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -920,7 +920,7 @@ const HeroProfileHeader = ({
             </div>
              
              {/* Spacer below for 16px gap before tab content */}
-             <div className="h-20" />
+             <div className="h-4" />
            </section>
         </div>
       ) : (
@@ -969,7 +969,7 @@ const HeroProfileHeader = ({
             <div 
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-0.5vh]
+                bottom-[-20px]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
