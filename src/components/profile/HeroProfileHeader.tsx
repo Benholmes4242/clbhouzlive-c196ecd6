@@ -890,7 +890,7 @@ const HeroProfileHeader = ({
                           aria-controls={`tabpanel-${tab.id}`}
                           tabIndex={activeSection === tab.id ? 0 : -1}
                           className={`
-                            relative pt-3 pb-0 px-2 text-sm font-medium transition-colors duration-200
+                            relative py-3 px-2 text-sm font-medium transition-colors duration-200
                             ${activeSection === tab.id 
                               ? 'text-gray-900 focus:outline-none' 
                               : 'text-gray-600 hover:text-gray-800 focus:outline-none'
@@ -1112,7 +1112,7 @@ const HeroProfileHeader = ({
                           aria-controls={`tabpanel-${tab.id}`}
                           tabIndex={activeSection === tab.id ? 0 : -1}
                           className={`
-                            relative pt-3 pb-0 px-3 text-base font-medium transition-colors duration-200
+                            relative py-3 px-3 text-base font-medium transition-colors duration-200
                             ${activeSection === tab.id 
                               ? 'text-gray-900 focus:outline-none' 
                               : 'text-gray-600 hover:text-gray-800 focus:outline-none'
