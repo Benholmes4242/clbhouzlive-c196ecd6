@@ -741,12 +741,12 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned with minimal overlap at bottom of hero */}
+            {/* Glass panel positioned just touching bottom edge of hero */}
             <div 
               ref={profileCardRef}
               className="
                 absolute left-0 right-0
-                bottom-[-2vh]
+                bottom-[-0.5vh]
                 w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
@@ -965,11 +965,11 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned with minimal overlap at bottom of hero */}
+            {/* Glass panel positioned just touching bottom edge of hero */}
             <div 
               className="
                 absolute left-1/2 -translate-x-1/2
-                bottom-[-2vh]
+                bottom-[-0.5vh]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
