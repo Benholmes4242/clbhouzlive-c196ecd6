@@ -741,11 +741,13 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned below hero (no overlap) */}
+            {/* Glass panel positioned with slight overlap at bottom of hero */}
             <div 
               ref={profileCardRef}
               className="
-                relative w-full
+                absolute left-0 right-0
+                bottom-[-5vh]
+                w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
@@ -917,8 +919,8 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel (16px gap) */}
-             <div className="h-4" />
+             {/* Spacer below for 16px gap before tab content */}
+             <div className="h-20" />
            </section>
         </div>
       ) : (
@@ -963,10 +965,11 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned below hero (no overlap) */}
+            {/* Glass panel positioned with slight overlap at bottom of hero */}
             <div 
               className="
-                relative mx-auto
+                absolute left-1/2 -translate-x-1/2
+                bottom-[-5vh]
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
