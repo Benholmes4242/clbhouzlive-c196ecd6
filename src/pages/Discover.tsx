@@ -141,8 +141,8 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
-          {/* Tabs and Search */}
-          <div className="bg-white">
+          {/* Sticky Tabs and Search */}
+          <div className="sticky top-16 z-30 bg-white">
             {/* Segmented Control Tabs */}
             <SegmentedControl 
               activeTab={activeFilter} 
