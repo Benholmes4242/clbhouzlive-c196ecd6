@@ -166,11 +166,6 @@ const Discover = () => {
                   onFilterChange={setActiveFilter}
                 />
               </div>
-
-              {/* Hashtag Pills - smaller size */}
-              <div className="space-y-2">
-                <TrendingTagsBar onTagsChange={setSelectedTags} />
-              </div>
             </div>
           </div>
 
