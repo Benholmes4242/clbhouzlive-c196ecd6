@@ -102,9 +102,9 @@ const MediaSearch = ({
       <div 
         className={cn(
           "relative flex items-center rounded-full transition-all duration-200",
-          "bg-[#f2f2f2] border border-[#eaeaea]",
+          "bg-gray-100/80 border border-gray-200/60",
           "h-12 px-4 gap-3",
-          isFocused && "bg-white border-[#ddd] shadow-[0_0_0_3px_rgba(0,0,0,0.05)] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+          isFocused && "bg-white border-gray-300 ring-2 ring-brand-orange/50"
         )}
       >
         <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
