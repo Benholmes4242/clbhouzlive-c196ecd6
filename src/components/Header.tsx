@@ -99,7 +99,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
           "h-16 md:h-18", // 64px mobile, 72px desktop
           // Variant-specific backgrounds
           isGlassDark && "backdrop-blur-md bg-black/60",
-          isSolidLight && "bg-white",
+          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           headerClasses
         )}
         style={{ '--header-h-mobile': '60px' } as any}
