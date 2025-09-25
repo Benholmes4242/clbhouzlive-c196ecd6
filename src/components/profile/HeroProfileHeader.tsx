@@ -741,13 +741,11 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper - Full Width, overlapping ~20% */}
+            {/* Glass panel positioned below hero (no overlap) */}
             <div 
               ref={profileCardRef}
               className="
-                absolute left-0 right-0
-                bottom-[-11vh]
-                w-full
+                relative w-full
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
                 shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
@@ -919,8 +917,8 @@ const HeroProfileHeader = ({
               </div>
             </div>
              
-             {/* Spacer below to avoid clipping the panel */}
-             <div className="h-32" />
+             {/* Spacer below to avoid clipping the panel (16px gap) */}
+             <div className="h-4" />
            </section>
         </div>
       ) : (
@@ -965,11 +963,10 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel positioned relative to OUTER wrapper so it can overflow, small overlap at bottom */}
+            {/* Glass panel positioned below hero (no overlap) */}
             <div 
               className="
-                absolute left-1/2 -translate-x-1/2
-                bottom-[-2vh]
+                relative mx-auto
                 w-[90%] md:w-full max-w-4xl
                 border border-white/35
                 bg-white/35 backdrop-blur-xl
