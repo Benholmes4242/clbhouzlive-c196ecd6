@@ -62,21 +62,21 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
     <Card className="p-6">
       <div className="space-y-4">
         <div>
-          <Label className="text-lg font-semibold">Header Photo</Label>
+          <Label className="text-lg font-semibold">Mini Profile Card Photo</Label>
           <p className="text-sm text-muted-foreground">
-            Upload and crop your header image for mobile and desktop views
+            This controls which part of the photo appears within your mini profile card photo
           </p>
         </div>
 
         {/* File Upload */}
         <div className="space-y-3">
-          <Label htmlFor="headerPhoto">Upload Header Image</Label>
+          <Label htmlFor="headerPhoto">Upload Mini Profile Card Photo</Label>
           <div className="flex items-center gap-4">
             {imageUrl && (
-              <div className="w-20 h-12 rounded overflow-hidden bg-gray-200 flex-shrink-0">
+              <div className="w-12 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0" style={{ aspectRatio: '3/4' }}>
                 <img 
                   src={imageUrl} 
-                  alt="Header preview" 
+                  alt="Mini profile card preview" 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -90,7 +90,7 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
                 className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Recommended: 1600×600+ pixels. JPG, PNG, or WebP format.
+                Square or portrait images work best. JPG, PNG, or WebP format.
               </p>
             </div>
           </div>
@@ -98,105 +98,88 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
 
         {/* Crop Controls */}
         {imageUrl && (
-          <Tabs defaultValue="mobile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="mobile">Mobile Crop</TabsTrigger>
-              <TabsTrigger value="desktop">Desktop Crop</TabsTrigger>
-            </TabsList>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-medium">Mini Profile Card Photo Crop</Label>
+                <p className="text-xs text-muted-foreground">
+                  This controls which part of the photo appears within your mini profile card photo
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleCropClick('mobile')}
+                className="gap-2"
+              >
+                <Crop className="w-4 h-4" />
+                Adjust Crop
+              </Button>
+            </div>
             
-            <TabsContent value="mobile" className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label className="text-sm font-medium">Mobile Hero Crop</Label>
-                    <p className="text-xs text-muted-foreground">
-                      How your header appears on mobile devices
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCropClick('mobile')}
-                    className="gap-2"
+            {/* Preview */}
+            <div className="space-y-3">
+              <Label className="text-xs font-medium">Preview:</Label>
+              <div className="flex items-center gap-6">
+                {/* Mobile preview */}
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Mobile</p>
+                  <div 
+                    className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
+                    style={{ 
+                      width: 84,
+                      height: 112 
+                    }}
                   >
-                    <Crop className="w-4 h-4" />
-                    Adjust Crop
-                  </Button>
+                    <img 
+                      src={imageUrl} 
+                      alt="Mobile mini card preview" 
+                      className="w-full h-full object-cover"
+                      style={{
+                        objectPosition: `${mobileCrop.x + mobileCrop.width / 2}% ${mobileCrop.y + mobileCrop.height / 2}%`
+                      }}
+                    />
+                  </div>
                 </div>
                 
-                {/* Safe zone preview */}
-                <div className="relative w-full h-32 rounded overflow-hidden border">
-                  <img 
-                    src={imageUrl} 
-                    alt="Mobile preview" 
-                    className="w-full h-full object-cover"
-                    style={{
-                      objectPosition: `${mobileCrop.x + mobileCrop.width / 2}% ${mobileCrop.y + mobileCrop.height / 2}%`
-                    }}
-                  />
-                  {/* Safe zone overlay */}
+                {/* Desktop preview */}
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Desktop</p>
                   <div 
-                    className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/80 via-white/40 to-transparent pointer-events-none"
-                    style={{ height: `${(PROFILE_PANEL_OVERLAP_PX / 128) * 100}%` }}
-                  />
-                  <div className="absolute bottom-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
-                    Panel covers this area
+                    className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
+                    style={{ 
+                      width: 112,
+                      height: 149 
+                    }}
+                  >
+                    <img 
+                      src={imageUrl} 
+                      alt="Desktop mini card preview" 
+                      className="w-full h-full object-cover"
+                      style={{
+                        objectPosition: `${mobileCrop.x + mobileCrop.width / 2}% ${mobileCrop.y + mobileCrop.height / 2}%`
+                      }}
+                    />
                   </div>
                 </div>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="desktop" className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label className="text-sm font-medium">Desktop Hero Crop</Label>
-                    <p className="text-xs text-muted-foreground">
-                      How your header appears on desktop screens
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCropClick('desktop')}
-                    className="gap-2"
-                  >
-                    <Crop className="w-4 h-4" />
-                    Adjust Crop
-                  </Button>
-                </div>
-                
-                {/* Safe zone preview */}
-                <div className="relative w-full h-32 rounded overflow-hidden border">
-                  <img 
-                    src={imageUrl} 
-                    alt="Desktop preview" 
-                    className="w-full h-full object-cover"
-                    style={{
-                      objectPosition: `${desktopCrop.x + desktopCrop.width / 2}% ${desktopCrop.y + desktopCrop.height / 2}%`
-                    }}
-                  />
-                  {/* Safe zone overlay */}
-                  <div 
-                    className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/80 via-white/40 to-transparent pointer-events-none"
-                    style={{ height: `${(PROFILE_PANEL_OVERLAP_PX / 128) * 100}%` }}
-                  />
-                  <div className="absolute bottom-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
-                    Panel covers this area
-                  </div>
-                </div>
+              
+              {/* Crop info */}
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>Crop: {mobileCrop.x.toFixed(1)}%, {mobileCrop.y.toFixed(1)}%</p>
+                <p>Size: {mobileCrop.width.toFixed(1)}% × {mobileCrop.height.toFixed(1)}%</p>
               </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         )}
 
         {/* Crop Tool Modal */}
         {showCropTool && imageUrl && (
           <HeaderCropTool
             imageUrl={imageUrl}
-            initialCrop={cropMode === 'mobile' ? mobileCrop : desktopCrop}
-            mode={cropMode}
-            onSave={handleCropSave}
+            initialCrop={mobileCrop}
+            mode="mobile"
+            onSave={(crop) => onMobileCropChange(crop)}
             onCancel={() => setShowCropTool(false)}
           />
         )}
