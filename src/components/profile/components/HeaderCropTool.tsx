@@ -95,13 +95,15 @@ export const HeaderCropTool: React.FC<HeaderCropToolProps> = ({
     <Dialog open onOpenChange={onCancel}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Crop Mini Profile Card Photo (3:4 Aspect Ratio)</DialogTitle>
+          <DialogTitle>
+            Crop Header Photo - {mode === 'mobile' ? 'Mobile' : 'Desktop'} View
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Drag the crop area to reposition and drag the bottom-right corner to resize. 
-            The aspect ratio is locked to 3:4 for the mini profile card.
+            Drag to reposition and use zoom controls to adjust the crop area. 
+            The shaded area at the bottom shows what will be covered by your profile panel.
           </div>
           
           {/* Crop container */}

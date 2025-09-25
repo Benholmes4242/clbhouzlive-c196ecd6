@@ -156,7 +156,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving} variant="outline">
+          <Button onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
