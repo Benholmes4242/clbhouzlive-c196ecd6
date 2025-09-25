@@ -39,7 +39,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full bg-background border-b border-border"
+      className="relative w-full bg-white border-b border-gray-200"
     >
       {/* Tab buttons */}
       <div className="flex w-full">

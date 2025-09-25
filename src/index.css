@@ -457,8 +457,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --chart-5: 27 87% 67%;
     
     /* Clubhouse Design Tokens */
-    --hud-bg: 0 0% 0% / 0.45;
-    --hud-border: 0 0% 100% / 0.18;
+    --hud-bg: rgba(0, 0, 0, 0.45);
+    --hud-border: rgba(255, 255, 255, 0.18);
     --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
     
     /* Header Heights */
