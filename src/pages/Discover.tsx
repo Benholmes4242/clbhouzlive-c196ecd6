@@ -142,7 +142,7 @@ const Discover = () => {
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
           {/* Tabs and Search */}
-          <div className="bg-white">
+          <div className="bg-background">
             {/* Segmented Control Tabs */}
             <SegmentedControl 
               activeTab={activeFilter} 
@@ -150,7 +150,7 @@ const Discover = () => {
             />
             
             {/* Search Bar */}
-            <div className="px-1 py-2 bg-white border-b border-gray-50">
+            <div className="px-1 py-2 bg-background">
               <div className="mx-1">
                 <MediaSearch 
                   placeholder="Search" 
