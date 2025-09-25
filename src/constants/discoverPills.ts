@@ -7,27 +7,6 @@ export type MainPill =
   | "channels"
   | "hack-shack";
 
-export const SUBPILLS: Record<MainPill, string[]> = {
-  friends: ["Videos", "Photos", "Shorts"],
-  videos: [
-    "Explore",      // default first (was "Videos")
-    "Trending",
-    "Shorts",
-    "Chipping",
-    "Driver Videos",
-    "Hitting Bombs",
-    "Golf Humour",
-    "Hole in One",
-    "Golf Swing",
-  ],
-  photos: ["Videos", "Trending", "Photos", "Shorts"],
-  trending: ["Videos", "Photos", "Shorts"],
-  "verified-pros": ["Videos", "Tips", "Lessons", "Highlights"],
-  channels: ["Videos", "Series", "Clips"],
-  "hack-shack": ["Videos", "Gear", "Drills", "DIY"],
-};
-
-export const DEFAULT_SUBPILL = "Explore";
 
 // Map filter types to main pills
 export const FILTER_TO_MAIN_PILL: Record<string, MainPill> = {

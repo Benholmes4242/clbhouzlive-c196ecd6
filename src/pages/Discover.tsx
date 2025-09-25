@@ -26,7 +26,7 @@ const Discover = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const { main, sub } = useDiscoverQuery();
+  const { main } = useDiscoverQuery();
   
   // Sync activeFilter with URL state
   React.useEffect(() => {

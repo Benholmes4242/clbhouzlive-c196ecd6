@@ -16,8 +16,8 @@ interface DiscoverContentProps {
   selectedTags?: string[];
 }
 
-// Map main+sub combinations to filter types for API calls
-function getFilterTypeFromPills(main: string, sub: string): string {
+// Map main pill to filter types for API calls
+function getFilterTypeFromPills(main: string): string {
   // Map main pill to base filter type
   const mainToFilter: Record<string, string> = {
     'friends': FILTER_TYPES.FRIENDS,
@@ -29,19 +29,9 @@ function getFilterTypeFromPills(main: string, sub: string): string {
     'hack-shack': FILTER_TYPES.HACK_SHACK,
   };
   
-  // For now, use main filter type - in future, sub could modify the query
   return mainToFilter[main] || FILTER_TYPES.VIDEOS;
 }
 
-// Apply client-side sub-filtering 
-function applySubFilter(content: ExploreContentItem[], main: string, sub: string): ExploreContentItem[] {
-  // For now, return all content - in future this could filter by subpill
-  // Example logic could be:
-  // if (sub === 'Shorts') return content.filter(item => item.duration && parseInt(item.duration) < 60);
-  // if (sub === 'Chipping') return content.filter(item => item.title?.toLowerCase().includes('chip'));
-  
-  return content;
-}
 
 // Apply tag filtering to content
 function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): ExploreContentItem[] {
@@ -62,11 +52,11 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 }
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
-  const { main, sub } = useDiscoverQuery();
+  const { main } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   
   // Get the filter type based on main pill
-  const filterType = getFilterTypeFromPills(main, sub);
+  const filterType = getFilterTypeFromPills(main);
   
   // Use existing hook to fetch content
   const { 
@@ -76,10 +66,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     loadMore 
   } = useInfiniteExploreContent(filterType === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : filterType);
 
-  // Apply sub-filtering, search filtering, and tag filtering whenever content or pills change
+  // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {
     if (content) {
-      let filtered = applySubFilter(content, main, sub);
+      let filtered = content;
       
       // Apply search filter if query exists
       if (searchQuery && searchQuery.trim()) {
@@ -105,7 +95,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     } else {
       setCurrentContent(null);
     }
-  }, [content, main, sub, searchQuery, selectedTags]);
+  }, [content, main, searchQuery, selectedTags]);
 
 
   const handleCreatorClick = (creator: CreatorHighlight) => {
