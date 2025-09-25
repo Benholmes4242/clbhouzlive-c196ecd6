@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, X, ExternalLink } from 'lucide-react';
-import { BIO_MAX_LENGTH } from '@/constants/profile';
+
+const BIO_MAX_LENGTH = 100;
 
 interface BioWebsitesSectionProps {
   bio: string;

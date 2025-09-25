@@ -70,7 +70,8 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     handleTextareaChange,
     handleFileChange,
     handleWebsitesChange,
-    handleHeaderCropChange,
+    handleHeaderMobileCropChange,
+    handleHeaderDesktopCropChange,
     handleMiniCardCropChange,
     handleSave,
   } = useEditProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
@@ -112,8 +113,8 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 height: formData.desktopCropHeight,
               }}
               onFileChange={(file) => handleFileChange('headerPhoto', file)}
-              onMobileCropChange={(type, crop) => handleHeaderCropChange('mobile', crop)}
-              onDesktopCropChange={(type, crop) => handleHeaderCropChange('desktop', crop)}
+              onMobileCropChange={handleHeaderMobileCropChange}
+              onDesktopCropChange={handleHeaderDesktopCropChange}
             />
 
             {/* Mini Profile Card Section */}

@@ -2,7 +2,9 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { useQueryClient } from "@tanstack/react-query";
-import { BIO_MAX_LENGTH } from "@/constants/profile";
+import { CropData } from '@/components/profile/profile-config';
+
+const BIO_MAX_LENGTH = 100;
 
 interface Profile {
   display_name?: string | null;
@@ -26,13 +28,6 @@ interface Profile {
   mini_card_crop_y?: number | null;
   mini_card_crop_width?: number | null;
   mini_card_crop_height?: number | null;
-}
-
-interface CropData {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 }
 
 interface EditProfileFormData {
@@ -133,24 +128,24 @@ export const useEditProfileForm = (
     setFormData(prev => ({ ...prev, websites }));
   }, []);
 
-  const handleHeaderCropChange = useCallback((type: 'mobile' | 'desktop', crop: CropData) => {
-    if (type === 'mobile') {
-      setFormData(prev => ({
-        ...prev,
-        mobileCropX: crop.x,
-        mobileCropY: crop.y,
-        mobileCropWidth: crop.width,
-        mobileCropHeight: crop.height,
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        desktopCropX: crop.x,
-        desktopCropY: crop.y,
-        desktopCropWidth: crop.width,
-        desktopCropHeight: crop.height,
-      }));
-    }
+  const handleHeaderMobileCropChange = useCallback((crop: CropData) => {
+    setFormData(prev => ({
+      ...prev,
+      mobileCropX: crop.x,
+      mobileCropY: crop.y,
+      mobileCropWidth: crop.width,
+      mobileCropHeight: crop.height,
+    }));
+  }, []);
+
+  const handleHeaderDesktopCropChange = useCallback((crop: CropData) => {
+    setFormData(prev => ({
+      ...prev,
+      desktopCropX: crop.x,
+      desktopCropY: crop.y,
+      desktopCropWidth: crop.width,
+      desktopCropHeight: crop.height,
+    }));
   }, []);
 
   const handleMiniCardCropChange = useCallback((crop: CropData) => {
@@ -246,7 +241,7 @@ export const useEditProfileForm = (
 
       // Invalidate React Query cache
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['user-profile', profile?.username] });
 
       onProfileUpdate();
       onClose();
@@ -255,7 +250,7 @@ export const useEditProfileForm = (
     } finally {
       setSaving(false);
     }
-  }, [formData, userId, isUsernameSet, normalizeWebsites, queryClient, onProfileUpdate, onClose]);
+  }, [formData, userId, isUsernameSet, normalizeWebsites, queryClient, onProfileUpdate, onClose, profile?.username]);
 
   return {
     formData,
@@ -267,7 +262,8 @@ export const useEditProfileForm = (
     handleTextareaChange,
     handleFileChange,
     handleWebsitesChange,
-    handleHeaderCropChange,
+    handleHeaderMobileCropChange,
+    handleHeaderDesktopCropChange,
     handleMiniCardCropChange,
     handleSave,
   };
