@@ -20,7 +20,7 @@ import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ProfileEditDialog from "./ProfileEditDialog";
-import { useProfileForm } from "./hooks/useProfileForm";
+
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
@@ -539,19 +539,6 @@ const HeroProfileHeader = ({
   // Animation hook for badges
   const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
 
-  // Profile form hook
-  const {
-    formData,
-    saving,
-    isUsernameSet,
-    handleInputChange,
-    handleHandicapChange,
-    handlePublicToggle,
-    handleTextareaChange,
-    handleSelectChange,
-    handleFileChange,
-    handleSave,
-  } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
   // Removed scroll event listeners
 
