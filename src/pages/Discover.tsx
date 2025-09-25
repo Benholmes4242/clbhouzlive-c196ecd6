@@ -139,7 +139,7 @@ const Discover = () => {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground page-with-header">
+    <div className="min-h-screen bg-white text-foreground page-with-header">
       <main className="pb-20">
           {/* Tabs and Search */}
           <div className="bg-white">
