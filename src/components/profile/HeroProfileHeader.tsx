@@ -19,7 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import ProfileFormFields from "./ProfileFormFields";
+import ProfileEditDialog from "./ProfileEditDialog";
 import { useProfileForm } from "./hooks/useProfileForm";
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost } from './types/ActivityTypes';
@@ -1323,38 +1323,17 @@ const HeroProfileHeader = ({
 
       {/* Rest of content sections would continue here... */}
       
-      {/* Custom Edit Profile Dialog with glass effect trigger */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
-          </DialogHeader>
-          
-          
-          <ProfileFormFields
-            formData={formData}
-            isUsernameSet={isUsernameSet}
-            userId={user?.id || ''}
-            userType={profile?.user_type}
-            profile={profile}
-            onInputChange={handleInputChange}
-            onTextareaChange={handleTextareaChange}
-            onSelectChange={handleSelectChange}
-            onHandicapChange={handleHandicapChange}
-            onPublicToggle={handlePublicToggle}
-            onFileChange={handleFileChange}
-            onProfileUpdate={onProfileUpdate}
-          />
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* New comprehensive Edit Profile Modal */}
+      {editDialogOpen && (
+        <ProfileEditDialog
+          profile={profile}
+          userId={user?.id || ''}
+          onProfileUpdate={() => {
+            onProfileUpdate();
+            setEditDialogOpen(false);
+          }}
+        />
+      )}
 
       {/* Compare Progress Modal - Placeholder for now */}
       {isCompareModalOpen && (
