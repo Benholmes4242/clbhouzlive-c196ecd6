@@ -70,6 +70,15 @@ interface UserProfile {
   home_club?: string;
   profile_photo_url?: string;
   header_photo_url?: string;
+  updated_at?: string;
+  mini_card_crop_x?: number;
+  mini_card_crop_y?: number;
+  mini_card_crop_width?: number;
+  mini_card_crop_height?: number;
+  desktop_crop_x?: number;
+  desktop_crop_y?: number;
+  desktop_crop_width?: number;
+  desktop_crop_height?: number;
   profile_video_url?: string;
   profile_video_thumbnail_url?: string;
   has_profile_video?: boolean;
@@ -81,15 +90,6 @@ interface UserProfile {
   eg_app_connected?: boolean;
   user_type?: string;
   is_public?: boolean;
-  // Mobile and desktop crop fields
-  mobile_crop_x?: number;
-  mobile_crop_y?: number;
-  mobile_crop_width?: number;
-  mobile_crop_height?: number;
-  desktop_crop_x?: number;
-  desktop_crop_y?: number;
-  desktop_crop_width?: number;
-  desktop_crop_height?: number;
 }
 
 interface AchievementRing {
@@ -694,9 +694,13 @@ const HeroProfileHeader = ({
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
-              {profile?.profile_photo_url ? (
+              {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
-                  src={profile.profile_photo_url}
+                  src={(() => {
+                    const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
+                    const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                    return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
+                  })()}
                   alt={profile?.display_name || 'Profile'}
                   className="h-full w-full object-cover"
                   style={{ 
@@ -785,9 +789,25 @@ const HeroProfileHeader = ({
                       <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
-                            src={profile.profile_photo_url}
+                            src={(() => {
+                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
+                            })()}
                             alt="Mini profile"
                             className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: (() => {
+                                const crop = {
+                                  x: profile?.mini_card_crop_x || 0,
+                                  y: profile?.mini_card_crop_y || 0,
+                                  width: profile?.mini_card_crop_width || 100,
+                                  height: profile?.mini_card_crop_height || 100
+                                };
+                                const cx = crop.x + crop.width / 2;
+                                const cy = crop.y + crop.height / 2;
+                                return `${cx}% ${cy}%`;
+                              })()
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
@@ -917,13 +937,27 @@ const HeroProfileHeader = ({
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
-              {profile?.profile_photo_url ? (
+              {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
-                  src={profile.profile_photo_url}
+                  src={(() => {
+                    const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
+                    const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                    return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
+                  })()}
                   alt={profile?.display_name || 'Profile'}
                   className="h-full w-full object-cover"
                   style={{ 
-                    objectPosition: 'center center',
+                    objectPosition: (() => {
+                      const crop = {
+                        x: profile?.desktop_crop_x || 0,
+                        y: profile?.desktop_crop_y || 0,
+                        width: profile?.desktop_crop_width || 100,
+                        height: profile?.desktop_crop_height || 100
+                      };
+                      const cx = crop.x + crop.width / 2;
+                      const cy = crop.y + crop.height / 2;
+                      return `${cx}% ${cy}%`;
+                    })(),
                     objectFit: 'cover'
                   }}
                   loading="eager"
@@ -1006,9 +1040,25 @@ const HeroProfileHeader = ({
                       <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0">
                         {profile?.profile_photo_url ? (
                           <img
-                            src={profile.profile_photo_url}
+                            src={(() => {
+                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
+                            })()}
                             alt="Mini profile"
                             className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: (() => {
+                                const crop = {
+                                  x: profile?.mini_card_crop_x || 0,
+                                  y: profile?.mini_card_crop_y || 0,
+                                  width: profile?.mini_card_crop_width || 100,
+                                  height: profile?.mini_card_crop_height || 100
+                                };
+                                const cx = crop.x + crop.width / 2;
+                                const cy = crop.y + crop.height / 2;
+                                return `${cx}% ${cy}%`;
+                              })()
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
