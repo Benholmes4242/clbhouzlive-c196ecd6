@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Monitor } from 'lucide-react';
-import { PROFILE_PANEL_OVERLAP_PX, MINI_CARD_MOBILE_SIZE, MINI_CARD_DESKTOP_SIZE } from '@/constants/profile';
+import { PROFILE_PANEL_OVERLAP_PX, MINI_CARD_MOBILE, MINI_CARD_DESKTOP } from '@/components/profile/profile-config';
 
 interface LivePreviewSectionProps {
   formData: {
@@ -88,7 +88,7 @@ export const LivePreviewSection: React.FC<LivePreviewSectionProps> = ({
   const headerImageUrl = getHeaderImageUrl();
   const profileImageUrl = getProfileImageUrl();
   const isMobile = activeMode === 'mobile';
-  const miniCardSize = isMobile ? MINI_CARD_MOBILE_SIZE : MINI_CARD_DESKTOP_SIZE;
+  const miniCardSize = isMobile ? MINI_CARD_MOBILE : MINI_CARD_DESKTOP;
 
   return (
     <Card className="p-4 sticky top-4">
@@ -159,8 +159,8 @@ export const LivePreviewSection: React.FC<LivePreviewSectionProps> = ({
                   <div 
                     className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm flex-shrink-0"
                     style={{ 
-                      width: miniCardSize.width * 0.8,
-                      height: miniCardSize.height * 0.8 
+                      width: miniCardSize.w * 0.8,
+                      height: miniCardSize.h * 0.8 
                     }}
                   >
                     <img 

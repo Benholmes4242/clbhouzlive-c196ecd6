@@ -4,15 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Crop } from 'lucide-react';
-import { MINI_CARD_MOBILE_SIZE, MINI_CARD_DESKTOP_SIZE } from '@/constants/profile';
+import { MINI_CARD_MOBILE, MINI_CARD_DESKTOP } from '@/components/profile/profile-config';
+import { CropData } from '@/components/profile/profile-config';
 import { MiniCardCropTool } from './MiniCardCropTool';
 
-interface CropData {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 interface MiniCardSectionProps {
   profilePhoto: File | null;
@@ -132,8 +127,8 @@ export const MiniCardSection: React.FC<MiniCardSectionProps> = ({
                   <div 
                     className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
                     style={{ 
-                      width: MINI_CARD_MOBILE_SIZE.width,
-                      height: MINI_CARD_MOBILE_SIZE.height 
+                      width: MINI_CARD_MOBILE.w,
+                      height: MINI_CARD_MOBILE.h 
                     }}
                   >
                     <img 
@@ -151,8 +146,8 @@ export const MiniCardSection: React.FC<MiniCardSectionProps> = ({
                   <div 
                     className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
                     style={{ 
-                      width: MINI_CARD_DESKTOP_SIZE.width,
-                      height: MINI_CARD_DESKTOP_SIZE.height 
+                      width: MINI_CARD_DESKTOP.w,
+                      height: MINI_CARD_DESKTOP.h 
                     }}
                   >
                     <img 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PROFILE_PANEL_OVERLAP_PX } from '@/constants/profile';
+import { PROFILE_PANEL_OVERLAP_PX } from '@/components/profile/profile-config';
 
 interface CropData {
   x: number;

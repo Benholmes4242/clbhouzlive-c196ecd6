@@ -5,15 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Upload, Crop } from 'lucide-react';
-import { PROFILE_PANEL_OVERLAP_PX } from '@/constants/profile';
+import { PROFILE_PANEL_OVERLAP_PX } from '@/components/profile/profile-config';
+import { CropData } from '@/components/profile/profile-config';
 import { HeaderCropTool } from './HeaderCropTool';
-
-interface CropData {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 interface HeaderPhotoSectionProps {
   headerPhoto: File | null;
@@ -21,8 +15,8 @@ interface HeaderPhotoSectionProps {
   mobileCrop: CropData;
   desktopCrop: CropData;
   onFileChange: (file: File | null) => void;
-  onMobileCropChange: (type: 'mobile' | 'desktop', crop: CropData) => void;
-  onDesktopCropChange: (type: 'mobile' | 'desktop', crop: CropData) => void;
+  onMobileCropChange: (crop: CropData) => void;
+  onDesktopCropChange: (crop: CropData) => void;
 }
 
 export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
@@ -55,9 +49,9 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
 
   const handleCropSave = (crop: CropData) => {
     if (cropMode === 'mobile') {
-      onMobileCropChange('mobile', crop);
+      onMobileCropChange(crop);
     } else {
-      onDesktopCropChange('desktop', crop);
+      onDesktopCropChange(crop);
     }
     setShowCropTool(false);
   };

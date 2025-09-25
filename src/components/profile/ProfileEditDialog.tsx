@@ -1,4 +1,3 @@
-
 import React from "react";
 import { EditProfileModal } from "./EditProfileModal";
 
@@ -19,6 +18,19 @@ interface ProfileEditDialogProps {
     bio?: string | null;
     profile_photo_url?: string | null;
     header_photo_url?: string | null;
+    websites?: string[] | null;
+    mobile_crop_x?: number | null;
+    mobile_crop_y?: number | null;
+    mobile_crop_width?: number | null;
+    mobile_crop_height?: number | null;
+    desktop_crop_x?: number | null;
+    desktop_crop_y?: number | null;
+    desktop_crop_width?: number | null;
+    desktop_crop_height?: number | null;
+    mini_card_crop_x?: number | null;
+    mini_card_crop_y?: number | null;
+    mini_card_crop_width?: number | null;
+    mini_card_crop_height?: number | null;
   } | null;
   userId: string;
   onProfileUpdate: () => void;
