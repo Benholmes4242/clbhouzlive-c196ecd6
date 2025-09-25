@@ -1856,6 +1856,10 @@ export type Database = {
           is_public: boolean | null
           location: string | null
           logo_url: string | null
+          mini_card_crop_height: number | null
+          mini_card_crop_width: number | null
+          mini_card_crop_x: number | null
+          mini_card_crop_y: number | null
           mobile_crop_height: number | null
           mobile_crop_width: number | null
           mobile_crop_x: number | null
@@ -1876,6 +1880,7 @@ export type Database = {
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
           website_url: string | null
+          websites: string[] | null
         }
         Insert: {
           background_image_url?: string | null
@@ -1906,6 +1911,10 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mini_card_crop_height?: number | null
+          mini_card_crop_width?: number | null
+          mini_card_crop_x?: number | null
+          mini_card_crop_y?: number | null
           mobile_crop_height?: number | null
           mobile_crop_width?: number | null
           mobile_crop_x?: number | null
@@ -1926,6 +1935,7 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+          websites?: string[] | null
         }
         Update: {
           background_image_url?: string | null
@@ -1956,6 +1966,10 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mini_card_crop_height?: number | null
+          mini_card_crop_width?: number | null
+          mini_card_crop_x?: number | null
+          mini_card_crop_y?: number | null
           mobile_crop_height?: number | null
           mobile_crop_width?: number | null
           mobile_crop_x?: number | null
@@ -1976,6 +1990,7 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+          websites?: string[] | null
         }
         Relationships: []
       }

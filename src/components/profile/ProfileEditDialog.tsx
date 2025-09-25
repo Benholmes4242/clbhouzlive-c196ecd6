@@ -1,16 +1,6 @@
 
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
-import ProfileFormFields from "./ProfileFormFields";
-import { useProfileForm } from "./hooks/useProfileForm";
+import React from "react";
+import { EditProfileModal } from "./EditProfileModal";
 
 interface ProfileEditDialogProps {
   profile: {
@@ -39,57 +29,12 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   userId,
   onProfileUpdate,
 }) => {
-  const [open, setOpen] = useState(false);
-
-  const {
-    formData,
-    saving,
-    isUsernameSet,
-    handleInputChange,
-    handleHandicapChange,
-    handlePublicToggle,
-    handleTextareaChange,
-    handleSelectChange,
-    handleFileChange,
-    handleSave,
-  } = useProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Edit className="w-4 h-4" />
-          Edit Profile
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-background border border-border">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-        </DialogHeader>
-        <ProfileFormFields
-          formData={formData}
-          isUsernameSet={isUsernameSet}
-          userId={userId}
-          userType={profile?.user_type}
-          profile={profile}
-          onInputChange={handleInputChange}
-          onTextareaChange={handleTextareaChange}
-          onSelectChange={handleSelectChange}
-          onHandicapChange={handleHandicapChange}
-          onPublicToggle={handlePublicToggle}
-          onFileChange={handleFileChange}
-          onProfileUpdate={onProfileUpdate}
-        />
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <EditProfileModal
+      profile={profile}
+      userId={userId}
+      onProfileUpdate={onProfileUpdate}
+    />
   );
 };
 
