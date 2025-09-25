@@ -859,7 +859,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-4 text-center">
+                  <div className="w-full grid grid-cols-4 gap-4 text-center mt-4">
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                       <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
@@ -879,7 +879,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-4 pt-3">
+                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
@@ -1081,7 +1081,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-6 text-center max-w-2xl mx-auto">
+                  <div className="w-full grid grid-cols-4 gap-6 text-center max-w-2xl mx-auto mt-5">
                     <div className="flex flex-col">
                       <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
                       <span className="text-sm text-gray-600 uppercase tracking-wide">Posts</span>
@@ -1101,7 +1101,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-5 pt-4">
+                  <div className="w-full border-t border-gray-300 mt-5 pt-5">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
