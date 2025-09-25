@@ -141,11 +141,6 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
-          {/* Suggested Users - Top Section */}
-          <div className="mt-2">
-            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
-          </div>
-
           {/* Sticky Tabs and Search */}
           <div className="sticky top-16 z-30 bg-white">
             {/* Segmented Control Tabs */}
@@ -164,6 +159,11 @@ const Discover = () => {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Suggested Users - Below Tabs/Search */}
+          <div className="mt-2">
+            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
           {/* Main Grid with Container */}
