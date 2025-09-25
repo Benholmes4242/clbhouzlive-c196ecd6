@@ -50,15 +50,23 @@ interface EditProfileModalProps {
   profile: Profile | null;
   userId: string;
   onProfileUpdate: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   profile,
   userId,
   onProfileUpdate,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [activePreviewMode, setActivePreviewMode] = useState<'mobile' | 'desktop'>('mobile');
+
+  // Use external open state if provided, otherwise use internal state
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
 
   const {
     formData,
@@ -78,16 +86,19 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const handleClose = useCallback(() => {
     setOpen(false);
-  }, []);
+  }, [setOpen]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Edit className="w-4 h-4" />
-          Edit Profile
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {/* Only show trigger button if not controlled externally */}
+      {externalOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Edit className="w-4 h-4" />
+            Edit Profile
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-background border border-border">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>

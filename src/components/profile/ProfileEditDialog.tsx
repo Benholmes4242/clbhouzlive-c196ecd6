@@ -34,18 +34,24 @@ interface ProfileEditDialogProps {
   } | null;
   userId: string;
   onProfileUpdate: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   profile,
   userId,
   onProfileUpdate,
+  open,
+  onOpenChange,
 }) => {
   return (
     <EditProfileModal
       profile={profile}
       userId={userId}
       onProfileUpdate={onProfileUpdate}
+      open={open}
+      onOpenChange={onOpenChange}
     />
   );
 };

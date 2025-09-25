@@ -1324,16 +1324,16 @@ const HeroProfileHeader = ({
       {/* Rest of content sections would continue here... */}
       
       {/* New comprehensive Edit Profile Modal */}
-      {editDialogOpen && (
-        <ProfileEditDialog
-          profile={profile}
-          userId={user?.id || ''}
-          onProfileUpdate={() => {
-            onProfileUpdate();
-            setEditDialogOpen(false);
-          }}
-        />
-      )}
+      <ProfileEditDialog
+        profile={profile}
+        userId={user?.id || ''}
+        onProfileUpdate={() => {
+          onProfileUpdate();
+          setEditDialogOpen(false);
+        }}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
 
       {/* Compare Progress Modal - Placeholder for now */}
       {isCompareModalOpen && (
