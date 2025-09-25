@@ -100,9 +100,9 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
             </div>
           </div>
           
-          {/* Right side - Mini Profile Card - scaled up and anchored to right */}
-          <div className="w-28 h-36 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-4 mt-6 ml-auto">
-            <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 mb-3">
+          {/* Right side - Mini Profile Card - positioned with more breathing room */}
+          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2 mt-6">
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
                 <img
                   src={profile.profile_photo_url}
@@ -111,13 +111,13 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-                  <span className="text-white font-bold text-base">
+                  <span className="text-white font-bold text-xs">
                     {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 </div>
               )}
             </div>
-            <p className="text-sm text-white/70 font-medium truncate w-full text-center">
+            <p className="text-xs text-white/70 font-medium truncate w-full text-center">
               {profile?.display_name?.split(' ')[0] || 'User'}
             </p>
           </div>
