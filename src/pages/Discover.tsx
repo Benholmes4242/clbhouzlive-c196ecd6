@@ -150,8 +150,8 @@ const Discover = () => {
             />
             
             {/* Search Bar */}
-            <div className="px-4 py-3 bg-white border-b border-gray-100">
-              <div className="w-[90%] mx-auto">
+            <div className="px-1 py-3 bg-white border-b border-gray-100">
+              <div className="mx-1">
                 <MediaSearch 
                   placeholder="Search" 
                   onSearchChange={setSearchQuery}
