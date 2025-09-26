@@ -236,15 +236,15 @@ const SearchPill = ({
           "relative flex items-center rounded-full",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
           "bg-transparent border transition-all duration-200",
-          useWhiteScheme ? "border-white" : "border-black/20",
-          isOpen && useWhiteScheme && "border-white",
+          useWhiteScheme ? "border-white/20" : "border-black/20",
+          isOpen && useWhiteScheme && "border-white/40",
           isOpen && !useWhiteScheme && "border-black/40"
         )}
       >
         {/* Search Icon */}
         <Search className={cn(
           "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-          useWhiteScheme ? "text-white !text-white" : "text-black/70"
+          useWhiteScheme ? "text-white/70 !text-white/70" : "text-black/70"
         )} />
 
         {/* Input with enhanced accessibility */}
@@ -262,8 +262,8 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            useWhiteScheme ? "text-white placeholder:text-white !text-white !placeholder:text-white" : "text-black placeholder:text-black/50",
-            isOpen && useWhiteScheme && "placeholder:text-white",
+            useWhiteScheme ? "text-white placeholder:text-white/50 !text-white" : "text-black placeholder:text-black/50",
+            isOpen && useWhiteScheme && "placeholder:text-white/70",
             isOpen && !useWhiteScheme && "placeholder:text-black/70"
           )}
           aria-label={placeholder}
@@ -287,7 +287,7 @@ const SearchPill = ({
           >
             <X className={cn(
               "h-3 w-3 md:h-4 md:w-4",
-              useWhiteScheme ? "text-white" : "text-black/70"
+              useWhiteScheme ? "text-white/70" : "text-black/70"
             )} />
           </button>
         )}
