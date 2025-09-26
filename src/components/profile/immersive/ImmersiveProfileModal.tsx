@@ -446,7 +446,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   return (
     <div
       id="immersive-modal"
-      className="fixed inset-0 z-[100] bg-black"
+      className="fixed inset-0 z-[99] bg-black"
       data-immersive-modal="true"
       {...swipeHandlers}
     >
@@ -574,11 +574,16 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
       />
 
       {/* Down Arrow - Bottom Center */}
-      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-20">
+      <div
+        className="absolute left-1/2 transform -translate-x-1/2 z-20"
+        style={{ bottom: 'calc(var(--bottom-nav-height) + 8px)' }}
+      >
         <button
           onClick={handleClose}
           className="w-8 h-8 rounded-full transition-all duration-300 hover:scale-105 animate-[bounce_1.5s_ease-in-out_infinite] p-0"
           style={liquidGlassStyle}
+          aria-label="Close immersive"
+          title="Close"
         >
           <ChevronDown className="w-4 h-4 text-white mx-auto" />
         </button>
