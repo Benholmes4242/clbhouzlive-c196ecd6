@@ -73,12 +73,11 @@ body.route-clubhouse .global-header {
 
 /* Clubhouse header: anchored to top with safe-area handling */
 .clubhouse-header {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 60;
-  padding-top: env(safe-area-inset-top);
   touch-action: pan-x; /* no vertical pull on header */
 }
+
 
 /* Clubhouse scroll container: prevent pull-down behavior */
 .clubhouse-scroll {
@@ -159,21 +158,18 @@ html, body, #root, .app-shell { touch-action: auto; }
   transform: translate3d(0, 0, 0);
   will-change: transform;
   
-  /* Ensure it never breaks from transforms in parent elements */
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
+  /* Scroll with the page - no fixed positioning */
+  position: relative !important;
 }
 
 /* Ensure pages have top padding for the header */
 .page-with-header {
-  padding-top: var(--header-height);
+  padding-top: 0;
 }
 
 @media (min-width: 768px) {
   .page-with-header {
-    padding-top: var(--header-height-desktop);
+    padding-top: 0;
   }
 }
 
@@ -186,7 +182,7 @@ html, body, #root, .app-shell { touch-action: auto; }
 
 /* Prevent header from being affected by page transforms */
 .no-transform-context .global-header {
-  position: fixed !important;
+  position: relative !important;
 }
 
 /* Immersive header hiding - ensure header and top spacer collapse when immersive modals are active */
