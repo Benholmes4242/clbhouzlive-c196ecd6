@@ -76,7 +76,6 @@ const SearchPill = ({
 
   // Color scheme based on page
   const useWhiteScheme = isClubhousePage;
-  console.log('SearchPill - isClubhousePage:', isClubhousePage, 'useWhiteScheme:', useWhiteScheme);
 
   // Convert hook results to SearchResult format for compatibility
   const results: SearchResult[] = [

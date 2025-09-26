@@ -108,6 +108,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
             <SearchPill 
               className="w-full max-w-xl" 
               variant={variant}
+              isClubhousePage={true}
             />
           </div>
 
@@ -156,6 +157,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
                 variant={variant}
+                isClubhousePage={true}
               />
             </div>
           </div>
