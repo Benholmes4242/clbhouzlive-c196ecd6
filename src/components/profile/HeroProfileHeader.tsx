@@ -1034,8 +1034,12 @@ const HeroProfileHeader = ({
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
                       <div 
-                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
                         onClick={() => openImmersive(0)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Open immersive profile preview"
+                        title="Open immersive profile preview"
                       >
                         {profile?.profile_photo_url ? (
                           <img
