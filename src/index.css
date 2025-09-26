@@ -198,7 +198,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
   z-index: 2000 !important;
 }
 
-/* Ensure header stays below modals */
+/* Search dropdowns - ensure they're always above page content */
+.search-dropdown,
+[class*="z-[330]"],
+[class*="z-[9999]"] {
+  z-index: 1500 !important;
+}
+
+/* Ensure header stays below modals but above content */
 .global-header { 
   z-index: 1000 !important; 
 }
