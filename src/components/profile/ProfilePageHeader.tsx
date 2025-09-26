@@ -42,7 +42,7 @@ const ProfilePageHeader: React.FC = () => {
           "z-40", // Layer above content
           "h-16 md:h-18", // 64px mobile, 72px desktop
           "transition-all duration-300",
-          "bg-white/10 backdrop-blur-2xl border-b border-white/20"
+          "bg-white/10 backdrop-blur-2xl"
         )}
         style={{
           // Safe area support
