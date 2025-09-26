@@ -6,8 +6,8 @@ const ProfileWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Profile pages use glass-dark variant for the special effect
-    setVariant('glass-dark');
+    // Profile pages use light liquid glass
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <ProfilePage />;

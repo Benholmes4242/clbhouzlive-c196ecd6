@@ -73,8 +73,7 @@ const GlobalHeader: React.FC = () => {
     isImmersive,
     showHeader,
     pathname: location.pathname,
-    hasDataImmersive: document.documentElement.hasAttribute('data-immersive'),
-    isProfileRoute: location.pathname.startsWith('/profile')
+    hasDataImmersive: document.documentElement.hasAttribute('data-immersive')
   });
   
   console.log('🔍 HIDDEN_ROUTES:', HIDDEN_ROUTES);
@@ -177,6 +176,15 @@ const GlobalHeader: React.FC = () => {
         )}
       </AnimatePresence>
       
+      {/* Spacer to neutralize pages that use negative top margins (e.g., Profile) */}
+      {showHeader && location.pathname.startsWith('/profile') && (
+        <div
+          className="app-shell--topSpacer"
+          style={{
+            height: 'var(--header-height)',
+          }}
+        />
+      )}
 
       {/* Mobile Search Overlay */}
       <AnimatePresence>
