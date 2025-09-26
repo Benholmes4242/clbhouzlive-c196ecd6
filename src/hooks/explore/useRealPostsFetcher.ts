@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
+import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -37,7 +38,11 @@ export const useRealPostsFetcher = () => {
           post_media!inner (
             id,
             media_type,
-            media_url
+            media_url,
+            width,
+            height,
+            aspect_ratio,
+            orientation
           ),
           post_tags (
             id,
@@ -54,6 +59,11 @@ export const useRealPostsFetcher = () => {
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
+
+      // Apply portrait filtering when flag is enabled
+      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
+        query = query.filter('post_media.aspect_ratio', 'lte', PORTRAIT_MAX_ASPECT_RATIO);
+      }
 
       const { data: postsData, error } = await query;
 

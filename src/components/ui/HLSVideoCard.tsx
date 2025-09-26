@@ -31,7 +31,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   poster,
   className = '',
   aspectRatio = '4/5',
-  fit = 'contain',
+  fit = 'cover',
   showControls = false,
   showMuteButton = false,
   autoplay = false,
@@ -289,12 +289,13 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   return (
     <div
       ref={containerRef}
-      className={`videoContainer relative overflow-hidden bg-black ${className}`}
+      className={`videoContainer relative overflow-hidden bg-black data-[ready=true]:bg-transparent ${className}`}
       style={{ aspectRatio }}
+      data-ready="false"
     >
       <video
         ref={videoRef}
-        className={`videoEl w-full h-full ${videoFitClass} bg-black`}
+        className={`videoEl absolute inset-0 w-full h-full ${videoFitClass}`}
         playsInline
         muted={isMuted}
         loop={loop}
@@ -303,6 +304,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         preload="metadata"
         onClick={handleVideoClick}
         onEnded={onEnded}
+        onLoadedData={() => {
+          if (containerRef.current) {
+            containerRef.current.setAttribute('data-ready', 'true');
+          }
+        }}
       />
       
       <div

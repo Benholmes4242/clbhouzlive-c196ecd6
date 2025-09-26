@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
@@ -24,6 +24,8 @@ import { AudioStrip } from './AudioStrip';
 import PostMetadata from './PostMetadata';
 import EngagementRail from './EngagementRail';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
+import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -95,6 +97,39 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onCurrentPostChange
 }) => {
   const { user } = useSupabaseSession();
+  
+  // Helper function to check aspect ratio for portrait filtering
+  const getAspectRatio = useCallback((media: any) => {
+    if (media.aspect_ratio) return media.aspect_ratio;
+    if (media.width && media.height) return media.width / media.height;
+    return null;
+  }, []);
+
+  // Client-side filtering for portrait-only mode (transitional guard)
+  const filteredPosts = useMemo(() => {
+    if (!FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) return posts;
+    
+    const filtered = posts.filter(post => {
+      const media = post.media?.[0];
+      if (!media) return false;
+      
+      const aspectRatio = getAspectRatio(media);
+      if (!aspectRatio) {
+        // TODO: Implement client-side probing for missing aspect ratios
+        // For now, include the post (backfill will handle this)
+        return true;
+      }
+      
+      return aspectRatio <= PORTRAIT_MAX_ASPECT_RATIO;
+    });
+
+    // Log telemetry for filtering effectiveness
+    if (posts.length > 0) {
+      logClubhouseFiltering(posts.length, filtered.length);
+    }
+    
+    return filtered;
+  }, [posts, getAspectRatio]);
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
@@ -188,7 +223,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const postIds = posts.map(post => post.id);
+      const postIds = filteredPosts.map(post => post.id);
       const { data, error } = await supabase
         .from('post_likes')
         .select('post_id')
@@ -202,7 +237,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       
       return data.map(like => like.post_id);
     },
-    enabled: !!user?.id && posts.length > 0
+    enabled: !!user?.id && filteredPosts.length > 0
   });
 
   // Follow/unfollow mutation
@@ -330,11 +365,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const newIndex = Math.round(scrollTop / itemHeight);
     
     // Immediate index update for responsiveness
-    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
+    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredPosts.length) {
       setCurrentIndex(newIndex);
       
       // If scrolling to a photo post, stop all videos
-      const currentPost = posts[newIndex];
+      const currentPost = filteredPosts[newIndex];
       if (currentPost && currentPost.type !== 'video') {
         setActiveVideo(null);
       }
@@ -346,13 +381,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
     
     scrollTimeoutRef.current = setTimeout(() => {
-      if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
+      if (newIndex >= filteredPosts.length - 3 && hasMore && !isLoadingMore) {
         onLoadMore();
       }
     }, 150);
 
     prevScrollTopRef.current = scrollTop;
-  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
+  }, [currentIndex, filteredPosts.length, hasMore, isLoadingMore, onLoadMore]);
 
   // Scroll to specific index
   const scrollToIndex = (index: number) => {
@@ -379,13 +414,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           break;
         case 'ArrowDown':
           e.preventDefault();
-          if (currentIndex < posts.length - 1) {
+          if (currentIndex < filteredPosts.length - 1) {
             const newIndex = currentIndex + 1;
             setCurrentIndex(newIndex);
             scrollToIndex(newIndex);
             
             // Load more if near end
-            if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
+            if (newIndex >= filteredPosts.length - 3 && hasMore && !isLoadingMore) {
               onLoadMore();
             }
           }
@@ -395,7 +430,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
+  }, [currentIndex, filteredPosts.length, hasMore, isLoadingMore, onLoadMore]);
 
 
 
@@ -459,7 +494,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     setShowReactionTray(false);
   }, []);
 
-  if (posts.length === 0) {
+  if (filteredPosts.length === 0) {
     return <ClubhouzLoading />;
   }
 
@@ -481,7 +516,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         }}
       >
 
-        {posts.map((item, index) => {
+        {filteredPosts.map((item, index) => {
           // Get media array for this item
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,

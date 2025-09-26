@@ -875,31 +875,43 @@ export type Database = {
       }
       post_media: {
         Row: {
+          aspect_ratio: number | null
           created_at: string
+          height: number | null
           id: string
           media_type: string
           media_url: string
+          orientation: string | null
           post_id: string
           poster_url: string | null
           stream_id: string | null
+          width: number | null
         }
         Insert: {
+          aspect_ratio?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           media_type: string
           media_url: string
+          orientation?: string | null
           post_id: string
           poster_url?: string | null
           stream_id?: string | null
+          width?: number | null
         }
         Update: {
+          aspect_ratio?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           media_type?: string
           media_url?: string
+          orientation?: string | null
           post_id?: string
           poster_url?: string | null
           stream_id?: string | null
+          width?: number | null
         }
         Relationships: [
           {
