@@ -131,38 +131,40 @@ const App: React.FC = () => {
                             <TopTenProvider>
                               <AuthWrapper>
                                 <Suspense fallback={<ClubhouzLoading />}>
-                        <Routes>
-                          <Route path="/" element={<ClubhouseWrapped />} />
-                          <Route path="/auth" element={<AuthWrapped />} />
-                          <Route path="/create-profile" element={<CreateProfile />} />
-                          <Route path="/profile" element={<ProfileWrapped />} />
-                          <Route path="/profile-test" element={<ProfileTestPage />} />
-                          <Route path="/profile/:username" element={<UserProfilePage />} />
-                          <Route path="/settings" element={<SettingsWrapped />} />
-                          {/* Explore route removed - redirects to discover */}
-                          <Route path="/clubhouse" element={<ClubhouseWrapped />} />
-                          <Route path="/discover" element={<DiscoverWrapped />} />
-                          <Route path="/courses" element={<Courses />} />
-                          <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                          <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-                          <Route path="/my-ratings" element={<MyRatings />} />
-                          <Route path="/news" element={<News />} />
-                          <Route path="/tour-central" element={<TourCentral />} />
-                          
-                          <Route path="/messages" element={<MessagesPage />} />
-                          <Route path="/notifications" element={<NotificationsPage />} />
-                          <Route path="/friends" element={<FriendsPage />} />
-                          <Route path="/followers" element={<FollowersPage />} />
-                          <Route path="/following" element={<FollowingPage />} />
-                          
-                          <Route path="/global-top100" element={<GlobalTop100 />} />
-                          <Route path="/achievements" element={<AchievementsPage />} />
-                          <Route path="/admin-setup" element={<AdminSetupPage />} />
-                          <Route path="/admin" element={<AdminPage />} />
-                          
-                          
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
+                                  {/* Global header should render before routes so it sits at the top in normal flow */}
+                                  <GlobalHeader />
+                                  <Routes>
+                                    <Route path="/" element={<ClubhouseWrapped />} />
+                                    <Route path="/auth" element={<AuthWrapped />} />
+                                    <Route path="/create-profile" element={<CreateProfile />} />
+                                    <Route path="/profile" element={<ProfileWrapped />} />
+                                    <Route path="/profile-test" element={<ProfileTestPage />} />
+                                    <Route path="/profile/:username" element={<UserProfilePage />} />
+                                    <Route path="/settings" element={<SettingsWrapped />} />
+                                    {/* Explore route removed - redirects to discover */}
+                                    <Route path="/clubhouse" element={<ClubhouseWrapped />} />
+                                    <Route path="/discover" element={<DiscoverWrapped />} />
+                                    <Route path="/courses" element={<Courses />} />
+                                    <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+                                    <Route path="/user/:username/courses" element={<UserCoursesPage />} />
+                                    <Route path="/my-ratings" element={<MyRatings />} />
+                                    <Route path="/news" element={<News />} />
+                                    <Route path="/tour-central" element={<TourCentral />} />
+                                    
+                                    <Route path="/messages" element={<MessagesPage />} />
+                                    <Route path="/notifications" element={<NotificationsPage />} />
+                                    <Route path="/friends" element={<FriendsPage />} />
+                                    <Route path="/followers" element={<FollowersPage />} />
+                                    <Route path="/following" element={<FollowingPage />} />
+                                    
+                                    <Route path="/global-top100" element={<GlobalTop100 />} />
+                                    <Route path="/achievements" element={<AchievementsPage />} />
+                                    <Route path="/admin-setup" element={<AdminSetupPage />} />
+                                    <Route path="/admin" element={<AdminPage />} />
+                                    
+                                    
+                                    <Route path="*" element={<NotFound />} />
+                                  </Routes>
                                 </Suspense>
                               </AuthWrapper>
                             </TopTenProvider>
@@ -172,7 +174,6 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <AIChat />
-                      <GlobalHeader />
                       <GlobalBottomNavigation />
                     </BrowserRouter>
                   </UIProvider>
