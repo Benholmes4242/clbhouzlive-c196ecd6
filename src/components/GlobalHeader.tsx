@@ -107,7 +107,10 @@ const GlobalHeader: React.FC = () => {
           <motion.header
             className={cn(
               "global-header",
-              "fixed top-0 left-0 right-0 w-full",
+              // Remove fixed positioning on discover, profile, and courses pages
+              location.pathname === '/discover' || location.pathname.includes('/profile') || location.pathname === '/courses' || location.pathname.includes('/user/') && location.pathname.includes('/courses')
+                ? "relative" // Make header scroll with page content
+                : "fixed top-0 left-0 right-0 w-full",
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
