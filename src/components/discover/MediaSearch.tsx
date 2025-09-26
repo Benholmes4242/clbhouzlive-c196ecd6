@@ -146,7 +146,7 @@ const MediaSearch = ({
 
       {/* Search Suggestions Dropdown */}
       {showSuggestions && hasContent && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg z-[1600] max-h-80 overflow-y-auto search-dropdown">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg z-[9999] max-h-80 overflow-y-auto">
           {query.length === 0 && (
             <>
               {/* Recent Searches */}

@@ -429,7 +429,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     <div
       ref={dropdownRef}
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[1600] search-dropdown",
+        "absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[330]",
         "rounded-2xl liquid-glass liquid-glass--elevated liquid-glass--dropdown",
         "text-left max-h-[70vh] overflow-auto",
         "md:max-h-[72vh] md:rounded-2xl",
@@ -473,7 +473,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
 
   if (isMobile) {
     return (
-      <div className="fixed inset-x-0 top-16 bottom-0 z-[1600] pointer-events-auto search-dropdown">
+      <div className="fixed inset-x-0 top-16 bottom-0 z-[330] pointer-events-auto">
         <div className="liquid-glass liquid-glass--elevated rounded-t-2xl overflow-hidden mx-0 h-full max-h-[calc(100vh-4rem)] overflow-y-auto">
           {/* Mobile header */}
           <div className={cn(

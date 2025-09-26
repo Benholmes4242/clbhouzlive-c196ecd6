@@ -68,7 +68,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (loading) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[1600] pointer-events-auto animate-fade-in search-dropdown">
+      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[9999] pointer-events-auto animate-fade-in">
         <div className="p-6 text-center text-gray-500">
           <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto mb-2"></div>
           Searching...
@@ -80,7 +80,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   // Show enhanced default state when no query
   if (!query.trim()) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[1600] max-h-[80vh] overflow-y-auto pointer-events-auto animate-fade-in search-dropdown">
+      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[9999] max-h-[80vh] overflow-y-auto pointer-events-auto animate-fade-in">
         <div className="p-4">
           {/* Trending Tags */}
           <TrendingTags onTagClick={handleTagClick} />
@@ -110,7 +110,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   // Show search results
   if (results.length === 0) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[1600] pointer-events-auto animate-fade-in search-dropdown">
+      <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[9999] pointer-events-auto animate-fade-in">
         <div className="p-6 text-center text-gray-500">
           <div className="text-2xl mb-2">🔍</div>
           <p className="text-sm">No users or clubs found for "{query}"</p>
@@ -121,7 +121,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   return (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[1600] max-h-[80vh] overflow-y-auto pointer-events-auto animate-fade-in search-dropdown">
+    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl mt-2 shadow-xl z-[9999] max-h-[80vh] overflow-y-auto pointer-events-auto animate-fade-in">
       <div className="p-2">
         {results.map((result) => (
           <div
