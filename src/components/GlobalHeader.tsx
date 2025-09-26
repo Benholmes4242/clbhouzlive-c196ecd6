@@ -112,8 +112,8 @@ const GlobalHeader: React.FC = () => {
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
               // Determine background based on page
-              location.pathname === '/' || location.pathname === '/clubhouse' ? 
-                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
+              location.pathname === '/' || location.pathname === '/clubhouse' || location.pathname === '/profile' ? 
+                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse and profile
                 "bg-white" // Pure white for all other pages
             )}
             initial={{ y: -100, opacity: 0 }}
