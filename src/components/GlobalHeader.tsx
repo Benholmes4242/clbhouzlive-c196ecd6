@@ -73,7 +73,8 @@ const GlobalHeader: React.FC = () => {
     isImmersive,
     showHeader,
     pathname: location.pathname,
-    hasDataImmersive: document.documentElement.hasAttribute('data-immersive')
+    hasDataImmersive: document.documentElement.hasAttribute('data-immersive'),
+    isProfileRoute: location.pathname.startsWith('/profile')
   });
   
   console.log('🔍 HIDDEN_ROUTES:', HIDDEN_ROUTES);
