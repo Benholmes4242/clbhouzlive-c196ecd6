@@ -117,8 +117,10 @@ const GlobalHeader: React.FC = () => {
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
               // Determine background based on page
-              location.pathname === '/clubhouse' || location.pathname.startsWith('/profile') ? 
-                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse and profile
+              location.pathname === '/clubhouse' ? 
+                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
+                location.pathname.startsWith('/profile') ?
+                "bg-white/10 backdrop-blur-2xl border border-white/20" : // Profile specific styling
                 "bg-white shadow-none" // Pure white for all other pages
             )}
             style={{
