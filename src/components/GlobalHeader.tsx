@@ -14,6 +14,7 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/create-profile',
   '/admin-setup',
+  '/profile', // Profile page uses its own header
   // Add more full-screen routes as needed
 ];
 

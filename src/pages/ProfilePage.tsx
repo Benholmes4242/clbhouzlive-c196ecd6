@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import ProfilePageHeader from '@/components/profile/ProfilePageHeader';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -101,7 +102,12 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background page-with-header relative">
+    <div className="min-h-screen bg-background relative">
+      <ProfilePageHeader />
+      
+      {/* Add spacing for fixed header */}
+      <div className="h-16 md:h-18" />
+      
       <HeroProfileHeader 
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
