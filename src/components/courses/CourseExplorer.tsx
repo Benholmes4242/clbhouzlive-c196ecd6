@@ -101,9 +101,9 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="space-y-3 relative z-50">
+    <div className="space-y-3">
       {/* Search */}
-      <div className="relative max-w-md z-60">
+      <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search courses, countries, or regions..."
@@ -114,7 +114,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region Selection */}
-      <div className="flex items-center gap-4 relative z-60">
+      <div className="flex items-center gap-4">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
           <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
             <SelectValue />
