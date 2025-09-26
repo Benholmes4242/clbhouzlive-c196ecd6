@@ -26,7 +26,6 @@ const NotificationsPage = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view notifications.</p>
         </div>
@@ -38,7 +37,6 @@ const NotificationsPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <div className="max-w-2xl mx-auto">
             <NotificationsHeader />
@@ -52,7 +50,7 @@ const NotificationsPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      
       
       <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-2xl mx-auto">

@@ -47,7 +47,6 @@ const MessagesPage = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view messages.</p>
         </div>
@@ -58,7 +57,7 @@ const MessagesPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      
       
       <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-6xl mx-auto">

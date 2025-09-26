@@ -36,7 +36,6 @@ const Settings = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -55,7 +54,6 @@ const Settings = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background pb-28">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading settings</span>
@@ -79,7 +77,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <Header />
+      
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
         

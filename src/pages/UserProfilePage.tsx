@@ -73,7 +73,7 @@ const UserProfilePage = () => {
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" />
       
       {/* Header integrated into profile layout */}
-      <Header />
+      
       
       {/* Content flows naturally without fixed positioning */}
       <div className="relative">

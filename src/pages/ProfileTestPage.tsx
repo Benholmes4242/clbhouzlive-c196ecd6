@@ -46,7 +46,6 @@ const ProfileTestPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -65,7 +64,6 @@ const ProfileTestPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background pb-28">
-        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading profile</span>
@@ -90,7 +88,7 @@ const ProfileTestPage = () => {
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      <Header />
+      
       
       {/* Test Page Banner */}
       <div className="bg-yellow-500/20 border-b border-yellow-500/30 px-4 py-2 text-center">
