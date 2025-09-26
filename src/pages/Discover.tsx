@@ -146,22 +146,26 @@ const Discover = () => {
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Search + Filter Pills */}
-          <div className="px-4 md:px-6 pt-3 pb-2 md:pt-4 md:pb-3 space-y-3 md:space-y-4">
-            {/* Search */}
-            <div className="w-full">
-              <MediaSearch 
-                placeholder="Search videos and photos..." 
-                onSearchChange={setSearchQuery}
-              />
-            </div>
+          {/* Search + Filter Pills Divider */}
+          <div className="pt-3 pb-2 md:pt-4 md:pb-3">
+            <div className="backdrop-blur-md bg-white/60 border-l-0 border-r-0 border-white/20 px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4"
+                 style={{ boxShadow: 'var(--hud-shadow, 0 4px 20px rgba(0, 0, 0, 0.1))' }}>
+              
+              {/* Search */}
+              <div className="w-full">
+                <MediaSearch 
+                  placeholder="Search videos and photos..." 
+                  onSearchChange={setSearchQuery}
+                />
+              </div>
 
-            {/* Main Filter Pills */}
-            <div className="space-y-2">
-              <DiscoverPillRow 
-                activeFilter={activeFilter} 
-                onFilterChange={setActiveFilter}
-              />
+              {/* Main Filter Pills - larger size */}
+              <div className="space-y-2">
+                <DiscoverPillRow 
+                  activeFilter={activeFilter} 
+                  onFilterChange={setActiveFilter}
+                />
+              </div>
             </div>
           </div>
 
