@@ -76,9 +76,9 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
       {/* Main Header */}
       <header
         className={cn(
-          "sticky top-0 z-header transition-all duration-300",
+          "relative z-header transition-all duration-300", // Remove sticky but keep original styling
           "h-16 md:h-18", // 64px mobile, 72px desktop
-          // Variant-specific backgrounds
+          // Keep original variant-specific backgrounds for clubhouse
           isGlassDark && "backdrop-blur-md bg-black/60",
           isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           className

@@ -107,11 +107,14 @@ const GlobalHeader: React.FC = () => {
           <motion.header
             className={cn(
               "global-header",
-              "fixed top-0 left-0 right-0 w-full",
+              "relative w-full", // Remove fixed positioning
               "z-[200]", // Above content, below toasts/modals
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
-              "liquid-glass liquid-glass--elevated"
+              // Determine background based on page
+              location.pathname === '/' || location.pathname === '/clubhouse' ? 
+                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
+                "bg-white" // Pure white for all other pages
             )}
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

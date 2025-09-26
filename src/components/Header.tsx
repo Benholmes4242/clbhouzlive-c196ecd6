@@ -57,11 +57,10 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
     navigate('/clubhouse');
   };
 
-  // Always sticky on clubhouse page, relative everywhere else  
+  // Check if we're on clubhouse page
   const hashPath = location.hash && location.hash.startsWith('#/') ? location.hash.slice(1) : null;
   const pathname = hashPath || location.pathname;
   const isClubhousePage = pathname === '/clubhouse' || pathname === '/' || pathname.startsWith('/clubhouse');
-  const headerClasses = isClubhousePage ? "sticky top-0 z-[60]" : "relative z-[60]";
   
   // Simplified safe area handling - let CSS handle the padding
   const headerStyle = {};
@@ -95,12 +94,10 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
       {/* Main Header */}
       <header
         className={cn(
-          "sticky top-0 z-header transition-all duration-300",
+          "relative z-header transition-all duration-300", // Remove sticky
           "h-16 md:h-18", // 64px mobile, 72px desktop
-          // Variant-specific backgrounds
-          isGlassDark && "backdrop-blur-md bg-black/60",
-          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
-          headerClasses
+          // Pure white background for all non-clubhouse pages
+          "bg-white"
         )}
         style={{ '--header-h-mobile': '60px' } as any}
       >
