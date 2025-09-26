@@ -76,6 +76,7 @@ const SearchPill = ({
 
   // Color scheme based on page
   const useWhiteScheme = isClubhousePage;
+  console.log('SearchPill - isClubhousePage:', isClubhousePage, 'useWhiteScheme:', useWhiteScheme);
 
   // Convert hook results to SearchResult format for compatibility
   const results: SearchResult[] = [
@@ -244,7 +245,7 @@ const SearchPill = ({
         {/* Search Icon */}
         <Search className={cn(
           "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-          useWhiteScheme ? "text-white/70" : "text-black/70"
+          useWhiteScheme ? "text-white/70 !text-white/70" : "text-black/70"
         )} />
 
         {/* Input with enhanced accessibility */}
@@ -262,7 +263,7 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            useWhiteScheme ? "text-white placeholder:text-white/50" : "text-black placeholder:text-black/50",
+            useWhiteScheme ? "text-white placeholder:text-white/50 !text-white" : "text-black placeholder:text-black/50",
             isOpen && useWhiteScheme && "placeholder:text-white/70",
             isOpen && !useWhiteScheme && "placeholder:text-black/70"
           )}
