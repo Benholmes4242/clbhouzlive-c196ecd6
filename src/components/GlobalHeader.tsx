@@ -61,8 +61,8 @@ const GlobalHeader: React.FC = () => {
     setVariant('glass-dark');
   }, [setVariant]);
 
-  // Final visibility state - also check for data-immersive attribute
-  const showHeader = isVisible && !shouldHideForRoute && !shouldHideHeader && !isImmersive;
+  // Force header to always show (unless specifically hidden for routes like auth)
+  const showHeader = !shouldHideForRoute && !shouldHideHeader && !isImmersive;
   
   // Debug logging
   console.log('🔍 GlobalHeader state:', {
@@ -104,11 +104,11 @@ const GlobalHeader: React.FC = () => {
       {/* Global Fixed Header */}
       <AnimatePresence>
         {showHeader && (
-          <motion.header
+          <header
             className={cn(
               "global-header",
-              "relative w-full", // Remove fixed positioning
-              "z-[200]", // Above content, below toasts/modals
+              "w-full relative", // Normal document flow positioning
+              "z-40", // Layer above content
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
               // Determine background based on page
@@ -116,21 +116,9 @@ const GlobalHeader: React.FC = () => {
                 "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse and profile
                 "bg-white shadow-none" // Pure white for all other pages
             )}
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              duration: 0.25 
-            }}
             style={{
               // Safe area support
               paddingTop: 'max(env(safe-area-inset-top, 0px), 4px)',
-              // Hardware acceleration
-              transform: 'translate3d(0, 0, 0)',
-              willChange: 'transform',
             }}
           >
             <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">
@@ -177,7 +165,7 @@ const GlobalHeader: React.FC = () => {
                 <HeaderNavigation />
               </nav>
             </div>
-          </motion.header>
+          </header>
         )}
       </AnimatePresence>
 
