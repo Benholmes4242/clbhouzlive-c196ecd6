@@ -171,6 +171,13 @@ const GlobalHeader: React.FC = () => {
               </nav>
             </div>
           </header>
+          {/* Spacer to neutralize pages that use negative top margins (e.g., Profile) */}
+          <div
+            className="app-shell--topSpacer"
+            style={{
+              height: (location.pathname.startsWith('/profile')) ? 'var(--header-height)' : '0px',
+            }}
+          />
         )}
       </AnimatePresence>
 
