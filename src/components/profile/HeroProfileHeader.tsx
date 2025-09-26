@@ -1390,9 +1390,9 @@ const HeroProfileHeader = ({
         isOpen={isImmersiveOpen}
         onClose={closeImmersive}
         onMorphToHeader={handleMorphTransition}
-        mediaItems={mediaItems.filter(item => item.media_type === 'video').map(item => ({
+        mediaItems={mediaItems.map(item => ({
           ...item,
-          media_type: 'video' as const
+          media_type: item.media_type as 'video' | 'image'
         }))}
         userId={profile?.id || ''}
         initialIndex={currentMediaIndex}

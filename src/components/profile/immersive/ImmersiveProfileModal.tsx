@@ -20,7 +20,7 @@ import { MediaItem } from '@/types/media';
 
 interface LocalMediaItem {
   id: string;
-  media_type: 'video';
+  media_type: 'video' | 'image';
   media_url: string;
   thumbnail_url?: string;
   duration: number;
