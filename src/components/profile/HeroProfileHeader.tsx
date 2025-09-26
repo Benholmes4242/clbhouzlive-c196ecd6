@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
+import { TbMovie } from 'react-icons/tb';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -758,12 +759,6 @@ const HeroProfileHeader = ({
                           <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
                             Edit Profile
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -785,8 +780,11 @@ const HeroProfileHeader = ({
                         </p>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) */}
-                      <div className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0">
+                      {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
+                      <div 
+                        className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        onClick={() => openImmersive(0)}
+                      >
                         {profile?.profile_photo_url ? (
                           <img
                             src={(() => {
@@ -816,6 +814,10 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
+                        {/* Movie icon in top right */}
+                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
+                          <TbMovie className="w-3 h-3 text-white" />
+                        </div>
                       </div>
                     </div>
 
@@ -1009,12 +1011,6 @@ const HeroProfileHeader = ({
                           <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
                             Edit Profile
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setMediaManagerOpen(true)}>
-                            Media Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => previewImmersive()}>
-                            Immersive Preview
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -1036,8 +1032,11 @@ const HeroProfileHeader = ({
                         </p>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) */}
-                      <div className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0">
+                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
+                      <div 
+                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        onClick={() => openImmersive(0)}
+                      >
                         {profile?.profile_photo_url ? (
                           <img
                             src={(() => {
@@ -1067,6 +1066,10 @@ const HeroProfileHeader = ({
                             </span>
                           </div>
                         )}
+                        {/* Movie icon in top right */}
+                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
+                          <TbMovie className="w-4 h-4 text-white" />
+                        </div>
                       </div>
                     </div>
 
@@ -1398,17 +1401,6 @@ const HeroProfileHeader = ({
         onUploadComplete={() => refetchMedia()}
       />
 
-      {/* Media Manager Modal */}
-      <MediaManagerModal
-        isOpen={mediaManagerOpen}
-        onClose={() => setMediaManagerOpen(false)}
-        userId={profile?.id || ''}
-        mediaItems={mediaItems.filter(item => item.media_type === 'video').map(item => ({
-          ...item,
-          media_type: 'video' as const
-        }))}
-        onMediaUpdate={refetchMedia}
-      />
 
       {/* ProfileModalRouter - Available to all profile visitors for course viewing */}
       <ProfileModalRouter />

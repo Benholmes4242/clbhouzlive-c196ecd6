@@ -14,6 +14,7 @@ import { HeaderPhotoSection } from "./components/HeaderPhotoSection";
 import { MiniCardSection } from "./components/MiniCardSection";
 import { BioWebsitesSection } from "./components/BioWebsitesSection";
 import { LivePreviewSection } from "./components/LivePreviewSection";
+import { MediaManagerSection } from "./components/MediaManagerSection";
 
 interface Profile {
   display_name?: string | null;
@@ -149,6 +150,9 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onBioChange={(bio) => handleTextareaChange({ target: { name: 'bio', value: bio } } as any)}
               onWebsitesChange={handleWebsitesChange}
             />
+
+            {/* Media Manager Section */}
+            <MediaManagerSection userId={userId} />
           </div>
 
           {/* Live Preview - 1/3 width on desktop, full width on mobile */}
