@@ -49,10 +49,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
             ref={el => tabRefs.current[index] = el}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "flex-1 py-3 px-4 text-center transition-all duration-200 relative z-10",
+              "flex-1 py-3 px-4 text-center transition-all duration-200 relative z-10 text-sm",
               activeTab === tab.id 
-                ? "text-black font-bold" 
-                : "text-gray-500 font-medium hover:text-gray-700"
+                ? "text-foreground font-bold" 
+                : "text-muted-foreground font-medium hover:text-foreground/70"
             )}
           >
             {tab.label}
@@ -62,7 +62,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       
       {/* Sliding underline indicator */}
       <div
-        className="absolute bottom-0 h-0.5 bg-black transition-all duration-300 ease-out"
+        className="absolute bottom-0 h-0.5 bg-brand-orange transition-all duration-300 ease-out"
         style={indicatorStyle}
       />
     </div>

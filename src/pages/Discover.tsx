@@ -155,7 +155,7 @@ const Discover = () => {
                 <MediaSearch 
                   placeholder="Search" 
                   onSearchChange={setSearchQuery}
-                  className="w-full bg-gray-100 border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:bg-white focus:border focus:border-gray-300 focus:shadow-sm transition-all duration-200"
+                  className="w-full border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:shadow-sm transition-all duration-200"
                 />
               </div>
             </div>
