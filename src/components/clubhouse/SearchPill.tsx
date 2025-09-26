@@ -244,7 +244,7 @@ const SearchPill = ({
         {/* Search Icon */}
         <Search className={cn(
           "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-          useWhiteScheme ? "text-white/70 !text-white/70" : "text-black/70"
+          useWhiteScheme ? "text-white !text-white" : "text-black/70"
         )} />
 
         {/* Input with enhanced accessibility */}
@@ -287,7 +287,7 @@ const SearchPill = ({
           >
             <X className={cn(
               "h-3 w-3 md:h-4 md:w-4",
-              useWhiteScheme ? "text-white/70" : "text-black/70"
+              useWhiteScheme ? "text-white" : "text-black/70"
             )} />
           </button>
         )}
