@@ -120,7 +120,7 @@ const GlobalHeader: React.FC = () => {
               // Determine background based on page
               location.pathname === '/clubhouse' ? 
                 "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
-                location.pathname === '/profile' ?
+                location.pathname.startsWith('/profile') ?
                 "bg-white/10 backdrop-blur-2xl border border-white/20" : // Profile specific styling
                 "bg-white shadow-none" // Pure white for all other pages
             )}
@@ -177,15 +177,6 @@ const GlobalHeader: React.FC = () => {
         )}
       </AnimatePresence>
       
-      {/* Spacer to neutralize pages that use negative top margins (e.g., Profile) */}
-      {showHeader && location.pathname.startsWith('/profile') && (
-        <div
-          className="app-shell--topSpacer"
-          style={{
-            height: 'var(--header-height)',
-          }}
-        />
-      )}
 
       {/* Mobile Search Overlay */}
       <AnimatePresence>
