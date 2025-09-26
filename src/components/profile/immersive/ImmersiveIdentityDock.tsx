@@ -114,7 +114,7 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
           ? 'translate-y-0 opacity-100 animate-[bounce_0.8s_ease-out_0.3s_both]' 
           : 'translate-y-full opacity-0'
       }`}
-      style={{ bottom: 'calc(var(--bottom-nav-height) + 12px)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + 52px)', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div
         style={liquidGlassStyle}
