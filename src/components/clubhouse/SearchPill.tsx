@@ -236,8 +236,8 @@ const SearchPill = ({
           "relative flex items-center rounded-full",
           "h-11 md:h-12 px-4 md:px-6 gap-3",
           "bg-transparent border transition-all duration-200",
-          useWhiteScheme ? "border-white/20" : "border-black/20",
-          isOpen && useWhiteScheme && "border-white/40",
+          useWhiteScheme ? "border-white" : "border-black/20",
+          isOpen && useWhiteScheme && "border-white",
           isOpen && !useWhiteScheme && "border-black/40"
         )}
       >
@@ -262,8 +262,8 @@ const SearchPill = ({
             "placeholder:transition-colors duration-200",
             // Enhanced focus styles for accessibility
             "focus:ring-0 focus:outline-none",
-            useWhiteScheme ? "text-white placeholder:text-white/50 !text-white" : "text-black placeholder:text-black/50",
-            isOpen && useWhiteScheme && "placeholder:text-white/70",
+            useWhiteScheme ? "text-white placeholder:text-white !text-white !placeholder:text-white" : "text-black placeholder:text-black/50",
+            isOpen && useWhiteScheme && "placeholder:text-white",
             isOpen && !useWhiteScheme && "placeholder:text-black/70"
           )}
           aria-label={placeholder}
