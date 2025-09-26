@@ -88,7 +88,7 @@ const UserProfilePage = () => {
         )}
       </div>
       
-      <BottomNavigation />
+      
     </div>
   );
 };

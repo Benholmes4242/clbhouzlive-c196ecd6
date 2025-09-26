@@ -20,7 +20,7 @@ const GlobalTop100 = () => {
         </div>
       </main>
       
-      <BottomNavigation />
+      
     </div>
   );
 };

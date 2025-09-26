@@ -15,7 +15,7 @@ const MyRatings = () => {
         </div>
       </main>
       
-      <BottomNavigation />
+      
     </div>
   );
 };

@@ -45,7 +45,6 @@ const Settings = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -65,7 +64,7 @@ const Settings = () => {
             </button>
           </div>
         </div>
-        <BottomNavigation />
+        
       </div>
     );
   }
@@ -93,7 +92,6 @@ const Settings = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       </div>
-      <BottomNavigation />
     </div>
   );
 };

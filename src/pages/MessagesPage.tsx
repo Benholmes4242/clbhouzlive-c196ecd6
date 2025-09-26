@@ -50,7 +50,6 @@ const MessagesPage = () => {
         <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view messages.</p>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -247,7 +246,7 @@ const MessagesPage = () => {
         </div>
       </main>
       
-      <BottomNavigation />
+      
     </div>
   );
 };

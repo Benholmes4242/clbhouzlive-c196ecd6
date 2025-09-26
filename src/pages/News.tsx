@@ -17,7 +17,7 @@ const News = () => {
       </main>
       
       
-      <BottomNavigation />
+      
     </div>
   );
 };

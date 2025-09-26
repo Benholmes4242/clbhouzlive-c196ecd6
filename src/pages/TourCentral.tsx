@@ -48,7 +48,7 @@ const TourCentral = () => {
         </Tabs>
       </div>
       
-      <BottomNavigation />
+      
     </div>
   );
 };

@@ -29,7 +29,6 @@ const NotificationsPage = () => {
         <div className="container mx-auto px-4 md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view notifications.</p>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -43,7 +42,7 @@ const NotificationsPage = () => {
             <p className="text-center text-muted-foreground">Loading notifications...</p>
           </div>
         </div>
-        <BottomNavigation />
+        
       </div>
     );
   }
@@ -66,7 +65,6 @@ const NotificationsPage = () => {
         </div>
       </main>
       
-      <BottomNavigation />
     </div>
   );
 };

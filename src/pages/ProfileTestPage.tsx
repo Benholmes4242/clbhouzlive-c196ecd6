@@ -55,7 +55,6 @@ const ProfileTestPage = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
@@ -75,7 +74,7 @@ const ProfileTestPage = () => {
             </button>
           </div>
         </div>
-        <BottomNavigation />
+        
       </div>
     );
   }
@@ -106,7 +105,6 @@ const ProfileTestPage = () => {
       {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
       
       
-      <BottomNavigation />
     </div>
   );
 };

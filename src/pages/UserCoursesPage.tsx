@@ -20,7 +20,7 @@ const UserCoursesPage = () => {
         </div>
       </main>
       
-      <BottomNavigation />
+      
     </div>
   );
 };
