@@ -65,6 +65,7 @@ const GlobalHeader: React.FC = () => {
   const showHeader = !shouldHideForRoute && !shouldHideHeader && !isImmersive;
   
   // Debug logging
+  console.log('🔍 GlobalHeader MOUNTED - Component is rendering');
   console.log('🔍 GlobalHeader state:', {
     isVisible,
     shouldHideForRoute,
@@ -74,6 +75,10 @@ const GlobalHeader: React.FC = () => {
     pathname: location.pathname,
     hasDataImmersive: document.documentElement.hasAttribute('data-immersive')
   });
+  
+  console.log('🔍 HIDDEN_ROUTES:', HIDDEN_ROUTES);
+  console.log('🔍 Current pathname:', location.pathname);
+  console.log('🔍 Body classes:', document.body.className);
 
   // Handle mobile search overlay
   useEffect(() => {

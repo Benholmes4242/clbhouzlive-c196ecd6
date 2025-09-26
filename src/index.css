@@ -71,6 +71,11 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
+/* Profile page should show global header */
+body.route-profile .global-header {
+  display: block !important;
+}
+
 /* Clubhouse header: anchored to top with safe-area handling */
 .clubhouse-header {
   position: relative;
