@@ -162,7 +162,7 @@ const Discover = () => {
             </div>
             
             {/* Filter Pills Row */}
-            <div className="py-2 border-b border-gray-50">
+            <div className="py-3 border-b border-gray-50">
               <ExploreFilters 
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
