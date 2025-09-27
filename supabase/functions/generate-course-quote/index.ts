@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -101,8 +102,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in generate-course-quote function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const err = normalizeError(error);
+    console.error('Error in generate-course-quote function:', err.name, err.message, err.stack);
+    return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

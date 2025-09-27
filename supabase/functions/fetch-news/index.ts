@@ -1,5 +1,6 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -206,7 +207,8 @@ Deno.serve(async (req) => {
           console.log(`Successfully fetched ${articles.length} articles from ${feed.source}`)
         }
       } catch (error) {
-        console.error(`Failed to fetch from ${feed.source}:`, error.message)
+        const err = normalizeError(error);
+        console.error(`Failed to fetch from ${feed.source}:`, err.message)
       }
     }
 
@@ -273,7 +275,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: normalizeError(error).message 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

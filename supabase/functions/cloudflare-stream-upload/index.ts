@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { corsHeaders } from '../_shared/cors.ts';
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 // Runtime verification logging
 console.log('🔧 RUNTIME CHECK - CLOUDFLARE_ACCOUNT_ID accessible:', Boolean(Deno.env.get('CLOUDFLARE_ACCOUNT_ID')));

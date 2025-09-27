@@ -122,9 +122,9 @@ serve(async (req) => {
       console.error('Error fetching review media:', reviewError)
     }
 
-    // Get all unique user IDs
-    const postUserIds = postMedia?.map(item => item.posts.user_id) || []
-    const reviewUserIds = reviewMedia?.map(item => item.course_ratings.user_id) || []
+    // Get all unique user IDs with type casting
+    const postUserIds = (postMedia ?? []).map(item => (item as any).posts.user_id);
+    const reviewUserIds = (reviewMedia ?? []).map(item => (item as any).course_ratings.user_id);
     const allUserIds = [...new Set([...postUserIds, ...reviewUserIds])]
 
     // Get user profiles
@@ -153,6 +153,7 @@ serve(async (req) => {
       }
     }
 
+
     // Helper to generate safe thumbnail URL
     const getSafeThumbnailUrl = (mediaUrl: string, mediaType: string): string => {
       const isVideo = mediaType === 'video'
@@ -170,20 +171,21 @@ serve(async (req) => {
     }
 
     // Transform post media
-    const transformedPostMedia: MediaItem[] = (postMedia || []).map(item => {
-      const profile = profiles.find(p => p.id === item.posts.user_id)
-      const safeThumbnail = getSafeThumbnailUrl(item.media_url, item.media_type)
+    const transformedPostMedia: MediaItem[] = (postMedia ?? []).map(item => {
+      const typedItem = item as any;
+      const profile = profiles.find(p => p.id === typedItem.posts.user_id)
+      const safeThumbnail = getSafeThumbnailUrl(typedItem.media_url, typedItem.media_type)
       
       return {
-        id: item.id,
+        id: typedItem.id,
         source: 'post' as const,
-        sourceId: item.posts.id,
-        type: item.media_type as 'image' | 'video',
-        url: item.media_url,
+        sourceId: typedItem.posts.id,
+        type: typedItem.media_type as 'image' | 'video',
+        url: typedItem.media_url,
         thumbnailUrl: safeThumbnail,
-        createdAt: item.created_at,
+        createdAt: typedItem.created_at,
         author: {
-          id: item.posts.user_id,
+          id: typedItem.posts.user_id,
           displayName: profile?.display_name || profile?.username || 'Anonymous',
           username: profile?.username,
           avatarUrl: profile?.profile_photo_url
@@ -192,20 +194,21 @@ serve(async (req) => {
     })
 
     // Transform review media
-    const transformedReviewMedia: MediaItem[] = (reviewMedia || []).map(item => {
-      const profile = profiles.find(p => p.id === item.course_ratings.user_id)
-      const safeThumbnail = getSafeThumbnailUrl(item.media_url, item.media_type)
+    const transformedReviewMedia: MediaItem[] = (reviewMedia ?? []).map(item => {
+      const typedItem = item as any;
+      const profile = profiles.find(p => p.id === typedItem.course_ratings.user_id)
+      const safeThumbnail = getSafeThumbnailUrl(typedItem.media_url, typedItem.media_type)
       
       return {
-        id: item.id,
+        id: typedItem.id,
         source: 'review' as const,
-        sourceId: item.course_ratings.id,
-        type: item.media_type as 'image' | 'video',
-        url: item.media_url,
+        sourceId: typedItem.course_ratings.id,
+        type: typedItem.media_type as 'image' | 'video',
+        url: typedItem.media_url,
         thumbnailUrl: safeThumbnail,
-        createdAt: item.created_at,
+        createdAt: typedItem.created_at,
         author: {
-          id: item.course_ratings.user_id,
+          id: typedItem.course_ratings.user_id,
           displayName: profile?.display_name || profile?.username || 'Anonymous',
           username: profile?.username,
           avatarUrl: profile?.profile_photo_url

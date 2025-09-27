@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -171,9 +172,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ Account ID fix error:', error);
+    const err = normalizeError(error);
+    console.error('❌ Account ID fix error:', err.name, err.message, err.stack);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: err.message,
       success: false
     }), {
       status: 500,
