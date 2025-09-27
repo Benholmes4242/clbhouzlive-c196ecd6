@@ -787,9 +787,9 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Glass Control Bar - Centered in overlay */}
+          {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className="absolute inset-0 px-4 flex items-center justify-center"
+            className="absolute bottom-0 inset-x-0 px-4 py-4"
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
@@ -798,7 +798,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           >
             {/* Swipe indicator for expanded state */}
             {isDetailExpanded && (
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+              <div className="flex justify-center mb-2">
                 <div 
                   className="w-8 h-1 rounded-full bg-white/30"
                   style={{
