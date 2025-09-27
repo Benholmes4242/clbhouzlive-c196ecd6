@@ -630,7 +630,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
-          height: isDetailExpanded ? "100%" : "40px",
+          height: isDetailExpanded ? "100%" : "64px",
         }}
         style={{
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
@@ -659,7 +659,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-x-0 top-0 bottom-10 flex flex-col"
+                className="absolute inset-0 flex flex-col"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showStaggeredContent ? 1 : 0 }}
                 exit={{ opacity: 0 }}
@@ -789,7 +789,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
           {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className="absolute inset-x-0 bottom-0 h-10 px-4 relative"
+            className="absolute bottom-0 inset-x-0 px-4 py-4"
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
@@ -798,7 +798,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           >
             {/* Swipe indicator for expanded state */}
             {isDetailExpanded && (
-              <div className="absolute -top-3 left-0 right-0 flex justify-center">
+              <div className="flex justify-center mb-2">
                 <div 
                   className="w-8 h-1 rounded-full bg-white/30"
                   style={{
@@ -807,7 +807,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 />
               </div>
             )}
-            <div className="flex items-center justify-center gap-6 h-full">
+            <div className="flex items-center justify-center gap-3">
               {/* Left: Dismiss Button - Accessible & Performance Optimized */}
               <motion.button
                 aria-label={`Dismiss suggestion for ${user.displayName}`}
@@ -826,11 +826,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 28px instead of 32px
-                  width: '28px',
-                  height: '28px',
-                  minWidth: '28px',
-                  minHeight: '28px',
+                  // Smaller size: 36px instead of 44px
+                  width: '36px',
+                  height: '36px',
+                  minWidth: '36px',
+                  minHeight: '36px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -875,11 +875,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   isDetailExpanded && "ring-1 ring-accent/30"
                 )}
                 style={{
-                  // Smaller size: 28px instead of 32px
-                  width: '28px',
-                  height: '28px',
-                  minWidth: '28px',
-                  minHeight: '28px',
+                  // Smaller size: 36px instead of 44px
+                  width: '36px',
+                  height: '36px',
+                  minWidth: '36px',
+                  minHeight: '36px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -928,11 +928,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 28px instead of 32px
-                  width: '28px',
-                  height: '28px',
-                  minWidth: '28px',
-                  minHeight: '28px',
+                  // Smaller size: 36px instead of 44px
+                  width: '36px',
+                  height: '36px',
+                  minWidth: '36px',
+                  minHeight: '36px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
