@@ -789,7 +789,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
           {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 px-4"
+            className={`absolute inset-x-0 px-4 ${isDetailExpanded ? 'bottom-0 py-4' : 'top-1/2 transform -translate-y-1/2'}`}
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
