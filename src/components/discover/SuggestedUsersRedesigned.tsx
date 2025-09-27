@@ -789,16 +789,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
           {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className="absolute bottom-0 inset-x-0 px-4 py-4"
+            className="absolute bottom-0 inset-x-0 h-10 px-4 flex items-center justify-center"
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
               borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
-            {/* Swipe indicator for expanded state */}
+            {/* Swipe indicator for expanded state (do not affect layout) */}
             {isDetailExpanded && (
-              <div className="flex justify-center mb-2">
+              <div className="absolute top-1.5 left-1/2 -translate-x-1/2">
                 <div 
                   className="w-8 h-1 rounded-full bg-white/30"
                   style={{
