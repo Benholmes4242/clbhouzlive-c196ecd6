@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -50,7 +51,13 @@ serve(async (req) => {
 
         // Convert each iframe URL to HLS manifest URL
         for (const record of records) {
-          const oldUrl = (record as any)[table.column] as string
+          const rec = record as unknown as Record<string, unknown>;
+          const oldUrl = rec[table.column] as string | undefined;
+          
+          if (!oldUrl) {
+            console.warn(`No URL found for record ${(record as any).id}`);
+            continue;
+          }
           
           // Extract video ID from iframe URL
           let videoId: string | null = null

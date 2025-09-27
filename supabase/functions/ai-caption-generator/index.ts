@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -72,9 +73,10 @@ Generate a unique caption now:`;
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in ai-caption-generator function:', error);
+    const err = normalizeError(error);
+    console.error('Error in ai-caption-generator function:', err.name, err.message, err.stack);
     return new Response(JSON.stringify({ 
-      error: (error as Error).message || 'Failed to generate caption'
+      error: err.message || 'Failed to generate caption'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -80,7 +81,7 @@ serve(async (req) => {
     console.error('❌ Error configuring CORS:', error);
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message 
+      error: normalizeError(error).message 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500

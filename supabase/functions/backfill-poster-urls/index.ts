@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -136,11 +137,12 @@ Deno.serve(async (req) => {
       },
     )
   } catch (error) {
-    console.error('Backfill error:', error);
+    const err = normalizeError(error);
+    console.error('Backfill error:', err.name, err.message, err.stack);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: err.message
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

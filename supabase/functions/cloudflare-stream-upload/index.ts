@@ -134,7 +134,7 @@ serve(async (req) => {
       } catch (error) {
         console.error('❌ Error uploading to Cloudflare Stream:', error);
         return new Response(
-          JSON.stringify({ error: 'Upload failed', details: error.message }),
+          JSON.stringify({ error: 'Upload failed', details: normalizeError(error).message }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -213,7 +213,7 @@ serve(async (req) => {
       } catch (error) {
         console.error('❌ Error fetching video details:', error);
         return new Response(
-          JSON.stringify({ error: 'Failed to fetch video details', details: error.message }),
+          JSON.stringify({ error: 'Failed to fetch video details', details: normalizeError(error).message }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -227,7 +227,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in cloudflare-stream-upload function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: normalizeError(error).message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

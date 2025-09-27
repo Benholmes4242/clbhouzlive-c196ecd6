@@ -233,8 +233,9 @@ Deno.serve(async (req) => {
           finalUpload = uploadData
           console.log('File upload completed successfully:', finalUpload.path)
         } catch (combineError) {
-          console.error('Error during chunk processing:', combineError)
-          throw new Error(`Chunk processing failed: ${combineError.message}`)
+          const ce = normalizeError(combineError);
+          console.error('Error during chunk processing:', ce.name, ce.message, ce.stack)
+          throw new Error(`Chunk processing failed: ${ce.message}`)
         }
 
         // Clean up chunks
@@ -273,16 +274,17 @@ Deno.serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('Chunked upload error:', error)
+    const err = normalizeError(error);
+    console.error('Chunked upload error:', err.name, err.message, err.stack)
     console.error('Error details:', {
-      message: error.message,
-      stack: error.stack
+      message: err.message,
+      stack: err.stack
     })
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: err.message,
         success: false,
-        details: error.stack
+        details: err.stack
       }),
       { 
         status: 400,

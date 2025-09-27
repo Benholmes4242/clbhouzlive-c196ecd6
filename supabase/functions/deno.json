@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "checkJs": false,
-    "noCheck": true
+    "noCheck": true,
+    "lib": ["deno.window"]
+  },
+  "fmt": {
+    "exclude": ["**/*.d.ts"]
   }
 }
