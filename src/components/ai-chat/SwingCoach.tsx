@@ -387,152 +387,133 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     }
   };
 
-  const extractFramesFromVideo = async (videoFile: File): Promise<string[]> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const frames: string[] = [];
-      
-      // Mobile-specific settings
+  const extractFramesViaPlayback = async (file: File): Promise<string[]> => {
+    return new Promise<string[]>(async (resolve, reject) => {
+      const video = document.createElement('video') as HTMLVideoElement;
       video.muted = true;
       video.playsInline = true;
-      video.preload = 'metadata';
-      
-      // Add timeout for mobile devices
-      const timeout = setTimeout(() => {
-        console.error('Video frame extraction timed out');
-        reject(new Error('Video processing timed out'));
-      }, 15000); // Reduced timeout for 8 frames
-      
-      // Enhanced error handling
-      video.onerror = (e) => {
-        clearTimeout(timeout);
-        console.error('Video error:', e);
-        reject(new Error('Video failed to load'));
+      video.preload = 'auto';
+      video.src = URL.createObjectURL(file);
+
+      let isComplete = false;
+      let timeoutId: NodeJS.Timeout;
+
+      const cleanup = () => {
+        if (isComplete) return;
+        isComplete = true;
+        
+        try {
+          video.pause();
+        } catch (e) {
+          // Ignore pause errors
+        }
+        
+        // Event listeners will be cleaned up automatically
+        URL.revokeObjectURL(video.src);
+        video.src = '';
+        
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
       };
-      
-      video.onloadedmetadata = () => {
+
+      // Setup timeout
+      timeoutId = setTimeout(() => {
+        cleanup();
+        reject(new Error('Playback capture timed out'));
+      }, 15000);
+
+      try {
+        // Wait for video to be ready
+        await new Promise<void>((res, rej) => {
+          const onError = () => rej(new Error('Video failed to load'));
+          const onReady = () => {
+            video.removeEventListener('error', onError);
+            res();
+          };
+          video.addEventListener('error', onError);
+          video.addEventListener('canplaythrough', onReady, { once: true });
+        });
+
+        const duration = video.duration;
+        const targets = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95].map(p => p * duration);
+        const captured = new Array<boolean>(targets.length).fill(false);
+        const frames: string[] = [];
+
         console.log('Video metadata loaded:', {
           width: video.videoWidth,
           height: video.videoHeight,
           duration: video.duration
         });
-        
-        // Optimized canvas size for faster processing
-        const isMobile = window.innerWidth <= 768;
-        const maxWidth = 512; // Reduced for faster processing
-        canvas.width = Math.min(video.videoWidth, maxWidth);
-        canvas.height = (canvas.width / video.videoWidth) * video.videoHeight;
-        
-        const duration = video.duration;
-        
-        // Optimized to 8 key frames for faster processing
-        const framePositions = [
-          0.03, // Initial setup/Address (P1)
-          0.13, // Takeaway initiation 
-          0.28, // Mid takeaway (P2)
-          0.48, // Three-quarter back
-          0.58, // Top of backswing (P4)
-          0.73, // Mid downswing (P5)
-          0.87, // Impact (P6)
-          0.95  // Full finish (P8/P9)
-        ];
-        
-        const positions = framePositions.map(pos => pos * duration);
-        let frameIndex = 0;
-        let seekTimeout: NodeJS.Timeout;
-        
-        // Simplified processing: no batching needed with 8 frames
-        const batchSize = positions.length; // Process all frames together for speed
-        let currentBatch = 0;
-        
-        const processBatch = () => {
-          const batchStart = currentBatch * batchSize;
-          const batchEnd = Math.min(batchStart + batchSize, positions.length);
-          
-          if (batchStart >= positions.length) {
-            clearTimeout(timeout);
-            console.log(`Successfully extracted ${frames.length} frames`);
-            resolve(frames);
-            return;
-          }
-          
-          frameIndex = batchStart;
-          captureFrame();
-        };
-        
-        const captureFrame = () => {
-          const batchStart = currentBatch * batchSize;
-          const batchEnd = Math.min(batchStart + batchSize, positions.length);
-          
-          if (frameIndex >= batchEnd) {
-            // Batch complete, clean up memory and start next batch
-            if (isMobile) {
-              // Force garbage collection on mobile by nullifying references
-              ctx?.clearRect(0, 0, canvas.width, canvas.height);
-              // Small delay to allow memory cleanup
-              setTimeout(() => {
-                currentBatch++;
-                processBatch();
-              }, 200);
-            } else {
-              currentBatch++;
-              processBatch();
+
+        // Setup canvas
+        const canvas = document.createElement('canvas');
+        const maxWidth = 512;
+        const canvasWidth = Math.min(video.videoWidth || 512, maxWidth);
+        const canvasHeight = Math.round(canvasWidth * (video.videoHeight / video.videoWidth));
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        const ctx = canvas.getContext('2d')!;
+
+        const tolerance = 0.045; // 45ms tolerance
+        const maybeCapture = (currentTime: number) => {
+          for (let i = 0; i < targets.length; i++) {
+            if (!captured[i] && Math.abs(currentTime - targets[i]) <= tolerance) {
+              ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+              frames.push(canvas.toDataURL('image/jpeg', 0.65));
+              captured[i] = true;
+              console.log(`Captured frame ${i + 1}/${targets.length} at ${currentTime.toFixed(2)}s`);
+              break;
             }
-            return;
           }
-          
-          // Clear any existing seek timeout
-          if (seekTimeout) clearTimeout(seekTimeout);
-          
-          video.currentTime = positions[frameIndex];
-          
-          // Backup timeout for seek operation
-          seekTimeout = setTimeout(() => {
-            console.warn(`Seek timeout for frame ${frameIndex + 1}, skipping...`);
-            frameIndex++;
-            captureFrame();
-          }, 4000); // Longer timeout for mobile
-          
-          video.onseeked = () => {
-            clearTimeout(seekTimeout);
-            
-            if (ctx) {
-              try {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                // Optimized quality for faster processing
-                const quality = 0.65; // Reduced quality for speed
-                const frameData = canvas.toDataURL('image/jpeg', quality);
-                frames.push(frameData);
-                console.log(`Captured frame ${frameIndex + 1}/${positions.length} (Batch ${currentBatch + 1})`);
-                
-                // Clear canvas immediately after capture on mobile
-                if (isMobile) {
-                  ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-              } catch (e) {
-                console.error('Canvas draw error:', e);
+
+          // Check if we're done
+          if (captured.filter(Boolean).length >= targets.length || video.ended) {
+            if (frames.length >= 4) {
+              // Add telemetry
+              console.info('[SC] capture', {
+                frames: frames.length,
+                targets: 8,
+                mime: file.type,
+                duration: video.duration
+              });
+
+              if (frames.length < 8) {
+                console.warn('[SC] partial_capture', { frames: frames.length });
               }
+
+              cleanup();
+              resolve(frames);
+            } else if (video.ended) {
+              cleanup();
+              reject(new Error('Insufficient frames captured'));
             }
-            
-            frameIndex++;
-            // Slightly longer delay between frames for mobile stability
-            setTimeout(captureFrame, isMobile ? 150 : 50);
-          };
+          }
         };
+
+        const useRVFC = 'requestVideoFrameCallback' in (video as any);
+        const onTimeUpdate = () => maybeCapture(video.currentTime);
         
-        // Start processing first batch
-        setTimeout(processBatch, 500);
-      };
-      
-      // Enhanced data handling for mobile
-      video.oncanplay = () => {
-        console.log('Video can play');
-      };
-      
-      video.src = URL.createObjectURL(videoFile);
-      video.load(); // Explicitly load the video
+        const rvfcLoop = (_: any, metadata: any) => {
+          maybeCapture(metadata.mediaTime);
+          if (!isComplete && captured.filter(Boolean).length < targets.length && !video.ended) {
+            (video as any).requestVideoFrameCallback(rvfcLoop);
+          }
+        };
+
+        // Start capturing
+        if (useRVFC) {
+          (video as any).requestVideoFrameCallback(rvfcLoop);
+        } else {
+          video.addEventListener('timeupdate', onTimeUpdate);
+        }
+        
+        await video.play();
+
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     });
   };
 
@@ -595,7 +576,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             });
           }
           setAnalysisStatus('Extracting frames...');
-          extractedFrames = await extractFramesFromVideo(uploadedVideo);
+          extractedFrames = await extractFramesViaPlayback(uploadedVideo);
           setExtractedFrames(extractedFrames);
           if (extractedFrames.length === 0) {
             throw new Error("Couldn't extract frames from video");
@@ -709,7 +690,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         
         // Try once more
         if (uploadedVideo.type.startsWith('video/')) {
-          extractedFrames = await extractFramesFromVideo(uploadedVideo);
+          extractedFrames = await extractFramesViaPlayback(uploadedVideo);
         }
         
         if (extractedFrames.length === 0) {
