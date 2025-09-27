@@ -141,14 +141,17 @@ serve(async (req: Request) => {
       
       const systemPrompt = `You are Echo, a professional golf instructor and swing coach with expertise in biomechanics and golf technique. When analyzing golf swing images/frames:
 
-1. Always provide specific technical analysis of what you observe in the frames
-2. Break down the swing into phases: Setup, Takeaway, Backswing, Top, Downswing, Impact, Follow-through
-3. Comment on posture, grip, swing plane, tempo, balance, and body mechanics
-4. Identify strengths and specific areas for improvement
-5. Give actionable tips that can help improve their swing
-6. Be encouraging while being technically accurate
+1. Always provide DETAILED, comprehensive technical analysis of what you observe in the frames
+2. Break down the swing into ALL phases with specific observations: Setup/Address, Takeaway, Backswing, Top of Swing, Downswing, Impact, Follow-through
+3. For EACH phase, comment on: posture, grip, alignment, swing plane, tempo, balance, and body mechanics
+4. Include specific metrics and measurements when possible (angles, positions, timing)
+5. Identify strengths and provide detailed areas for improvement with specific drills/tips
+6. Give actionable practice recommendations and feel-based cues
+7. Be encouraging while being technically comprehensive and accurate
+8. Structure your response with clear headings for each swing phase
+9. Include a summary with 3-5 key takeaways and practice priorities
 
-Analyze the swing frames directly and provide detailed feedback. Never say you can't analyze the images - always give specific observations about what you see in the swing sequence.`;
+IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide condensed or quick summaries unless specifically requested. Analyze the swing frames directly and give comprehensive feedback with specific observations for each frame/phase.`;
       
       const messages = [
         { role: 'system', content: systemPrompt },
@@ -179,7 +182,7 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
 
       // Add timeout for faster failure/fallback
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 13000); // 13s SLA
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s SLA for full analysis
 
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -192,7 +195,7 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
           body: JSON.stringify({
             model: 'gpt-4o-mini', // Fast vision model for swing analysis
             messages: messages,
-            max_tokens: 600, // Reduced for faster response
+            max_tokens: 1500, // Increased for detailed phase-by-phase analysis
             temperature: 0.2
           }),
         });
@@ -208,16 +211,24 @@ Analyze the swing frames directly and provide detailed feedback. Never say you c
         const data = await response.json();
         const finalResponse = data.choices[0].message.content.trim();
         
+        // Calculate payload size and log metrics
+        const payloadSize = JSON.stringify(messages).length;
+        const tokenCount = data.usage?.total_tokens || 0;
+        
         console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
           responseLength: finalResponse.length,
-          responsePreview: finalResponse.substring(0, 100)
+          responsePreview: finalResponse.substring(0, 100),
+          payloadBytes: payloadSize,
+          tokenCount: tokenCount,
+          timedOut: false
         });
 
         console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
 
         return new Response(JSON.stringify({ 
           response: finalResponse, 
-          metadata: null 
+          metadata: { timeout: false, quick: false, timedOut: false, tokenCount },
+          mode: 'full'
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -239,12 +250,13 @@ Based on the submitted frames, I can see:
 
 *This is a condensed analysis due to processing time. For detailed breakdown, try uploading a shorter video clip or use the "Refine Details" option.*`;
 
-          return new Response(JSON.stringify({ 
-            response: quickAnalysis,
-            metadata: { timeout: true, quick: true }
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+        return new Response(JSON.stringify({ 
+          response: quickAnalysis,
+          metadata: { timeout: true, quick: true, timedOut: true },
+          mode: 'quick'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
         }
         
         throw error;

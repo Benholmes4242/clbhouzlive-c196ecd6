@@ -740,12 +740,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       const apiStartTime = Date.now();
       
-      // Add AbortController for 13s timeout
+      // Add AbortController for 20s timeout (aligned with edge function)
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-        console.warn('[SC] API call aborted after 13s timeout');
-      }, 13000);
+        console.warn('[SC] API call aborted after 20s timeout');
+      }, 20000);
 
       try {
         const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
@@ -755,7 +755,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               role: msg.type === 'user' ? 'user' : 'assistant',
               content: msg.content
             })),
-            detailMode: false,
+            detailMode: true, // Request full detailed analysis
             isEcho: true,
             images: extractedFrames,
             swingContext: swingContext
@@ -765,8 +765,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         clearTimeout(timeoutId);
 
         const apiResponseTime = Date.now() - apiStartTime;
-        console.log('✅ Edge Function response:', { error, hasData: !!data, responseTime: apiResponseTime });
-        console.info(`[SC] API round-trip: ${apiResponseTime}ms`);
+        
+        // Enhanced logging with payload metrics
+        const payloadSize = JSON.stringify(extractedFrames).length;
+        console.log('✅ Edge Function response:', { 
+          error, 
+          hasData: !!data, 
+          responseTime: apiResponseTime,
+          payloadBytes: Math.round(payloadSize / 1024) + 'KB',
+          mode: data?.mode || 'unknown',
+          timedOut: data?.metadata?.timedOut || false,
+          tokenCount: data?.metadata?.tokenCount || 0
+        });
+        console.info(`[SC] API round-trip: ${apiResponseTime}ms, mode: ${data?.mode || 'unknown'}, payloadSize: ${Math.round(payloadSize / 1024)}KB`);
 
       // Ensure visual progression uses at least 80% of total wait time
       const minProgressTime = apiResponseTime * 0.8;
@@ -791,7 +802,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         type: 'ai',
         content: data.response,
         timestamp: new Date(),
-        metadata: data.metadata
+        metadata: {
+          ...data.metadata,
+          mode: data.mode, // Track whether response was 'full' or 'quick'
+          analysisType: data.metadata?.timedOut ? 'quick' : 'full'
+        }
       };
 
       setMessages(prev => [...prev, aiMessage]);
