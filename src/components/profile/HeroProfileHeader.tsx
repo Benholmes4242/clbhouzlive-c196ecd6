@@ -319,13 +319,13 @@ const HeroProfileHeader = ({
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16 bg-white">
+        <div className="min-h-screen bg-white relative overflow-visible -mt-16">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
-            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
-              {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-              
+            <div
+              className="relative w-full profile-hero"
+              style={{ height: 'var(--hero-h)' }}
+            >
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -334,21 +334,17 @@ const HeroProfileHeader = ({
                     return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
                   })()}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none"
                   style={{ 
                     objectPosition: '50% 50%'
                   }}
                   loading="eager"
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.previousElementSibling?.remove();
-                  }}
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder.svg';
                   }}
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                <div className="absolute inset-0 w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
                   <Camera className="w-16 h-16 mb-4 opacity-50" />
                   <p className="text-lg font-medium mb-2">No Profile Photo</p>
                   <p className="text-sm text-center px-4">
@@ -365,8 +361,14 @@ const HeroProfileHeader = ({
 
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
-              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
-              style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)' }}
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] transform-gpu will-change-transform profile-panel"
+              style={{
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                WebkitBackdropFilter: 'blur(16px)',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+              }}
             >
               {/* Header row: kebab • name/handle • mini card */}
               <div
@@ -719,7 +721,7 @@ const HeroProfileHeader = ({
           </section>
           
           {/* Tabs rail spacing */}
-          <div style={{ marginTop: 'var(--tabs-gap-top)' }}>
+          <div className="mt-[var(--tabs-gap-top)] relative z-0" style={{ marginTop: 'var(--tabs-gap-top)' }}>
             {/* Tab content will be rendered here by parent component */}
           </div>
         </div>
