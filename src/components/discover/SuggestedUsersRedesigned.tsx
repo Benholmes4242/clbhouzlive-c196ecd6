@@ -630,7 +630,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
-          height: isDetailExpanded ? "100%" : "64px",
+          height: isDetailExpanded ? "100%" : "40px",
         }}
         style={{
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
@@ -826,11 +826,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 28px instead of 36px
+                  width: '28px',
+                  height: '28px',
+                  minWidth: '28px',
+                  minHeight: '28px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -875,11 +875,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   isDetailExpanded && "ring-1 ring-accent/30"
                 )}
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 28px instead of 36px
+                  width: '28px',
+                  height: '28px',
+                  minWidth: '28px',
+                  minHeight: '28px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -928,11 +928,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 28px instead of 36px
+                  width: '28px',
+                  height: '28px',
+                  minWidth: '28px',
+                  minHeight: '28px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
