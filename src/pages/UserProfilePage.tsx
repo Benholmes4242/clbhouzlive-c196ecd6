@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import ProfilePageHeader from '@/components/profile/ProfilePageHeader';
+import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import UserProfileLoader from '@/components/profile/UserProfileLoader';
 import UserProfileContent from '@/components/profile/UserProfileContent';
@@ -72,8 +72,8 @@ const UserProfilePage = () => {
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png" />
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" />
       
-      {/* Profile Page Header */}
-      <ProfilePageHeader />
+      {/* Header spacer so hero sits under the header (matches /profile) */}
+      <div aria-hidden className="h-16 md:h-18" />
       
       {/* Content flows naturally without fixed positioning */}
       <div className="relative">
