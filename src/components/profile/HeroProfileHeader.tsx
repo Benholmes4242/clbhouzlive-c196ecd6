@@ -737,7 +737,7 @@ const HeroProfileHeader = ({
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
               ref={profileCardRef}
-              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              className="relative z-20 mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)' }}
             >
                <div className="px-5 py-4 flex flex-col items-center relative">
@@ -985,7 +985,7 @@ const HeroProfileHeader = ({
 
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
-              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              className="relative z-20 mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)' }}
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
