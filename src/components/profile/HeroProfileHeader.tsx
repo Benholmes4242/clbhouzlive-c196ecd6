@@ -767,7 +767,14 @@ const HeroProfileHeader = ({
                       
                       {/* Name + Handle - perfectly centered */}
                       <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">
+                        <h1 
+                          className="text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden px-2" 
+                          style={{ 
+                            textOverflow: 'ellipsis',
+                            maxWidth: 'calc(100% - 8px)' 
+                          }}
+                          title={displayName}
+                        >
                           {displayName}
                         </h1>
                         <p className="mt-1 text-sm text-gray-700">
@@ -1015,7 +1022,14 @@ const HeroProfileHeader = ({
                       
                       {/* Name + Handle - perfectly centered */}
                       <div className="text-center">
-                        <h1 className="text-3xl font-semibold text-gray-900">
+                        <h1 
+                          className="text-3xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden px-2" 
+                          style={{ 
+                            textOverflow: 'ellipsis',
+                            maxWidth: 'calc(100% - 8px)' 
+                          }}
+                          title={displayName}
+                        >
                           {displayName}
                         </h1>
                         <p className="mt-1 text-base text-gray-700">
