@@ -720,7 +720,11 @@ const HeroProfileHeader = ({
           
           {/* Tabs rail spacing */}
           <div style={{ marginTop: 'var(--tabs-gap-top)' }}>
-            {/* Tab content will be rendered here by parent component */}
+            <UniversalProfileTabs
+              userId={profile?.id || ''}
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+            />
           </div>
         </div>
       )}
