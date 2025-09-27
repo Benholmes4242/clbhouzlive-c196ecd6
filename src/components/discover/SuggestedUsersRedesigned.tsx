@@ -710,7 +710,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-white text-2xl font-bold">
+                          <span className="text-white text-xl font-bold">
                             {user.displayName.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -734,7 +734,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   >
                     {/* Display Name - Second in stagger */}
                     <motion.h3 
-                      className="text-white font-bold text-lg cursor-pointer hover:text-white/90 transition-colors duration-200 truncate"
+                      className="text-white font-bold text-base cursor-pointer hover:text-white/90 transition-colors duration-200 truncate"
                       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -756,7 +756,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     
                     {/* Handle - Third in stagger */}
                     <motion.p 
-                      className="text-white/70 text-base mt-0.5"
+                      className="text-white/70 text-sm mt-0.5"
                       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ 
@@ -775,7 +775,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     {/* Handicap - Fourth in stagger - Only show if user has one */}
                     {user.handicap !== undefined && (
                       <motion.p 
-                        className="text-white/80 text-sm mt-0.5"
+                        className="text-white/80 text-xs mt-0.5"
                         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ 
@@ -966,7 +966,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 transition={{ duration: 0.15 }}
               >
                 <div 
-                  className="text-white font-medium text-center text-sm whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
+                  className="text-white font-medium text-center text-xs whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
                   style={{ 
                     textShadow: '0 1px 2px rgba(0,0,0,0.5)',
                     background: 'hsl(var(--glass-dark))',
