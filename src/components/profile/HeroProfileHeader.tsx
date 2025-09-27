@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical, Camera, MapPin, BarChart3 } from 'lucide-react';
 import SocialActivity from './SocialActivity';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { TbMovie } from 'react-icons/tb';
-import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
