@@ -668,6 +668,16 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   ease: "easeOut"
                 }}
               >
+                {/* Swipe indicator at top of expanded content */}
+                <div className="flex justify-center pt-2 pb-1">
+                  <div 
+                    className="w-8 h-1 rounded-full bg-white/30"
+                    style={{
+                      opacity: isPanelDragging ? 0.6 : 0.3
+                    }}
+                  />
+                </div>
+                
                 {/* Profile Info Section - Top Area with Stagger */}
                 <div className="flex-1 flex flex-col px-4 pt-1 pb-20">
                   {/* User Avatar - First in stagger */}
@@ -796,17 +806,6 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
               borderTop: isDetailExpanded ? '1px solid hsl(var(--glass-border))' : 'none'
             }}
           >
-            {/* Swipe indicator for expanded state (do not affect layout) */}
-            {isDetailExpanded && (
-              <div className="absolute top-1.5 left-1/2 -translate-x-1/2">
-                <div 
-                  className="w-8 h-1 rounded-full bg-white/30"
-                  style={{
-                    opacity: isPanelDragging ? 0.6 : 0.3
-                  }}
-                />
-              </div>
-            )}
             <div className="flex items-center justify-center gap-6">
               {/* Left: Dismiss Button - Accessible & Performance Optimized */}
               <motion.button
