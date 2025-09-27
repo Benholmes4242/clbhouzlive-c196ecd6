@@ -737,23 +737,20 @@ const HeroProfileHeader = ({
       {/* Immersive Profile Modal */}
       {isImmersiveOpen && (
         <ImmersiveProfileModal
-          profile={profile}
-          mediaItems={mediaItems}
-          currentIndex={currentMediaIndex}
-          onIndexChange={setCurrentMediaIndex}
-          isOwnProfile={isOwnProfile}
+          isOpen={isImmersiveOpen}
           onClose={closeImmersive}
-          onMorphTransition={() => {}}
-          onMediaManagerOpen={() => setMediaManagerOpen(true)}
-          previewMode={false}
+          userId={profile?.id ?? ''}
+          mediaItems={mediaItems}
         />
       )}
 
       {/* Media Manager Modal */}
       {mediaManagerOpen && (
         <MediaManagerModal
-          profile={profile}
+          isOpen={mediaManagerOpen}
           onClose={() => setMediaManagerOpen(false)}
+          userId={profile?.id ?? ''}
+          mediaItems={mediaItems}
           onMediaUpdate={refetchMedia}
         />
       )}
