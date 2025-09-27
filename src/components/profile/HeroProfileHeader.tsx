@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical, Camera, MapPin, BarChart3 } from 'lucide-react';
-import SocialActivity from './SocialActivity';
-import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { TbMovie } from 'react-icons/tb';
+import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
@@ -719,41 +718,9 @@ const HeroProfileHeader = ({
             </section>
           </section>
           
-          {/* Tab Content */}
+          {/* Tabs rail spacing */}
           <div style={{ marginTop: 'var(--tabs-gap-top)' }}>
-            {activeSection === 'activity' && (
-              <SocialActivity
-                userId={profile?.id || ''}
-                isOwnProfile={isOwnProfile}
-                activityVisible={true}
-                profileDisplayName={profile?.display_name}
-                userType="individual"
-              />
-            )}
-            {activeSection === 'stats' && (
-              <HandicapSection userId={profile?.id || ''} profile={profile} />
-            )}
-            {activeSection === 'courses' && (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
-                </div>
-                <UserCoursesContent 
-                  username={profile?.username} 
-                  isOwnProfile={isOwnProfile}
-                  displayName={profile?.display_name}
-                />
-              </>
-            )}
-            {activeSection === 'achievements' && (
-              <AchievementsPane 
-                userId={profile?.id}
-                userDisplayName={profile?.display_name || 'User'}
-                userHandicap={profile?.eg_handicap_index}
-                userProfilePhotoUrl={profile?.profile_photo_url}
-                isCurrentUser={isOwnProfile}
-              />
-            )}
+            {/* Tab content will be rendered here by parent component */}
           </div>
         </div>
       )}
