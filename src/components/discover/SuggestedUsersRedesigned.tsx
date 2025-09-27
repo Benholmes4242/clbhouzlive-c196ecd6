@@ -630,7 +630,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
         className="absolute inset-x-0 bottom-0 z-30"
         initial={false}
         animate={{
-          height: isDetailExpanded ? "100%" : "64px",
+          height: isDetailExpanded ? "100%" : "48px",
         }}
         style={{
           transform: `translateY(${isPanelDragging ? panelDragY * 0.5 : 0}px)`,
