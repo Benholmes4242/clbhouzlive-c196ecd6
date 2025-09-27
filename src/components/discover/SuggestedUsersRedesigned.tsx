@@ -659,7 +659,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           <AnimatePresence>
             {isDetailExpanded && (
               <motion.div
-                className="absolute inset-0 flex flex-col"
+                className="absolute inset-x-0 top-0 bottom-10 flex flex-col"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showStaggeredContent ? 1 : 0 }}
                 exit={{ opacity: 0 }}
@@ -789,7 +789,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
 
           {/* Glass Control Bar - Always at Bottom */}
           <motion.div 
-            className={`absolute inset-x-0 px-4 ${isDetailExpanded ? 'bottom-0 py-4' : 'top-1/2 transform -translate-y-1/2'}`}
+            className="absolute inset-x-0 bottom-0 h-10 px-4 relative"
             style={{
               background: 'hsl(var(--glass-dark))',
               backdropFilter: 'blur(16px)',
@@ -798,7 +798,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
           >
             {/* Swipe indicator for expanded state */}
             {isDetailExpanded && (
-              <div className="flex justify-center mb-2">
+              <div className="absolute -top-3 left-0 right-0 flex justify-center">
                 <div 
                   className="w-8 h-1 rounded-full bg-white/30"
                   style={{
