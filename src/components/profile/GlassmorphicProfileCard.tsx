@@ -31,7 +31,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 p-6 text-center"
+      className={`relative text-center ${isMobile ? 'mx-4 px-[6px] py-[14px]' : 'mx-8 p-6'}`}
       style={glassmorphicStyle}
     >
       {/* Profile photo - overlapping top of card */}
@@ -61,7 +61,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
         </h2>
 
         {/* Username row with edit button */}
-        <div className="flex items-center justify-center gap-3">
+        <div className={`flex items-center justify-center ${isMobile ? 'gap-2.5' : 'gap-3'}`}>
           <p className="text-base text-white/80">
             @{profile?.username || 'username'}
           </p>
