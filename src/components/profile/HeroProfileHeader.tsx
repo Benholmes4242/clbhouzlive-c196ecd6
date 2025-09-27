@@ -689,9 +689,11 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-16 bg-white">
+        <div className="min-h-screen bg-white relative overflow-visible">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed, responsive height) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+              <div className="relative h-full w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -731,21 +733,20 @@ const HeroProfileHeader = ({
               <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
+              </div>
             </div>
 
-            {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
+            {/* GLASS PANEL – small, consistent overlap */}
+            <section
               ref={profileCardRef}
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-0
-              "
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
             >
-               <div className="px-5 py-4 flex flex-col items-center relative">
+               <div className="flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-4 left-5">
@@ -766,23 +767,23 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[84px]"></div>
+                    <div
+                      className="grid items-center"
+                      style={{ gridTemplateColumns: 'max-content 1fr var(--mini-w)' }}
+                    >
+                      {/* Left: existing menu/kebab (unchanged) */}
+                      <div></div>
                       
-                      {/* Name + Handle - perfectly centered */}
+                      {/* Center: name/handle (just apply the sizes) */}
                       <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
+                        <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">{displayName}</h1>
+                        <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
-                      <div 
-                        className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                      {/* Right: mini card (keep existing image/content) */}
+                      <div
+                        className="justify-self-end rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                       >
                         {profile?.profile_photo_url ? (
@@ -924,8 +925,8 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
-            </div>
+                </div>
+              </section>
              
              {/* Spacer below for 16px gap before tab content */}
              <div className="h-4" />
@@ -933,9 +934,11 @@ const HeroProfileHeader = ({
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative -mt-16 bg-white">
+        <div className="min-h-screen bg-white relative overflow-visible">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed, responsive height) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+              <div className="relative h-full w-full overflow-hidden">
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -985,19 +988,19 @@ const HeroProfileHeader = ({
               <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
                               bg-gradient-to-t from-white via-white/60 to-transparent
                               pointer-events-none z-[5]" />
+              </div>
             </div>
 
-            {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-              "
+            {/* GLASS PANEL – small, consistent overlap */}
+            <section
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
             >
-               <div className="px-8 py-6 flex flex-col items-center relative">
+               <div className="flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-6 left-8">
@@ -1018,23 +1021,23 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-4">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[112px]"></div>
+                    <div
+                      className="grid items-center"
+                      style={{ gridTemplateColumns: 'max-content 1fr var(--mini-w)' }}
+                    >
+                      {/* Left: existing menu/kebab (unchanged) */}
+                      <div></div>
                       
-                      {/* Name + Handle - perfectly centered */}
+                      {/* Center: name/handle (just apply the sizes) */}
                       <div className="text-center">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-base text-gray-700">
-                          @{username}
-                        </p>
+                        <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">{displayName}</h1>
+                        <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
-                      <div 
-                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
+                      {/* Right: mini card (keep existing image/content) */}
+                      <div
+                        className="justify-self-end rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                         role="button"
                         tabIndex={0}
@@ -1142,6 +1145,9 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
+                  {/* (Optional) keep breathing room before tabs; doesn't wrap tabs */}
+                  <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
+
                   {/* Tab Navigation - pinned to bottom */}
                   <div className="w-full border-t border-gray-300 mt-5 pt-5">
                     <div className="flex" role="tablist" aria-label="Profile sections">
@@ -1181,7 +1187,7 @@ const HeroProfileHeader = ({
                   </div>
 
               </div>
-            </div>
+            </section>
              
              {/* Spacer below to avoid clipping the panel - 16px gap */}
              <div className="h-4" />
