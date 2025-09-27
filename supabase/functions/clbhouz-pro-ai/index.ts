@@ -238,7 +238,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         
         // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
-          console.log('🚨 API call aborted due to 13s timeout - returning quick analysis');
+          console.log('🚨 API call aborted due to 20s timeout - returning quick analysis');
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:

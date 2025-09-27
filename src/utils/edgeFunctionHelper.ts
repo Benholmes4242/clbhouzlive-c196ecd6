@@ -26,7 +26,7 @@ export async function callEdgeFunction<T = any>(
   options: EdgeFunctionOptions = {}
 ): Promise<T> {
   const {
-    timeout = 10000,
+    timeout = 22000,
     retries = 2,
     retryDelay = 1000
   } = options;
