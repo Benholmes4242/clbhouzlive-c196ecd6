@@ -1,8 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 // Supabase Edge Function (Deno runtime)
 // ⚠️ Router applies ONLY to text Q&A. SwingCoach (CV/video) and CaddieLogs flows are untouched.
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
@@ -300,7 +299,7 @@ Based on the submitted frames, I can see:
         answer = await withTimeout(callOpenAI(STATIC_SYSTEM, STATIC_BRIDGE(message), conversation));
       }
     } catch (e) {
-      console.warn('⚠️ Primary route failed:', e.message);
+      console.warn('⚠️ Primary route failed:', (e as Error).message);
       if (route === "live") {
         // fallback to static background
         console.log('🔄 Falling back to static knowledge');
@@ -319,7 +318,7 @@ Based on the submitted frames, I can see:
         answer = `${answer}\n\n—\n**Live Update:** ${live}`;
         route = "live";
       } catch (e) {
-        console.warn('⚠️ Live update failed:', e.message);
+        console.warn('⚠️ Live update failed:', (e as Error).message);
       }
     }
 
