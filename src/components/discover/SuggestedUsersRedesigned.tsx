@@ -696,7 +696,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     }}
                   >
                     <div 
-                      className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/profile/${user.id}`);
