@@ -693,9 +693,6 @@ const HeroProfileHeader = ({
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
             <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
-              {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-              
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -710,10 +707,6 @@ const HeroProfileHeader = ({
                     objectFit: 'cover'
                   }}
                   loading="eager"
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.previousElementSibling?.remove();
-                  }}
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder.svg';
                   }}
@@ -928,9 +921,6 @@ const HeroProfileHeader = ({
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
             <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
-              {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-              
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
