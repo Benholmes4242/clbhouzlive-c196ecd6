@@ -1103,7 +1103,8 @@ const HeroProfileHeader = ({
              <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
            </section>
          </div>
-      )}
+         </div>
+       )}
 
       {/* Stats Display - Hidden, legacy */}
       <div style={{ display: 'none' }}>
