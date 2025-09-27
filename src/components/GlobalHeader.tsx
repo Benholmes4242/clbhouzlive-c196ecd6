@@ -14,8 +14,13 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/create-profile',
   '/admin-setup',
-  '/profile', // Profile page uses its own header
   // Add more full-screen routes as needed
+];
+
+// Routes that should use ProfilePageHeader instead of GlobalHeader
+const PROFILE_HEADER_ROUTES = [
+  '/profile', // Benjamin Holmes profile
+  // All user profiles will use ProfilePageHeader
 ];
 
 // Routes that use glass-dark variant
@@ -54,7 +59,7 @@ const GlobalHeader: React.FC = () => {
   }, []);
 
   // Determine if current route should hide header
-  const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
+  const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname) || location.pathname.startsWith('/profile');
   const isClubhousePage = location.pathname === '/' || location.pathname === '/clubhouse';
   
   // Set header variant - always use glass-dark now (liquid glass everywhere)
