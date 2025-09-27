@@ -50,7 +50,7 @@ serve(async (req) => {
 
         // Convert each iframe URL to HLS manifest URL
         for (const record of records) {
-          const oldUrl = record[table.column] as string
+          const oldUrl = (record as any)[table.column] as string
           
           // Extract video ID from iframe URL
           let videoId: string | null = null

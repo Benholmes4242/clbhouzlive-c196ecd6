@@ -192,8 +192,8 @@ Deno.serve(async (req) => {
             batchChunks.length = 0
             
             // Force garbage collection if available
-            if (typeof globalThis.gc === 'function') {
-              globalThis.gc()
+            if ('gc' in globalThis && typeof (globalThis as any).gc === 'function') {
+              (globalThis as any).gc();
             }
           }
 
