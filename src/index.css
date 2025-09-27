@@ -494,7 +494,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --sheet-scroll-pad-bottom: calc(16px + env(safe-area-inset-bottom, 0px) + 8px);
     
     /* Responsive Profile Hero System */
-    --hero-h: clamp(55vh, 65vh, 75vh);
+    --hero-h: clamp(44vh, 52vh, 60vh);
     --panel-overlap: clamp(56px, 7vh, 96px);
     --panel-pad-x: clamp(16px, 4vw, 32px);
     --panel-pad-y: clamp(12px, 2.6vh, 24px);
