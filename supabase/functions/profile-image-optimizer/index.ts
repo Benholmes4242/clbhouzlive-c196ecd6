@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,10 +46,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in profile-image-optimizer:', error);
+    const err = normalizeError(error);
+    console.error('Error in profile-image-optimizer:', err.message);
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message 
+      error: err.message 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500

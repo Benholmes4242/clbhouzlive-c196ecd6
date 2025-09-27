@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -162,9 +163,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ Database update error:', error);
+    const err = normalizeError(error);
+    console.error('❌ Database update error:', err.message);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: err.message,
       success: false
     }), {
       status: 500,

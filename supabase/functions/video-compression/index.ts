@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -163,10 +164,11 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Video compression error:', error)
+    const err = normalizeError(error);
+    console.error('Video compression error:', err.message)
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: err.message,
         success: false
       }),
       {

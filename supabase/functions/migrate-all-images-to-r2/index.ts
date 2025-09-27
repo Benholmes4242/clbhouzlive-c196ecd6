@@ -1,8 +1,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+type BucketResult = {
+  totalFiles: number;
+  migratedFiles: number;
+  errors: string[];
 };
 
 interface MigrationProgress {
@@ -10,7 +17,7 @@ interface MigrationProgress {
   processedFiles: number;
   migratedFiles: number;
   errors: string[];
-  bucketResults: Record<string, any>;
+  bucketResults: Record<string, BucketResult>;
 }
 
 Deno.serve(async (req) => {
@@ -101,7 +108,7 @@ Deno.serve(async (req) => {
         }
 
         progress.totalFiles += files.length;
-        const bucketResult = {
+        const bucketResult: BucketResult = {
           totalFiles: files.length,
           migratedFiles: 0,
           errors: []
@@ -134,9 +141,9 @@ Deno.serve(async (req) => {
               .download(file.name);
 
             if (downloadError) {
-              const errorDetails = downloadError.message || JSON.stringify(downloadError) || 'Unknown download error';
-              bucketResult.errors.push(`Download error for ${file.name}: ${errorDetails}`);
-              console.error(`Failed to download ${file.name} from ${bucket}:`, downloadError);
+              const err = normalizeError(downloadError);
+              bucketResult.errors.push(`Download error for ${file.name}: ${err.message}`);
+              console.error(`Failed to download ${file.name} from ${bucket}:`, err.message);
               progress.processedFiles++;
               continue;
             }
@@ -148,17 +155,20 @@ Deno.serve(async (req) => {
               continue;
             }
 
-            // Upload to Cloudflare R2 directly
-            const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${bucket}/${file.name}`;
-            
-            const uploadResponse = await fetch(uploadUrl, {
-              method: 'PUT',
-              headers: {
-                'Authorization': `Bearer ${cloudflareApiToken}`,
-                'Content-Type': fileData.type || 'application/octet-stream',
-              },
-              body: fileData,
-            });
+          // Upload to Cloudflare R2 directly
+          const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${bucket}/${file.name}`;
+          
+          const arrayBuffer = await fileData.arrayBuffer();
+          const body = new Blob([arrayBuffer], { type: fileData.type || 'application/octet-stream' });
+          
+          const uploadResponse = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${cloudflareApiToken}`,
+              'Content-Type': fileData.type || 'application/octet-stream',
+            },
+            body,
+          });
 
             if (!uploadResponse.ok) {
               const errorText = await uploadResponse.text();
@@ -177,17 +187,19 @@ Deno.serve(async (req) => {
             // Update database references (for specific known tables)
             await updateDatabaseReferences(supabase, bucket, file.name, publicUrl);
 
-          } catch (error) {
-            bucketResult.errors.push(`Error processing ${file.name}: ${error.message}`);
-            progress.processedFiles++;
-          }
+        } catch (error) {
+          const err = normalizeError(error);
+          bucketResult.errors.push(`Error processing ${file.name}: ${err.message}`);
+          progress.processedFiles++;
+        }
         }
 
         progress.bucketResults[bucket] = bucketResult;
         console.log(`Completed bucket ${bucket}: ${bucketResult.migratedFiles}/${bucketResult.totalFiles} files migrated`);
 
       } catch (error) {
-        progress.errors.push(`Error processing bucket ${bucket}: ${error.message}`);
+        const err = normalizeError(error);
+        progress.errors.push(`Error processing bucket ${bucket}: ${err.message}`);
       }
     }
 
@@ -196,13 +208,14 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Migration error:', error);
+    const err = normalizeError(error);
+    console.error('Migration error:', err.message);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: err.message,
       totalFiles: 0,
       processedFiles: 0,
       migratedFiles: 0,
-      errors: [error.message]
+      errors: [err.message]
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

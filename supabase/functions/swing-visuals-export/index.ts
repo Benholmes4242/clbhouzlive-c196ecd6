@@ -53,7 +53,7 @@ serve(async (req) => {
     // Create ZIP content (simplified - in production would use proper ZIP library)
     const zipContent = await createZipContent(visuals, analysis);
 
-    return new Response(zipContent, {
+    return new Response(zipContent as BodyInit, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/zip',

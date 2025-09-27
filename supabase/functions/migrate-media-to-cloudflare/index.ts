@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -238,8 +239,9 @@ serve(async (req) => {
             console.log(`✅ Migrated ${filePath} → ${newUrl}`);
 
           } catch (error) {
+            const err = normalizeError(error);
             progress.failed++;
-            const errorMsg = `Failed to migrate ${record[source.urlColumn]}: ${error.message}`;
+            const errorMsg = `Failed to migrate ${record[source.urlColumn]}: ${err.message}`;
             console.error(errorMsg);
             progress.errors.push(errorMsg);
           }
@@ -274,11 +276,12 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Migration error:', error);
+    const err = normalizeError(error);
+    console.error('Migration error:', err.message);
     return new Response(
       JSON.stringify({ 
         error: 'Migration failed', 
-        details: error.message,
+        details: err.message,
         status: 'error'
       }),
       { 

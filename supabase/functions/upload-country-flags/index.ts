@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -110,9 +111,10 @@ Deno.serve(async (req) => {
           }
 
         } catch (error) {
-          console.error(`Error processing ${file.name}:`, error);
+          const err = normalizeError(error);
+          console.error(`Error processing ${file.name}:`, err.message);
           errorCount++;
-          return { countryCode: file.name, error: error.message };
+          return { countryCode: file.name, error: err.message };
         }
       });
 
@@ -147,11 +149,12 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Country flags upload error:', error);
+    const err = normalizeError(error);
+    console.error('Country flags upload error:', err.message);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: err.message,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

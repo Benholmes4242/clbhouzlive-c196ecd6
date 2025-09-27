@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -193,11 +194,12 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in scrape-golf-courses function:', error);
+    const err = normalizeError(error);
+    console.error('Error in scrape-golf-courses function:', err.message);
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        details: error.message 
+        details: err.message 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

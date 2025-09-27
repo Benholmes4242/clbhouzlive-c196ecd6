@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -194,7 +195,8 @@ serve(async (req) => {
         progress.processedVideos++;
 
       } catch (error) {
-        progress.errors.push(`Error processing ${videoObj.key}: ${error.message}`);
+        const err = normalizeError(error);
+        progress.errors.push(`Error processing ${videoObj.key}: ${err.message}`);
         progress.processedVideos++;
       }
     }
@@ -206,13 +208,14 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ Migration error:', error);
+    const err = normalizeError(error);
+    console.error('❌ Migration error:', err.message);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: err.message,
       totalVideos: 0,
       processedVideos: 0,
       migratedVideos: 0,
-      errors: [error.message]
+      errors: [err.message]
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0'
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -184,11 +185,12 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error updating media URLs:', error)
+    const err = normalizeError(error);
+    console.error('Error updating media URLs:', err.message)
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: err.message
       }),
       {
         status: 500,

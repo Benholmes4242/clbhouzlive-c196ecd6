@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { normalizeError } from '../_shared/normalize-error.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -92,9 +93,10 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in voice-to-text function:', error);
+    const err = normalizeError(error);
+    console.error('Error in voice-to-text function:', err.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: err.message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
