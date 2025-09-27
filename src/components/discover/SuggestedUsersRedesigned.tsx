@@ -1198,7 +1198,7 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
               <motion.div
                 key={user.id}
                 data-card-id={user.id}
-                className="flex-shrink-0 w-40"
+                className={`flex-shrink-0 ${isMobile ? 'w-[calc((100vw-4px)/2.1)]' : 'w-40'}`}
                 layout
                 initial={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -160, scale: 0.8 }}

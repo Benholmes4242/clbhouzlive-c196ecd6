@@ -171,7 +171,7 @@ const Discover = () => {
           </div>
 
           {/* Suggested Users - Below Tabs/Search */}
-          <div className="mt-2">
+          <div className="pt-1">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
           </div>
 
