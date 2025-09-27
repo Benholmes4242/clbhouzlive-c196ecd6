@@ -826,11 +826,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 32px instead of 36px
+                  width: '32px',
+                  height: '32px',
+                  minWidth: '32px',
+                  minHeight: '32px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -875,11 +875,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                   isDetailExpanded && "ring-1 ring-accent/30"
                 )}
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 32px instead of 36px
+                  width: '32px',
+                  height: '32px',
+                  minWidth: '32px',
+                  minHeight: '32px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
@@ -928,11 +928,11 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 }}
                 className="group relative rounded-full flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
                 style={{
-                  // Smaller size: 36px instead of 44px
-                  width: '36px',
-                  height: '36px',
-                  minWidth: '36px',
-                  minHeight: '36px',
+                  // Smaller size: 32px instead of 36px
+                  width: '32px',
+                  height: '32px',
+                  minWidth: '32px',
+                  minHeight: '32px',
                   background: 'hsl(var(--glass-dark) / 0.9)', 
                   backdropFilter: 'blur(16px) saturate(1.2)',
                   border: '1px solid hsl(var(--glass-border) / 0.4)',
