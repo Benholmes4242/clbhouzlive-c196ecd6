@@ -75,6 +75,9 @@ const UserProfilePage = () => {
       {/* Header integrated into profile layout */}
       
       
+      {/* Header spacer so hero sits under the header (matches /profile) */}
+      <div aria-hidden className="h-16 md:h-18" />
+      
       {/* Content flows naturally without fixed positioning */}
       <div className="relative">
         <UserProfileLoader isLoading={isLoading} profile={profile} />
