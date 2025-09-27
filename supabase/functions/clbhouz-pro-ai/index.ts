@@ -261,23 +261,6 @@ Based on the submitted frames, I can see:
         
         throw error;
       }
-
-      const data = await response.json();
-      const finalResponse = data.choices[0].message.content.trim();
-      
-      console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
-        responseLength: finalResponse.length,
-        responsePreview: finalResponse.substring(0, 100)
-      });
-
-      console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
-
-      return new Response(JSON.stringify({ 
-        response: finalResponse, 
-        metadata: null 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
     }
 
     // Priority 2: Text Q&A with Freshness Router (NEW IMPLEMENTATION)
