@@ -151,7 +151,7 @@ const Discover = () => {
             />
             
             {/* Search Bar */}
-            <div className="px-1 py-2 bg-white">
+            <div className="px-1 pt-2 pb-1 bg-white">
               <div className="mx-1">
                 <MediaSearch 
                   placeholder="Search" 
@@ -162,7 +162,7 @@ const Discover = () => {
             </div>
             
             {/* Filter Pills Row */}
-            <div className="py-3 border-b border-gray-50">
+            <div className="pt-1 pb-3 border-b border-gray-50">
               <ExploreFilters 
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
