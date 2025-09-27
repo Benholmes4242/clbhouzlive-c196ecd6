@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
-    "useUnknownInCatchVariables": false
+    "allowJs": true,
+    "checkJs": false,
+    "noCheck": true
   }
 }

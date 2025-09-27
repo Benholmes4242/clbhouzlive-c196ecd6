@@ -1,6 +1,5 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 import { S3Client, PutObjectCommand } from "https://esm.sh/@aws-sdk/client-s3@3.400.0";
 
 const corsHeaders = {
@@ -202,14 +201,14 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('❌ STEP ERROR: Exception caught in R2 upload function:');
-    console.error('❌ STEP ERROR.1: Error type:', error.constructor.name);
-    console.error('❌ STEP ERROR.2: Error message:', error.message);
-    console.error('❌ STEP ERROR.3: Error stack:', error.stack);
+    console.error('❌ STEP ERROR.1: Error type:', (error as Error).constructor.name);
+    console.error('❌ STEP ERROR.2: Error message:', (error as Error).message);
+    console.error('❌ STEP ERROR.3: Error stack:', (error as Error).stack);
     
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: (error as Error).message,
       success: false,
-      errorType: error.constructor.name
+      errorType: (error as Error).constructor.name
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

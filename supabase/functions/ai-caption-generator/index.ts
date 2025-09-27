@@ -74,7 +74,7 @@ Generate a unique caption now:`;
   } catch (error) {
     console.error('Error in ai-caption-generator function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Failed to generate caption'
+      error: (error as Error).message || 'Failed to generate caption'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

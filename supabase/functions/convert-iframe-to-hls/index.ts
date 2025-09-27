@@ -81,11 +81,11 @@ serve(async (req) => {
           const { error: updateError } = await supabase
             .from(table.name)
             .update({ [table.column]: newHlsUrl })
-            .eq('id', record.id)
+            .eq('id', (record as any).id)
 
           if (updateError) {
-            console.error(`Error updating ${table.name} record ${record.id}:`, updateError)
-            errors.push(`Error updating ${table.name} record ${record.id}: ${updateError.message}`)
+            console.error(`Error updating ${table.name} record ${(record as any).id}:`, updateError)
+            errors.push(`Error updating ${table.name} record ${(record as any).id}: ${updateError.message}`)
             errorCount++
           } else {
             console.log(`✅ Converted ${table.name}: ${oldUrl} → ${newHlsUrl}`)
@@ -94,7 +94,7 @@ serve(async (req) => {
         }
       } catch (error) {
         console.error(`Error processing table ${table.name}:`, error)
-        errors.push(`Error processing table ${table.name}: ${error.message}`)
+        errors.push(`Error processing table ${table.name}: ${(error as any).message}`)
         errorCount++
       }
     }
@@ -119,7 +119,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: false, 
         error: 'Internal server error',
-        message: error.message 
+        message: (error as any).message 
       }),
       { 
         status: 500, 
