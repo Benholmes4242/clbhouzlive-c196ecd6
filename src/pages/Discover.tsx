@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 
 import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
+import ExploreFilters from '@/components/explore/ExploreFilters';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
@@ -158,6 +159,14 @@ const Discover = () => {
                   className="w-full border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:shadow-sm transition-all duration-200"
                 />
               </div>
+            </div>
+            
+            {/* Filter Pills Row */}
+            <div className="py-2">
+              <ExploreFilters 
+                activeFilter={activeFilter}
+                onFilterChange={setActiveFilter}
+              />
             </div>
           </div>
 
