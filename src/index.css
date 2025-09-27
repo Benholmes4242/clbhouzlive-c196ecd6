@@ -425,6 +425,25 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --discover-orange: 28 85 65; /* Match subtle orange */
     --discover-orange-dark: 25 80 60; /* Darker subtle hover */
     
+    /* Profile responsive variables */
+    --hero-h: clamp(44vh, 52vh, 60vh);
+    --panel-overlap: clamp(56px, 7vh, 96px);
+
+    --panel-pad-x: clamp(16px, 4vw, 32px);
+    --panel-pad-y: clamp(12px, 2.6vh, 24px);
+
+    --mini-w: clamp(72px, 10vw, 128px);
+    --mini-h: calc(var(--mini-w) * 4 / 3);
+    --mini-radius: 10px;
+
+    --fs-display: clamp(22px, 3.8vw, 32px);
+    --fs-handle:  clamp(13px, 2.2vw, 16px);
+    --fs-label:   clamp(11px, 1.9vw, 14px);
+    --fs-value:   clamp(16px, 2.6vw, 20px);
+    --fs-bio:     clamp(14px, 2.4vw, 17px);
+
+    --tabs-gap-top: 16px;
+
     /* Design System Colors */
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;

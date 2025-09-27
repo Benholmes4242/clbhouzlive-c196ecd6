@@ -691,7 +691,8 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -734,50 +735,43 @@ const HeroProfileHeader = ({
             </div>
 
             {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
+            <section
               ref={profileCardRef}
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-0
-              "
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)', WebkitBackdropFilter: 'blur(16px)' }}
             >
-               <div className="px-5 py-4 flex flex-col items-center relative">
-                  {/* Three dots menu - positioned absolutely on left */}
-                  {isOwnProfile && (
-                    <div className="absolute top-4 left-5">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={20} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
+                <div className="flex flex-col items-center relative">
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-3">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[84px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
+                   {/* Header Block - Name + Handle with mini profile card on right */}
+                   <div className="w-full mb-3">
+                     <div
+                       className="grid items-center"
+                       style={{ gridTemplateColumns: 'max-content 1fr var(--mini-w)' }}
+                     >
+                       {/* Left: kebab/menu */}
+                       <div className="justify-self-start">
+                         {isOwnProfile && (
+                           <DropdownMenu>
+                             <DropdownMenuTrigger asChild>
+                               <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                                 <MoreVertical size={20} />
+                               </button>
+                             </DropdownMenuTrigger>
+                             <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                               <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                                 Edit Profile
+                               </DropdownMenuItem>
+                             </DropdownMenuContent>
+                           </DropdownMenu>
+                         )}
+                       </div>
+
+                       {/* Center: name + handle */}
+                       <div className="text-center">
+                         <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
+                           {displayName}
+                         </h1>
+                         <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
                       </div>
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
@@ -924,18 +918,18 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
-            </div>
+               </div>
              
              {/* Spacer below for 16px gap before tab content */}
-             <div className="h-4" />
+             <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
            </section>
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -1180,11 +1174,10 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
-            </div>
+               </div>
              
              {/* Spacer below to avoid clipping the panel - 16px gap */}
-             <div className="h-4" />
+             <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
            </section>
         </div>
       )}
