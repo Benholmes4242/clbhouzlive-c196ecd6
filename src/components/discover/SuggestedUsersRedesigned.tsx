@@ -696,7 +696,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                     }}
                   >
                     <div 
-                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
+                      className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/30 cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/profile/${user.id}`);
@@ -710,7 +710,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-white text-xl font-bold">
+                          <span className="text-white text-2xl font-bold">
                             {user.displayName.charAt(0).toUpperCase()}
                           </span>
                         </div>
