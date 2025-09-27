@@ -865,13 +865,14 @@ const HeroProfileHeader = ({
                   </div>
 
               </div>
-             
-             {/* Spacer below */}
-             <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
-           </section>
-        </div>
-      ) : (
-        /* Desktop layout - updated to match mobile design pattern */
+              
+              {/* Spacer below */}
+              <div style={{ marginTop: 'var(--tabs-gap-top)' }} />
+            </section>
+         </div>
+         </div>
+       ) : (
+         
         <div className="relative -mt-16 bg-white">
           <div className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
@@ -1120,39 +1121,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Legacy ProfileTabs for content rendering - Hidden */}
-      <div style={{ display: 'none' }}>
-        <ProfileTabs
-          activeTab={activeSection}
-          onTabChange={handleTabChange}
-          userId={profile?.id || ''}
-          userDisplayName={profile?.display_name}
-          userHandicap={profile?.eg_handicap_index}
-          userProfilePhotoUrl={profile?.profile_photo_url}
-          isCurrentUser={isOwnProfile}
-          transitionState={transitionState}
-        >
-        {{
-          activity: (
-            <div></div> // Content will be rendered separately below
-          ),
-          courses: (
-            <div></div> // Content will be rendered separately below
-          ),
-          achievements: (
-            <AchievementsPane
-              userId={profile?.id}
-              userDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
-          ),
-          stats: (
-            <div></div> // Content will be rendered separately below
-          )
-        }}
-        </ProfileTabs>
-      </div>
+      <div style={{ display: 'none' }} />
 
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
@@ -1162,9 +1131,9 @@ const HeroProfileHeader = ({
             {/* Outgoing section */}
             <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
               {transitionDirection === 'right' ? (
-                /* Moving away from current section */
+                
                 activeSection === 'activity' ? (
-                  <div></div> // Achievements moved to dedicated tab
+                  <div></div> {/* Achievements moved to dedicated tab */}
                 ) : activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -1172,10 +1141,10 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                   />
                 ) : (
-                  <div></div> // stats section has no hero content
+                  <div></div>
                 )
               ) : (
-                /* Moving to current section from right */
+                
                 activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -1183,9 +1152,8 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                   />
                 ) : activeSection === 'stats' ? (
-                  <div></div> // stats section has no hero content
-                ) : (
-                  <div></div> // Achievements moved to dedicated tab
+                  <div></div>
+                 ) : (
                 )
               )}
             </div>
@@ -1193,7 +1161,7 @@ const HeroProfileHeader = ({
             {/* Incoming section */}
             <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
               {transitionDirection === 'right' ? (
-                /* Moving to next section */
+                
                 activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -1201,14 +1169,14 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                   />
                 ) : activeSection === 'stats' ? (
-                  <div></div> // stats section has no hero content
+                  <div></div>
                 ) : (
-                  <div></div> // Achievements moved to dedicated tab
+                  <div></div>
                 )
               ) : (
-                /* Moving to previous section */
+                
                 activeSection === 'activity' ? (
-                  <div></div> // Achievements moved to dedicated tab
+                  <div></div>
                 ) : activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -1216,13 +1184,12 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                   />
                 ) : (
-                  <div></div> // stats section has no hero content
+                  <div></div>
                 )
               )}
             </div>
           </>
         ) : (
-          /* Normal state - only show active section */
           <>
             {activeSection === 'courses' ? (
               <CoursesJourney 
@@ -1231,10 +1198,9 @@ const HeroProfileHeader = ({
                 isOwnProfile={isOwnProfile}
               />
             ) : activeSection === 'stats' ? (
-              // No hero section for handicap tab - achievements are removed
+              {/* No hero section for handicap tab - achievements are removed */}
               <div></div>
-            ) : (
-              <div></div> // Achievements moved to dedicated tab
+                 ) : (
             )}
           </>
         )}
@@ -1260,7 +1226,7 @@ const HeroProfileHeader = ({
             </div>
           </>
         ) : (
-          /* Normal state - only show active section */
+          
           <div className={`
             ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
             ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
