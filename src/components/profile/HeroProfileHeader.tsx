@@ -691,7 +691,8 @@ const HeroProfileHeader = ({
       {isMobile ? (
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -733,17 +734,11 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
+            {/* GLASS PANEL — consistent overlap & padding */}
+            <section
               ref={profileCardRef}
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-                pb-0
-              "
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)' }}
             >
                <div className="px-5 py-4 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
@@ -925,7 +920,7 @@ const HeroProfileHeader = ({
                   </div>
 
               </div>
-            </div>
+            </section>
              
              {/* Spacer below for 16px gap before tab content */}
              <div className="h-4" />
@@ -935,7 +930,8 @@ const HeroProfileHeader = ({
         /* Desktop layout - updated to match mobile design pattern */
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
+            {/* HERO (full-bleed) */}
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
               {/* Loading state */}
               <div className="absolute inset-0 bg-gray-100 animate-pulse" />
               
@@ -987,15 +983,10 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-              "
+            {/* GLASS PANEL — consistent overlap & padding */}
+            <section
+              className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{ marginTop: 'calc(var(--panel-overlap) * -1)', padding: 'var(--panel-pad-y) var(--panel-pad-x)' }}
             >
                <div className="px-8 py-6 flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
@@ -1181,7 +1172,7 @@ const HeroProfileHeader = ({
                   </div>
 
               </div>
-            </div>
+            </section>
              
              {/* Spacer below to avoid clipping the panel - 16px gap */}
              <div className="h-4" />
