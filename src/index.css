@@ -7,9 +7,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import responsive profile styles */
-@import './styles/responsive-profile.css';
-
 /* iOS Full-Screen Support for Edge-to-Edge Rendering */
 /* Full height baseline - extend background behind status bar */
 html, body, #root { 

@@ -54,8 +54,6 @@ import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
-import ResponsiveHeroSection from './ResponsiveHeroSection';
-import ResponsiveGlassPanel from './ResponsiveGlassPanel';
 
 interface Course {
   id: string;
@@ -687,9 +685,730 @@ const HeroProfileHeader = ({
   };
 
   return (
-    <>
-      {/* TEMP: compiling scaffold; we’ll re-add sections next */}
-    </>
+    <SwipeToReturnZone onSwipeDown={reopenImmersive}>
+
+      {/* Mobile-Only Full Bleed Profile Layout */}
+      {isMobile ? (
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[55vh] md:h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {(profile?.header_photo_url || profile?.profile_photo_url) ? (
+                <img
+                  src={(() => {
+                    const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
+                    const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                    return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
+                  })()}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: getMobileCropPosition(profile),
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel with fixed 20px overlap (flow-based) */}
+            <div 
+              ref={profileCardRef}
+              className="
+                relative -mt-28
+                w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+                pb-0
+              "
+            >
+               <div className="px-5 py-4 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-4 left-5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={20} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
+
+                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  <div className="w-full mb-3">
+                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
+                      {/* Left spacer (invisible) */}
+                      <div className="w-[84px]"></div>
+                      
+                      {/* Name + Handle - perfectly centered */}
+                      <div className="text-center">
+                        <h1 className="text-2xl font-semibold text-gray-900">
+                          {displayName}
+                        </h1>
+                        <p className="mt-1 text-sm text-gray-700">
+                          @{username}
+                        </p>
+                      </div>
+                      
+                      {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
+                      <div 
+                        className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-4 mt-[80px] flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        onClick={() => openImmersive(0)}
+                      >
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={(() => {
+                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
+                            })()}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: (() => {
+                                const crop = {
+                                  x: profile?.mini_card_crop_x || 0,
+                                  y: profile?.mini_card_crop_y || 0,
+                                  width: profile?.mini_card_crop_width || 100,
+                                  height: profile?.mini_card_crop_height || 100
+                                };
+                                const cx = crop.x + crop.width / 2;
+                                const cy = crop.y + crop.height / 2;
+                                return `${cx}% ${cy}%`;
+                              })()
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-2xl">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                        {/* Movie icon in top right */}
+                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
+                          <TbMovie className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Club + Handicap + Bio Grid Layout */}
+                    <div className="absolute w-full mt-[-112px] px-4">
+                      <div className="grid grid-cols-3 gap-4 pr-2">
+                        {/* Col 1: Golf Club */}
+                        <div className="text-center">
+                          <div className="text-xs text-gray-700">Golf Club</div>
+                          <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
+                        </div>
+                        
+                        {/* Col 2: Handicap */}
+                        <div className="text-center">
+                          <div className="text-xs text-gray-700">Handicap</div>
+                          <div className="mt-1 text-lg font-semibold text-gray-900">
+                            {handicap}
+                          </div>
+                        </div>
+                        
+                        {/* Col 3: Mini profile card space - empty */}
+                        <div></div>
+                      </div>
+                      
+                      {/* Bio spanning cols 1-2, positioned below club/handicap */}
+                      <div className="grid grid-cols-3 gap-4 mt-4 pr-2">
+                        <div className="col-span-2 text-left pr-4">
+                          {profile?.bio && (
+                            <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
+                              {profile.bio}
+                            </p>
+                          )}
+                          {profile?.website && (
+                            <a 
+                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                            >
+                              {profile.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          )}
+                        </div>
+                        <div></div> {/* Empty space for mini profile card */}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slim Stats Row */}
+                  <div className="w-full grid grid-cols-4 gap-4 text-center mt-4">
+                    <div className="flex flex-col">
+                      <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
+                      <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-4">
+                      <span className="text-lg font-semibold text-gray-900">2,500</span>
+                      <span className="text-xs text-gray-600 uppercase tracking-wide">Total XP</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-4">
+                      <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
+                      <span className="text-xs text-gray-600 uppercase tracking-wide">Following</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-4">
+                      <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
+                      <span className="text-xs text-gray-600 uppercase tracking-wide">Followers</span>
+                    </div>
+                  </div>
+
+                  {/* Tab Navigation - pinned to bottom */}
+                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
+                    <div className="flex" role="tablist" aria-label="Profile sections">
+                      {tabs.map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => handleTabChange(tab.id)}
+                          role="tab"
+                          aria-selected={activeSection === tab.id}
+                          aria-controls={`tabpanel-${tab.id}`}
+                          tabIndex={activeSection === tab.id ? 0 : -1}
+                          className={`
+                            relative py-3 px-2 text-sm font-medium transition-colors duration-200
+                            ${activeSection === tab.id 
+                              ? 'text-gray-900 focus:outline-none' 
+                              : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                            }
+                            flex-1 text-center
+                          `}
+                        >
+                          {tab.label}
+                          {/* Brand orange underline animation */}
+                          <div 
+                            className={`
+                              absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                              transition-all duration-300 ease-out
+                              ${activeSection === tab.id 
+                                ? 'scale-x-100 opacity-100' 
+                                : 'scale-x-0 opacity-0'
+                              }
+                              origin-center
+                            `}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below for 16px gap before tab content */}
+             <div className="h-4" />
+           </section>
+        </div>
+      ) : (
+        /* Desktop layout - updated to match mobile design pattern */
+        <div className="relative -mt-16 bg-white">
+          <section className="relative w-full overflow-visible">
+            <div className="relative h-[56vh] w-full overflow-hidden">
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
+              {(profile?.header_photo_url || profile?.profile_photo_url) ? (
+                <img
+                  src={(() => {
+                    const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
+                    const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                    return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
+                  })()}
+                  alt={profile?.display_name || 'Profile'}
+                  className="h-full w-full object-cover"
+                  style={{ 
+                    objectPosition: (() => {
+                      const crop = {
+                        x: profile?.desktop_crop_x || 0,
+                        y: profile?.desktop_crop_y || 0,
+                        width: profile?.desktop_crop_width || 100,
+                        height: profile?.desktop_crop_height || 100
+                      };
+                      const cx = crop.x + crop.width / 2;
+                      const cy = crop.y + crop.height / 2;
+                      return `${cx}% ${cy}%`;
+                    })(),
+                    objectFit: 'cover'
+                  }}
+                  loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <Camera className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
+                  <p className="text-sm text-center px-4">
+                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+                  </p>
+                </div>
+              )}
+
+              {/* Bottom Fade Gradient - behind panel */}
+              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
+                              bg-gradient-to-t from-white via-white/60 to-transparent
+                              pointer-events-none z-[5]" />
+            </div>
+
+            {/* Glass panel with fixed 20px overlap (flow-based) */}
+            <div 
+              className="
+                relative -mt-28
+                w-full
+                border border-white/35
+                bg-white/35 backdrop-blur-xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
+              "
+            >
+               <div className="px-8 py-6 flex flex-col items-center relative">
+                  {/* Three dots menu - positioned absolutely on left */}
+                  {isOwnProfile && (
+                    <div className="absolute top-6 left-8">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
+                            <MoreVertical size={24} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
+                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                            Edit Profile
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
+
+                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  <div className="w-full mb-4">
+                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
+                      {/* Left spacer (invisible) */}
+                      <div className="w-[112px]"></div>
+                      
+                      {/* Name + Handle - perfectly centered */}
+                      <div className="text-center">
+                        <h1 className="text-3xl font-semibold text-gray-900">
+                          {displayName}
+                        </h1>
+                        <p className="mt-1 text-base text-gray-700">
+                          @{username}
+                        </p>
+                      </div>
+                      
+                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
+                      <div 
+                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        onClick={() => openImmersive(0)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Open immersive profile preview"
+                        title="Open immersive profile preview"
+                      >
+                        {profile?.profile_photo_url ? (
+                          <img
+                            src={(() => {
+                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
+                            })()}
+                            alt="Mini profile"
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: (() => {
+                                const crop = {
+                                  x: profile?.mini_card_crop_x || 0,
+                                  y: profile?.mini_card_crop_y || 0,
+                                  width: profile?.mini_card_crop_width || 100,
+                                  height: profile?.mini_card_crop_height || 100
+                                };
+                                const cx = crop.x + crop.width / 2;
+                                const cy = crop.y + crop.height / 2;
+                                return `${cx}% ${cy}%`;
+                              })()
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                            <span className="text-gray-600 font-bold text-3xl">
+                              {displayName?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                        {/* Movie icon in top right */}
+                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
+                          <TbMovie className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Club + Handicap + Bio Grid Layout */}
+                    <div className="absolute w-full mt-[-150px] px-8">
+                      <div className="grid grid-cols-3 gap-6 pr-4">
+                        {/* Col 1: Golf Club */}
+                        <div className="text-center">
+                          <div className="text-sm text-gray-700">Golf Club</div>
+                          <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
+                        </div>
+                        
+                        {/* Col 2: Handicap */}
+                        <div className="text-center">
+                          <div className="text-sm text-gray-700">Handicap</div>
+                          <div className="mt-1 text-2xl font-semibold text-gray-900">
+                            {handicap}
+                          </div>
+                        </div>
+                        
+                        {/* Col 3: Mini profile card space - empty */}
+                        <div></div>
+                      </div>
+                      
+                      {/* Bio spanning cols 1-2, positioned below club/handicap */}
+                      <div className="grid grid-cols-3 gap-6 mt-5 pr-4">
+                        <div className="col-span-2 text-left pr-6">
+                          {profile?.bio && (
+                            <p className="text-base text-gray-700 mb-3 line-clamp-3 text-left leading-relaxed">
+                              {profile.bio}
+                            </p>
+                          )}
+                          {profile?.website && (
+                            <a 
+                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                            >
+                              {profile.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          )}
+                        </div>
+                        <div></div> {/* Empty space for mini profile card */}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slim Stats Row */}
+                  <div className="w-full grid grid-cols-4 gap-6 text-center max-w-2xl mx-auto mt-5">
+                    <div className="flex flex-col">
+                      <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
+                      <span className="text-sm text-gray-600 uppercase tracking-wide">Posts</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-6">
+                      <span className="text-xl font-semibold text-gray-900">2,500</span>
+                      <span className="text-sm text-gray-600 uppercase tracking-wide">Total XP</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-6">
+                      <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
+                      <span className="text-sm text-gray-600 uppercase tracking-wide">Following</span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-300 pl-6">
+                      <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
+                      <span className="text-sm text-gray-600 uppercase tracking-wide">Followers</span>
+                    </div>
+                  </div>
+
+                  {/* Tab Navigation - pinned to bottom */}
+                  <div className="w-full border-t border-gray-300 mt-5 pt-5">
+                    <div className="flex" role="tablist" aria-label="Profile sections">
+                      {tabs.map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => handleTabChange(tab.id)}
+                          role="tab"
+                          aria-selected={activeSection === tab.id}
+                          aria-controls={`tabpanel-${tab.id}`}
+                          tabIndex={activeSection === tab.id ? 0 : -1}
+                          className={`
+                            relative py-3 px-3 text-base font-medium transition-colors duration-200
+                            ${activeSection === tab.id 
+                              ? 'text-gray-900 focus:outline-none' 
+                              : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                            }
+                            flex-1 text-center
+                          `}
+                        >
+                          {tab.label}
+                          {/* Brand orange underline animation */}
+                          <div 
+                            className={`
+                              absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                              transition-all duration-300 ease-out
+                              ${activeSection === tab.id 
+                                ? 'scale-x-100 opacity-100' 
+                                : 'scale-x-0 opacity-0'
+                              }
+                              origin-center
+                            `}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+             
+             {/* Spacer below to avoid clipping the panel - 16px gap */}
+             <div className="h-4" />
+           </section>
+        </div>
+      )}
+
+      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
+      <div style={{ display: 'none' }}>
+        <ResponsiveStatsDisplay
+          primaryStats={{
+            handicap: profile?.eg_handicap_index?.toFixed(1) || 'N/A',
+            posts: postsCount,
+            followers: followersCount,
+            following: followingCount
+          }}
+          onStatClick={handleStatClick}
+        />
+      </div>
+
+
+      {/* Legacy ProfileTabs for content rendering */}
+      <div style={{ display: 'none' }}>
+        <ProfileTabs
+          activeTab={activeSection}
+          onTabChange={handleTabChange}
+          userId={profile?.id || ''}
+          userDisplayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
+          transitionState={transitionState}
+        >
+        {{
+          activity: (
+            <div></div> // Content will be rendered separately below
+          ),
+          courses: (
+            <div></div> // Content will be rendered separately below
+          ),
+          achievements: (
+            <AchievementsPane
+              userId={profile?.id}
+              userDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
+          ),
+          stats: (
+            <div></div> // Content will be rendered separately below
+          )
+        }}
+        </ProfileTabs>
+      </div>
+
+      {/* Hero Section - Achievements or Courses Journey */}
+      <div className="relative">
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing section */}
+            <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving away from current section */
+                activeSection === 'activity' ? (
+                  <div></div> // Achievements moved to dedicated tab
+                ) : activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : (
+                  <div></div> // stats section has no hero content
+                )
+              ) : (
+                /* Moving to current section from right */
+                activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : activeSection === 'stats' ? (
+                  <div></div> // stats section has no hero content
+                ) : (
+                  <div></div> // Achievements moved to dedicated tab
+                )
+              )}
+            </div>
+            
+            {/* Incoming section */}
+            <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving to next section */
+                activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : activeSection === 'stats' ? (
+                  <div></div> // stats section has no hero content
+                ) : (
+                  <div></div> // Achievements moved to dedicated tab
+                )
+              ) : (
+                /* Moving to previous section */
+                activeSection === 'activity' ? (
+                  <div></div> // Achievements moved to dedicated tab
+                ) : activeSection === 'courses' ? (
+                  <CoursesJourney 
+                    userId={profile?.id}
+                    userDisplayName={profile?.display_name || 'User'}
+                    isOwnProfile={isOwnProfile}
+                  />
+                ) : (
+                  <div></div> // stats section has no hero content
+                )
+              )}
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <>
+            {activeSection === 'courses' ? (
+              <CoursesJourney 
+                userId={profile?.id}
+                userDisplayName={profile?.display_name || 'User'}
+                isOwnProfile={isOwnProfile}
+              />
+            ) : activeSection === 'stats' ? (
+              // No hero section for handicap tab - achievements are removed
+              <div></div>
+            ) : (
+              <div></div> // Achievements moved to dedicated tab
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Content sections with slide transitions */}
+      <div className="relative overflow-hidden">
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing content */}
+            <div className={`absolute inset-0 w-full ${getContentTransitionClass(true)}`}>
+              <div role="tabpanel" aria-hidden="true">
+                {getPreviousContent()}
+              </div>
+            </div>
+            
+            {/* Incoming content */}
+            <div className={`relative w-full ${getContentTransitionClass(false)}`}>
+              <div role="tabpanel" id={`tabpanel-${activeSection}`} aria-hidden="false">
+                {getCurrentContent()}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <div className={`
+            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
+            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
+            ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
+            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+          `}>
+            <div className={`
+              ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}
+            `}>
+              <div role="tabpanel" id={`tabpanel-${activeSection}`} aria-labelledby={`tab-${activeSection}`}>
+                {getCurrentContent()}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Remove FullscreenMediaModal - handled by individual components */}
+
+      {/* Rest of content sections would continue here... */}
+      
+      {/* New comprehensive Edit Profile Modal */}
+      <ProfileEditDialog
+        profile={profile}
+        userId={user?.id || ''}
+        onProfileUpdate={() => {
+          onProfileUpdate();
+          setEditDialogOpen(false);
+        }}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      {/* Compare Progress Modal - Placeholder for now */}
+      {isCompareModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setIsCompareModalOpen(false)}>
+          <div className="bg-white p-4 rounded-lg">
+            <h3>Compare Progress Modal</h3>
+            <button onClick={() => setIsCompareModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Immersive Profile Modal */}
+      <ImmersiveProfileModal
+        isOpen={isImmersiveOpen}
+        onClose={closeImmersive}
+        onMorphToHeader={handleMorphTransition}
+        mediaItems={mediaItems.map(item => ({
+          ...item,
+          media_type: item.media_type as 'video' | 'image'
+        }))}
+        userId={profile?.id || ''}
+        initialIndex={currentMediaIndex}
+        onCurrentIndexChange={setCurrentMediaIndex}
+        uploadMode={isOwnProfile}
+        onUploadComplete={() => refetchMedia()}
+      />
+
+
+      {/* ProfileModalRouter - Available to all profile visitors for course viewing */}
+      <ProfileModalRouter />
+    </SwipeToReturnZone>
   );
 };
 
