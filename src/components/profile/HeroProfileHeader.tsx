@@ -689,7 +689,7 @@ const HeroProfileHeader = ({
 
       {/* Mobile-Only Full Bleed Profile Layout */}
       {isMobile ? (
-        <div className="relative -mt-20 bg-white">
+        <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
             <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
@@ -924,7 +924,7 @@ const HeroProfileHeader = ({
         </div>
       ) : (
         /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative -mt-20 bg-white">
+        <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
             <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
