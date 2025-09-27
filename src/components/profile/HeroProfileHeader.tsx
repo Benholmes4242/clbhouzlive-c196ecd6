@@ -777,7 +777,13 @@ const HeroProfileHeader = ({
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
                       <div 
-                        className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{
+                          width: 'calc(100% - 8px)',
+                          height: 'calc((100% - 8px) * 4/3)',
+                          maxWidth: '112px',
+                          maxHeight: '149px'
+                        }}
                         onClick={() => openImmersive(0)}
                       >
                         {profile?.profile_photo_url ? (
@@ -818,15 +824,15 @@ const HeroProfileHeader = ({
 
                     {/* Club + Handicap + Bio Grid Layout */}
                     <div className="w-full mt-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Col 1: Golf Club */}
-                        <div className="text-center">
+                      <div className="grid grid-cols-[1fr_1fr] gap-3">
+                        {/* Col 1: Golf Club - Left aligned with bio */}
+                        <div className="text-left">
                           <div className="text-xs text-gray-700">Golf Club</div>
                           <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
                         </div>
                         
-                        {/* Col 2: Handicap */}
-                        <div className="text-center">
+                        {/* Col 2: Handicap - Right aligned */}
+                        <div className="text-right">
                           <div className="text-xs text-gray-700">Handicap</div>
                           <div className="mt-1 text-lg font-semibold text-gray-900">
                             {handicap}
@@ -837,7 +843,7 @@ const HeroProfileHeader = ({
                       {/* Bio spanning full width, positioned below club/handicap */}
                       <div className="mt-4">
                         {profile?.bio && (
-                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-center leading-relaxed">
+                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
                             {profile.bio}
                           </p>
                         )}
@@ -1021,7 +1027,13 @@ const HeroProfileHeader = ({
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
                       <div 
-                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{
+                          width: 'calc(100% - 8px)',
+                          height: 'calc((100% - 8px) * 4/3)',
+                          maxWidth: '140px',
+                          maxHeight: '187px'
+                        }}
                         onClick={() => openImmersive(0)}
                         role="button"
                         tabIndex={0}
@@ -1066,15 +1078,15 @@ const HeroProfileHeader = ({
 
                     {/* Club + Handicap + Bio Grid Layout */}
                     <div className="w-full mt-6">
-                      <div className="grid grid-cols-2 gap-6">
-                        {/* Col 1: Golf Club */}
-                        <div className="text-center">
+                      <div className="grid grid-cols-[1fr_1fr] gap-6">
+                        {/* Col 1: Golf Club - Left aligned with bio */}
+                        <div className="text-left">
                           <div className="text-sm text-gray-700">Golf Club</div>
                           <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
                         </div>
                         
-                        {/* Col 2: Handicap */}
-                        <div className="text-center">
+                        {/* Col 2: Handicap - Right aligned */}
+                        <div className="text-right">
                           <div className="text-sm text-gray-700">Handicap</div>
                           <div className="mt-1 text-2xl font-semibold text-gray-900">
                             {handicap}
@@ -1085,7 +1097,7 @@ const HeroProfileHeader = ({
                       {/* Bio spanning full width, positioned below club/handicap */}
                       <div className="mt-5">
                         {profile?.bio && (
-                          <p className="text-base text-gray-700 mb-3 line-clamp-3 text-center leading-relaxed">
+                          <p className="text-base text-gray-700 mb-3 line-clamp-3 text-left leading-relaxed">
                             {profile.bio}
                           </p>
                         )}
