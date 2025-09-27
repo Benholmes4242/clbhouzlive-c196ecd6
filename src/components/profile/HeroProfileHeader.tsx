@@ -996,6 +996,16 @@ const HeroProfileHeader = ({
         </div>
       )}
 
+      {/* Desktop Profile Header */}
+      {!isMobile && !isImmersiveOpen && (
+        <div className="relative -mt-16 bg-white">
+          <GlassmorphicProfileCard
+            profile={profile}
+            isOwnProfile={isOwnProfile}
+            onEditProfile={() => setEditDialogOpen(true)}
+          />
+        </div>
+      )}
       {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
       <div style={{ display: 'none' }}>
         <ResponsiveStatsDisplay
@@ -1021,28 +1031,7 @@ const HeroProfileHeader = ({
           userProfilePhotoUrl={profile?.profile_photo_url}
           isCurrentUser={isOwnProfile}
           transitionState={transitionState}
-        >
-        {{
-          activity: (
-            <div></div> // Content will be rendered separately below
-          ),
-          courses: (
-            <div></div> // Content will be rendered separately below
-          ),
-          achievements: (
-            <AchievementsPane
-              userId={profile?.id}
-              userDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
-          ),
-          stats: (
-            <div></div> // Content will be rendered separately below
-          )
-        }}
-        </ProfileTabs>
+        />
       </div>
 
       {/* Hero Section - Achievements or Courses Journey */}
