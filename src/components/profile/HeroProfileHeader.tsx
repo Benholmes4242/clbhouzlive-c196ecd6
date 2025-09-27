@@ -989,10 +989,8 @@ const HeroProfileHeader = ({
 
               </div>
             </div>
-             
-             {/* Spacer below to avoid clipping the panel - 16px gap */}
-             <div className="h-4" />
-           </section>
+            <div className="h-4"></div>
+          </section>
         </div>
       )}
 
@@ -1006,7 +1004,8 @@ const HeroProfileHeader = ({
           />
         </div>
       )}
-      {/* Stats Display - Remove this section as stats are now integrated into the card layout */}
+
+      {/* Stats Display */}
       <div style={{ display: 'none' }}>
         <ResponsiveStatsDisplay
           primaryStats={{
