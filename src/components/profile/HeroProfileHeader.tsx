@@ -687,124 +687,53 @@ const HeroProfileHeader = ({
   };
 
   return (
-    <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Responsive Hero and Glass Panel */}
-      {!isImmersiveOpen && (
-        <>
-          <ResponsiveHeroSection profile={profile} />
-          
-          <ResponsiveGlassPanel
-            profile={profile}
-            isOwnProfile={isOwnProfile}
-            onEditProfile={() => setEditDialogOpen(true)}
-            stats={{
-              posts: postsCount,
-              followers: followersCount,
-              following: followingCount,
-              courses: ratedCoursesCount
-            }}
-          />
-          
-          {/* Tabs section with responsive spacing */}
-          <div style={{ marginTop: 'var(--tabs-gap-top)' }} className="px-4">
-            <div className="flex" role="tablist" aria-label="Profile sections">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  role="tab"
-                  aria-selected={activeSection === tab.id}
-                  aria-controls={`tabpanel-${tab.id}`}
-                  tabIndex={activeSection === tab.id ? 0 : -1}
-                  className="relative py-3 px-2 text-sm font-medium transition-colors duration-200 flex-1 text-center text-gray-600 hover:text-gray-800 focus:outline-none"
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
+    <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+      {profile?.header_photo_url || profile?.profile_photo_url ? (
+        <img
+          src={(() => {
+            const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
+            const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+            return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
+          })()}
+          alt={profile?.display_name || 'Profile'}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ 
+            objectPosition: getMobileCropPosition(profile),
+            objectFit: 'cover'
+          }}
+          loading="eager"
+          onLoad={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.previousElementSibling?.remove();
+          }}
+          onError={(e) => {
+            e.currentTarget.src = '/placeholder.svg';
+          }}
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+          <Camera className="w-16 h-16 mb-4 opacity-50" />
+          <p className="text-lg font-medium mb-2">No Profile Photo</p>
+          <p className="text-sm text-center px-4">
+            {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
+          </p>
+        </div>
       )}
 
-      {/* Desktop Layout */}
-      <div className="relative">
-        <GlassmorphicProfileCard
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          onEditProfile={() => setEditDialogOpen(true)}
-        />
-      </div>
+      {/* Bottom Fade Gradient - behind panel */}
+      <div className="absolute bottom-0 left-0 w-full h-16 md:h-20 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none z-[5]" />
+    </div>
 
-      {/* Rest of component content */}
-      <div className="mt-4">
-        </div>
-      ) : (
-        /* Desktop layout - updated to match mobile design pattern */
-        <div className="relative -mt-16 bg-white">
-          <section className="relative w-full overflow-visible">
-            <div className="relative h-[56vh] w-full overflow-hidden">
-              {/* Loading state */}
-              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
-              
-              {(profile?.header_photo_url || profile?.profile_photo_url) ? (
-                <img
-                  src={(() => {
-                    const heroSrc = profile?.header_photo_url || profile?.profile_photo_url || '';
-                    const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
-                    return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
-                  })()}
-                  alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
-                  style={{ 
-                    objectPosition: (() => {
-                      const crop = {
-                        x: profile?.desktop_crop_x || 0,
-                        y: profile?.desktop_crop_y || 0,
-                        width: profile?.desktop_crop_width || 100,
-                        height: profile?.desktop_crop_height || 100
-                      };
-                      const cx = crop.x + crop.width / 2;
-                      const cy = crop.y + crop.height / 2;
-                      return `${cx}% ${cy}%`;
-                    })(),
-                    objectFit: 'cover'
-                  }}
-                  loading="eager"
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.previousElementSibling?.remove();
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
-                  <Camera className="w-16 h-16 mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">No Profile Photo</p>
-                  <p className="text-sm text-center px-4">
-                    {isOwnProfile ? 'Upload a photo in Edit Profile' : 'User hasn\'t uploaded a photo yet'}
-                  </p>
-                </div>
-              )}
-
-              {/* Bottom Fade Gradient - behind panel */}
-              <div className="absolute bottom-0 left-0 w-full h-16 md:h-20
-                              bg-gradient-to-t from-white via-white/60 to-transparent
-                              pointer-events-none z-[5]" />
-            </div>
-
-            {/* Glass panel with fixed 20px overlap (flow-based) */}
-            <div 
-              className="
-                relative -mt-28
-                w-full
-                border border-white/35
-                bg-white/35 backdrop-blur-xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10
-              "
-            >
-               <div className="px-8 py-6 flex flex-col items-center relative">
+    {/* GLASS PANEL — small consistent overlap */}
+    <section
+      ref={profileCardRef}
+      className="relative mx-4 rounded-2xl border border-white/35 bg-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-10"
+      style={{
+        marginTop: 'calc(var(--panel-overlap) * -1)',
+        padding: 'var(--panel-pad-y) var(--panel-pad-x)'
+      }}
+    >
+      <div className="flex flex-col items-center relative">
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-6 left-8">
@@ -823,66 +752,43 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
-                  <div className="w-full mb-4">
-                    <div className="grid grid-cols-[max-content_1fr_max-content] items-start">
-                      {/* Left spacer (invisible) */}
-                      <div className="w-[112px]"></div>
-                      
-                      {/* Name + Handle - perfectly centered */}
-                      <div className="text-center">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                          {displayName}
-                        </h1>
-                        <p className="mt-1 text-base text-gray-700">
-                          @{username}
-                        </p>
-                      </div>
-                      
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
-                      <div 
-                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden ml-6 mt-[80px] flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
-                        onClick={() => openImmersive(0)}
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Open immersive profile preview"
-                        title="Open immersive profile preview"
-                      >
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={(() => {
-                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
-                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
-                            })()}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                            style={{
-                              objectPosition: (() => {
-                                const crop = {
-                                  x: profile?.mini_card_crop_x || 0,
-                                  y: profile?.mini_card_crop_y || 0,
-                                  width: profile?.mini_card_crop_width || 100,
-                                  height: profile?.mini_card_crop_height || 100
-                                };
-                                const cx = crop.x + crop.width / 2;
-                                const cy = crop.y + crop.height / 2;
-                                return `${cx}% ${cy}%`;
-                              })()
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-3xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                        {/* Movie icon in top right */}
-                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
-                          <TbMovie className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
+                  {/* Header row: kebab • name/handle • mini card */}
+                  <div
+                    className="grid items-center"
+                    style={{ gridTemplateColumns: 'max-content 1fr var(--mini-w)' }}
+                  >
+                    {/* Left: kebab/menu — keep your component here */}
+                    <div className="justify-self-start">
+                      {/* ... three-dot menu ... */}
                     </div>
+
+                    {/* Center: name + handle */}
+                    <div className="text-center">
+                      <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
+                        {displayName}
+                      </h1>
+                      <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+                    </div>
+
+                    {/* Right: mini profile card */}
+                    <div
+                      className="justify-self-end rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden"
+                      style={{
+                        width: 'var(--mini-w)',
+                        height: 'var(--mini-h)',
+                        borderRadius: 'var(--mini-radius)',
+                      }}
+                    >
+                      {profile?.profile_photo_url ? (
+                        <img
+                          src={profile.profile_photo_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : null}
+                    </div>
+                  </div>
 
                     {/* Club + Handicap + Bio Grid Layout */}
                     <div className="absolute w-full mt-[-150px] px-8">
