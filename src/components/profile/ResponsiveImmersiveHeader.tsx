@@ -26,7 +26,7 @@ const ResponsiveImmersiveHeader: React.FC<ResponsiveImmersiveHeaderProps> = ({
   
   return (
     <div className={`
-      relative w-full overflow-hidden transition-all duration-700 ease-out
+      w-full overflow-hidden transition-all duration-700 ease-out
       ${isCollapsed 
         ? isMobile 
           ? 'h-32' // Mobile collapsed

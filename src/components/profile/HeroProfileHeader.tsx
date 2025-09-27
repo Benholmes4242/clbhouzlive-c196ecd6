@@ -692,7 +692,10 @@ const HeroProfileHeader = ({
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
-            <div className="relative w-full overflow-hidden" style={{ height: 'var(--hero-h)' }}>
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -701,12 +704,16 @@ const HeroProfileHeader = ({
                     return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
                   })()}
                   alt={profile?.display_name || 'Profile'}
-                  className="absolute inset-0 block h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                   style={{ 
                     objectPosition: getMobileCropPosition(profile),
                     objectFit: 'cover'
                   }}
                   loading="eager"
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.previousElementSibling?.remove();
+                  }}
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder.svg';
                   }}
@@ -920,7 +927,10 @@ const HeroProfileHeader = ({
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
-            <div className="relative w-full overflow-hidden" style={{ height: 'var(--hero-h)' }}>
+            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+              {/* Loading state */}
+              <div className="absolute inset-0 bg-gray-100 animate-pulse" />
+              
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -929,7 +939,7 @@ const HeroProfileHeader = ({
                     return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
                   })()}
                   alt={profile?.display_name || 'Profile'}
-                  className="absolute inset-0 block h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                   style={{ 
                     objectPosition: (() => {
                       const crop = {
