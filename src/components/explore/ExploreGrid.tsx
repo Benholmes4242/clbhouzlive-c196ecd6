@@ -817,7 +817,15 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   return (
     <>
       {/* Fixed Grid Layout with Square and Portrait Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)' }}>
+      <div className="grid md:grid-cols-4 lg:grid-cols-4 gap-px min-h-0 -mx-0 md:mx-0" style={{ gridAutoRows: 'minmax(auto, max-content)', gridTemplateColumns: 'repeat(2.1, 1fr)' }}>
+        {/* Use media query to override on mobile */}
+        <style>{`
+          @media (min-width: 768px) {
+            .grid[style*="gridTemplateColumns"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+        `}</style>
         {gridItems.map((gridItem, index) => {
           const isAboveTheFold = index < ABOVE_THE_FOLD_COUNT;
           
