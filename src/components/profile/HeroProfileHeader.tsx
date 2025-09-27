@@ -692,7 +692,7 @@ const HeroProfileHeader = ({
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
-            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+            <div className="relative w-full overflow-hidden" style={{ height: 'var(--hero-h)' }}>
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -701,7 +701,7 @@ const HeroProfileHeader = ({
                     return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
                   })()}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 block h-full w-full object-cover"
                   style={{ 
                     objectPosition: getMobileCropPosition(profile),
                     objectFit: 'cover'
@@ -920,7 +920,7 @@ const HeroProfileHeader = ({
         <div className="relative -mt-16 bg-white">
           <section className="relative w-full overflow-visible">
             {/* HERO (full-bleed) */}
-            <div className="relative w-full" style={{ height: 'var(--hero-h)' }}>
+            <div className="relative w-full overflow-hidden" style={{ height: 'var(--hero-h)' }}>
               {(profile?.header_photo_url || profile?.profile_photo_url) ? (
                 <img
                   src={(() => {
@@ -929,7 +929,7 @@ const HeroProfileHeader = ({
                     return heroSrc ? `${heroSrc}${heroSrc.includes('?') ? '&' : '?'}v=${ver}` : '';
                   })()}
                   alt={profile?.display_name || 'Profile'}
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 block h-full w-full object-cover"
                   style={{ 
                     objectPosition: (() => {
                       const crop = {
