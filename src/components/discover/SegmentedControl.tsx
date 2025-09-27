@@ -10,6 +10,7 @@ const tabs = [
   { id: 'Friends', label: 'Friends' },
   { id: 'Videos', label: 'Videos' },
   { id: 'Photos', label: 'Photos' },
+  { id: 'Channels', label: 'Channels' },
   { id: 'Trending', label: 'Trending' }
 ];
 
