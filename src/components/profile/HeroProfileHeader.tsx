@@ -759,34 +759,34 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - Name + Handle with mini profile card on right */}
+                  {/* Header Block - 3-column grid: empty | content | mini card */}
                   <div className="w-full mb-3">
                     <div 
-                      className="grid items-start"
+                      className="profileHeader grid items-start"
                       style={{
-                        gridTemplateColumns: 'max-content 1fr var(--mini-w)',
-                        columnGap: '8px'
+                        gridTemplateColumns: 'max-content minmax(0,1fr) max-content',
+                        columnGap: '16px'
                       }}
                     >
-                      {/* left: kebab/menu (empty for mobile) */}
-                      <div className="justify-self-start"></div>
+                      {/* leftCol: kebab/menu (empty for mobile) */}
+                      <div className="leftCol justify-self-start"></div>
 
-                      {/* center: name/handle */}
-                      <div className="text-center">
+                      {/* contentCol: name/handle + club/handicap */}
+                      <div className="contentCol text-center min-w-0">
                         <h1 
-                          className="font-semibold leading-tight text-[length:var(--fs-display)]"
+                          className="displayName font-semibold leading-tight text-[length:var(--fs-display)] m-0 mb-1"
                           title={displayName}
                         >
                           {displayName}
                         </h1>
-                        <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+                        <div className="handle opacity-70 text-[length:var(--fs-handle)] m-0">@{username}</div>
 
                         {/* Club + Handicap Row - 24px below handle */}
-                        <div className="clubHandicapRow mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:justify-items-center text-left sm:text-center">
+                        <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-6 justify-items-center text-center">
                           {/* Golf Club */}
                           <div className="statItem">
                             <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
-                            <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                            <div className="statValue clubValue text-sm font-semibold text-foreground max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
                               {homeClub}
                             </div>
                           </div>
@@ -794,16 +794,16 @@ const HeroProfileHeader = ({
                           {/* Handicap */}
                           <div className="statItem">
                             <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
-                            <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
+                            <div className="statValue handicapValue text-base font-semibold text-foreground">
                               {handicap}
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* right: mini profile card (ANCHOR + SIZE) */}
+                      {/* miniProfileCard: right column */}
                       <div 
-                        className="justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
                         style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                       >
