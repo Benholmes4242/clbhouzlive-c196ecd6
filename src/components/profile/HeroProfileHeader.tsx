@@ -816,8 +816,8 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap + Bio Left-aligned Layout with 8px margins */}
-                    <div className="w-full mt-4 px-2">
+                    {/* Club + Handicap + Bio Left-aligned Layout with 6px margins */}
+                    <div className="w-full mt-4 px-1.5">
                       {/* Golf Club and Handicap - left-aligned with titles above, 6px from edges */}
                       <div className="flex items-start justify-start gap-6">
                         <div className="text-left">
