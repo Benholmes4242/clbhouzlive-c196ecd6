@@ -761,13 +761,18 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    {/* Name/Handle Row */}
                     <div 
-                      className="flex items-start justify-between"
-                      style={{ columnGap: '16px' }}
+                      className="grid items-start"
+                      style={{
+                        gridTemplateColumns: 'max-content 1fr var(--mini-w)',
+                        columnGap: '8px'
+                      }}
                     >
-                      {/* Center name/handle between left edge of glass and left edge of mini card */}
-                      <div className="flex-1 text-center" style={{ marginRight: 'calc(var(--mini-w) + 16px)' }}>
+                      {/* left: kebab/menu (empty for mobile) */}
+                      <div className="justify-self-start"></div>
+
+                      {/* center: name/handle */}
+                      <div className="text-center">
                         <h1 
                           className="font-semibold leading-tight text-[length:var(--fs-display)]"
                           title={displayName}
@@ -779,7 +784,7 @@ const HeroProfileHeader = ({
                       
                       {/* right: mini profile card (ANCHOR + SIZE) */}
                       <div 
-                        className="flex-shrink-0 rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
                         style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                       >
@@ -819,21 +824,15 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Golf Club + Handicap Row - 24px below name/handle */}
-                    <div className="w-full mt-6 px-1.5">
-                      {/* Golf Club and Handicap - aligned with name block edges, 16px minimum gap */}
-                      <div 
-                        className="flex items-start justify-between"
-                        style={{ 
-                          marginRight: 'calc(var(--mini-w) + 16px)',
-                          gap: '16px'
-                        }}
-                      >
+                    {/* Club + Handicap + Bio Left-aligned Layout with 6px margins */}
+                    <div className="w-full mt-4 px-1.5">
+                      {/* Golf Club and Handicap - left-aligned with titles above, 6px from edges */}
+                      <div className="flex items-start justify-start gap-6">
                         <div className="text-left">
                           <div className="text-xs text-gray-700">Golf Club</div>
                           <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left">
                           <div className="text-xs text-gray-700">Handicap</div>
                           <div className="mt-1 text-lg font-semibold text-gray-900">{handicap}</div>
                         </div>
@@ -1010,25 +1009,45 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-4">
-                    {/* Name/Handle Row */}
                     <div 
-                      className="flex items-start justify-between"
-                      style={{ columnGap: '16px' }}
+                      className="grid items-start"
+                      style={{
+                        gridTemplateColumns: 'max-content 1fr var(--mini-w)',
+                        columnGap: '8px'
+                      }}
                     >
-                      {/* Center name/handle between left edge of glass and left edge of mini card */}
-                      <div className="flex-1 text-center" style={{ marginRight: 'calc(var(--mini-w) + 16px)' }}>
+                      {/* left: kebab/menu (empty for desktop) */}
+                      <div className="justify-self-start"></div>
+
+                      {/* center: name/handle + club/handicap */}
+                      <div className="text-center">
                         <h1 
                           className="font-semibold leading-tight text-[length:var(--fs-display)]"
                           title={displayName}
                         >
                           {displayName}
                         </h1>
-                        <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+                        <div className="opacity-70 text-[length:var(--fs-handle)] mb-3">@{username}</div>
+                        
+                        {/* Golf Club and Handicap - side by side inline */}
+                        <div className="flex items-center justify-center gap-6">
+                          <div className="text-center">
+                            <div className="text-sm text-gray-700">Golf Club</div>
+                            <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-sm text-gray-700">Handicap</div>
+                            <div className="mt-1 text-2xl font-semibold text-gray-900">
+                              {handicap}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
                       {/* right: mini profile card (ANCHOR + SIZE) */}
                       <div 
-                        className="flex-shrink-0 rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20"
+                        className="justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20"
                         style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                         role="button"
@@ -1068,29 +1087,6 @@ const HeroProfileHeader = ({
                         {/* Movie icon in top right */}
                         <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
                           <TbMovie className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Golf Club + Handicap Row - 24px below name/handle */}
-                    <div className="w-full mt-6">
-                      {/* Golf Club and Handicap - aligned with name block edges, 16px minimum gap */}
-                      <div 
-                        className="flex items-start justify-between"
-                        style={{ 
-                          marginRight: 'calc(var(--mini-w) + 16px)',
-                          gap: '16px'
-                        }}
-                      >
-                        <div className="text-left">
-                          <div className="text-sm text-gray-700">Golf Club</div>
-                          <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-gray-700">Handicap</div>
-                          <div className="mt-1 text-2xl font-semibold text-gray-900">
-                            {handicap}
-                          </div>
                         </div>
                       </div>
                     </div>
