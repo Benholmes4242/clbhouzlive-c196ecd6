@@ -816,9 +816,9 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap + Bio Left-aligned Layout */}
-                    <div className="w-full mt-4">
-                      {/* Golf Club and Handicap - left-aligned with titles above */}
+                    {/* Club + Handicap + Bio Left-aligned Layout with 6px margins */}
+                    <div className="w-full mt-4 px-1.5">
+                      {/* Golf Club and Handicap - left-aligned with titles above, 6px from edges */}
                       <div className="flex items-start justify-start gap-6">
                         <div className="text-left">
                           <div className="text-xs text-gray-700">Golf Club</div>
@@ -830,7 +830,7 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                       
-                      {/* Bio spanning full width, positioned below club/handicap */}
+                      {/* Bio spanning full width, positioned below club/handicap, with 6px margins */}
                       <div className="mt-4">
                         {profile?.bio && (
                           <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
@@ -849,8 +849,8 @@ const HeroProfileHeader = ({
                             </a>
                           </div>
                         )}
+                      </div>
                     </div>
-                  </div>
 
                   {/* Slim Stats Row */}
                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-4">
