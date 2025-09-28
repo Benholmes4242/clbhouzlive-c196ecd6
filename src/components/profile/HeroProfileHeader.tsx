@@ -794,10 +794,43 @@ const HeroProfileHeader = ({
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
               ref={profileCardRef}
-              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] px-[6px] py-[14px]"
-              style={{ marginTop: 'calc(var(--panel-overlap) * -1)' }}
+              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              style={{
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
+              }}
             >
                <div className="flex flex-col items-center relative">
+                  {/* Overhanging mini profile card */}
+                  <div
+                    className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                    style={{
+                      width: 'var(--mini-w)',
+                      height: 'var(--mini-h)',
+                      right: 'var(--panel-pad-x)',
+                      top: 'calc(var(--mini-h) * -0.28)'
+                    }}
+                    onClick={() => openImmersive?.(0)}
+                    role="button"
+                    aria-label="Open immersive profile"
+                  >
+                    {profile?.profile_photo_url ? (
+                      <img
+                        src={profile.profile_photo_url}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        style={{
+                          objectPosition: (() => {
+                            const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
+                            const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
+                            return `${cx}% ${cy}%`;
+                          })()
+                        }}
+                        loading="lazy"
+                      />
+                    ) : null}
+                  </div>
+
                   {/* Three dots menu - positioned absolutely on left */}
                   {isOwnProfile && (
                     <div className="absolute top-0 left-0">
@@ -816,132 +849,59 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Header Block - 3-column grid: empty | content | mini card */}
-                  <div className="w-full mb-3">
-                    <div 
-                      className="profileHeader grid items-start"
-                      style={{
-                        gridTemplateColumns: 'max-content minmax(0,1fr) max-content',
-                        columnGap: '16px'
-                      }}
+                  {/* Content column with space reserved for the overhang */}
+                  <div style={{ paddingRight: 'calc(var(--mini-w) + 16px)' }}>
+                    {/* Name & handle */}
+                    <div className="text-left">
+                      <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
+                        {displayName}
+                      </h1>
+                      <div className="mt-1 opacity-70 text-[length:var(--fs-handle)]">
+                        @{username}
+                      </div>
+                    </div>
+
+                    {/* Golf Club (left) + Handicap (right) */}
+                    <div
+                      className="mt-6 grid items-start"
+                      style={{ gridTemplateColumns: '1fr 1fr', columnGap: '24px' }}
                     >
-                      {/* leftCol: kebab/menu (empty for mobile) */}
-                      <div className="leftCol justify-self-start"></div>
+                      {/* Golf Club – left aligned */}
+                      <div className="text-left">
+                        <div className="opacity-60 text-[length:var(--fs-label)]">Golf Club</div>
+                        <div className="text-[length:var(--fs-value)]">{homeClub}</div>
+                      </div>
 
-                      {/* contentCol: name/handle + club/handicap */}
-                      <div className="contentCol text-center min-w-0">
-                        <div ref={nameBlockRef}>
-                          <h1 
-                            className="displayName font-semibold leading-tight text-[length:var(--fs-display)] m-0 mb-1"
-                            title={displayName}
+                      {/* Handicap – right aligned */}
+                      <div className="text-right">
+                        <div className="opacity-60 text-[length:var(--fs-label)]">Handicap</div>
+                        <div className="text-[length:var(--fs-value)]">{handicap}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bio section below the content column */}
+                  <div className="w-full mt-6">
+                    <div className="text-center">
+                      {profile?.bio && (
+                        <p className="text-sm text-gray-700 mb-2 line-clamp-2 leading-relaxed">
+                          {profile.bio}
+                        </p>
+                      )}
+                      {profile?.website && (
+                        <div className="text-center">
+                          <a 
+                            href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
                           >
-                            {displayName}
-                          </h1>
-                          <div className="handle opacity-70 text-[length:var(--fs-handle)] m-0">@{username}</div>
+                            {profile.website.replace(/^https?:\/\//, '')}
+                          </a>
                         </div>
-
-                        {/* Club + Handicap Row - dynamic gap from hook (falls back to 24px if measure fails) */}
-                        <div 
-                          ref={metaRowRef}
-                          className="clubHandicapRow grid grid-cols-2 gap-2 justify-items-center text-center"
-                          style={{ marginTop: 'var(--club-gap, 24px)' }}
-                        >
-                          {/* Golf Club */}
-                          <div className="statItem">
-                            <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
-                            <div className="statValue clubValue text-sm font-semibold text-foreground max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                              {homeClub}
-                            </div>
-                          </div>
-                          
-                          {/* Handicap */}
-                          <div className="statItem">
-                            <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
-                            <div className="statValue handicapValue text-base font-semibold text-foreground">
-                              {handicap}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* miniProfileCard: right column */}
-                      <div 
-                        ref={miniCardRef}
-                        className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
-                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
-                        onClick={() => openImmersive(0)}
-                      >
-                        {profile?.profile_photo_url ? (
-                          <img
-                            src={(() => {
-                              const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
-                              return `${profile.profile_photo_url}${profile.profile_photo_url.includes('?') ? '&' : '?'}v=${ver}`;
-                            })()}
-                            alt="Mini profile"
-                            className="w-full h-full object-cover"
-                            style={{
-                              objectPosition: (() => {
-                                const crop = {
-                                  x: profile?.mini_card_crop_x || 0,
-                                  y: profile?.mini_card_crop_y || 0,
-                                  width: profile?.mini_card_crop_width || 100,
-                                  height: profile?.mini_card_crop_height || 100
-                                };
-                                const cx = crop.x + crop.width / 2;
-                                const cy = crop.y + crop.height / 2;
-                                return `${cx}% ${cy}%`;
-                              })()
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <span className="text-gray-600 font-bold text-2xl">
-                              {displayName?.charAt(0).toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        )}
-                        {/* Movie icon in top right */}
-                        <div className="absolute top-1 right-1 bg-black/40 rounded-full p-1">
-                          <TbMovie className="w-3 h-3 text-white" />
-                        </div>
-                      </div>
+                      )}
                     </div>
-
-                    {/* Club + Handicap + Bio Left-aligned Layout with 6px margins */}
-                    <div className="w-full mt-4 px-1.5">
-                      {/* Golf Club and Handicap - left-aligned with titles above, 6px from edges */}
-                      <div className="hidden">
-                        <div className="text-left">
-                          <div className="text-xs text-gray-700">Golf Club</div>
-                          <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
-                        </div>
-                        <div className="text-left">
-                          <div className="text-xs text-gray-700">Handicap</div>
-                          <div className="mt-1 text-lg font-semibold text-gray-900">{handicap}</div>
-                        </div>
-                      </div>
-                      
-                      {/* Bio spanning full width, positioned below club/handicap, with 6px margins */}
-                      <div className="mt-4">
-                        {profile?.bio && (
-                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
-                            {profile.bio}
-                          </p>
-                        )}
-                        {profile?.website && (
-                          <div className="text-left">
-                            <a 
-                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                            >
-                              {profile.website.replace(/^https?:\/\//, '')}
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  </div>
 
                   {/* Slim Stats Row */}
                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-4">
@@ -1002,7 +962,6 @@ const HeroProfileHeader = ({
                   </div>
 
                </div>
-            </div>
             </section>
              
              {/* Spacer below for 16px gap before tab content */}
