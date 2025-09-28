@@ -782,7 +782,7 @@ const HeroProfileHeader = ({
                         <div className="handle opacity-70 text-[length:var(--fs-handle)] m-0">@{username}</div>
 
                         {/* Club + Handicap Row - 24px below handle */}
-                        <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-6 justify-items-center text-center">
+                        <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-2 justify-items-center text-center">
                           {/* Golf Club */}
                           <div className="statItem">
                             <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
@@ -1043,7 +1043,7 @@ const HeroProfileHeader = ({
                          </div>
 
                          {/* Golf Club + Handicap Row - 24px below name/handle */}
-                         <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-6 justify-items-center text-center">
+                         <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-2 justify-items-center text-center">
                            {/* Golf Club */}
                            <div className="statItem">
                              <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
