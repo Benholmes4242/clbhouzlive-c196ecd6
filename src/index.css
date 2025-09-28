@@ -2102,6 +2102,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
+  margin-bottom: 0;
   text-overflow: ellipsis;
 }
 
