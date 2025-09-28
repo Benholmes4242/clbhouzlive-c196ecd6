@@ -2063,3 +2063,22 @@ html[data-immersive="true"] .app-shell--topSpacer {
 .recently-played-carousel .shrink-0:last-child {
   margin-right: 0 !important;
 }
+
+/* Profile layout responsive safeguards */
+@media (max-width: 375px) {
+  .clubHandicapRow {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    justify-items: start !important;
+    text-align: left !important;
+  }
+  
+  .miniProfileCard {
+    grid-column: 1 !important;
+    margin-top: 12px !important;
+  }
+  
+  .profileHeader {
+    grid-template-columns: 1fr !important;
+  }
+}

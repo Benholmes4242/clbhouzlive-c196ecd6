@@ -1007,16 +1007,13 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                   {/* Header Block - Name + Handle with mini profile card on right */}
+                   {/* Header Block - 2-column grid layout */}
                    <div className="w-full mb-4">
-                     <div className="relative">
-                       {/* Center the name/handle block between left edge of glass panel and left edge of mini profile card */}
-                       <div 
-                         className="flex justify-between items-start"
-                         style={{ marginRight: 'calc(var(--mini-w) + 8px)' }}
-                       >
-                         {/* Name/Handle Block - Centered in available space */}
-                         <div className="flex-1 text-center">
+                     <div className="grid grid-cols-[minmax(0,1fr)_max-content] gap-4 items-start">
+                       {/* Left column: Name/Handle + Club/Handicap */}
+                       <div className="leftWrap min-w-0">
+                         {/* Name/Handle Block - Centered in left column */}
+                         <div className="text-center">
                            <h1 
                              className="font-semibold leading-tight text-[length:var(--fs-display)]"
                              title={displayName}
@@ -1025,34 +1022,30 @@ const HeroProfileHeader = ({
                            </h1>
                            <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
                          </div>
-                       </div>
 
-                       {/* Golf Club + Handicap Row - 24px below name/handle */}
-                       <div 
-                         className="flex justify-between items-center mt-6"
-                         style={{ 
-                           marginRight: 'calc(var(--mini-w) + 8px)',
-                           minHeight: '2rem' /* Ensure consistent height */
-                         }}
-                       >
-                         {/* Golf Club - aligned with left edge of name block */}
-                         <div className="text-left min-w-0 flex-shrink-0" style={{ paddingRight: '16px' }}>
-                           <div className="text-sm text-gray-700">Golf Club</div>
-                           <div className="mt-1 text-sm text-gray-900 truncate">{homeClub}</div>
-                         </div>
-                         
-                         {/* Handicap - aligned with right edge of name block */}
-                         <div className="text-right min-w-0 flex-shrink-0" style={{ paddingLeft: '16px' }}>
-                           <div className="text-sm text-gray-700">Handicap</div>
-                           <div className="mt-1 text-2xl font-semibold text-gray-900">
-                             {handicap}
+                         {/* Golf Club + Handicap Row - 24px below name/handle */}
+                         <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-6 justify-items-center text-center">
+                           {/* Golf Club */}
+                           <div className="statItem">
+                             <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
+                             <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                               {homeClub}
+                             </div>
+                           </div>
+                           
+                           {/* Handicap */}
+                           <div className="statItem">
+                             <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
+                             <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
+                               {handicap}
+                             </div>
                            </div>
                          </div>
                        </div>
                        
-                       {/* Mini profile card - positioned absolutely to maintain anchor */}
+                       {/* Right column: Mini profile card */}
                        <div 
-                         className="absolute top-0 right-0 rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20"
+                         className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
                          style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                          onClick={() => openImmersive(0)}
                          role="button"
