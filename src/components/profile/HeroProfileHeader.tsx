@@ -761,7 +761,7 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    <div className="grid grid-cols-[1fr_auto] items-center gap-x-2.5">
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-x-2.5">
                       {/* Name + Handle - left aligned with min-width for proper text measuring */}
                       <div className="text-center min-w-0">
                         <h1 
@@ -816,21 +816,17 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap + Bio Grid Layout */}
+                    {/* Club + Handicap + Bio Inline Layout */}
                     <div className="w-full mt-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Col 1: Golf Club */}
-                        <div className="text-center">
+                      {/* Inline row: Golf Club and Handicap */}
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="flex items-center gap-2">
                           <div className="text-xs text-gray-700">Golf Club</div>
-                          <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
+                          <div className="text-xs text-gray-900">{homeClub}</div>
                         </div>
-                        
-                        {/* Col 2: Handicap */}
-                        <div className="text-center">
+                        <div className="flex items-center gap-2">
                           <div className="text-xs text-gray-700">Handicap</div>
-                          <div className="mt-1 text-lg font-semibold text-gray-900">
-                            {handicap}
-                          </div>
+                          <div className="text-lg font-semibold text-gray-900">{handicap}</div>
                         </div>
                       </div>
                       
