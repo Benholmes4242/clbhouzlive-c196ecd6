@@ -2106,7 +2106,18 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 .clubValue { max-width: 100%; }
 
-/* Profile layout responsive safeguards */
+/* Small phones only: stack Golf Club + Handicap vertically */
+@media (max-width: 480px) {
+  .clubHandicapRow {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .clubHandicapRow .statItem + .statItem {
+    margin-top: 24px !important;
+  }
+}
+
+/* Very narrow screens: full stack layout */
 @media (max-width: 375px) {
   .profileHeader {
     grid-template-columns: 1fr !important;
@@ -2115,12 +2126,5 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .miniProfileCard {
     grid-column: 1 !important;
     margin-top: 12px !important;
-  }
-  
-  .clubHandicapRow {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    justify-items: start !important;
-    text-align: left !important;
   }
 }
