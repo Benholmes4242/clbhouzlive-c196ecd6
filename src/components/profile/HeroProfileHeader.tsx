@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -118,6 +118,11 @@ const HeroProfileHeader = ({
 }: HeroProfileHeaderProps) => {
   console.log('HeroProfileHeader render with profile:', profile?.id);
   const { user } = useSupabaseSession();
+  
+  // Refs for dynamic gap calculation
+  const nameBlockRef = useRef<HTMLDivElement | null>(null);
+  const metaRowRef = useRef<HTMLDivElement | null>(null);
+  const miniCardRef = useRef<HTMLDivElement | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
@@ -313,6 +318,58 @@ const HeroProfileHeader = ({
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+
+  // Hook to compute even gap between handle and mini card
+  function useEvenGapToMiniCard(
+    nameBlockEl: HTMLElement | null,
+    metaRowEl: HTMLElement | null,
+    miniCardEl: HTMLElement | null
+  ) {
+    useLayoutEffect(() => {
+      if (!nameBlockEl || !metaRowEl || !miniCardEl) return;
+
+      const compute = () => {
+        const nameH = nameBlockEl.getBoundingClientRect().height || 0;
+        const metaH = metaRowEl.getBoundingClientRect().height || 0;
+        const cardH = miniCardEl.getBoundingClientRect().height || 0;
+
+        // target: center meta row in the band from handle bottom → mini card bottom
+        let raw = (cardH - nameH - metaH) / 2;
+
+        // clamp (px)
+        const gap = Math.max(16, Math.min(raw, 64));
+
+        metaRowEl.style.setProperty('--club-gap', `${Math.round(gap)}px`);
+      };
+
+      // initial + on layout changes
+      compute();
+
+      // listeners
+      const ro = new ResizeObserver(compute);
+      ro.observe(nameBlockEl);
+      ro.observe(metaRowEl);
+      ro.observe(miniCardEl);
+
+      const onResize = () => compute();
+      window.addEventListener('resize', onResize);
+      window.addEventListener('orientationchange', onResize);
+
+      // re-run after fonts load (avoids a tiny shift)
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(compute).catch(() => {});
+      }
+
+      return () => {
+        ro.disconnect();
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('orientationchange', onResize);
+      };
+    }, [nameBlockEl, metaRowEl, miniCardEl]);
+  }
+
+  // Wire the hook
+  useEvenGapToMiniCard(nameBlockRef.current, metaRowRef.current, miniCardRef.current);
 
   // Auto-open immersive mode for other users when they have media (default entry)
   useEffect(() => {
@@ -773,16 +830,22 @@ const HeroProfileHeader = ({
 
                       {/* contentCol: name/handle + club/handicap */}
                       <div className="contentCol text-center min-w-0">
-                        <h1 
-                          className="displayName font-semibold leading-tight text-[length:var(--fs-display)] m-0 mb-1"
-                          title={displayName}
-                        >
-                          {displayName}
-                        </h1>
-                        <div className="handle opacity-70 text-[length:var(--fs-handle)] m-0">@{username}</div>
+                        <div ref={nameBlockRef}>
+                          <h1 
+                            className="displayName font-semibold leading-tight text-[length:var(--fs-display)] m-0 mb-1"
+                            title={displayName}
+                          >
+                            {displayName}
+                          </h1>
+                          <div className="handle opacity-70 text-[length:var(--fs-handle)] m-0">@{username}</div>
+                        </div>
 
-                        {/* Club + Handicap Row - 24px below handle */}
-                        <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-2 justify-items-center text-center">
+                        {/* Club + Handicap Row - dynamic gap from hook (falls back to 24px if measure fails) */}
+                        <div 
+                          ref={metaRowRef}
+                          className="clubHandicapRow grid grid-cols-2 gap-2 justify-items-center text-center"
+                          style={{ marginTop: 'var(--club-gap, 24px)' }}
+                        >
                           {/* Golf Club */}
                           <div className="statItem">
                             <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
@@ -803,6 +866,7 @@ const HeroProfileHeader = ({
                       
                       {/* miniProfileCard: right column */}
                       <div 
+                        ref={miniCardRef}
                         className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
                         style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
@@ -1029,43 +1093,48 @@ const HeroProfileHeader = ({
                    {/* Header Block - 2-column grid layout */}
                    <div className="w-full mb-4">
                      <div className="grid grid-cols-[minmax(0,1fr)_max-content] gap-4 items-start">
-                       {/* Left column: Name/Handle + Club/Handicap */}
-                       <div className="leftWrap min-w-0">
-                         {/* Name/Handle Block - Centered in left column */}
-                         <div className="text-center">
-                           <h1 
-                             className="font-semibold leading-tight text-[length:var(--fs-display)]"
-                             title={displayName}
-                           >
-                             {displayName}
-                           </h1>
-                           <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
-                         </div>
+                        {/* Left column: Name/Handle + Club/Handicap */}
+                        <div className="leftWrap min-w-0">
+                          {/* Name/Handle Block - Centered in left column */}
+                          <div ref={nameBlockRef} className="text-center">
+                            <h1 
+                              className="font-semibold leading-tight text-[length:var(--fs-display)]"
+                              title={displayName}
+                            >
+                              {displayName}
+                            </h1>
+                            <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+                          </div>
 
-                         {/* Golf Club + Handicap Row - 24px below name/handle */}
-                         <div className="clubHandicapRow mt-6 grid grid-cols-2 gap-2 justify-items-center text-center">
-                           {/* Golf Club */}
-                           <div className="statItem">
-                             <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
-                             <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                               {homeClub}
-                             </div>
-                           </div>
-                           
-                           {/* Handicap */}
-                           <div className="statItem">
-                             <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
-                             <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
-                               {handicap}
-                             </div>
-                           </div>
-                         </div>
-                       </div>
+                          {/* Golf Club + Handicap Row - dynamic gap from hook (falls back to 24px if measure fails) */}
+                          <div 
+                            ref={metaRowRef}
+                            className="clubHandicapRow grid grid-cols-2 gap-2 justify-items-center text-center"
+                            style={{ marginTop: 'var(--club-gap, 24px)' }}
+                          >
+                            {/* Golf Club */}
+                            <div className="statItem">
+                              <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
+                              <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                                {homeClub}
+                              </div>
+                            </div>
+                            
+                            {/* Handicap */}
+                            <div className="statItem">
+                              <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
+                              <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
+                                {handicap}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                        
-                       {/* Right column: Mini profile card */}
-                       <div 
-                         className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
-                         style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
+                        {/* Right column: Mini profile card */}
+                        <div 
+                          ref={miniCardRef}
+                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
+                          style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                          onClick={() => openImmersive(0)}
                          role="button"
                          tabIndex={0}
