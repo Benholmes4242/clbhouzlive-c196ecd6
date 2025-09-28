@@ -1093,48 +1093,59 @@ const HeroProfileHeader = ({
                    {/* Header Block - 2-column grid layout */}
                    <div className="w-full mb-4">
                      <div className="grid grid-cols-[minmax(0,1fr)_max-content] gap-4 items-start">
-                        {/* Left column: Name/Handle + Club/Handicap */}
-                        <div className="leftWrap min-w-0">
-                          {/* Name/Handle Block - Centered in left column */}
-                          <div ref={nameBlockRef} className="text-center">
-                            <h1 
-                              className="font-semibold leading-tight text-[length:var(--fs-display)]"
-                              title={displayName}
-                            >
-                              {displayName}
-                            </h1>
-                            <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
-                          </div>
+                         {/* Left column: Name/Handle + Club/Handicap - Left aligned */}
+                         <div className="leftWrap min-w-0" style={{ paddingRight: 'calc(var(--mini-w) + 24px)' }}>
+                           {/* Name/Handle Block - Left aligned */}
+                           <div ref={nameBlockRef} className="text-left">
+                             <h1 
+                               className="font-semibold leading-tight text-[length:var(--fs-display)]"
+                               title={displayName}
+                             >
+                               {displayName}
+                             </h1>
+                             <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+                           </div>
 
-                          {/* Golf Club + Handicap Row - dynamic gap from hook (falls back to 24px if measure fails) */}
-                          <div 
-                            ref={metaRowRef}
-                            className="clubHandicapRow grid grid-cols-2 gap-2 justify-items-center text-center"
-                            style={{ marginTop: 'var(--club-gap, 24px)' }}
-                          >
-                            {/* Golf Club */}
-                            <div className="statItem">
-                              <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
-                              <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                                {homeClub}
-                              </div>
-                            </div>
-                            
-                            {/* Handicap */}
-                            <div className="statItem">
-                              <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
-                              <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
-                                {handicap}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                           {/* Golf Club + Handicap Row - Horizontal flex layout */}
+                           <div 
+                             ref={metaRowRef}
+                             className="clubHandicapRow flex justify-between items-center"
+                             style={{ 
+                               marginTop: 'var(--club-gap, 24px)',
+                               paddingRight: '24px',
+                               gap: '24px'
+                             }}
+                           >
+                             {/* Golf Club - Left aligned */}
+                             <div className="statItem flex-1 text-left">
+                               <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
+                               <div className="statValue clubValue text-sm font-semibold text-gray-900 truncate">
+                                 {homeClub}
+                               </div>
+                             </div>
+                             
+                             {/* Handicap - Right aligned */}
+                             <div className="statItem flex-shrink-0 text-right">
+                               <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
+                               <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
+                                 {handicap}
+                               </div>
+                             </div>
+                           </div>
+                         </div>
                        
-                        {/* Right column: Mini profile card */}
+                        {/* Mini profile card - positioned to overhang */}
                         <div 
                           ref={miniCardRef}
-                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
-                          style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
+                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 absolute z-20"
+                          style={{ 
+                            width: 'var(--mini-w)', 
+                            height: 'var(--mini-h)', 
+                            borderRadius: 'var(--mini-radius)',
+                            top: '-25%',
+                            right: 'var(--panel-pad-x)',
+                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
+                          }}
                          onClick={() => openImmersive(0)}
                          role="button"
                          tabIndex={0}
