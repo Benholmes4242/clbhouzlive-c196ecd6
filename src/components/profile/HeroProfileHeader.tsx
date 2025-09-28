@@ -761,23 +761,31 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-3">
-                    <div className="grid grid-cols-[1fr_auto] items-start gap-x-2.5">
-                      {/* Name + Handle - left aligned with min-width for proper text measuring */}
-                      <div className="text-center min-w-0">
+                    <div 
+                      className="grid items-start"
+                      style={{
+                        gridTemplateColumns: 'max-content 1fr var(--mini-w)',
+                        columnGap: '8px'
+                      }}
+                    >
+                      {/* left: kebab/menu (empty for mobile) */}
+                      <div className="justify-self-start"></div>
+
+                      {/* center: name/handle */}
+                      <div className="text-center">
                         <h1 
-                          className="text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-visible"
+                          className="font-semibold leading-tight text-[length:var(--fs-display)]"
                           title={displayName}
                         >
                           {displayName}
                         </h1>
-                        <p className="mt-1 text-sm text-gray-700">
-                          @{username}
-                        </p>
+                        <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger size) - Clickable for immersive preview */}
+                      {/* right: mini profile card (ANCHOR + SIZE) */}
                       <div 
-                        className="w-[84px] h-[112px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                       >
                         {profile?.profile_photo_url ? (
@@ -1001,18 +1009,25 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-4">
-                    <div className="grid grid-cols-[1fr_auto] items-start gap-x-2.5">
-                      {/* Name + Handle + Club/Handicap - left aligned with min-width for proper text measuring */}
-                      <div className="text-center min-w-0">
+                    <div 
+                      className="grid items-start"
+                      style={{
+                        gridTemplateColumns: 'max-content 1fr var(--mini-w)',
+                        columnGap: '8px'
+                      }}
+                    >
+                      {/* left: kebab/menu (empty for desktop) */}
+                      <div className="justify-self-start"></div>
+
+                      {/* center: name/handle + club/handicap */}
+                      <div className="text-center">
                         <h1 
-                          className="text-3xl font-semibold text-gray-900 whitespace-nowrap overflow-visible"
+                          className="font-semibold leading-tight text-[length:var(--fs-display)]"
                           title={displayName}
                         >
                           {displayName}
                         </h1>
-                        <p className="mt-1 text-base text-gray-700 mb-3">
-                          @{username}
-                        </p>
+                        <div className="opacity-70 text-[length:var(--fs-handle)] mb-3">@{username}</div>
                         
                         {/* Golf Club and Handicap - side by side inline */}
                         <div className="flex items-center justify-center gap-6">
@@ -1030,9 +1045,10 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                       
-                      {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
+                      {/* right: mini profile card (ANCHOR + SIZE) */}
                       <div 
-                        className="w-[112px] h-[149px] rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden flex-shrink-0 relative z-20 cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        className="justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20"
+                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                         onClick={() => openImmersive(0)}
                         role="button"
                         tabIndex={0}

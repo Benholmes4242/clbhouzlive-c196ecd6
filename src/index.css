@@ -498,7 +498,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --panel-overlap: clamp(56px, 7vh, 96px);
     --panel-pad-x: clamp(16px, 4vw, 32px);
     --panel-pad-y: clamp(12px, 2.6vh, 24px);
-    --mini-w: clamp(72px, 10vw, 128px);
+    --mini-w: clamp(120px, 34vw, 176px);
     --mini-h: calc(var(--mini-w) * 4 / 3);
     --mini-radius: 10px;
     --fs-display: clamp(22px, 3.8vw, 32px);
