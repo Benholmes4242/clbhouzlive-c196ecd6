@@ -867,8 +867,15 @@ const HeroProfileHeader = ({
                       {/* miniProfileCard: right column */}
                       <div 
                         ref={miniCardRef}
-                        className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
-                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
+                        className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 absolute"
+                        style={{ 
+                          width: 'var(--mini-w)', 
+                          height: 'var(--mini-h)', 
+                          borderRadius: 'var(--mini-radius)',
+                          top: '-25%',
+                          right: 'var(--panel-pad-x, 1rem)',
+                          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+                        }}
                         onClick={() => openImmersive(0)}
                       >
                         {profile?.profile_photo_url ? (
@@ -1133,8 +1140,15 @@ const HeroProfileHeader = ({
                         {/* Right column: Mini profile card */}
                         <div 
                           ref={miniCardRef}
-                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
-                          style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
+                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 absolute z-20"
+                          style={{ 
+                            width: 'var(--mini-w)', 
+                            height: 'var(--mini-h)', 
+                            borderRadius: 'var(--mini-radius)',
+                            top: '-25%',
+                            right: 'var(--panel-pad-x, 1rem)',
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+                          }}
                          onClick={() => openImmersive(0)}
                          role="button"
                          tabIndex={0}
