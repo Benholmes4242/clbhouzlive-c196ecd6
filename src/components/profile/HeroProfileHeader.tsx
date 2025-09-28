@@ -864,11 +864,18 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                       
-                      {/* miniProfileCard: right column */}
+                       {/* miniProfileCard: right column - overhanging absolute position */}
                       <div 
                         ref={miniCardRef}
-                        className="miniProfileCard justify-self-end self-start rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
-                        style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
+                        className="miniProfileCard absolute rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200"
+                        style={{ 
+                          width: 'var(--mini-w)', 
+                          height: 'var(--mini-h)', 
+                          borderRadius: 'var(--mini-radius)',
+                          top: '-25%',
+                          right: 'var(--panel-pad-x)',
+                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                        }}
                         onClick={() => openImmersive(0)}
                       >
                         {profile?.profile_photo_url ? (
