@@ -1130,10 +1130,10 @@ const HeroProfileHeader = ({
                           </div>
                         </div>
                        
-                        {/* Right column: Mini profile card with overhang */}
+                        {/* Right column: Mini profile card */}
                         <div 
                           ref={miniCardRef}
-                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-lg overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 absolute -top-7 right-4 z-20"
+                          className="miniProfileCard rounded-lg border border-white/40 bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden cursor-pointer hover:bg-white/30 transition-all duration-200 relative z-20 self-start"
                           style={{ width: 'var(--mini-w)', height: 'var(--mini-h)', borderRadius: 'var(--mini-radius)' }}
                          onClick={() => openImmersive(0)}
                          role="button"
