@@ -55,11 +55,6 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
       {/* Profile content */}
       <div className="pt-6 space-y-2">
-        {/* Name - large, bold */}
-        <h2 className="text-2xl font-bold text-white">
-          {profile?.display_name || 'User'}
-        </h2>
-
         {/* Username row with edit button */}
         <div className="flex items-center justify-center gap-3">
           <p className="text-base text-white/80">
@@ -78,30 +73,38 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           )}
         </div>
 
-        {/* Home Club and Handicap - moved left with mini profile card on right */}
+        {/* Name aligned with mini profile card and club/handicap info side by side */}
         <div className="flex items-start justify-between gap-4">
-          {/* Left side - Home Club and Handicap centered */}
+          {/* Left side - Name and club/handicap info */}
           <div className="flex-1 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Flag className="w-4 h-4 text-white/60" />
-              <p className="text-sm text-white/60">
-                {profile?.home_club || 'No Club'}
-              </p>
-            </div>
-            {/* Handicap display */}
-            <div className="text-center">
-              <p className="text-xs text-white/50">Handicap</p>
-              <p className="text-sm font-medium text-white/80">
-                {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined 
-                  ? `${profile.eg_handicap_index > 0 ? '+' : ''}${profile.eg_handicap_index.toFixed(1)}`
-                  : 'Not set'
-                }
-              </p>
+            {/* Name - large, bold - aligned with mini card top */}
+            <h2 className="text-2xl font-bold text-white">
+              {profile?.display_name || 'User'}
+            </h2>
+            
+            {/* Golf Club and Handicap - side by side */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Flag className="w-4 h-4 text-white/60" />
+                <p className="text-sm text-white/60">
+                  {profile?.home_club || 'No Club'}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-white/50">Handicap:</span>
+                <span className="text-sm font-medium text-white/80">
+                  {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined 
+                    ? `${profile.eg_handicap_index > 0 ? '+' : ''}${profile.eg_handicap_index.toFixed(1)}`
+                    : 'Not set'
+                  }
+                </span>
+              </div>
             </div>
           </div>
           
-          {/* Right side - Mini Profile Card - positioned with more breathing room */}
-          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2 mt-6">
+          {/* Right side - Mini Profile Card */}
+          <div className="w-16 h-20 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center p-2">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 mb-1">
               {profile?.profile_photo_url ? (
                 <img
