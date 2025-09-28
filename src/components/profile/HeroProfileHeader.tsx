@@ -816,29 +816,29 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap + Bio Inline Layout */}
+                    {/* Club + Handicap + Bio Left-aligned Layout */}
                     <div className="w-full mt-4">
-                      {/* Inline row: Golf Club and Handicap */}
-                      <div className="flex items-center justify-center gap-4">
-                        <div className="flex items-center gap-2">
+                      {/* Golf Club and Handicap - left-aligned with titles above */}
+                      <div className="flex items-start justify-start gap-6">
+                        <div className="text-left">
                           <div className="text-xs text-gray-700">Golf Club</div>
-                          <div className="text-xs text-gray-900">{homeClub}</div>
+                          <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="text-left">
                           <div className="text-xs text-gray-700">Handicap</div>
-                          <div className="text-lg font-semibold text-gray-900">{handicap}</div>
+                          <div className="mt-1 text-lg font-semibold text-gray-900">{handicap}</div>
                         </div>
                       </div>
                       
                       {/* Bio spanning full width, positioned below club/handicap */}
                       <div className="mt-4">
                         {profile?.bio && (
-                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-center leading-relaxed">
+                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 text-left leading-relaxed">
                             {profile.bio}
                           </p>
                         )}
                         {profile?.website && (
-                          <div className="text-center">
+                          <div className="text-left">
                             <a 
                               href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                               target="_blank"
@@ -849,7 +849,6 @@ const HeroProfileHeader = ({
                             </a>
                           </div>
                         )}
-                      </div>
                     </div>
                   </div>
 
@@ -911,7 +910,8 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
+               </div>
+            </div>
             </section>
              
              {/* Spacer below for 16px gap before tab content */}
