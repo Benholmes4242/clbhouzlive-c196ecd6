@@ -780,6 +780,25 @@ const HeroProfileHeader = ({
                           {displayName}
                         </h1>
                         <div className="opacity-70 text-[length:var(--fs-handle)]">@{username}</div>
+
+                        {/* Club + Handicap Row - 24px below handle */}
+                        <div className="clubHandicapRow mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:justify-items-center text-left sm:text-center">
+                          {/* Golf Club */}
+                          <div className="statItem">
+                            <div className="statTitle text-xs opacity-70 mb-1.5">Golf Club</div>
+                            <div className="statValue clubValue text-sm font-semibold text-gray-900 max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                              {homeClub}
+                            </div>
+                          </div>
+                          
+                          {/* Handicap */}
+                          <div className="statItem">
+                            <div className="statTitle text-xs opacity-70 mb-1.5">Handicap</div>
+                            <div className="statValue handicapValue text-2xl font-semibold text-gray-900">
+                              {handicap}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
                       {/* right: mini profile card (ANCHOR + SIZE) */}
@@ -827,7 +846,7 @@ const HeroProfileHeader = ({
                     {/* Club + Handicap + Bio Left-aligned Layout with 6px margins */}
                     <div className="w-full mt-4 px-1.5">
                       {/* Golf Club and Handicap - left-aligned with titles above, 6px from edges */}
-                      <div className="flex items-start justify-start gap-6">
+                      <div className="hidden">
                         <div className="text-left">
                           <div className="text-xs text-gray-700">Golf Club</div>
                           <div className="mt-1 text-xs text-gray-900">{homeClub}</div>
