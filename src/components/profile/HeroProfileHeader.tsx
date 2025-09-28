@@ -1005,8 +1005,8 @@ const HeroProfileHeader = ({
 
                   {/* Header Block - Name + Handle with mini profile card on right */}
                   <div className="w-full mb-4">
-                    <div className="grid grid-cols-[1fr_auto] items-center gap-x-2.5">
-                      {/* Name + Handle - left aligned with min-width for proper text measuring */}
+                    <div className="grid grid-cols-[1fr_auto] items-start gap-x-2.5">
+                      {/* Name + Handle + Club/Handicap - left aligned with min-width for proper text measuring */}
                       <div className="text-center min-w-0">
                         <h1 
                           className="text-3xl font-semibold text-gray-900 whitespace-nowrap overflow-visible"
@@ -1014,9 +1014,24 @@ const HeroProfileHeader = ({
                         >
                           {displayName}
                         </h1>
-                        <p className="mt-1 text-base text-gray-700">
+                        <p className="mt-1 text-base text-gray-700 mb-3">
                           @{username}
                         </p>
+                        
+                        {/* Golf Club and Handicap - side by side inline */}
+                        <div className="flex items-center justify-center gap-6">
+                          <div className="text-center">
+                            <div className="text-sm text-gray-700">Golf Club</div>
+                            <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
+                          </div>
+                          
+                          <div className="text-center">
+                            <div className="text-sm text-gray-700">Handicap</div>
+                            <div className="mt-1 text-2xl font-semibold text-gray-900">
+                              {handicap}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
                       {/* Mini Profile Card (3:4 aspect ratio, larger desktop size) - Clickable for immersive preview */}
@@ -1064,28 +1079,12 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Club + Handicap + Bio Grid Layout */}
+                    {/* Bio section - moved to separate section */}
                     <div className="w-full mt-6">
-                      <div className="grid grid-cols-2 gap-6">
-                        {/* Col 1: Golf Club */}
-                        <div className="text-center">
-                          <div className="text-sm text-gray-700">Golf Club</div>
-                          <div className="mt-1 text-sm text-gray-900">{homeClub}</div>
-                        </div>
-                        
-                        {/* Col 2: Handicap */}
-                        <div className="text-center">
-                          <div className="text-sm text-gray-700">Handicap</div>
-                          <div className="mt-1 text-2xl font-semibold text-gray-900">
-                            {handicap}
-                          </div>
-                        </div>
-                      </div>
-                      
                       {/* Bio spanning full width, positioned below club/handicap */}
-                      <div className="mt-5">
+                      <div className="text-center">
                         {profile?.bio && (
-                          <p className="text-base text-gray-700 mb-3 line-clamp-3 text-center leading-relaxed">
+                          <p className="text-base text-gray-700 mb-3 line-clamp-3 leading-relaxed">
                             {profile.bio}
                           </p>
                         )}
