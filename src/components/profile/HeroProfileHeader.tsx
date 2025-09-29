@@ -943,10 +943,11 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <hr className="mt-4 border-white/10" />
+                    <div className="space-y-0">
+                      <hr className="m-0 border-white/10" />
 
                     {/* Tab Navigation */}
-                    <nav className="mt-4 w-full">
+                    <nav className="w-full">
                       <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
                         {tabs.map((tab) => (
                           <button
@@ -982,6 +983,7 @@ const HeroProfileHeader = ({
                         ))}
                       </div>
                     </nav>
+                    </div>
                   </div>
 
                </div>
