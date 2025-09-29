@@ -864,10 +864,10 @@ const HeroProfileHeader = ({
                     </div>
 
                     {/* TITLES ROW (golf club & handicap on the SAME line) */}
-                    <div className="col-[1] row-[2] flex justify-center mt-4">
+                    <div className="col-[1] row-[2] flex justify-center mt-10">
                       <div className="text-sm font-semibold text-center">Golf Club</div>
                     </div>
-                    <div className="col-[3] row-[2] flex justify-center mt-4">
+                    <div className="col-[3] row-[2] flex justify-center mt-10">
                       <div className="text-sm font-semibold text-center">Handicap</div>
                     </div>
 
@@ -1109,8 +1109,8 @@ const HeroProfileHeader = ({
                      </div>
                    </div>
 
-                   {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
-                   <div className="mt-3 flex justify-center items-start gap-6" 
+                    {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
+                    <div className="mt-10 flex justify-center items-start gap-6"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
