@@ -851,7 +851,7 @@ const HeroProfileHeader = ({
                    <div 
                      className="absolute text-center"
                      style={{
-                       top: 'calc(var(--mini-h) * 0.76 + 12px)', // Same line as handicap
+                       top: 'calc(var(--mini-h) * 0.15 + 140px)', // Aligned with handle level
                        left: '50%', // Center horizontally
                        transform: 'translateX(-50%)', // Perfect center alignment
                        width: 'auto' // Auto width for content
