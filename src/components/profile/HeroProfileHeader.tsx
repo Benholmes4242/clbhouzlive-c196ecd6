@@ -849,27 +849,28 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                   {/* Content column with space reserved for the overhang */}
-                   <div className="text-center"
-                        style={{
-                          maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
-                        }}>
-                     <h1
-                       className="font-bold text-xl leading-tight break-words"
+                  {/* Content column with space reserved for the overhang */}
+                  <div className="text-center"
                        style={{
-                         marginTop: 'clamp(4px, 1.2vh, 10px)'
-                       }}
-                     >
-                       {displayName}
-                     </h1>
+                         maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
+                       }}>
+                    <h1
+                      className="font-semibold leading-snug line-clamp-2"
+                      style={{
+                        fontSize: 'var(--fs-display)',
+                        marginTop: 'clamp(4px, 1.2vh, 10px)'
+                      }}
+                    >
+                      {displayName}
+                    </h1>
 
-                     <div
-                       className="opacity-70 text-sm font-medium"
-                       style={{ marginTop: '6px' }}
-                     >
-                       @{username}
-                     </div>
-                   </div>
+                    <div
+                      className="opacity-70"
+                      style={{ fontSize: 'var(--fs-handle)', marginTop: '6px' }}
+                    >
+                      @{username}
+                    </div>
+                  </div>
 
                   {/* Golf Club (left) + Handicap (centered under mini card) */}
                   <div
