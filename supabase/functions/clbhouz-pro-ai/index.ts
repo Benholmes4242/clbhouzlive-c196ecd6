@@ -179,9 +179,9 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
       }
 
-      // Add timeout for faster failure/fallback
+      // Add timeout for swing analysis - longer for detailed analysis
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s SLA for full analysis
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s for detailed swing analysis
 
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -192,10 +192,10 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
           },
           signal: controller.signal,
           body: JSON.stringify({
-            model: 'gpt-4o-mini', // Fast vision model for swing analysis
+            model: 'gpt-4o', // Use more powerful model for detailed swing analysis
             messages: messages,
-            max_tokens: 1500, // Increased for detailed phase-by-phase analysis
-            temperature: 0.2
+            max_tokens: 2000, // Increased for comprehensive analysis
+            temperature: 0.1 // Lower temperature for more consistent analysis
           }),
         });
 
@@ -237,7 +237,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         
         // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
-          console.log('🚨 API call aborted due to 20s timeout - returning quick analysis');
+          console.log('🚨 API call aborted due to 45s timeout - returning quick analysis');
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:
