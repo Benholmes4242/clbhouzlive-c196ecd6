@@ -849,10 +849,10 @@ const HeroProfileHeader = ({
                         const { first, last } = splitName(displayName);
                         return (
                           <>
-                            <span className="block text-[clamp(28px,6vw,32px)] font-normal leading-[1.1]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
                               {first}
                             </span>
-                            <span className="block text-[clamp(28px,6vw,32px)] font-normal leading-[1.1] mt-[2px]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1] mt-[2px]">
                               {last}
                             </span>
                             <span className="mt-2 text-base font-medium text-neutral-600">
