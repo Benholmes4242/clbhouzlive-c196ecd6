@@ -847,16 +847,14 @@ const HeroProfileHeader = ({
                      })()}
                    </div>
 
-                  {/* Golf Club (left) + Handicap (centered under mini card) */}
+                  {/* Golf Club (left only) */}
                   <div
-                    className="grid items-start"
+                    className="flex justify-start"
                     style={{
-                      gridTemplateColumns: '1fr 1fr var(--mini-w)',
-                      columnGap: 'clamp(12px, 4vw, 28px)',
                       marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
                     }}
                   >
-                    {/* Column 1 — Golf Club */}
+                    {/* Golf Club */}
                     <div className="text-left">
                       <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
                         Golf Club
@@ -872,24 +870,28 @@ const HeroProfileHeader = ({
                         {homeClub}
                       </div>
                     </div>
+                  </div>
 
-                    {/* Column 2 — spacer (do not render content) */}
-                    <div />
-
-                    {/* Column 3 — Handicap (centered under the mini card) */}
-                    <div className="text-center">
-                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
-                        Handicap
-                      </div>
-                      <div
-                        className="leading-snug"
-                        style={{
-                          fontSize: 'var(--fs-value)',
-                          paddingTop: '2px'
-                        }}
-                      >
-                        {handicap}
-                      </div>
+                  {/* Handicap section - positioned under mini card */}
+                  <div 
+                    className="absolute text-center"
+                    style={{
+                      top: 'calc(var(--mini-h) * 0.76 + 12px)', // Position below mini card
+                      right: '8px', // Same right alignment as mini card
+                      width: 'var(--mini-w)' // Same width as mini card
+                    }}
+                  >
+                    <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                      Handicap
+                    </div>
+                    <div
+                      className="leading-snug"
+                      style={{
+                        fontSize: 'var(--fs-value)',
+                        paddingTop: '2px'
+                      }}
+                    >
+                      {handicap}
                     </div>
                   </div>
 
