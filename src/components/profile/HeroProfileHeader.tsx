@@ -955,7 +955,7 @@ const HeroProfileHeader = ({
                             aria-controls={`tabpanel-${tab.id}`}
                             tabIndex={activeSection === tab.id ? 0 : -1}
                              className={`
-                               relative py-3 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
+                               relative py-2 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
                                ${activeSection === tab.id 
                                  ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
                                  : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
