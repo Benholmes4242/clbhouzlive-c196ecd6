@@ -849,7 +849,7 @@ const HeroProfileHeader = ({
 
                   {/* Golf Club - positioned on same line as handicap */}
                   <div 
-                    className="absolute text-left"
+                    className="absolute text-center"
                     style={{
                       top: 'calc(var(--mini-h) * 0.76 + 12px)', // Same line as handicap
                       left: '8px' // Left alignment
