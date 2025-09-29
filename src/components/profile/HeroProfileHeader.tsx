@@ -837,13 +837,13 @@ const HeroProfileHeader = ({
                    <div className="nameBlock-mobile" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                      {(() => {
                        const { first, last } = splitName(displayName);
-                       return (
-                         <>
-                           <span className="block leading-tight font-bold text-[clamp(40px,10vw,56px)]">{first}</span>
-                           <span className="block leading-tight font-bold text-[clamp(40px,10vw,56px)]">{last}</span>
-                           <div className="mt-1 text-sm text-gray-600">@{username}</div>
-                         </>
-                       );
+                        return (
+                          <>
+                            <span className="block leading-tight font-bold text-[clamp(48px,12vw,64px)]">{first}</span>
+                            <span className="block leading-tight font-bold text-[clamp(48px,12vw,64px)]">{last}</span>
+                            <div className="mt-1 text-base text-gray-600">@{username}</div>
+                          </>
+                        );
                      })()}
                    </div>
 
