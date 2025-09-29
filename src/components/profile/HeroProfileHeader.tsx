@@ -930,7 +930,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Slim Stats Row */}
-                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-4">
+                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-6">
                      <div className="flex flex-col">
                        <span className="text-lg font-bold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
