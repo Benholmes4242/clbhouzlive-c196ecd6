@@ -846,7 +846,10 @@ const HeroProfileHeader = ({
                           marginTop: 'clamp(4px, 1.2vh, 10px)',
                           wordWrap: 'break-word',
                           overflowWrap: 'break-word',
-                          hyphens: 'auto'
+                          wordBreak: 'break-word',
+                          whiteSpace: 'normal',
+                          hyphens: 'auto',
+                          maxWidth: '100%'
                         }}
                       >
                         {displayName}
