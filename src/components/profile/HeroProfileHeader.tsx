@@ -892,7 +892,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Bio section below the content column */}
-                  <div className="w-full" style={{ marginTop: 'calc(var(--mini-h) * 0.76 + 52px)' }}>
+                  <div className="w-full" style={{ marginTop: 'calc(var(--mini-h) * 0.76 + 24px)' }}>
                     <div className="text-center">
                       {profile?.bio && (
                         <p className="text-sm text-gray-700 mb-2 line-clamp-2 leading-relaxed">
