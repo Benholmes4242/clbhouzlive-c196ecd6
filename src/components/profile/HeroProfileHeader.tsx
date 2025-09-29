@@ -943,9 +943,6 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <div className="space-y-0">
-                      <hr className="m-0 border-white/10" />
-
                     {/* Tab Navigation */}
                     <nav className="w-full">
                       <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
@@ -983,7 +980,6 @@ const HeroProfileHeader = ({
                         ))}
                       </div>
                     </nav>
-                    </div>
                   </div>
 
                </div>
