@@ -943,10 +943,10 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <hr className="mt-3 border-white/10" />
+                    <hr className="mt-2 border-white/10" />
 
                     {/* Tab Navigation */}
-                    <nav className="mt-3 w-full">
+                    <nav className="mt-2 w-full">
                       <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
                         {tabs.map((tab) => (
                           <button
