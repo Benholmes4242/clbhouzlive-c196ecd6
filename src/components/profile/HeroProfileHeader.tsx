@@ -832,16 +832,16 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Content column centered between left edge and mini card */}
-                   <div className="flex flex-col items-center"
+                   {/* Content column perfectly centered between left edge and mini card */}
+                   <div className="flex flex-col items-center justify-center absolute left-0"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
-                          marginRight: 'calc(var(--mini-w) + 8px)'
+                          height: 'calc(var(--mini-h) * 0.76)'
                         }}>
                      <h1
                        className="font-bold text-xl leading-tight break-words text-center"
                        style={{
-                         marginTop: 'clamp(4px, 1.2vh, 10px)'
+                         maxWidth: '100%'
                        }}
                      >
                        {displayName}
