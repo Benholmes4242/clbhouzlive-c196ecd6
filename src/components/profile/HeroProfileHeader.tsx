@@ -1109,53 +1109,51 @@ const HeroProfileHeader = ({
                      </div>
                    </div>
 
-                   {/* Club + Handicap (left area)  ·  Spacer  ·  Handicap (under mini card) */}
-                   <div
-                     className="grid mt-3 items-start"
-                     style={{
-                       gridTemplateColumns: '1fr var(--mini-w) 1fr',
-                       columnGap: '24px'
-                     }}
-                   >
-                     {/* Golf Club */}
-                     <div className="text-left">
+                   {/* Golf Club and Handicap aligned with user name positioning (desktop/tablet only) */}
+                   <div className="mt-3 flex justify-between" 
+                        style={{
+                          width: 'calc(100% - var(--mini-w) - 8px)',
+                          marginRight: 'calc(var(--mini-w) + 8px)'
+                        }}>
+                     {/* Golf Club - centered to left side of user name */}
+                     <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Golf Club</div>
                        <div style={{ fontSize: 'var(--fs-value)' }}>{homeClub}</div>
                      </div>
 
-                     {/* Spacer under the mini card (keep empty) */}
-                     <div />
-
-                     {/* Handicap */}
+                     {/* Handicap - centered to right side of user name */}
                      <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Handicap</div>
                        <div style={{ fontSize: 'var(--fs-value)' }}>{handicap}</div>
                      </div>
                    </div>
 
-                      {/* Bio section - left exactly as is */}
-                      <div className="w-full mt-6">
-                        {/* Bio spanning full width, positioned below club/handicap */}
-                        <div className="text-center">
-                          {profile?.bio && (
-                            <p className="text-base text-gray-700 mb-3 line-clamp-3 leading-relaxed">
-                              {profile.bio}
-                            </p>
-                          )}
-                          {profile?.website && (
-                            <div className="text-center">
-                              <a 
-                                href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                              >
-                                {profile.website.replace(/^https?:\/\//, '')}
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                   {/* Bio section - centered with user name */}
+                   <div className="mt-6"
+                        style={{
+                          width: 'calc(100% - var(--mini-w) - 8px)',
+                          marginRight: 'calc(var(--mini-w) + 8px)'
+                        }}>
+                     <div className="text-center">
+                       {profile?.bio && (
+                         <p className="text-base text-gray-700 mb-3 line-clamp-3 leading-relaxed">
+                           {profile.bio}
+                         </p>
+                       )}
+                       {profile?.website && (
+                         <div className="text-center">
+                           <a 
+                             href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             className="text-base text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                           >
+                             {profile.website.replace(/^https?:\/\//, '')}
+                           </a>
+                         </div>
+                       )}
+                     </div>
+                   </div>
 
                   {/* Slim Stats Row */}
                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
