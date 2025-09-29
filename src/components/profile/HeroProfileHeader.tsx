@@ -928,15 +928,15 @@ const HeroProfileHeader = ({
                           <span className="text-lg font-bold text-gray-900">{postsCount}</span>
                           <span className="text-sm font-normal text-neutral-800/80 leading-5">Posts</span>
                         </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
+                        <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">2,500</span>
                           <span className="text-sm font-normal text-neutral-800/80 leading-5">Total XP</span>
                         </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
+                        <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{followingCount}</span>
                           <span className="text-sm font-normal text-neutral-800/80 leading-5">Following</span>
                         </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
+                        <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{followersCount}</span>
                           <span className="text-sm font-normal text-neutral-800/80 leading-5">Followers</span>
                         </button>
@@ -1160,18 +1160,18 @@ const HeroProfileHeader = ({
                        <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
                      </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-semibold text-gray-900">2,500</span>
-                       <span className="text-base font-normal text-neutral-800">Total XP</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Following</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Followers</span>
-                     </div>
+                     <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-gray-900">2,500</span>
+                        <span className="text-base font-normal text-neutral-800">Total XP</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
+                        <span className="text-base font-normal text-neutral-800">Following</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
+                        <span className="text-base font-normal text-neutral-800">Followers</span>
+                      </div>
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
