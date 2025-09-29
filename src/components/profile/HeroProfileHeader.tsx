@@ -850,7 +850,7 @@ const HeroProfileHeader = ({
                   )}
 
                   {/* Content column with space reserved for the overhang */}
-                  <div className="text-left"
+                  <div className="text-center"
                        style={{
                          maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
                        }}>
@@ -872,18 +872,18 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-                  {/* Golf Club (left) + Handicap (right) — aligned to mini card */}
+                  {/* Golf Club (left) + Handicap (centered under mini card) */}
                   <div
                     className="grid items-start"
                     style={{
-                      gridTemplateColumns: '1fr 1fr',
-                      columnGap: '24px',
+                      gridTemplateColumns: '1fr 1fr var(--mini-w)',
+                      columnGap: 'clamp(12px, 4vw, 28px)',
                       marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
                     }}
                   >
-                    {/* LEFT: Golf Club */}
+                    {/* Column 1 — Golf Club */}
                     <div className="text-left">
-                      <div className="opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
                         Golf Club
                       </div>
                       <div
@@ -898,9 +898,12 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* RIGHT: Handicap */}
-                    <div className="text-right">
-                      <div className="opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                    {/* Column 2 — spacer (do not render content) */}
+                    <div />
+
+                    {/* Column 3 — Handicap (centered under the mini card) */}
+                    <div className="text-center">
+                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
                         Handicap
                       </div>
                       <div
