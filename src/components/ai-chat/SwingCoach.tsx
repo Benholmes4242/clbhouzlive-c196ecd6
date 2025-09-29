@@ -387,6 +387,223 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     }
   };
 
+  // Helper functions for video analysis
+  const waitForEvent = (element: HTMLElement, eventName: string) => {
+    return new Promise<void>((resolve, reject) => {
+      const onEvent = () => {
+        element.removeEventListener(eventName, onEvent);
+        element.removeEventListener('error', onError);
+        resolve();
+      };
+      const onError = () => {
+        element.removeEventListener(eventName, onEvent);
+        element.removeEventListener('error', onError);
+        reject(new Error(`Video ${eventName} failed`));
+      };
+      element.addEventListener(eventName, onEvent, { once: true });
+      element.addEventListener('error', onError, { once: true });
+    });
+  };
+
+  const waitUntil = (condition: () => boolean, timeoutMs: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const startTime = Date.now();
+      const check = () => {
+        if (condition()) {
+          resolve();
+        } else if (Date.now() - startTime > timeoutMs) {
+          reject(new Error('Condition timeout'));
+        } else {
+          setTimeout(check, 50);
+        }
+      };
+      check();
+    });
+  };
+
+  const seekTo = (video: HTMLVideoElement, time: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const onSeeked = () => {
+        video.removeEventListener('seeked', onSeeked);
+        video.removeEventListener('error', onError);
+        resolve();
+      };
+      const onError = () => {
+        video.removeEventListener('seeked', onSeeked);
+        video.removeEventListener('error', onError);
+        reject(new Error('Seek failed'));
+      };
+      video.addEventListener('seeked', onSeeked, { once: true });
+      video.addEventListener('error', onError, { once: true });
+      video.currentTime = time;
+    });
+  };
+
+  const extractFramesLongClipAware = async (file: File): Promise<string[]> => {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.src = URL.createObjectURL(file);
+    
+    try {
+      await waitForEvent(video, 'loadedmetadata');
+      const duration = video.duration;
+      
+      console.log('Video loaded:', { duration, width: video.videoWidth, height: video.videoHeight });
+      
+      // If duration ≤ 9s, use current playback-capture unchanged
+      if (duration <= 9) {
+        return extractFramesViaPlayback(file);
+      }
+      
+      // For longer clips, find swing window via motion detection
+      setAnalysisStatus('Finding swing in video...');
+      
+      // Quick auto-detect pass (≤6s budget)
+      const tinyCanvas = document.createElement('canvas');
+      const ctx = tinyCanvas.getContext('2d')!;
+      tinyCanvas.width = 64;
+      tinyCanvas.height = 64;
+      
+      let tPeak: number | null = null;
+      let lastFrame: Uint8ClampedArray | null = null;
+      const startScan = performance.now();
+      
+      video.playbackRate = 4.0;
+      const scanDone = new Promise<void>((resolve) => {
+        const loop = (_: number, meta: any) => {
+          // Stop if we've used ~6s wall time
+          if (performance.now() - startScan > 6000) {
+            resolve();
+            return;
+          }
+          
+          // Draw tiny frame & compute motion score
+          ctx.drawImage(video, 0, 0, tinyCanvas.width, tinyCanvas.height);
+          const d = ctx.getImageData(0, 0, tinyCanvas.width, tinyCanvas.height).data;
+          
+          if (lastFrame) {
+            let diff = 0;
+            for (let i = 0; i < d.length; i += 4) {
+              // Simple luma diff; cheap & good enough
+              const luma = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+              const lumaPrev = lastFrame[i]; // We store luma in red channel slot below
+              diff += Math.abs(luma - lumaPrev);
+              d[i] = luma; // Pack luma back for next frame
+            }
+            // Heuristic: large/sustained diff → swing
+            if (diff > 64000) { // Tune threshold once
+              tPeak = meta.mediaTime;
+              resolve();
+              return;
+            }
+          } else {
+            // Seed lastFrame with luma in red channel
+            for (let i = 0; i < d.length; i += 4) {
+              const luma = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+              d[i] = luma; // Stash luma in R
+            }
+          }
+          lastFrame = d;
+          
+          if (!video.ended && 'requestVideoFrameCallback' in (video as any)) {
+            (video as any).requestVideoFrameCallback(loop);
+          } else {
+            resolve();
+          }
+        };
+        
+        if ('requestVideoFrameCallback' in (video as any)) {
+          (video as any).requestVideoFrameCallback(loop);
+        } else {
+          resolve(); // Fallback if RVFC not supported
+        }
+      });
+      
+      await video.play();
+      await scanDone;
+      video.pause();
+      
+      // Define 3.0s analysis window
+      const windowLen = 3.0;
+      let windowStart = tPeak != null
+        ? Math.max(0, Math.min(duration - windowLen, tPeak - 1.2))
+        : Math.max(0, (duration / 2) - (windowLen / 2));
+      const windowEnd = windowStart + windowLen;
+      
+      console.log('Swing window detected:', { 
+        peakAt: tPeak, 
+        windowStart, 
+        windowEnd, 
+        method: tPeak ? 'motion_peak' : 'center_fallback' 
+      });
+      
+      setAnalysisStatus('Extracting swing frames...');
+      
+      // Single seek to windowStart, then normal-speed capture
+      await seekTo(video, windowStart);
+      video.playbackRate = 1.0;
+      
+      const targetPercents = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95];
+      const targets = targetPercents.map(p => windowStart + p * (windowEnd - windowStart));
+      
+      const frames: string[] = [];
+      const canvas = document.createElement('canvas');
+      const c2d = canvas.getContext('2d')!;
+      const maxW = 512;
+      const w = Math.min(video.videoWidth, maxW);
+      const h = Math.round((w / video.videoWidth) * video.videoHeight);
+      canvas.width = w;
+      canvas.height = h;
+      
+      let nextIdx = 0;
+      const captureLoop = (_: number, meta: any) => {
+        // Capture when we pass a target
+        while (nextIdx < targets.length && meta.mediaTime >= targets[nextIdx]) {
+          c2d.drawImage(video, 0, 0, w, h);
+          frames.push(canvas.toDataURL('image/jpeg', 0.65));
+          console.log(`Captured swing frame ${nextIdx + 1}/${targets.length} at ${meta.mediaTime.toFixed(2)}s`);
+          nextIdx++;
+        }
+        
+        if (nextIdx < targets.length && !video.ended) {
+          (video as any).requestVideoFrameCallback(captureLoop);
+        }
+      };
+      
+      if ('requestVideoFrameCallback' in (video as any)) {
+        (video as any).requestVideoFrameCallback(captureLoop);
+      }
+      
+      await video.play();
+      
+      // Stop after the window (safety)
+      await waitUntil(() => nextIdx >= targets.length || video.currentTime >= windowEnd + 0.2, 5000);
+      video.pause();
+      
+      // Graceful partial success if needed
+      if (frames.length >= 4) {
+        console.info('[SC] long_clip_capture', {
+          frames: frames.length,
+          targets: 8,
+          duration: duration,
+          window: [windowStart, windowEnd],
+          peakDetected: !!tPeak
+        });
+        
+        return frames;
+      }
+      
+      // Fallback: try short clip extraction on middle section
+      console.warn('[SC] long_clip_fallback', { capturedFrames: frames.length });
+      throw new Error('Insufficient frames from long clip analysis');
+      
+    } finally {
+      URL.revokeObjectURL(video.src);
+    }
+  };
+
   const extractFramesViaPlayback = async (file: File): Promise<string[]> => {
     return new Promise<string[]>(async (resolve, reject) => {
       const video = document.createElement('video') as HTMLVideoElement;
@@ -576,7 +793,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             });
           }
           setAnalysisStatus('Extracting frames...');
-          extractedFrames = await extractFramesViaPlayback(uploadedVideo);
+          extractedFrames = await extractFramesLongClipAware(uploadedVideo);
           setExtractedFrames(extractedFrames);
           if (extractedFrames.length === 0) {
             throw new Error("Couldn't extract frames from video");
@@ -690,7 +907,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         
         // Try once more
         if (uploadedVideo.type.startsWith('video/')) {
-          extractedFrames = await extractFramesViaPlayback(uploadedVideo);
+          extractedFrames = await extractFramesLongClipAware(uploadedVideo);
         }
         
         if (extractedFrames.length === 0) {
