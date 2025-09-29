@@ -834,7 +834,7 @@ const HeroProfileHeader = ({
 
 
                    {/* Name block (mobile): always 2 lines, centered */}
-                   <div className="nameBlock-mobile">
+                   <div className="nameBlock-mobile" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                      {(() => {
                        const { first, last } = splitName(displayName);
                        return (
