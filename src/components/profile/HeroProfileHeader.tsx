@@ -833,74 +833,82 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Name block (mobile): always 2 lines, centered */}
-                   <div className="nameBlock-mobile" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
-                     {(() => {
-                       const { first, last } = splitName(displayName);
+                  {/* MOBILE: glass content layout with grid */}
+                  <div
+                    className="
+                      grid
+                      grid-cols-[1fr,8px,var(--mini-w)]
+                      auto-rows-auto
+                      gap-y-4
+                    "
+                    style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}
+                  >
+                    {/* NAME + HANDLE (left column, centered) */}
+                    <div className="col-[1] row-[1] flex flex-col items-center text-center">
+                      {(() => {
+                        const { first, last } = splitName(displayName);
                         return (
                           <>
-                            <span className="block leading-tight font-bold text-[clamp(48px,12vw,64px)]">{first}</span>
-                            <span className="block leading-tight font-bold text-[clamp(48px,12vw,64px)]">{last}</span>
-                            <div className="mt-1 text-base text-gray-600">@{username}</div>
+                            <span className="block font-extrabold leading-tight text-[clamp(26px,6.2vw,34px)]">
+                              {first}
+                            </span>
+                            <span className="block font-extrabold leading-tight text-[clamp(26px,6.2vw,34px)] mt-1">
+                              {last}
+                            </span>
+                            <span className="mt-2 text-[clamp(14px,3.5vw,16px)] text-neutral-600">
+                              @{username}
+                            </span>
                           </>
                         );
-                     })()}
-                   </div>
+                      })()}
+                    </div>
 
-                  {/* Golf Club - positioned on same line as handicap */}
-                  <div 
-                    className="absolute text-center"
-                    style={{
-                      top: 'calc(var(--mini-h) * 0.76 + 12px)', // Same line as handicap
-                      left: '8px' // Left alignment
-                    }}
-                  >
-                    <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
-                      Golf Club
+                    {/* TITLES ROW (golf club & handicap on the SAME line) */}
+                    <div className="col-[1] row-[2] flex justify-center">
+                      <div className="text-[clamp(12px,3.2vw,14px)] font-semibold">Golf Club</div>
                     </div>
-                    <div
-                      className="leading-snug text-sm text-gray-700"
-                      style={{
-                        display: 'inline-block',
-                        maxWidth: 'min(100%, 26ch)'
-                      }}
-                    >
-                      {homeClub}
+                    <div className="col-[3] row-[2] flex justify-center">
+                      <div className="text-[clamp(12px,3.2vw,14px)] font-semibold">Handicap</div>
                     </div>
-                  </div>
 
-                  {/* Handicap section - positioned under mini card */}
-                  <div 
-                    className="absolute text-center"
-                    style={{
-                      top: 'calc(var(--mini-h) * 0.76 + 12px)', // Position below mini card
-                      right: '8px', // Same right alignment as mini card
-                      width: 'var(--mini-w)' // Same width as mini card
-                    }}
-                  >
-                    <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
-                      Handicap
+                    {/* VALUES ROW */}
+                    <div className="col-[1] row-[3] flex justify-center">
+                      <div
+                        className="
+                          text-[clamp(17px,4.2vw,20px)]
+                          leading-[1.15]
+                          font-normal
+                          text-center
+                          max-w-[22ch]
+                          break-words
+                        "
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {homeClub}
+                      </div>
                     </div>
-                    <div
-                      className="leading-snug text-sm text-gray-700"
-                      style={{
-                        paddingTop: 0
-                      }}
-                    >
-                      {handicap}
-                    </div>
-                  </div>
 
-                  {/* Bio section below the content column */}
-                  <div className="w-full" style={{ marginTop: 0 }}>
-                    <div className="text-center">
+                    <div className="col-[3] row-[3] flex justify-center">
+                      <div className="text-[clamp(20px,5vw,26px)] leading-none font-semibold">
+                        {handicap ?? '—'}
+                      </div>
+                    </div>
+
+                    {/* BIO — sits directly UNDER the values row */}
+                    <div className="col-[1_/_span_3] row-[4] mt-6">
+                      {/* mt-6 = 24px exact gap */}
                       {profile?.bio && (
-                        <p className="text-sm text-gray-700 mb-2 line-clamp-2 leading-relaxed">
+                        <p className="m-0 text-[clamp(14px,3.6vw,16px)] text-center text-neutral-800">
                           {profile.bio}
                         </p>
                       )}
                       {profile?.website && (
-                        <div className="text-center">
+                        <div className="text-center mt-2">
                           <a 
                             href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
                             target="_blank"
