@@ -833,22 +833,27 @@ const HeroProfileHeader = ({
 
 
                    {/* Content column centered between left edge and mini card */}
-                   <div className="flex flex-col items-center"
+                   <div className="flex flex-col items-center justify-center"
                         style={{
-                          width: 'calc(100% - var(--mini-w) - 8px)',
-                          marginRight: 'calc(var(--mini-w) + 8px)'
+                          width: 'calc(100% - var(--mini-w) - 16px)',
+                          marginRight: 'calc(var(--mini-w) + 16px)',
+                          paddingLeft: '8px',
+                          paddingRight: '8px'
                         }}>
                      <h1
-                       className="font-bold text-xl leading-tight break-words text-center"
+                       className="font-bold text-2xl leading-tight break-words text-center"
                        style={{
-                         marginTop: 'clamp(4px, 1.2vh, 10px)'
+                         marginTop: 'clamp(4px, 1.2vh, 10px)',
+                         wordWrap: 'break-word',
+                         overflowWrap: 'break-word',
+                         hyphens: 'auto'
                        }}
                      >
                        {displayName}
                      </h1>
 
                      <div
-                       className="opacity-70 text-sm font-medium text-center"
+                       className="opacity-70 text-base font-medium text-center"
                        style={{ marginTop: '6px' }}
                      >
                        @{username}
