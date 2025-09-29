@@ -32,6 +32,17 @@ html, body {
   --safe-right: 0px;
 }
 
+/* Exclusion padding to center content within left area */
+:root { 
+  --mini-w: 132px; 
+}
+
+@media (max-width: 430px) {
+  .exclude-mini { 
+    padding-right: calc(var(--mini-w) + 12px); 
+  }
+}
+
 /* Mobile-only name block centering */
 @media (max-width: 768px) {
   /* The mini card sits at right: 8px with width var(--mini-w) inside the glass panel.

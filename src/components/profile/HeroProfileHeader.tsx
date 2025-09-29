@@ -808,11 +808,12 @@ const HeroProfileHeader = ({
                    {/* Overhanging mini profile card */}
                     <div
                       className="absolute overflow-hidden rounded-xl border border-white/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
-                     style={{
+                      style={{
                        top: 'calc(var(--mini-h) * -0.24)',   // 24% overhang
                        right: '8px',                         // anchor 8px from right
                        width: 'var(--mini-w)',
-                       height: 'var(--mini-h)'
+                       height: 'var(--mini-h)',
+                       pointerEvents: 'none'
                      }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
@@ -839,7 +840,7 @@ const HeroProfileHeader = ({
                   {/* MOBILE: glass content layout with vertical stack */}
                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                     {/* Name + handle */}
-                    <div className="flex flex-col gap-y-2 items-center text-center mt-2">
+                    <div className="exclude-mini flex flex-col gap-y-2 items-center text-center mt-2">
                       {(() => {
                         const { first, last } = splitName(displayName);
                         return (
@@ -883,7 +884,7 @@ const HeroProfileHeader = ({
                           {homeClub}
                         </div>
                       </div>
-                      <div className="flex flex-col gap-y-1">
+                      <div className="flex flex-col gap-y-1 mt-2">
                         <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Handicap</span>
                         <div className="text-base leading-6 font-normal text-center text-neutral-900">
                           {handicap ?? '—'}
@@ -941,11 +942,11 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <hr className="border-white/10" />
+                    <hr className="mt-3 border-white/10" />
 
                     {/* Tab Navigation */}
-                    <nav className="flex items-center gap-4 py-2">
-                      <div className="flex" role="tablist" aria-label="Profile sections">
+                    <nav className="mt-3 w-full">
+                      <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
                         {tabs.map((tab) => (
                           <button
                             key={tab.id}
