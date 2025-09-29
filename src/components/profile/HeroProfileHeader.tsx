@@ -950,7 +950,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 pt-4">
+                  <div className="w-full border-t border-gray-300 mt-6 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
