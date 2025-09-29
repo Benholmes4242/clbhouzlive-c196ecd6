@@ -1091,22 +1091,29 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Name + handle block, perfectly centered between glass edge and mini card */}
+                   {/* Name lane - perfectly centered between glass inner left and mini card left */}
                    <div
-                     className="relative"
+                     className="text-center"
                      style={{
-                       width: 'calc(100% - var(--mini-w) - 8px)',
-                       marginRight: 'calc(var(--mini-w) + 8px)'
+                       marginLeft: 'var(--panel-pad-x)',
+                       width: 'calc(100% - (var(--panel-pad-x) * 2) - var(--mini-w) - 8px)'
                      }}
                    >
-                     <div className="mx-auto text-center">
-                       <h1 className="font-semibold leading-tight"
-                           style={{ fontSize: 'var(--fs-display)' }}>
-                         {displayName}
-                       </h1>
-                       <div className="opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
-                         @{username}
-                       </div>
+                     {(() => {
+                       // Split display name into first and last for forced two-line layout
+                       const parts = (displayName || '').trim().split(/\s+/);
+                       const firstName = parts[0] || '';
+                       const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+                       
+                       return (
+                         <h1 className="leading-tight font-semibold" style={{ fontSize: 'var(--fs-display)' }}>
+                           <span className="block">{firstName}</span>
+                           {lastName && <span className="block">{lastName}</span>}
+                         </h1>
+                       );
+                     })()}
+                     <div className="mt-1 opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
+                       @{username}
                      </div>
                    </div>
 
